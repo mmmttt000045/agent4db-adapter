@@ -1,0 +1,5 @@
+/target
+build.log
+.env
+# 本机专用：zig 链接器的绝对路径配置
+.cargo/

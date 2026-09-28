@@ -47,6 +47,14 @@ impl Check {
         }
     }
 
+    /// 反馈统计的上下文：键唯一性看被检查的表，另两种看关联方向（左表>右表）。
+    pub fn context(&self) -> String {
+        match self {
+            Check::KeyUnique { table, .. } => table.clone(),
+            Check::SampleFanout { left, right, .. } | Check::RowConservation { left, right, .. } => format!("{left}>{right}"),
+        }
+    }
+
     /// 本检查大致要扫的行数（给反馈模块估代价用）。
     pub fn rows_touched(&self, rows: &dyn Fn(&str) -> f64) -> f64 {
         match self {

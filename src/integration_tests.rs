@@ -4,7 +4,7 @@
 use crate::db::{Db, QKind};
 use crate::llm::Provider;
 use crate::middle::{Middle, MiddleConfig};
-use crate::optimizer::Optimizer;
+use crate::optimizer::{Gate, Optimizer};
 use crate::{etl, server};
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
@@ -29,7 +29,9 @@ async fn exercise(url: &str, out: &str) -> Result<Value> {
     etl::setup(&admin).await?;
     let db = Arc::new(Db::connect(url, 4, true)?);
     let mid = Arc::new(Middle::new(db.clone(), MiddleConfig { version_ttl_ms: 0, ..Default::default() }).await?);
-    let optimizer = Arc::new(Optimizer::new(Provider::Mock, out)?);
+    // The fixture only has valid joins, so no audited failures exist for replay; this test covers the
+    // management lifecycle, while the replay gate itself is unit-tested in optimizer/feedback.
+    let optimizer = Arc::new(Optimizer::with_gate(Provider::Mock, out, Gate::NoRegression)?);
     // Reserve an ephemeral address briefly; report a binding failure through readiness timeout.
     let listener = std::net::TcpListener::bind("127.0.0.1:0")?;
     let addr = listener.local_addr()?;

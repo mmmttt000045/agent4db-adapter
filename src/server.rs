@@ -118,6 +118,12 @@ pub async fn serve(
                 let mut last_runs = 0;
                 loop {
                     interval.tick().await;
+                    // 先看已应用策略在新证据上是否退化，再决定是否生成新建议。
+                    match management.optimizer.watch(&management.mid.fb) {
+                        Ok(Some(event)) => eprintln!("回放显示当前策略退化，已自动回滚：{}", event["replay"]),
+                        Ok(None) => {}
+                        Err(e) => eprintln!("退化监测失败，原策略保持：{e:#}"),
+                    }
                     let runs: u64 = management.mid.fb.snapshot().values().map(|s| s.runs).sum();
                     if runs == last_runs {
                         continue;

@@ -69,6 +69,9 @@ enum Cmd {
         /// 定期生成的建议通过校验后自动应用；默认只生成建议
         #[arg(long, requires = "optimizer_interval_secs")]
         optimizer_auto_apply: bool,
+        /// 策略采纳门槛：improvement 需回放证明更省；no-regression 只拒绝回放显著变差；off 只做格式校验且不自动回滚
+        #[arg(long, value_enum, default_value_t = optimizer::Gate::Improvement)]
+        optimizer_gate: optimizer::Gate,
     },
     /// 按 PPT 故事线演示一遍
     Demo,
@@ -166,9 +169,9 @@ async fn main() -> Result<()> {
                 _ => anyhow::bail!("未知动作 {action}（apply-v2 / reset / status）"),
             }
         }
-        Cmd::Serve { addr, optimizer_provider, optimizer_interval_secs, optimizer_auto_apply } => {
+        Cmd::Serve { addr, optimizer_provider, optimizer_interval_secs, optimizer_auto_apply, optimizer_gate } => {
             let optimizer = optimizer_provider
-                .map(|kind| optimizer::Optimizer::new(llm::Provider::from_env(&kind)?, &cli.out).map(Arc::new))
+                .map(|kind| optimizer::Optimizer::with_gate(llm::Provider::from_env(&kind)?, &cli.out, optimizer_gate).map(Arc::new))
                 .transpose()?;
             etl::setup(&admin).await?;
             let mid = Arc::new(Middle::new(db, MiddleConfig { verbose: true, ..Default::default() }).await?);
@@ -231,6 +234,7 @@ mod tests {
             vec!["app", "etl", "typo"],
             vec!["app", "serve", "--optimizer-auto-apply"],
             vec!["app", "serve", "--optimizer-interval-secs", "300"],
+            vec!["app", "serve", "--optimizer-provider", "mock", "--optimizer-gate", "typo"],
         ] {
             assert!(Cli::try_parse_from(&args).is_err(), "{args:?}");
         }
@@ -254,5 +258,8 @@ mod tests {
             "--optimizer-auto-apply"
         ])
         .is_ok());
+        for gate in ["off", "no-regression", "improvement"] {
+            assert!(Cli::try_parse_from(["app", "serve", "--optimizer-provider", "mock", "--optimizer-gate", gate]).is_ok());
+        }
     }
 }

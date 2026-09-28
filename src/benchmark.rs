@@ -266,9 +266,10 @@ async fn trial(url: &str, admin: &Db, o: &Options, pool: usize, mode: &str, outp
     let optimizer =
         if mode == "mock-managed" { Some(Optimizer::new(Provider::Mock, &format!("{out}/round-{round}-{mode}"))?) } else { None };
     let mut decisions = vec![];
+    // A replay-gate rejection is a recorded decision, not an experiment failure.
     if let Some(manager) = &optimizer {
         let p = manager.propose(&mid.fb).await?;
-        decisions.push(json!({"phase":"after-training","proposal":p,"apply":manager.apply(p.id,&mid.fb)?}));
+        decisions.push(json!({"phase":"after-training","proposal":p,"apply":manager.apply(p.id,&mid.fb).map_err(|e|format!("{e:#}"))}));
     }
     let training = json!({"stats":mid.stats_json(),"check_traces":mid.take_check_traces()});
     let v1 = phase(mid.clone(), o, false, gold.clone()).await?;
@@ -281,8 +282,11 @@ async fn trial(url: &str, admin: &Db, o: &Options, pool: usize, mode: &str, outp
     let drift = json!({"inserted_rows":inserted,"unfiltered_amount":unfiltered,"inflation_percent":(unfiltered/gold[8]-1.0)*100.0,"repair":repair,"wall_seconds":drift_start.elapsed().as_secs_f64(),"check_traces":mid.take_check_traces(),
         "database":sim::diff(&drift_before,&mid.db.meter.snap()),"etl_notification":true});
     if let Some(manager) = &optimizer {
+        let watch = manager.watch(&mid.fb).map_err(|e| format!("{e:#}"));
         let p = manager.propose(&mid.fb).await?;
-        decisions.push(json!({"phase":"after-drift","proposal":p,"apply":manager.apply(p.id,&mid.fb)?}));
+        decisions.push(
+            json!({"phase":"after-drift","watch":watch,"proposal":p,"apply":manager.apply(p.id,&mid.fb).map_err(|e|format!("{e:#}"))}),
+        );
     }
     let v2 = phase(mid.clone(), o, true, gold).await?;
     Ok(json!({"round":round,"mode":mode,"training":training,"v1":v1,"drift":drift,"v2":v2,
@@ -391,12 +395,16 @@ fn markdown(report: &Value) -> String {
         }
     }
     text.push_str("\n## 如何解释\n\n- fixed、feedback、mock-managed 共用缓存、在途合并和守护；仅检查排序策略不同。不能把共享缓存收益归因于模型。\n- Agent 为并发脚本，不是真实推理模型。直接调用与 HTTP 相同的工具调度，不包含 HTTP、模型网络耗时或 token 成本。\n- 所有组使用相同数据与任务序列，轮换执行顺序；没有清空操作系统缓存。反馈审计存在未固定种子的随机性。\n- v1/v2 表格只含混合负载；训练、ETL 通知、重验修复和策略应用独立记录在 JSON 中。\n- JSON 的 scenarios 与 events 记录每次输入、预期、实际结果、耗时与拒绝理由；决策记录含原始反馈。\n- 多数请求可复用经验，因此排序策略可能没有稳定优势。比较多轮分布，不凭单次毫秒差得出提升结论。\n");
-    text.push_str("\n## 决策依据（mock 可逐项复算）\n\n分数 = ((失败次数 + 1) / (执行次数 + 2)) / (平均耗时 ms + 1)，按分数降序。平滑概率不等于真实错误率；真实模型的推理也不等于此公式。\n\n");
+    text.push_str("\n## 决策依据（mock 可逐项复算）\n\n分数 = ((失败次数 + 1) / (执行次数 + 2)) / (平均耗时 ms + 1)，按分数降序。平滑概率不等于真实错误率；真实模型的推理也不等于此公式。建议还须通过回放门槛（默认 improvement：被审计失败候选上显著比默认顺序更省）才会应用。\n\n");
     for run in report["runs"].as_array().unwrap().iter().filter(|r| r["mode"] == "mock-managed") {
         for decision in run["decisions"].as_array().unwrap() {
             let p = &decision["proposal"];
+            let applied = match decision["apply"]["Err"].as_str() {
+                Some(reason) => format!("未应用：{reason}"),
+                None => "已应用".to_string(),
+            };
             text.push_str(&format!(
-                "### 第 {} 轮 / {}\n\n排序：`{}`\n\n|检查|样本|失败|平均 ms|平滑失败概率|分数|\n|---|---:|---:|---:|---:|---:|\n",
+                "### 第 {} 轮 / {}\n\n排序：`{}`；{applied}\n\n|检查|样本|失败|平均 ms|平滑失败概率|分数|\n|---|---:|---:|---:|---:|---:|\n",
                 run["round"],
                 decision["phase"].as_str().unwrap(),
                 p["policy"]["check_order"]

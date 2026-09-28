@@ -3,12 +3,13 @@
 //! 三个机制：
 //! - 共享：探查 / 检查 / 关联知识存进经验库，按作用域（任务 / 会话 / Agent / 全局）复用；并发相同请求在途合并。
 //! - 守护：每条经验绑定依赖表的版本；依赖变化时先重跑守卫（验证时成立的不变量），失败即撤销、通知使用者并修复。
-//! - 反馈：检查顺序按历史“发现问题的概率 / 代价”调整；被证伪的关联写法不再重试，Agent 提交的 SQL 用到时直接拦下。
+//! - 反馈：检查顺序按“发现问题的概率 / 共享摊销后的代价”调整，回放证据显示更省才采纳，且重排不改变验证结论；
+//!   被证伪的关联写法不再重试，Agent 提交的 SQL 用到时直接拦下。
 
 use crate::catalog::{self, Catalog, TableVersion};
 use crate::checks::{flip, fmt_on, same_on, Check, On, Outcome};
 use crate::db::{lit, Db, QKind};
-use crate::feedback::{Feedback, AUDIT_RATE};
+use crate::feedback::{Feedback, Obs, AUDIT_RATE};
 use crate::flight::Flight;
 use crate::knowledge::{BadPath, Content, Entry, JoinPath, Status, Store};
 use crate::sqlscan;
@@ -272,7 +273,7 @@ impl Middle {
             "knowledge_hits": g(&s.hits), "knowledge_misses": g(&s.misses), "inflight_merged": self.merged(),
             "guard_runs": g(&s.guard_runs), "guard_fails": g(&s.guard_fails), "revocations": g(&s.revocations),
             "repairs": g(&s.repairs), "sql_rejections": g(&s.rejections), "notices": g(&s.notices),
-            "entries": self.store.len(), "feedback": self.fb.snapshot(), "db": self.db.meter.snap(),
+            "entries": self.store.len(), "feedback": self.fb.report(), "db": self.db.meter.snap(),
         })
     }
 
@@ -431,16 +432,25 @@ impl Middle {
         Ok((o, merged))
     }
 
-    /// 先查经验库里的检查结果，没有再执行。
-    async fn run_check(&self, ctx: &Ctx, c: &Check) -> Result<Outcome> {
+    /// 经验库里是否已有该检查的有效结果。只读探测，不跑守卫；排序时把它视为零代价，真正使用仍经过 `lookup`。
+    fn cached(&self, ctx: &Ctx, c: &Check) -> bool {
+        self.store.get(&self.fk(ctx, &format!("check:{}", c.key()))).is_some_and(|e| e.status == Status::Valid)
+    }
+
+    /// 先查经验库里的检查结果，没有再执行。返回结果，以及本次是否实际访问了数据库（复用与合并都不算）。
+    async fn run_check(&self, ctx: &Ctx, c: &Check) -> Result<(Outcome, bool)> {
         if let Lookup::Hit(e) = self.lookup(ctx, &format!("check:{}", c.key())).await? {
             if let Content::CheckResult { outcome, .. } = e.content {
+                self.fb.record_reuse(c);
                 self.trace(ctx, json!({"event":"check","check":c,"source":"reused","outcome":outcome}));
                 self.log(ctx, format!("复用检查「{}」", c.describe()));
-                return Ok(outcome);
+                return Ok((outcome, false));
             }
         }
         let (o, merged) = self.exec_check(ctx, c, QKind::Check).await?;
+        if merged {
+            self.fb.record_reuse(c);
+        }
         self.log(
             ctx,
             format!(
@@ -451,7 +461,7 @@ impl Middle {
                 o.ms
             ),
         );
-        Ok(o)
+        Ok((o, !merged))
     }
 
     // ───────────────────────── 工具：表 ─────────────────────────
@@ -618,59 +628,98 @@ impl Middle {
         'retry: loop {
             let lf = filters.get(left).cloned();
             let rf = filters.get(right).cloned();
+            let key_check = Check::KeyUnique { table: right.into(), cols: rcols.clone(), filter: rf.clone() };
             let checks = vec![
-                Check::KeyUnique { table: right.into(), cols: rcols.clone(), filter: rf.clone() },
+                key_check.clone(),
                 Check::RowConservation { left: left.into(), right: right.into(), on: on.clone(), lf: lf.clone(), rf: rf.clone() },
                 Check::SampleFanout { left: left.into(), right: right.into(), on: on.clone(), lf: lf.clone(), rf: rf.clone(), n: 1000 },
             ];
-            let ordered = self.fb.order(self.cfg.feedback, checks, &self.rows());
+            let rows = self.rows();
+            let ordered = self.fb.order(self.cfg.feedback, checks, &rows, &|c: &Check| self.cached(ctx, c));
             self.trace(
                 ctx,
                 json!({"event":"planned_order","left":left,"right":right,"checks":ordered.iter().map(Check::kind).collect::<Vec<_>>()}),
             );
+            let mut seen: Vec<Obs> = vec![];
+            let mut key_outcome: Option<Outcome> = None;
             let mut rc: Option<Outcome> = None;
+            let mut failed: Option<(Check, Outcome)> = None;
+            let mut audited = false;
             for (idx, c) in ordered.iter().enumerate() {
-                let o = self.run_check(ctx, c).await?;
-                if !o.pass {
-                    // 反馈的无偏性：排在后面的检查只见过“前面都通过”的候选，永远学不到它们也能发现问题。
-                    // 以小概率把剩余检查也跑完（审计），代价照常计入。
-                    let audit = match self.cfg.audit_seed {
-                        Some(seed) => audit_candidate(seed, &serde_json::to_string(&(left, right, on, &filters))?),
-                        None => rand::random::<f64>() < AUDIT_RATE,
-                    };
-                    if self.cfg.feedback && audit {
-                        for rest in &ordered[idx + 1..] {
-                            self.exec_check(ctx, rest, QKind::Check).await?;
+                let (o, executed) = self.run_check(ctx, c).await?;
+                seen.push(Obs::new(c, &o, executed, &rows));
+                if *c == key_check {
+                    key_outcome = Some(o.clone());
+                }
+                if o.pass {
+                    if matches!(c, Check::RowConservation { .. }) {
+                        rc = Some(o);
+                    }
+                    continue;
+                }
+                // 反馈的无偏性：排在后面的检查只见过“前面都通过”的候选，永远学不到它们也能发现问题。
+                // 以小概率把剩余检查也跑完（审计），代价照常计入。是否审计只取决于候选，与顺序和结果无关，
+                // 所以被审计的失败候选是回放其他顺序的无偏样本。
+                let audit = match self.cfg.audit_seed {
+                    Some(seed) => audit_candidate(seed, &serde_json::to_string(&(left, right, on, &filters))?),
+                    None => rand::random::<f64>() < AUDIT_RATE,
+                };
+                if self.cfg.feedback && audit {
+                    audited = true;
+                    for rest in &ordered[idx + 1..] {
+                        let (ro, merged) = self.exec_check(ctx, rest, QKind::Check).await?;
+                        seen.push(Obs::new(rest, &ro, !merged, &rows));
+                        if *rest == key_check {
+                            key_outcome = Some(ro);
                         }
                     }
-                    if let Check::KeyUnique { table, cols, .. } = c {
-                        let avg = metric(&o, "avg_mult");
-                        if avg > 1.0 && avg < 1.5 && tried_repair.insert(table.clone()) {
-                            if let Some(f) = self.repair_grain(ctx, table, cols).await? {
-                                filters.insert(table.clone(), f);
-                                continue 'retry;
-                            }
-                        }
-                    }
-                    return Ok(Err(BadPath {
-                        left: left.into(),
-                        right: right.into(),
-                        on: on.clone(),
-                        reason: format!("{}：{}", c.describe(), outcome_text(c, &o)),
-                        fanout: fanout_of(c, &o),
-                    }));
                 }
-                if matches!(c, Check::RowConservation { .. }) {
-                    rc = Some(o);
-                }
+                failed = Some((c.clone(), o));
+                break;
             }
+            if let Some((c, o)) = failed {
+                // 重排不改变结论：抽样扇出、行数守恒失败都蕴含右侧键不唯一，但是否修复粒度要看键唯一性的平均倍数。
+                // 其他检查先失败时补查键唯一性（常可复用），因此修复与判定和默认顺序一致。
+                let probe_key = !tried_repair.contains(right);
+                let probed = key_outcome.is_none() && probe_key;
+                if probed {
+                    key_outcome = Some(self.run_check(ctx, &key_check).await?.0);
+                }
+                self.trace(
+                    ctx,
+                    json!({"event":"validation_failed","left":left,"right":right,"first_failed":c.kind(),"audited":audited,"key_probe":probed}),
+                );
+                self.fb.episode(seen, audited, probe_key);
+                if let Some(ko) = key_outcome.as_ref().filter(|ko| !ko.pass) {
+                    let avg = metric(ko, "avg_mult");
+                    if avg > 1.0 && avg < 1.5 && tried_repair.insert(right.to_string()) {
+                        if let Some(f) = self.repair_grain(ctx, right, &rcols).await? {
+                            filters.insert(right.to_string(), f);
+                            continue 'retry;
+                        }
+                    }
+                }
+                // 反例说明优先取键唯一性的结果，不同顺序给出同样的诊断
+                let (c, o) = match key_outcome {
+                    Some(ko) if !ko.pass => (key_check, ko),
+                    _ => (c, o),
+                };
+                return Ok(Err(BadPath {
+                    left: left.into(),
+                    right: right.into(),
+                    on: on.clone(),
+                    reason: format!("{}：{}", c.describe(), outcome_text(&c, &o)),
+                    fanout: fanout_of(&c, &o),
+                }));
+            }
+            self.fb.episode(seen, audited, false);
             let rc = rc.ok_or_else(|| anyhow!("缺少行数守恒检查"))?;
             let (n_left, n_right, n_join) = (metric(&rc, "n_left") as i64, metric(&rc, "n_right") as i64, metric(&rc, "n_join") as i64);
             // 基数：若关联行数不超过右表行数，左侧也可能唯一（1:1），需要确认——它会成为守卫
             let mut left_unique = false;
             if n_join <= n_right {
                 let c = Check::KeyUnique { table: left.into(), cols: lcols.clone(), filter: lf.clone() };
-                let o = self.run_check(ctx, &c).await?;
+                let (o, _) = self.run_check(ctx, &c).await?;
                 left_unique = o.pass;
                 let avg = metric(&o, "avg_mult");
                 if !o.pass && avg > 1.0 && avg < 1.5 && tried_repair.insert(left.to_string()) {

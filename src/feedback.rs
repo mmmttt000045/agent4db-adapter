@@ -1,11 +1,18 @@
-//! 反馈：根据历史执行记录调整检查顺序。
-//! 目标是“出问题时尽早停下”：按 P(发现问题) / 预计代价 从大到小排（顺序检验的经典最优规则）。
-//! 正常数据上所有检查一项不少，所以只省失败路径上的代价，不降低正确性要求。
+//! 反馈：根据执行记录调整关联检查的顺序，并用回放证据决定是否采纳。
+//!
+//! 目标是“出问题时尽早停下”：按 P(发现问题) / 预计代价 从大到小排（顺序检验的经典规则）。
+//! 三种检查在同一候选上是蕴含关系：抽样扇出或行数守恒失败，右侧键必然不唯一。调用方据此
+//! 保证重排不改变验证结论（见 `Middle::validate`），这里只决定为同一结论花多少数据库代价。
+//!
+//! 自适应顺序不会直接生效。被审计的失败候选（三项检查结果全知，抽样与顺序无关）可以离线
+//! 回放任意顺序的代价；只有回放显示比默认顺序显著更省时才采纳，证据增加后重新评估。
+//! 模型策略的采纳门槛与退化回滚也使用同一个评估器（见 `optimizer`）。
 
 use crate::checks::{Check, Outcome};
 use parking_lot::Mutex;
 use serde::Serialize;
-use std::collections::BTreeMap;
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, HashMap, VecDeque};
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct KindStats {
@@ -13,6 +20,8 @@ pub struct KindStats {
     pub fails: u64,
     pub ms: f64,
     pub mrows: f64,
+    /// 已执行的结果被后续请求直接复用的次数
+    pub hits: u64,
 }
 
 impl KindStats {
@@ -26,6 +35,21 @@ impl KindStats {
             300.0
         }
     }
+    fn mean_ms(&self) -> Option<f64> {
+        if self.runs > 0 {
+            Some(self.ms / self.runs as f64)
+        } else {
+            None
+        }
+    }
+    /// 每次执行平均被复用几次；用于把执行代价摊到所有使用者身上。
+    fn reuse_rate(&self) -> f64 {
+        if self.runs > 0 {
+            self.hits as f64 / self.runs as f64
+        } else {
+            0.0
+        }
+    }
 }
 
 /// 发现问题后，以此概率把剩余检查也跑完，给反馈提供无偏样本。
@@ -34,51 +58,460 @@ pub const AUDIT_RATE: f64 = 0.2;
 /// 有足够样本之前沿用固定顺序。
 const MIN_RUNS: u64 = 3;
 
+/// 默认顺序：与固定顺序对照组一致，也是回放比较的基线。
+pub const DEFAULT_ORDER: [&str; 3] = ["KeyUnique", "RowConservation", "SampleFanout"];
+
+/// 上下文失败概率向该检查种类整体收缩的先验强度（相当于多少次虚拟观测）。
+const PRIOR_WEIGHT: f64 = 4.0;
+
+/// 作出采纳 / 回滚判断至少需要的被审计失败候选数。
+pub const MIN_EVIDENCE: usize = 8;
+
+/// 回放窗口：只保留最近的被审计失败候选，跟随负载变化。
+const WINDOW: usize = 2000;
+
+/// 每新增多少条证据重新评估一次自适应顺序。
+const REEVALUATE_EVERY: u64 = 4;
+
+/// 一次验证尝试中某项检查的观测。
+#[derive(Clone, Debug)]
+pub struct Obs {
+    kind: String,
+    context: String,
+    key: String,
+    rows: f64,
+    pass: bool,
+    /// 本次实际花费的数据库毫秒；复用或合并为 0
+    ms: f64,
+    executed: bool,
+}
+
+impl Obs {
+    /// `executed=false` 表示结果来自经验库复用或在途合并，本次不产生数据库代价。
+    pub fn new(c: &Check, o: &Outcome, executed: bool, rows: &dyn Fn(&str) -> f64) -> Obs {
+        Obs {
+            kind: c.kind().to_string(),
+            context: c.context(),
+            key: c.key(),
+            rows: c.rows_touched(rows),
+            pass: o.pass,
+            ms: if executed { o.ms } else { 0.0 },
+            executed,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+struct Episode {
+    obs: Vec<Obs>,
+    /// 首个失败的不是键唯一性时，是否还要补查它来决定粒度修复（与顺序无关，取决于修复进度）
+    probe_key: bool,
+    /// 记录时的策略纪元；`set_priority` 每调用一次加一
+    epoch: u64,
+}
+
+/// 可回放的排序策略。
+#[derive(Clone, Debug)]
+pub enum Order {
+    /// 按检查种类的固定排列：默认顺序或模型策略
+    Fixed(Vec<String>),
+    /// 内置自适应评分
+    Adaptive,
+}
+
+impl Order {
+    pub fn default_order() -> Order {
+        Order::Fixed(DEFAULT_ORDER.map(String::from).to_vec())
+    }
+}
+
+/// 候选策略与默认顺序在同一批被审计失败候选上的配对回放结果。
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct Evidence {
+    /// 参与回放的被审计失败候选数
+    pub episodes: usize,
+    /// 候选策略的平均摊销代价（ms / 候选）
+    pub policy_ms: f64,
+    /// 默认顺序的平均摊销代价（ms / 候选）
+    pub baseline_ms: f64,
+    /// 候选 − 默认 的平均配对差；负数表示更省
+    pub mean_delta_ms: f64,
+    /// 配对差均值的正态近似 95% 区间
+    pub ci95: [f64; 2],
+}
+
+impl Evidence {
+    /// 证据足够，且区间整体低于 0。
+    pub fn improves(&self) -> bool {
+        self.episodes >= MIN_EVIDENCE && self.ci95[1] < 0.0
+    }
+    /// 证据足够，且区间整体高于 0。
+    pub fn regresses(&self) -> bool {
+        self.episodes >= MIN_EVIDENCE && self.ci95[0] > 0.0
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+struct Decision {
+    /// 作出判断时累计的证据条数
+    at: u64,
+    adopted: bool,
+    evidence: Evidence,
+}
+
+#[derive(Default)]
+struct State {
+    kinds: BTreeMap<String, KindStats>,
+    /// 键：`种类|上下文`
+    contexts: BTreeMap<String, KindStats>,
+    /// 检查键 → 被复用次数
+    reuse: HashMap<String, u64>,
+    priority: Option<Vec<String>>,
+    epoch: u64,
+    episodes: VecDeque<Episode>,
+    /// 被审计失败候选的累计数（含已滑出窗口的）
+    evidence_total: u64,
+    passed: u64,
+    unaudited_failures: u64,
+    adaptive: Option<Decision>,
+}
+
+fn ctx_key(kind: &str, context: &str) -> String {
+    format!("{kind}|{context}")
+}
+
+fn rank(priority: &[String], kind: &str) -> usize {
+    priority.iter().position(|k| k == kind).unwrap_or(usize::MAX)
+}
+
+fn summarize(pairs: &[(f64, f64)]) -> Evidence {
+    let n = pairs.len();
+    if n == 0 {
+        return Evidence::default();
+    }
+    let nf = n as f64;
+    let policy_ms = pairs.iter().map(|p| p.0).sum::<f64>() / nf;
+    let baseline_ms = pairs.iter().map(|p| p.1).sum::<f64>() / nf;
+    let mean = policy_ms - baseline_ms;
+    let half = if n > 1 {
+        let var = pairs.iter().map(|(p, b)| (p - b - mean).powi(2)).sum::<f64>() / (nf - 1.0);
+        1.96 * (var / nf).sqrt()
+    } else {
+        0.0
+    };
+    Evidence { episodes: n, policy_ms, baseline_ms, mean_delta_ms: mean, ci95: [mean - half, mean + half] }
+}
+
+impl State {
+    /// 排序分数，越大越先执行。
+    /// - 失败概率：上下文（具体表 / 表对方向）的观测向该种类整体收缩，少量样本不会大幅摆动；
+    /// - 代价：优先用该上下文的实测均值，没有时才按行数线性外推；
+    /// - 共享摊销：执行一次、被复用 h 次的检查，每次使用平均只花 1/(1+h)；已缓存的视为零代价。
+    fn score(&self, kind: &str, context: &str, rows: f64, cached: bool) -> f64 {
+        let k = self.kinds.get(kind).cloned().unwrap_or_default();
+        let x = self.contexts.get(&ctx_key(kind, context));
+        let prior = k.p_fail();
+        let p = x.map_or(prior, |x| (x.fails as f64 + PRIOR_WEIGHT * prior) / (x.runs as f64 + PRIOR_WEIGHT));
+        let cost = if cached {
+            0.0
+        } else {
+            let exec = x.and_then(KindStats::mean_ms).unwrap_or_else(|| k.ms_per_mrow() * rows / 1e6);
+            exec / (1.0 + x.map_or_else(|| k.reuse_rate(), KindStats::reuse_rate))
+        };
+        p / (cost + 1.0)
+    }
+
+    fn amortized(&self, o: &Obs) -> f64 {
+        if o.executed {
+            o.ms / (1.0 + self.reuse.get(&o.key).copied().unwrap_or(0) as f64)
+        } else {
+            0.0
+        }
+    }
+
+    /// 按某策略重放一个被审计的失败候选：累加到第一个失败为止的代价；
+    /// 若第一个失败的不是键唯一性且需要补查，再加上它的代价。审计本身的开销不计入任何策略。
+    fn replay(&self, e: &Episode, policy: &Order) -> f64 {
+        let mut idx: Vec<usize> = (0..e.obs.len()).collect();
+        let default = DEFAULT_ORDER.map(String::from);
+        idx.sort_by_key(|&i| rank(&default, &e.obs[i].kind));
+        match policy {
+            Order::Fixed(priority) => idx.sort_by_key(|&i| rank(priority, &e.obs[i].kind)),
+            Order::Adaptive => {
+                let keys: Vec<f64> = e.obs.iter().map(|o| self.score(&o.kind, &o.context, o.rows, !o.executed)).collect();
+                idx.sort_by(|&a, &b| keys[b].total_cmp(&keys[a]));
+            }
+        }
+        let mut cost = 0.0;
+        for i in idx {
+            let o = &e.obs[i];
+            cost += self.amortized(o);
+            if !o.pass {
+                if o.kind != "KeyUnique" && e.probe_key {
+                    cost += e.obs.iter().find(|x| x.kind == "KeyUnique").map_or(0.0, |x| self.amortized(x));
+                }
+                break;
+            }
+        }
+        cost
+    }
+
+    fn evaluate(&self, policy: &Order, since_epoch: Option<u64>) -> Evidence {
+        let baseline = Order::default_order();
+        let pairs: Vec<(f64, f64)> = self
+            .episodes
+            .iter()
+            .filter(|e| since_epoch.is_none_or(|s| e.epoch >= s))
+            .map(|e| (self.replay(e, policy), self.replay(e, &baseline)))
+            .collect();
+        summarize(&pairs)
+    }
+
+    /// 自适应顺序是否已被回放证据采纳；证据每增加 `REEVALUATE_EVERY` 条重新判断，失效时自动退回默认顺序。
+    fn adaptive_adopted(&mut self) -> bool {
+        if self.adaptive.as_ref().is_none_or(|d| self.evidence_total >= d.at + REEVALUATE_EVERY) {
+            let evidence = self.evaluate(&Order::Adaptive, None);
+            self.adaptive = Some(Decision { at: self.evidence_total, adopted: evidence.improves(), evidence });
+        }
+        self.adaptive.as_ref().is_some_and(|d| d.adopted)
+    }
+}
+
 #[derive(Default)]
 pub struct Feedback {
-    stats: Mutex<BTreeMap<String, KindStats>>,
-    priority: Mutex<Option<Vec<String>>>,
+    state: Mutex<State>,
 }
 
 impl Feedback {
-    pub fn set_priority(&self, priority: Option<Vec<String>>) {
-        *self.priority.lock() = priority;
+    /// 设置（或清除）固定排列，返回新的策略纪元；之后记录的证据都带这个纪元。
+    pub fn set_priority(&self, priority: Option<Vec<String>>) -> u64 {
+        let mut s = self.state.lock();
+        s.priority = priority;
+        s.epoch += 1;
+        s.epoch
     }
 
+    /// 一次实际执行（种类整体与具体上下文各记一份）。
     pub fn record(&self, c: &Check, o: &Outcome, rows: &dyn Fn(&str) -> f64) {
-        let mut s = self.stats.lock();
-        let e = s.entry(c.kind().to_string()).or_default();
-        e.runs += 1;
-        if !o.pass {
-            e.fails += 1;
+        let mrows = c.rows_touched(rows) / 1e6;
+        let mut guard = self.state.lock();
+        let s = &mut *guard;
+        let kind = s.kinds.entry(c.kind().to_string()).or_default();
+        let context = s.contexts.entry(ctx_key(c.kind(), &c.context())).or_default();
+        for e in [kind, context] {
+            e.runs += 1;
+            if !o.pass {
+                e.fails += 1;
+            }
+            e.ms += o.ms;
+            e.mrows += mrows;
         }
-        e.ms += o.ms;
-        e.mrows += c.rows_touched(rows) / 1e6;
     }
 
-    /// `enabled=false` 时保持调用方给出的固定顺序。
-    pub fn order(&self, enabled: bool, mut checks: Vec<Check>, rows: &dyn Fn(&str) -> f64) -> Vec<Check> {
+    /// 检查结果被直接复用（未访问数据库）。
+    pub fn record_reuse(&self, c: &Check) {
+        let mut s = self.state.lock();
+        s.kinds.entry(c.kind().to_string()).or_default().hits += 1;
+        s.contexts.entry(ctx_key(c.kind(), &c.context())).or_default().hits += 1;
+        *s.reuse.entry(c.key()).or_default() += 1;
+    }
+
+    /// 记录一次验证尝试。只有被审计的失败候选能回放其他顺序；通过的候选所有顺序代价相同，只计数。
+    pub fn episode(&self, obs: Vec<Obs>, audited: bool, probe_key: bool) {
+        let mut s = self.state.lock();
+        if obs.iter().all(|o| o.pass) {
+            s.passed += 1;
+            return;
+        }
+        if !audited {
+            s.unaudited_failures += 1;
+            return;
+        }
+        let epoch = s.epoch;
+        s.episodes.push_back(Episode { obs, probe_key, epoch });
+        while s.episodes.len() > WINDOW {
+            s.episodes.pop_front();
+        }
+        s.evidence_total += 1;
+    }
+
+    /// 策略相对默认顺序的回放证据；`since_epoch` 只看该纪元之后记录的候选。
+    pub fn evaluate(&self, policy: &Order, since_epoch: Option<u64>) -> Evidence {
+        self.state.lock().evaluate(policy, since_epoch)
+    }
+
+    /// `enabled=false` 时保持调用方给出的固定顺序（调用方按 `DEFAULT_ORDER` 构造）。
+    /// `cached` 报告某检查的结果当前是否已在经验库中，它会被视为零代价。
+    pub fn order(&self, enabled: bool, mut checks: Vec<Check>, rows: &dyn Fn(&str) -> f64, cached: &dyn Fn(&Check) -> bool) -> Vec<Check> {
         if !enabled {
             return checks;
         }
-        if let Some(priority) = &*self.priority.lock() {
-            checks.sort_by_key(|c| priority.iter().position(|k| k == c.kind()).unwrap_or(usize::MAX));
+        let mut s = self.state.lock();
+        if let Some(priority) = &s.priority {
+            checks.sort_by_key(|c| rank(priority, c.kind()));
             return checks;
         }
-        let s = self.stats.lock();
-        if checks.iter().any(|c| s.get(c.kind()).is_none_or(|k| k.runs < MIN_RUNS)) {
+        if checks.iter().any(|c| s.kinds.get(c.kind()).is_none_or(|k| k.runs < MIN_RUNS)) || !s.adaptive_adopted() {
             return checks;
         }
-        let score = |c: &Check| {
-            let k = &s[c.kind()];
-            let cost = k.ms_per_mrow() * c.rows_touched(rows) / 1e6 + 1.0;
-            k.p_fail() / cost
-        };
-        checks.sort_by(|a, b| score(b).partial_cmp(&score(a)).unwrap_or(std::cmp::Ordering::Equal));
-        checks
+        let keys: Vec<f64> = checks.iter().map(|c| s.score(c.kind(), &c.context(), c.rows_touched(rows), cached(c))).collect();
+        let mut idx: Vec<usize> = (0..checks.len()).collect();
+        idx.sort_by(|&a, &b| keys[b].total_cmp(&keys[a]));
+        idx.into_iter().map(|i| checks[i].clone()).collect()
     }
 
     pub fn snapshot(&self) -> BTreeMap<String, KindStats> {
-        self.stats.lock().clone()
+        self.state.lock().kinds.clone()
+    }
+
+    /// 统计、证据与自适应采纳状态，供 `/v1/stats` 与实验报告使用。
+    pub fn report(&self) -> Value {
+        let s = self.state.lock();
+        json!({
+            "kinds": s.kinds,
+            "contexts": s.contexts,
+            "policy": s.priority,
+            "epoch": s.epoch,
+            "evidence": {"audited_failures_in_window": s.episodes.len(), "audited_failures_total": s.evidence_total,
+                "passed": s.passed, "unaudited_failures": s.unaudited_failures, "min_evidence": MIN_EVIDENCE},
+            "adaptive": s.adaptive,
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn checks() -> Vec<Check> {
+        vec![
+            Check::KeyUnique { table: "u".into(), cols: vec!["id".into()], filter: None },
+            Check::RowConservation { left: "t".into(), right: "u".into(), on: vec![], lf: None, rf: None },
+            Check::SampleFanout { left: "t".into(), right: "u".into(), on: vec![], lf: None, rf: None, n: 10 },
+        ]
+    }
+
+    fn outcome(pass: bool, ms: f64) -> Outcome {
+        Outcome { pass, metrics: json!({}), ms }
+    }
+
+    /// 键唯一性、行数守恒各自的耗时与结果；抽样扇出 1 ms 且通过（样本没碰到重复键）。
+    fn audited(fb: &Feedback, key: (bool, f64), rc: (bool, f64), probe_key: bool) {
+        let c = checks();
+        let obs = vec![
+            Obs::new(&c[0], &outcome(key.0, key.1), true, &|_| 100.0),
+            Obs::new(&c[1], &outcome(rc.0, rc.1), true, &|_| 100.0),
+            Obs::new(&c[2], &outcome(true, 1.0), true, &|_| 100.0),
+        ];
+        fb.episode(obs, true, probe_key);
+    }
+
+    fn rc_first() -> Order {
+        Order::Fixed(vec!["RowConservation".into(), "KeyUnique".into(), "SampleFanout".into()])
+    }
+
+    #[test]
+    fn replay_counts_cost_until_first_failure_plus_needed_key_probe() {
+        let fb = Feedback::default();
+        for _ in 0..MIN_EVIDENCE {
+            audited(&fb, (false, 50.0), (false, 5.0), false);
+        }
+        let e = fb.evaluate(&rc_first(), None);
+        assert_eq!(e.episodes, MIN_EVIDENCE);
+        assert!((e.policy_ms - 5.0).abs() < 1e-9 && (e.baseline_ms - 50.0).abs() < 1e-9);
+        assert!(e.improves() && !e.regresses());
+        // 需要补查键唯一性时，先跑行数守恒反而多花一次检查。
+        let fb = Feedback::default();
+        for _ in 0..MIN_EVIDENCE {
+            audited(&fb, (false, 50.0), (false, 5.0), true);
+        }
+        let e = fb.evaluate(&rc_first(), None);
+        assert!((e.policy_ms - 55.0).abs() < 1e-9);
+        assert!(e.regresses() && !e.improves());
+    }
+
+    #[test]
+    fn passing_and_unaudited_candidates_are_not_replay_evidence() {
+        let fb = Feedback::default();
+        let c = checks();
+        for _ in 0..MIN_EVIDENCE * 2 {
+            fb.episode(c.iter().map(|x| Obs::new(x, &outcome(true, 3.0), true, &|_| 1.0)).collect(), false, true);
+            fb.episode(vec![Obs::new(&c[0], &outcome(false, 3.0), true, &|_| 1.0)], false, true);
+        }
+        let e = fb.evaluate(&rc_first(), None);
+        assert_eq!(e.episodes, 0);
+        assert!(!e.improves() && !e.regresses());
+        let r = fb.report();
+        assert_eq!(r["evidence"]["passed"], MIN_EVIDENCE as u64 * 2);
+        assert_eq!(r["evidence"]["unaudited_failures"], MIN_EVIDENCE as u64 * 2);
+    }
+
+    #[test]
+    fn reuse_amortizes_shared_checks() {
+        let fb = Feedback::default();
+        for _ in 0..MIN_EVIDENCE {
+            audited(&fb, (false, 50.0), (false, 5.0), false);
+        }
+        // 键唯一性结果被复用 9 次：默认顺序的摊销代价从 50 降到 5，与先跑行数守恒持平。
+        for _ in 0..9 {
+            fb.record_reuse(&checks()[0]);
+        }
+        let e = fb.evaluate(&rc_first(), None);
+        assert!((e.baseline_ms - 5.0).abs() < 1e-9);
+        assert!(!e.improves() && !e.regresses());
+    }
+
+    #[test]
+    fn adaptive_order_needs_replay_evidence_and_reverts_when_it_fades() {
+        let fb = Feedback::default();
+        let c = checks();
+        for _ in 0..10 {
+            fb.record(&c[0], &outcome(false, 50.0), &|_| 100.0);
+            fb.record(&c[1], &outcome(false, 5.0), &|_| 100.0);
+            fb.record(&c[2], &outcome(true, 1.0), &|_| 100.0);
+        }
+        let none = |_: &Check| false;
+        // 统计已偏向先跑行数守恒，但没有回放证据前保持默认顺序。
+        assert_eq!(fb.order(true, c.clone(), &|_| 100.0, &none), c);
+        for _ in 0..MIN_EVIDENCE {
+            audited(&fb, (false, 50.0), (false, 5.0), false);
+        }
+        assert_eq!(fb.order(true, c.clone(), &|_| 100.0, &none)[0].kind(), "RowConservation");
+        assert_eq!(fb.order(false, c.clone(), &|_| 100.0, &none), c);
+        // 新证据表明要补查键唯一性：窗口内优势消失后退回默认顺序。
+        for _ in 0..MIN_EVIDENCE * 4 {
+            audited(&fb, (false, 50.0), (false, 5.0), true);
+        }
+        assert_eq!(fb.order(true, c.clone(), &|_| 100.0, &none), c);
+        assert_eq!(fb.report()["adaptive"]["adopted"], false);
+    }
+
+    #[test]
+    fn cached_checks_are_treated_as_free() {
+        let fb = Feedback::default();
+        let c = checks();
+        for _ in 0..10 {
+            fb.record(&c[0], &outcome(false, 50.0), &|_| 100.0);
+            fb.record(&c[1], &outcome(false, 5.0), &|_| 100.0);
+            fb.record(&c[2], &outcome(true, 1.0), &|_| 100.0);
+        }
+        for _ in 0..MIN_EVIDENCE {
+            audited(&fb, (false, 50.0), (false, 5.0), false);
+        }
+        let key_cached = |x: &Check| x.kind() == "KeyUnique";
+        assert_eq!(fb.order(true, c.clone(), &|_| 100.0, &key_cached)[0].kind(), "KeyUnique");
+    }
+
+    #[test]
+    fn priority_overrides_adaptive_and_advances_epoch() {
+        let fb = Feedback::default();
+        let c = checks();
+        let epoch = fb.set_priority(Some(vec!["SampleFanout".into(), "KeyUnique".into(), "RowConservation".into()]));
+        assert_eq!(epoch, 1);
+        assert_eq!(fb.order(true, c.clone(), &|_| 1.0, &|_| false)[0].kind(), "SampleFanout");
+        audited(&fb, (false, 50.0), (false, 5.0), false);
+        assert_eq!(fb.evaluate(&rc_first(), Some(1)).episodes, 1);
+        assert_eq!(fb.set_priority(None), 2);
+        assert_eq!(fb.evaluate(&rc_first(), Some(2)).episodes, 0);
     }
 }

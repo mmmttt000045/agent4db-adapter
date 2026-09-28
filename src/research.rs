@@ -328,11 +328,13 @@ async fn change(admin: &Db, shifted: bool) -> Result<()> {
 async fn manage(manager: &Option<Optimizer>, mid: &Middle, stage: &str) -> Value {
     if let Some(manager) = manager {
         let start = Instant::now();
+        // Regression check on evidence recorded since the last apply comes before a new proposal.
+        let watch = manager.watch(&mid.fb).map_err(|e| format!("{e:#}"));
         match manager.propose(&mid.fb).await {
             Ok(p) => {
-                json!({"stage":stage,"proposal":p,"apply":manager.apply(p.id,&mid.fb).map_err(|e|e.to_string()),"wall_ms":start.elapsed().as_secs_f64()*1000.0})
+                json!({"stage":stage,"watch":watch,"proposal":p,"apply":manager.apply(p.id,&mid.fb).map_err(|e|e.to_string()),"wall_ms":start.elapsed().as_secs_f64()*1000.0})
             }
-            Err(e) => json!({"stage":stage,"error":format!("{e:#}"),"wall_ms":start.elapsed().as_secs_f64()*1000.0}),
+            Err(e) => json!({"stage":stage,"watch":watch,"error":format!("{e:#}"),"wall_ms":start.elapsed().as_secs_f64()*1000.0}),
         }
     } else {
         Value::Null
@@ -506,6 +508,40 @@ fn markdown(report: &Value) -> String {
             c["bootstrap_interval_95"]
         ));
     }
+    s.push_str("\n## 反馈闭环\n\n自适应顺序只在被审计失败候选的配对回放显著更省时采纳（否则保持默认顺序）；M 的模型策略按 improvement 门槛应用，之后新证据显著变差则自动回滚。重排不改变验证结论，只影响代价。\n\n|组|adapter 数|结束时采纳自适应|被审计失败候选|未审计失败|通过的验证|\n|---|---:|---:|---:|---:|---:|\n");
+    for mode in ["C", "D", "M"] {
+        let states: Vec<&Value> = report["runs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|r| r["mode"] == mode)
+            .flat_map(|r| r["final_states"].as_array().into_iter().flatten())
+            .collect();
+        let adopted = states.iter().filter(|st| st["stats"]["feedback"]["adaptive"]["adopted"] == true).count();
+        let sum = |key: &str| states.iter().map(|st| st["stats"]["feedback"]["evidence"][key].as_u64().unwrap_or(0)).sum::<u64>();
+        s.push_str(&format!(
+            "|{mode}|{}|{adopted}|{}|{}|{}|\n",
+            states.len(),
+            sum("audited_failures_total"),
+            sum("unaudited_failures"),
+            sum("passed")
+        ));
+    }
+    let decisions: Vec<&Value> = report["runs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|r| r["mode"] == "M")
+        .flat_map(|r| r["decisions"].as_array().into_iter().flatten())
+        .filter(|d| d.is_object())
+        .collect();
+    s.push_str(&format!(
+        "\nM 组模型决策：生成 {} 次，应用 {} 次，未应用 {} 次（门槛或版本），自动回滚 {} 次。\n",
+        decisions.iter().filter(|d| d["proposal"].is_object()).count(),
+        decisions.iter().filter(|d| d["apply"]["Ok"].is_object()).count(),
+        decisions.iter().filter(|d| d["apply"]["Err"].is_string()).count(),
+        decisions.iter().filter(|d| d["watch"]["Ok"].is_object()).count()
+    ));
     let boundary: Vec<_> =
         report["runs"].as_array().unwrap().iter().flat_map(|r| r["robustness"]["events"].as_array().into_iter().flatten()).collect();
     if !boundary.is_empty() {

@@ -26,14 +26,7 @@ pub enum QKind {
     Exec = 5,
 }
 
-pub const QKINDS: [QKind; 6] = [
-    QKind::Meta,
-    QKind::Probe,
-    QKind::Check,
-    QKind::Guard,
-    QKind::Repair,
-    QKind::Exec,
-];
+pub const QKINDS: [QKind; 6] = [QKind::Meta, QKind::Probe, QKind::Check, QKind::Guard, QKind::Repair, QKind::Exec];
 
 impl QKind {
     pub fn name(self) -> &'static str {
@@ -128,6 +121,7 @@ pub struct Db {
 impl Db {
     /// `read_only`：Agent 用的连接池一律只读，ETL / 初始化用单独的可写池。
     pub fn connect(url: &str, size: usize, read_only: bool) -> Result<Self> {
+        anyhow::ensure!(size > 0, "连接池大小必须大于 0");
         let mut pg: tokio_postgres::Config = url.parse().context("数据库连接串格式错误")?;
         let mut opts = String::from("-c statement_timeout=300000");
         if read_only {
@@ -147,6 +141,9 @@ impl Db {
         let msgs = res.map_err(|e| anyhow!("SQL 执行失败：{}", db_err(&e)))?;
         let mut out = Rows::default();
         for m in msgs {
+            if let SimpleQueryMessage::RowDescription(ref cols) = m {
+                out.cols = cols.iter().map(|c| c.name().to_string()).collect();
+            }
             if let SimpleQueryMessage::Row(r) = m {
                 if out.cols.is_empty() {
                     out.cols = r.columns().iter().map(|c| c.name().to_string()).collect();
@@ -168,4 +165,17 @@ fn db_err(e: &tokio_postgres::Error) -> String {
 /// SQL 字符串字面量转义。
 pub fn lit(s: &str) -> String {
     format!("'{}'", s.replace('\'', "''"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn result_serialization_preserves_nulls_and_truncation() {
+        let rows = Rows { cols: vec!["amount".into()], rows: vec![vec![Some("12.50".into())], vec![None]] };
+        assert_eq!(rows.to_json(1), json!({"columns": ["amount"], "rows": [["12.50"]], "row_count": 2, "truncated": true}));
+        assert_eq!(rows.to_json(2)["rows"][1][0], Value::Null);
+        assert!(Db::connect("postgres://localhost/test", 0, true).is_err());
+    }
 }

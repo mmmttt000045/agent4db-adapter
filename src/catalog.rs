@@ -53,6 +53,21 @@ pub struct TableVersion {
 }
 
 impl Catalog {
+    /// 工具输入只能引用目录中实际存在的列，不能作为 SQL 片段直接拼接。
+    pub fn validate_join(&self, left: &str, right: &str, on: &crate::checks::On) -> Result<()> {
+        anyhow::ensure!(left != right, "暂不支持自关联");
+        anyhow::ensure!(!on.is_empty(), "关联列 on 不能为空");
+        let a = self.table(left).ok_or_else(|| anyhow::anyhow!("表不存在：{left}"))?;
+        let b = self.table(right).ok_or_else(|| anyhow::anyhow!("表不存在：{right}"))?;
+        let mut seen = std::collections::BTreeSet::new();
+        for (l, r) in on {
+            anyhow::ensure!(a.col(l).is_some(), "列不存在：{left}.{l}");
+            anyhow::ensure!(b.col(r).is_some(), "列不存在：{right}.{r}");
+            anyhow::ensure!(seen.insert((l, r)), "关联列重复：{l} = {r}");
+        }
+        Ok(())
+    }
+
     pub async fn load(db: &Db) -> Result<Catalog> {
         let cols = db
             .query(
@@ -65,9 +80,7 @@ impl Catalog {
                  order by c.relname, a.attnum",
             )
             .await?;
-        let stats = db
-            .query(QKind::Meta, "select tablename, attname, n_distinct from pg_stats where schemaname = 'public'")
-            .await?;
+        let stats = db.query(QKind::Meta, "select tablename, attname, n_distinct from pg_stats where schemaname = 'public'").await?;
         let mut nd: HashMap<(String, String), f64> = HashMap::new();
         for i in 0..stats.rows.len() {
             if let (Some(t), Some(c), Some(v)) = (stats.cell(i, 0), stats.cell(i, 1), stats.f64(i, 2)) {
@@ -166,4 +179,37 @@ pub async fn versions(db: &Db) -> Result<HashMap<String, TableVersion>> {
         );
     }
     Ok(out)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn join_input_must_reference_real_columns() {
+        let tables = ["left", "right"]
+            .into_iter()
+            .map(|name| {
+                (
+                    name.into(),
+                    Table {
+                        name: name.into(),
+                        comment: None,
+                        rows_est: 1.0,
+                        cols: vec![Column { name: "id".into(), dtype: "integer".into(), comment: None, n_distinct: None }],
+                    },
+                )
+            })
+            .collect();
+        let cat = Catalog { tables, col_table: HashMap::new() };
+        let valid = vec![("id".into(), "id".into())];
+        assert!(cat.validate_join("left", "right", &valid).is_ok());
+        assert!(cat.validate_join("left", "right", &vec![]).is_err());
+        assert!(cat.validate_join("left", "left", &valid).is_err());
+        assert!(cat.validate_join("left", "missing", &valid).is_err());
+        assert!(cat.validate_join("left", "right", &vec![valid[0].clone(), valid[0].clone()]).is_err());
+        for name in ["missing", "id); select 1; --"] {
+            assert!(cat.validate_join("left", "right", &vec![(name.into(), "id".into())]).is_err());
+        }
+    }
 }

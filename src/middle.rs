@@ -58,6 +58,9 @@ pub struct MiddleConfig {
     pub version_ttl_ms: u64,
     pub max_rows: usize,
     pub verbose: bool,
+    pub trace_checks: bool,
+    /// 实验可固定候选级审计抽样；None 保持逐次随机审计。
+    pub audit_seed: Option<u64>,
 }
 
 impl Default for MiddleConfig {
@@ -73,6 +76,8 @@ impl Default for MiddleConfig {
             version_ttl_ms: 200,
             max_rows: 50,
             verbose: false,
+            trace_checks: false,
+            audit_seed: None,
         }
     }
 }
@@ -89,7 +94,7 @@ impl Role {
         Role { name: "analyst".into(), tables: None }
     }
     pub fn allows(&self, t: &str) -> bool {
-        self.tables.as_ref().map_or(true, |s| s.contains(t))
+        self.tables.as_ref().is_none_or(|s| s.contains(t))
     }
 }
 
@@ -127,7 +132,10 @@ enum Lookup {
     Hit(Entry),
     Miss,
     /// 守卫失败：经验已撤销，附带失败的守卫
-    Violated { entry: Entry, failed: Check },
+    Violated {
+        entry: Entry,
+        failed: Check,
+    },
 }
 
 type Versions = Arc<HashMap<String, TableVersion>>;
@@ -144,6 +152,7 @@ pub struct Middle {
     versions: Mutex<Option<(Instant, Versions)>>,
     notices: Mutex<HashMap<String, Vec<String>>>,
     pub stats: Stats,
+    traces: Mutex<Vec<Value>>,
 }
 
 fn join_key(a: &str, b: &str) -> String {
@@ -154,11 +163,17 @@ fn join_key(a: &str, b: &str) -> String {
     }
 }
 
+/// Stable FNV-style hash, sampled by candidate rather than scheduling order.
+fn audit_candidate(seed: u64, candidate: &str) -> bool {
+    let mut hash = 14695981039346656037u64 ^ seed;
+    for byte in candidate.as_bytes() {
+        hash = (hash ^ u64::from(*byte)).wrapping_mul(1099511628211);
+    }
+    hash % 10_000 < (AUDIT_RATE * 10_000.0) as u64
+}
+
 fn ver_sig(deps: &BTreeMap<String, TableVersion>) -> String {
-    deps.iter()
-        .map(|(t, v)| format!("{t}:{}:{}:{}", v.batch, v.dml, &v.schema[..v.schema.len().min(8)]))
-        .collect::<Vec<_>>()
-        .join(",")
+    deps.iter().map(|(t, v)| format!("{t}:{}:{}:{}", v.batch, v.dml, &v.schema[..v.schema.len().min(8)])).collect::<Vec<_>>().join(",")
 }
 
 fn metric(o: &Outcome, k: &str) -> f64 {
@@ -174,18 +189,19 @@ fn fanout_of(c: &Check, o: &Outcome) -> f64 {
 
 fn outcome_text(c: &Check, o: &Outcome) -> String {
     match c {
-        Check::KeyUnique { .. } => format!(
-            "{} 行只有 {} 个不同键（平均每键 {:.2} 行）",
-            o.metrics["n_rows"], o.metrics["n_keys"], metric(o, "avg_mult")
-        ),
+        Check::KeyUnique { .. } => {
+            format!("{} 行只有 {} 个不同键（平均每键 {:.2} 行）", o.metrics["n_rows"], o.metrics["n_keys"], metric(o, "avg_mult"))
+        }
         Check::SampleFanout { .. } => format!(
             "抽样 {} 行中 {} 行匹配多行（最多 {}，平均 {:.2}）",
-            o.metrics["n_sample"], o.metrics["n_fanned"], o.metrics["max_mult"], metric(o, "avg_mult")
+            o.metrics["n_sample"],
+            o.metrics["n_fanned"],
+            o.metrics["max_mult"],
+            metric(o, "avg_mult")
         ),
-        Check::RowConservation { .. } => format!(
-            "左表 {} 行，关联后 {} 行（{:.1} 倍）",
-            o.metrics["n_left"], o.metrics["n_join"], metric(o, "join_ratio")
-        ),
+        Check::RowConservation { .. } => {
+            format!("左表 {} 行，关联后 {} 行（{:.1} 倍）", o.metrics["n_left"], o.metrics["n_join"], metric(o, "join_ratio"))
+        }
     }
 }
 
@@ -204,6 +220,7 @@ impl Middle {
             versions: Mutex::new(None),
             notices: Mutex::new(HashMap::new()),
             stats: Stats::default(),
+            traces: Mutex::new(Vec::new()),
         })
     }
 
@@ -211,6 +228,20 @@ impl Middle {
         if self.cfg.verbose {
             eprintln!("    · [{}] {}", ctx.agent, msg.as_ref());
         }
+    }
+
+    fn trace(&self, ctx: &Ctx, detail: Value) {
+        if self.cfg.trace_checks {
+            let mut traces = self.traces.lock();
+            if traces.len() < 20_000 {
+                let sequence = traces.len() + 1;
+                traces.push(json!({"sequence":sequence,"agent":ctx.agent,"session":ctx.session,"task":ctx.task,"detail":detail}));
+            }
+        }
+    }
+
+    pub fn take_check_traces(&self) -> Vec<Value> {
+        std::mem::take(&mut *self.traces.lock())
     }
 
     fn scope_key(&self, ctx: &Ctx) -> String {
@@ -257,10 +288,7 @@ impl Middle {
                 return Ok(v.clone());
             }
         }
-        let (v, _) = self
-            .flight_ver
-            .run(true, "versions", || async { Ok(Arc::new(catalog::versions(&self.db).await?)) })
-            .await?;
+        let (v, _) = self.flight_ver.run(true, "versions", || async { Ok(Arc::new(catalog::versions(&self.db).await?)) }).await?;
         *self.versions.lock() = Some((Instant::now(), v.clone()));
         Ok(v)
     }
@@ -303,8 +331,7 @@ impl Middle {
             return Ok(self.hit(ctx, &fk, e));
         }
         let cur = self.versions().await?;
-        let changed: Vec<String> =
-            e.deps.iter().filter(|(t, v)| cur.get(*t) != Some(*v)).map(|(t, _)| t.clone()).collect();
+        let changed: Vec<String> = e.deps.iter().filter(|(t, v)| cur.get(*t) != Some(*v)).map(|(t, _)| t.clone()).collect();
         if changed.is_empty() && self.cfg.guard == GuardMode::OnChange {
             return Ok(self.hit(ctx, &fk, e));
         }
@@ -318,8 +345,7 @@ impl Middle {
             return Ok(Lookup::Miss);
         }
         let always = self.cfg.guard == GuardMode::Always;
-        let to_run: Vec<Check> =
-            e.guards.iter().filter(|g| always || g.tables().iter().any(|t| changed.contains(t))).cloned().collect();
+        let to_run: Vec<Check> = e.guards.iter().filter(|g| always || g.tables().iter().any(|t| changed.contains(t))).cloned().collect();
         for g in &to_run {
             inc(&self.stats.guard_runs);
             let o = self.exec_check(ctx, g, QKind::Guard).await?.0;
@@ -330,8 +356,7 @@ impl Middle {
                 return Ok(Lookup::Violated { entry: e, failed: g.clone() });
             }
         }
-        let new_deps: BTreeMap<String, TableVersion> =
-            e.deps.keys().filter_map(|t| cur.get(t).map(|v| (t.clone(), v.clone()))).collect();
+        let new_deps: BTreeMap<String, TableVersion> = e.deps.keys().filter_map(|t| cur.get(t).map(|v| (t.clone(), v.clone()))).collect();
         self.store.update(&fk, |x| x.deps = new_deps);
         Ok(self.hit(ctx, &fk, e))
     }
@@ -351,10 +376,9 @@ impl Middle {
         if notify {
             let mut n = self.notices.lock();
             for a in &e.consumers {
-                n.entry(a.clone()).or_default().push(format!(
-                    "你用过的经验「{}」已撤销（{}）。此前基于它得到的结果建议复核。",
-                    e.key, reason
-                ));
+                n.entry(a.clone())
+                    .or_default()
+                    .push(format!("你用过的经验「{}」已撤销（{}）。此前基于它得到的结果建议复核。", e.key, reason));
                 inc(&self.stats.notices);
             }
         }
@@ -383,7 +407,7 @@ impl Middle {
     /// 执行一个检查（不看经验库），在途合并，并把结果写进经验库。
     async fn exec_check(&self, ctx: &Ctx, c: &Check, kind: QKind) -> Result<(Outcome, bool)> {
         let deps = self.deps_for(&c.tables()).await?;
-        let fkey = format!("{}@{}", c.key(), ver_sig(&deps));
+        let fkey = self.fk(ctx, &format!("{}@{}", c.key(), ver_sig(&deps)));
         let sql = c.sql();
         let (o, merged) = self
             .flight_c
@@ -399,6 +423,10 @@ impl Middle {
             .await?;
         let key = format!("check:{}", c.key());
         let content = Content::CheckResult { check: c.clone(), outcome: o.clone() };
+        self.trace(
+            ctx,
+            json!({"event":"check","check":c,"purpose":kind.name(),"source":if merged {"merged"} else {"executed"},"outcome":o}),
+        );
         self.store.put(&self.fk(ctx, &key), self.new_entry(ctx, &key, content, deps, vec![]));
         Ok((o, merged))
     }
@@ -407,6 +435,7 @@ impl Middle {
     async fn run_check(&self, ctx: &Ctx, c: &Check) -> Result<Outcome> {
         if let Lookup::Hit(e) = self.lookup(ctx, &format!("check:{}", c.key())).await? {
             if let Content::CheckResult { outcome, .. } = e.content {
+                self.trace(ctx, json!({"event":"check","check":c,"source":"reused","outcome":outcome}));
                 self.log(ctx, format!("复用检查「{}」", c.describe()));
                 return Ok(outcome);
             }
@@ -450,7 +479,7 @@ impl Middle {
         let deps = self.deps_for(&[table.to_string()]).await?;
         let (v, merged) = self
             .flight_v
-            .run(self.cfg.singleflight, &format!("profile:{table}@{}", ver_sig(&deps)), || self.probe_table(table))
+            .run(self.cfg.singleflight, &self.fk(ctx, &format!("profile:{table}@{}", ver_sig(&deps))), || self.probe_table(table))
             .await?;
         self.log(ctx, format!("{}探查表 {table}", if merged { "合并" } else { "执行" }));
         self.store.put(&self.fk(ctx, &key), self.new_entry(ctx, &key, Content::Profile(v.clone()), deps, vec![]));
@@ -595,13 +624,21 @@ impl Middle {
                 Check::SampleFanout { left: left.into(), right: right.into(), on: on.clone(), lf: lf.clone(), rf: rf.clone(), n: 1000 },
             ];
             let ordered = self.fb.order(self.cfg.feedback, checks, &self.rows());
+            self.trace(
+                ctx,
+                json!({"event":"planned_order","left":left,"right":right,"checks":ordered.iter().map(Check::kind).collect::<Vec<_>>()}),
+            );
             let mut rc: Option<Outcome> = None;
             for (idx, c) in ordered.iter().enumerate() {
                 let o = self.run_check(ctx, c).await?;
                 if !o.pass {
                     // 反馈的无偏性：排在后面的检查只见过“前面都通过”的候选，永远学不到它们也能发现问题。
                     // 以小概率把剩余检查也跑完（审计），代价照常计入。
-                    if self.cfg.feedback && rand::random::<f64>() < AUDIT_RATE {
+                    let audit = match self.cfg.audit_seed {
+                        Some(seed) => audit_candidate(seed, &serde_json::to_string(&(left, right, on, &filters))?),
+                        None => rand::random::<f64>() < AUDIT_RATE,
+                    };
+                    if self.cfg.feedback && audit {
                         for rest in &ordered[idx + 1..] {
                             self.exec_check(ctx, rest, QKind::Check).await?;
                         }
@@ -628,8 +665,7 @@ impl Middle {
                 }
             }
             let rc = rc.ok_or_else(|| anyhow!("缺少行数守恒检查"))?;
-            let (n_left, n_right, n_join) =
-                (metric(&rc, "n_left") as i64, metric(&rc, "n_right") as i64, metric(&rc, "n_join") as i64);
+            let (n_left, n_right, n_join) = (metric(&rc, "n_left") as i64, metric(&rc, "n_right") as i64, metric(&rc, "n_join") as i64);
             // 基数：若关联行数不超过右表行数，左侧也可能唯一（1:1），需要确认——它会成为守卫
             let mut left_unique = false;
             if n_join <= n_right {
@@ -678,7 +714,7 @@ impl Middle {
             match self.validate(ctx, l, r, &o, BTreeMap::new(), None).await? {
                 Ok(p) => return Ok(Ok(p)),
                 Err(x) => {
-                    if worst.as_ref().map_or(true, |w| x.fanout > w.fanout) {
+                    if worst.as_ref().is_none_or(|w| x.fanout > w.fanout) {
                         worst = Some(x);
                     }
                 }
@@ -696,7 +732,13 @@ impl Middle {
             .db
             .query(
                 QKind::Meta,
-                &format!("select attname, n_distinct from pg_stats where schemaname = 'public' and tablename = {}", lit(table)),
+                &format!(
+                    "select s.attname, case when s.n_distinct < 0 then -s.n_distinct * c.reltuples else s.n_distinct end \
+                     from pg_stats s join pg_namespace n on n.nspname = s.schemaname \
+                     join pg_class c on c.relnamespace = n.oid and c.relname = s.tablename \
+                     where s.schemaname = 'public' and s.tablename = {}",
+                    lit(table)
+                ),
             )
             .await?;
         let mut cands: Vec<(f64, String)> = (0..st.rows.len())
@@ -822,7 +864,7 @@ impl Middle {
             .await?;
         let mut ranked: Vec<(i64, (String, String, bool))> =
             rest.iter().enumerate().map(|(i, p)| (r.i64(0, i + 1).unwrap_or(0), p.clone())).collect();
-        ranked.sort_by(|x, y| y.0.cmp(&x.0));
+        ranked.sort_by_key(|x| std::cmp::Reverse(x.0));
         Ok(ranked.into_iter().map(|(_, p)| p).collect())
     }
 
@@ -857,6 +899,7 @@ impl Middle {
     /// 工具 check_join：验证 Agent 给出的关联写法。
     pub async fn check_join(&self, ctx: &Ctx, a: &str, b: &str, on: &On) -> Result<Value> {
         self.allowed(ctx, &[a, b])?;
+        self.cat.validate_join(a, b, on)?;
         let (r, src) = self.verdict(ctx, a, b, on).await?;
         Ok(match r {
             Ok(p) => json!({"valid": true, "path": p, "source": src}),
@@ -895,7 +938,7 @@ impl Middle {
         let max_rows = self.cfg.max_rows;
         let (v, merged) = self
             .flight_v
-            .run(self.cfg.singleflight, &format!("sql:{norm}@{}", ver_sig(&deps)), || async {
+            .run(self.cfg.singleflight, &self.fk(ctx, &format!("sql:{norm}@{}", ver_sig(&deps))), || async {
                 Ok(self.db.query(QKind::Exec, s).await?.to_json(max_rows))
             })
             .await?;

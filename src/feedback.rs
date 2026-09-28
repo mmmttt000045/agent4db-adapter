@@ -37,9 +37,14 @@ const MIN_RUNS: u64 = 3;
 #[derive(Default)]
 pub struct Feedback {
     stats: Mutex<BTreeMap<String, KindStats>>,
+    priority: Mutex<Option<Vec<String>>>,
 }
 
 impl Feedback {
+    pub fn set_priority(&self, priority: Option<Vec<String>>) {
+        *self.priority.lock() = priority;
+    }
+
     pub fn record(&self, c: &Check, o: &Outcome, rows: &dyn Fn(&str) -> f64) {
         let mut s = self.stats.lock();
         let e = s.entry(c.kind().to_string()).or_default();
@@ -56,8 +61,12 @@ impl Feedback {
         if !enabled {
             return checks;
         }
+        if let Some(priority) = &*self.priority.lock() {
+            checks.sort_by_key(|c| priority.iter().position(|k| k == c.kind()).unwrap_or(usize::MAX));
+            return checks;
+        }
         let s = self.stats.lock();
-        if checks.iter().any(|c| s.get(c.kind()).map_or(true, |k| k.runs < MIN_RUNS)) {
+        if checks.iter().any(|c| s.get(c.kind()).is_none_or(|k| k.runs < MIN_RUNS)) {
             return checks;
         }
         let score = |c: &Check| {

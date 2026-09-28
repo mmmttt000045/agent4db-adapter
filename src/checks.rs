@@ -58,11 +58,9 @@ impl Check {
 
     pub fn describe(&self) -> String {
         match self {
-            Check::KeyUnique { table, cols, filter } => format!(
-                "{table}({}) 是否唯一{}",
-                cols.join(", "),
-                filter.as_ref().map(|f| format!(" [过滤 {f}]")).unwrap_or_default()
-            ),
+            Check::KeyUnique { table, cols, filter } => {
+                format!("{table}({}) 是否唯一{}", cols.join(", "), filter.as_ref().map(|f| format!(" [过滤 {f}]")).unwrap_or_default())
+            }
             Check::SampleFanout { left, right, on, .. } => format!("抽样：{left}→{right} 按 {} 是否一对多", fmt_on(on)),
             Check::RowConservation { left, right, on, .. } => {
                 format!("行数守恒：{left}⋈{right} 按 {} 后行数是否超过 {left}", fmt_on(on))
@@ -78,10 +76,7 @@ impl Check {
                 if let Some(f) = filter {
                     conds.push(format!("({f})"));
                 }
-                format!(
-                    "select count(*) as n_rows, count(distinct {key}) as n_keys from {table} where {}",
-                    conds.join(" and ")
-                )
+                format!("select count(*) as n_rows, count(distinct {key}) as n_keys from {table} where {}", conds.join(" and "))
             }
             Check::SampleFanout { left, right, on, lf, rf, n } => {
                 let lcols: Vec<&str> = on.iter().map(|(l, _)| l.as_str()).collect();
@@ -97,12 +92,10 @@ impl Check {
                     "with s as (select {cols} from {left} where {lc} limit {n}) \
                      select count(*) as n_sample, coalesce(max(m), 0) as max_mult, coalesce(avg(m), 0) as avg_mult, \
                             count(*) filter (where m > 1) as n_fanned \
-                     from (select count(r.{rk}) as m from s left join {right} r on {jc} group by {sg}) t",
-                    rk = on[0].1,
+                     from s cross join lateral (select count(*) as m from {right} r where {jc}) t",
                     cols = lcols.join(", "),
                     lc = lconds.join(" and "),
                     jc = jconds.join(" and "),
-                    sg = lcols.iter().map(|c| format!("s.{c}")).collect::<Vec<_>>().join(", "),
                 )
             }
             Check::RowConservation { left, right, on, lf, rf } => {
@@ -145,8 +138,7 @@ impl Check {
                 }
             }
             Check::RowConservation { .. } => {
-                let (n_left, n_right, n_join) =
-                    (rows.i64(0, 0).unwrap_or(0), rows.i64(0, 1).unwrap_or(0), rows.i64(0, 2).unwrap_or(0));
+                let (n_left, n_right, n_join) = (rows.i64(0, 0).unwrap_or(0), rows.i64(0, 1).unwrap_or(0), rows.i64(0, 2).unwrap_or(0));
                 let ratio = if n_left > 0 { n_join as f64 / n_left as f64 } else { 0.0 };
                 Outcome {
                     pass: n_join <= n_left,

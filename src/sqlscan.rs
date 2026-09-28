@@ -71,10 +71,10 @@ pub fn joins(sql: &str, cat: &Catalog) -> Vec<JoinUse> {
     out
 }
 
-/// 归一化 SQL（压缩空白、小写），用于结果复用与过滤条件匹配。
+/// 保守的结果缓存键：只去掉首尾空白，保留字面量、标识符和注释的原文。
+/// 不压缩内部空白，也不转小写，否则不同的查询可能错误共享结果。
 pub fn normalize(sql: &str) -> String {
-    let s = sql.trim().trim_end_matches(';').to_lowercase();
-    s.split_whitespace().collect::<Vec<_>>().join(" ")
+    sql.trim().to_string()
 }
 
 /// 过滤条件是否出现在 SQL 中（忽略空白、大小写与表别名）。
@@ -84,4 +84,23 @@ pub fn contains_filter(sql: &str, filter: &str) -> bool {
         re.replace_all(&x.to_lowercase(), "").chars().filter(|c| !c.is_whitespace()).collect()
     };
     squash(sql).contains(&squash(filter))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::normalize;
+
+    #[test]
+    fn cache_keys_preserve_sql_semantics() {
+        for (a, b) in [
+            ("select 'ABC'", "select 'abc'"),
+            ("select 'a  b'", "select 'a b'"),
+            ("select 1 as \"Name\"", "select 1 as \"name\""),
+            ("select $$ABC$$", "select $$abc$$"),
+            ("select 1 -- comment\n + 2", "select 1 -- comment + 2"),
+        ] {
+            assert_ne!(normalize(a), normalize(b));
+        }
+        assert_eq!(normalize("  select 1\n"), normalize("select 1"));
+    }
 }

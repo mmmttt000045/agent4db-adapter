@@ -74,13 +74,6 @@ pub enum Channel {
 impl Channel {
     pub const ALL: [Channel; 3] = [Channel::Store, Channel::Catalog, Channel::Web];
 
-    pub fn name(self) -> &'static str {
-        match self {
-            Channel::Store => "门店",
-            Channel::Catalog => "目录",
-            Channel::Web => "网店",
-        }
-    }
     pub fn returns(self) -> &'static str {
         match self {
             Channel::Store => "store_returns",

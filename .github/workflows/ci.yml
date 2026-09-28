@@ -1,0 +1,50 @@
+name: Rust checks
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --check
+      - run: cargo test --locked
+      - run: cargo clippy --locked --all-targets -- -D warnings
+
+  postgres-mock:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: mock-ci-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      AGENTDB_TEST_URL: postgres://postgres:mock-ci-password@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --locked postgres_http_mock_lifecycle -- --ignored --nocapture
+      - run: cargo test --locked research_postgres_oracles_and_drift -- --ignored --nocapture
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: postgres-mock-reports
+          path: |
+            results/mock-*/
+            results/research-test-*/

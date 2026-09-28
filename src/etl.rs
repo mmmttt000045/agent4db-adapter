@@ -18,11 +18,8 @@ async fn exec(db: &Db, sql: &str) -> Result<()> {
 
 /// 幂等：建批次日志表、加状态列（v1 全为“完成”）。
 pub async fn setup(db: &Db) -> Result<()> {
-    exec(
-        db,
-        "create table if not exists etl_batch_log (table_name text, batch_id int, note text, applied_at timestamptz default now())",
-    )
-    .await?;
+    exec(db, "create table if not exists etl_batch_log (table_name text, batch_id int, note text, applied_at timestamptz default now())")
+        .await?;
     exec(db, "alter table store_returns add column if not exists sr_status varchar(8) not null default '完成'").await?;
     exec(db, "comment on column store_returns.sr_status is '退货状态：申请 / 完成'").await?;
     let n = db.query(QKind::Meta, "select count(*) from etl_batch_log").await?.i64(0, 0).unwrap_or(0);
@@ -42,11 +39,7 @@ async fn next_batch(db: &Db) -> Result<i64> {
 }
 
 pub async fn is_v2(db: &Db) -> Result<bool> {
-    Ok(db
-        .query(QKind::Meta, "select exists (select 1 from store_returns where sr_status = '申请')")
-        .await?
-        .cell(0, 0)
-        == Some("t"))
+    Ok(db.query(QKind::Meta, "select exists (select 1 from store_returns where sr_status = '申请')").await?.cell(0, 0) == Some("t"))
 }
 
 /// 应用改版：为变更日之后的退货补写“申请”行。

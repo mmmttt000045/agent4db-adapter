@@ -50,8 +50,17 @@ fn kinds_json(d: &MeterSnap) -> Value {
 /// 把主要大表读一遍，让各组实验在相近的缓存状态下开始。
 pub async fn warmup(db: &Db) -> Result<()> {
     for t in [
-        "store_sales", "store_returns", "catalog_sales", "catalog_returns", "web_sales", "web_returns",
-        "date_dim", "item", "customer", "customer_address", "customer_demographics",
+        "store_sales",
+        "store_returns",
+        "catalog_sales",
+        "catalog_returns",
+        "web_sales",
+        "web_returns",
+        "date_dim",
+        "item",
+        "customer",
+        "customer_address",
+        "customer_demographics",
     ] {
         db.query(QKind::Meta, &format!("select count(*) from {t}")).await?;
     }
@@ -152,12 +161,17 @@ pub async fn e1(db: Arc<Db>, o: &E1Opts) -> Result<(Value, String)> {
     }
     let picked: Vec<workload::TaskNeeds> = assign.iter().flat_map(|(_, _, v)| v.iter().map(|&i| tasks[i].clone())).collect();
     let (p_req, j_req, dt_req, dj_req) = workload::needs_summary(&picked);
-    eprintln!(
-        "E1：TPC-DS 99 条查询共需表探查 {p_all} 次、关联验证 {j_all} 次（不同表 {dt_all} 张、不同关联 {dj_all} 种）"
-    );
+    eprintln!("E1：TPC-DS 99 条查询共需表探查 {p_all} 次、关联验证 {j_all} 次（不同表 {dt_all} 张、不同关联 {dj_all} 种）");
     eprintln!(
         "E1：{} 个 Agent × {} 个会话 × 每会话 {} 个任务 = {} 个任务；需求 {} 次表探查 + {} 次关联验证，去重后 {} + {}",
-        o.agents, o.sessions, o.tasks_per_session, picked.len(), p_req, j_req, dt_req, dj_req
+        o.agents,
+        o.sessions,
+        o.tasks_per_session,
+        picked.len(),
+        p_req,
+        j_req,
+        dt_req,
+        dj_req
     );
     warmup(&db).await?;
     let assign = Arc::new(assign);
@@ -192,7 +206,14 @@ pub async fn e1(db: Arc<Db>, o: &E1Opts) -> Result<(Value, String)> {
         "### 实验 1：共享与在途合并对数据库负载的影响（实测）\n\n\
          负载：TPC-DS 99 条标准查询各自需要的表探查与关联验证。{} 个 Agent × {} 个会话 × 每会话 {} 个任务（随机抽取，种子 {}），\
          共需 {} 次表探查 + {} 次关联验证；去重后只有 {} 张表 + {} 种关联。\n\n{}",
-        o.agents, o.sessions, o.tasks_per_session, o.seed, p_req, j_req, dt_req, dj_req,
+        o.agents,
+        o.sessions,
+        o.tasks_per_session,
+        o.seed,
+        p_req,
+        j_req,
+        dt_req,
+        dj_req,
         md_table(&["并发", "模式", "数据库查询数", "数据库耗时 s", "总耗时 s", "任务 p50 s", "任务 p95 s", "经验命中", "在途合并"], &rows)
     );
     Ok((
@@ -385,8 +406,7 @@ pub async fn e2(db: Arc<Db>, admin: Arc<Db>, modes: &[String], verbose: bool) ->
     for (_, v) in plan2.iter_mut() {
         v.push(h1);
     }
-    let keys: Vec<(Channel, Period)> =
-        plan1.iter().chain(plan2.iter()).flat_map(|(_, v)| v.iter().map(|p| (Channel::Store, *p))).collect();
+    let keys: Vec<(Channel, Period)> = plan1.iter().chain(plan2.iter()).flat_map(|(_, v)| v.iter().map(|p| (Channel::Store, *p))).collect();
     let gold = gold_rates(&admin, &keys).await?;
     warmup(&db).await?;
     let mut results = vec![];
@@ -524,11 +544,11 @@ pub async fn e3(db: Arc<Db>, admin: Arc<Db>, o: &E3Opts) -> Result<(Value, Strin
     etl::setup(&admin).await?;
     etl::reset(&admin).await?;
     let years = [1999, 2000, 2001, 2002];
-    let kinds: Vec<(Channel, Period)> =
-        Channel::ALL.iter().flat_map(|c| years.iter().map(move |y| (*c, Period::year(*y)))).collect();
+    let kinds: Vec<(Channel, Period)> = Channel::ALL.iter().flat_map(|c| years.iter().map(move |y| (*c, Period::year(*y)))).collect();
     let mut rng = StdRng::seed_from_u64(o.seed);
     // 预先抽好每个会话的任务与“是否掉进陷阱”，所有模式看到同样的 Agent 行为
-    let mut plan: Vec<(String, String, Vec<(Channel, Period, bool)>)> = vec![];
+    type SessionPlan = (String, String, Vec<(Channel, Period, bool)>);
+    let mut plan: Vec<SessionPlan> = vec![];
     for a in 0..o.agents {
         for s in 0..o.sessions {
             let v = (0..o.tasks_per_session)
@@ -628,7 +648,12 @@ pub async fn demo(db: Arc<Db>, admin: Arc<Db>) -> Result<()> {
     let s = db.meter.snap();
     let a = ask_via_paths(&mid, &fin, Channel::Store, y2001).await?;
     let d = diff(&s, &db.meter.snap());
-    eprintln!("  → 答 {:.2}%（标准答案 {g2001:.2}%）；这次打到数据库 {} 条查询，{:.1} s", a.value.unwrap_or(f64::NAN), d.queries, d.db_ms / 1000.0);
+    eprintln!(
+        "  → 答 {:.2}%（标准答案 {g2001:.2}%）；这次打到数据库 {} 条查询，{:.1} s",
+        a.value.unwrap_or(f64::NAN),
+        d.queries,
+        d.db_ms / 1000.0
+    );
     eprintln!("  中间层记下的关联经验：");
     show_join(&mid, "store_returns", "store_sales");
     show_join(&mid, "store_sales", "date_dim");
@@ -636,16 +661,9 @@ pub async fn demo(db: Arc<Db>, admin: Arc<Db>) -> Result<()> {
     step("② 周二 · 另一家厂商的门店运营 Agent（Claude 系）自己写 SQL，只按小票号关联");
     let ops = Ctx::new("store-claude", "tue", "q2");
     let s = db.meter.snap();
-    let a = run_with_retries(
-        &mid,
-        &ops,
-        Channel::Store,
-        y2001,
-        Channel::Store.trap_on(),
-        None,
-        ("ss_sold_date_sk".into(), "d_date_sk".into()),
-    )
-    .await?;
+    let a =
+        run_with_retries(&mid, &ops, Channel::Store, y2001, Channel::Store.trap_on(), None, ("ss_sold_date_sk".into(), "d_date_sk".into()))
+            .await?;
     let d = diff(&s, &db.meter.snap());
     for r in &a.reasons {
         eprintln!("  中间层拦下：{r}");

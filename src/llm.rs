@@ -23,7 +23,9 @@ pub struct ToolCall {
 pub enum Turn {
     User(String),
     /// raw：厂商原样返回的助手消息（Anthropic 为 content 数组，需原样回传，含 thinking 块）
-    Assistant { raw: Value },
+    Assistant {
+        raw: Value,
+    },
     ToolResults(Vec<(String, String, bool)>),
 }
 
@@ -53,7 +55,7 @@ impl Provider {
             "claude" | "anthropic" => Provider::Anthropic {
                 key: env("ANTHROPIC_API_KEY").ok_or_else(|| anyhow!("缺少 ANTHROPIC_API_KEY（写在 .env 里）"))?,
                 base: env("ANTHROPIC_BASE_URL").unwrap_or_else(|| "https://api.anthropic.com".into()),
-                model: env("ANTHROPIC_MODEL").unwrap_or_else(|| "claude-opus-5".into()),
+                model: env("ANTHROPIC_MODEL").ok_or_else(|| anyhow!("缺少 ANTHROPIC_MODEL"))?,
                 http: http(),
             },
             "openai" => Provider::OpenAi {
@@ -128,9 +130,11 @@ async fn anthropic_chat(
             })).collect::<Vec<_>>()}),
         })
         .collect();
-    let tools: Vec<Value> =
-        tools.iter().map(|t| json!({"name": t.name, "description": t.description, "input_schema": t.schema})).collect();
-    let mut body = json!({"model": model, "max_tokens": 16000, "system": system, "tools": tools, "messages": messages});
+    let tools: Vec<Value> = tools.iter().map(|t| json!({"name": t.name, "description": t.description, "input_schema": t.schema})).collect();
+    let mut body = json!({"model": model, "max_tokens": 16000, "system": system, "messages": messages});
+    if !tools.is_empty() {
+        body["tools"] = json!(tools);
+    }
     let mut req = http
         .post(format!("{}/v1/messages", base.trim_end_matches('/')))
         .header("x-api-key", key)
@@ -200,7 +204,10 @@ async fn openai_chat(
         .iter()
         .map(|t| json!({"type": "function", "function": {"name": t.name, "description": t.description, "parameters": t.schema}}))
         .collect();
-    let body = json!({"model": model, "messages": messages, "tools": tools});
+    let mut body = json!({"model": model, "messages": messages});
+    if !tools.is_empty() {
+        body["tools"] = json!(tools);
+    }
     let req = http.post(format!("{}/chat/completions", base.trim_end_matches('/'))).bearer_auth(key);
     let v = post_json(req, &body).await?;
     let msg = v["choices"][0]["message"].clone();
@@ -368,8 +375,7 @@ pub async fn llm_eval(
 ) -> Result<(Value, String)> {
     etl::setup(&admin).await?;
     etl::reset(&admin).await?;
-    let qs: Vec<Question> =
-        questions().into_iter().filter(|q| qids.as_ref().map_or(true, |v| v.iter().any(|x| x == q.id))).collect();
+    let qs: Vec<Question> = questions().into_iter().filter(|q| qids.as_ref().is_none_or(|v| v.iter().any(|x| x == q.id))).collect();
     let mut gold = std::collections::HashMap::new();
     for q in &qs {
         let r = admin.query(crate::db::QKind::Meta, q.gold_sql).await?;
@@ -435,5 +441,40 @@ pub async fn llm_eval(
         "### LLM Agent：直连 vs 中间层\n\n{}",
         md_table(&["模式", "数据", "题", "Agent", "对错", "回答", "标准答案", "工具调用", "拦下", "DB 查询", "DB s", "token"], &rows)
     );
-    Ok((json!({"experiment": "llm", "agents": agents.iter().map(|(a, p)| json!({"agent": a, "provider": p.label()})).collect::<Vec<_>>(), "runs": runs}), md))
+    Ok((
+        json!({"experiment": "llm", "agents": agents.iter().map(|(a, p)| json!({"agent": a, "provider": p.label()})).collect::<Vec<_>>(), "runs": runs}),
+        md,
+    ))
+}
+
+#[cfg(test)]
+mod provider_tests {
+    use super::*;
+    use axum::{routing::post, Json, Router};
+
+    #[tokio::test]
+    async fn management_request_uses_configured_model_without_tools() {
+        let app = Router::new().route(
+            "/v1/chat/completions",
+            post(|Json(body): Json<Value>| async move {
+                assert_eq!(body["model"], "test-model");
+                assert_eq!(body["messages"][0]["role"], "system");
+                assert!(body.get("tools").is_none());
+                Json(json!({"choices": [{"message": {"role": "assistant", "content": "{\"ok\":true}"}}]}))
+            }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+        let provider = Provider::OpenAi {
+            key: "test-key".into(),
+            base: format!("http://{addr}/v1"),
+            model: "test-model".into(),
+            http: reqwest::Client::builder().no_proxy().build().unwrap(),
+        };
+        let reply = provider.chat("Return JSON", &[Turn::User("aggregate metrics".into())], &[]).await.unwrap();
+        assert_eq!(reply.text, r#"{"ok":true}"#);
+        assert!(reply.calls.is_empty());
+        server.abort();
+    }
 }

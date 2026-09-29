@@ -31,6 +31,11 @@ pub fn tables(sql: &str, cat: &Catalog) -> BTreeSet<String> {
     word_re().find_iter(&s).map(|m| m.as_str().to_string()).filter(|w| cat.table(w).is_some()).collect()
 }
 
+/// 表达式中的标识符（小写，已去掉注释与字符串字面量）。
+pub fn words(expr: &str) -> Vec<String> {
+    word_re().find_iter(&strip(expr)).map(|m| m.as_str().to_string()).collect()
+}
+
 /// 一次关联：left.col = right.col（可多列）。
 #[derive(Clone, Debug)]
 pub struct JoinUse {
@@ -86,9 +91,44 @@ pub fn contains_filter(sql: &str, filter: &str) -> bool {
     squash(sql).contains(&squash(filter))
 }
 
+/// 逐键查看的查询不会跨同键的多行汇总：没有聚合，或只有一层 SELECT 且 GROUP BY 含全部键列
+/// （例如查看状态流水里哪些键有重复行）。嵌套查询一律不算，避免“内层按键求和、外层再求和”。
+pub fn per_key(sql: &str, key: &[String]) -> bool {
+    let s = strip(sql);
+    let agg = Regex::new(r"\b(sum|count|avg|min|max|string_agg|array_agg|bool_and|bool_or)\s*\(").unwrap();
+    let group = Regex::new(r"\bgroup\s+by\b").unwrap();
+    if !agg.is_match(&s) && !group.is_match(&s) {
+        return true;
+    }
+    if Regex::new(r"\bselect\b").unwrap().find_iter(&s).count() != 1 {
+        return false;
+    }
+    let Some(m) = group.find(&s) else { return false };
+    let rest = &s[m.end()..];
+    let end = Regex::new(r"\b(having|order\s+by|limit|offset|window)\b").unwrap().find(rest).map_or(rest.len(), |x| x.start());
+    let cols = words(&rest[..end]);
+    !key.is_empty() && key.iter().all(|k| cols.contains(&k.to_lowercase()))
+}
+
 #[cfg(test)]
 mod tests {
-    use super::normalize;
+    use super::{normalize, per_key};
+
+    #[test]
+    fn per_key_queries_do_not_sum_across_duplicates() {
+        let key = vec!["sr_ticket_number".to_string(), "sr_item_sk".to_string()];
+        let dup = "SELECT sr_ticket_number, sr_item_sk, count(*), count(DISTINCT sr_status) FROM store_returns \
+                   GROUP BY sr_ticket_number, sr.sr_item_sk HAVING count(*) > 1 ORDER BY 3 DESC LIMIT 10";
+        assert!(per_key(dup, &key));
+        assert!(per_key("select * from store_returns limit 5", &key));
+        assert!(!per_key("select sum(sr_return_amt) from store_returns", &key));
+        assert!(!per_key("select sr_ticket_number, sum(sr_return_amt) from store_returns group by sr_ticket_number", &key));
+        assert!(!per_key(
+            "select sum(a) from (select sr_ticket_number, sr_item_sk, sum(sr_return_amt) a from store_returns \
+             group by sr_ticket_number, sr_item_sk) x",
+            &key
+        ));
+    }
 
     #[test]
     fn cache_keys_preserve_sql_semantics() {

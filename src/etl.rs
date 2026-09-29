@@ -88,10 +88,14 @@ pub async fn reset(db: &Db) -> Result<()> {
     Ok(())
 }
 
-/// 等 pg_stat 的 DML 计数刷新（PG 统计是异步上报的），避免实验里同一次变更被“感知”两次。
 async fn wait_stats(db: &Db, before: i64) -> Result<()> {
+    wait_table_stats(db, "store_returns", before).await
+}
+
+/// 等 pg_stat 的 DML 计数刷新（PG 统计是异步上报的），避免实验里同一次变更被“感知”两次。
+pub(crate) async fn wait_table_stats(db: &Db, table: &str, before: i64) -> Result<()> {
     for _ in 0..40 {
-        let now = catalog::versions(db).await?.get("store_returns").map(|v| v.dml).unwrap_or(0);
+        let now = catalog::versions(db).await?.get(table).map(|v| v.dml).unwrap_or(0);
         if now != before {
             return Ok(());
         }

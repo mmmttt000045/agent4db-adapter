@@ -1,0 +1,28 @@
+生成合成零售数据：门店销售 1000000 行，目录销售 500000 行
+== r1-metric-global-named
+  r1-metric-global-named learn    A M1-L1  correct  轮  5 工具  7 拦下 0 | 答 13570368.70 / 标准 13570368.70
+  提炼 M1-L1 → promoted 
+  r1-metric-global-named learn    A M1-L2  correct  轮  3 工具  4 拦下 0 | 答 13085788.40 / 标准 13085788.40
+  提炼 M1-L2 → candidate G7
+  r1-metric-global-named learn    A M3-L1  correct  轮  7 工具 15 拦下 0 | 答 23.76 / 标准 23.7563154314960
+  r1-metric-global-named learn    A M3-L2  correct  轮  8 工具 16 拦下 0 | 答 23.76 / 标准 23.7637966785249
+  提炼 M3-L2 → promoted 
+  r1-metric-global-named holdout  B M1-P1  correct  轮  5 工具  6 拦下 0 | 答 13069651.80 / 标准 13069651.80
+  r1-metric-global-named holdout  B M1-T1  correct  轮  3 工具  5 拦下 0 | 答 -12007.70 / 标准 -12007.70
+  r1-metric-global-named holdout  B M1-T2  correct  轮  4 工具  5 拦下 0 | 答 12 / 标准 12
+  r1-metric-global-named holdout  B M3-P1  correct  轮  6 工具  9 拦下 0 | 答 23.81 / 标准 23.8079848462374
+  r1-metric-global-named holdout  B M3-T1  correct  轮  6 工具  9 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-named holdout  B M3-T2  correct  轮  6 工具 10 拦下 0 | 答 7 / 标准 7
+  正常新增：补录 27095 行
+  r1-metric-global-named growth   B M1-P1  correct  轮  3 工具  5 拦下 0 | 答 26139303.60 / 标准 26139303.60
+  r1-metric-global-named growth   B M1-T1  correct  轮  5 工具  6 拦下 0 | 答 13057644.10 / 标准 13057644.10
+  r1-metric-global-named growth   B M1-T2  correct  轮  4 工具  6 拦下 0 | 答 9 / 标准 9
+  r1-metric-global-named growth   B M3-P1  correct  轮  3 工具  5 拦下 0 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-named growth   B M3-T1  correct  轮  4 工具  6 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-named growth   B M3-T2  correct  轮  4 工具  6 拦下 0 | 答 7 / 标准 7
+  ETL v2：新增“申请”行 170816 条
+  r1-metric-global-named v2       B M3-P1  correct  轮  4 工具  9 拦下 0 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-named v2       B M3-T1  correct  轮  6 工具  9 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-named v2       B M3-T2  correct  轮  5 工具  7 拦下 1 | 答 7 / 标准 7
+指标经验评测报告：results/metric-1790670392834889/report.md
+EXIT 0

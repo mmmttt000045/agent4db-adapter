@@ -121,6 +121,12 @@ impl Catalog {
         self.col_table.get(col).map(String::as_str)
     }
 
+    #[cfg(test)]
+    pub fn from_tables(tables: Vec<Table>) -> Catalog {
+        let col_table = tables.iter().flat_map(|t| t.cols.iter().map(|c| (c.name.clone(), t.name.clone()))).collect();
+        Catalog { tables: tables.into_iter().map(|t| (t.name.clone(), t)).collect(), col_table }
+    }
+
     pub fn rows(&self, t: &str) -> f64 {
         self.table(t).map(|x| x.rows_est).unwrap_or(0.0)
     }

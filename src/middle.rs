@@ -5,6 +5,11 @@
 //! - 守护：每条经验绑定依赖表的版本；依赖变化时先重跑守卫（验证时成立的不变量），失败即撤销、通知使用者并修复。
 //! - 反馈：检查顺序按“发现问题的概率 / 共享摊销后的代价”调整，回放证据显示更省才采纳，且重排不改变验证结论；
 //!   被证伪的关联写法不再重试，Agent 提交的 SQL 用到时直接拦下。
+//! - 指标经验：从成功轨迹提炼的业务口径，经门槛晋升后共享，见子模块 `metrics`。
+
+mod metrics;
+
+pub use metrics::MetricEvidence;
 
 use crate::catalog::{self, Catalog, TableVersion};
 use crate::checks::{flip, fmt_on, same_on, Check, On, Outcome};
@@ -45,6 +50,35 @@ pub enum GuardMode {
     Always,
 }
 
+/// 指标经验在依赖表有写入后的维护方式（对照组）。除 Off 外执行端都核对声明的引用；
+/// 守卫所用的条件、受限修复与回归在各方式间相同，只有“何时重查、重查哪些条件、结论是否跨定义复用”不同。
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, clap::ValueEnum)]
+#[serde(rename_all = "snake_case")]
+pub enum Maint {
+    /// 不守护：记住了就直接用，执行端也不核对引用
+    Off,
+    /// 只看表结构：结构指纹不变就刷新依赖版本继续用
+    Schema,
+    /// 逐写入撤销：依赖表有写入即正式撤销，不重验、不修复，只能重新提炼
+    Revoke,
+    /// 定义级重验：依赖表有写入即待验证，首次使用时重跑该定义的全部条件
+    Definition,
+    /// 条件级重验：只重查读到了变化表的条件；同一条件在同一版本上的结论跨定义复用
+    Condition,
+}
+
+impl Maint {
+    pub fn name(self) -> &'static str {
+        match self {
+            Maint::Off => "off",
+            Maint::Schema => "schema",
+            Maint::Revoke => "revoke",
+            Maint::Definition => "definition",
+            Maint::Condition => "condition",
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize)]
 pub struct MiddleConfig {
     pub name: String,
@@ -62,6 +96,15 @@ pub struct MiddleConfig {
     pub trace_checks: bool,
     /// 实验可固定候选级审计抽样；None 保持逐次随机审计。
     pub audit_seed: Option<u64>,
+    /// 指标经验的可见范围，与其他经验的 scope 分开设置
+    pub metric_scope: Scope,
+    /// 指标经验的维护方式；Off 同时关闭执行端引用检查
+    pub metric_maint: Maint,
+    /// 条件结论复用：同一条件（键唯一性按表、列集合与过滤）在读到的表的当前版本上已有结论时，守卫、指标条件与修复回归直接复用，
+    /// 同表同键的粒度修复复用已找到的过滤。条件级维护的一部分；默认关闭，其他实验的行为不变
+    pub cond_reuse: bool,
+    /// 按任务记录 run_sql 计算链（指标经验的提炼与评测用）
+    pub record: bool,
 }
 
 impl Default for MiddleConfig {
@@ -79,6 +122,10 @@ impl Default for MiddleConfig {
             verbose: false,
             trace_checks: false,
             audit_seed: None,
+            metric_scope: Scope::Global,
+            metric_maint: Maint::Condition,
+            cond_reuse: false,
+            record: false,
         }
     }
 }
@@ -141,6 +188,60 @@ enum Lookup {
 
 type Versions = Arc<HashMap<String, TableVersion>>;
 
+/// 一个任务里 run_sql 的计算链。
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct TaskLog {
+    pub calls: Vec<SqlCall>,
+    /// 被拦下的 SQL：{sql, reason, metrics}
+    pub rejections: Vec<Value>,
+    pub finds: u32,
+    /// find_metric 返回的有效指标 (key, revision)
+    pub found: Vec<(String, u32)>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct SqlCall {
+    /// 对 Agent 显示为 r{index}
+    pub index: usize,
+    pub sql: String,
+    pub deps: BTreeMap<String, TableVersion>,
+    pub result: Value,
+    /// 本条 SQL 声明依据的指标经验
+    pub metrics: Vec<(String, u32)>,
+    pub source: String,
+}
+
+fn task_key(ctx: &Ctx) -> String {
+    format!("{}/{}/{}", ctx.agent, ctx.session, ctx.task)
+}
+
+fn scope_prefix(scope: Scope, ctx: &Ctx) -> String {
+    match scope {
+        Scope::Global => "G".into(),
+        Scope::Agent => format!("A:{}", ctx.agent),
+        Scope::Session => format!("S:{}/{}", ctx.agent, ctx.session),
+        Scope::Task => format!("T:{}/{}/{}", ctx.agent, ctx.session, ctx.task),
+    }
+}
+
+/// run_sql 的可选参数 metrics：[{key, revision}]。
+fn metric_refs(args: &Value) -> Result<Vec<(String, u32)>> {
+    let Some(a) = args.get("metrics").filter(|a| !a.is_null()) else { return Ok(vec![]) };
+    let bad = || anyhow!("参数 metrics 应为 [{{\"key\": ..., \"revision\": ...}}]");
+    a.as_array()
+        .ok_or_else(bad)?
+        .iter()
+        .map(|x| {
+            let key = x["key"].as_str().ok_or_else(bad)?;
+            let rev = x["revision"]
+                .as_u64()
+                .or_else(|| x["revision"].as_str().and_then(|s| s.trim().trim_start_matches(['r', 'R']).parse().ok()))
+                .ok_or_else(bad)?;
+            Ok((key.to_string(), u32::try_from(rev)?))
+        })
+        .collect()
+}
+
 pub struct Middle {
     pub db: Arc<Db>,
     pub cat: Catalog,
@@ -154,6 +255,10 @@ pub struct Middle {
     notices: Mutex<HashMap<String, Vec<String>>>,
     pub stats: Stats,
     traces: Mutex<Vec<Value>>,
+    tasks: Mutex<HashMap<String, TaskLog>>,
+    /// 指标经验的验证证据（按完整键），不随 find_metric 返回
+    metric_evidence: Mutex<HashMap<String, MetricEvidence>>,
+    metric_events: Mutex<Vec<Value>>,
 }
 
 fn join_key(a: &str, b: &str) -> String {
@@ -222,6 +327,9 @@ impl Middle {
             notices: Mutex::new(HashMap::new()),
             stats: Stats::default(),
             traces: Mutex::new(Vec::new()),
+            tasks: Mutex::new(HashMap::new()),
+            metric_evidence: Mutex::new(HashMap::new()),
+            metric_events: Mutex::new(Vec::new()),
         })
     }
 
@@ -245,13 +353,60 @@ impl Middle {
         std::mem::take(&mut *self.traces.lock())
     }
 
-    fn scope_key(&self, ctx: &Ctx) -> String {
-        match self.cfg.scope {
-            Scope::Global => "G".into(),
-            Scope::Agent => format!("A:{}", ctx.agent),
-            Scope::Session => format!("S:{}/{}", ctx.agent, ctx.session),
-            Scope::Task => format!("T:{}/{}/{}", ctx.agent, ctx.session, ctx.task),
+    /// 取出并清空该任务的计算链记录。
+    pub fn take_task_log(&self, ctx: &Ctx) -> TaskLog {
+        self.tasks.lock().remove(&task_key(ctx)).unwrap_or_default()
+    }
+
+    /// 记录一次成功的 run_sql，返回给 Agent 的编号 r{n}。
+    fn note_call(
+        &self,
+        ctx: &Ctx,
+        sql: &str,
+        refs: &[(String, u32)],
+        result: &Value,
+        source: &str,
+        deps: BTreeMap<String, TableVersion>,
+    ) -> Option<String> {
+        if !self.cfg.record {
+            return None;
         }
+        let mut tasks = self.tasks.lock();
+        let log = tasks.entry(task_key(ctx)).or_default();
+        let index = log.calls.len() + 1;
+        log.calls.push(SqlCall {
+            index,
+            sql: sql.to_string(),
+            deps,
+            result: result.clone(),
+            metrics: refs.to_vec(),
+            source: source.to_string(),
+        });
+        Some(format!("r{index}"))
+    }
+
+    fn note_rejection(&self, ctx: &Ctx, sql: &str, refs: &[(String, u32)], rej: &Value) {
+        if self.cfg.record {
+            self.tasks
+                .lock()
+                .entry(task_key(ctx))
+                .or_default()
+                .rejections
+                .push(json!({"sql": sql, "reason": rej["reason"], "metrics": refs}));
+        }
+    }
+
+    fn note_find(&self, ctx: &Ctx, found: &[(String, u32)]) {
+        if self.cfg.record {
+            let mut tasks = self.tasks.lock();
+            let log = tasks.entry(task_key(ctx)).or_default();
+            log.finds += 1;
+            log.found.extend_from_slice(found);
+        }
+    }
+
+    fn scope_key(&self, ctx: &Ctx) -> String {
+        scope_prefix(self.cfg.scope, ctx)
     }
 
     fn fk(&self, ctx: &Ctx, key: &str) -> String {
@@ -319,6 +474,11 @@ impl Middle {
     // ───────────────────────── 经验库：查、守卫、撤销 ─────────────────────────
 
     async fn lookup(&self, ctx: &Ctx, key: &str) -> Result<Lookup> {
+        self.lookup_with(ctx, key, false).await
+    }
+
+    /// `force`：不论哪张依赖表变化都重跑全部守卫（指标经验的定义级重验用）。
+    async fn lookup_with(&self, ctx: &Ctx, key: &str, force: bool) -> Result<Lookup> {
         let fk = self.fk(ctx, key);
         let Some(e) = self.store.get(&fk) else {
             inc(&self.stats.misses);
@@ -333,7 +493,8 @@ impl Middle {
         }
         let cur = self.versions().await?;
         let changed: Vec<String> = e.deps.iter().filter(|(t, v)| cur.get(*t) != Some(*v)).map(|(t, _)| t.clone()).collect();
-        if changed.is_empty() && self.cfg.guard == GuardMode::OnChange {
+        let always = force || self.cfg.guard == GuardMode::Always;
+        if changed.is_empty() && !always {
             return Ok(self.hit(ctx, &fk, e));
         }
         if e.guards.is_empty() {
@@ -345,11 +506,14 @@ impl Middle {
             inc(&self.stats.misses);
             return Ok(Lookup::Miss);
         }
-        let always = self.cfg.guard == GuardMode::Always;
         let to_run: Vec<Check> = e.guards.iter().filter(|g| always || g.tables().iter().any(|t| changed.contains(t))).cloned().collect();
         for g in &to_run {
             inc(&self.stats.guard_runs);
-            let o = self.exec_check(ctx, g, QKind::Guard).await?.0;
+            let o = if self.cfg.cond_reuse {
+                self.cond_check(ctx, g, QKind::Guard).await?.0
+            } else {
+                self.exec_check(ctx, g, QKind::Guard).await?.0
+            };
             self.log(ctx, format!("守卫「{}」→ {}", g.describe(), if o.pass { "通过" } else { "失败" }));
             if !o.pass {
                 inc(&self.stats.guard_fails);
@@ -548,8 +712,12 @@ impl Middle {
 
     /// 读取（必要时重验）某表对的关联经验。
     async fn join_entry(&self, ctx: &Ctx, a: &str, b: &str) -> Result<(Vec<JoinPath>, Vec<BadPath>, &'static str)> {
+        self.join_entry_with(ctx, a, b, false).await
+    }
+
+    async fn join_entry_with(&self, ctx: &Ctx, a: &str, b: &str, force: bool) -> Result<(Vec<JoinPath>, Vec<BadPath>, &'static str)> {
         let key = join_key(a, b);
-        match self.lookup(ctx, &key).await? {
+        match self.lookup_with(ctx, &key, force).await? {
             Lookup::Hit(e) => match e.content {
                 Content::Join { paths, bad } => Ok((paths, bad, "reused")),
                 _ => Ok((vec![], vec![], "none")),
@@ -777,6 +945,12 @@ impl Middle {
     /// 粒度修复：`table` 在 `cols` 上几乎唯一时，找一个低基数列上的取值，
     /// 使过滤后键唯一且不丢任何键（例如状态流水表只取“完成”状态）。
     async fn repair_grain(&self, ctx: &Ctx, table: &str, cols: &[String]) -> Result<Option<String>> {
+        if self.cfg.cond_reuse {
+            if let Some(f) = self.known_grain_filter(ctx, table, cols).await? {
+                self.log(ctx, format!("粒度修复：复用 {table} 在当前版本上已找到的过滤 {f}"));
+                return Ok(Some(f));
+            }
+        }
         let st = self
             .db
             .query(
@@ -919,7 +1093,19 @@ impl Middle {
 
     /// 某个具体写法是否成立（先查经验，未知才验证）。
     async fn verdict(&self, ctx: &Ctx, a: &str, b: &str, on: &On) -> Result<(std::result::Result<JoinPath, BadPath>, &'static str)> {
-        let (paths, bad, src) = self.join_entry(ctx, a, b).await?;
+        self.verdict_with(ctx, a, b, on, false).await
+    }
+
+    /// `force`：关联经验的全部守卫都重跑，见 `lookup_with`。
+    async fn verdict_with(
+        &self,
+        ctx: &Ctx,
+        a: &str,
+        b: &str,
+        on: &On,
+        force: bool,
+    ) -> Result<(std::result::Result<JoinPath, BadPath>, &'static str)> {
+        let (paths, bad, src) = self.join_entry_with(ctx, a, b, force).await?;
         if let Some(p) = paths.iter().find(|p| same_on(&p.on, on)) {
             return Ok((Ok(p.clone()), src));
         }
@@ -959,6 +1145,11 @@ impl Middle {
     // ───────────────────────── 工具：执行 ─────────────────────────
 
     pub async fn run_sql(&self, ctx: &Ctx, sql: &str) -> Result<Value> {
+        self.run_sql_with(ctx, sql, &[]).await
+    }
+
+    /// `refs`：本条 SQL 声明依据的指标经验 (key, revision)，执行前核对仍然有效。
+    pub async fn run_sql_with(&self, ctx: &Ctx, sql: &str, refs: &[(String, u32)]) -> Result<Value> {
         let s = sql.trim().trim_end_matches(';').trim();
         let low = s.to_lowercase();
         if !(low.starts_with("select") || low.starts_with("with")) || s.contains(';') {
@@ -966,35 +1157,54 @@ impl Middle {
         }
         let tables: Vec<String> = sqlscan::tables(s, &self.cat).into_iter().collect();
         self.allowed(ctx, &tables.iter().map(String::as_str).collect::<Vec<_>>())?;
+        if !refs.is_empty() && self.cfg.metric_maint != Maint::Off {
+            if let Some(rej) = self.check_metric_refs(ctx, refs).await? {
+                self.log(ctx, format!("拦下 SQL：{}", rej["reason"].as_str().unwrap_or("")));
+                self.note_rejection(ctx, s, refs, &rej);
+                return Ok(rej);
+            }
+        }
         if self.cfg.validate_sql {
             if let Some(rej) = self.review_sql(ctx, s, &tables).await? {
                 inc(&self.stats.rejections);
                 self.log(ctx, format!("拦下 SQL：{}", rej["reason"].as_str().unwrap_or("")));
+                self.note_rejection(ctx, s, refs, &rej);
                 return Ok(rej);
             }
         }
         let norm = sqlscan::normalize(s);
         let key = format!("result:{norm}");
+        let mut reused = None;
         if self.cfg.result_cache {
             if let Lookup::Hit(e) = self.lookup(ctx, &key).await? {
                 if let Content::Result(v) = e.content {
                     self.log(ctx, "复用相同查询的结果");
-                    return Ok(json!({"result": v, "source": "reused"}));
+                    reused = Some((v, e.deps));
                 }
             }
         }
-        let deps = self.deps_for(&tables).await?;
-        let max_rows = self.cfg.max_rows;
-        let (v, merged) = self
-            .flight_v
-            .run(self.cfg.singleflight, &self.fk(ctx, &format!("sql:{norm}@{}", ver_sig(&deps))), || async {
-                Ok(self.db.query(QKind::Exec, s).await?.to_json(max_rows))
-            })
-            .await?;
-        if self.cfg.result_cache {
-            self.store.put(&self.fk(ctx, &key), self.new_entry(ctx, &key, Content::Result(v.clone()), deps, vec![]));
+        let (v, source, deps) = match reused {
+            Some((v, deps)) => (v, "reused", deps),
+            None => {
+                let deps = self.deps_for(&tables).await?;
+                let max_rows = self.cfg.max_rows;
+                let (v, merged) = self
+                    .flight_v
+                    .run(self.cfg.singleflight, &self.fk(ctx, &format!("sql:{norm}@{}", ver_sig(&deps))), || async {
+                        Ok(self.db.query(QKind::Exec, s).await?.to_json(max_rows))
+                    })
+                    .await?;
+                if self.cfg.result_cache {
+                    self.store.put(&self.fk(ctx, &key), self.new_entry(ctx, &key, Content::Result(v.clone()), deps.clone(), vec![]));
+                }
+                (v, if merged { "merged" } else { "executed" }, deps)
+            }
+        };
+        let mut out = json!({"result": v, "source": source});
+        if let Some(r) = self.note_call(ctx, s, refs, &v, source, deps) {
+            out["ref"] = json!(r);
         }
-        Ok(json!({"result": v, "source": if merged { "merged" } else { "executed" }}))
+        Ok(out)
     }
 
     /// 执行前审查：关联写法是否已被证伪 / 验证不通过；用到的表是否需要粒度过滤。
@@ -1019,7 +1229,8 @@ impl Middle {
             if let Lookup::Hit(e) = self.lookup(ctx, &key).await? {
                 if let Content::Profile(g) = e.content {
                     let f = g["filter"].as_str().unwrap_or_default();
-                    if !sqlscan::contains_filter(sql, f) {
+                    let key: Vec<String> = serde_json::from_value(g["key"].clone()).unwrap_or_default();
+                    if !sqlscan::contains_filter(sql, f) && !sqlscan::per_key(sql, &key) {
                         return Ok(Some(json!({
                             "rejected": true,
                             "reason": format!("表 {t} 现在每个键有多行（状态流水）；统计前需要加过滤 {f}，否则会重复计算"),
@@ -1045,7 +1256,15 @@ impl Middle {
                     .map_err(|_| anyhow!("参数 on 应为 [[左列, 右列], ...]"))?;
                 self.check_join(ctx, s("left")?, s("right")?, &on).await?
             }
-            "run_sql" => self.run_sql(ctx, s("sql")?).await?,
+            "run_sql" => self.run_sql_with(ctx, s("sql")?, &metric_refs(args)?).await?,
+            "find_metric" => {
+                let tables: Vec<String> = args
+                    .get("tables")
+                    .and_then(Value::as_array)
+                    .map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect())
+                    .unwrap_or_default();
+                self.find_metric(ctx, s("query")?, &tables).await?
+            }
             _ => bail!("未知工具：{name}"),
         };
         let notes = self.take_notices(&ctx.agent);
@@ -1065,6 +1284,11 @@ pub struct ToolSpec {
 }
 
 pub fn tool_specs(middle_tools: bool) -> Vec<ToolSpec> {
+    tool_specs_with(middle_tools, false)
+}
+
+/// `metric_tools`：加上 find_metric，并让 run_sql 接受 metrics 引用。
+pub fn tool_specs_with(middle_tools: bool, metric_tools: bool) -> Vec<ToolSpec> {
     let mut v = vec![
         ToolSpec {
             name: "list_tables",
@@ -1095,6 +1319,23 @@ pub fn tool_specs(middle_tools: bool) -> Vec<ToolSpec> {
                 "left": {"type": "string"}, "right": {"type": "string"},
                 "on": {"type": "array", "items": {"type": "array", "items": {"type": "string"}}}
             }, "required": ["left", "right", "on"]}),
+        });
+    }
+    if metric_tools {
+        if let Some(run) = v.iter_mut().find(|t| t.name == "run_sql") {
+            run.schema["properties"]["metrics"] = json!({
+                "type": "array",
+                "description": "本条 SQL 依据的指标经验（find_metric 返回的 key 与 revision），执行前会核对是否仍然有效",
+                "items": {"type": "object", "properties": {"key": {"type": "string"}, "revision": {"type": "integer"}}, "required": ["key", "revision"]}
+            });
+        }
+        v.push(ToolSpec {
+            name: "find_metric",
+            description: "查询中间层已验证的业务指标口径：定义、事实表、聚合表达式、时间角色、必需的关联与过滤、注意事项和示例 SQL。按指标名称或别名匹配，可用 tables 限定涉及的表。",
+            schema: json!({"type": "object", "properties": {
+                "query": {"type": "string", "description": "指标名称，如“门店营业额”"},
+                "tables": {"type": "array", "items": {"type": "string"}}
+            }, "required": ["query"]}),
         });
     }
     v

@@ -24,9 +24,11 @@ pub enum QKind {
     Repair = 4,
     /// 执行 Agent 的查询
     Exec = 5,
+    /// 指标经验的晋升门槛、守护与回归
+    Metric = 6,
 }
 
-pub const QKINDS: [QKind; 6] = [QKind::Meta, QKind::Probe, QKind::Check, QKind::Guard, QKind::Repair, QKind::Exec];
+pub const QKINDS: [QKind; 7] = [QKind::Meta, QKind::Probe, QKind::Check, QKind::Guard, QKind::Repair, QKind::Exec, QKind::Metric];
 
 impl QKind {
     pub fn name(self) -> &'static str {
@@ -37,14 +39,15 @@ impl QKind {
             QKind::Guard => "guard",
             QKind::Repair => "repair",
             QKind::Exec => "exec",
+            QKind::Metric => "metric",
         }
     }
 }
 
 #[derive(Default)]
 pub struct Meter {
-    counts: [AtomicU64; 6],
-    micros: [AtomicU64; 6],
+    counts: [AtomicU64; 7],
+    micros: [AtomicU64; 7],
 }
 
 #[derive(Clone, Debug, Serialize, Default)]

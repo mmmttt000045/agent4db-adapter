@@ -10,6 +10,9 @@ mod flight;
 mod integration_tests;
 mod knowledge;
 mod llm;
+mod maintbench;
+mod metric;
+mod metricbench;
 mod middle;
 mod optimizer;
 mod realbench;
@@ -52,6 +55,10 @@ enum Cmd {
     Bench(benchmark::Options),
     /// 2×2 消融：跨 Agent 共享 × 自反馈排序，另含专项测试
     Ablation(benchmark::Options),
+    /// 指标经验评测：提炼、跨 Agent 复用与 ETL 后的失效管理（真实模型，独立数据库）
+    MetricBench(metricbench::Options),
+    /// 指标经验维护方式对照：相同口径与数据变化序列下比较逐写入撤销、只看结构、定义级与条件级重验（不调用 LLM，独立数据库）
+    MaintBench(maintbench::Options),
     /// 初始化：状态列与 ETL 批次表（幂等）
     Setup,
     /// 模拟 ETL 改版：apply-v2 / reset / status
@@ -157,6 +164,8 @@ async fn main() -> Result<()> {
         Cmd::Research(options) => research::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::Bench(options) => benchmark::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::Ablation(options) => ablation::run(&cli.db, cli.pool, &cli.out, options).await?,
+        Cmd::MetricBench(options) => metricbench::run(&cli.db, cli.pool, &cli.out, options).await?,
+        Cmd::MaintBench(options) => maintbench::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::Setup => {
             etl::setup(&admin).await?;
             eprintln!("初始化完成");

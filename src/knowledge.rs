@@ -66,18 +66,139 @@ pub struct BadPath {
     pub fanout: f64,
 }
 
+/// 指标经验：业务含义到数据的映射。示例只存题面与 SQL，不存结果值。
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct Metric {
+    pub name: String,
+    #[serde(default)]
+    pub aliases: Vec<String>,
+    pub definition: String,
+    pub fact: String,
+    /// 聚合表达式，只能引用 fact 与 joins 涉及表的列
+    pub measure: String,
+    /// fact 上“一行一条业务记录”的键
+    pub grain: Vec<String>,
+    pub time: Option<TimeSpec>,
+    #[serde(default)]
+    pub joins: Vec<JoinRef>,
+    /// 仅口径必需条件（表 → 条件），不含题目参数
+    #[serde(default)]
+    pub filters: BTreeMap<String, String>,
+    #[serde(default)]
+    pub empty: EmptyRule,
+    #[serde(default)]
+    pub caveats: Vec<String>,
+    #[serde(default)]
+    pub examples: Vec<Example>,
+    #[serde(default)]
+    pub basis: Basis,
+}
+
+impl Metric {
+    /// 口径涉及的全部表（事实表、关联表、时间维度表）。
+    pub fn tables(&self) -> Vec<String> {
+        let mut t: BTreeSet<String> = [self.fact.clone()].into_iter().collect();
+        for j in &self.joins {
+            t.insert(j.left.clone());
+            t.insert(j.right.clone());
+        }
+        if let Some(tm) = &self.time {
+            t.insert(tm.dim.clone());
+        }
+        t.into_iter().collect()
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct TimeSpec {
+    /// 时间角色，如“销售日”“退货日”
+    pub role: String,
+    pub fact_col: String,
+    pub dim: String,
+    pub dim_col: String,
+    /// day / month / year
+    pub grain: String,
+}
+
+/// 指标引用的已验证关联：方向、基数、过滤与丢行比例都记下，关联能执行不等于不放大聚合。
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct JoinRef {
+    #[serde(default)]
+    pub key: String,
+    /// 多侧
+    pub left: String,
+    /// 一侧
+    pub right: String,
+    pub on: On,
+    #[serde(default)]
+    pub kind: JoinKind,
+    #[serde(default)]
+    pub filters: BTreeMap<String, String>,
+    #[serde(default)]
+    pub cardinality: String,
+    #[serde(default)]
+    pub loss_ratio: f64,
+    /// 引用时关联条目的修订号
+    #[serde(default)]
+    pub revision: u32,
+}
+
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum JoinKind {
+    #[default]
+    Inner,
+    Left,
+}
+
+/// 无输入行时的取值。PostgreSQL 的 SUM 此时返回 NULL，口径未说明时不默认当作零。
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum EmptyRule {
+    Null,
+    Zero,
+    #[default]
+    Unspecified,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct Example {
+    pub question: String,
+    pub sql: String,
+}
+
+/// 口径依据。
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum Basis {
+    ExplicitQuestion {
+        task: String,
+    },
+    Glossary {
+        source: String,
+    },
+    Confirmed {
+        by: String,
+    },
+    #[default]
+    None,
+}
+
 #[derive(Clone, Debug, Serialize)]
 pub enum Content {
     Profile(Value),
     Join { paths: Vec<JoinPath>, bad: Vec<BadPath> },
     CheckResult { check: Check, outcome: Outcome },
     Result(Value),
+    Metric(Box<Metric>),
 }
 
 #[derive(Clone, Debug, Serialize, PartialEq)]
 pub enum Status {
     Valid,
     Revoked(String),
+    /// 未通过晋升门槛或修复待验证；查找时按未命中处理
+    Candidate(String),
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -115,6 +236,14 @@ impl Store {
 
     pub fn len(&self) -> usize {
         self.map.read().len()
+    }
+
+    /// 按键前缀取出条目（含完整键），按键排序。
+    pub fn scan(&self, prefix: &str) -> Vec<(String, Entry)> {
+        let mut v: Vec<(String, Entry)> =
+            self.map.read().iter().filter(|(k, _)| k.starts_with(prefix)).map(|(k, e)| (k.clone(), e.clone())).collect();
+        v.sort_by(|a, b| a.0.cmp(&b.0));
+        v
     }
 
     pub fn dump(&self) -> Vec<Entry> {

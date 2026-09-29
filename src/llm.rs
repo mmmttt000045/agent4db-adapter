@@ -296,15 +296,41 @@ fn mock_chat(turns: &[Turn]) -> Result<Reply> {
 const SYSTEM: &str = "你是一个数据分析 Agent，通过工具查询 PostgreSQL 上的 TPC-DS 零售数仓（门店 / 目录 / 网店三个渠道）。\
 先弄清表结构与关联方式，再写 SQL；不要猜测列的含义。得到结果后调用 final_answer：answer 只写最终值（数字或类别名，不带单位与说明），sql 写得到它的那条 SQL。";
 
-const SYSTEM_MIDDLE: &str = "工具由数据中间层提供：join_path 返回两表验证过的关联方式（含需要的行过滤）；\
+pub(crate) const SYSTEM_MIDDLE: &str = "工具由数据中间层提供：join_path 返回两表验证过的关联方式（含需要的行过滤）；\
 run_sql 可能拒绝不可靠的写法并说明原因与建议，请按提示修改后重试；返回中的 notices 是中间层对你此前结果的提醒。";
 
-fn final_answer_spec() -> ToolSpec {
-    ToolSpec {
-        name: "final_answer",
-        description: "提交最终答案。",
-        schema: json!({"type": "object", "properties": {"answer": {"type": "string"}, "sql": {"type": "string"}}, "required": ["answer"]}),
+/// `chain`：要求 Agent 给出参与答案的查询编号与算式（指标经验评测用）。
+pub fn final_answer_spec(chain: bool) -> ToolSpec {
+    let mut schema =
+        json!({"type": "object", "properties": {"answer": {"type": "string"}, "sql": {"type": "string"}}, "required": ["answer"]});
+    if chain {
+        schema["properties"]["used"] = json!({"type": "array", "items": {"type": "string"},
+            "description": "参与计算最终答案的查询编号（run_sql 返回的 ref，如 r2）"});
+        schema["properties"]["derivation"] = json!({"type": "string",
+            "description": "用查询编号写出的最终答案算式，如 r2 - r3；答案直接来自一条查询时写 r2"});
     }
+    ToolSpec { name: "final_answer", description: "提交最终答案。", schema }
+}
+
+pub fn clarification_spec() -> ToolSpec {
+    ToolSpec {
+        name: "ask_clarification",
+        description: "题目中的业务口径不明确、且无法从数据或工具得到可靠定义时，请求澄清。调用后任务结束。",
+        schema: json!({"type": "object", "properties": {"question": {"type": "string", "description": "需要澄清的内容"}}, "required": ["question"]}),
+    }
+}
+
+fn parse_used(v: &Value) -> Vec<String> {
+    v.as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|x| match x {
+            Value::String(s) => crate::metric::ref_index(s),
+            Value::Number(n) => n.as_u64().and_then(|n| usize::try_from(n).ok()),
+            _ => None,
+        })
+        .map(|n| format!("r{n}"))
+        .collect()
 }
 
 #[derive(Debug, Default, serde::Serialize)]
@@ -319,17 +345,34 @@ pub struct AgentRun {
     pub input_tokens: u64,
     pub output_tokens: u64,
     pub seconds: f64,
+    pub used: Vec<String>,
+    pub derivation: Option<String>,
+    /// 调用了 ask_clarification（任务随即结束）
+    pub clarification: Option<String>,
 }
 
 pub async fn run_agent(p: &Provider, mid: &Middle, ctx: &Ctx, question: &str, middle_tools: bool, max_steps: usize) -> Result<AgentRun> {
     let mut tools = tool_specs(middle_tools);
-    tools.push(final_answer_spec());
+    tools.push(final_answer_spec(false));
     let system = if middle_tools { format!("{SYSTEM}\n{SYSTEM_MIDDLE}") } else { SYSTEM.to_string() };
+    run_agent_with(p, mid, ctx, question, &system, &tools, max_steps).await
+}
+
+/// 通用 Agent 循环：由调用方给出系统提示与工具。final_answer 与 ask_clarification 结束任务，其余工具交给中间层。
+pub async fn run_agent_with(
+    p: &Provider,
+    mid: &Middle,
+    ctx: &Ctx,
+    question: &str,
+    system: &str,
+    tools: &[ToolSpec],
+    max_steps: usize,
+) -> Result<AgentRun> {
     let mut turns = vec![Turn::User(question.to_string())];
     let mut run = AgentRun::default();
     let t0 = Instant::now();
     for _ in 0..max_steps {
-        let r = p.chat(&system, &turns, &tools).await?;
+        let r = p.chat(system, &turns, tools).await?;
         run.steps += 1;
         run.input_tokens += r.input_tokens;
         run.output_tokens += r.output_tokens;
@@ -345,8 +388,16 @@ pub async fn run_agent(p: &Provider, mid: &Middle, ctx: &Ctx, question: &str, mi
             if c.name == "final_answer" {
                 run.answer = c.input["answer"].as_str().map(str::to_string).or_else(|| Some(c.input["answer"].to_string()));
                 run.sql = c.input["sql"].as_str().map(str::to_string);
+                run.used = parse_used(&c.input["used"]);
+                run.derivation = c.input["derivation"].as_str().map(str::trim).filter(|s| !s.is_empty()).map(str::to_string);
                 done = true;
                 results.push((c.id.clone(), "已记录".to_string(), false));
+                continue;
+            }
+            if c.name == "ask_clarification" {
+                run.clarification = Some(c.input["question"].as_str().unwrap_or_default().to_string());
+                done = true;
+                results.push((c.id.clone(), "已记录；本实验没有人工答复，任务结束。".to_string(), false));
                 continue;
             }
             match mid.call_tool(ctx, &c.name, &c.input).await {

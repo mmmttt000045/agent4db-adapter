@@ -122,11 +122,15 @@ pub struct Db {
 }
 
 impl Db {
-    /// `read_only`：Agent 用的连接池一律只读，ETL / 初始化用单独的可写池。
+    /// `read_only`：Agent 用的连接池一律只读，ETL / 初始化用单独的可写池。单条 SQL 超时 300 秒。
     pub fn connect(url: &str, size: usize, read_only: bool) -> Result<Self> {
+        Self::connect_timeout(url, size, read_only, 300)
+    }
+
+    pub fn connect_timeout(url: &str, size: usize, read_only: bool, timeout_secs: u64) -> Result<Self> {
         anyhow::ensure!(size > 0, "连接池大小必须大于 0");
         let mut pg: tokio_postgres::Config = url.parse().context("数据库连接串格式错误")?;
-        let mut opts = String::from("-c statement_timeout=300000");
+        let mut opts = format!("-c statement_timeout={}", timeout_secs * 1000);
         if read_only {
             opts.push_str(" -c default_transaction_read_only=on");
         }

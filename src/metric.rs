@@ -182,9 +182,23 @@ impl Calc<'_> {
     }
 }
 
-/// 算式里引用的查询编号。
+/// Agent 常在算式后附说明（如 `r1（按销售日）`、`r1 - r2 (r2 为去年)`），只取开头的算式：
+/// 截到第一个算式外的字符，去掉尾部残留的运算符与未闭合的左括号。
+pub fn leading_expr(s: &str) -> &str {
+    let ok = |c: char| c.is_whitespace() || c.is_ascii_digit() || "rR.+-*/()×÷−".contains(c);
+    let mut e = &s[..s.find(|c: char| !ok(c)).unwrap_or(s.len())];
+    loop {
+        e = e.trim_end_matches(|c: char| c.is_whitespace() || "rR.+-*/×÷−(".contains(c));
+        if e.matches('(').count() <= e.matches(')').count() {
+            return e;
+        }
+        e = &e[..e.rfind('(').unwrap_or(0)];
+    }
+}
+
+/// 算式里引用的查询编号（算式后的说明文字忽略）。
 pub fn refs_in(expr: &str) -> Result<BTreeSet<usize>> {
-    Ok(tokenize(expr)?.into_iter().filter_map(|t| if let Tok::Ref(n) = t { Some(n) } else { None }).collect())
+    Ok(tokenize(leading_expr(expr))?.into_iter().filter_map(|t| if let Tok::Ref(n) = t { Some(n) } else { None }).collect())
 }
 
 /// 按算式重算答案。`cell(n)` 是第 n 条查询结果的首个单元格。只有一个编号时保留文本（如类别名）。
@@ -208,7 +222,7 @@ fn first_cell(result: &Value) -> Option<String> {
 /// 验证计算链：按 derivation 重算，结果须与提交的答案一致。`results` 为本任务 r{n} → 结果集。
 pub fn verify_chain(traj: &Trajectory, results: &BTreeMap<usize, Value>) -> std::result::Result<Answer, String> {
     let derivation = match (&traj.derivation, traj.used.as_slice()) {
-        (Some(d), _) if !d.trim().is_empty() => d.clone(),
+        (Some(d), _) if !leading_expr(d).is_empty() => leading_expr(d).to_string(),
         (_, [one]) => one.clone(),
         _ => return Err("计算链缺失：没有 derivation，used 也不是恰好一条".into()),
     };
@@ -622,6 +636,19 @@ mod tests {
         assert!(verify_chain(&traj(&["r1"], Some("r1 - r2"), "7"), &results).is_err());
         assert!(verify_chain(&traj(&[], Some("r1 - r2"), "8"), &results).is_err());
         assert!(verify_chain(&traj(&[], Some("r3"), "8"), &results).is_err());
+        // 算式后的说明文字忽略
+        assert!(verify_chain(&traj(&["r1"], Some("r1（按销售日）"), "10.00"), &results).is_ok());
+        assert!(verify_chain(&traj(&[], Some("r1 - r2 (r2 为去年)"), "7.00"), &results).is_ok());
+    }
+
+    #[test]
+    fn leading_expr_drops_trailing_notes() {
+        assert_eq!(leading_expr("r1（按销售日）"), "r1");
+        assert_eq!(leading_expr("r1 - r2 (r2 为去年)"), "r1 - r2");
+        assert_eq!(leading_expr("(r1 - r2) / r2 × 100%"), "(r1 - r2) / r2 × 100");
+        assert_eq!(leading_expr("r1 revenue"), "r1");
+        assert_eq!(leading_expr("r2."), "r2");
+        assert_eq!(leading_expr("见上"), "");
     }
 
     #[test]

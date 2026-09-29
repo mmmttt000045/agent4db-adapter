@@ -38,6 +38,9 @@ pub struct Options {
     /// staggered：Agent 依次到达，前一个用完全部口径后下一个才开始；burst：变化后全部 Agent 同时开始
     #[arg(long, value_delimiter = ',', default_value = "staggered,burst", value_parser = ["staggered", "burst"])]
     arrivals: Vec<String>,
+    /// 共享度：每个口径族取前 k 个口径（族不足 k 个时取全部），可给多个值做扫描，如 1,2,4,6；6 为全部 19 个
+    #[arg(long, value_delimiter = ',', default_value = "6", value_parser = clap::value_parser!(u32).range(1..=6))]
+    share: Vec<u32>,
     #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=10))]
     repeats: u32,
     #[arg(long, default_value_t = 42)]
@@ -100,6 +103,16 @@ static SPECS: [Spec; 19] = [
     Spec { name: "目录渠道运费", family: Family::Catalog, num: "cs_ext_ship_cost", den: None },
     Spec { name: "目录渠道销量", family: Family::Catalog, num: "cs_quantity", den: None },
 ];
+
+/// 共享度 k：每个族取前 k 个。k 越小，共享同一条件的口径越少（门店销售族与比率族之间仍共享门店销售的条件）。
+fn specs(share: u32) -> Vec<&'static Spec> {
+    SPECS
+        .iter()
+        .enumerate()
+        .filter(|(i, s)| SPECS[..*i].iter().filter(|x| x.family == s.family).count() < share as usize)
+        .map(|(_, s)| s)
+        .collect()
+}
 
 fn spec_of(key: &str) -> Option<&'static Spec> {
     let name = key.strip_prefix("metric:")?;
@@ -391,12 +404,12 @@ impl Run<'_> {
         let mut served: BTreeMap<(String, u64), bool> = BTreeMap::new();
         for u in uses.iter().filter(|u| u["status"] == "valid") {
             let k = (s(&u["key"]), u["revision"].as_u64().unwrap_or(0));
-            if !served.contains_key(&k) {
+            if let std::collections::btree_map::Entry::Vacant(slot) = served.entry(k) {
                 let ok = match serde_json::from_value::<Metric>(u["metric"].clone()) {
-                    Ok(m) => correct(probe, &k.0, &m).await,
+                    Ok(m) => correct(probe, &slot.key().0, &m).await,
                     Err(_) => false,
                 };
-                served.insert(k, ok);
+                slot.insert(ok);
             }
         }
         let stale = uses
@@ -479,9 +492,9 @@ impl Run<'_> {
     }
 }
 
-async fn cell(env: &Env<'_>, policy_name: &str, arrival: &str, repeat: u32) -> Result<Value> {
+async fn cell(env: &Env<'_>, policy_name: &str, arrival: &str, repeat: u32, share: u32) -> Result<Value> {
     let policy = policy_of(policy_name);
-    let id = format!("r{repeat}-{policy_name}-{arrival}");
+    let id = format!("r{repeat}-k{share}-{policy_name}-{arrival}");
     eprintln!("== {id}");
     reset(env.admin).await?;
     warm(env.admin).await?;
@@ -499,12 +512,13 @@ async fn cell(env: &Env<'_>, policy_name: &str, arrival: &str, repeat: u32) -> R
     let m0 = db.meter.snap();
     let t0 = Instant::now();
     let mut seeded = vec![];
-    for sp in SPECS.iter() {
+    let chosen = specs(share);
+    for sp in &chosen {
         seeded.push(mid.seed_metric(&ctx, metric(sp), Ask::Single { period: learn_period() }, 2, &gold(sp, &learn_period())).await?);
     }
     let ad = diff(&m0, &db.meter.snap());
     let keys: Vec<String> = seeded.iter().filter(|x| x["promoted"] == true).map(|x| s(&x["key"])).collect();
-    eprintln!("  准入：{}/{} 条口径晋升", keys.len(), SPECS.len());
+    eprintln!("  准入：{}/{} 条口径晋升", keys.len(), chosen.len());
     mid.take_metric_events();
 
     let run = Run { env, mid: &mid, db: db.as_ref(), arrival, policy, keys: &keys };
@@ -531,7 +545,7 @@ async fn cell(env: &Env<'_>, policy_name: &str, arrival: &str, repeat: u32) -> R
         events.push(v);
     }
     Ok(json!({
-        "cell": id, "policy": policy_name, "arrival": arrival, "repeat": repeat, "agents": env.o.agents,
+        "cell": id, "policy": policy_name, "arrival": arrival, "repeat": repeat, "share": share, "specs": chosen.len(), "agents": env.o.agents,
         "admission": {"seconds": t0.elapsed().as_secs_f64(), "promoted": keys.len(), "db": {"queries": ad.queries, "ms": ad.db_ms}, "entries": seeded},
         "events": events, "stats": mid.stats_json(),
     }))
@@ -555,13 +569,15 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         let env = Env { o: &o, url: isolated.as_str(), pool, admin: &admin, probe: &probe };
         let mut cells = vec![];
         for r in 1..=o.repeats {
-            // 每轮轮换组的执行顺序
-            for k in 0..o.policies.len() {
-                let p = &o.policies[(k + r as usize - 1) % o.policies.len()];
-                for a in &o.arrivals {
-                    let c = cell(&env, p, a, r).await?;
-                    std::fs::write(format!("{directory}/cell-{}.json", s(&c["cell"])), serde_json::to_string_pretty(&c)?)?;
-                    cells.push(c);
+            for &share in &o.share {
+                // 每轮轮换组的执行顺序
+                for k in 0..o.policies.len() {
+                    let p = &o.policies[(k + r as usize - 1) % o.policies.len()];
+                    for a in &o.arrivals {
+                        let c = cell(&env, p, a, r, share).await?;
+                        std::fs::write(format!("{directory}/cell-{}.json", s(&c["cell"])), serde_json::to_string_pretty(&c)?)?;
+                        cells.push(c);
+                    }
                 }
             }
         }
@@ -574,6 +590,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             "events": EVENTS.iter().map(|(e, l)| json!({"event": e, "label": l})).collect::<Vec<_>>(),
             "methodology": {
                 "admission": "各组以相同的口径与判题查询走 G3、G4、G5、G7，不经提炼",
+                "share": "共享度 k：每个口径族取前 k 个口径，族内口径共享同一批条件；门店销售族与比率族之间另外共享门店销售的粒度与时间关联",
                 "use": "每次变化后 agents 个 Agent 各按随机顺序把全部口径用一次，走执行端引用检查同一条守护路径（use_metric）",
                 "revoke": "逐写入撤销：依赖表有写入即撤销；本次变化的使用结束后重新提交（代替重新学习与提炼，LLM 成本不计），恢复前的使用记为不可用",
                 "schema": "只看表结构：结构指纹不变就继续用",
@@ -610,11 +627,23 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
 
 // ───────────────────────── 报告 ─────────────────────────
 
+/// 一个组四次变化合计：[条件执行次数（含在途合并）, 中间层 DB ms, 等待维护的总时长 s]。
+fn totals(c: &Value) -> [f64; 3] {
+    let mut t = [0.0; 3];
+    for e in c["events"].as_array().into_iter().flatten().filter(|e| e["event"] != "none") {
+        let cnt = |k: &str| e["maintenance"]["conditions"][k].as_f64().unwrap_or(0.0);
+        t[0] += cnt("executed") + cnt("merged");
+        t[1] += f(&e["db"]["ms"]);
+        t[2] += f(&e["wait_ms"]) / 1000.0;
+    }
+    t
+}
+
 fn markdown(report: &Value) -> String {
     let cells: Vec<&Value> = report["cells"].as_array().into_iter().flatten().collect();
     let mut out = format!(
-        "# 维护方式对照（不调用 LLM）\n\n{} 条口径，{} 个 Agent；每次变化后每个 Agent 把全部口径各用一次。本报告是描述性结果，不作显著性声明。\
-         协议见 docs/metric-experience-protocol.md。\n",
+        "# 维护方式对照（不调用 LLM）\n\n口径数随共享度 k 变化（k = 6 为全部 {} 条），{} 个 Agent；每次变化后每个 Agent 把全部口径各用一次。\
+         组名 r轮次-k共享度-维护方式-到达方式。本报告是描述性结果，不作显著性声明。协议见 docs/metric-experience-protocol.md。\n",
         SPECS.len(),
         report["options"]["agents"]
     );
@@ -719,6 +748,37 @@ fn markdown(report: &Value) -> String {
         }
     }
     out.push_str(&md_table(&["组", "变化", "重新提交", "通过门槛", "耗时 s", "DB ms"], &rows));
+
+    out.push_str(
+        "\n## 4. 按共享度汇总\n\n四次变化合计，多轮取平均。条件执行＝访问数据库的条件检查（含在途合并）；DB ms 为中间层全部查询；\
+         相对 definition＝同一共享度、同一到达方式下 DB ms 之比。共享度越低，condition 与 definition 应越接近。\n",
+    );
+    let shares: BTreeSet<u64> = cells.iter().filter_map(|c| c["share"].as_u64()).collect();
+    for a in &arrivals {
+        let mut rows = vec![];
+        for k in &shares {
+            let group: Vec<&&Value> = cells.iter().filter(|c| s(&c["arrival"]) == *a && c["share"].as_u64() == Some(*k)).collect();
+            let mean = |p: &str| -> Option<[f64; 3]> {
+                let g: Vec<[f64; 3]> = group.iter().filter(|c| c["policy"] == p).map(|c| totals(c)).collect();
+                (!g.is_empty()).then(|| [0usize, 1, 2].map(|i| g.iter().map(|t| t[i]).sum::<f64>() / g.len() as f64))
+            };
+            let base = mean("definition");
+            for p in ["revoke", "schema", "definition", "condition-scope", "condition"] {
+                let Some(t) = mean(p) else { continue };
+                rows.push(vec![
+                    k.to_string(),
+                    group.first().map(|c| c["specs"].to_string()).unwrap_or_default(),
+                    p.to_string(),
+                    format!("{:.0}", t[0]),
+                    format!("{:.0}", t[1]),
+                    format!("{:.1}", t[2]),
+                    base.filter(|b| b[1] > 0.0).map_or("—".into(), |b| format!("{:.2}", t[1] / b[1])),
+                ]);
+            }
+        }
+        out.push_str(&format!("\n### 到达方式：{a}\n\n"));
+        out.push_str(&md_table(&["共享度 k", "口径数", "组", "条件执行", "DB ms", "等待 s", "相对 definition"], &rows));
+    }
 
     out.push_str(
         "\n## 说明\n\n\

@@ -216,6 +216,7 @@ G7 检查的是其他 Agent 实际读到的字段，而不只是示例 SQL。提
    - 变化序列：门店销售追加 → 门店退货追加 → 目录销售追加（均为正常）→ v2（破坏性，只改数据）。
    - 使用：每次变化后 N 个 Agent 各按随机顺序把全部口径用一次，走执行端引用检查同一条守护路径。`staggered` 依次到达，`burst` 同时开始。
    - 组：`revoke`、`schema`、`definition`、`condition-scope`（条件级、不复用）、`condition`。`definition` 与 `condition-scope` 之差是重验范围，`condition-scope` 与 `condition` 之差是跨定义复用。
+   - 共享度扫描（`--share 1,2,4,6`）：每个口径族只取前 k 个口径，k = 6 为全部 19 个。验证“共享同一条件的口径越少，条件级与定义级越接近”；k = 1 时门店销售族与比率族之间仍共享门店销售的条件。报告第 4 节按共享度汇总条件执行次数、DB 耗时、等待时长及相对 definition 的比值。
 
 指标（每次变化）：
 
@@ -365,6 +366,8 @@ cargo run --release --locked -- metric-bench --rows 100000 --modes middle,metric
 ```bash
 # 不调用 LLM：5 组 × 2 种到达方式，每组约 19 次准入加 4 次变化
 cargo run --release --locked -- --pool 16 maint-bench --agents 8
+# 共享度扫描：4 种共享度 × 5 组 × 2 种到达方式
+cargo run --release --locked -- --pool 16 maint-bench --agents 8 --share 1,2,4,6
 # 端到端（调用 LLM），只报指标名题面：
 cargo run --release --locked -- --pool 16 metric-bench --agent openai --extractor openai \
   --modes metric-global,metric-global-def,metric-global-schema,metric-global-revoke --phrasings named --metrics M1,M2,M3

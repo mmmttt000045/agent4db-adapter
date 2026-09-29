@@ -1,39 +1,116 @@
 # 相关工作与审稿质疑
 
-目标会议：SIGMOD。本页记录已核实的近邻工作、审稿人最可能的质疑，以及我们的回答。
+目标会议：SIGMOD。本页按“支撑我们哪句话、与我们区别在哪”记录已核实的相关工作，以及审稿人最可能的质疑和我们的回答。定位与摘要见 `abstract.md`；简称对应的完整条目见第 10 节。
 
-## 已核实的近邻工作
+检索日期 2026-09-29。核实标记：
 
-| 工作 | 做了什么 | 没做什么 | 核实来源 |
+- **原文**：读过原文，引文逐字核对。
+- **出处**：会议、期刊或文档出处已在官方页面核对；内容来自摘要或检索概括，引用具体说法前需读原文。
+- **预印本**：只有 arXiv，不能写成已发表。
+
+## 1. 问题：智能体优先的数据系统与共享记忆
+
+| 简称 | 出处 | 核实 | 支撑我们的说法 | 与我们的区别 |
+|---|---|---|---|---|
+| Liu26 | CIDR 2026 | 原文 | ① 数据 Agent 的探索高度重复：BIRD 上每题 50 次独立尝试，“the number of distinct sub-plans of each size is often a small fraction of less than 10-20% of the total”（§2）。② 提出跨 Agent 的 agentic memory store，数据或元数据更新 “necessitating updates to any related information in the agentic memory”；让记忆与数据不一致、等新探查发现过期，缺点是 “the stale information may lead a new probe to make a mistake”（§6.1）。 | 愿景论文，没有系统与有效性模型；举例是表结构更新和新增表，没有讨论只改数据的变化；建议 “draw inspiration from work on knowledge bases as well as schema evolution”。**我们是这个开放问题在指标口径上的具体回答，不主张问题是新的。** |
+| Luo26 | SIGMOD 2026 教程 | 出处 | 数据 Agent 的分级与开放问题，引言定位用 | 综述 |
+| Li26 | PVLDB 19(12) 2026 教程 | 出处（作者主页的定稿 PDF，未在 vldb.org 交叉核对） | 把多 Agent 协作记忆列为开放问题 | 综述 |
+| AgentSM | arXiv 2601.15709 | 预印本 | 执行轨迹组织成结构化语义记忆，目标是减少重复探索、提高一致性；原文把共享记忆留作后续工作：“shared memory introduces nontrivial challenges in retrieval efficiency, consistency management, and error propagation, which we leave as future work.” | 按问题相似度检索，复用前不在数据库上验证，不讨论数据变化。是“共享轨迹检索”基线的原型 |
+
+## 2. Agent 经验与记忆
+
+| 简称 | 出处 | 核实 | 做了什么 |
 |---|---|---|---|
-| AgentSM（arXiv 2601.15709，2026-01） | 把执行轨迹组织成结构化语义记忆，供后续 Text-to-SQL 复用；目标包括减少重复探索、提高一致性与效率 | 只按问题相似度检索，复用前不对数据库验证；不讨论数据或模式变化后的失效；明确把共享记忆留作后续工作：“shared memory introduces nontrivial challenges in retrieval efficiency, consistency management, and error propagation, which we leave as future work.” | [arXiv](https://arxiv.org/abs/2601.15709)、[全文](https://arxiv.org/html/2601.15709) |
-| Snowflake Cortex Analyst：用已验证查询优化语义视图（Preview，2025-12） | 分析已验证 SQL，提取可泛化的过滤与指标写入语义层（例：从“活跃用户”查询提取 `is_active` 过滤）；也可从查询历史建议最多 10 个过滤、10 个指标 | 来源是人工验证的查询；文档未提到数据变化后的重验证 | [文档](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst/analyst-optimization)、[发布说明](https://docs.snowflake.com/en/release-notes/2025/other/2025-12-02-cortex-analyst-optimization) |
-| Snowflake Semantic Views | 表达业务指标与关系，并有关系、表达式与粒度相关的验证规则 | 待核实细节（来自审稿式质疑，尚未逐条查证） | — |
+| AWM | ICML 2025 | 出处 | 从 Web Agent 轨迹归纳可复用工作流 |
+| ExpeL | AAAI 2024 | 出处 | 从经验中提炼自然语言洞见，增删改投票维护 |
+| ReasoningBank | ICLR 2026 | 出处 | 从自评的成功与失败中提炼策略 |
+| ACE | ICLR 2026 | 出处 | 以增量编辑演化的 “playbook” 上下文 |
+| A-MEM | NeurIPS 2025 | 出处 | 互相链接的笔记，新笔记到来时更新旧笔记 |
+| Mem0 | ECAI 2025 | 出处 | 对话事实，冲突时更新或删除 |
+| CollabMem | ICML 2025 workshop（不是主会） | 出处 | 多用户记忆共享，带随时间变化的访问控制与来源 |
 
-待查：MCP 类数据库服务、Agent 记忆（反思、工作流记忆）、语义层（dbt、LookML、Cube）、语义缓存与物化视图维护。尚未确认“多个并发 Agent 共享经验”没有先例，摘要写这一点前需要查证。
+共同点（支撑 `abstract.md` “区别于 Agent 记忆”一表）：记忆是文本、工作流或洞见；成功由 Agent 自认或 LLM 自评；不在外部数据上验证；只有 A-MEM、Mem0 会修改旧记忆，触发条件是新记忆或对话，不是数据变化。CollabMem 管“谁能看”，不管“是否仍然成立”。
 
-## 最可能导致拒稿的质疑
+## 3. 从历史学业务知识、语义层与基准
+
+### 论文
+
+| 简称 | 出处 | 核实 | 支撑我们的说法 | 与我们的区别 |
+|---|---|---|---|---|
+| Sequeda24 | GRADES-NDA 2024（SIGMOD workshop） | 出处 | 业务语义显著提高 LLM 在企业库上的正确率：GPT-4 零样本 16% → 54% | 知识图谱人工构建，静态 |
+| BIRD | NeurIPS 2023 D&B | 出处 | 每题附外部知识（业务定义），说明口径是 Text-to-SQL 的独立难点 | 知识随题给出，不学、不维护 |
+| BIRD-Interact | ICLR 2026 | 出处 | 删去或打断知识库条目制造歧义，把缺失的业务知识作为交互难点 | 是否在修改后的数据上继续提问未确认 |
+| Spider 2.0 | ICLR 2025 | 出处 | 企业级工作流，需要文档与代码库；可作真实 schema 来源 | 数据静态 |
+| DataLab | ICDE 2025 | 出处 | 从脚本历史与血缘中用 LLM 生成领域知识，含派生列的计算逻辑——“从历史学口径”不是新意 | 只经 LLM 自评与 JSON Schema 检查，不在数据上验证，不维护 |
+| EvoSchema | PVLDB 18(10) 2025 | 出处 | 表结构演化会降低 Text-to-SQL 正确率 | 只覆盖表结构变化（列、表的增删改名），不涉及只改数据的变化 |
+| Fürst25 | EDBT 2025 | 出处 | 同一问题在不同数据模型上结果不同 | 同上，只看表结构 |
+
+### 产品
+
+只有 Databricks 一行是本人核对的原文，其余为检索概括，写进论文前逐条打开官方文档核对。
+
+| 产品 | 自动学口径 | 在数据上检查粒度/关联 | 只改数据后 | 查询绑定口径修订 |
+|---|---|---|---|---|
+| Databricks metric views | 否（Genie 可辅助） | **否**。文档原文：“This property is not validated at runtime. If the join produces a fan-out, measures return incorrect results.” 多对多时 “the engine selects the first matching row.”（Model star schemas 一节，2026-09-29 核对） | 无处理 | 否 |
+| Databricks Genie knowledge mining | 是：从被点赞或下载的回答中建议度量、过滤、关联，作者确认 | 否 | 基准需手动运行 | 否 |
+| Snowflake Semantic Views + Autopilot | 是：从查询历史、示例 SQL、BI 工具学语义视图 | 验证规则在定义时检查，基于声明的键 | 按使用情况“保持更新”，不按数据条件 | 否 |
+| Cortex Analyst verified queries | 是：从已验证 SQL 提取过滤与指标 | 只检查能否执行 | 已验证查询只有时间戳 | 否 |
+| dbt Semantic Layer / MetricFlow | 辅助生成，人工确认 | 只检查对象存在、SQL 能执行（代码变化时的 CI）；`unique` 测试存在但不与指标绑定 | 无处理 | 否（MCP 工具不带修订） |
+| Looker | 辅助生成 LookML | 部分：对称聚合求和时主键不唯一会在查询时报错 | 每次查询报错，不撤销定义 | 否 |
+
+能写的说法：“我们查看的产品文档都没有记载在提供口径前对当前数据检查键唯一或关联多重性，也没有记载在只改数据的更新后撤销口径。”不能写“语义层不做任何验证”。
+
+## 4. 口径的数据条件与维护方式
+
+只收能支撑具体说法的几篇。
+
+| 简称 | 出处 | 核实 | 支撑我们的说法 |
+|---|---|---|---|
+| Lenz97 | SSDBM 1997 | 出处 | 汇总结果正确的必要条件：不相交、完备、类型兼容。对应我们的条件：不相交 ↔ 过滤后键唯一、关联不放大；完备 ↔ 覆盖（“申请”行不覆盖全部键，所以不能作为修复过滤）。对应关系是我们的解读，正文写明 |
+| Mazón09 | DKE 68(12) 2009 | 出处 | 综述：违反可汇总性会使分析工具给出错误结果。综述讨论的是多维建模阶段的处理；我们在运行时对学到的口径检查这些条件，这一区别是我们的说法，引用时不要算到综述头上 |
+| Zhou07 | VLDB 2007 | 出处 | 物化视图的懒维护：推迟到视图被使用时再维护。说明“标脏 + 首次使用时重验”是成熟做法，因此定义级重验是最强对照，不是稻草人 |
+| Deequ | PVLDB 11(12) 2018 | 出处 | 声明式数据检查；全唯一列上增量计算始终慢于批量（直方图开销），低基数列 3–4 批后增量占优。支撑“默认全量检查，增量检查要测何时划算” |
+| TxCache | OSDI 2010 | 出处 | 缓存结果带有效区间、快照一致读。快照绑定执行的技术先例，不作为贡献 |
+| Cache-Craft | SIGMOD 2025 | 出处 | 实验归因：完全重算、完全复用为两端，选择性重算基线控制相同重算比例。对应我们的 `revoke` / `off` 与 `definition` / `condition` |
+
+## 5. 同期预印本（2026，写相关工作前需读全文）
+
+都是检索代理找到并核对过 arXiv 元数据的，本人未读全文。投稿时按同期工作引用。
+
+| 预印本 | 重叠 | 区别（据摘要） |
+|---|---|---|
+| Tk-Boost，arXiv 2602.13521（2026-02） | 从 Agent 错误中学可复用知识，带适用条件，执行 SQL 验证，可接任意 Agent | 知识是文本，适用条件是表、列、关键词；不绑数据版本，无撤销与修复 |
+| Invalidation Contracts for Cross-Episode Agent Memory，2609.00243（2026-08） | 用服务端版本戳在数据漂移后驱逐 Agent 缓存的修正；讨论失效粒度（行级可行、表级抹掉收益） | 只驱逐，不重验、不修复；键值 API 而非 SQL；单 Agent |
+| Fresh Memory, Stale Plans，2609.03340（2026-09） | 存储的 Agent 计划链接到带版本的输入，执行前重查 | 不感知数据库，没有数据条件检查 |
+| EvoOntology，2609.15779（2026-09） | 面向数据 Agent 的类型化、带版本的本体，从轨迹演化，编辑经任务评估门槛 | 门槛是任务正确率，不是键或关联条件；不处理数据变化 |
+| GATE，2606.05634（2026-06） | 用执行结果验证语义层条目，存为记忆 | 只在学习时验证，无失效 |
+| GROUND，2608.26157（2026-08） | 按指标、关联、粒度、过滤规则检查生成的 SQL | 规则人工编写，无版本与数据变化处理 |
+| Patel et al.，2609.03141（2026-09） | 研究议程：“persistent semantic context”（含规范口径）在团队或企业范围共享，更新会使其失效 | 只是议程；不是 CIDR 论文 |
+| Revoked but Still Authoritative，2609.08258（2026-09） | 五个记忆系统在撤销后仍返回旧事实，提出检索端拦截 | 拦在检索端；我们拦在执行端 |
+| Automatic Metadata Extraction，2505.19988 | 从查询日志挖掘关联约束与业务公式 | 不在数据上验证，不处理数据变化 |
+
+## 6. 最可能导致拒稿的质疑
+
+### 质疑一
 
 > 相比“已有语义层自动填充 + 历史查询检索 + 依赖变化后失效”，本文究竟增加了哪项非平凡能力？
 
-结论：“存指标而不是 SQL”、提炼流程、准入门槛都不能作为新颖性。能站住的是最后一环“依赖变化后失效”，以及多个并发 Agent 共享时的一致性。
+回答：前两项都有先例（Snowflake Autopilot、Genie knowledge mining、DataLab；AgentSM），不作为新意；“给 Agent 口径能提高正确率”也有先例（Sequeda24）。增加的是：口径依赖的数据条件被显式记录并在数据上检查（语义层只声明，Databricks 文档明言运行时不验证）；只改数据的变化被发现（按表结构失效看不到，EvoSchema 等只研究表结构）；执行端按声明修订放行；失效后受限修复。Liu26 把共享记忆的过期列为开放问题，我们给出指标口径上的具体机制。
 
-紧接着的第二个质疑（2026-09-29）：
+### 质疑二（2026-09-29）
 
 > 合理的保守方案是“依赖表变化 → 相关定义标为待验证 → 首次使用时重查约束 → 通过后继续使用”，并不需要删除经验、重新调用 LLM。你们报告里的流程正是如此。条件级维护相对它多了什么？
 
-结论：在目前的实现层面两者几乎相同（2026-09-29 之前的代码就是定义级重验）。“保留定义比删除定义好”不是贡献。要主张的是粒度带来的额外收益——重验范围、跨定义复用、并发合并、可用性——并且必须给出数据，也要说明收益何时消失。见 `abstract.md` 的“论断修正”。
+回答：这个方案就是 Zhou07 的懒维护用在口径上，我们把它作为最强对照（同条件、同修复、同在途合并）。在目前的实现层面两者几乎相同（2026-09-29 之前的代码就是定义级重验）。“保留定义比删除定义好”不是贡献。要主张的是粒度带来的额外收益——重验范围、跨定义复用、并发合并、可用性——并且必须给出数据，也要说明收益何时消失。见 `abstract.md` 的“论断修正”。
 
-## 我们的回答：失效方式的阶梯
-
-上一版这里写的是“按依赖变化失效在两个方向都会错”。这只对前两行成立；“标脏 + 首用重验”两个方向都不会错。
+### 我们的回答：失效方式的阶梯
 
 | 维护方式 | 正常新增（追加行） | 只改数据的破坏性变化（ETL v2） | 维护代价 |
 |---|---|---|---|
 | 按模式或血缘 | 保持 ✓ | 继续用旧口径 ✗（v2 不改表结构：`sr_status` 列本来就有，只追加“申请”行） | 无 |
 | 写入即删除，不恢复 | 撤销 ✗ | 撤销 ✓，不修复 | 永久失去复用。过弱，不作对照 |
 | 写入即撤销，重新提炼 | 撤销后需重新学习 | 撤销 ✓；重新学习能否得到正确口径取决于提炼 | 每次写入 × 受影响定义数次提炼（LLM、判题），恢复前不可用 |
-| 标脏，首次使用时定义级重验 | 保持 ✓ | 撤销 ✓，同样的受限修复 | 每个受影响定义重跑自己的全部条件，含未变化表上的条件；相同条件在不同定义里各查一次 |
+| 标脏，首次使用时定义级重验（Zhou07 式懒维护） | 保持 ✓ | 撤销 ✓，同样的受限修复 | 每个受影响定义重跑自己的全部条件，含未变化表上的条件；相同条件在不同定义里各查一次 |
 | 本文：条件级重验 | 保持 ✓（0 撤销，6/6 正确） | 撤销 ✓ 并修复（3/3 正确；旧口径答错全部 3 题） | 每个受影响的条件查一次，结论被各定义、关联守卫与修复复用 |
 | 按结果数值变化 | 分不清 | 分不清 | — |
 
@@ -41,15 +118,15 @@
 
 目前能从记录里直接看到的一处差别（`exp/2026-09-29-metric-shared-named-M1M3`，正常新增后的 M3-P1）：退货率口径的关联是 1:1，关联守卫里有 `KeyUnique(store_sales, 小票号+商品)`，口径自己的粒度条件也是它。一次维护里同一条件执行了两次（守卫 1374 ms、粒度 1293 ms）。同一次运行里 M1 学到的粒度键是“日期 + 小票号 + 商品”，与 M3 的键不是同一个条件；但“小票号 + 商品”唯一蕴含它唯一，M3 先维护时 M1 这次 5.9 s 的检查可以省掉（那次是 M1 先维护，省不掉）。这只是单次观察，量化要看 `maint-bench`。
 
-核心观察：学到的口径只在几条数据性质成立时正确——过滤后的键唯一（粒度）、关联的基数与覆盖及必需过滤、时间角色的关联。这些不在 SQL 文本里（`SUM(sr_return_amt)` 不说“每笔退货一行”），但能从产生口径的探索里得到。
+核心观察：学到的口径只在几条数据性质成立时正确——过滤后的键唯一（粒度）、关联的基数与覆盖及必需过滤、时间角色的关联。这些是可汇总性条件（Lenz97）在具体口径上的实例，不在 SQL 文本里（`SUM(sr_return_amt)` 不说“每笔退货一行”），但能从产生口径的探索里得到。
 
 难做对的维护决策：
 
 1. 表结构不变、只改数据时，判断是正常还是破坏性。
-2. 修复要恢复含义，而不只是恢复约束。例：只取“申请”也能让退货表每键一行，但“申请”行只在变更日之后存在、不覆盖全部键，按覆盖条件排除，只有 `sr_status = '完成'` 成立；再经学习题回归确认。
+2. 修复要恢复含义，而不只是恢复约束。例：只取“申请”也能让退货表每键一行，但“申请”行只在变更日之后存在、不覆盖全部键，按覆盖条件（Lenz97 的完备性）排除，只有 `sr_status = '完成'` 成立；再经学习题回归确认。
 3. 什么时候不修：模式变化、关联不再成立时保持不可用。
 
-并发一致性（AgentSM 留作后续工作）可写成可检验的不变量：
+并发一致性（AgentSM 留作后续工作，Liu26 列为开放问题）可写成可检验的不变量：
 
 - 安全：声明引用了已撤销修订的 SQL 不会执行。
 - 可用：满足假设的正常变化不撤销。定义级重验同样满足，不能作为区别。
@@ -57,10 +134,61 @@
 
 条件级只有在“多个定义共享条件”且“写入只触及部分条件”时才有优势。每个条件只被一个定义使用、或每次写入都触及全部条件时，两者应当接近，这要在实验里如实报告。
 
-## 支撑这套回答还缺什么
+## 7. 支撑这套回答还缺什么
 
-1. 变化类型分类：正常（追加、迟到数据、旧期间回填）；只改数据的破坏（状态行、ETL 重跑重复加载、软删除标记、维度键复用）；模式变化（改名、改类型）；明确不在范围内的（单位变化、编码含义变化）。`maint-bench` 目前只有三张表上的正常追加与 v2。
+1. 变化类型负载：正常（追加、迟到数据、旧期间回填）；只改数据的破坏（状态行、ETL 重跑重复加载、软删除标记、维度键复用）；模式变化（改名、改类型）；明确不在范围内的（单位变化、编码含义变化）。检索没有找到“只改数据的变化使已学知识失效”的基准（EvoSchema、Fürst25 只看表结构），做出来可以作为一条贡献。`maint-bench` 目前只有三张表上的正常追加与 v2。
 2. 失效基线：只看结构、逐写入撤销后重新提炼、定义级重验已实现（2026-09-29），未运行；只按相似度检索不验证（AgentSM 式）尚未实现。
-3. 检查成本：当前粒度检查是全表扫描，1M 行首次重查约 5.9 s。只检查变化批次（增量检查）尚未实现；它依赖条件的语义（追加时键唯一性只需查新批次与已有键是否冲突），把重验当黑盒的定义级方案做不到，是条件级的另一个潜在优势。
+3. 检查成本：当前粒度检查是全表扫描，1M 行首次重查约 5.9 s。只检查变化批次（增量检查）尚未实现；做的话写成集成，并按 Deequ 的做法报告何时划算，不作为新意。
 4. 并发：口径维护已按（定义, 依赖版本）在途合并，但定义级对照组同样享有；安全不变量只覆盖声明了引用的 SQL，未声明的使用只靠 `review_sql`。
-5. 快照绑定：检查与执行仍不在同一快照上。
+5. 快照绑定：检查与执行仍不在同一快照上。PostgreSQL 上可把条件检查与 Agent 的 SQL 放进同一个 `REPEATABLE READ` 事务；技术先例是 TxCache，不作为贡献。
+
+## 8. 不能写的话
+
+- “首次提出共享 Agent 记忆会随数据变化过期”（Liu26）。
+- “首次从 Agent 轨迹或查询历史学业务口径”（DataLab、AgentSM、Snowflake、Databricks）。
+- “首次在数据库上执行验证学到的知识”（Tk-Boost、GATE 等预印本，Cortex Analyst）。
+- “首次对 LLM 生成的 SQL 做指标、粒度、关联检查”（GROUND 预印本、语义层产品）。
+- “首次用数据版本使 Agent 记忆失效”（Invalidation Contracts 预印本）。能写的是：在 SQL 数据库上，把学到的口径落到可执行数据条件、按数据版本共享结论、执行端按修订强制、失效后受限修复，检索没有找到把这些合在一起的工作。
+- “语义层不做验证”；“增量检查是新意”；“快照绑定是新意”。
+- 把 AgentSM、Tk-Boost、EvoOntology、GATE 等写成已发表；把 CollabMem 写成 ICML 主会；把 Patel et al. 写成 CIDR 论文。
+- 把 5/15 vs 15/15 写成超出“15 题的动机例子”的结论。
+
+## 9. 合作者引用核对记录（2026-09-29）
+
+另一份建议中用到的引用，逐条核对结果：
+
+- 准确：Adda（PACMMOD 3(3), 2025，SIGMOD 2025）；SafeQL（PVLDB 19(9):2210–2223, 2026）；DBToaster（PVLDB 5(10), 2012）；Deequ（PVLDB 11(12):1781–1794, 2018）；MAC-SQL（COLING 2025, pp. 540–557）；MADA 优化器（ICML 2024, PMLR 235）；MADA 多 Agent 设计助手（arXiv 2603.11515，预印本）。
+- 需更正：Cache-Craft 的实验并非所有基线都控制相同重算比例。完全重算与完全复用是两端；只有选择性重算基线（Random-Recomp、Prefill-H2O）控制与 Cache-Craft 相同的平均重算比例。
+- 需补充：Deequ 的“增量始终更慢”只针对全唯一列（图 8，唯一性与熵一起计算）；低基数列上增量在 3–4 批后占优。
+
+## 10. 参考文献
+
+| 简称 | 条目 |
+|---|---|
+| Liu26 | Shu Liu, Soujanya Ponnapalli, Shreya Shankar, Sepanta Zeighami, Alan Zhu, Shubham Agarwal, Ruiqi Chen, Samion Suwito, Shuo Yuan, Ion Stoica, Matei Zaharia, Alvin Cheung, Natacha Crooks, Joseph E. Gonzalez, Aditya G. Parameswaran. Supporting Our AI Overlords: Redesigning Data Systems to be Agent-First. CIDR 2026. https://www.vldb.org/cidrdb/papers/2026/p32-liu.pdf |
+| Luo26 | Yuyu Luo et al. Data Agents: Levels, State of the Art, and Open Problems. SIGMOD 2026 Companion（教程）. arXiv 2602.04261 |
+| Li26 | Guoliang Li et al. 智能体记忆的数据管理（教程，英文标题待核）. PVLDB 19(12), 2026. https://dbgroup.cs.tsinghua.edu.cn/ligl/papers/VLDB2026-AMem-Paper.pdf |
+| AgentSM | Asim Biswal et al. AgentSM. arXiv 2601.15709, 2026（预印本） |
+| AWM | Zora Zhiruo Wang et al. Agent Workflow Memory. ICML 2025 (PMLR 267) |
+| ExpeL | Andrew Zhao et al. ExpeL: LLM Agents Are Experiential Learners. AAAI 2024 |
+| ReasoningBank | ReasoningBank. ICLR 2026（作者与完整标题待核） |
+| ACE | Agentic Context Engineering. ICLR 2026（作者与完整标题待核） |
+| A-MEM | Wujiang Xu et al. A-MEM: Agentic Memory for LLM Agents. NeurIPS 2025 |
+| Mem0 | Prateek Chhikara et al. Mem0. ECAI 2025 (FAIA 413) |
+| CollabMem | Alireza Rezazadeh et al. Collaborative Memory: Multi-User Memory Sharing in LLM Agents with Dynamic Access Control. ICML 2025 Workshop on Multi-Agent Systems |
+| Sequeda24 | Juan Sequeda, Dean Allemang, Bryon Jacob. A Benchmark to Understand the Role of Knowledge Graphs on Large Language Model's Accuracy for Question Answering on Enterprise SQL Databases. GRADES-NDA 2024. doi:10.1145/3661304.3661901 |
+| BIRD | Jinyang Li et al. Can LLM Already Serve as a Database Interface? A BIg Bench for Large-Scale Database Grounded Text-to-SQLs. NeurIPS 2023 Datasets and Benchmarks |
+| BIRD-Interact | Nan Huo et al. BIRD-Interact. ICLR 2026 |
+| Spider 2.0 | Fangyu Lei et al. Spider 2.0: Evaluating Language Models on Real-World Enterprise Text-to-SQL Workflows. ICLR 2025 |
+| DataLab | Luoxuan Weng et al. DataLab: A Unified Platform for LLM-Powered Business Intelligence. ICDE 2025 |
+| EvoSchema | Zhang et al. EvoSchema. PVLDB 18(10), 2025. https://www.vldb.org/pvldb/vol18/p3655-zhang.pdf |
+| Fürst25 | Fürst et al. 基于真实用户问题的 Text-to-SQL 数据模型鲁棒性评估. EDBT 2025. https://openproceedings.org/2025/conf/edbt/paper-18.pdf |
+| Lenz97 | Hans-J. Lenz, Arie Shoshani. Summarizability in OLAP and Statistical Data Bases. SSDBM 1997, pp. 132–143 |
+| Mazón09 | Jose-Norberto Mazón, Jens Lechtenbörger, Juan Trujillo. A Survey on Summarizability Issues in Multidimensional Modeling. Data & Knowledge Engineering 68(12):1452–1469, 2009 |
+| Zhou07 | Jingren Zhou, Per-Åke Larson, Hicham G. Elmongui. Lazy Maintenance of Materialized Views. VLDB 2007, pp. 231–242 |
+| Deequ | Sebastian Schelter et al. Automating Large-Scale Data Quality Verification. PVLDB 11(12):1781–1794, 2018 |
+| TxCache | Dan R. K. Ports et al. Transactional Consistency and Automatic Management in an Application Data Cache. OSDI 2010 |
+| Cache-Craft | Shubham Agarwal et al. Cache-Craft: Managing Chunk-Caches for Efficient Retrieval-Augmented Generation. PACMMOD 3(3), 2025 (SIGMOD 2025). doi:10.1145/3725273 |
+| Databricks | Databricks 文档，Unity Catalog metric views，“Model star schemas”. https://docs.databricks.com/aws/en/uc-semantics/metric-views/basic-modeling（2026-09-29 访问） |
+
+标“待核”的条目写进 bib 前补全作者与标题。

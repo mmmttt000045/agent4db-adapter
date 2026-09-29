@@ -75,6 +75,8 @@
 
 问题 1、2 使 4 次提炼只晋升了 2 次；两次失败都不是口径错误。
 
+（同日修复，已在 noctis 编译并通过单元测试，未经 LLM 实验验证）1：G3 去掉与时间关联相同的 join（`src/middle/metrics.rs` 的 `static_gate`）。2：计算链只取开头的算式，说明文字忽略（`metric::leading_expr`）。3：`run_sql` 的 `metrics` 引用缺 `metric:` 前缀时自动补上。4：`metric-bench` 的 Agent 连接池超时默认 60 s（`--sql-timeout-secs`，含中间层检查；行数很大时调高），其他连接仍为 300 s。
+
 ## 4. 能说明什么、不能说明什么
 
 - 能说明：一个 Agent 知道的口径能准确传给其他 Agent，并在正常新增和已建模的破坏性更新后保持正确。

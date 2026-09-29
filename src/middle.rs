@@ -237,7 +237,10 @@ fn metric_refs(args: &Value) -> Result<Vec<(String, u32)>> {
                 .as_u64()
                 .or_else(|| x["revision"].as_str().and_then(|s| s.trim().trim_start_matches(['r', 'R']).parse().ok()))
                 .ok_or_else(bad)?;
-            Ok((key.to_string(), u32::try_from(rev)?))
+            // Agent 有时省略 find_metric 返回的 metric: 前缀，按同一 key 处理
+            let key = key.trim();
+            let key = if key.starts_with("metric:") { key.to_string() } else { format!("metric:{key}") };
+            Ok((key, u32::try_from(rev)?))
         })
         .collect()
 }

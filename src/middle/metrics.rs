@@ -488,6 +488,13 @@ impl Middle {
             if let Err(x) = self.verdict(ctx, &m.fact, &t.dim, &on).await?.0 {
                 bad!("时间关联 {}={} 未通过验证：{}", t.fact_col, t.dim_col, x.reason);
             }
+            // 提炼器有时把时间关联也写进 joins；规范编译会另加时间关联，重复会使 G7 报“表名被指定多次”
+            let flip = vec![(t.dim_col.clone(), t.fact_col.clone())];
+            let fact = m.fact.clone();
+            m.joins.retain(|j| {
+                let tables = (j.left == fact && j.right == t.dim) || (j.left == t.dim && j.right == fact);
+                !(tables && (j.on == on || j.on == flip))
+            });
         }
         let mut allowed: BTreeSet<String> = [m.fact.clone()].into_iter().collect();
         for j in m.joins.iter_mut() {

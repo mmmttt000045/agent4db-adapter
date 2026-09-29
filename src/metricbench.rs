@@ -46,6 +46,9 @@ pub struct Options {
     max_steps: u32,
     #[arg(long, default_value_t = 2, value_parser = clap::value_parser!(u32).range(1..=5))]
     extract_attempts: u32,
+    /// Agent 连接池（含中间层检查）的单条 SQL 超时，各组相同；行数很大时调高，避免粒度检查超时
+    #[arg(long, default_value_t = 60, value_parser = clap::value_parser!(u64).range(10..=3600))]
+    sql_timeout_secs: u64,
     /// 不对参与答案的 SQL 执行 EXPLAIN (ANALYZE, BUFFERS)
     #[arg(long)]
     no_explain: bool,
@@ -795,7 +798,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             dataset.insert(t.into(), json!(n));
         }
         let probe = Db::connect(isolated.as_str(), 2, true)?;
-        let db = Arc::new(Db::connect(isolated.as_str(), pool, true)?);
+        let db = Arc::new(Db::connect_timeout(isolated.as_str(), pool, true, o.sql_timeout_secs)?);
         let tasks = tasks(&o.metrics);
         let env = Env { o: &o, admin: &admin, probe: &probe, agent: &agent, extractor: &extractor, tasks: &tasks };
         let mut cells = vec![];

@@ -50,8 +50,10 @@ impl Check {
     /// 反馈统计的上下文：键唯一性看被检查的表，另两种看关联方向（左表>右表）。
     pub fn context(&self) -> String {
         match self {
-            Check::KeyUnique { table, .. } => table.clone(),
-            Check::SampleFanout { left, right, .. } | Check::RowConservation { left, right, .. } => format!("{left}>{right}"),
+            Check::KeyUnique { table, cols, .. } => format!("{table}({})", cols.join(",")),
+            Check::SampleFanout { left, right, on, .. } | Check::RowConservation { left, right, on, .. } => {
+                format!("{left}>{right}:{}", fmt_on(on))
+            }
         }
     }
 

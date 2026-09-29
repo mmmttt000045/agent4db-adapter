@@ -2,7 +2,7 @@
 //! 模型只能排序既有检查；不获取业务行数据，也不能关闭检查或执行 SQL。
 //! 候选先在被审计的失败候选上与默认顺序配对回放，满足门槛才应用；应用后只看新证据，显著变差即自动回滚。
 
-use crate::feedback::{Evidence, Feedback, KindStats, Order, DEFAULT_ORDER, MIN_EVIDENCE};
+use crate::feedback::{Checkpoint, Evidence, Feedback, KindStats, Order, DEFAULT_ORDER, MIN_EVIDENCE};
 use crate::llm::{Provider, Turn};
 use anyhow::{bail, ensure, Context, Result};
 use parking_lot::Mutex;
@@ -11,7 +11,7 @@ use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::Write;
 use std::path::PathBuf;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 const KINDS: [&str; 3] = ["KeyUnique", "SampleFanout", "RowConservation"];
 const SYSTEM: &str = r#"You manage a database adapter's validation order.
@@ -86,6 +86,10 @@ pub struct Proposal {
     pub heuristic_reference: Value,
     /// 生成时与默认顺序的回放比较；应用时会用最新证据重新计算。
     pub replay: Evidence,
+    pub evaluation_boundary: Checkpoint,
+    pub evaluation_consumed: bool,
+    pub model_usage: Value,
+    pub proposal_wall_ms: f64,
 }
 
 #[derive(Default, Serialize)]
@@ -96,6 +100,7 @@ struct State {
     applied_evidence: Option<BTreeMap<String, KindStats>>,
     /// 应用时的反馈纪元；退化监测只看此后记录的证据
     applied_epoch: Option<u64>,
+    monitor_boundary: Option<Checkpoint>,
 }
 
 fn active_order(state: &State) -> Option<Vec<String>> {
@@ -154,6 +159,8 @@ impl Optimizer {
         let evidence = feedback.snapshot();
         ensure!(KINDS.iter().all(|k| evidence.get(*k).is_some_and(|s| s.runs >= 3)), "样本不足：每种检查至少需要 3 次执行记录");
         let revision = self.state.lock().revision;
+        let proposal_start = Instant::now();
+        let mut model_usage = json!({"logical_calls":0,"input_tokens":0,"output_tokens":0});
         let policy = match &self.provider {
             Provider::Mock => {
                 let mut order = KINDS.map(String::from).to_vec();
@@ -178,11 +185,18 @@ impl Optimizer {
                 let reply = tokio::time::timeout(Duration::from_secs(60), provider.chat(SYSTEM, &[Turn::User(input)], &[]))
                     .await
                     .context("优化模型调用超过 60 秒，原策略保持不变")??;
+                model_usage = json!({"logical_calls":1,"input_tokens":reply.input_tokens,"output_tokens":reply.output_tokens,"provider_usage":reply.usage});
+                self.audit(
+                    "model_response",
+                    &json!({"provider":provider.label(),"wall_ms":proposal_start.elapsed().as_secs_f64()*1000.0,"usage":model_usage}),
+                )?;
                 ensure!(reply.calls.is_empty(), "优化模型不能调用工具");
                 Policy::parse(&reply.text)?
             }
         };
         policy.validate()?;
+        // Freeze after proposal generation: concurrent training observations must not leak into validation.
+        let evaluation_boundary = feedback.checkpoint();
         let replay = feedback.evaluate(&Order::Fixed(policy.check_order.clone()), None);
         let mut state = self.state.lock();
         ensure!(state.revision == revision, "生成期间策略已变化，请重新生成建议");
@@ -196,10 +210,21 @@ impl Optimizer {
             base_revision: revision,
             heuristic_reference: reference,
             replay,
+            evaluation_boundary,
+            evaluation_consumed: false,
+            model_usage,
+            proposal_wall_ms: proposal_start.elapsed().as_secs_f64() * 1000.0,
         };
         self.audit("propose", &json!(proposal))?;
         state.proposals.push(proposal.clone());
         Ok(proposal)
+    }
+
+    pub fn pending_valid(&self, id: u64) -> bool {
+        let s = self.state.lock();
+        s.proposals
+            .iter()
+            .any(|p| p.id == id && !p.evaluation_consumed && p.base_revision == s.revision && now().saturating_sub(p.created_at) <= 3600)
     }
 
     /// 应用候选前用最新证据回放；未达门槛时记录 reject 事件并保持原策略。
@@ -207,9 +232,14 @@ impl Optimizer {
         let mut state = self.state.lock();
         let proposal = state.proposals.iter().find(|p| p.id == id).context("策略编号不存在")?.clone();
         ensure!(proposal.base_revision == state.revision, "策略已过期，请基于当前版本重新生成");
+        ensure!(!proposal.evaluation_consumed, "该候选已完成独立批次评估，请生成新候选");
         ensure!(now().saturating_sub(proposal.created_at) <= 3600, "建议超过一小时，请重新生成");
         proposal.policy.validate()?;
-        let replay = feedback.evaluate(&Order::Fixed(proposal.policy.check_order.clone()), None);
+        let replay = feedback.evaluate_after(&Order::Fixed(proposal.policy.check_order.clone()), &proposal.evaluation_boundary);
+        // One decision per complete batch, never repeated significance checks on a growing prefix.
+        if replay.episodes >= MIN_EVIDENCE {
+            state.proposals.iter_mut().find(|p| p.id == id).unwrap().evaluation_consumed = true;
+        }
         if !self.gate.admits(&replay) {
             self.audit("reject", &json!({"id": id, "gate": self.gate, "replay": replay}))?;
             bail!(
@@ -231,6 +261,7 @@ impl Optimizer {
         state.active = Some(id);
         state.applied_evidence = Some(evidence);
         state.applied_epoch = Some(epoch);
+        state.monitor_boundary = Some(feedback.monitoring_checkpoint());
         Ok(event)
     }
 
@@ -241,8 +272,12 @@ impl Optimizer {
             return Ok(None);
         }
         let mut state = self.state.lock();
-        let (Some(order), Some(epoch)) = (active_order(&state), state.applied_epoch) else { return Ok(None) };
-        let replay = feedback.evaluate(&Order::Fixed(order), Some(epoch));
+        let (Some(order), Some(boundary)) = (active_order(&state), state.monitor_boundary.as_ref()) else { return Ok(None) };
+        let replay = feedback.evaluate_after(&Order::Fixed(order), boundary);
+        if replay.episodes < MIN_EVIDENCE {
+            return Ok(None);
+        }
+        state.monitor_boundary = Some(feedback.monitoring_checkpoint());
         if !replay.regresses() {
             return Ok(None);
         }
@@ -269,6 +304,7 @@ impl Optimizer {
         state.active = None;
         state.applied_evidence = None;
         state.applied_epoch = None;
+        state.monitor_boundary = None;
         Ok(())
     }
 }
@@ -336,6 +372,10 @@ mod tests {
 
     /// 一个被审计的失败候选：键唯一性与行数守恒失败，抽样扇出通过。
     fn audited(fb: &Feedback, checks: &[Check], key_ms: f64, rc_ms: f64, probe_key: bool) {
+        let mut checks = checks.to_vec();
+        if let Check::KeyUnique { filter, .. } = &mut checks[0] {
+            *filter = Some(format!("id > {}", fb.report()["evidence"]["audited_failures_total"]));
+        }
         let o = |pass: bool, ms: f64| Outcome { pass, ms, metrics: json!({}) };
         fb.episode(
             vec![
@@ -442,5 +482,26 @@ mod tests {
         assert!(!Gate::Improvement.admits(&e(MIN_EVIDENCE - 1, -2.0, -1.0)));
         assert!(!Gate::Improvement.admits(&e(MIN_EVIDENCE, -2.0, 1.0)));
         assert!(Gate::Improvement.admits(&e(MIN_EVIDENCE, -2.0, -1.0)));
+    }
+
+    #[tokio::test]
+    async fn rejected_complete_batch_cannot_be_retested_until_lucky() {
+        let dir = temp_dir("single-decision");
+        let optimizer = Optimizer::new(Provider::Mock, dir.to_str().unwrap()).unwrap();
+        let fb = Feedback::default();
+        let checks = sample_checks();
+        record_samples(&fb, &checks);
+        let p = optimizer.propose(&fb).await.unwrap();
+        for _ in 0..MIN_EVIDENCE {
+            audited(&fb, &checks, 5.0, 50.0, true);
+        }
+        assert!(optimizer.apply(p.id, &fb).is_err());
+        assert!(!optimizer.pending_valid(p.id));
+        for _ in 0..MIN_EVIDENCE * 10 {
+            audited(&fb, &checks, 50.0, 1.0, false);
+        }
+        assert!(optimizer.apply(p.id, &fb).is_err());
+        std::fs::remove_file(&optimizer.journal).unwrap();
+        std::fs::remove_dir(dir).unwrap();
     }
 }

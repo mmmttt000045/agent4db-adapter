@@ -657,9 +657,9 @@ impl Middle {
                     }
                     continue;
                 }
-                // 反馈的无偏性：排在后面的检查只见过“前面都通过”的候选，永远学不到它们也能发现问题。
-                // 以小概率把剩余检查也跑完（审计），代价照常计入。是否审计只取决于候选，与顺序和结果无关，
-                // 所以被审计的失败候选是回放其他顺序的无偏样本。
+                // 补充观测缓解提前停止的选择偏差；不是无偏因果估计。
+                // 剩余检查走相同的有效缓存路径，避免把本可复用的结果算成强制执行成本。
+                // 审计开销照常计入整体数据库成本。
                 let audit = match self.cfg.audit_seed {
                     Some(seed) => audit_candidate(seed, &serde_json::to_string(&(left, right, on, &filters))?),
                     None => rand::random::<f64>() < AUDIT_RATE,
@@ -667,8 +667,8 @@ impl Middle {
                 if self.cfg.feedback && audit {
                     audited = true;
                     for rest in &ordered[idx + 1..] {
-                        let (ro, merged) = self.exec_check(ctx, rest, QKind::Check).await?;
-                        seen.push(Obs::new(rest, &ro, !merged, &rows));
+                        let (ro, executed) = self.run_check(ctx, rest).await?;
+                        seen.push(Obs::new(rest, &ro, executed, &rows));
                         if *rest == key_check {
                             key_outcome = Some(ro);
                         }

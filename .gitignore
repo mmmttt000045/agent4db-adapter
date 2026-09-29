@@ -1,6 +1,7 @@
 /target
 build.log
 .env
+.env.deepseek
 /results/
 # 本机专用：zig 链接器的绝对路径配置
 .cargo/

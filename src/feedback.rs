@@ -12,7 +12,7 @@ use crate::checks::{Check, Outcome};
 use parking_lot::Mutex;
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct KindStats {
@@ -52,7 +52,7 @@ impl KindStats {
     }
 }
 
-/// 发现问题后，以此概率把剩余检查也跑完，给反馈提供无偏样本。
+/// 发现问题后，以此概率把剩余检查也跑完，给反馈提供补充观测（不是无偏因果估计）。
 pub const AUDIT_RATE: f64 = 0.2;
 
 /// 有足够样本之前沿用固定顺序。
@@ -70,8 +70,18 @@ pub const MIN_EVIDENCE: usize = 8;
 /// 回放窗口：只保留最近的被审计失败候选，跟随负载变化。
 const WINDOW: usize = 2000;
 
-/// 每新增多少条证据重新评估一次自适应顺序。
-const REEVALUATE_EVERY: u64 = 4;
+/// Frozen boundary: only later, previously unseen candidate groups may validate a policy.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct Checkpoint {
+    cursor: u64,
+    groups: BTreeSet<String>,
+}
+
+fn signature(obs: &[Obs]) -> String {
+    let mut keys: Vec<&str> = obs.iter().map(|o| o.key.as_str()).collect();
+    keys.sort_unstable();
+    keys.join("\n")
+}
 
 /// 一次验证尝试中某项检查的观测。
 #[derive(Clone, Debug)]
@@ -108,6 +118,7 @@ struct Episode {
     probe_key: bool,
     /// 记录时的策略纪元；`set_priority` 每调用一次加一
     epoch: u64,
+    sequence: u64,
 }
 
 /// 可回放的排序策略。
@@ -128,15 +139,15 @@ impl Order {
 /// 候选策略与默认顺序在同一批被审计失败候选上的配对回放结果。
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct Evidence {
-    /// 参与回放的被审计失败候选数
+    /// 不同候选签名组数，重复请求先组内平均
     pub episodes: usize,
-    /// 候选策略的平均摊销代价（ms / 候选）
+    /// 候选策略的平均观测执行代价（ms / 候选组）
     pub policy_ms: f64,
-    /// 默认顺序的平均摊销代价（ms / 候选）
+    /// 默认顺序的平均观测执行代价（ms / 候选组）
     pub baseline_ms: f64,
     /// 候选 − 默认 的平均配对差；负数表示更省
     pub mean_delta_ms: f64,
-    /// 配对差均值的正态近似 95% 区间
+    /// 候选组平均配对差的保守 Student-t 95% 描述性区间
     pub ci95: [f64; 2],
 }
 
@@ -164,8 +175,12 @@ struct State {
     kinds: BTreeMap<String, KindStats>,
     /// 键：`种类|上下文`
     contexts: BTreeMap<String, KindStats>,
-    /// 检查键 → 被复用次数
-    reuse: HashMap<String, u64>,
+    /// Frozen scorer; never updated with its evaluation batch.
+    frozen: Option<Box<State>>,
+    boundary: Checkpoint,
+    seen_groups: BTreeSet<String>,
+    adaptive_uses: u64,
+    order_calls: u64,
     priority: Option<Vec<String>>,
     epoch: u64,
     episodes: VecDeque<Episode>,
@@ -195,7 +210,22 @@ fn summarize(pairs: &[(f64, f64)]) -> Evidence {
     let mean = policy_ms - baseline_ms;
     let half = if n > 1 {
         let var = pairs.iter().map(|(p, b)| (p - b - mean).powi(2)).sum::<f64>() / (nf - 1.0);
-        1.96 * (var / nf).sqrt()
+        // Student-t critical values; this remains a descriptive interval, not a sequential guarantee.
+        let critical = match n {
+            2 => 12.706,
+            3 => 4.303,
+            4 => 3.182,
+            5 => 2.776,
+            6 => 2.571,
+            7 => 2.447,
+            8 => 2.365,
+            9 => 2.306,
+            10 => 2.262,
+            11..=16 => 2.228,
+            17..=31 => 2.120,
+            _ => 2.042,
+        };
+        critical * (var / nf).sqrt()
     } else {
         0.0
     };
@@ -221,12 +251,10 @@ impl State {
         p / (cost + 1.0)
     }
 
-    fn amortized(&self, o: &Obs) -> f64 {
-        if o.executed {
-            o.ms / (1.0 + self.reuse.get(&o.key).copied().unwrap_or(0) as f64)
-        } else {
-            0.0
-        }
+    fn observed_cost(&self, o: &Obs) -> f64 {
+        // Immutable actual incremental cost. Future hits cannot rewrite old evidence.
+        // Reuse is already represented by zero-cost observations; do not discount twice.
+        o.ms
     }
 
     /// 按某策略重放一个被审计的失败候选：累加到第一个失败为止的代价；
@@ -243,12 +271,14 @@ impl State {
             }
         }
         let mut cost = 0.0;
+        let mut key_seen = false;
         for i in idx {
             let o = &e.obs[i];
-            cost += self.amortized(o);
+            cost += self.observed_cost(o);
+            key_seen |= o.kind == "KeyUnique";
             if !o.pass {
-                if o.kind != "KeyUnique" && e.probe_key {
-                    cost += e.obs.iter().find(|x| x.kind == "KeyUnique").map_or(0.0, |x| self.amortized(x));
+                if !key_seen && e.probe_key {
+                    cost += e.obs.iter().find(|x| x.kind == "KeyUnique").map_or(0.0, |x| self.observed_cost(x));
                 }
                 break;
             }
@@ -256,22 +286,50 @@ impl State {
         cost
     }
 
-    fn evaluate(&self, policy: &Order, since_epoch: Option<u64>) -> Evidence {
+    fn checkpoint(&self) -> Checkpoint {
+        Checkpoint { cursor: self.evidence_total, groups: self.seen_groups.clone() }
+    }
+
+    fn evaluate_batch(&self, policy: &Order, since_epoch: Option<u64>, boundary: Option<&Checkpoint>, scorer: &State) -> Evidence {
         let baseline = Order::default_order();
-        let pairs: Vec<(f64, f64)> = self
-            .episodes
-            .iter()
-            .filter(|e| since_epoch.is_none_or(|s| e.epoch >= s))
-            .map(|e| (self.replay(e, policy), self.replay(e, &baseline)))
+        let mut groups: BTreeMap<String, Vec<(f64, f64)>> = BTreeMap::new();
+        for e in &self.episodes {
+            let key = signature(&e.obs);
+            if since_epoch.is_some_and(|s| e.epoch < s) || boundary.is_some_and(|b| e.sequence <= b.cursor || b.groups.contains(&key)) {
+                continue;
+            }
+            groups.entry(key).or_default().push((scorer.replay(e, policy), scorer.replay(e, &baseline)));
+        }
+        let pairs: Vec<_> = groups
+            .values()
+            .map(|g| {
+                let n = g.len() as f64;
+                (g.iter().map(|p| p.0).sum::<f64>() / n, g.iter().map(|p| p.1).sum::<f64>() / n)
+            })
             .collect();
         summarize(&pairs)
     }
 
-    /// 自适应顺序是否已被回放证据采纳；证据每增加 `REEVALUATE_EVERY` 条重新判断，失效时自动退回默认顺序。
+    fn evaluate(&self, policy: &Order, since_epoch: Option<u64>) -> Evidence {
+        self.evaluate_batch(policy, since_epoch, None, self)
+    }
+
+    /// Freeze a scorer, then decide once per fresh batch of distinct candidates.
     fn adaptive_adopted(&mut self) -> bool {
-        if self.adaptive.as_ref().is_none_or(|d| self.evidence_total >= d.at + REEVALUATE_EVERY) {
-            let evidence = self.evaluate(&Order::Adaptive, None);
-            self.adaptive = Some(Decision { at: self.evidence_total, adopted: evidence.improves(), evidence });
+        if self.frozen.is_none() {
+            self.frozen = Some(Box::new(State { kinds: self.kinds.clone(), contexts: self.contexts.clone(), ..Default::default() }));
+            self.boundary = self.checkpoint();
+            self.adaptive = Some(Decision { at: self.evidence_total, adopted: false, evidence: Evidence::default() });
+            return false;
+        }
+        let evidence = self.evaluate_batch(&Order::Adaptive, None, Some(&self.boundary), self.frozen.as_ref().unwrap());
+        if evidence.episodes >= MIN_EVIDENCE {
+            let adopted = evidence.improves();
+            self.adaptive = Some(Decision { at: self.evidence_total, adopted, evidence });
+            self.boundary.cursor = self.evidence_total;
+            if !adopted {
+                self.frozen = None;
+            }
         }
         self.adaptive.as_ref().is_some_and(|d| d.adopted)
     }
@@ -313,12 +371,12 @@ impl Feedback {
         let mut s = self.state.lock();
         s.kinds.entry(c.kind().to_string()).or_default().hits += 1;
         s.contexts.entry(ctx_key(c.kind(), &c.context())).or_default().hits += 1;
-        *s.reuse.entry(c.key()).or_default() += 1;
     }
 
     /// 记录一次验证尝试。只有被审计的失败候选能回放其他顺序；通过的候选所有顺序代价相同，只计数。
     pub fn episode(&self, obs: Vec<Obs>, audited: bool, probe_key: bool) {
         let mut s = self.state.lock();
+        s.seen_groups.insert(signature(&obs));
         if obs.iter().all(|o| o.pass) {
             s.passed += 1;
             return;
@@ -328,7 +386,8 @@ impl Feedback {
             return;
         }
         let epoch = s.epoch;
-        s.episodes.push_back(Episode { obs, probe_key, epoch });
+        let sequence = s.evidence_total + 1;
+        s.episodes.push_back(Episode { obs, probe_key, epoch, sequence });
         while s.episodes.len() > WINDOW {
             s.episodes.pop_front();
         }
@@ -340,6 +399,20 @@ impl Feedback {
         self.state.lock().evaluate(policy, since_epoch)
     }
 
+    pub fn checkpoint(&self) -> Checkpoint {
+        self.state.lock().checkpoint()
+    }
+
+    /// Monitoring is time-separated but may revisit existing workloads after data drift.
+    pub fn monitoring_checkpoint(&self) -> Checkpoint {
+        Checkpoint { cursor: self.state.lock().evidence_total, groups: BTreeSet::new() }
+    }
+
+    pub fn evaluate_after(&self, policy: &Order, boundary: &Checkpoint) -> Evidence {
+        let s = self.state.lock();
+        s.evaluate_batch(policy, None, Some(boundary), &s)
+    }
+
     /// `enabled=false` 时保持调用方给出的固定顺序（调用方按 `DEFAULT_ORDER` 构造）。
     /// `cached` 报告某检查的结果当前是否已在经验库中，它会被视为零代价。
     pub fn order(&self, enabled: bool, mut checks: Vec<Check>, rows: &dyn Fn(&str) -> f64, cached: &dyn Fn(&Check) -> bool) -> Vec<Check> {
@@ -347,6 +420,10 @@ impl Feedback {
             return checks;
         }
         let mut s = self.state.lock();
+        s.order_calls += 1;
+        let mut candidate_keys: Vec<String> = checks.iter().map(Check::key).collect();
+        candidate_keys.sort();
+        s.seen_groups.insert(candidate_keys.join("\n"));
         if let Some(priority) = &s.priority {
             checks.sort_by_key(|c| rank(priority, c.kind()));
             return checks;
@@ -354,7 +431,9 @@ impl Feedback {
         if checks.iter().any(|c| s.kinds.get(c.kind()).is_none_or(|k| k.runs < MIN_RUNS)) || !s.adaptive_adopted() {
             return checks;
         }
-        let keys: Vec<f64> = checks.iter().map(|c| s.score(c.kind(), &c.context(), c.rows_touched(rows), cached(c))).collect();
+        s.adaptive_uses += 1;
+        let scorer = s.frozen.as_ref().expect("adopted scorer");
+        let keys: Vec<f64> = checks.iter().map(|c| scorer.score(c.kind(), &c.context(), c.rows_touched(rows), cached(c))).collect();
         let mut idx: Vec<usize> = (0..checks.len()).collect();
         idx.sort_by(|&a, &b| keys[b].total_cmp(&keys[a]));
         idx.into_iter().map(|i| checks[i].clone()).collect()
@@ -367,6 +446,7 @@ impl Feedback {
     /// 统计、证据与自适应采纳状态，供 `/v1/stats` 与实验报告使用。
     pub fn report(&self) -> Value {
         let s = self.state.lock();
+        let pending = s.frozen.as_ref().map(|scorer| s.evaluate_batch(&Order::Adaptive, None, Some(&s.boundary), scorer));
         json!({
             "kinds": s.kinds,
             "contexts": s.contexts,
@@ -375,6 +455,9 @@ impl Feedback {
             "evidence": {"audited_failures_in_window": s.episodes.len(), "audited_failures_total": s.evidence_total,
                 "passed": s.passed, "unaudited_failures": s.unaudited_failures, "min_evidence": MIN_EVIDENCE},
             "adaptive": s.adaptive,
+            "pending_validation": pending,
+            "order_calls": s.order_calls, "adaptive_uses": s.adaptive_uses,
+            "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
         })
     }
 }
@@ -397,7 +480,10 @@ mod tests {
 
     /// 键唯一性、行数守恒各自的耗时与结果；抽样扇出 1 ms 且通过（样本没碰到重复键）。
     fn audited(fb: &Feedback, key: (bool, f64), rc: (bool, f64), probe_key: bool) {
-        let c = checks();
+        let mut c = checks();
+        if let Check::KeyUnique { filter, .. } = &mut c[0] {
+            *filter = Some(format!("id > {}", fb.state.lock().evidence_total));
+        }
         let obs = vec![
             Obs::new(&c[0], &outcome(key.0, key.1), true, &|_| 100.0),
             Obs::new(&c[1], &outcome(rc.0, rc.1), true, &|_| 100.0),
@@ -447,18 +533,18 @@ mod tests {
     }
 
     #[test]
-    fn reuse_amortizes_shared_checks() {
+    fn future_reuse_cannot_rewrite_past_execution_costs() {
         let fb = Feedback::default();
         for _ in 0..MIN_EVIDENCE {
             audited(&fb, (false, 50.0), (false, 5.0), false);
         }
-        // 键唯一性结果被复用 9 次：默认顺序的摊销代价从 50 降到 5，与先跑行数守恒持平。
+        // 后续复用不能回溯降低已经发生的执行成本。
         for _ in 0..9 {
             fb.record_reuse(&checks()[0]);
         }
         let e = fb.evaluate(&rc_first(), None);
-        assert!((e.baseline_ms - 5.0).abs() < 1e-9);
-        assert!(!e.improves() && !e.regresses());
+        assert!((e.baseline_ms - 50.0).abs() < 1e-9);
+        assert!(e.improves() && !e.regresses());
     }
 
     #[test]
@@ -495,6 +581,7 @@ mod tests {
             fb.record(&c[1], &outcome(false, 5.0), &|_| 100.0);
             fb.record(&c[2], &outcome(true, 1.0), &|_| 100.0);
         }
+        fb.order(true, c.clone(), &|_| 100.0, &|_| false);
         for _ in 0..MIN_EVIDENCE {
             audited(&fb, (false, 50.0), (false, 5.0), false);
         }
@@ -513,5 +600,60 @@ mod tests {
         assert_eq!(fb.evaluate(&rc_first(), Some(1)).episodes, 1);
         assert_eq!(fb.set_priority(None), 2);
         assert_eq!(fb.evaluate(&rc_first(), Some(2)).episodes, 0);
+    }
+
+    #[test]
+    fn repeated_candidates_do_not_inflate_evidence_and_training_groups_are_excluded() {
+        let fb = Feedback::default();
+        let c = checks();
+        let observations = || {
+            vec![
+                Obs::new(&c[0], &outcome(false, 50.0), true, &|_| 100.0),
+                Obs::new(&c[1], &outcome(false, 5.0), true, &|_| 100.0),
+                Obs::new(&c[2], &outcome(true, 1.0), true, &|_| 100.0),
+            ]
+        };
+        fb.episode(observations(), true, false);
+        let boundary = fb.checkpoint();
+        for _ in 0..100 {
+            fb.episode(observations(), true, false);
+        }
+        assert_eq!(fb.evaluate(&rc_first(), None).episodes, 1);
+        assert_eq!(fb.evaluate_after(&rc_first(), &boundary).episodes, 0);
+        assert!(!fb.evaluate(&rc_first(), None).improves());
+        // A monitoring batch may revisit an existing group, but still counts it only once.
+        let monitor = fb.monitoring_checkpoint();
+        fb.episode(observations(), true, false);
+        assert_eq!(fb.evaluate_after(&rc_first(), &monitor).episodes, 1);
+    }
+
+    #[test]
+    fn replay_does_not_charge_an_already_executed_key_probe_twice() {
+        let fb = Feedback::default();
+        audited(&fb, (true, 50.0), (false, 5.0), true);
+        // Inconsistent observations can occur without a shared transaction snapshot.
+        let e = fb.evaluate(&Order::default_order(), None);
+        assert_eq!(e.baseline_ms, 55.0);
+        assert_eq!(e.policy_ms, 55.0);
+    }
+
+    #[test]
+    fn scorer_is_frozen_until_fresh_validation_completes() {
+        let fb = Feedback::default();
+        let c = checks();
+        for _ in 0..3 {
+            for (check, ms) in c.iter().zip([50.0, 5.0, 1.0]) {
+                fb.record(check, &outcome(check.kind() == "SampleFanout", ms), &|_| 100.0);
+            }
+        }
+        fb.order(true, c.clone(), &|_| 100.0, &|_| false);
+        // New telemetry strongly favors the opposite ranking. The evaluated scorer stays frozen.
+        for _ in 0..100 {
+            fb.record(&c[1], &outcome(false, 10000.0), &|_| 100.0);
+        }
+        for _ in 0..MIN_EVIDENCE {
+            audited(&fb, (false, 50.0), (false, 5.0), false);
+        }
+        assert_eq!(fb.order(true, c, &|_| 100.0, &|_| false)[0].kind(), "RowConservation");
     }
 }

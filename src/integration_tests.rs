@@ -114,6 +114,61 @@ async fn exercise(url: &str, out: &str) -> Result<Value> {
     result
 }
 
+// Deliberately controlled telemetry tests scheduling, not measured database performance.
+async fn exercise_manual_monitor(url: &str, out: &str) -> Result<Value> {
+    use crate::checks::{Check, Outcome};
+    use crate::feedback::{Obs, MIN_EVIDENCE};
+    let mid = Arc::new(Middle::new(Arc::new(Db::connect(url, 2, true)?), MiddleConfig::default()).await?);
+    let optimizer = Arc::new(Optimizer::with_gate(Provider::Mock, &format!("{out}/manual-monitor"), Gate::NoRegression)?);
+    let checks = vec![
+        Check::KeyUnique { table: "store_sales".into(), cols: vec!["ss_item_sk".into()], filter: None },
+        Check::RowConservation { left: "item".into(), right: "store_sales".into(), on: vec![], lf: None, rf: None },
+        Check::SampleFanout { left: "item".into(), right: "store_sales".into(), on: vec![], lf: None, rf: None, n: 1000 },
+    ];
+    for _ in 0..3 {
+        for c in &checks {
+            mid.fb.record(c, &Outcome { pass: c.kind() != "RowConservation", metrics: json!({}), ms: 10.0 }, &|_| 100.0);
+        }
+    }
+    let p = optimizer.propose(&mid.fb).await?;
+    optimizer.apply(p.id, &mid.fb)?;
+    for i in 0..MIN_EVIDENCE {
+        let mut candidate = checks.clone();
+        if let Check::KeyUnique { filter, .. } = &mut candidate[0] {
+            *filter = Some(format!("ss_item_sk>{i}"));
+        }
+        let obs = candidate
+            .iter()
+            .enumerate()
+            .map(|(j, c)| Obs::new(c, &Outcome { pass: j == 2, metrics: json!({}), ms: if j == 0 { 5.0 } else { 50.0 } }, true, &|_| 100.0))
+            .collect();
+        mid.fb.episode(obs, true, true);
+    }
+    let listener = std::net::TcpListener::bind("127.0.0.1:0")?;
+    let addr = listener.local_addr()?;
+    drop(listener);
+    let server_mid = mid.clone();
+    let task = tokio::spawn(async move { server::serve(server_mid, &addr.to_string(), Some(optimizer), None, false).await });
+    let http = reqwest::Client::builder().no_proxy().build()?;
+    let result = tokio::time::timeout(Duration::from_secs(5), async {
+        loop {
+            if let Ok(response) = http.get(format!("http://{addr}/v1/optimizer")).send().await {
+                let state: Value = response.json().await?;
+                if state["state"]["revision"] == 2 {
+                    ensure!(state["state"]["active"].is_null(), "manual mode should roll back");
+                    ensure!(state["state"]["proposals"].as_array().unwrap().len() == 1, "manual mode must not generate proposals");
+                    return Ok::<Value, anyhow::Error>(json!({"status":"passed","revision":2,"proposal_interval":null}));
+                }
+            }
+            tokio::time::sleep(Duration::from_millis(25)).await;
+        }
+    })
+    .await;
+    task.abort();
+    let _ = task.await;
+    result.context("manual-mode regression monitor did not run")?
+}
+
 #[tokio::test]
 #[ignore = "requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission"]
 async fn postgres_http_mock_lifecycle() -> Result<()> {
@@ -126,7 +181,12 @@ async fn postgres_http_mock_lifecycle() -> Result<()> {
     test_url.set_path(&format!("/{name}"));
     let out = format!("results/mock-{unique}");
     admin.query(QKind::Meta, &format!("create database {name}")).await.context("无法创建独立测试库")?;
-    let result = tokio::time::timeout(Duration::from_secs(90), exercise(test_url.as_str(), &out)).await;
+    let result = tokio::time::timeout(Duration::from_secs(90), async {
+        let mut report = exercise(test_url.as_str(), &out).await?;
+        report["manual_mode_monitor"] = exercise_manual_monitor(test_url.as_str(), &out).await?;
+        Ok::<Value, anyhow::Error>(report)
+    })
+    .await;
     // The generated identifier contains only ASCII letters, digits and underscores.
     let cleanup = admin.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
     let report = match &result {

@@ -111,11 +111,13 @@ pub async fn serve(
             .route("/v1/optimizer/rollback", post(rollback_policy))
             .with_state(management.clone());
         app = app.merge(routes);
-        if let Some(seconds) = interval_secs {
+        {
+            let seconds = interval_secs.unwrap_or(30);
             background = Some(BackgroundTask(tokio::spawn(async move {
                 let mut interval = tokio::time::interval(std::time::Duration::from_secs(seconds as u64));
                 interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
                 let mut last_runs = 0;
+                let mut pending = None;
                 loop {
                     interval.tick().await;
                     // 先看已应用策略在新证据上是否退化，再决定是否生成新建议。
@@ -123,6 +125,19 @@ pub async fn serve(
                         Ok(Some(event)) => eprintln!("回放显示当前策略退化，已自动回滚：{}", event["replay"]),
                         Ok(None) => {}
                         Err(e) => eprintln!("退化监测失败，原策略保持：{e:#}"),
+                    }
+                    // Monitoring remains active even when proposal generation is manual.
+                    if interval_secs.is_none() {
+                        continue;
+                    }
+                    if let Some(id) = pending {
+                        if management.optimizer.apply(id, &management.mid.fb).is_ok() {
+                            pending = None;
+                        } else if management.optimizer.pending_valid(id) {
+                            continue;
+                        } else {
+                            pending = None;
+                        }
                     }
                     let runs: u64 = management.mid.fb.snapshot().values().map(|s| s.runs).sum();
                     if runs == last_runs {
@@ -135,6 +150,7 @@ pub async fn serve(
                             if auto_apply {
                                 if let Err(e) = management.optimizer.apply(p.id, &management.mid.fb) {
                                     eprintln!("优化策略未应用：{e:#}");
+                                    pending = Some(p.id);
                                 }
                             }
                         }

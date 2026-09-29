@@ -1,0 +1,2437 @@
+{
+  "completed_cells": 48,
+  "planned_cells": 48,
+  "main": [
+    {
+      "study": "cache-on",
+      "round": 0,
+      "mode": "B",
+      "wall_seconds": 1.0846445,
+      "db_ms": 13677.59,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-on",
+      "round": 0,
+      "mode": "D",
+      "wall_seconds": 0.981544,
+      "db_ms": 10574.668,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-on",
+      "round": 0,
+      "mode": "M",
+      "wall_seconds": 0.9519385,
+      "db_ms": 10294.064,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-on",
+      "round": 0,
+      "mode": "L",
+      "wall_seconds": 29.2287549,
+      "db_ms": 10527.837,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-on",
+      "round": 1,
+      "mode": "D",
+      "wall_seconds": 1.0126044,
+      "db_ms": 12609.712,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-on",
+      "round": 1,
+      "mode": "M",
+      "wall_seconds": 1.0591523,
+      "db_ms": 13017.998,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-on",
+      "round": 1,
+      "mode": "L",
+      "wall_seconds": 26.2864845,
+      "db_ms": 13243.003,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-on",
+      "round": 1,
+      "mode": "B",
+      "wall_seconds": 1.0289463,
+      "db_ms": 11391.746,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-on",
+      "round": 2,
+      "mode": "M",
+      "wall_seconds": 0.9666409,
+      "db_ms": 10726.133,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-on",
+      "round": 2,
+      "mode": "L",
+      "wall_seconds": 32.2424913,
+      "db_ms": 10843.810000000001,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-on",
+      "round": 2,
+      "mode": "B",
+      "wall_seconds": 0.960584,
+      "db_ms": 11612.443,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-on",
+      "round": 2,
+      "mode": "D",
+      "wall_seconds": 0.9513822,
+      "db_ms": 10345.564999999999,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-on",
+      "round": 3,
+      "mode": "L",
+      "wall_seconds": 12.170481,
+      "db_ms": 12306.172999999999,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-on",
+      "round": 3,
+      "mode": "B",
+      "wall_seconds": 0.9234918,
+      "db_ms": 12063.255000000001,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-on",
+      "round": 3,
+      "mode": "D",
+      "wall_seconds": 0.9886932,
+      "db_ms": 11311.042,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-on",
+      "round": 3,
+      "mode": "M",
+      "wall_seconds": 1.0356307,
+      "db_ms": 11917.814999999999,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-off",
+      "round": 0,
+      "mode": "B",
+      "wall_seconds": 3.2800246,
+      "db_ms": 49744.347,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-off",
+      "round": 0,
+      "mode": "D",
+      "wall_seconds": 3.255033,
+      "db_ms": 49263.532,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-off",
+      "round": 0,
+      "mode": "M",
+      "wall_seconds": 3.3252427,
+      "db_ms": 50270.955,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-off",
+      "round": 0,
+      "mode": "L",
+      "wall_seconds": 40.4767875,
+      "db_ms": 49829.801,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-off",
+      "round": 1,
+      "mode": "D",
+      "wall_seconds": 3.2730133,
+      "db_ms": 49343.024,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-off",
+      "round": 1,
+      "mode": "M",
+      "wall_seconds": 3.4041416,
+      "db_ms": 51585.051,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-off",
+      "round": 1,
+      "mode": "L",
+      "wall_seconds": 28.9700308,
+      "db_ms": 48607.91099999999,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-off",
+      "round": 1,
+      "mode": "B",
+      "wall_seconds": 3.3647064,
+      "db_ms": 51090.061,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-off",
+      "round": 2,
+      "mode": "M",
+      "wall_seconds": 3.2354888,
+      "db_ms": 48940.491,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-off",
+      "round": 2,
+      "mode": "L",
+      "wall_seconds": 13.7663649,
+      "db_ms": 50597.724,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-off",
+      "round": 2,
+      "mode": "B",
+      "wall_seconds": 3.354687,
+      "db_ms": 50640.796,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-off",
+      "round": 2,
+      "mode": "D",
+      "wall_seconds": 3.4609981,
+      "db_ms": 52114.253000000004,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-off",
+      "round": 3,
+      "mode": "L",
+      "wall_seconds": 26.7273721,
+      "db_ms": 49490.055,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    },
+    {
+      "study": "cache-off",
+      "round": 3,
+      "mode": "B",
+      "wall_seconds": 3.2267722,
+      "db_ms": 48778.712,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-off",
+      "round": 3,
+      "mode": "D",
+      "wall_seconds": 3.2351449,
+      "db_ms": 49198.638,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 0
+    },
+    {
+      "study": "cache-off",
+      "round": 3,
+      "mode": "M",
+      "wall_seconds": 3.2271033,
+      "db_ms": 48666.833,
+      "tasks": 7680,
+      "correct": 7680,
+      "applies": 0,
+      "reordered": 0,
+      "proposals": 1
+    }
+  ],
+  "comparisons": [
+    {
+      "study": "cache-on",
+      "baseline": "B",
+      "metric": "db_ms",
+      "saving_pct": {
+        "mean": 2.845762255998216,
+        "ci95": [
+          -23.29874288700661,
+          28.990267399003045
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-on",
+      "baseline": "B",
+      "metric": "wall_seconds",
+      "saving_pct": {
+        "mean": -2380.97603935241,
+        "ci95": [
+          -3734.475661858917,
+          -1027.4764168459035
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-on",
+      "baseline": "D",
+      "metric": "db_ms",
+      "saving_pct": {
+        "mean": -4.548321187225538,
+        "ci95": [
+          -10.591257824248881,
+          1.4946154497978048
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-on",
+      "baseline": "D",
+      "metric": "wall_seconds",
+      "saving_pct": {
+        "mean": -2448.436184183597,
+        "ci95": [
+          -3938.0052872395618,
+          -958.8670811276324
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-on",
+      "baseline": "M",
+      "metric": "db_ms",
+      "saving_pct": {
+        "mean": -2.088776025371275,
+        "ci95": [
+          -3.5457160029355137,
+          -0.6318360478070364
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-on",
+      "baseline": "M",
+      "metric": "wall_seconds",
+      "saving_pct": {
+        "mean": -2415.7455810861557,
+        "ci95": [
+          -3946.961229164547,
+          -884.5299330077642
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-off",
+      "baseline": "B",
+      "metric": "db_ms",
+      "saving_pct": {
+        "mean": 0.8283356805858179,
+        "ci95": [
+          -3.5797360549296844,
+          5.23640741610132
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-off",
+      "baseline": "B",
+      "metric": "wall_seconds",
+      "saving_pct": {
+        "mean": -733.4247783807036,
+        "ci95": [
+          -1269.3153431399514,
+          -197.53421362145582
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-off",
+      "baseline": "D",
+      "metric": "db_ms",
+      "saving_pct": {
+        "mean": 0.6645032725922734,
+        "ci95": [
+          -2.32563117227875,
+          3.654637717463297
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-off",
+      "baseline": "D",
+      "metric": "wall_seconds",
+      "saving_pct": {
+        "mean": -738.136468711508,
+        "ci95": [
+          -1289.8234038555215,
+          -186.4495335674943
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-off",
+      "baseline": "M",
+      "metric": "db_ms",
+      "saving_pct": {
+        "mean": 0.39277718158003116,
+        "ci95": [
+          -5.958109422495262,
+          6.743663785655325
+        ],
+        "rounds": 4
+      }
+    },
+    {
+      "study": "cache-off",
+      "baseline": "M",
+      "metric": "wall_seconds",
+      "saving_pct": {
+        "mean": -730.4942548646787,
+        "ci95": [
+          -1245.3307593476866,
+          -215.657750381671
+        ],
+        "rounds": 4
+      }
+    }
+  ],
+  "check_summary": [
+    {
+      "mode": "B",
+      "probe": true,
+      "subset": "all",
+      "saving_pct": {
+        "mean": -0.7536564436467996,
+        "ci95": [
+          -2.8205589202219117,
+          1.3132460329283124
+        ],
+        "rounds": 4
+      },
+      "trials": 192,
+      "adopted": 0,
+      "matches": 192,
+      "both_rejected": 192,
+      "candidate_ms": 4387.548000000001,
+      "baseline_ms": 4354.263000000001,
+      "observation_ms": 9443.694999999998
+    },
+    {
+      "mode": "B",
+      "probe": true,
+      "subset": "deployment",
+      "saving_pct": {
+        "mean": 0.1861543540705779,
+        "ci95": [
+          -0.45190418670574184,
+          0.8242128948468976
+        ],
+        "rounds": 4
+      },
+      "trials": 128,
+      "adopted": 0,
+      "matches": 128,
+      "both_rejected": 128,
+      "candidate_ms": 2755.996,
+      "baseline_ms": 2761.246,
+      "observation_ms": 6025.024999999999
+    },
+    {
+      "mode": "B",
+      "probe": false,
+      "subset": "all",
+      "saving_pct": {
+        "mean": -0.21849967715885654,
+        "ci95": [
+          -0.8122214249507015,
+          0.3752220706329884
+        ],
+        "rounds": 4
+      },
+      "trials": 192,
+      "adopted": 0,
+      "matches": 192,
+      "both_rejected": 192,
+      "candidate_ms": 4329.595999999994,
+      "baseline_ms": 4320.045999999992,
+      "observation_ms": 9382.109000000011
+    },
+    {
+      "mode": "B",
+      "probe": false,
+      "subset": "deployment",
+      "saving_pct": {
+        "mean": 0.12890118700805697,
+        "ci95": [
+          -0.20450211183013067,
+          0.4623044858462446
+        ],
+        "rounds": 4
+      },
+      "trials": 128,
+      "adopted": 0,
+      "matches": 128,
+      "both_rejected": 128,
+      "candidate_ms": 2737.788999999996,
+      "baseline_ms": 2741.2959999999875,
+      "observation_ms": 5972.312000000014
+    },
+    {
+      "mode": "D",
+      "probe": true,
+      "subset": "all",
+      "saving_pct": {
+        "mean": -0.5944744200911511,
+        "ci95": [
+          -1.2295014753067544,
+          0.040552635124452174
+        ],
+        "rounds": 4
+      },
+      "trials": 192,
+      "adopted": 0,
+      "matches": 192,
+      "both_rejected": 192,
+      "candidate_ms": 4375.964999999995,
+      "baseline_ms": 4349.982,
+      "observation_ms": 9450.134000000004
+    },
+    {
+      "mode": "D",
+      "probe": true,
+      "subset": "deployment",
+      "saving_pct": {
+        "mean": -0.41673540807356524,
+        "ci95": [
+          -1.325654209251094,
+          0.4921833931039634
+        ],
+        "rounds": 4
+      },
+      "trials": 128,
+      "adopted": 0,
+      "matches": 128,
+      "both_rejected": 128,
+      "candidate_ms": 2786.4519999999948,
+      "baseline_ms": 2774.6859999999997,
+      "observation_ms": 6064.179000000004
+    },
+    {
+      "mode": "D",
+      "probe": false,
+      "subset": "all",
+      "saving_pct": {
+        "mean": 65.7546180310762,
+        "ci95": [
+          65.53103692107933,
+          65.97819914107308
+        ],
+        "rounds": 4
+      },
+      "trials": 192,
+      "adopted": 144,
+      "matches": 192,
+      "both_rejected": 192,
+      "candidate_ms": 1494.4209999999985,
+      "baseline_ms": 4363.993000000003,
+      "observation_ms": 9445.978
+    },
+    {
+      "mode": "D",
+      "probe": false,
+      "subset": "deployment",
+      "saving_pct": {
+        "mean": 90.87513650409062,
+        "ci95": [
+          90.81795913008082,
+          90.93231387810042
+        ],
+        "rounds": 4
+      },
+      "trials": 128,
+      "adopted": 128,
+      "matches": 128,
+      "both_rejected": 128,
+      "candidate_ms": 252.15400000000045,
+      "baseline_ms": 2763.179999999995,
+      "observation_ms": 6016.678000000005
+    },
+    {
+      "mode": "M",
+      "probe": true,
+      "subset": "all",
+      "saving_pct": {
+        "mean": -0.19421819989890177,
+        "ci95": [
+          -1.2019641332927633,
+          0.8135277334949599
+        ],
+        "rounds": 4
+      },
+      "trials": 192,
+      "adopted": 0,
+      "matches": 192,
+      "both_rejected": 192,
+      "candidate_ms": 4352.3200000000015,
+      "baseline_ms": 4343.948,
+      "observation_ms": 9386.270999999999
+    },
+    {
+      "mode": "M",
+      "probe": true,
+      "subset": "deployment",
+      "saving_pct": {
+        "mean": -0.1456739348522862,
+        "ci95": [
+          -1.3161143902522645,
+          1.0247665205476921
+        ],
+        "rounds": 4
+      },
+      "trials": 128,
+      "adopted": 0,
+      "matches": 128,
+      "both_rejected": 128,
+      "candidate_ms": 2757.733000000002,
+      "baseline_ms": 2753.785,
+      "observation_ms": 5985.962999999998
+    },
+    {
+      "mode": "M",
+      "probe": false,
+      "subset": "all",
+      "saving_pct": {
+        "mean": 57.62921231312733,
+        "ci95": [
+          57.487609400468784,
+          57.77081522578588
+        ],
+        "rounds": 4
+      },
+      "trials": 192,
+      "adopted": 128,
+      "matches": 192,
+      "both_rejected": 192,
+      "candidate_ms": 1829.8700000000063,
+      "baseline_ms": 4318.7339999999895,
+      "observation_ms": 9359.280000000002
+    },
+    {
+      "mode": "M",
+      "probe": false,
+      "subset": "deployment",
+      "saving_pct": {
+        "mean": 90.84927483079247,
+        "ci95": [
+          90.74002594261805,
+          90.95852371896689
+        ],
+        "rounds": 4
+      },
+      "trials": 128,
+      "adopted": 128,
+      "matches": 128,
+      "both_rejected": 128,
+      "candidate_ms": 250.9430000000075,
+      "baseline_ms": 2742.3069999999925,
+      "observation_ms": 5971.579999999999
+    },
+    {
+      "mode": "L",
+      "probe": true,
+      "subset": "all",
+      "saving_pct": {
+        "mean": -0.34254119226226065,
+        "ci95": [
+          -1.0507034031422329,
+          0.3656210186177117
+        ],
+        "rounds": 4
+      },
+      "trials": 192,
+      "adopted": 0,
+      "matches": 192,
+      "both_rejected": 192,
+      "candidate_ms": 4353.487000000005,
+      "baseline_ms": 4338.668999999999,
+      "observation_ms": 9383.637999999997
+    },
+    {
+      "mode": "L",
+      "probe": true,
+      "subset": "deployment",
+      "saving_pct": {
+        "mean": 0.10617155992567462,
+        "ci95": [
+          -0.6124716484644414,
+          0.8248147683157906
+        ],
+        "rounds": 4
+      },
+      "trials": 128,
+      "adopted": 0,
+      "matches": 128,
+      "both_rejected": 128,
+      "candidate_ms": 2751.194000000004,
+      "baseline_ms": 2754.115,
+      "observation_ms": 5978.256999999996
+    },
+    {
+      "mode": "L",
+      "probe": false,
+      "subset": "all",
+      "saving_pct": {
+        "mean": 57.45145331487677,
+        "ci95": [
+          57.03633697563406,
+          57.86656965411949
+        ],
+        "rounds": 4
+      },
+      "trials": 192,
+      "adopted": 128,
+      "matches": 192,
+      "both_rejected": 192,
+      "candidate_ms": 1837.4269999999997,
+      "baseline_ms": 4318.402999999997,
+      "observation_ms": 9340.373000000005
+    },
+    {
+      "mode": "L",
+      "probe": false,
+      "subset": "deployment",
+      "saving_pct": {
+        "mean": 90.81856960592984,
+        "ci95": [
+          90.68846794572823,
+          90.94867126613144
+        ],
+        "rounds": 4
+      },
+      "trials": 128,
+      "adopted": 128,
+      "matches": 128,
+      "both_rejected": 128,
+      "candidate_ms": 250.88900000000103,
+      "baseline_ms": 2732.6179999999977,
+      "observation_ms": 5939.814000000002
+    }
+  ],
+  "checks": [
+    {
+      "cell": "checks-0-B",
+      "round": 0,
+      "mode": "B",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1136.021000000001,
+      "baseline_ms": 1106.4030000000002,
+      "saving_pct": -2.676963095725604,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2394.7549999999987
+    },
+    {
+      "cell": "checks-0-B",
+      "round": 0,
+      "mode": "B",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 701.6450000000007,
+      "baseline_ms": 706.2650000000001,
+      "saving_pct": 0.6541453986817158,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1538.4929999999993
+    },
+    {
+      "cell": "checks-0-B",
+      "round": 0,
+      "mode": "B",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1096.6549999999997,
+      "baseline_ms": 1091.4869999999964,
+      "saving_pct": -0.4734825059760972,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2377.1340000000037
+    },
+    {
+      "cell": "checks-0-B",
+      "round": 0,
+      "mode": "B",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 688.1189999999988,
+      "baseline_ms": 687.274999999996,
+      "saving_pct": -0.12280382670732948,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1504.1640000000052
+    },
+    {
+      "cell": "checks-0-D",
+      "round": 0,
+      "mode": "D",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1076.6809999999991,
+      "baseline_ms": 1076.2899999999988,
+      "saving_pct": -0.03632849882468925,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2337.056000000002
+    },
+    {
+      "cell": "checks-0-D",
+      "round": 0,
+      "mode": "D",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 681.8279999999993,
+      "baseline_ms": 682.4819999999986,
+      "saving_pct": 0.09582670312173747,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1490.7350000000022
+    },
+    {
+      "cell": "checks-0-D",
+      "round": 0,
+      "mode": "D",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 364.30799999999545,
+      "baseline_ms": 1067.273000000002,
+      "saving_pct": 65.86552831374965,
+      "adopted": 36,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2310.112000000002
+    },
+    {
+      "cell": "checks-0-D",
+      "round": 0,
+      "mode": "D",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 61.690999999998894,
+      "baseline_ms": 677.8089999999993,
+      "saving_pct": 90.89846844760118,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1474.6670000000013
+    },
+    {
+      "cell": "checks-0-M",
+      "round": 0,
+      "mode": "M",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1091.1100000000017,
+      "baseline_ms": 1096.0759999999987,
+      "saving_pct": 0.4530707724644034,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2362.359
+    },
+    {
+      "cell": "checks-0-M",
+      "round": 0,
+      "mode": "M",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 694.9790000000019,
+      "baseline_ms": 699.1149999999984,
+      "saving_pct": 0.5916051007340051,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1510.7609999999997
+    },
+    {
+      "cell": "checks-0-M",
+      "round": 0,
+      "mode": "M",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 456.6310000000003,
+      "baseline_ms": 1077.2349999999988,
+      "saving_pct": 57.61082772097075,
+      "adopted": 32,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2336.232000000001
+    },
+    {
+      "cell": "checks-0-M",
+      "round": 0,
+      "mode": "M",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 62.37200000000212,
+      "baseline_ms": 683.7319999999972,
+      "saving_pct": 90.87771232003148,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1490.991000000001
+    },
+    {
+      "cell": "checks-0-L",
+      "round": 0,
+      "mode": "L",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1097.1919999999996,
+      "baseline_ms": 1087.9040000000002,
+      "saving_pct": -0.8537518016294987,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2361.0210000000006
+    },
+    {
+      "cell": "checks-0-L",
+      "round": 0,
+      "mode": "L",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 693.6019999999996,
+      "baseline_ms": 690.7370000000005,
+      "saving_pct": -0.414774364193482,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1501.663
+    },
+    {
+      "cell": "checks-0-L",
+      "round": 0,
+      "mode": "L",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 460.2320000000027,
+      "baseline_ms": 1080.3589999999958,
+      "saving_pct": 57.40008645274354,
+      "adopted": 32,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2337.5610000000015
+    },
+    {
+      "cell": "checks-0-L",
+      "round": 0,
+      "mode": "L",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 63.08700000000135,
+      "baseline_ms": 684.3239999999969,
+      "saving_pct": 90.78112122327995,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1489.2050000000017
+    },
+    {
+      "cell": "checks-1-D",
+      "round": 1,
+      "mode": "D",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1115.539999999998,
+      "baseline_ms": 1106.0030000000006,
+      "saving_pct": -0.8622942252414667,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2402.9370000000013
+    },
+    {
+      "cell": "checks-1-D",
+      "round": 1,
+      "mode": "D",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 718.7379999999978,
+      "baseline_ms": 709.9820000000004,
+      "saving_pct": -1.233270702637168,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1552.0400000000013
+    },
+    {
+      "cell": "checks-1-D",
+      "round": 1,
+      "mode": "D",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 389.3130000000019,
+      "baseline_ms": 1140.2549999999992,
+      "saving_pct": 65.85737400844529,
+      "adopted": 36,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2464.584999999999
+    },
+    {
+      "cell": "checks-1-D",
+      "round": 1,
+      "mode": "D",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 66.12100000000191,
+      "baseline_ms": 721.314999999996,
+      "saving_pct": 90.83326979197683,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1570.2250000000022
+    },
+    {
+      "cell": "checks-1-M",
+      "round": 1,
+      "mode": "M",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1076.2980000000002,
+      "baseline_ms": 1078.7220000000016,
+      "saving_pct": 0.2247103516940685,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2330.995999999998
+    },
+    {
+      "cell": "checks-1-M",
+      "round": 1,
+      "mode": "M",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 677.1380000000001,
+      "baseline_ms": 679.2230000000018,
+      "saving_pct": 0.30696840360259214,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1478.2269999999976
+    },
+    {
+      "cell": "checks-1-M",
+      "round": 1,
+      "mode": "M",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 456.2059999999965,
+      "baseline_ms": 1074.137000000007,
+      "saving_pct": 57.528136541242546,
+      "adopted": 32,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2325.7189999999964
+    },
+    {
+      "cell": "checks-1-M",
+      "round": 1,
+      "mode": "M",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 62.487999999999374,
+      "baseline_ms": 682.6220000000039,
+      "saving_pct": 90.84588542414411,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1481.6559999999963
+    },
+    {
+      "cell": "checks-1-L",
+      "round": 1,
+      "mode": "L",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1090.3840000000012,
+      "baseline_ms": 1092.8669999999977,
+      "saving_pct": 0.22720056511876807,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2354.6780000000012
+    },
+    {
+      "cell": "checks-1-L",
+      "round": 1,
+      "mode": "L",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 684.8940000000009,
+      "baseline_ms": 689.6389999999974,
+      "saving_pct": 0.6880411345640991,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1493.3400000000017
+    },
+    {
+      "cell": "checks-1-L",
+      "round": 1,
+      "mode": "L",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 459.4569999999994,
+      "baseline_ms": 1079.3189999999986,
+      "saving_pct": 57.43084296672254,
+      "adopted": 32,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2342.224000000002
+    },
+    {
+      "cell": "checks-1-L",
+      "round": 1,
+      "mode": "L",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 62.1899999999996,
+      "baseline_ms": 681.7240000000002,
+      "saving_pct": 90.87753988417606,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1483.353
+    },
+    {
+      "cell": "checks-1-B",
+      "round": 1,
+      "mode": "B",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1101.5780000000009,
+      "baseline_ms": 1098.7069999999994,
+      "saving_pct": -0.261307154682866,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2397.5969999999993
+    },
+    {
+      "cell": "checks-1-B",
+      "round": 1,
+      "mode": "B",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 694.236000000001,
+      "baseline_ms": 693.4809999999991,
+      "saving_pct": -0.10887104333094921,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1522.6659999999995
+    },
+    {
+      "cell": "checks-1-B",
+      "round": 1,
+      "mode": "B",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1092.6799999999948,
+      "baseline_ms": 1086.1969999999992,
+      "saving_pct": -0.5968530570417352,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2369.319000000006
+    },
+    {
+      "cell": "checks-1-B",
+      "round": 1,
+      "mode": "B",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 692.6779999999953,
+      "baseline_ms": 693.2289999999985,
+      "saving_pct": 0.07948311452681267,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1512.9320000000062
+    },
+    {
+      "cell": "checks-2-M",
+      "round": 2,
+      "mode": "M",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1096.1660000000006,
+      "baseline_ms": 1089.7879999999986,
+      "saving_pct": -0.585251443400181,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2363.203000000001
+    },
+    {
+      "cell": "checks-2-M",
+      "round": 2,
+      "mode": "M",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 693.9690000000007,
+      "baseline_ms": 690.8469999999984,
+      "saving_pct": -0.451909033404263,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1510.220000000001
+    },
+    {
+      "cell": "checks-2-M",
+      "round": 2,
+      "mode": "M",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 458.2200000000039,
+      "baseline_ms": 1084.3909999999933,
+      "saving_pct": 57.7440240651198,
+      "adopted": 32,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2356.308000000002
+    },
+    {
+      "cell": "checks-2-M",
+      "round": 2,
+      "mode": "M",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 62.43000000000302,
+      "baseline_ms": 687.3579999999965,
+      "saving_pct": 90.91739675685693,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1502.2979999999998
+    },
+    {
+      "cell": "checks-2-L",
+      "round": 2,
+      "mode": "L",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1074.607000000001,
+      "baseline_ms": 1070.0170000000014,
+      "saving_pct": -0.4289651472826783,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2316.9069999999974
+    },
+    {
+      "cell": "checks-2-L",
+      "round": 2,
+      "mode": "L",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 679.5340000000012,
+      "baseline_ms": 680.0020000000015,
+      "saving_pct": 0.06882332699026383,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1477.9769999999971
+    },
+    {
+      "cell": "checks-2-L",
+      "round": 2,
+      "mode": "L",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 454.8759999999984,
+      "baseline_ms": 1077.9690000000028,
+      "saving_pct": 57.80249710334924,
+      "adopted": 32,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2324.3949999999995
+    },
+    {
+      "cell": "checks-2-L",
+      "round": 2,
+      "mode": "L",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 62.520000000001346,
+      "baseline_ms": 686.5990000000002,
+      "saving_pct": 90.89424831670286,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1487.5809999999992
+    },
+    {
+      "cell": "checks-2-B",
+      "round": 2,
+      "mode": "B",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1071.751999999999,
+      "baseline_ms": 1068.9970000000005,
+      "saving_pct": -0.2577182162343261,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2309.4690000000005
+    },
+    {
+      "cell": "checks-2-B",
+      "round": 2,
+      "mode": "B",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 677.071999999999,
+      "baseline_ms": 675.8260000000007,
+      "saving_pct": -0.18436698203359025,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1471.4430000000002
+    },
+    {
+      "cell": "checks-2-B",
+      "round": 2,
+      "mode": "B",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1067.8279999999986,
+      "baseline_ms": 1069.592999999998,
+      "saving_pct": 0.16501603881097227,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2314.8030000000026
+    },
+    {
+      "cell": "checks-2-B",
+      "round": 2,
+      "mode": "B",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 676.3770000000013,
+      "baseline_ms": 678.9629999999979,
+      "saving_pct": 0.3808749519482846,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1475.71
+    },
+    {
+      "cell": "checks-2-D",
+      "round": 2,
+      "mode": "D",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1100.459999999998,
+      "baseline_ms": 1090.6280000000004,
+      "saving_pct": -0.90149895289664,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2368.6890000000017
+    },
+    {
+      "cell": "checks-2-D",
+      "round": 2,
+      "mode": "D",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 698.9769999999978,
+      "baseline_ms": 696.854000000001,
+      "saving_pct": -0.3046549205424576,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1524.1040000000012
+    },
+    {
+      "cell": "checks-2-D",
+      "round": 2,
+      "mode": "D",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 372.6449999999977,
+      "baseline_ms": 1082.185000000004,
+      "saving_pct": 65.5654994293955,
+      "adopted": 36,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2337.253999999999
+    },
+    {
+      "cell": "checks-2-D",
+      "round": 2,
+      "mode": "D",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 61.961999999998625,
+      "baseline_ms": 681.7180000000026,
+      "saving_pct": 90.91090450890275,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1483.549
+    },
+    {
+      "cell": "checks-3-L",
+      "round": 3,
+      "mode": "L",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1091.3040000000024,
+      "baseline_ms": 1087.8809999999996,
+      "saving_pct": -0.31464838525563366,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2351.031999999998
+    },
+    {
+      "cell": "checks-3-L",
+      "round": 3,
+      "mode": "L",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 693.1640000000023,
+      "baseline_ms": 693.7370000000001,
+      "saving_pct": 0.08259614234181756,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1505.2769999999973
+    },
+    {
+      "cell": "checks-3-L",
+      "round": 3,
+      "mode": "L",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 462.86199999999917,
+      "baseline_ms": 1080.7559999999994,
+      "saving_pct": 57.172386736691784,
+      "adopted": 32,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2336.193000000002
+    },
+    {
+      "cell": "checks-3-L",
+      "round": 3,
+      "mode": "L",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 63.091999999998734,
+      "baseline_ms": 679.9710000000005,
+      "saving_pct": 90.72136899956047,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1479.675000000001
+    },
+    {
+      "cell": "checks-3-B",
+      "round": 3,
+      "mode": "B",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1078.1970000000001,
+      "baseline_ms": 1080.1560000000002,
+      "saving_pct": 0.18136269205559774,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2341.874
+    },
+    {
+      "cell": "checks-3-B",
+      "round": 3,
+      "mode": "B",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 683.0429999999997,
+      "baseline_ms": 685.6740000000004,
+      "saving_pct": 0.3837100429651352,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1492.4229999999998
+    },
+    {
+      "cell": "checks-3-B",
+      "round": 3,
+      "mode": "B",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1072.433000000001,
+      "baseline_ms": 1072.7689999999984,
+      "saving_pct": 0.03132081557143396,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2320.853
+    },
+    {
+      "cell": "checks-3-B",
+      "round": 3,
+      "mode": "B",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 680.6150000000007,
+      "baseline_ms": 681.8289999999952,
+      "saving_pct": 0.17805050826446012,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1479.506000000003
+    },
+    {
+      "cell": "checks-3-D",
+      "round": 3,
+      "mode": "D",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1083.2839999999999,
+      "baseline_ms": 1077.0610000000004,
+      "saving_pct": -0.5777760034018087,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2341.4519999999993
+    },
+    {
+      "cell": "checks-3-D",
+      "round": 3,
+      "mode": "D",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 686.9090000000001,
+      "baseline_ms": 685.3679999999999,
+      "saving_pct": -0.22484271223637275,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1497.2999999999995
+    },
+    {
+      "cell": "checks-3-D",
+      "round": 3,
+      "mode": "D",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 368.1550000000034,
+      "baseline_ms": 1074.279999999998,
+      "saving_pct": 65.73007037271437,
+      "adopted": 36,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2334.026999999999
+    },
+    {
+      "cell": "checks-3-D",
+      "round": 3,
+      "mode": "D",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 62.38000000000102,
+      "baseline_ms": 682.337999999997,
+      "saving_pct": 90.85790326788171,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1488.237000000002
+    },
+    {
+      "cell": "checks-3-M",
+      "round": 3,
+      "mode": "M",
+      "probe": true,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 1088.7459999999987,
+      "baseline_ms": 1079.3620000000012,
+      "saving_pct": -0.869402480353898,
+      "adopted": 0,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2329.7129999999997
+    },
+    {
+      "cell": "checks-3-M",
+      "round": 3,
+      "mode": "M",
+      "probe": true,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 691.646999999999,
+      "baseline_ms": 684.6000000000013,
+      "saving_pct": -1.029360210341479,
+      "adopted": 0,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1486.7549999999997
+    },
+    {
+      "cell": "checks-3-M",
+      "round": 3,
+      "mode": "M",
+      "probe": false,
+      "subset": "all",
+      "trials": 48,
+      "candidate_ms": 458.81300000000556,
+      "baseline_ms": 1082.9709999999905,
+      "saving_pct": 57.633860925176236,
+      "adopted": 32,
+      "matches": 48,
+      "both_rejected": 48,
+      "observation_ms": 2341.0210000000043
+    },
+    {
+      "cell": "checks-3-M",
+      "round": 3,
+      "mode": "M",
+      "probe": false,
+      "subset": "deployment",
+      "trials": 32,
+      "candidate_ms": 63.653000000002976,
+      "baseline_ms": 688.5949999999948,
+      "saving_pct": 90.75610482213733,
+      "adopted": 32,
+      "matches": 32,
+      "both_rejected": 32,
+      "observation_ms": 1496.635000000002
+    }
+  ],
+  "model_usage": {
+    "successful_responses": 16,
+    "input_tokens": 4870,
+    "output_tokens": 55057,
+    "wall_seconds": 262.2981049,
+    "reasoning_tokens": 51640
+  },
+  "model_calls": [
+    {
+      "cell": "checks-0-L",
+      "journal": "manager-false\\optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 301,
+        "logical_calls": 1,
+        "output_tokens": 3012,
+        "provider_usage": {
+          "completion_tokens": 3012,
+          "completion_tokens_details": {
+            "reasoning_tokens": 2804
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 301,
+          "prompt_tokens": 301,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 3313
+        }
+      },
+      "wall_ms": 15476.292300000001
+    },
+    {
+      "cell": "checks-0-L",
+      "journal": "manager-true\\optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 301,
+        "logical_calls": 1,
+        "output_tokens": 503,
+        "provider_usage": {
+          "completion_tokens": 503,
+          "completion_tokens_details": {
+            "reasoning_tokens": 277
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 301,
+          "prompt_tokens": 301,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 804
+        }
+      },
+      "wall_ms": 2943.5999
+    },
+    {
+      "cell": "checks-1-L",
+      "journal": "manager-false\\optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 307,
+        "logical_calls": 1,
+        "output_tokens": 1677,
+        "provider_usage": {
+          "completion_tokens": 1677,
+          "completion_tokens_details": {
+            "reasoning_tokens": 1512
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 307,
+          "prompt_tokens": 307,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 1984
+        }
+      },
+      "wall_ms": 8578.8861
+    },
+    {
+      "cell": "checks-1-L",
+      "journal": "manager-true\\optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 298,
+        "logical_calls": 1,
+        "output_tokens": 2791,
+        "provider_usage": {
+          "completion_tokens": 2791,
+          "completion_tokens_details": {
+            "reasoning_tokens": 2570
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 298,
+          "prompt_tokens": 298,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 3089
+        }
+      },
+      "wall_ms": 13911.0815
+    },
+    {
+      "cell": "checks-2-L",
+      "journal": "manager-false\\optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 304,
+        "logical_calls": 1,
+        "output_tokens": 903,
+        "provider_usage": {
+          "completion_tokens": 903,
+          "completion_tokens_details": {
+            "reasoning_tokens": 727
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 304,
+          "prompt_tokens": 304,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 1207
+        }
+      },
+      "wall_ms": 4840.423000000001
+    },
+    {
+      "cell": "checks-2-L",
+      "journal": "manager-true\\optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 300,
+        "logical_calls": 1,
+        "output_tokens": 759,
+        "provider_usage": {
+          "completion_tokens": 759,
+          "completion_tokens_details": {
+            "reasoning_tokens": 645
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 300,
+          "prompt_tokens": 300,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 1059
+        }
+      },
+      "wall_ms": 4563.570000000001
+    },
+    {
+      "cell": "checks-3-L",
+      "journal": "manager-false\\optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 304,
+        "logical_calls": 1,
+        "output_tokens": 3043,
+        "provider_usage": {
+          "completion_tokens": 3043,
+          "completion_tokens_details": {
+            "reasoning_tokens": 2855
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 304,
+          "prompt_tokens": 304,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 3347
+        }
+      },
+      "wall_ms": 14846.5468
+    },
+    {
+      "cell": "checks-3-L",
+      "journal": "manager-true\\optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 307,
+        "logical_calls": 1,
+        "output_tokens": 766,
+        "provider_usage": {
+          "completion_tokens": 766,
+          "completion_tokens_details": {
+            "reasoning_tokens": 546
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 307,
+          "prompt_tokens": 307,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 1073
+        }
+      },
+      "wall_ms": 4769.941
+    },
+    {
+      "cell": "cache-on-0-L",
+      "journal": "optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 306,
+        "logical_calls": 1,
+        "output_tokens": 6257,
+        "provider_usage": {
+          "completion_tokens": 6257,
+          "completion_tokens_details": {
+            "reasoning_tokens": 6079
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 306,
+          "prompt_tokens": 306,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 6563
+        }
+      },
+      "wall_ms": 28153.261400000003
+    },
+    {
+      "cell": "cache-on-1-L",
+      "journal": "optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 302,
+        "logical_calls": 1,
+        "output_tokens": 5720,
+        "provider_usage": {
+          "completion_tokens": 5720,
+          "completion_tokens_details": {
+            "reasoning_tokens": 5374
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 302,
+          "prompt_tokens": 302,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 6022
+        }
+      },
+      "wall_ms": 25201.3446
+    },
+    {
+      "cell": "cache-on-2-L",
+      "journal": "optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 308,
+        "logical_calls": 1,
+        "output_tokens": 6447,
+        "provider_usage": {
+          "completion_tokens": 6447,
+          "completion_tokens_details": {
+            "reasoning_tokens": 6226
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 308,
+          "prompt_tokens": 308,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 6755
+        }
+      },
+      "wall_ms": 31177.1205
+    },
+    {
+      "cell": "cache-on-3-L",
+      "journal": "optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 305,
+        "logical_calls": 1,
+        "output_tokens": 2337,
+        "provider_usage": {
+          "completion_tokens": 2337,
+          "completion_tokens_details": {
+            "reasoning_tokens": 2076
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 305,
+          "prompt_tokens": 305,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 2642
+        }
+      },
+      "wall_ms": 11064.472
+    },
+    {
+      "cell": "cache-off-0-L",
+      "journal": "optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 312,
+        "logical_calls": 1,
+        "output_tokens": 8141,
+        "provider_usage": {
+          "completion_tokens": 8141,
+          "completion_tokens_details": {
+            "reasoning_tokens": 7911
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 312,
+          "prompt_tokens": 312,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 8453
+        }
+      },
+      "wall_ms": 37159.4098
+    },
+    {
+      "cell": "cache-off-1-L",
+      "journal": "optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 301,
+        "logical_calls": 1,
+        "output_tokens": 5532,
+        "provider_usage": {
+          "completion_tokens": 5532,
+          "completion_tokens_details": {
+            "reasoning_tokens": 5312
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 301,
+          "prompt_tokens": 301,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 5833
+        }
+      },
+      "wall_ms": 25726.722599999997
+    },
+    {
+      "cell": "cache-off-2-L",
+      "journal": "optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 309,
+        "logical_calls": 1,
+        "output_tokens": 2051,
+        "provider_usage": {
+          "completion_tokens": 2051,
+          "completion_tokens_details": {
+            "reasoning_tokens": 1783
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 309,
+          "prompt_tokens": 309,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 2360
+        }
+      },
+      "wall_ms": 10424.0266
+    },
+    {
+      "cell": "cache-off-3-L",
+      "journal": "optimizer.jsonl",
+      "provider": "openai-compatible:deepseek-flash",
+      "usage": {
+        "input_tokens": 305,
+        "logical_calls": 1,
+        "output_tokens": 5118,
+        "provider_usage": {
+          "completion_tokens": 5118,
+          "completion_tokens_details": {
+            "reasoning_tokens": 4943
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 305,
+          "prompt_tokens": 305,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 5423
+        }
+      },
+      "wall_ms": 23461.4068
+    }
+  ],
+  "policies": [
+    {
+      "cell": "checks-0-M",
+      "probe": true,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "mock 根据 (fails+1)/(runs+2)/(mean_ms+1) 降序得到 SampleFanout → KeyUnique → RowConservation。样本来自已执行检查，成本会受负载和缓存影响；这是启发式建议，不是性能提升证明。"
+      },
+      "wall_ms": 0.058
+    },
+    {
+      "cell": "checks-0-M",
+      "probe": false,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "mock 根据 (fails+1)/(runs+2)/(mean_ms+1) 降序得到 SampleFanout → KeyUnique → RowConservation。样本来自已执行检查，成本会受负载和缓存影响；这是启发式建议，不是性能提升证明。"
+      },
+      "wall_ms": 0.0294
+    },
+    {
+      "cell": "checks-0-L",
+      "probe": true,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "All three checks fail in 8/8 runs and have 0 hits, so any check placed first detects the failure; minimizing cost per attempted validation is therefore the only useful optimization. SampleFanout is far cheaper (14.74 ms vs 202.86/216.97 ms) with similar mrows, so it should run first. KeyUnique is slightly cheaper than RowConservation (202.86 ms vs 216.97 ms; 47.7772 vs 47.78144 mrows), so it should run second and RowConservation last. Uncertainty: the telemetry has only 8 runs per check and no variance, so ms differences could be noisy; however the SampleFanout gap is large and the KeyUnique/RowConservation gap is small. Tradeoff: this ordering changes nothing about failure coverage or guards while reducing expected cost if failures remain universal; if evidence later shows a later check detects failures earlier or is cheaper under different conditions, the applied order may be rolled back."
+      },
+      "wall_ms": 2944.2614000000003
+    },
+    {
+      "cell": "checks-0-L",
+      "probe": false,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "Evidence: all three checks failed 8/8 runs, so observed failure probability is equal; ordering should minimize cost to first failure. SampleFanout is far cheaper (14.8033 ms total, ~1.85 ms/run) than KeyUnique (200.8195 ms total, ~25.10 ms/run) and RowConservation (213.4288 ms total, ~26.68 ms/run), with nearly identical row counts (~47.78M). KeyUnique is also slightly cheaper than RowConservation. Tradeoff/uncertainty: telemetry covers only audited failed validations, so pass-path behavior, check correlation, and hidden dependencies are not observed; if fail rates shift or SampleFanout becomes less specific, the benefit may change. Given current per-unit cost and equal fail rates, SampleFanout first minimizes early failure cost, then KeyUnique, then RowConservation."
+      },
+      "wall_ms": 15476.9298
+    },
+    {
+      "cell": "checks-1-M",
+      "probe": true,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "mock 根据 (fails+1)/(runs+2)/(mean_ms+1) 降序得到 SampleFanout → KeyUnique → RowConservation。样本来自已执行检查，成本会受负载和缓存影响；这是启发式建议，不是性能提升证明。"
+      },
+      "wall_ms": 0.0588
+    },
+    {
+      "cell": "checks-1-M",
+      "probe": false,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "mock 根据 (fails+1)/(runs+2)/(mean_ms+1) 降序得到 SampleFanout → KeyUnique → RowConservation。样本来自已执行检查，成本会受负载和缓存影响；这是启发式建议，不是性能提升证明。"
+      },
+      "wall_ms": 0.0295
+    },
+    {
+      "cell": "checks-1-L",
+      "probe": true,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "All three checks show fails=8/runs=8 and hits=0, so there is no evidence that any check is more selective; cost is the only reliable discriminator. The cheapest check is far lower in ms (~14.9) with the same mrows as the next (~47.7772) and slightly fewer mrows than the last (~47.7814), so it should run first. The next cheapest (~201.9 ms) is both lower ms and slightly lower mrows than the most expensive (~217.1 ms), so it should run second. Uncertainty: equal failures may mean the suite audits checks independently rather than short-circuiting, in which case order affects time-to-first-failure only when the first check fails as observed. Tradeoff: if the cheap first check often passes while a later check fails, putting it first could add early cost, but current telemetry has zero hits and equal failure counts, and the replay gate with automatic rollback limits downside."
+      },
+      "wall_ms": 13911.886900000001
+    },
+    {
+      "cell": "checks-1-L",
+      "probe": false,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "Every audited failed validation reports 8/8 failures for all checks and 0 hits, so observed detection power is tied and cost is the differentiator. Total ms per run are about 1.85, 25.37, and 27.20, with nearly identical mrows (~47.78M), so row-normalized cost preserves the same ranking. Cheapest-first minimizes expected latency to first failure, and the remaining positions follow ascending cost. Uncertainty: identical fail counts may reflect replay aggregation rather than equal future failure rates; if a more expensive check later proves more likely to fail first on some validations, this order could be suboptimal, but the gate can roll it back on new evidence."
+      },
+      "wall_ms": 8579.7803
+    },
+    {
+      "cell": "checks-2-M",
+      "probe": true,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "mock 根据 (fails+1)/(runs+2)/(mean_ms+1) 降序得到 SampleFanout → KeyUnique → RowConservation。样本来自已执行检查，成本会受负载和缓存影响；这是启发式建议，不是性能提升证明。"
+      },
+      "wall_ms": 0.06509999999999999
+    },
+    {
+      "cell": "checks-2-M",
+      "probe": false,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "mock 根据 (fails+1)/(runs+2)/(mean_ms+1) 降序得到 SampleFanout → KeyUnique → RowConservation。样本来自已执行检查，成本会受负载和缓存影响；这是启发式建议，不是性能提升证明。"
+      },
+      "wall_ms": 0.030000000000000002
+    },
+    {
+      "cell": "checks-2-L",
+      "probe": true,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "All three checks failed all 8 runs with 0 hits, so observed failure rates are identical. Order by ascending cost per run: the cheapest check first, then the next-cheapest, then the most expensive. This minimizes early failure detection cost per unit and total failed-validation cost if the failure profile persists. Uncertainty is that there is no differential selectivity or hit evidence, so the replay gate may reject or roll back this order if new evidence shows different failure behavior."
+      },
+      "wall_ms": 4564.4546
+    },
+    {
+      "cell": "checks-2-L",
+      "probe": false,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "All three checks failed in 8/8 runs with 0 hits, so observed failure probability is tied at 100%; early-failure cost is therefore dominated by first-check latency. SampleFanout is far cheaper (~14.0 ms) than KeyUnique (~195.9 ms) and RowConservation (~208.5 ms) over nearly identical ~47.78M-row workloads, so it should run first to minimize per-failed-validation cost. KeyUnique precedes RowConservation because it is marginally cheaper. Uncertainty: the sample is small and contains only failed validations, so if SampleFanout later becomes non-failing it adds ~14 ms overhead before the next checks; the improvement gate should roll back if new evidence shows the order is clearly more expensive."
+      },
+      "wall_ms": 4841.218
+    },
+    {
+      "cell": "checks-3-L",
+      "probe": true,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "All three checks have identical observed failure counts (8/8 runs, 0 hits), so ordering by expected cost to first failure favors the cheapest check first. SampleFanout is far cheaper (~14.7 ms) than KeyUnique (~200.5 ms) and RowConservation (~212.6 ms), while processed rows are nearly identical (~47.78 M), so it should run first for maximal early-failure efficiency. KeyUnique is slightly cheaper than RowConservation and similar in rows, so it should precede RowConservation. Uncertainty: only 8 audited failed validations are shown, with no passing-case or selectivity data, so the true early-failure rate per check is unknown and future workloads could change relative benefit. Tradeoff: this improves cost when failures occur at or before the first checks, but if checks rarely fail early, total execution cost is unchanged by ordering; the gain is robust here mainly because all observed runs fail and SampleFanout dominates on cost."
+      },
+      "wall_ms": 4770.8205
+    },
+    {
+      "cell": "checks-3-L",
+      "probe": false,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "All three checks failed 8/8 audited runs with 0 hits and near-identical mrows (~47.78), so there is no reliability signal that any check catches more failures; ordering by early-failure cost favors the cheapest first. The ~15.2ms check is far cheaper than the ~205.1ms and ~218.5ms checks, so it should run first; the ~205.1ms check is marginally cheaper than the ~218.5ms check, so it should run second. Uncertainty: all failures may be coupled and short-circuit behavior is not directly proven, so if validation always runs every check the order is cost-neutral. Tradeoff: this delays the default-first and slightly costliest check, but it has no better failure signal than the cheaper checks, making it least useful early."
+      },
+      "wall_ms": 14847.3609
+    },
+    {
+      "cell": "checks-3-M",
+      "probe": true,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "mock 根据 (fails+1)/(runs+2)/(mean_ms+1) 降序得到 SampleFanout → KeyUnique → RowConservation。样本来自已执行检查，成本会受负载和缓存影响；这是启发式建议，不是性能提升证明。"
+      },
+      "wall_ms": 0.0481
+    },
+    {
+      "cell": "checks-3-M",
+      "probe": false,
+      "policy": {
+        "check_order": [
+          "SampleFanout",
+          "KeyUnique",
+          "RowConservation"
+        ],
+        "reason": "mock 根据 (fails+1)/(runs+2)/(mean_ms+1) 降序得到 SampleFanout → KeyUnique → RowConservation。样本来自已执行检查，成本会受负载和缓存影响；这是启发式建议，不是性能提升证明。"
+      },
+      "wall_ms": 0.031
+    }
+  ],
+  "errors": [],
+  "provenance_verified": true
+}

@@ -36,11 +36,19 @@ pub struct Reply {
     pub calls: Vec<ToolCall>,
     pub input_tokens: u64,
     pub output_tokens: u64,
+    pub usage: Value,
+}
+
+#[derive(Default)]
+pub struct OpenAiOptions {
+    reasoning_effort: Option<String>,
+    thinking: Option<String>,
+    preserve_reasoning: bool,
 }
 
 pub enum Provider {
     Anthropic { key: String, base: String, model: String, http: reqwest::Client },
-    OpenAi { key: String, base: String, model: String, http: reqwest::Client },
+    OpenAi { key: String, base: String, model: String, options: OpenAiOptions, http: reqwest::Client },
     Mock,
 }
 
@@ -58,12 +66,22 @@ impl Provider {
                 model: env("ANTHROPIC_MODEL").ok_or_else(|| anyhow!("缺少 ANTHROPIC_MODEL"))?,
                 http: http(),
             },
-            "openai" => Provider::OpenAi {
-                key: env("OPENAI_API_KEY").ok_or_else(|| anyhow!("缺少 OPENAI_API_KEY（写在 .env 里）"))?,
-                base: env("OPENAI_BASE_URL").unwrap_or_else(|| "https://api.openai.com/v1".into()),
-                model: env("OPENAI_MODEL").ok_or_else(|| anyhow!("缺少 OPENAI_MODEL（如 deepseek-chat、qwen-plus、gpt-5）"))?,
-                http: http(),
-            },
+            "openai" => {
+                let base = env("OPENAI_BASE_URL").unwrap_or_else(|| "https://api.openai.com/v1".into());
+                let thinking = env("OPENAI_THINKING");
+                anyhow::ensure!(
+                    thinking.as_deref().is_none_or(|v| matches!(v, "enabled" | "disabled")),
+                    "OPENAI_THINKING 必须为 enabled 或 disabled"
+                );
+                let preserve_reasoning = reqwest::Url::parse(&base).ok().is_some_and(|u| u.host_str() == Some("api.deepseek.com"));
+                Provider::OpenAi {
+                    key: env("OPENAI_API_KEY").ok_or_else(|| anyhow!("缺少 OPENAI_API_KEY（写在 .env 里）"))?,
+                    base,
+                    model: env("OPENAI_MODEL").ok_or_else(|| anyhow!("缺少 OPENAI_MODEL（如 deepseek-chat、qwen-plus、gpt-5）"))?,
+                    http: http(),
+                    options: OpenAiOptions { reasoning_effort: env("OPENAI_REASONING_EFFORT"), thinking, preserve_reasoning },
+                }
+            }
             "mock" => Provider::Mock,
             _ => bail!("未知 provider：{kind}（可选 claude / openai / mock）"),
         })
@@ -80,7 +98,9 @@ impl Provider {
     pub async fn chat(&self, system: &str, turns: &[Turn], tools: &[ToolSpec]) -> Result<Reply> {
         match self {
             Provider::Anthropic { key, base, model, http } => anthropic_chat(http, base, key, model, system, turns, tools).await,
-            Provider::OpenAi { key, base, model, http } => openai_chat(http, base, key, model, system, turns, tools).await,
+            Provider::OpenAi { key, base, model, options, http } => {
+                openai_chat(http, base, key, (model, options), system, turns, tools).await
+            }
             Provider::Mock => mock_chat(turns),
         }
     }
@@ -155,6 +175,7 @@ async fn anthropic_chat(
         raw: content.clone(),
         input_tokens: v["usage"]["input_tokens"].as_u64().unwrap_or(0),
         output_tokens: v["usage"]["output_tokens"].as_u64().unwrap_or(0),
+        usage: v["usage"].clone(),
         ..Default::default()
     };
     for b in content.as_array().into_iter().flatten() {
@@ -177,7 +198,7 @@ async fn openai_chat(
     http: &reqwest::Client,
     base: &str,
     key: &str,
-    model: &str,
+    (model, options): (&str, &OpenAiOptions),
     system: &str,
     turns: &[Turn],
     tools: &[ToolSpec],
@@ -188,8 +209,10 @@ async fn openai_chat(
             Turn::User(s) => messages.push(json!({"role": "user", "content": s})),
             Turn::Assistant { raw } => {
                 let mut m = raw.clone();
-                if let Some(o) = m.as_object_mut() {
-                    o.remove("reasoning_content"); // 部分推理模型不接受回传思考内容
+                if !options.preserve_reasoning {
+                    if let Some(o) = m.as_object_mut() {
+                        o.remove("reasoning_content");
+                    }
                 }
                 messages.push(m);
             }
@@ -205,6 +228,12 @@ async fn openai_chat(
         .map(|t| json!({"type": "function", "function": {"name": t.name, "description": t.description, "parameters": t.schema}}))
         .collect();
     let mut body = json!({"model": model, "messages": messages});
+    if let Some(effort) = &options.reasoning_effort {
+        body["reasoning_effort"] = json!(effort);
+    }
+    if let Some(thinking) = &options.thinking {
+        body["thinking"] = json!({"type":thinking});
+    }
     if !tools.is_empty() {
         body["tools"] = json!(tools);
     }
@@ -216,6 +245,7 @@ async fn openai_chat(
         text: msg["content"].as_str().unwrap_or_default().to_string(),
         input_tokens: v["usage"]["prompt_tokens"].as_u64().unwrap_or(0),
         output_tokens: v["usage"]["completion_tokens"].as_u64().unwrap_or(0),
+        usage: v["usage"].clone(),
         ..Default::default()
     };
     for c in msg["tool_calls"].as_array().into_iter().flatten() {
@@ -470,11 +500,50 @@ mod provider_tests {
             key: "test-key".into(),
             base: format!("http://{addr}/v1"),
             model: "test-model".into(),
+            options: OpenAiOptions::default(),
             http: reqwest::Client::builder().no_proxy().build().unwrap(),
         };
         let reply = provider.chat("Return JSON", &[Turn::User("aggregate metrics".into())], &[]).await.unwrap();
         assert_eq!(reply.text, r#"{"ok":true}"#);
         assert!(reply.calls.is_empty());
+        server.abort();
+    }
+
+    #[tokio::test]
+    async fn deepseek_max_and_tool_history_are_preserved() {
+        let app = Router::new().route(
+            "/chat/completions",
+            post(|Json(body): Json<Value>| async move {
+                assert_eq!(body["model"], "deepseek-flash");
+                assert_eq!(body["reasoning_effort"], "max");
+                assert_eq!(body["thinking"]["type"], "enabled");
+                assert_eq!(body["messages"][2]["reasoning_content"], "test fixture reasoning");
+                assert_eq!(body["messages"][3]["tool_call_id"], "call-test");
+                assert!(body["tools"].is_array());
+                Json(json!({"choices":[{"message":{"role":"assistant","content":"OK"}}]}))
+            }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+        let provider = Provider::OpenAi {
+            key: "test-key".into(),
+            base: format!("http://{addr}"),
+            model: "deepseek-flash".into(),
+            options: OpenAiOptions { reasoning_effort: Some("max".into()), thinking: Some("enabled".into()), preserve_reasoning: true },
+            http: reqwest::Client::builder().no_proxy().build().unwrap(),
+        };
+        let turns = vec![
+            Turn::User("test".into()),
+            Turn::Assistant {
+                raw: json!({"role":"assistant","content":null,
+            "reasoning_content":"test fixture reasoning","tool_calls":[{"id":"call-test","type":"function",
+            "function":{"name":"describe_table","arguments":"{}"}}]}),
+            },
+            Turn::ToolResults(vec![("call-test".into(), "{}".into(), false)]),
+        ];
+        let reply = provider.chat("test", &turns, &tool_specs(true)).await.unwrap();
+        assert_eq!(reply.text, "OK");
         server.abort();
     }
 }

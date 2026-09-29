@@ -12,6 +12,7 @@ mod knowledge;
 mod llm;
 mod middle;
 mod optimizer;
+mod realbench;
 mod research;
 mod server;
 mod sim;
@@ -43,6 +44,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// 官方 NYC TLC 真实数据上的只读脚本评测（先运行 tools/prepare-tlc.py）
+    RealBench(realbench::Options),
     /// 多业务域、结构留出、数据漂移的可复现研究评测
     Research(research::Options),
     /// 独立数据库上的规模化多 Agent mock 对照实验
@@ -150,6 +153,7 @@ async fn main() -> Result<()> {
     let db = Arc::new(Db::connect(&cli.db, cli.pool, true)?);
     let admin = Arc::new(Db::connect(&cli.db, 2, false)?);
     match cli.cmd {
+        Cmd::RealBench(options) => realbench::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::Research(options) => research::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::Bench(options) => benchmark::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::Ablation(options) => ablation::run(&cli.db, cli.pool, &cli.out, options).await?,

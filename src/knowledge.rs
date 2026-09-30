@@ -118,6 +118,9 @@ pub struct TimeSpec {
     pub dim_col: String,
     /// day / month / year
     pub grain: String,
+    /// 准入时事实表关联不上时间维度的行占比（空键或孤儿键），由中间层按已验证路径填写；覆盖条件以它为基线
+    #[serde(default)]
+    pub loss_ratio: f64,
 }
 
 /// 指标引用的已验证关联：方向、基数、过滤与丢行比例都记下，关联能执行不等于不放大聚合。
@@ -244,6 +247,15 @@ impl Store {
             self.map.read().iter().filter(|(k, _)| k.starts_with(prefix)).map(|(k, e)| (k.clone(), e.clone())).collect();
         v.sort_by(|a, b| a.0.cmp(&b.0));
         v
+    }
+
+    /// 整库快照与替换（评测用：数据变化场景之间恢复同一个学习后的状态）。
+    pub fn snapshot(&self) -> HashMap<String, Entry> {
+        self.map.read().clone()
+    }
+
+    pub fn replace(&self, map: HashMap<String, Entry>) {
+        *self.map.write() = map;
     }
 
     pub fn dump(&self) -> Vec<Entry> {

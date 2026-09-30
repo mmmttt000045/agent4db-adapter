@@ -156,6 +156,7 @@ fn metric(s: &Spec) -> Metric {
             dim: "date_dim".into(),
             dim_col: "d_date_sk".into(),
             grain: "month".into(),
+            loss_ratio: 0.0,
         }),
         joins,
         filters: BTreeMap::new(),

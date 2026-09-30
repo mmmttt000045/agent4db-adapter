@@ -164,6 +164,16 @@ impl Db {
         }
         Ok(out)
     }
+
+    /// 执行写入语句（初始化与 ETL 用），返回最后一条命令影响的行数。
+    pub async fn execute(&self, sql: &str) -> Result<u64> {
+        let client = self.pool.get().await.context("获取数据库连接失败")?;
+        let t = Instant::now();
+        let res = client.simple_query(sql).await;
+        self.meter.record(QKind::Meta, t.elapsed().as_micros() as u64);
+        let msgs = res.map_err(|e| anyhow!("SQL 执行失败：{}", db_err(&e)))?;
+        Ok(msgs.iter().filter_map(|m| if let SimpleQueryMessage::CommandComplete(n) = m { Some(*n) } else { None }).last().unwrap_or(0))
+    }
 }
 
 fn db_err(e: &tokio_postgres::Error) -> String {

@@ -186,6 +186,12 @@ enum Lookup {
 
 type Versions = Arc<HashMap<String, TableVersion>>;
 
+/// 见 `Middle::checkpoint`。
+pub struct Checkpoint {
+    store: HashMap<String, Entry>,
+    evidence: HashMap<String, MetricEvidence>,
+}
+
 /// 一个任务里 run_sql 的计算链。
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct TaskLog {
@@ -437,6 +443,38 @@ impl Middle {
     /// 让下一次请求重新读取版本（ETL 通知钩子；实验里也用来消除轮询间隔的影响）。
     pub fn invalidate_versions(&self) {
         *self.versions.lock() = None;
+    }
+
+    /// 经验库与指标验证证据的快照（评测用）。检查排序的反馈统计与计数器不在快照内，继续累计。
+    pub fn checkpoint(&self) -> Checkpoint {
+        Checkpoint { store: self.store.snapshot(), evidence: self.metric_evidence.lock().clone() }
+    }
+
+    /// 恢复快照，并把条目与证据记录的依赖版本改写为当前版本。只在数据内容已回到快照时的状态、
+    /// 且调用方已逐表核对之后使用：此时快照里的结论在当前数据上依然成立，只是版本计数前进了。
+    pub async fn restore(&self, cp: &Checkpoint) -> Result<()> {
+        self.invalidate_versions();
+        let cur = self.versions().await?;
+        let rebase = |deps: &mut BTreeMap<String, TableVersion>| {
+            for (t, v) in deps.iter_mut() {
+                if let Some(c) = cur.get(t) {
+                    *v = c.clone();
+                }
+            }
+        };
+        let mut map = cp.store.clone();
+        for e in map.values_mut() {
+            rebase(&mut e.deps);
+        }
+        self.store.replace(map);
+        let mut ev = cp.evidence.clone();
+        for x in ev.values_mut() {
+            rebase(&mut x.versions);
+        }
+        *self.metric_evidence.lock() = ev;
+        self.notices.lock().clear();
+        self.metric_events.lock().clear();
+        Ok(())
     }
 
     async fn deps_for(&self, tables: &[String]) -> Result<BTreeMap<String, TableVersion>> {

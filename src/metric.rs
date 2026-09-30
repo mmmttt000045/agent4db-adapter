@@ -439,6 +439,41 @@ pub fn check_filter(table: &str, filter: &str, time: Option<&TimeSpec>, ask: &As
     Ok(())
 }
 
+/// 口径引用的列（表 → 列）：粒度、时间关联与关联键，聚合表达式与过滤中的列；按 date_dim 编译时还用到 d_year、d_moy。
+/// 结构依赖只比较这些列，无关列的增删不使口径失效。
+pub fn columns(m: &Metric, cat: &Catalog) -> BTreeMap<String, BTreeSet<String>> {
+    let mut out: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    let mut add = |t: &str, c: &str| {
+        out.entry(t.to_string()).or_default().insert(c.to_lowercase());
+    };
+    for c in &m.grain {
+        add(&m.fact, c);
+    }
+    if let Some(t) = &m.time {
+        add(&m.fact, &t.fact_col);
+        add(&t.dim, &t.dim_col);
+        if t.dim == "date_dim" {
+            add("date_dim", "d_year");
+            add("date_dim", "d_moy");
+        }
+    }
+    for j in &m.joins {
+        for (l, r) in &j.on {
+            add(&j.left, l);
+            add(&j.right, r);
+        }
+    }
+    let exprs = std::iter::once(&m.measure).chain(m.filters.values()).chain(m.joins.iter().flat_map(|j| j.filters.values()));
+    for e in exprs {
+        for w in sqlscan::words(e) {
+            if let Some(t) = cat.table_of(&w) {
+                add(t, &w);
+            }
+        }
+    }
+    out
+}
+
 /// 口径结构是否相同（不看名称、示例、说明文字与关联元数据）。
 pub fn same_structure(a: &Metric, b: &Metric) -> bool {
     let joins = |m: &Metric| -> BTreeSet<String> {
@@ -516,6 +551,9 @@ pub fn parse_draft(text: &str) -> std::result::Result<Draft, String> {
     let mut m = raw.metric;
     m.basis = Basis::None;
     m.examples.clear();
+    if let Some(t) = &mut m.time {
+        t.loss_ratio = 0.0;
+    }
     for j in &mut m.joins {
         j.key.clear();
         j.cardinality.clear();
@@ -596,6 +634,7 @@ mod tests {
                 dim: "date_dim".into(),
                 dim_col: "d_date_sk".into(),
                 grain: "day".into(),
+                loss_ratio: 0.0,
             }),
             joins: vec![JoinRef {
                 key: String::new(),
@@ -752,5 +791,14 @@ mod tests {
         assert!(same_structure(&rate(), &b));
         b.filters.insert("store_sales".into(), "ss_net_paid > 0".into());
         assert!(!same_structure(&rate(), &b));
+    }
+
+    #[test]
+    fn referenced_columns_cover_keys_measure_and_filters() {
+        let cols = columns(&rate(), &cat());
+        let set = |xs: &[&str]| xs.iter().map(|x| x.to_string()).collect::<BTreeSet<String>>();
+        assert_eq!(cols["store_sales"], set(&["ss_item_sk", "ss_net_paid", "ss_sold_date_sk", "ss_ticket_number"]));
+        assert_eq!(cols["store_returns"], set(&["sr_item_sk", "sr_return_amt", "sr_status", "sr_ticket_number"]));
+        assert_eq!(cols["date_dim"], set(&["d_date_sk", "d_moy", "d_year"]));
     }
 }

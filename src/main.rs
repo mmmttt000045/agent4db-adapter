@@ -12,6 +12,7 @@ mod maintbench;
 mod metric;
 mod metricbench;
 mod middle;
+mod scenario;
 mod server;
 mod sqlscan;
 

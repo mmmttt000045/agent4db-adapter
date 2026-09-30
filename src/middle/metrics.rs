@@ -17,6 +17,9 @@ use std::time::Instant;
 /// find_metric 每次最多返回的条目数（各组相同的检索预算）。
 const FIND_BUDGET: usize = 3;
 
+/// 覆盖条件的容差：事实表关联不上时间维度的行占比最多比准入基线高 0.1 个百分点。
+const COVERAGE_TOLERANCE: f64 = 0.001;
+
 /// 验证证据：来源任务、判题值与各门槛记录。不随 find_metric 返回。
 #[derive(Clone, Debug, Serialize)]
 pub struct MetricEvidence {
@@ -51,13 +54,20 @@ enum Breach {
         reason: String,
     },
     Time(String),
+    /// 事实行无法归入期间（时间关联丢行比例超过基线）；不在受限修复范围
+    Coverage(String),
     Grain(String),
 }
 
 impl Breach {
     fn reason(&self) -> String {
         match self {
-            Breach::Write(r) | Breach::Schema(r) | Breach::Time(r) | Breach::Grain(r) | Breach::Join { reason: r, .. } => r.clone(),
+            Breach::Write(r)
+            | Breach::Schema(r)
+            | Breach::Time(r)
+            | Breach::Coverage(r)
+            | Breach::Grain(r)
+            | Breach::Join { reason: r, .. } => r.clone(),
         }
     }
 }
@@ -70,11 +80,29 @@ fn blocked(s: &Status) -> Option<String> {
     }
 }
 
-fn schema_breach(e: &Entry, cur: &HashMap<String, TableVersion>, changed: &[String]) -> Option<Breach> {
-    changed
-        .iter()
-        .find(|t| cur.get(*t).map(|v| &v.schema) != e.deps.get(*t).map(|v| &v.schema))
-        .map(|t| Breach::Schema(format!("表 {t} 的结构已变化")))
+/// 结构依赖只看口径引用的列（`used`）：引用列都在且类型不变时，无关列的增删不算结构变化。
+/// 没有列信息时按整表结构指纹判断。
+fn schema_breach(
+    e: &Entry,
+    used: &BTreeMap<String, BTreeSet<String>>,
+    cur: &HashMap<String, TableVersion>,
+    changed: &[String],
+) -> Option<Breach> {
+    for t in changed {
+        let (Some(now), Some(then)) = (cur.get(t), e.deps.get(t)) else { return Some(Breach::Schema(format!("表 {t} 不存在"))) };
+        if now.schema == then.schema {
+            continue;
+        }
+        match used.get(t).filter(|_| !then.cols.is_empty()) {
+            Some(cols) => {
+                if let Some(c) = cols.iter().find(|c| now.col_sig(c) != then.col_sig(c)) {
+                    return Some(Breach::Schema(format!("表 {t} 的列 {c} 已删除或改变类型")));
+                }
+            }
+            None => return Some(Breach::Schema(format!("表 {t} 的结构已变化"))),
+        }
+    }
+    None
 }
 
 fn squash(s: &str) -> String {
@@ -150,11 +178,43 @@ fn view(e: &Entry) -> Value {
     v
 }
 
+/// 覆盖条件：事实表按时间键关联时间维度后的行数，与事实表行数比较。它读事实表与维度表，任一有写入都要重查。
+fn coverage_check(m: &Metric) -> Option<Check> {
+    let t = m.time.as_ref()?;
+    Some(Check::RowConservation {
+        left: m.fact.clone(),
+        right: t.dim.clone(),
+        on: vec![(t.fact_col.clone(), t.dim_col.clone())],
+        lf: None,
+        rf: None,
+    })
+}
+
+/// 关联不上的行占比（空键或孤儿键）。
+fn loss_of(o: &Outcome) -> f64 {
+    (1.0 - o.metrics["join_ratio"].as_f64().unwrap_or(1.0)).max(0.0)
+}
+
+/// 规范 SQL 实际作用于事实表的过滤：口径过滤与各关联上的事实表过滤（`metric::compile` 都放进 WHERE），去重后合取。
+fn fact_filter(m: &Metric) -> Option<String> {
+    let mut fs: Vec<&String> = vec![];
+    for f in m.filters.get(&m.fact).into_iter().chain(m.joins.iter().filter_map(|j| j.filters.get(&m.fact))) {
+        if !fs.iter().any(|x| squash(x) == squash(f)) {
+            fs.push(f);
+        }
+    }
+    match fs.as_slice() {
+        [] => None,
+        [f] => Some((*f).clone()),
+        _ => Some(fs.iter().map(|f| format!("({f})")).collect::<Vec<_>>().join(" and ")),
+    }
+}
+
 /// 粒度条件。键列排序，使列顺序不同的同一条件得到相同的检查键（在途合并按检查键进行）。
 fn grain_check(m: &Metric) -> Check {
     let mut cols = m.grain.clone();
     cols.sort();
-    Check::KeyUnique { table: m.fact.clone(), cols, filter: m.filters.get(&m.fact).cloned() }
+    Check::KeyUnique { table: m.fact.clone(), cols, filter: fact_filter(m) }
 }
 
 impl TaskLog {
@@ -485,8 +545,13 @@ impl Middle {
                 bad!("维度列 {}.{} 不存在", t.dim, t.dim_col);
             }
             let on = vec![(t.fact_col.clone(), t.dim_col.clone())];
-            if let Err(x) = self.verdict(ctx, &m.fact, &t.dim, &on).await?.0 {
-                bad!("时间关联 {}={} 未通过验证：{}", t.fact_col, t.dim_col, x.reason);
+            match self.verdict(ctx, &m.fact, &t.dim, &on).await?.0 {
+                Ok(p) => {
+                    if let Some(tm) = m.time.as_mut() {
+                        tm.loss_ratio = p.loss_ratio;
+                    }
+                }
+                Err(x) => bad!("时间关联 {}={} 未通过验证：{}", t.fact_col, t.dim_col, x.reason),
             }
             // 提炼器有时把时间关联也写进 joins；规范编译会另加时间关联，重复会使 G7 报“表名被指定多次”
             let flip = vec![(t.dim_col.clone(), t.fact_col.clone())];
@@ -725,7 +790,7 @@ impl Middle {
         let breach = match policy {
             Maint::Off => None,
             Maint::Revoke => Some(Breach::Write(format!("依赖表 {} 有写入（逐写入撤销）", changed.join("、")))),
-            Maint::Schema => schema_breach(e, cur, &changed),
+            Maint::Schema => schema_breach(e, &metric::columns(&m, &self.cat), cur, &changed),
             Maint::Definition | Maint::Condition => self.metric_breach(ctx, &m, e, cur, &changed, &mut conds).await?,
         };
         let outcome = match breach {
@@ -778,7 +843,7 @@ impl Middle {
         changed: &[String],
         conds: &mut Vec<Value>,
     ) -> Result<Option<Breach>> {
-        if let Some(b) = schema_breach(e, cur, changed) {
+        if let Some(b) = schema_breach(e, &metric::columns(m, &self.cat), cur, changed) {
             return Ok(Some(b));
         }
         let force = self.cfg.metric_maint == Maint::Definition;
@@ -822,6 +887,34 @@ impl Middle {
                 conds.push(json!({"cond": label, "action": action, "source": src, "pass": r.is_ok()}));
                 if let Err(x) = r {
                     return Ok(Some(Breach::Time(format!("时间关联不再成立：{}", x.reason))));
+                }
+            }
+            // 覆盖：每条事实都应能归入某个期间。关联不上时间维度的行占比超过准入基线即不成立
+            if let Some(c) = coverage_check(m) {
+                let label = format!("覆盖 {}⋈{}", m.fact, t.dim);
+                if !force && !c.tables().iter().any(|x| changed.contains(x)) {
+                    conds.push(json!({"cond": label, "tables": c.tables(), "action": "skipped"}));
+                } else {
+                    let (o, how) = if self.cfg.cond_reuse && !force {
+                        self.cond_check(ctx, &c, QKind::Metric).await?
+                    } else {
+                        let (o, merged) = self.exec_check(ctx, &c, QKind::Metric).await?;
+                        (o, if merged { "merged" } else { "executed" })
+                    };
+                    let loss = loss_of(&o);
+                    let pass = loss <= t.loss_ratio + COVERAGE_TOLERANCE;
+                    let ms = if how == "executed" { o.ms } else { 0.0 };
+                    conds.push(json!({"cond": label, "tables": c.tables(), "action": how, "pass": pass,
+                                      "loss": loss, "baseline": t.loss_ratio, "ms": ms}));
+                    if !pass {
+                        return Ok(Some(Breach::Coverage(format!(
+                            "{} 中关联不上 {} 的行占比从 {:.2}% 升至 {:.2}%，部分事实无法归入期间",
+                            m.fact,
+                            t.dim,
+                            t.loss_ratio * 100.0,
+                            loss * 100.0
+                        ))));
+                    }
                 }
             }
         }
@@ -1068,5 +1161,43 @@ mod tests {
         assert!(!implies(&ku("t", &["a", "b", "c"], None), &ku("t", &["a", "b"], None)));
         assert!(!implies(&ku("t", &["a"], Some("x = 1")), &ku("t", &["a", "b"], None)));
         assert!(!implies(&ku("t", &["a"], None), &ku("u", &["a", "b"], None)));
+    }
+
+    #[test]
+    fn schema_dependency_only_covers_referenced_columns() {
+        let v = |cols: &str| TableVersion { schema: format!("md5:{cols}"), dml: 0, batch: 1, cols: cols.into() };
+        let then = v("sr_item_sk:integer,sr_return_amt:numeric(12,2),sr_status:character varying(8)");
+        let e = Entry {
+            key: "metric:门店退货金额".into(),
+            content: Content::Profile(Value::Null),
+            deps: [("store_returns".to_string(), then)].into_iter().collect(),
+            guards: vec![],
+            status: Status::Valid,
+            created_by: "A".into(),
+            hits: 0,
+            consumers: BTreeSet::new(),
+            revision: 0,
+        };
+        let used: BTreeMap<String, BTreeSet<String>> =
+            [("store_returns".to_string(), ["sr_item_sk", "sr_return_amt"].iter().map(|c| c.to_string()).collect())].into_iter().collect();
+        let changed = vec!["store_returns".to_string()];
+        let cur = |cols: &str| -> HashMap<String, TableVersion> { [("store_returns".to_string(), v(cols))].into_iter().collect() };
+        let added = cur("sr_item_sk:integer,sr_return_amt:numeric(12,2),sr_status:character varying(8),sr_reason:character varying(20)");
+        assert!(schema_breach(&e, &used, &added, &changed).is_none(), "无关列新增不应使口径失效");
+        let unused_dropped = cur("sr_item_sk:integer,sr_return_amt:numeric(12,2)");
+        assert!(schema_breach(&e, &used, &unused_dropped, &changed).is_none());
+        let retyped = cur("sr_item_sk:integer,sr_return_amt:bigint,sr_status:character varying(8)");
+        assert!(schema_breach(&e, &used, &retyped, &changed).is_some(), "引用列改类型必须失效");
+        let dropped = cur("sr_item_sk:integer,sr_status:character varying(8)");
+        assert!(schema_breach(&e, &used, &dropped, &changed).is_some(), "引用列删除必须失效");
+        assert!(schema_breach(&e, &BTreeMap::new(), &added, &changed).is_some(), "没有列信息时按整表判断");
+        assert!(schema_breach(&e, &used, &HashMap::new(), &changed).is_some(), "表不存在必须失效");
+    }
+
+    #[test]
+    fn coverage_loss_reads_join_ratio() {
+        let o = |r: f64| Outcome { pass: true, metrics: json!({"join_ratio": r}), ms: 0.0 };
+        assert!((loss_of(&o(0.99)) - 0.01).abs() < 1e-12);
+        assert_eq!(loss_of(&o(1.2)), 0.0);
     }
 }

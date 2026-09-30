@@ -1,4 +1,4 @@
-//! 指标经验评测：学习 → 参数 / 题型留出 → 正常新增 → 已建模的破坏性 ETL（v2）。
+//! 指标经验评测：学习 → 参数 / 题型留出 → 数据变化场景（每个场景从 v1 独立施加、结束后回滚，见 `scenario`）。
 //! 在独立数据库上生成合成零售数据；查询 Agent 与提炼器都调用真实模型。协议见 docs/metric-experience-protocol.md。
 
 use crate::catalog;
@@ -8,6 +8,7 @@ use crate::knowledge::{Basis, Content, Status};
 use crate::llm::{self, AgentRun, Provider};
 use crate::metric::{self, parse_answer, same_value, Ask, Period, Trajectory};
 use crate::middle::{tool_specs_with, Ctx, GuardMode, Maint, Middle, MiddleConfig, Scope, SqlCall, TaskLog, ToolSpec};
+use crate::scenario::{self, Change};
 use anyhow::{ensure, Context, Result};
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -33,8 +34,12 @@ pub struct Options {
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
     phrasings: Vec<String>,
-    #[arg(long, value_delimiter = ',', default_value = "M1,M2,M3,M4", value_parser = ["M1", "M2", "M3", "M4"])]
+    #[arg(long, value_delimiter = ',', default_value = "M1,M2,M3,M4", value_parser = ["M1", "M2", "M3", "M4", "M5"])]
     metrics: Vec<String>,
+    /// 留出之后依次评测的数据变化场景；每个场景从 v1 独立施加，结束后回滚并恢复留出后的经验库
+    #[arg(long, value_delimiter = ',', default_value = "append,status",
+          value_parser = ["append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit"])]
+    changes: Vec<String>,
     /// 做留出题的 Agent；学习只由 A 完成，默认由未接触过指标的 B 做留出
     #[arg(long, value_delimiter = ',', default_value = "B")]
     holdout_agents: Vec<String>,
@@ -58,26 +63,22 @@ struct Def {
     id: &'static str,
     name: &'static str,
     definition: &'static str,
-    /// 受“正常新增”（补录 2002-09 门店销售）影响
-    growth: bool,
-    /// 受 v2（门店退货改为状态流水）影响
-    v2: bool,
+    /// 口径读到的表；数据变化场景只重问读到被写入表的指标
+    tables: &'static [&'static str],
 }
 
-static DEFS: [Def; 4] = [
+static DEFS: [Def; 5] = [
     Def {
         id: "M1",
         name: "门店营业额",
         definition: "门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间",
-        growth: true,
-        v2: false,
+        tables: &["store_sales", "date_dim"],
     },
     Def {
         id: "M2",
         name: "门店退货金额",
         definition: "门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次",
-        growth: false,
-        v2: true,
+        tables: &["store_returns", "date_dim"],
     },
     Def {
         id: "M3",
@@ -85,15 +86,20 @@ static DEFS: [Def; 4] = [
         definition:
             "门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；\
                      按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次",
-        growth: true,
-        v2: true,
+        tables: &["store_sales", "store_returns", "date_dim"],
     },
     Def {
         id: "M4",
         name: "目录渠道营业额",
         definition: "目录渠道营业额 = 目录销售行的净支付额（catalog_sales.cs_net_paid）之和，按销售日期归属期间",
-        growth: false,
-        v2: false,
+        tables: &["catalog_sales", "date_dim"],
+    },
+    Def {
+        id: "M5",
+        name: "电子品类门店营业额",
+        definition: "电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，\
+                     按销售日期归属期间；商品按其当前类别计",
+        tables: &["store_sales", "item", "date_dim"],
     },
 ];
 
@@ -140,6 +146,13 @@ fn tasks(ids: &[String]) -> Vec<Task> {
                 (Set::Param, single(2002, 9)),
                 (Set::Type, diff((2002, 6), (2001, 6))),
                 (Set::Type, Ask::RankMonth { year: 2001 }),
+            ],
+            "M5" => vec![
+                (Set::Learn, single(2001, 1)),
+                (Set::Learn, single(2000, 10)),
+                (Set::Param, single(2002, 9)),
+                (Set::Type, diff((2002, 9), (2001, 9))),
+                (Set::Type, Ask::RankMonth { year: 2002 }),
             ],
             _ => vec![
                 (Set::Learn, single(2001, 5)),
@@ -200,28 +213,35 @@ fn decimals(ask: &Ask) -> u32 {
 
 // ───────────────────────── 判题器（独立于 metric::compile 手写） ─────────────────────────
 
-fn gold_period(def: &str, p: &Period) -> String {
+pub(crate) fn gold_period(def: &str, p: &Period) -> String {
     let when = format!("d_year = {} and d_moy between {} and {}", p.year, p.m1, p.m2);
     match def {
-        "M1" => format!("select sum(s.ss_net_paid) from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where {when}"),
+        "M1" => format!(
+            "select sum(s.ss_net_paid) from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk \
+             where s.ss_is_current = 1 and {when}"
+        ),
         "M2" => format!(
             "select sum(r.sr_return_amt) from store_returns r join date_dim d on r.sr_returned_date_sk = d.d_date_sk \
              where r.sr_status = '完成' and {when}"
         ),
         "M3" => format!(
             "with s as (select ss_ticket_number as t, ss_item_sk as i, ss_net_paid as paid from store_sales \
-                        join date_dim on ss_sold_date_sk = d_date_sk where {when}) \
+                        join date_dim on ss_sold_date_sk = d_date_sk where ss_is_current = 1 and {when}) \
              select 100.0 * (select sum(r.sr_return_amt) from store_returns r join s on r.sr_ticket_number = s.t and r.sr_item_sk = s.i \
                              where r.sr_status = '完成') / (select sum(paid) from s)"
+        ),
+        "M5" => format!(
+            "select sum(s.ss_net_paid) from store_sales s join item i on s.ss_item_sk = i.i_item_sk and i.i_is_current = 'Y' \
+             join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and i.i_category = '电子' and {when}"
         ),
         _ => format!("select sum(c.cs_net_paid) from catalog_sales c join date_dim d on c.cs_sold_date_sk = d.d_date_sk where {when}"),
     }
 }
 
-fn gold_rank(def: &str, year: i32) -> String {
+pub(crate) fn gold_rank(def: &str, year: i32) -> String {
     match def {
         "M1" => format!(
-            "select d_moy from store_sales join date_dim on ss_sold_date_sk = d_date_sk where d_year = {year} \
+            "select d_moy from store_sales join date_dim on ss_sold_date_sk = d_date_sk where d_year = {year} and ss_is_current = 1 \
              group by d_moy order by sum(ss_net_paid) desc, d_moy limit 1"
         ),
         "M2" => format!(
@@ -230,11 +250,16 @@ fn gold_rank(def: &str, year: i32) -> String {
         ),
         "M3" => format!(
             "with s as (select ss_ticket_number as t, ss_item_sk as i, ss_net_paid as paid, d_moy as mo from store_sales \
-                        join date_dim on ss_sold_date_sk = d_date_sk where d_year = {year}), \
+                        join date_dim on ss_sold_date_sk = d_date_sk where d_year = {year} and ss_is_current = 1), \
                   r as (select s.mo, sum(r.sr_return_amt) as amt from store_returns r join s on r.sr_ticket_number = s.t and r.sr_item_sk = s.i \
                         where r.sr_status = '完成' group by s.mo), \
                   p as (select mo, sum(paid) as paid from s group by mo) \
              select p.mo from p left join r using (mo) order by coalesce(r.amt, 0) / p.paid desc, p.mo limit 1"
+        ),
+        "M5" => format!(
+            "select d_moy from store_sales join item on ss_item_sk = i_item_sk and i_is_current = 'Y' \
+             join date_dim on ss_sold_date_sk = d_date_sk where d_year = {year} and ss_is_current = 1 and i_category = '电子' \
+             group by d_moy order by sum(ss_net_paid) desc, d_moy limit 1"
         ),
         _ => format!(
             "select d_moy from catalog_sales join date_dim on cs_sold_date_sk = d_date_sk where d_year = {year} \
@@ -466,6 +491,9 @@ struct Env<'a> {
     agent: &'a Provider,
     extractor: &'a Provider,
     tasks: &'a [Task],
+    changes: &'a [Change],
+    /// v1 的逐表内容指纹；每个场景回滚后核对
+    v1: &'a BTreeMap<String, String>,
 }
 
 struct Cell<'a> {
@@ -638,6 +666,9 @@ async fn learn_step(env: &Env<'_>, mid: &Middle, rec: &TaskRec, t: &Task) -> Res
               "gate_db": {"queries": d.queries, "ms": d.db_ms}, "gate_seconds": t0.elapsed().as_secs_f64()}))
 }
 
+/// v1 中值恒定、场景里用来区分记录版本或状态的列；审计记录口径是否已带上这些过滤。
+const GUARD_COLS: [&str; 3] = ["sr_status", "ss_is_current", "i_is_current"];
+
 /// 评估用：已晋升（含撤销、修复）的口径在当前快照上是否答对其所属指标的全部留出题。
 /// 使用留出题标准答案，但只进入报告，不进入提炼、晋升或修复。
 async fn audit(env: &Env<'_>, mid: &Middle, gold: &HashMap<String, String>) -> Result<(Vec<Value>, HashSet<(String, u32)>)> {
@@ -670,9 +701,10 @@ async fn audit(env: &Env<'_>, mid: &Middle, gold: &HashMap<String, String>) -> R
         if !ok {
             bad.insert((e.key.clone(), e.revision));
         }
-        let status_filter = m.filters.values().chain(m.joins.iter().flat_map(|j| j.filters.values())).any(|f| f.contains("sr_status"));
+        let has = |col: &str| m.filters.values().chain(m.joins.iter().flat_map(|j| j.filters.values())).any(|f| f.contains(col));
+        let guard_filters: Vec<&str> = GUARD_COLS.into_iter().filter(|c| has(c)).collect();
         rows.push(json!({"full_key": fk, "key": e.key, "revision": e.revision, "status": e.status, "metric_def": def,
-                         "ok": ok, "wrong_on": wrong, "has_status_filter": status_filter, "repaired": repaired}));
+                         "ok": ok, "wrong_on": wrong, "guard_filters": guard_filters, "repaired": repaired}));
     }
     Ok((rows, bad))
 }
@@ -685,8 +717,7 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     let cell =
         Cell { id: format!("r{repeat}-{mode}-{phrasing}"), mode, phrasing, repeat, system: system(middle_tools, metric_tools), tools };
     eprintln!("== {}", cell.id);
-    etl::reset(env.admin).await?;
-    reset_growth(env.admin).await?;
+    scenario::ensure_v1(env.admin, env.v1, "上一组").await?;
     let mid = Middle::new(db, cfg).await?;
     let defined = phrasing == "defined";
     let mut records = vec![];
@@ -694,6 +725,7 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     let mut relearning = vec![];
     let mut audits = serde_json::Map::new();
     let mut events = serde_json::Map::new();
+    let mut writes = serde_json::Map::new();
     let t0 = Instant::now();
 
     // 学习：A 用带口径的题面完成；直连组没有跨任务状态，跳过
@@ -711,19 +743,28 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     }
     events.insert("learn".into(), json!(mid.take_metric_events()));
 
-    for phase in ["holdout", "growth", "v2"] {
-        match phase {
-            "growth" => eprintln!("  正常新增：补录 {} 行", apply_growth(env.admin).await?),
-            "v2" => eprintln!("  ETL v2：新增“申请”行 {} 条", etl::apply_v2(env.admin).await?),
-            _ => {}
-        }
+    // 留出之后的每个场景都从 v1 与留出后的经验库开始：先施加改变业务事实的部分并计算标准答案，
+    // 再施加只改变数据表示的部分；答完后回滚、核对内容回到 v1，并恢复经验库快照。
+    let mut checkpoint = None;
+    for ch in std::iter::once(None).chain(env.changes.iter().copied().map(Some)) {
+        let phase = ch.map_or("holdout", Change::name);
+        let gold = match ch {
+            None => gold_map(env.admin, env.tasks).await?,
+            Some(c) => {
+                let truth = c.apply_truth(env.admin).await?;
+                let gold = gold_map(env.admin, env.tasks).await?;
+                let hidden = c.apply_hidden(env.admin).await?;
+                eprintln!("  场景 {phase}（{}，{}）：写入 {truth} + {hidden} 行", c.label(), c.class());
+                writes.insert(phase.into(), json!({"truth_rows": truth, "hidden_rows": hidden}));
+                gold
+            }
+        };
         mid.invalidate_versions();
-        let gold = gold_map(env.admin, env.tasks).await?;
         let (rows, bad) = audit(env, &mid, &gold).await?;
         audits.insert(phase.into(), json!(rows));
         // 逐写入撤销组的恢复：写入通知到达即撤销依赖有写入的口径，再由 A 用带口径题面在新快照上重新学习与提炼。
         // 重新学习的任务记为 *-relearn 阶段，成本单列，不计入答案统计。
-        if phase != "holdout" && mid.cfg.metric_maint == Maint::Revoke {
+        if ch.is_some() && mid.cfg.metric_maint == Maint::Revoke {
             let sweeper = Ctx::new("A", &format!("{}-{phase}-sweep", cell.id), "sweep");
             let swept = mid.sweep_metrics(&sweeper).await?;
             let defs: HashSet<String> = swept
@@ -731,8 +772,8 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
                 .filter(|x| x["after"]["status"] != "valid")
                 .filter_map(|x| x["task"].as_str().and_then(|t| t.split('-').next()).map(str::to_string))
                 .collect();
-            let name = if phase == "growth" { "growth-relearn" } else { "v2-relearn" };
-            let ph = Phase { env, mid: &mid, cell: &cell, name, gold: &gold, bad: &bad };
+            let name = format!("{phase}-relearn");
+            let ph = Phase { env, mid: &mid, cell: &cell, name: &name, gold: &gold, bad: &bad };
             let t1 = Instant::now();
             for t in env.tasks.iter().filter(|t| t.set == Set::Learn && defs.contains(t.def.id)) {
                 let rec = run_task(&ph, "A", t, true).await?;
@@ -747,11 +788,7 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
             .tasks
             .iter()
             .filter(|t| t.set != Set::Learn)
-            .filter(|t| match phase {
-                "growth" => t.def.growth,
-                "v2" => t.def.v2,
-                _ => true,
-            })
+            .filter(|t| ch.is_none_or(|c| t.def.tables.iter().any(|x| c.tables().contains(x))))
             .collect();
         for agent in &env.o.holdout_agents {
             for t in &set {
@@ -759,13 +796,19 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
             }
         }
         events.insert(phase.into(), json!(mid.take_metric_events()));
-        if phase == "v2" {
-            audits.insert("v2_end".into(), json!(audit(env, &mid, &gold).await?.0));
+        match ch {
+            None => checkpoint = Some(mid.checkpoint()),
+            Some(c) => {
+                audits.insert(format!("{phase}_end"), json!(audit(env, &mid, &gold).await?.0));
+                c.reset(env.admin).await?;
+                scenario::ensure_v1(env.admin, env.v1, phase).await?;
+                mid.restore(checkpoint.as_ref().context("缺少留出后的经验库快照")?).await?;
+            }
         }
     }
     Ok(json!({
         "cell": cell.id, "mode": mode, "phrasing": phrasing, "repeat": repeat, "seconds": t0.elapsed().as_secs_f64(),
-        "learning": learning, "relearning": relearning, "audits": audits, "events": events,
+        "learning": learning, "relearning": relearning, "audits": audits, "events": events, "writes": writes,
         "metric_report": mid.metric_report(), "stats": mid.stats_json(), "records": records,
     }))
 }
@@ -777,6 +820,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     );
     let agent = Provider::from_env(&o.agent)?;
     let extractor = Provider::from_env(&o.extractor)?;
+    let changes = o.changes.iter().map(|c| Change::parse(c)).collect::<Result<Vec<_>>>()?;
     let stamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
     let name = format!("agentdb_metric_{}_{stamp}", std::process::id());
     let directory = format!("{out}/metric-{stamp}");
@@ -790,6 +834,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         eprintln!("生成合成零售数据：门店销售 {} 行，目录销售 {} 行", o.rows, o.rows / 2);
         admin.query(QKind::Meta, &fixture(o.rows)).await?;
         etl::setup(&admin).await?;
+        scenario::setup(&admin).await?;
+        let v1 = scenario::fingerprint(&admin).await?;
         let mut dataset = serde_json::Map::new();
         for t in ["store_sales", "store_returns", "catalog_sales", "date_dim", "item"] {
             let n = admin.query(QKind::Meta, &format!("select count(*) from {t}")).await?.i64(0, 0).unwrap_or(0);
@@ -798,7 +844,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         let probe = Db::connect(isolated.as_str(), 2, true)?;
         let db = Arc::new(Db::connect_timeout(isolated.as_str(), pool, true, o.sql_timeout_secs)?);
         let tasks = tasks(&o.metrics);
-        let env = Env { o: &o, admin: &admin, probe: &probe, agent: &agent, extractor: &extractor, tasks: &tasks };
+        let env = Env { o: &o, admin: &admin, probe: &probe, agent: &agent, extractor: &extractor, tasks: &tasks, changes: &changes, v1: &v1 };
         let mut cells = vec![];
         for r in 1..=o.repeats {
             // 每轮轮换组的执行顺序
@@ -816,13 +862,15 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             "providers": {"agent": agent.label(), "extractor": extractor.label(), "temperature": "未设置（服务端默认）",
                           "agent_config": agent.config(), "extractor_config": extractor.config()},
             "dataset": dataset,
-            "tasks": tasks.iter().map(|t| json!({"id": t.id, "metric": t.def.id, "set": t.set, "ask": t.ask, "growth": t.def.growth, "v2": t.def.v2})).collect::<Vec<_>>(),
+            "tasks": tasks.iter().map(|t| json!({"id": t.id, "metric": t.def.id, "set": t.set, "ask": t.ask, "tables": t.def.tables})).collect::<Vec<_>>(),
+            "changes": changes.iter().map(|c| json!({"name": c.name(), "label": c.label(), "class": c.class(), "tables": c.tables(),
+                                                     "describe": c.describe()})).collect::<Vec<_>>(),
             "methodology": {
                 "learning": "学习题由 A 用带口径题面完成；直连组没有跨任务状态，不跑学习",
                 "holdout": "留出题由 holdout_agents 完成；参数留出与题型留出分开统计",
                 "judge": "手写参考 SQL 在同一快照上执行，按答案精度比较；学习题判题结果用于 G2 与 G8，留出题只用于评分与审计",
-                "growth": "复制 2002-09 门店销售行并换新小票号；结构、粒度与关联约束不变",
-                "v2": "etl::apply_v2：2001-10-01 起的门店退货增加“申请”行",
+                "changes": "每个场景从 v1 与留出后的经验库独立开始：先施加改变业务事实的部分并计算标准答案，再施加只改变数据表示的部分；\
+                            只重问读到被写入表的指标；结束后回滚，逐表核对内容回到 v1，并恢复经验库快照（依赖版本改写为回滚后的版本）",
                 "audit": "阶段开始时按留出题检查每条已晋升口径的规范 SQL；答错者记为不正确口径，用于统计过期使用与误撤销",
                 "explain": "任务结束后在只读连接上执行 EXPLAIN (ANALYZE, BUFFERS)，不计入中间层计量，但会影响后续缓存状态",
                 "order": "组的执行顺序按轮换；同一数据库顺序运行，不清空 OS/PG 缓存",
@@ -875,11 +923,21 @@ fn events<'a>(cell: &'a Value, phase: &str, kind: &str) -> Vec<&'a Value> {
 
 /// 评分阶段的任务（不含学习与逐写入撤销组的重新学习）。
 fn is_eval(r: &Value) -> bool {
-    matches!(r["phase"].as_str(), Some("holdout" | "growth" | "v2"))
+    r["phase"].as_str().is_some_and(|p| p != "learn" && !p.ends_with("-relearn"))
+}
+
+/// 报告的阶段：留出，加上各场景 (名称, 中文名, 条件类别)。
+fn phases_of(report: &Value) -> Vec<(String, String, String)> {
+    let mut v = vec![("holdout".to_string(), "留出".to_string(), "—".to_string())];
+    for c in report["changes"].as_array().into_iter().flatten() {
+        let g = |k: &str| c[k].as_str().unwrap_or_default().to_string();
+        v.push((g("name"), g("label"), g("class")));
+    }
+    v
 }
 
 /// 维护方式对照：待验证后通过、正式撤销与修复、逐写入撤销后重新提炼分开计数，条件按处理方式计数。
-fn maintenance_section(metric_cells: &[&Value], recs: &[&Value]) -> String {
+fn maintenance_section(metric_cells: &[&Value], recs: &[&Value], changes: &[(String, String, String)]) -> String {
     let mut s = String::from(
         "\n## 6. 依赖表有写入后的维护\n\n\
          各组的条件、受限修复与回归相同，只有维护方式不同。刷新：待验证，重查通过后继续使用；撤销后修复 / 撤销未恢复：条件不成立而正式撤销，\
@@ -889,7 +947,8 @@ fn maintenance_section(metric_cells: &[&Value], recs: &[&Value]) -> String {
     );
     let mut rows = vec![];
     for c in metric_cells {
-        for (phase, pl) in [("growth", "正常新增后"), ("v2", "ETL v2 后")] {
+        for (phase, pl, _) in changes {
+            let (phase, pl) = (phase.as_str(), pl.as_str());
             let ms = events(c, phase, "maintenance");
             let out = |o: &str| ms.iter().filter(|e| e["outcome"] == o).count().to_string();
             let mut acts: BTreeMap<String, usize> = BTreeMap::new();
@@ -973,46 +1032,81 @@ fn markdown(report: &Value) -> String {
     let strs = |v: &Value| -> Vec<String> { v.as_array().into_iter().flatten().filter_map(|x| x.as_str().map(str::to_string)).collect() };
     let modes = strs(&report["options"]["modes"]);
     let phrasings = strs(&report["options"]["phrasings"]);
-    let phases = [("holdout", "留出"), ("growth", "正常新增后"), ("v2", "ETL v2 后")];
+    let phases = phases_of(report);
+    let changes: Vec<(String, String, String)> = phases[1..].to_vec();
     let mut s = format!(
-        "# 指标经验评测\n\n查询 Agent：`{}`；提炼器：`{}`；温度：{}。数据：`{}`。\n\n\
-         本报告是单次运行的描述性结果，不作显著性声明。协议见 docs/metric-experience-protocol.md。\n",
+        "# 指标经验评测\n\n查询 Agent：`{}`；提炼器：`{}`；温度：{}。数据：`{}`。重复 {} 轮。\n\n\
+         本报告是描述性结果，不作显著性声明。协议见 docs/metric-experience-protocol.md。\n",
         report["providers"]["agent"].as_str().unwrap_or_default(),
         report["providers"]["extractor"].as_str().unwrap_or_default(),
         report["providers"]["temperature"].as_str().unwrap_or_default(),
-        report["dataset"]
+        report["dataset"],
+        report["options"]["repeats"]
     );
 
-    s.push_str("\n## 1. 答案\n\n两种题面分开报告。请求澄清单独计数，不算正确也不算错误；出错指模型或网络调用失败。\n");
+    s.push_str("\n## 1. 留出题答案\n\n两种题面分开报告。请求澄清单独计数，不算正确也不算错误；出错指模型或网络调用失败。\n");
     for ph in &phrasings {
         let mut rows = vec![];
         for mode in &modes {
-            for (phase, pl) in phases {
-                for (set, sl) in [("param", "参数留出"), ("type", "题型留出")] {
-                    let rs: Vec<&Value> = recs
-                        .iter()
-                        .copied()
-                        .filter(|r| r["phrasing"] == ph.as_str() && r["mode"] == mode.as_str() && r["phase"] == phase && r["set"] == set)
-                        .collect();
-                    if rs.is_empty() {
-                        continue;
-                    }
-                    let n = |o: &str| rs.iter().filter(|r| r["outcome"] == o).count().to_string();
-                    rows.push(vec![
-                        mode.clone(),
-                        pl.into(),
-                        sl.into(),
-                        rs.len().to_string(),
-                        n("correct"),
-                        n("wrong"),
-                        n("clarify"),
-                        n("error"),
-                    ]);
+            for (set, sl) in [("param", "参数留出"), ("type", "题型留出")] {
+                let rs: Vec<&Value> = recs
+                    .iter()
+                    .copied()
+                    .filter(|r| r["phrasing"] == ph.as_str() && r["mode"] == mode.as_str() && r["phase"] == "holdout" && r["set"] == set)
+                    .collect();
+                if rs.is_empty() {
+                    continue;
                 }
+                let n = |o: &str| rs.iter().filter(|r| r["outcome"] == o).count().to_string();
+                rows.push(vec![mode.clone(), sl.into(), rs.len().to_string(), n("correct"), n("wrong"), n("clarify"), n("error")]);
             }
         }
         s.push_str(&format!("\n### 题面：{}\n\n", phrasing_label(ph)));
-        s.push_str(&md_table(&["组", "阶段", "题集", "题数", "正确", "错误", "请求澄清", "出错"], &rows));
+        s.push_str(&md_table(&["组", "题集", "题数", "正确", "错误", "请求澄清", "出错"], &rows));
+    }
+
+    s.push_str(
+        "\n## 1b. 数据变化场景\n\n每个场景从 v1 与留出后的经验库独立开始，只重问读到被写入表的指标，结束后回滚。\
+         单元格为 正确/题数；另列请求澄清（澄）与出错（败）。“过期执行”为执行了引用不正确口径的 SQL 的任务数\
+         （不正确口径：场景开始时其规范 SQL 答错所属指标任一留出题）。\n",
+    );
+    for ph in &phrasings {
+        let mut rows = vec![];
+        let mut stale_rows = vec![];
+        for (phase, label, class) in &changes {
+            let mut row = vec![label.clone(), class.clone()];
+            let mut stale = vec![label.clone(), class.clone()];
+            for mode in &modes {
+                let rs: Vec<&Value> = recs
+                    .iter()
+                    .copied()
+                    .filter(|r| r["phrasing"] == ph.as_str() && r["mode"] == mode.as_str() && r["phase"] == phase.as_str())
+                    .collect();
+                if rs.is_empty() {
+                    row.push("—".into());
+                    stale.push("—".into());
+                    continue;
+                }
+                let n = |o: &str| rs.iter().filter(|r| r["outcome"] == o).count();
+                let mut cell = format!("{}/{}", n("correct"), rs.len());
+                if n("clarify") > 0 {
+                    cell.push_str(&format!(" 澄{}", n("clarify")));
+                }
+                if n("error") > 0 {
+                    cell.push_str(&format!(" 败{}", n("error")));
+                }
+                row.push(cell);
+                stale.push(rs.iter().filter(|r| f(&r["metric_use"]["bad_executed"]) > 0.0).count().to_string());
+            }
+            rows.push(row);
+            stale_rows.push(stale);
+        }
+        let mut headers = vec!["场景", "条件"];
+        headers.extend(modes.iter().map(String::as_str));
+        s.push_str(&format!("\n### 题面：{}，答案\n\n", phrasing_label(ph)));
+        s.push_str(&md_table(&headers, &rows));
+        s.push_str(&format!("\n### 题面：{}，过期执行\n\n", phrasing_label(ph)));
+        s.push_str(&md_table(&headers, &stale_rows));
     }
 
     s.push_str("\n## 2. 效率（留出阶段，出错除外）\n\n数据库一栏是任务期间中间层的全部查询；最终 SQL 一栏是参与答案的 SQL 的 EXPLAIN 结果，事后执行。\n\n");
@@ -1088,8 +1182,10 @@ fn markdown(report: &Value) -> String {
         let tok = |k: &str| l.iter().map(|x| f(&x["extraction"][k])).sum::<f64>();
         let v1: Vec<&Value> = c["audits"]["holdout"].as_array().into_iter().flatten().collect();
         let wrong = v1.iter().filter(|x| x["ok"] == false).count();
-        let filt = v1.iter().filter(|x| matches!(x["metric_def"].as_str(), Some("M2" | "M3")) && x["has_status_filter"] == true).count();
-        let m23 = v1.iter().filter(|x| matches!(x["metric_def"].as_str(), Some("M2" | "M3"))).count();
+        let filt: Vec<String> = GUARD_COLS
+            .iter()
+            .map(|c| v1.iter().filter(|x| x["guard_filters"].as_array().is_some_and(|a| a.iter().any(|y| y == c))).count().to_string())
+            .collect();
         rows.push(vec![
             c["cell"].as_str().unwrap_or_default().into(),
             l.len().to_string(),
@@ -1102,7 +1198,7 @@ fn markdown(report: &Value) -> String {
             format!("{:.1}", tok("seconds")),
             format!("{:.0}", l.iter().map(|x| f(&x["gate_db"]["ms"])).sum::<f64>()),
             format!("{wrong}/{}", v1.len()),
-            format!("{filt}/{m23}"),
+            filt.join("/"),
         ]);
     }
     s.push_str(&md_table(
@@ -1118,18 +1214,18 @@ fn markdown(report: &Value) -> String {
             "提炼 s",
             "门槛 DB ms",
             "错误口径晋升",
-            "M2/M3 口径含状态过滤",
+            "口径已含过滤 sr_status/ss_is_current/i_is_current",
         ],
         &rows,
     ));
 
-    s.push_str("\n## 4. 检索与声明（留出、正常新增、v2 合计）\n\n");
+    s.push_str("\n## 4. 检索与声明（留出与全部场景合计）\n\n");
     let mut rows = vec![];
     for c in &metric_cells {
         let rs: Vec<&Value> = recs.iter().copied().filter(|r| r["cell"] == c["cell"] && is_eval(r)).collect();
         let hit: Vec<&Value> = rs.iter().copied().filter(|r| r["metric_use"]["found"].as_array().is_some_and(|a| !a.is_empty())).collect();
         let declared = hit.iter().filter(|r| r["metric_use"]["declared"].as_array().is_some_and(|a| !a.is_empty())).count();
-        let rejected: usize = ["holdout", "growth", "v2"].iter().map(|p| events(c, p, "ref_rejected").len()).sum();
+        let rejected: usize = phases.iter().map(|(p, _, _)| events(c, p, "ref_rejected").len()).sum();
         rows.push(vec![
             c["cell"].as_str().unwrap_or_default().into(),
             rs.len().to_string(),
@@ -1147,7 +1243,8 @@ fn markdown(report: &Value) -> String {
     );
     let mut rows = vec![];
     for c in &metric_cells {
-        for (phase, pl) in phases {
+        for (phase, pl, _) in &phases {
+            let (phase, pl) = (phase.as_str(), pl.as_str());
             let rs: Vec<&Value> = recs.iter().copied().filter(|r| r["cell"] == c["cell"] && r["phase"] == phase).collect();
             let cnt = |k: &str| rs.iter().filter(|r| f(&r["metric_use"][k]) > 0.0).count().to_string();
             let bad: HashSet<(String, u64)> = c["audits"][phase]
@@ -1199,18 +1296,28 @@ fn markdown(report: &Value) -> String {
     ));
     let mut rows = vec![];
     for c in &metric_cells {
-        let end: Vec<&Value> =
-            c["audits"]["v2_end"].as_array().into_iter().flatten().filter(|x| x["repaired"] == true && x["status"] == "Valid").collect();
-        rows.push(vec![
-            c["cell"].as_str().unwrap_or_default().into(),
-            end.len().to_string(),
-            end.iter().filter(|x| x["ok"] == false).count().to_string(),
-        ]);
+        for (phase, pl, _) in &changes {
+            let end: Vec<&Value> = c["audits"][format!("{phase}_end")]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter(|x| x["repaired"] == true && x["status"] == "Valid")
+                .collect();
+            if end.is_empty() {
+                continue;
+            }
+            rows.push(vec![
+                c["cell"].as_str().unwrap_or_default().into(),
+                pl.clone(),
+                end.len().to_string(),
+                end.iter().filter(|x| x["ok"] == false).count().to_string(),
+            ]);
+        }
     }
-    s.push_str("\n修复后恢复有效的口径，在 v2 结束时的审计：\n\n");
-    s.push_str(&md_table(&["组", "修复后有效的口径", "其中答错留出题"], &rows));
+    s.push_str("\n修复后恢复有效的口径，在各场景结束时的审计（只列有修复的场景）：\n\n");
+    s.push_str(&md_table(&["组", "场景", "修复后有效的口径", "其中答错留出题"], &rows));
 
-    s.push_str(&maintenance_section(&metric_cells, &recs));
+    s.push_str(&maintenance_section(&metric_cells, &recs, &changes));
 
     s.push_str(
         "\n## 7. 成本\n\n提炼与晋升门槛不在请求路径上；守卫、守护、受限修复与 G8 回归在 find_metric 与 run_sql 的请求路径上。\
@@ -1246,6 +1353,7 @@ fn markdown(report: &Value) -> String {
          - 判题器与数据、任务生成器同源，不是外部确认的业务金标准。\n\
          - 直连组不跑学习；带口径题面下所有组得到相同的业务定义。\n\
          - 指标守护的结果依赖任务顺序：关联重验证和粒度修复会写入经验库，影响后续 run_sql 审查。顺序固定，见逐任务记录。\n\
+         - 场景之间恢复经验库快照；检查排序的反馈统计不在快照内，跨场景累计，只影响检查顺序与代价，不影响结论。\n\
          - 受限修复与 G8 使用学习集判题器，实验之外需要业务方确认。\n\
          - EXPLAIN 在任务结束后执行，会改变后续任务的缓存状态。\n",
     );

@@ -50,6 +50,16 @@ pub struct TableVersion {
     pub schema: String,
     pub dml: i64,
     pub batch: i64,
+    /// 列清单 `列:类型,…`（结构指纹的原文），用于只比较口径引用的列；不写入报告与 find_metric 返回
+    #[serde(default, skip_serializing)]
+    pub cols: String,
+}
+
+impl TableVersion {
+    /// 某列的 `列:类型`；列不存在时为 None。
+    pub fn col_sig(&self, col: &str) -> Option<&str> {
+        self.cols.split(',').find(|x| x.split_once(':').is_some_and(|(n, _)| n == col))
+    }
 }
 
 impl Catalog {
@@ -165,10 +175,11 @@ pub async fn versions(db: &Db) -> Result<HashMap<String, TableVersion>> {
             "select c.relname, \
                     coalesce(s.n_tup_ins + s.n_tup_upd + s.n_tup_del, 0), \
                     coalesce((select max(b.batch_id) from etl_batch_log b where b.table_name = c.relname), 0), \
-                    md5(coalesce((select string_agg(a.attname || ':' || format_type(a.atttypid, a.atttypmod), ',' order by a.attnum) \
-                                  from pg_attribute a where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped), '')) \
+                    md5(x.cols), x.cols \
              from pg_class c join pg_namespace n on n.oid = c.relnamespace \
              left join pg_stat_user_tables s on s.relid = c.oid \
+             cross join lateral (select coalesce(string_agg(a.attname || ':' || format_type(a.atttypid, a.atttypmod), ',' order by a.attnum), '') as cols \
+                                 from pg_attribute a where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped) x \
              where n.nspname = 'public' and c.relkind = 'r'",
         )
         .await?;
@@ -181,6 +192,7 @@ pub async fn versions(db: &Db) -> Result<HashMap<String, TableVersion>> {
                 dml: rows.i64(i, 1).unwrap_or(0),
                 batch: rows.i64(i, 2).unwrap_or(0),
                 schema: rows.cell(i, 3).unwrap_or_default().to_string(),
+                cols: rows.cell(i, 4).unwrap_or_default().to_string(),
             },
         );
     }

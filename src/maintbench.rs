@@ -627,12 +627,12 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
 
 // ───────────────────────── 报告 ─────────────────────────
 
-/// 一个组四次变化合计：[条件执行次数（含在途合并）, 中间层 DB ms, 等待维护的总时长 s]。
+/// 一个组四次变化合计：[条件执行次数（含在途合并与定义级强制重跑）, 中间层 DB ms, 等待维护的总时长 s]。
 fn totals(c: &Value) -> [f64; 3] {
     let mut t = [0.0; 3];
     for e in c["events"].as_array().into_iter().flatten().filter(|e| e["event"] != "none") {
         let cnt = |k: &str| e["maintenance"]["conditions"][k].as_f64().unwrap_or(0.0);
-        t[0] += cnt("executed") + cnt("merged");
+        t[0] += cnt("executed") + cnt("merged") + cnt("forced");
         t[1] += f(&e["db"]["ms"]);
         t[2] += f(&e["wait_ms"]) / 1000.0;
     }
@@ -750,7 +750,7 @@ fn markdown(report: &Value) -> String {
     out.push_str(&md_table(&["组", "变化", "重新提交", "通过门槛", "耗时 s", "DB ms"], &rows));
 
     out.push_str(
-        "\n## 4. 按共享度汇总\n\n四次变化合计，多轮取平均。条件执行＝访问数据库的条件检查（含在途合并）；DB ms 为中间层全部查询；\
+        "\n## 4. 按共享度汇总\n\n四次变化合计，多轮取平均。条件执行＝访问数据库的条件检查（含在途合并与定义级强制重跑的关联守卫，不含交给关联经验的）；DB ms 为中间层全部查询；\
          相对 definition＝同一共享度、同一到达方式下 DB ms 之比。共享度越低，condition 与 definition 应越接近。\n",
     );
     let shares: BTreeSet<u64> = cells.iter().filter_map(|c| c["share"].as_u64()).collect();

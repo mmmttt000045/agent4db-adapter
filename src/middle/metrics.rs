@@ -613,14 +613,15 @@ impl Middle {
         })
     }
 
-    /// 执行 SQL，首个单元格须在答案精度上等于 `expect`；执行失败算不通过。
+    /// 执行 SQL，第一行须有一个单元格在答案精度上等于 `expect`（示例 SQL 常把中间量与结果放在同一行；
+    /// 规范 SQL 只有一列）；执行失败算不通过。
     async fn value_gate(&self, sql: &str, expect: &Answer, decimals: u32) -> Gate {
         match self.db.query(QKind::Metric, sql).await {
             Err(e) => Err(format!("执行失败：{e:#}")),
-            Ok(r) => match r.cell(0, 0) {
+            Ok(r) => match r.rows.first() {
                 None => Err("结果为空".into()),
-                Some(c) if metric::same_value(&metric::parse_answer(c), expect, decimals) => Ok(()),
-                Some(c) => Err(format!("结果 {c} 与期望 {expect:?} 不一致")),
+                Some(row) if row.iter().flatten().any(|c| metric::same_value(&metric::parse_answer(c), expect, decimals)) => Ok(()),
+                Some(_) => Err(format!("结果 {} 与期望 {expect:?} 不一致", r.cell(0, 0).unwrap_or("NULL"))),
             },
         }
     }

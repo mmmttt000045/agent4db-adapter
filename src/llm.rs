@@ -307,7 +307,8 @@ pub fn final_answer_spec(chain: bool) -> ToolSpec {
         schema["properties"]["used"] = json!({"type": "array", "items": {"type": "string"},
             "description": "参与计算最终答案的查询编号（run_sql 返回的 ref，如 r2）"});
         schema["properties"]["derivation"] = json!({"type": "string",
-            "description": "用查询编号写出的最终答案算式，如 r2 - r3；答案直接来自一条查询时写 r2"});
+            "description": "用查询编号写出的最终答案算式，如 r2 - r3；答案直接来自一条查询时写 r2。rN 取第 N 条查询结果第一行第一列的值，\
+                            参与计算的查询请把所需的值放在第一列；只写算式，不加说明"});
     }
     ToolSpec { name: "final_answer", description: "提交最终答案。", schema }
 }

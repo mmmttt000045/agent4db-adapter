@@ -1,0 +1,2949 @@
+{
+  "audits": {
+    "growth": [],
+    "holdout": [],
+    "v2": [],
+    "v2_end": []
+  },
+  "cell": "r1-middle-named",
+  "events": {
+    "growth": [],
+    "holdout": [],
+    "learn": [],
+    "v2": []
+  },
+  "learning": [],
+  "metric_report": {
+    "entries": []
+  },
+  "mode": "middle",
+  "phrasing": "named",
+  "records": [
+    {
+      "agent": "A",
+      "answer": "13570368.70",
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 3,
+          "m2": 3,
+          "year": 2001
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            133.431
+          ],
+          "exec": [
+            1,
+            23.415
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            16.342
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            103.674
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 276.862,
+        "queries": 13
+      },
+      "defined": true,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 40.691,
+        "fact_scan_loops": 31.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 5719.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "13570368.70",
+      "metric": "M1",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "learn",
+      "phrasing": "named",
+      "question": "2001 年 3 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "13570368.70",
+        "clarification": null,
+        "derivation": "r1",
+        "input_tokens": 8911,
+        "notices": 0,
+        "output_tokens": 755,
+        "rejections": 0,
+        "seconds": 5.536729365,
+        "sql": null,
+        "steps": 4,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "set": "learn",
+      "sql_calls": 1,
+      "task": "M1-L1"
+    },
+    {
+      "agent": "A",
+      "answer": "13085788.40",
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 11,
+          "m2": 11,
+          "year": 2000
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            36.182
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            10.495999999999999
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 46.678,
+        "queries": 6
+      },
+      "defined": true,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 51.245999999999995,
+        "fact_scan_loops": 60.0,
+        "fact_scan_nodes": 2.0,
+        "shared_hit": 11070.0,
+        "shared_read": 0.0,
+        "sql": 2
+      },
+      "gold": "13085788.40",
+      "metric": "M1",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "learn",
+      "phrasing": "named",
+      "question": "2000 年 11 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "13085788.40",
+        "clarification": null,
+        "derivation": "r1",
+        "input_tokens": 14639,
+        "notices": 0,
+        "output_tokens": 1775,
+        "rejections": 0,
+        "seconds": 10.515477535,
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue_2000_11\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2000 AND d.d_moy = 11;",
+        "steps": 6,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2"
+        ]
+      },
+      "set": "learn",
+      "sql_calls": 2,
+      "task": "M1-L2"
+    },
+    {
+      "agent": "A",
+      "answer": "3133115.63",
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 4,
+          "m2": 4,
+          "year": 2001
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            2,
+            77.701
+          ],
+          "exec": [
+            2,
+            22.336999999999996
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            11.875999999999998
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            2,
+            63.268
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 175.18200000000002,
+        "queries": 11
+      },
+      "defined": true,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 19.787,
+        "fact_scan_loops": 30.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 5590.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "3133115.63",
+      "metric": "M2",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "learn",
+      "phrasing": "named",
+      "question": "2001 年 4 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "3133115.63",
+        "clarification": null,
+        "derivation": "r1",
+        "input_tokens": 11838,
+        "notices": 0,
+        "output_tokens": 1054,
+        "rejections": 0,
+        "seconds": 7.436335226,
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total_return_amt FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2001 AND d.d_moy = 4;",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "set": "learn",
+      "sql_calls": 2,
+      "task": "M2-L1"
+    },
+    {
+      "agent": "A",
+      "answer": "3299563.26",
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 8,
+          "m2": 8,
+          "year": 2000
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            64.46700000000001
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            9.419000000000004
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 73.88599999999997,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 59.148,
+        "fact_scan_loops": 31.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 5929.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "3299563.26",
+      "metric": "M2",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "learn",
+      "phrasing": "named",
+      "question": "2000 年 8 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "3299563.26",
+        "clarification": null,
+        "derivation": "r1",
+        "input_tokens": 8669,
+        "notices": 0,
+        "output_tokens": 1070,
+        "rejections": 0,
+        "seconds": 6.619988614,
+        "sql": "SELECT SUM(sr_return_amt) AS total_amt FROM store_returns r JOIN date_dim d ON r.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2000 AND d.d_moy = 8;",
+        "steps": 4,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "set": "learn",
+      "sql_calls": 1,
+      "task": "M2-L2"
+    },
+    {
+      "agent": "A",
+      "answer": "23.76",
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 2,
+          "m2": 2,
+          "year": 2001
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            8,
+            3811.801
+          ],
+          "exec": [
+            6,
+            3059.958
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            11,
+            30.144000000000005
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            1,
+            3.1599999999999966
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 6905.062999999999,
+        "queries": 26
+      },
+      "defined": true,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 2160.651,
+        "fact_scan_loops": 50587.0,
+        "fact_scan_nodes": 6.0,
+        "shared_hit": 186029.0,
+        "shared_read": 0.0,
+        "sql": 5
+      },
+      "gold": "23.7563154314960542",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "learn",
+      "phrasing": "named",
+      "question": "2001 年 2 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "23.76",
+        "clarification": null,
+        "derivation": "r5",
+        "input_tokens": 32328,
+        "notices": 0,
+        "output_tokens": 6970,
+        "rejections": 0,
+        "seconds": 40.71952474,
+        "sql": "WITH sales AS (\n  SELECT ss_ticket_number, ss_item_sk, ss_net_paid\n  FROM store_sales\n  WHERE ss_sold_date_sk BETWEEN 398 AND 425\n),\nret AS (\n  SELECT SUM(r.sr_return_amt) AS return_amt\n  FROM sales s\n  JOIN store_returns r\n    ON r.sr_ticket_number = s.ss_ticket_number\n   AND r.sr_item_sk = s.ss_item_sk\n)\nSELECT\n  ret.return_amt,\n  (SELECT SUM(ss_net_paid) FROM sales) AS net_paid,\n  ROUND(ret.return_amt / (SELECT SUM(ss_net_paid) FROM sales) * 100, 2) AS return_rate_pct\nFROM ret;",
+        "steps": 7,
+        "tool_calls": 12,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2",
+          "r3",
+          "r5",
+          "r6"
+        ]
+      },
+      "set": "learn",
+      "sql_calls": 6,
+      "task": "M3-L1"
+    },
+    {
+      "agent": "A",
+      "answer": "23.76",
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 7,
+          "m2": 7,
+          "year": 2000
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            4,
+            948.0840000000003
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            13.809999999999988
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 961.894000000002,
+        "queries": 9
+      },
+      "defined": true,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 284.899,
+        "fact_scan_loops": 56039.0,
+        "fact_scan_nodes": 5.0,
+        "shared_hit": 216183.0,
+        "shared_read": 0.0,
+        "sql": 3
+      },
+      "gold": "23.7637966785249009",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "learn",
+      "phrasing": "named",
+      "question": "2000 年 7 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "23.76",
+        "clarification": null,
+        "derivation": "r3 / r4 * 100",
+        "input_tokens": 28777,
+        "notices": 0,
+        "output_tokens": 6460,
+        "rejections": 0,
+        "seconds": 31.197342567,
+        "sql": "SELECT ROUND(SUM(COALESCE(r.sr_return_amt,0)) / SUM(s.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns r ON r.sr_ticket_number = s.ss_ticket_number AND r.sr_item_sk = s.ss_item_sk\nWHERE d.d_year = 2000 AND d.d_moy = 7",
+        "steps": 7,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r2",
+          "r3",
+          "r4"
+        ]
+      },
+      "set": "learn",
+      "sql_calls": 4,
+      "task": "M3-L2"
+    },
+    {
+      "agent": "B",
+      "answer": "14137928.00",
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 9,
+          "m2": 9,
+          "year": 2002
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            6,
+            58.685999999999694
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            10,
+            26.637
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            2,
+            87.17799999999997
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 172.50099999999838,
+        "queries": 18
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 27.009,
+        "fact_scan_loops": 30.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 5536.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "13069651.80",
+      "metric": "M1",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "wrong",
+      "phase": "holdout",
+      "phrasing": "named",
+      "question": "2002 年 9 月的门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "14137928.00",
+        "clarification": null,
+        "derivation": "r6",
+        "input_tokens": 150608,
+        "notices": 0,
+        "output_tokens": 49297,
+        "rejections": 0,
+        "seconds": 283.003174025,
+        "sql": "SELECT round(sum(ss_ext_sales_price), 2) AS store_revenue_2002_09\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "steps": 11,
+        "tool_calls": 14,
+        "tool_errors": 0,
+        "used": [
+          "r6"
+        ]
+      },
+      "set": "param",
+      "sql_calls": 6,
+      "task": "M1-P1"
+    },
+    {
+      "agent": "B",
+      "answer": "-24777.00",
+      "ask": {
+        "a": {
+          "m1": 9,
+          "m2": 9,
+          "year": 2002
+        },
+        "b": {
+          "m1": 6,
+          "m2": 6,
+          "year": 2001
+        },
+        "kind": "diff"
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            18,
+            186.17299999999977
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            14,
+            38.85300000000001
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 225.02599999999984,
+        "queries": 32
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 45.128,
+        "fact_scan_loops": 60.0,
+        "fact_scan_nodes": 2.0,
+        "shared_hit": 11071.0,
+        "shared_read": 0.0,
+        "sql": 2
+      },
+      "gold": "-12007.70",
+      "metric": "M1",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "wrong",
+      "phase": "holdout",
+      "phrasing": "named",
+      "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+      "rejections": [
+        {
+          "metrics": [],
+          "reason": "关联 store_returns⋈store_sales 按 (sr_ticket_number=ss_ticket_number) 不可靠：两侧键都不唯一（多对多，会膨胀）。store_sales(ss_ticket_number) 是否唯一：1000000 行只有 200000 个不同键（平均每键 5.00 行）",
+          "sql": "SELECT SUM(ss.ss_net_paid) FROM store_sales ss LEFT JOIN store_returns sr ON ss.ss_ticket_number = sr.sr_ticket_number"
+        }
+      ],
+      "repeat": 1,
+      "run": {
+        "answer": "-24777.00",
+        "clarification": null,
+        "derivation": "r15 - r16",
+        "input_tokens": 341360,
+        "notices": 0,
+        "output_tokens": 38260,
+        "rejections": 1,
+        "seconds": 194.78995967,
+        "sql": "SELECT\n  round(sum(CASE WHEN d.d_year = 2002 AND d.d_moy = 9 THEN ss.ss_ext_sales_price END), 2) -\n  round(sum(CASE WHEN d.d_year = 2001 AND d.d_moy = 6 THEN ss.ss_ext_sales_price END), 2) AS revenue_diff\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6);",
+        "steps": 17,
+        "tool_calls": 28,
+        "tool_errors": 2,
+        "used": [
+          "r15",
+          "r16"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 17,
+      "task": "M1-T1"
+    },
+    {
+      "agent": "B",
+      "answer": "12",
+      "ask": {
+        "kind": "rank_month",
+        "year": 2002
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            3,
+            421.8010000000004
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            19.158999999999992
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 440.9599999999991,
+        "queries": 9
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 309.164,
+        "fact_scan_loops": 8.0,
+        "fact_scan_nodes": 2.0,
+        "shared_hit": 20101.0,
+        "shared_read": 0.0,
+        "sql": 2
+      },
+      "gold": "12",
+      "metric": "M1",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "holdout",
+      "phrasing": "named",
+      "question": "2002 年哪个月的门店营业额最高？只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "12",
+        "clarification": null,
+        "derivation": "r3",
+        "input_tokens": 34426,
+        "notices": 0,
+        "output_tokens": 8774,
+        "rejections": 0,
+        "seconds": 42.338939611,
+        "sql": "WITH agg AS (\n  SELECT d.d_moy AS m,\n         SUM(ss.ss_ext_sales_price) AS ext,\n         SUM(ss.ss_net_paid) AS np,\n         SUM(ss.ss_net_paid_inc_tax) AS npt\n  FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 GROUP BY 1\n)\nSELECT 'max_ext_sales' AS metric, (SELECT m FROM agg ORDER BY ext DESC LIMIT 1) AS top_month\nUNION ALL\nSELECT 'max_net_paid', (SELECT m FROM agg ORDER BY np DESC LIMIT 1)\nUNION ALL\nSELECT 'max_net_paid_inc_tax', (SELECT m FROM agg ORDER BY npt DESC LIMIT 1);",
+        "steps": 8,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r3"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 3,
+      "task": "M1-T2"
+    },
+    {
+      "agent": "B",
+      "answer": "3294349.93",
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 5,
+          "m2": 5,
+          "year": 2002
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            11.33600000000024
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            7.846000000000004
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 19.1820000000007,
+        "queries": 4
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 13.187,
+        "fact_scan_loops": 31.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 5914.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "3294349.93",
+      "metric": "M2",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "holdout",
+      "phrasing": "named",
+      "question": "2002 年 5 月的门店退货金额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "3294349.93",
+        "clarification": null,
+        "derivation": "r1",
+        "input_tokens": 10747,
+        "notices": 0,
+        "output_tokens": 1252,
+        "rejections": 0,
+        "seconds": 7.555928788,
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "steps": 5,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "set": "param",
+      "sql_calls": 1,
+      "task": "M2-P1"
+    },
+    {
+      "agent": "B",
+      "answer": "-212139.52",
+      "ask": {
+        "a": {
+          "m1": 3,
+          "m2": 3,
+          "year": 2002
+        },
+        "b": {
+          "m1": 3,
+          "m2": 3,
+          "year": 2001
+        },
+        "kind": "diff"
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            46.95399999999972
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            11.442000000000007
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 58.39600000000064,
+        "queries": 6
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 25.314,
+        "fact_scan_loops": 62.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 11464.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "-212139.52",
+      "metric": "M2",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "holdout",
+      "phrasing": "named",
+      "question": "2002 年 3 月的门店退货金额比2001 年 3 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "-212139.52",
+        "clarification": null,
+        "derivation": "r2",
+        "input_tokens": 13732,
+        "notices": 0,
+        "output_tokens": 2487,
+        "rejections": 0,
+        "seconds": 12.356503164,
+        "sql": "SELECT SUM(CASE WHEN d.d_year = 2002 THEN sr.sr_return_amt ELSE 0 END)\n     - SUM(CASE WHEN d.d_year = 2001 THEN sr.sr_return_amt ELSE 0 END) AS diff\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_moy = 3 AND d.d_year IN (2001, 2002)",
+        "steps": 6,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 2,
+      "task": "M2-T1"
+    },
+    {
+      "agent": "B",
+      "answer": "7",
+      "ask": {
+        "kind": "rank_month",
+        "year": 2001
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            146.10099999999966
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            11.36699999999999
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 157.46800000000076,
+        "queries": 6
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 99.939,
+        "fact_scan_loops": 3.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 3696.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "7",
+      "metric": "M2",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "holdout",
+      "phrasing": "named",
+      "question": "2001 年哪个月的门店退货金额最高？只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "7",
+        "clarification": null,
+        "derivation": "r1",
+        "input_tokens": 13918,
+        "notices": 0,
+        "output_tokens": 1326,
+        "rejections": 0,
+        "seconds": 8.079801724,
+        "sql": "SELECT d.d_moy AS month, SUM(sr.sr_return_amt) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\nGROUP BY d.d_moy\nORDER BY total_return_amt DESC",
+        "steps": 6,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 2,
+      "task": "M2-T2"
+    },
+    {
+      "agent": "B",
+      "answer": null,
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 9,
+          "m2": 9,
+          "year": 2002
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            4,
+            8457.61
+          ],
+          "exec": [
+            22,
+            4468.406
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            23,
+            64.76200000000003
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 12990.777999999998,
+        "queries": 49
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 510.705,
+        "fact_scan_loops": 8.0,
+        "fact_scan_nodes": 2.0,
+        "shared_hit": 13710.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "23.8079848462374491",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "wrong",
+      "phase": "holdout",
+      "phrasing": "named",
+      "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": null,
+        "clarification": null,
+        "derivation": null,
+        "input_tokens": 294820,
+        "notices": 0,
+        "output_tokens": 31932,
+        "rejections": 0,
+        "seconds": 162.986240056,
+        "sql": null,
+        "steps": 20,
+        "tool_calls": 29,
+        "tool_errors": 0,
+        "used": []
+      },
+      "set": "param",
+      "sql_calls": 22,
+      "task": "M3-P1"
+    },
+    {
+      "agent": "B",
+      "answer": "0.18",
+      "ask": {
+        "a": {
+          "m1": 6,
+          "m2": 6,
+          "year": 2002
+        },
+        "b": {
+          "m1": 6,
+          "m2": 6,
+          "year": 2001
+        },
+        "kind": "diff"
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            24,
+            2352.7620000000006
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            19,
+            56.72099999999995
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 2409.483,
+        "queries": 43
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 64.01400000000001,
+        "fact_scan_loops": 120.0,
+        "fact_scan_nodes": 4.0,
+        "shared_hit": 22219.0,
+        "shared_read": 0.0,
+        "sql": 2
+      },
+      "gold": "0.0099219903410416",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "wrong",
+      "phase": "holdout",
+      "phrasing": "named",
+      "question": "2002 年 6 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "0.18",
+        "clarification": null,
+        "derivation": "r22 - r23",
+        "input_tokens": 612355,
+        "notices": 0,
+        "output_tokens": 97392,
+        "rejections": 0,
+        "seconds": 461.140607005,
+        "sql": "-- 2002年6月门店退货率（退货数量/销售数量）\nSELECT ROUND(100.0 * (\n  (SELECT SUM(sr_return_quantity)::numeric FROM store_returns r JOIN date_dim d ON r.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 6)\n  / (SELECT SUM(ss_quantity)::numeric FROM store_sales s JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 6)\n), 4) AS rate_2002_pct;  -- 40.1734\n\n-- 2001年6月门店退货率\nSELECT ROUND(100.0 * (\n  (SELECT SUM(sr_return_quantity)::numeric FROM store_returns r JOIN date_dim d ON r.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2001 AND d.d_moy = 6)\n  / (SELECT SUM(ss_quantity)::numeric FROM store_sales s JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2001 AND d.d_moy = 6)\n), 4) AS rate_2001_pct;  -- 39.9939\n\n-- 差值: 40.1734 - 39.9939 = 0.1795 ≈ 0.18 个百分点",
+        "steps": 18,
+        "tool_calls": 34,
+        "tool_errors": 2,
+        "used": [
+          "r22",
+          "r23"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 23,
+      "task": "M3-T1"
+    },
+    {
+      "agent": "B",
+      "answer": "7",
+      "ask": {
+        "kind": "rank_month",
+        "year": 2001
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            5,
+            874.5339999999997
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            7,
+            20.027000000000044
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 894.5610000000015,
+        "queries": 12
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 231.927,
+        "fact_scan_loops": 7.0,
+        "fact_scan_nodes": 2.0,
+        "shared_hit": 13745.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "7",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "holdout",
+      "phrasing": "named",
+      "question": "2001 年哪个月的门店退货率最高？只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "7",
+        "clarification": null,
+        "derivation": "r5",
+        "input_tokens": 42827,
+        "notices": 0,
+        "output_tokens": 8363,
+        "rejections": 0,
+        "seconds": 38.915414594,
+        "sql": "WITH ret AS (\n  SELECT d.d_moy, sum(sr.sr_return_quantity) AS ret_qty, sum(sr.sr_return_amt) AS ret_amt\n  FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 GROUP BY d.d_moy\n), sal AS (\n  SELECT d.d_moy, sum(ss.ss_quantity) AS sale_qty, sum(ss.ss_ext_sales_price) AS sale_amt\n  FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 GROUP BY d.d_moy\n)\nSELECT r.d_moy,\n       round(r.ret_qty::numeric / s.sale_qty, 5) AS qty_rate,\n       round(r.ret_amt / s.sale_amt, 5) AS amt_rate\nFROM ret r JOIN sal s USING (d_moy)\nORDER BY qty_rate DESC;",
+        "steps": 8,
+        "tool_calls": 13,
+        "tool_errors": 0,
+        "used": [
+          "r5"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 5,
+      "task": "M3-T2"
+    },
+    {
+      "agent": "B",
+      "answer": null,
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 9,
+          "m2": 9,
+          "year": 2002
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            2,
+            129.5709999999999
+          ],
+          "exec": [
+            10,
+            433.1910000000007
+          ],
+          "guard": [
+            2,
+            7307.823
+          ],
+          "meta": [
+            14,
+            39.53199999999998
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            116.74900000000002
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 8026.866000000002,
+        "queries": 32
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 38.868,
+        "fact_scan_loops": 30.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 5858.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "26139303.60",
+      "metric": "M1",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "clarify",
+      "phase": "growth",
+      "phrasing": "named",
+      "question": "2002 年 9 月的门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": null,
+        "clarification": "“门店营业额”的口径需要确认：数据中金额列有三种口径且数值差异较大——①销售额（数量×单价，未扣折扣）②净支付额（销售额−折扣，不含税）③含税净支付额。请问按哪一种统计？另外，是否需要扣除 2002 年 9 月的门店退货金额？确认后我可以立即给出准确数值。",
+        "derivation": null,
+        "input_tokens": 162622,
+        "notices": 0,
+        "output_tokens": 48665,
+        "rejections": 0,
+        "seconds": 271.627014764,
+        "sql": null,
+        "steps": 12,
+        "tool_calls": 21,
+        "tool_errors": 2,
+        "used": []
+      },
+      "set": "param",
+      "sql_calls": 10,
+      "task": "M1-P1"
+    },
+    {
+      "agent": "B",
+      "answer": null,
+      "ask": {
+        "a": {
+          "m1": 9,
+          "m2": 9,
+          "year": 2002
+        },
+        "b": {
+          "m1": 6,
+          "m2": 6,
+          "year": 2001
+        },
+        "kind": "diff"
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            36,
+            6926.817000000001
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            25,
+            69.73399999999998
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 6996.5509999999995,
+        "queries": 61
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 0.376,
+        "fact_scan_loops": 0.0,
+        "fact_scan_nodes": 0.0,
+        "shared_hit": 20.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "13057644.10",
+      "metric": "M1",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "wrong",
+      "phase": "growth",
+      "phrasing": "named",
+      "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": null,
+        "clarification": null,
+        "derivation": null,
+        "input_tokens": 502377,
+        "notices": 0,
+        "output_tokens": 69317,
+        "rejections": 0,
+        "seconds": 349.392757543,
+        "sql": null,
+        "steps": 20,
+        "tool_calls": 45,
+        "tool_errors": 2,
+        "used": []
+      },
+      "set": "type",
+      "sql_calls": 36,
+      "task": "M1-T1"
+    },
+    {
+      "agent": "B",
+      "answer": "9",
+      "ask": {
+        "kind": "rank_month",
+        "year": 2002
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            4,
+            1894.8729999999996
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            21.02600000000001
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 1915.899000000005,
+        "queries": 10
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 156.684,
+        "fact_scan_loops": 4.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 10319.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "9",
+      "metric": "M1",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "growth",
+      "phrasing": "named",
+      "question": "2002 年哪个月的门店营业额最高？只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "9",
+        "clarification": null,
+        "derivation": "r1",
+        "input_tokens": 29039,
+        "notices": 0,
+        "output_tokens": 3720,
+        "rejections": 0,
+        "seconds": 21.489145072,
+        "sql": "SELECT d.d_moy,\n       SUM(ss.ss_ext_sales_price) AS gross_sales,\n       SUM(ss.ss_net_paid) AS net_paid,\n       SUM(ss.ss_net_paid_inc_tax) AS net_paid_tax\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY gross_sales DESC",
+        "steps": 8,
+        "tool_calls": 11,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 4,
+      "task": "M1-T2"
+    },
+    {
+      "agent": "B",
+      "answer": null,
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 9,
+          "m2": 9,
+          "year": 2002
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            34,
+            5210.642
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            22,
+            69.40100000000001
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 5280.042999999991,
+        "queries": 56
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 254.413,
+        "fact_scan_loops": 1.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 3661.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "11.9039924231187246",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "wrong",
+      "phase": "growth",
+      "phrasing": "named",
+      "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": null,
+        "clarification": null,
+        "derivation": null,
+        "input_tokens": 553257,
+        "notices": 0,
+        "output_tokens": 70639,
+        "rejections": 0,
+        "seconds": 326.364871351,
+        "sql": null,
+        "steps": 20,
+        "tool_calls": 43,
+        "tool_errors": 0,
+        "used": []
+      },
+      "set": "param",
+      "sql_calls": 34,
+      "task": "M3-P1"
+    },
+    {
+      "agent": "B",
+      "answer": null,
+      "ask": {
+        "a": {
+          "m1": 6,
+          "m2": 6,
+          "year": 2002
+        },
+        "b": {
+          "m1": 6,
+          "m2": 6,
+          "year": 2001
+        },
+        "kind": "diff"
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            25,
+            2085.7239999999983
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            18,
+            53.833999999999946
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 2139.5580000000045,
+        "queries": 43
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 56.089,
+        "fact_scan_loops": 31.0,
+        "fact_scan_nodes": 2.0,
+        "shared_hit": 141.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "0.0099219903410416",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "wrong",
+      "phase": "growth",
+      "phrasing": "named",
+      "question": "2002 年 6 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": null,
+        "clarification": null,
+        "derivation": null,
+        "input_tokens": 532234,
+        "notices": 0,
+        "output_tokens": 59707,
+        "rejections": 0,
+        "seconds": 282.581750937,
+        "sql": null,
+        "steps": 20,
+        "tool_calls": 34,
+        "tool_errors": 4,
+        "used": []
+      },
+      "set": "type",
+      "sql_calls": 23,
+      "task": "M3-T1"
+    },
+    {
+      "agent": "B",
+      "answer": "7",
+      "ask": {
+        "kind": "rank_month",
+        "year": 2001
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            7,
+            1576.9279999999999
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            7,
+            19.540000000000077
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 1596.4679999999935,
+        "queries": 14
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 211.483,
+        "fact_scan_loops": 7.0,
+        "fact_scan_nodes": 2.0,
+        "shared_hit": 14015.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "7",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "growth",
+      "phrasing": "named",
+      "question": "2001 年哪个月的门店退货率最高？只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 1,
+      "run": {
+        "answer": "7",
+        "clarification": null,
+        "derivation": "r7",
+        "input_tokens": 35665,
+        "notices": 0,
+        "output_tokens": 6782,
+        "rejections": 0,
+        "seconds": 31.804570498,
+        "sql": "WITH s AS (\n  SELECT d.d_moy AS m, SUM(ss_quantity) AS q, SUM(ss_ext_sales_price) AS amt, COUNT(*) AS lines\n  FROM store_sales s JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 GROUP BY d.d_moy),\nr AS (\n  SELECT d.d_moy AS m, SUM(sr_return_quantity) AS q, SUM(sr_return_amt) AS amt, COUNT(*) AS lines\n  FROM store_returns r JOIN date_dim d ON r.sr_returned_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 GROUP BY d.d_moy)\nSELECT s.m AS month,\n       ROUND(r.q::numeric / s.q, 6) AS qty_return_rate,\n       ROUND(r.amt / s.amt, 6) AS amt_return_rate,\n       ROUND(r.lines::numeric / s.lines, 6) AS line_return_rate\nFROM s JOIN r ON s.m = r.m\nORDER BY qty_return_rate DESC;",
+        "steps": 7,
+        "tool_calls": 13,
+        "tool_errors": 0,
+        "used": [
+          "r7"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 7,
+      "task": "M3-T2"
+    },
+    {
+      "agent": "B",
+      "answer": "3294349.93",
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 5,
+          "m2": 5,
+          "year": 2002
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            6,
+            4614.790999999999
+          ],
+          "exec": [
+            15,
+            15212.481
+          ],
+          "guard": [
+            1,
+            474.6970000000001
+          ],
+          "meta": [
+            22,
+            56.374000000000024
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            2,
+            104.46300000000002
+          ],
+          "repair": [
+            4,
+            7311.465
+          ]
+        },
+        "ms": 27774.271000000008,
+        "queries": 50
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 28.661,
+        "fact_scan_loops": 31.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 11753.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "3294349.93",
+      "metric": "M2",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "v2",
+      "phrasing": "named",
+      "question": "2002 年 5 月的门店退货金额是多少？保留两位小数。",
+      "rejections": [
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT SUM(x.sr_return_amt) AS dedup_sum\nFROM (SELECT DISTINCT sr_returned_date_sk, sr_ticket_number, sr_item_sk, sr_return_quantity, sr_return_amt, sr_return_tax, sr_fee, sr_net_loss FROM store_returns) x\nJOIN date_dim d ON x.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5"
+        }
+      ],
+      "repeat": 1,
+      "run": {
+        "answer": "3294349.93",
+        "clarification": null,
+        "derivation": "r15",
+        "input_tokens": 132350,
+        "notices": 1,
+        "output_tokens": 24900,
+        "rejections": 1,
+        "seconds": 137.693417027,
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE sr.sr_status = '完成'\n  AND d.d_year = 2002\n  AND d.d_moy = 5;",
+        "steps": 13,
+        "tool_calls": 22,
+        "tool_errors": 0,
+        "used": [
+          "r15"
+        ]
+      },
+      "set": "param",
+      "sql_calls": 15,
+      "task": "M2-P1"
+    },
+    {
+      "agent": "B",
+      "answer": "-212139.52",
+      "ask": {
+        "a": {
+          "m1": 3,
+          "m2": 3,
+          "year": 2002
+        },
+        "b": {
+          "m1": 3,
+          "m2": 3,
+          "year": 2001
+        },
+        "kind": "diff"
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            70.74300000000221
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            13.752999999999929
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 84.49599999999919,
+        "queries": 7
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 38.085,
+        "fact_scan_loops": 62.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 16951.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "-212139.52",
+      "metric": "M2",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "v2",
+      "phrasing": "named",
+      "question": "2002 年 3 月的门店退货金额比2001 年 3 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+      "rejections": [
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT d.d_year, d.d_moy, r.sr_status, SUM(r.sr_return_amt) AS amt, COUNT(*) AS cnt\nFROM store_returns r\nJOIN date_dim d ON r.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year IN (2001, 2002) AND d.d_moy = 3\nGROUP BY d.d_year, d.d_moy, r.sr_status\nORDER BY d.d_year, r.sr_status"
+        }
+      ],
+      "repeat": 1,
+      "run": {
+        "answer": "-212139.52",
+        "clarification": null,
+        "derivation": "r2",
+        "input_tokens": 18033,
+        "notices": 0,
+        "output_tokens": 2327,
+        "rejections": 1,
+        "seconds": 11.589788022,
+        "sql": "SELECT\n  SUM(CASE WHEN d.d_year = 2002 THEN r.sr_return_amt END) -\n  SUM(CASE WHEN d.d_year = 2001 THEN r.sr_return_amt END) AS diff\nFROM store_returns r\nJOIN date_dim d ON r.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year IN (2001, 2002) AND d.d_moy = 3 AND r.sr_status = '完成';",
+        "steps": 7,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 2,
+      "task": "M2-T1"
+    },
+    {
+      "agent": "B",
+      "answer": "7",
+      "ask": {
+        "kind": "rank_month",
+        "year": 2001
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            106.67599999999948
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            11.841000000000008
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 118.51699999999255,
+        "queries": 5
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 112.163,
+        "fact_scan_loops": 3.0,
+        "fact_scan_nodes": 1.0,
+        "shared_hit": 5442.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "7",
+      "metric": "M2",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "v2",
+      "phrasing": "named",
+      "question": "2001 年哪个月的门店退货金额最高？只回答月份数字（1–12）。",
+      "rejections": [
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT d.d_moy AS month, SUM(sr.sr_return_amt) AS total_amt, COUNT(*) AS n_rows\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\nGROUP BY d.d_moy\nORDER BY total_amt DESC"
+        },
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT d.d_moy AS month, sr.sr_status, SUM(sr.sr_return_amt) AS total_amt, COUNT(*) AS n_rows\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\nGROUP BY d.d_moy, sr.sr_status\nORDER BY d.d_moy, sr.sr_status"
+        }
+      ],
+      "repeat": 1,
+      "run": {
+        "answer": "7",
+        "clarification": null,
+        "derivation": "r1",
+        "input_tokens": 14271,
+        "notices": 0,
+        "output_tokens": 1902,
+        "rejections": 2,
+        "seconds": 10.004603752,
+        "sql": "SELECT d.d_moy AS month, SUM(sr.sr_return_amt) AS total_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND sr.sr_status = '完成'\nGROUP BY d.d_moy\nORDER BY total_amt DESC;",
+        "steps": 6,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 1,
+      "task": "M2-T2"
+    },
+    {
+      "agent": "B",
+      "answer": null,
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 9,
+          "m2": 9,
+          "year": 2002
+        }
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            24,
+            3792.3009999999995
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            20,
+            58.940000000000055
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 3851.241000000009,
+        "queries": 44
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 0.797,
+        "fact_scan_loops": 0.0,
+        "fact_scan_nodes": 0.0,
+        "shared_hit": 77.0,
+        "shared_read": 0.0,
+        "sql": 1
+      },
+      "gold": "11.9039924231187246",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "wrong",
+      "phase": "v2",
+      "phrasing": "named",
+      "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+      "rejections": [
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT d.d_year, d.d_moy, sr.sr_status, COUNT(*) AS cnt, SUM(sr.sr_return_amt) AS return_amt, SUM(sr.sr_return_quantity) AS return_qty\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9\nGROUP BY d.d_year, d.d_moy, sr.sr_status\nORDER BY sr.sr_status"
+        },
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT sr_status, COUNT(*) AS rows, COUNT(DISTINCT (sr_ticket_number, sr_item_sk)) AS keys\nFROM store_returns GROUP BY sr_status ORDER BY sr_status"
+        },
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT sr_ticket_number, sr_item_sk, sr_status, sr_returned_date_sk, sr_return_amt, sr_return_quantity\nFROM store_returns\nWHERE (sr_ticket_number, sr_item_sk) IN (\n  SELECT sr_ticket_number, sr_item_sk FROM store_returns GROUP BY 1,2 HAVING COUNT(*) > 1 LIMIT 3\n)\nORDER BY sr_ticket_number, sr_item_sk, sr_status"
+        }
+      ],
+      "repeat": 1,
+      "run": {
+        "answer": null,
+        "clarification": null,
+        "derivation": null,
+        "input_tokens": 339995,
+        "notices": 0,
+        "output_tokens": 45729,
+        "rejections": 3,
+        "seconds": 206.784526844,
+        "sql": null,
+        "steps": 20,
+        "tool_calls": 37,
+        "tool_errors": 1,
+        "used": []
+      },
+      "set": "param",
+      "sql_calls": 26,
+      "task": "M3-P1"
+    },
+    {
+      "agent": "B",
+      "answer": "0.06",
+      "ask": {
+        "a": {
+          "m1": 6,
+          "m2": 6,
+          "year": 2002
+        },
+        "b": {
+          "m1": 6,
+          "m2": 6,
+          "year": 2001
+        },
+        "kind": "diff"
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            2,
+            320.1810000000005
+          ],
+          "exec": [
+            17,
+            1900.6920000000027
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            16,
+            49.85399999999993
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 2270.726999999999,
+        "queries": 35
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 80.652,
+        "fact_scan_loops": 120.0,
+        "fact_scan_nodes": 4.0,
+        "shared_hit": 27723.0,
+        "shared_read": 0.0,
+        "sql": 2
+      },
+      "gold": "0.0099219903410416",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "wrong",
+      "phase": "v2",
+      "phrasing": "named",
+      "question": "2002 年 6 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+      "rejections": [
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT d.d_year, d.d_moy, sr.sr_status,\n       COUNT(*) AS ret_rows,\n       SUM(sr.sr_return_quantity) AS ret_qty,\n       SUM(sr.sr_return_amt) AS ret_amt,\n       SUM(sr.sr_net_loss) AS ret_net_loss\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE (d.d_year = 2001 AND d.d_moy = 6) OR (d.d_year = 2002 AND d.d_moy = 6)\nGROUP BY d.d_year, d.d_moy, sr.sr_status\nORDER BY d.d_year, sr.sr_status"
+        },
+        {
+          "metrics": [],
+          "reason": "关联 store_returns⋈store_sales 按 (sr_return_quantity=ss_quantity) 不可靠：两侧键都不唯一（多对多，会膨胀）。store_sales(ss_quantity) 是否唯一：1027095 行只有 9 个不同键（平均每键 114121.67 行）",
+          "sql": "SELECT\n  COUNT(*) AS pairs,\n  SUM(CASE WHEN ss.ss_quantity = sr.sr_return_quantity THEN 1 ELSE 0 END) AS same_qty,\n  SUM(CASE WHEN ss.ss_ext_sales_price = sr.sr_return_amt THEN 1 ELSE 0 END) AS same_amt_as_ext,\n  SUM(CASE WHEN ss.ss_net_paid = sr.sr_return_amt THEN 1 ELSE 0 END) AS same_amt_as_net\nFROM store_sales ss\nJOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE sr.sr_status = '完成'"
+        },
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT sr_status, COUNT(*) AS rows, COUNT(DISTINCT (sr_ticket_number, sr_item_sk)) AS keys\nFROM store_returns\nGROUP BY sr_status"
+        }
+      ],
+      "repeat": 1,
+      "run": {
+        "answer": "0.06",
+        "clarification": null,
+        "derivation": "r16 - r17",
+        "input_tokens": 430512,
+        "notices": 0,
+        "output_tokens": 79778,
+        "rejections": 3,
+        "seconds": 391.792638709,
+        "sql": "WITH s2002 AS (\n  SELECT SUM(ss.ss_ext_sales_price) AS ext\n  FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 6\n), r2002 AS (\n  SELECT SUM(sr.sr_return_amt) AS amt\n  FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 6 AND sr.sr_status = '完成'\n), s2001 AS (\n  SELECT SUM(ss.ss_ext_sales_price) AS ext\n  FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 6\n), r2001 AS (\n  SELECT SUM(sr.sr_return_amt) AS amt\n  FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 6 AND sr.sr_status = '完成'\n)\nSELECT ROUND((r2002.amt / s2002.ext - r2001.amt / s2001.ext) * 100, 2) AS diff_pp\nFROM r2002, s2002, r2001, s2001;",
+        "steps": 17,
+        "tool_calls": 29,
+        "tool_errors": 0,
+        "used": [
+          "r16",
+          "r17"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 17,
+      "task": "M3-T1"
+    },
+    {
+      "agent": "B",
+      "answer": "7",
+      "ask": {
+        "kind": "rank_month",
+        "year": 2001
+      },
+      "cell": "r1-middle-named",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            4,
+            1104.2049999999945
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            16.418999999999983
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 1120.6239999999962,
+        "queries": 10
+      },
+      "defined": false,
+      "error": null,
+      "explain": {
+        "errors": 0,
+        "exec_ms": 1321.307,
+        "fact_scan_loops": 373.0,
+        "fact_scan_nodes": 4.0,
+        "shared_hit": 88438.0,
+        "shared_read": 0.0,
+        "sql": 3
+      },
+      "gold": "7",
+      "metric": "M3",
+      "metric_use": {
+        "bad_declared": 0,
+        "bad_executed": 0,
+        "bad_found": 0,
+        "declared": [],
+        "finds": 0,
+        "found": [],
+        "repaired_found": 0
+      },
+      "mode": "middle",
+      "outcome": "correct",
+      "phase": "v2",
+      "phrasing": "named",
+      "question": "2001 年哪个月的门店退货率最高？只回答月份数字（1–12）。",
+      "rejections": [
+        {
+          "metrics": [],
+          "reason": "表 store_returns 现在每个键有多行（状态流水）；统计前需要加过滤 sr_status = '完成'，否则会重复计算",
+          "sql": "SELECT sr_status, count(*) AS cnt, sum(sr_return_amt) AS amt, sum(sr_return_quantity) AS qty FROM store_returns GROUP BY 1"
+        }
+      ],
+      "repeat": 1,
+      "run": {
+        "answer": "7",
+        "clarification": null,
+        "derivation": "r2 / r3（逐月退货与销售之比；r4 为同口径逐月比值，四种口径均在 7 月最大）",
+        "input_tokens": 32872,
+        "notices": 0,
+        "output_tokens": 12219,
+        "rejections": 1,
+        "seconds": 53.336037695,
+        "sql": "SELECT r.moy, r.ret_amt / s.sales_amt AS rate_amt, r.ret_qty::numeric / s.sales_qty AS rate_qty\nFROM (SELECT d.d_moy AS moy, sum(sr.sr_return_amt) AS ret_amt, sum(sr.sr_return_quantity) AS ret_qty\n      FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\n      WHERE sr.sr_status = '完成' AND d.d_year = 2001 GROUP BY 1) r\nJOIN (SELECT d.d_moy AS moy, sum(ss.ss_ext_sales_price) AS sales_amt, sum(ss.ss_quantity) AS sales_qty\n      FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n      WHERE d.d_year = 2001 GROUP BY 1) s ON r.moy = s.moy\nORDER BY 1",
+        "steps": 7,
+        "tool_calls": 13,
+        "tool_errors": 0,
+        "used": [
+          "r2",
+          "r3",
+          "r4"
+        ]
+      },
+      "set": "type",
+      "sql_calls": 4,
+      "task": "M3-T2"
+    }
+  ],
+  "relearning": [],
+  "repeat": 1,
+  "seconds": 3423.347727805,
+  "stats": {
+    "db": {
+      "by_kind": {
+        "check": [
+          27,
+          17545.086
+        ],
+        "exec": [
+          278,
+          53036.469
+        ],
+        "guard": [
+          3,
+          7782.52
+        ],
+        "meta": [
+          290,
+          841.305
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          15,
+          478.492
+        ],
+        "repair": [
+          4,
+          7311.465
+        ]
+      },
+      "db_ms": 86995.337,
+      "queries": 617
+    },
+    "entries": 309,
+    "feedback": {
+      "adaptive": {
+        "adopted": false,
+        "at": 1,
+        "evidence": {
+          "baseline_ms": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "episodes": 0,
+          "mean_delta_ms": 0.0,
+          "policy_ms": 0.0
+        }
+      },
+      "adaptive_uses": 0,
+      "contexts": {
+        "KeyUnique|date_dim(d_date_sk)": {
+          "fails": 0,
+          "hits": 2,
+          "mrows": 0.001096,
+          "ms": 1.167739,
+          "runs": 1
+        },
+        "KeyUnique|store_returns(sr_return_quantity)": {
+          "fails": 1,
+          "hits": 0,
+          "mrows": 0.395878,
+          "ms": 124.34844100000001,
+          "runs": 1
+        },
+        "KeyUnique|store_returns(sr_returned_date_sk,sr_ticket_number,sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 1.583512,
+          "ms": 4517.756735999999,
+          "runs": 2
+        },
+        "KeyUnique|store_returns(sr_ticket_number)": {
+          "fails": 1,
+          "hits": 0,
+          "mrows": 0.395878,
+          "ms": 113.705693,
+          "runs": 1
+        },
+        "KeyUnique|store_returns(sr_ticket_number,sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 1.187634,
+          "ms": 3072.7743760000003,
+          "runs": 2
+        },
+        "KeyUnique|store_sales(ss_quantity)": {
+          "fails": 1,
+          "hits": 0,
+          "mrows": 1.0,
+          "ms": 195.868652,
+          "runs": 1
+        },
+        "KeyUnique|store_sales(ss_sold_date_sk,ss_ticket_number,ss_item_sk)": {
+          "fails": 0,
+          "hits": 1,
+          "mrows": 2.0,
+          "ms": 5880.4868719999995,
+          "runs": 1
+        },
+        "KeyUnique|store_sales(ss_ticket_number)": {
+          "fails": 1,
+          "hits": 0,
+          "mrows": 1.0,
+          "ms": 302.85900599999997,
+          "runs": 1
+        },
+        "KeyUnique|store_sales(ss_ticket_number,ss_item_sk)": {
+          "fails": 0,
+          "hits": 1,
+          "mrows": 1.5,
+          "ms": 1277.799487,
+          "runs": 1
+        },
+        "RowConservation|catalog_sales>date_dim:(cs_sold_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 1.001096,
+          "ms": 126.548928,
+          "runs": 1
+        },
+        "RowConservation|store_returns>date_dim:(sr_returned_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.792852,
+          "ms": 75.425446,
+          "runs": 1
+        },
+        "RowConservation|store_returns>store_sales:(sr_ticket_number=ss_ticket_number)": {
+          "fails": 1,
+          "hits": 0,
+          "mrows": 1.791756,
+          "ms": 290.073128,
+          "runs": 1
+        },
+        "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 2.001096,
+          "ms": 128.48816,
+          "runs": 1
+        },
+        "RowConservation|store_sales>store_returns:(ss_sold_date_sk=sr_returned_date_sk, ss_ticket_number=sr_ticket_number, ss_item_sk=sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 4.791756,
+          "ms": 740.319661,
+          "runs": 2
+        },
+        "RowConservation|store_sales>store_returns:(ss_ticket_number=sr_ticket_number, ss_item_sk=sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 4.791756,
+          "ms": 671.628148,
+          "runs": 2
+        },
+        "SampleFanout|catalog_sales>date_dim:(cs_sold_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.001096,
+          "ms": 3.050221,
+          "runs": 1
+        },
+        "SampleFanout|store_returns>date_dim:(sr_returned_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.001096,
+          "ms": 2.30933,
+          "runs": 1
+        },
+        "SampleFanout|store_returns>store_sales:(sr_ticket_number=ss_ticket_number)": {
+          "fails": 1,
+          "hits": 0,
+          "mrows": 1.0,
+          "ms": 3.409974,
+          "runs": 1
+        },
+        "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.001096,
+          "ms": 3.811632,
+          "runs": 1
+        },
+        "SampleFanout|store_sales>store_returns:(ss_sold_date_sk=sr_returned_date_sk, ss_ticket_number=sr_ticket_number, ss_item_sk=sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.791756,
+          "ms": 6.6111830000000005,
+          "runs": 2
+        },
+        "SampleFanout|store_sales>store_returns:(ss_ticket_number=sr_ticket_number, ss_item_sk=sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.791756,
+          "ms": 7.0594850000000005,
+          "runs": 2
+        }
+      },
+      "epoch": 0,
+      "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+      "evidence": {
+        "audited_failures_in_window": 1,
+        "audited_failures_total": 1,
+        "min_evidence": 8,
+        "passed": 7,
+        "unaudited_failures": 3
+      },
+      "kinds": {
+        "KeyUnique": {
+          "fails": 4,
+          "hits": 4,
+          "mrows": 9.063998000000002,
+          "ms": 15486.767001999999,
+          "runs": 11
+        },
+        "RowConservation": {
+          "fails": 1,
+          "hits": 0,
+          "mrows": 15.170312,
+          "ms": 2032.4834709999998,
+          "runs": 8
+        },
+        "SampleFanout": {
+          "fails": 1,
+          "hits": 0,
+          "mrows": 2.5868,
+          "ms": 26.251825,
+          "runs": 8
+        }
+      },
+      "order_calls": 11,
+      "pending_validation": {
+        "baseline_ms": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "episodes": 0,
+        "mean_delta_ms": 0.0,
+        "policy_ms": 0.0
+      },
+      "policy": null
+    },
+    "guard_fails": 1,
+    "guard_runs": 3,
+    "inflight_merged": 0,
+    "knowledge_hits": 448,
+    "knowledge_misses": 316,
+    "notices": 1,
+    "repairs": 2,
+    "revocations": 3,
+    "sql_rejections": 12
+  }
+}

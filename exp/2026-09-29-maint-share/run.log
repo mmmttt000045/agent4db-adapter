@@ -1,0 +1,243 @@
+生成合成零售数据：门店销售 1000000 行，目录销售 500000 行
+== r1-k1-revoke-staggered
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 2 | 不可用 16
+  returns-append  维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 2 | 不可用 16
+  catalog-append  维护 1 次 | DB 1 条        3 ms | 等待 1 次     0.0 s | 过期使用 0 | 误撤销 1 | 不可用 8
+  v2              维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 16
+== r1-k1-revoke-burst
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 2 | 不可用 16
+  returns-append  维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 2 | 不可用 16
+  catalog-append  维护 1 次 | DB 1 条        4 ms | 等待 1 次     0.0 s | 过期使用 0 | 误撤销 1 | 不可用 8
+  v2              维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 16
+== r1-k1-schema-staggered
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 2 次 | DB 1 条        4 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 1 次 | DB 1 条        3 ms | 等待 1 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 16 | 误撤销 0 | 不可用 0
+== r1-k1-schema-burst
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 1 次 | DB 1 条        3 ms | 等待 1 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 16 | 误撤销 0 | 不可用 0
+== r1-k1-definition-staggered
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 11 条    13476 ms | 等待 2 次    13.5 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 2 次 | DB 11 条    10016 ms | 等待 2 次    10.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 1 次 | DB 4 条     2665 ms | 等待 1 次     2.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 2 次 | DB 26 条    22542 ms | 等待 2 次    22.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k1-definition-burst
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 9 条     8537 ms | 等待 8 次    46.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 2 次 | DB 11 条    10781 ms | 等待 15 次    70.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 1 次 | DB 4 条     2936 ms | 等待 8 次    23.4 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 2 次 | DB 26 条    28540 ms | 等待 8 次   122.7 s | 过期使用 0 | 误撤销 0 | 不可用 2
+== r1-k1-condition-scope-staggered
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 7 条    12073 ms | 等待 2 次    12.1 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 2 次 | DB 5 条     3498 ms | 等待 2 次     3.5 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 1 次 | DB 3 条     2656 ms | 等待 1 次     2.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 2 次 | DB 25 条    27660 ms | 等待 2 次    27.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k1-condition-scope-burst
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 5 条     7349 ms | 等待 8 次    48.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 2 次 | DB 5 条     3614 ms | 等待 9 次    15.4 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 1 次 | DB 3 条     2923 ms | 等待 8 次    23.3 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 2 次 | DB 24 条    28680 ms | 等待 10 次   141.5 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k1-condition-staggered
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 3 条     1262 ms | 等待 2 次     1.3 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 2 次 | DB 3 条     2005 ms | 等待 2 次     2.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 1 次 | DB 3 条     2617 ms | 等待 1 次     2.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 2 次 | DB 18 条    13136 ms | 等待 2 次    13.1 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k1-condition-burst
+  准入：4/4 条口径晋升
+  sales-append    维护 2 次 | DB 5 条     7240 ms | 等待 11 次    47.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 2 次 | DB 5 条     3677 ms | 等待 9 次    15.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 1 次 | DB 3 条     2882 ms | 等待 8 次    23.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 2 次 | DB 21 条    18659 ms | 等待 10 次    77.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k2-revoke-staggered
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 1 条        4 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 4 | 不可用 32
+  returns-append  维护 4 次 | DB 1 条        2 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 4 | 不可用 32
+  catalog-append  维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 2 | 不可用 16
+  v2              维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 32
+== r1-k2-revoke-burst
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 1 条        2 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 4 | 不可用 32
+  returns-append  维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 4 | 不可用 32
+  catalog-append  维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 2 | 不可用 16
+  v2              维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 32
+== r1-k2-schema-staggered
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 1 条        4 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 32 | 误撤销 0 | 不可用 0
+== r1-k2-schema-burst
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 2 次 | DB 1 条        3 ms | 等待 2 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 32 | 误撤销 0 | 不可用 0
+== r1-k2-definition-staggered
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 21 条    28268 ms | 等待 4 次    28.3 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 4 次 | DB 21 条    20096 ms | 等待 4 次    20.1 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 2 次 | DB 7 条     5237 ms | 等待 2 次     5.2 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 4 次 | DB 45 条    42802 ms | 等待 4 次    42.8 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k2-definition-burst
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 9 条     8849 ms | 等待 8 次    45.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 4 次 | DB 11 条    11752 ms | 等待 12 次    75.2 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 2 次 | DB 4 条     3092 ms | 等待 8 次    24.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 4 次 | DB 37 条    41625 ms | 等待 8 次   119.5 s | 过期使用 0 | 误撤销 0 | 不可用 8
+== r1-k2-condition-scope-staggered
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 11 条    22717 ms | 等待 4 次    22.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 4 次 | DB 7 条     5543 ms | 等待 4 次     5.5 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 2 次 | DB 5 条     5274 ms | 等待 2 次     5.3 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 4 次 | DB 39 条    43222 ms | 等待 4 次    43.2 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k2-condition-scope-burst
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 5 条     7206 ms | 等待 8 次    46.2 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 4 次 | DB 5 条     3644 ms | 等待 12 次    16.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 2 次 | DB 3 条     2610 ms | 等待 8 次    20.8 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 4 次 | DB 33 条    32915 ms | 等待 11 次   124.2 s | 过期使用 0 | 误撤销 0 | 不可用 5
+== r1-k2-condition-staggered
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 3 条     5352 ms | 等待 4 次     5.4 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 4 次 | DB 3 条     1907 ms | 等待 4 次     1.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 2 次 | DB 3 条     2644 ms | 等待 2 次     2.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 4 次 | DB 23 条    12551 ms | 等待 4 次    12.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k2-condition-burst
+  准入：8/8 条口径晋升
+  sales-append    维护 4 次 | DB 5 条     6722 ms | 等待 13 次    42.3 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 4 次 | DB 5 条     3697 ms | 等待 12 次    17.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 2 次 | DB 3 条     2731 ms | 等待 8 次    21.8 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 4 次 | DB 32 条    35436 ms | 等待 11 次    92.6 s | 过期使用 0 | 误撤销 0 | 不可用 5
+== r1-k4-revoke-staggered
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 7 | 不可用 56
+  returns-append  维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 7 | 不可用 56
+  catalog-append  维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 4 | 不可用 32
+  v2              维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 56
+== r1-k4-revoke-burst
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 7 | 不可用 56
+  returns-append  维护 7 次 | DB 1 条        2 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 7 | 不可用 56
+  catalog-append  维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 4 | 不可用 32
+  v2              维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 56
+== r1-k4-schema-staggered
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 56 | 误撤销 0 | 不可用 0
+== r1-k4-schema-burst
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 7 次 | DB 1 条        3 ms | 等待 7 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 4 次 | DB 1 条        3 ms | 等待 4 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 7 次 | DB 1 条        4 ms | 等待 7 次     0.0 s | 过期使用 56 | 误撤销 0 | 不可用 0
+== r1-k4-definition-staggered
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 34 条    46462 ms | 等待 7 次    46.4 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 7 次 | DB 34 条    32556 ms | 等待 7 次    32.5 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 4 次 | DB 13 条    10990 ms | 等待 4 次    11.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 7 次 | DB 74 条    72244 ms | 等待 7 次    72.3 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k4-definition-burst
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 12 条    14589 ms | 等待 16 次    91.4 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 7 次 | DB 14 条    13149 ms | 等待 19 次    86.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 4 次 | DB 4 条     2872 ms | 等待 8 次    22.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 7 次 | DB 56 条    65750 ms | 等待 20 次   230.6 s | 过期使用 0 | 误撤销 0 | 不可用 4
+== r1-k4-condition-scope-staggered
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 17 条    38923 ms | 等待 7 次    38.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 7 次 | DB 11 条     9212 ms | 等待 7 次     9.2 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 4 次 | DB 9 条    10585 ms | 等待 4 次    10.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 7 次 | DB 62 条    71280 ms | 等待 7 次    71.3 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k4-condition-scope-burst
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 7 条    11978 ms | 等待 16 次    84.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 7 次 | DB 7 条     5704 ms | 等待 21 次    33.1 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 4 次 | DB 3 条     2707 ms | 等待 8 次    21.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 7 次 | DB 56 条    61183 ms | 等待 12 次   149.9 s | 过期使用 0 | 误撤销 0 | 不可用 22
+== r1-k4-condition-staggered
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 3 条     5428 ms | 等待 7 次     5.4 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 7 次 | DB 3 条     1941 ms | 等待 7 次     1.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 4 次 | DB 3 条     2611 ms | 等待 4 次     2.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 7 次 | DB 32 条    15089 ms | 等待 7 次    15.1 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k4-condition-burst
+  准入：15/15 条口径晋升
+  sales-append    维护 7 次 | DB 5 条     6739 ms | 等待 14 次    42.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 7 次 | DB 3 条     2100 ms | 等待 12 次    16.8 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 4 次 | DB 3 条     3225 ms | 等待 8 次    25.8 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 7 次 | DB 43 条    44723 ms | 等待 10 次    96.4 s | 过期使用 0 | 误撤销 0 | 不可用 17
+== r1-k6-revoke-staggered
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 1 条        3 ms | 等待 9 次     0.0 s | 过期使用 0 | 误撤销 9 | 不可用 72
+  returns-append  维护 8 次 | DB 1 条        3 ms | 等待 8 次     0.0 s | 过期使用 0 | 误撤销 8 | 不可用 64
+  catalog-append  维护 5 次 | DB 1 条        3 ms | 等待 5 次     0.0 s | 过期使用 0 | 误撤销 5 | 不可用 40
+  v2              维护 8 次 | DB 1 条        3 ms | 等待 8 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 64
+== r1-k6-revoke-burst
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 1 条        3 ms | 等待 9 次     0.0 s | 过期使用 0 | 误撤销 9 | 不可用 72
+  returns-append  维护 8 次 | DB 1 条        3 ms | 等待 8 次     0.0 s | 过期使用 0 | 误撤销 8 | 不可用 64
+  catalog-append  维护 5 次 | DB 1 条        4 ms | 等待 5 次     0.0 s | 过期使用 0 | 误撤销 5 | 不可用 40
+  v2              维护 8 次 | DB 1 条        4 ms | 等待 8 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 64
+== r1-k6-schema-staggered
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 1 条        3 ms | 等待 9 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 8 次 | DB 1 条        3 ms | 等待 8 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 5 次 | DB 1 条        3 ms | 等待 5 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 8 次 | DB 1 条        3 ms | 等待 8 次     0.0 s | 过期使用 64 | 误撤销 0 | 不可用 0
+== r1-k6-schema-burst
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 1 条        4 ms | 等待 9 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 8 次 | DB 1 条        4 ms | 等待 8 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 5 次 | DB 1 条        3 ms | 等待 5 次     0.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 8 次 | DB 1 条        3 ms | 等待 8 次     0.0 s | 过期使用 64 | 误撤销 0 | 不可用 0
+== r1-k6-definition-staggered
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 40 条    55894 ms | 等待 9 次    55.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 8 次 | DB 37 条    33750 ms | 等待 8 次    33.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 5 次 | DB 16 条    12947 ms | 等待 5 次    12.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 8 次 | DB 84 条    78086 ms | 等待 8 次    78.1 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k6-definition-burst
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 19 条    22291 ms | 等待 24 次   153.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 8 次 | DB 24 条    22454 ms | 等待 27 次   131.1 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 5 次 | DB 7 条     5425 ms | 等待 16 次    43.3 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 8 次 | DB 71 条    64436 ms | 等待 18 次   199.5 s | 过期使用 0 | 误撤销 0 | 不可用 14
+== r1-k6-condition-scope-staggered
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 21 条    49112 ms | 等待 9 次    49.1 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 8 次 | DB 13 条    10996 ms | 等待 8 次    11.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 5 次 | DB 11 条    12919 ms | 等待 5 次    12.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 8 次 | DB 71 条    74692 ms | 等待 8 次    74.7 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k6-condition-scope-burst
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 9 条    17367 ms | 等待 24 次   127.4 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 8 次 | DB 7 条     5719 ms | 等待 21 次    33.2 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 5 次 | DB 5 条     5199 ms | 等待 16 次    41.5 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 8 次 | DB 66 条    82380 ms | 等待 18 次   241.3 s | 过期使用 0 | 误撤销 0 | 不可用 10
+== r1-k6-condition-staggered
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 3 条     5234 ms | 等待 9 次     5.2 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 8 次 | DB 3 条     1948 ms | 等待 8 次     1.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 5 次 | DB 3 条     2581 ms | 等待 5 次     2.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 8 次 | DB 32 条    12865 ms | 等待 8 次    12.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+== r1-k6-condition-burst
+  准入：19/19 条口径晋升
+  sales-append    维护 9 次 | DB 5 条     6640 ms | 等待 12 次    42.0 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  returns-append  维护 8 次 | DB 5 条     3628 ms | 等待 16 次    16.6 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  catalog-append  维护 5 次 | DB 3 条     2623 ms | 等待 9 次    20.9 s | 过期使用 0 | 误撤销 0 | 不可用 0
+  v2              维护 8 次 | DB 43 条    41904 ms | 等待 13 次    92.2 s | 过期使用 0 | 误撤销 0 | 不可用 22
+维护方式对照报告：results/maint-1790686347212630/report.md
+EXIT 0

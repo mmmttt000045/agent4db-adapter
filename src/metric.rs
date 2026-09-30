@@ -239,9 +239,17 @@ pub fn verify_chain(traj: &Trajectory, results: &BTreeMap<usize, Value>) -> std:
             return Err(format!("derivation 引用了 used 之外的 r{n}"));
         }
     }
+    let answer = parse_answer(&traj.answer);
+    // 只引用一条查询时，答案可以在它第一行的任一列（Agent 常把中间量与结果放在同一行）
+    if let Ok([Tok::Ref(n)]) = tokenize(&derivation).as_deref() {
+        let row = results.get(n).and_then(|r| r["rows"][0].as_array().cloned()).unwrap_or_default();
+        if let Some(v) = row.iter().filter_map(Value::as_str).map(parse_answer).find(|v| same_value(v, &answer, traj.decimals)) {
+            return Ok(v);
+        }
+    }
     let cell = |n: usize| results.get(&n).and_then(first_cell);
     let value = eval_derivation(&derivation, &cell).map_err(|e| e.to_string())?;
-    if !same_value(&value, &parse_answer(&traj.answer), traj.decimals) {
+    if !same_value(&value, &answer, traj.decimals) {
         return Err(format!("计算链结果 {value:?} 与答案 {} 不一致", traj.answer));
     }
     Ok(value)
@@ -373,7 +381,8 @@ pub fn check_expr(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog) -> std:
         if w == "select" || w == "from" {
             return Err("表达式不能包含子查询".into());
         }
-        if SQL_WORDS.contains(&w.as_str()) {
+        // 口径内的表名只作列的限定前缀（store_returns.sr_return_amt）；规范 SQL 不给表起别名，这样写照样能执行
+        if SQL_WORDS.contains(&w.as_str()) || allowed.contains(&w) {
             continue;
         }
         match cat.table_of(&w) {
@@ -639,6 +648,11 @@ mod tests {
         // 算式后的说明文字忽略
         assert!(verify_chain(&traj(&["r1"], Some("r1（按销售日）"), "10.00"), &results).is_ok());
         assert!(verify_chain(&traj(&[], Some("r1 - r2 (r2 为去年)"), "7.00"), &results).is_ok());
+        // 只引用一条查询：答案可在第一行的其他列；算式仍取各查询的首个单元格
+        results.insert(3, serde_json::json!({"rows": [["12179532.00", "2893422.10", "23.76"]]}));
+        assert!(verify_chain(&traj(&["r3"], Some("r3"), "23.76"), &results).is_ok());
+        assert!(verify_chain(&traj(&["r3"], Some("r3"), "23.70"), &results).is_err());
+        assert!(verify_chain(&traj(&["r3", "r2"], Some("r3 / r2"), "23.76"), &results).is_err());
     }
 
     #[test]
@@ -699,6 +713,11 @@ mod tests {
         assert!(check_expr("sum(sr_return_amt)", &allowed, &c).is_err());
         assert!(check_expr("(select 1)", &allowed, &c).is_err());
         assert!(check_expr("sum(unknown_col)", &allowed, &c).is_err());
+        // 口径内表名作列的限定前缀可以；口径外的表不行
+        assert!(check_expr("sum(store_sales.ss_net_paid)", &allowed, &c).is_ok());
+        assert!(check_expr("sum(store_returns.sr_return_amt)", &allowed, &c).is_err());
+        let both: BTreeSet<String> = ["store_sales".to_string(), "store_returns".to_string()].into_iter().collect();
+        assert!(check_expr("100.0 * sum(store_returns.sr_return_amt) / sum(store_sales.ss_net_paid)", &both, &c).is_ok());
     }
 
     #[test]

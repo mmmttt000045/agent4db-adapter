@@ -1,0 +1,199 @@
+生成合成零售数据：门店销售 1000000 行，目录销售 500000 行
+== r1-metric-global-named
+  r1-metric-global-named learn    A M1-L1  correct  轮  5 工具  7 拦下 0 | 答 13570368.70 / 标准 13570368.70
+  提炼 M1-L1 → promoted 
+  r1-metric-global-named learn    A M1-L2  correct  轮  4 工具  5 拦下 0 | 答 13085788.40 / 标准 13085788.40
+  提炼 M1-L2 → corroborated 
+  r1-metric-global-named learn    A M2-L1  correct  轮  6 工具  7 拦下 0 | 答 3133115.63 / 标准 3133115.63
+  提炼 M2-L1 → promoted 
+  r1-metric-global-named learn    A M2-L2  correct  轮  3 工具  4 拦下 0 | 答 3299563.26 / 标准 3299563.26
+  提炼 M2-L2 → corroborated 
+  r1-metric-global-named learn    A M3-L1  correct  轮  7 工具 11 拦下 0 | 答 23.76 / 标准 23.7563154314960
+  提炼 M3-L1 → promoted 
+  r1-metric-global-named learn    A M3-L2  correct  轮  6 工具  9 拦下 0 | 答 23.76 / 标准 23.7637966785249
+  提炼 M3-L2 → promoted 
+  r1-metric-global-named holdout  B M1-P1  correct  轮  4 工具  5 拦下 0 | 答 13069651.80 / 标准 13069651.80
+  r1-metric-global-named holdout  B M1-T1  correct  轮  3 工具  5 拦下 0 | 答 -12007.70 / 标准 -12007.70
+  r1-metric-global-named holdout  B M1-T2  correct  轮  4 工具  7 拦下 0 | 答 12 / 标准 12
+  r1-metric-global-named holdout  B M2-P1  correct  轮  5 工具  6 拦下 0 | 答 3294349.93 / 标准 3294349.93
+  r1-metric-global-named holdout  B M2-T1  correct  轮  5 工具  8 拦下 0 | 答 -212139.52 / 标准 -212139.52
+  r1-metric-global-named holdout  B M2-T2  correct  轮  5 工具  7 拦下 0 | 答 7 / 标准 7
+  r1-metric-global-named holdout  B M3-P1  correct  轮  3 工具  4 拦下 0 | 答 23.81 / 标准 23.8079848462374
+  r1-metric-global-named holdout  B M3-T1  correct  轮  7 工具 13 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-named holdout  B M3-T2  correct  轮  5 工具  8 拦下 0 | 答 7 / 标准 7
+  正常新增：补录 27095 行
+  r1-metric-global-named growth   B M1-P1  correct  轮  3 工具  4 拦下 0 | 答 26139303.60 / 标准 26139303.60
+  r1-metric-global-named growth   B M1-T1  correct  轮  3 工具  5 拦下 0 | 答 13057644.10 / 标准 13057644.10
+  r1-metric-global-named growth   B M1-T2  correct  轮  3 工具  4 拦下 0 | 答 9 / 标准 9
+  r1-metric-global-named growth   B M3-P1  correct  轮  3 工具  4 拦下 0 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-named growth   B M3-T1  correct  轮  5 工具  9 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-named growth   B M3-T2  correct  轮  4 工具  6 拦下 0 | 答 7 / 标准 7
+  ETL v2：新增“申请”行 170816 条
+  r1-metric-global-named v2       B M2-P1  correct  轮  8 工具 12 拦下 2 | 答 3294349.93 / 标准 3294349.93
+  r1-metric-global-named v2       B M2-T1  correct  轮  6 工具 10 拦下 2 | 答 -212139.52 / 标准 -212139.52
+  r1-metric-global-named v2       B M2-T2  correct  轮  7 工具 10 拦下 2 | 答 7 / 标准 7
+  r1-metric-global-named v2       B M3-P1  correct  轮  7 工具 12 拦下 0 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-named v2       B M3-T1  correct  轮  6 工具 15 拦下 1 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-named v2       B M3-T2  correct  轮  6 工具 13 拦下 1 | 答 7 / 标准 7
+== r1-metric-global-def-named
+  r1-metric-global-def-named learn    A M1-L1  correct  轮  5 工具  7 拦下 0 | 答 13570368.70 / 标准 13570368.70
+  提炼 M1-L1 → promoted 
+  r1-metric-global-def-named learn    A M1-L2  correct  轮  3 工具  4 拦下 0 | 答 13085788.40 / 标准 13085788.40
+  提炼 M1-L2 → promoted 
+  r1-metric-global-def-named learn    A M2-L1  correct  轮  5 工具  7 拦下 0 | 答 3133115.63 / 标准 3133115.63
+  提炼 M2-L1 → promoted 
+  r1-metric-global-def-named learn    A M2-L2  correct  轮  4 工具  5 拦下 0 | 答 3299563.26 / 标准 3299563.26
+  提炼 M2-L2 → promoted 
+  r1-metric-global-def-named learn    A M3-L1  correct  轮 13 工具 19 拦下 0 | 答 23.76 / 标准 23.7563154314960
+  提炼 M3-L1 → candidate G3
+  r1-metric-global-def-named learn    A M3-L2  correct  轮  6 工具 11 拦下 0 | 答 23.76 / 标准 23.7637966785249
+  提炼 M3-L2 → promoted 
+  r1-metric-global-def-named holdout  B M1-P1  correct  轮  3 工具  4 拦下 0 | 答 13069651.80 / 标准 13069651.80
+  r1-metric-global-def-named holdout  B M1-T1  correct  轮  3 工具  5 拦下 0 | 答 -12007.70 / 标准 -12007.70
+  r1-metric-global-def-named holdout  B M1-T2  correct  轮  4 工具  5 拦下 0 | 答 12 / 标准 12
+  r1-metric-global-def-named holdout  B M2-P1  correct  轮  5 工具  7 拦下 0 | 答 3294349.93 / 标准 3294349.93
+  r1-metric-global-def-named holdout  B M2-T1  correct  轮  6 工具  8 拦下 0 | 答 -212139.52 / 标准 -212139.52
+  r1-metric-global-def-named holdout  B M2-T2  correct  轮  5 工具  7 拦下 0 | 答 7 / 标准 7
+  r1-metric-global-def-named holdout  B M3-P1  correct  轮  5 工具  8 拦下 0 | 答 23.81 / 标准 23.8079848462374
+  r1-metric-global-def-named holdout  B M3-T1  correct  轮  7 工具 12 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-def-named holdout  B M3-T2  correct  轮  5 工具  7 拦下 0 | 答 7 / 标准 7
+  正常新增：补录 27095 行
+  r1-metric-global-def-named growth   B M1-P1  correct  轮  4 工具  5 拦下 0 | 答 26139303.60 / 标准 26139303.60
+  r1-metric-global-def-named growth   B M1-T1  correct  轮  3 工具  5 拦下 0 | 答 13057644.10 / 标准 13057644.10
+  r1-metric-global-def-named growth   B M1-T2  correct  轮  4 工具  5 拦下 0 | 答 9 / 标准 9
+  r1-metric-global-def-named growth   B M3-P1  correct  轮  3 工具  5 拦下 0 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-def-named growth   B M3-T1  correct  轮  4 工具  6 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-def-named growth   B M3-T2  correct  轮  7 工具 13 拦下 0 | 答 7 / 标准 7
+  ETL v2：新增“申请”行 170816 条
+  r1-metric-global-def-named v2       B M2-P1  correct  轮  6 工具 13 拦下 2 | 答 3294349.93 / 标准 3294349.93
+  r1-metric-global-def-named v2       B M2-T1  correct  轮  5 工具 12 拦下 2 | 答 -212139.52 / 标准 -212139.52
+  r1-metric-global-def-named v2       B M2-T2  correct  轮  4 工具  6 拦下 1 | 答 7 / 标准 7
+  r1-metric-global-def-named v2       B M3-P1  correct  轮  7 工具 13 拦下 1 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-def-named v2       B M3-T1  correct  轮  6 工具 12 拦下 1 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-def-named v2       B M3-T2  correct  轮  6 工具 13 拦下 2 | 答 7 / 标准 7
+== r1-metric-global-schema-named
+  r1-metric-global-schema-named learn    A M1-L1  correct  轮  5 工具  7 拦下 0 | 答 13570368.70 / 标准 13570368.70
+  提炼 M1-L1 → promoted 
+  r1-metric-global-schema-named learn    A M1-L2  correct  轮  3 工具  4 拦下 0 | 答 13085788.40 / 标准 13085788.40
+  提炼 M1-L2 → promoted 
+  r1-metric-global-schema-named learn    A M2-L1  correct  轮  6 工具  8 拦下 0 | 答 3133115.63 / 标准 3133115.63
+  提炼 M2-L1 → promoted 
+  r1-metric-global-schema-named learn    A M2-L2  correct  轮  3 工具  4 拦下 0 | 答 3299563.26 / 标准 3299563.26
+  提炼 M2-L2 → corroborated 
+  r1-metric-global-schema-named learn    A M3-L1  correct  轮  6 工具 12 拦下 0 | 答 23.76 / 标准 23.7563154314960
+  提炼 M3-L1 → promoted 
+  r1-metric-global-schema-named learn    A M3-L2  correct  轮  6 工具 11 拦下 0 | 答 23.76 / 标准 23.7637966785249
+  提炼 M3-L2 → promoted 
+  r1-metric-global-schema-named holdout  B M1-P1  correct  轮  4 工具  5 拦下 0 | 答 13069651.80 / 标准 13069651.80
+  r1-metric-global-schema-named holdout  B M1-T1  correct  轮  3 工具  5 拦下 0 | 答 -12007.70 / 标准 -12007.70
+  r1-metric-global-schema-named holdout  B M1-T2  correct  轮  4 工具  7 拦下 0 | 答 12 / 标准 12
+  r1-metric-global-schema-named holdout  B M2-P1  correct  轮  5 工具  7 拦下 0 | 答 3294349.93 / 标准 3294349.93
+  r1-metric-global-schema-named holdout  B M2-T1  correct  轮  5 工具  8 拦下 0 | 答 -212139.52 / 标准 -212139.52
+  r1-metric-global-schema-named holdout  B M2-T2  correct  轮  3 工具  4 拦下 0 | 答 7 / 标准 7
+  r1-metric-global-schema-named holdout  B M3-P1  correct  轮  4 工具  5 拦下 0 | 答 23.81 / 标准 23.8079848462374
+  r1-metric-global-schema-named holdout  B M3-T1  correct  轮  5 工具 11 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-schema-named holdout  B M3-T2  correct  轮  6 工具  9 拦下 0 | 答 7 / 标准 7
+  正常新增：补录 27095 行
+  r1-metric-global-schema-named growth   B M1-P1  correct  轮  3 工具  4 拦下 0 | 答 26139303.60 / 标准 26139303.60
+  r1-metric-global-schema-named growth   B M1-T1  correct  轮  6 工具  8 拦下 0 | 答 13057644.10 / 标准 13057644.10
+  r1-metric-global-schema-named growth   B M1-T2  correct  轮  4 工具  5 拦下 0 | 答 9 / 标准 9
+  r1-metric-global-schema-named growth   B M3-P1  correct  轮  5 工具  7 拦下 0 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-schema-named growth   B M3-T1  correct  轮  4 工具 11 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-schema-named growth   B M3-T2  correct  轮  4 工具  5 拦下 0 | 答 7 / 标准 7
+  ETL v2：新增“申请”行 170816 条
+  r1-metric-global-schema-named v2       B M2-P1  wrong    轮  5 工具  7 拦下 0 | 答 6588699.86 / 标准 3294349.93
+  r1-metric-global-schema-named v2       B M2-T1  wrong    轮  5 工具  9 拦下 0 | 答 2880692.21 / 标准 -212139.52
+  r1-metric-global-schema-named v2       B M2-T2  wrong    轮  5 工具  7 拦下 0 | 答 10 / 标准 7
+  r1-metric-global-schema-named v2       B M3-P1  correct  轮  8 工具 11 拦下 1 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-schema-named v2       B M3-T1  correct  轮  7 工具 10 拦下 1 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-schema-named v2       B M3-T2  correct  轮  6 工具  8 拦下 1 | 答 7 / 标准 7
+== r1-metric-global-revoke-named
+  r1-metric-global-revoke-named learn    A M1-L1  correct  轮  5 工具  7 拦下 0 | 答 13570368.70 / 标准 13570368.70
+  提炼 M1-L1 → promoted 
+  r1-metric-global-revoke-named learn    A M1-L2  correct  轮  3 工具  4 拦下 0 | 答 13085788.40 / 标准 13085788.40
+  提炼 M1-L2 → corroborated 
+  r1-metric-global-revoke-named learn    A M2-L1  correct  轮  6 工具  8 拦下 0 | 答 3133115.63 / 标准 3133115.63
+  提炼 M2-L1 → promoted 
+  r1-metric-global-revoke-named learn    A M2-L2  correct  轮  4 工具  7 拦下 0 | 答 3299563.26 / 标准 3299563.26
+  提炼 M2-L2 → corroborated 
+  r1-metric-global-revoke-named learn    A M3-L1  correct  轮  6 工具 12 拦下 0 | 答 23.76 / 标准 23.7563154314960
+  提炼 M3-L1 → promoted 
+  r1-metric-global-revoke-named learn    A M3-L2  correct  轮  8 工具 10 拦下 0 | 答 23.76 / 标准 23.7637966785249
+  提炼 M3-L2 → candidate G3
+  r1-metric-global-revoke-named holdout  B M1-P1  correct  轮  3 工具  4 拦下 0 | 答 13069651.80 / 标准 13069651.80
+  r1-metric-global-revoke-named holdout  B M1-T1  correct  轮  5 工具  8 拦下 0 | 答 -12007.70 / 标准 -12007.70
+  r1-metric-global-revoke-named holdout  B M1-T2  correct  轮  3 工具  4 拦下 0 | 答 12 / 标准 12
+  r1-metric-global-revoke-named holdout  B M2-P1  correct  轮  5 工具  6 拦下 0 | 答 3294349.93 / 标准 3294349.93
+  r1-metric-global-revoke-named holdout  B M2-T1  correct  轮  4 工具  6 拦下 0 | 答 -212139.52 / 标准 -212139.52
+  r1-metric-global-revoke-named holdout  B M2-T2  correct  轮  5 工具  7 拦下 0 | 答 7 / 标准 7
+  r1-metric-global-revoke-named holdout  B M3-P1  correct  轮  4 工具  7 拦下 0 | 答 23.81 / 标准 23.8079848462374
+  r1-metric-global-revoke-named holdout  B M3-T1  correct  轮  3 工具  4 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-revoke-named holdout  B M3-T2  correct  轮  5 工具  8 拦下 0 | 答 7 / 标准 7
+  正常新增：补录 27095 行
+  r1-metric-global-revoke-named growth-relearn A M1-L1  correct  轮  5 工具  7 拦下 0 | 答 13570368.70 / 标准 13570368.70
+  提炼 M1-L1 → promoted 
+  r1-metric-global-revoke-named growth-relearn A M1-L2  correct  轮  3 工具  4 拦下 0 | 答 13085788.40 / 标准 13085788.40
+  提炼 M1-L2 → promoted 
+  r1-metric-global-revoke-named growth-relearn A M3-L1  correct  轮  7 工具 12 拦下 0 | 答 23.76 / 标准 23.7563154314960
+  提炼 M3-L1 → promoted 
+  r1-metric-global-revoke-named growth-relearn A M3-L2  correct  轮  5 工具  8 拦下 0 | 答 23.76 / 标准 23.7637966785249
+  提炼 M3-L2 → corroborated 
+  r1-metric-global-revoke-named growth   B M1-P1  correct  轮  5 工具  7 拦下 0 | 答 26139303.60 / 标准 26139303.60
+  r1-metric-global-revoke-named growth   B M1-T1  correct  轮  4 工具  6 拦下 0 | 答 13057644.10 / 标准 13057644.10
+  r1-metric-global-revoke-named growth   B M1-T2  correct  轮  4 工具  5 拦下 0 | 答 9 / 标准 9
+  r1-metric-global-revoke-named growth   B M3-P1  correct  轮  4 工具  5 拦下 0 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-revoke-named growth   B M3-T1  correct  轮  5 工具 11 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-revoke-named growth   B M3-T2  correct  轮  5 工具  9 拦下 0 | 答 7 / 标准 7
+  ETL v2：新增“申请”行 170816 条
+  r1-metric-global-revoke-named v2-relearn A M2-L1  correct  轮 11 工具 19 拦下 0 | 答 3133115.63 / 标准 3133115.63
+  提炼 M2-L1 → candidate G4
+  r1-metric-global-revoke-named v2-relearn A M2-L2  correct  轮 11 工具 16 拦下 0 | 答 3299563.26 / 标准 3299563.26
+  提炼 M2-L2 → promoted 
+  r1-metric-global-revoke-named v2-relearn A M3-L1  correct  轮  8 工具 17 拦下 2 | 答 23.76 / 标准 23.7563154314960
+  提炼 M3-L1 → promoted 
+  r1-metric-global-revoke-named v2-relearn A M3-L2  correct  轮  6 工具 10 拦下 0 | 答 23.76 / 标准 23.7637966785249
+  提炼 M3-L2 → promoted 
+  r1-metric-global-revoke-named v2       B M2-P1  correct  轮  5 工具  8 拦下 1 | 答 3294349.93 / 标准 3294349.93
+  r1-metric-global-revoke-named v2       B M2-T1  correct  轮  6 工具  9 拦下 0 | 答 -212139.52 / 标准 -212139.52
+  r1-metric-global-revoke-named v2       B M2-T2  correct  轮  5 工具  6 拦下 0 | 答 7 / 标准 7
+  r1-metric-global-revoke-named v2       B M3-P1  correct  轮  5 工具  7 拦下 0 | 答 11.90 / 标准 11.9039924231187
+  r1-metric-global-revoke-named v2       B M3-T1  correct  轮  5 工具  9 拦下 0 | 答 0.01 / 标准 0.00992199034104
+  r1-metric-global-revoke-named v2       B M3-T2  correct  轮  5 工具  7 拦下 0 | 答 7 / 标准 7
+== r1-metric-global-noguard-named
+  r1-metric-global-noguard-named learn    A M1-L1  correct  轮  6 工具  8 拦下 0 | 答 13570368.70 / 标准 13570368.70
+  提炼 M1-L1 → promoted 
+  r1-metric-global-noguard-named learn    A M1-L2  correct  轮  4 工具  5 拦下 0 | 答 13085788.40 / 标准 13085788.40
+  提炼 M1-L2 → corroborated 
+  r1-metric-global-noguard-named learn    A M2-L1  correct  轮  5 工具  8 拦下 0 | 答 3133115.63 / 标准 3133115.63
+  提炼 M2-L1 → promoted 
+  r1-metric-global-noguard-named learn    A M2-L2  correct  轮  3 工具  4 拦下 0 | 答 3299563.26 / 标准 3299563.26
+  提炼 M2-L2 → corroborated 
+  r1-metric-global-noguard-named learn    A M3-L1  correct  轮 10 工具 19 拦下 0 | 答 23.76 / 标准 23.7563154314960
+  提炼 M3-L1 → candidate G3
+  r1-metric-global-noguard-named learn    A M3-L2  correct  轮  5 工具 12 拦下 0 | 答 23.76 / 标准 23.7637966785249
+  提炼 M3-L2 → candidate G3
+  r1-metric-global-noguard-named holdout  B M1-P1  correct  轮  3 工具  4 拦下 0 | 答 13069651.80 / 标准 13069651.80
+  r1-metric-global-noguard-named holdout  B M1-T1  correct  轮  3 工具  6 拦下 0 | 答 -12007.70 / 标准 -12007.70
+  r1-metric-global-noguard-named holdout  B M1-T2  correct  轮  5 工具  6 拦下 0 | 答 12 / 标准 12
+  r1-metric-global-noguard-named holdout  B M2-P1  correct  轮  4 工具  5 拦下 0 | 答 3294349.93 / 标准 3294349.93
+  r1-metric-global-noguard-named holdout  B M2-T1  correct  轮  5 工具  8 拦下 0 | 答 -212139.52 / 标准 -212139.52
+  r1-metric-global-noguard-named holdout  B M2-T2  correct  轮  3 工具  4 拦下 0 | 答 7 / 标准 7
+  r1-metric-global-noguard-named holdout  B M3-P1  wrong    轮 11 工具 24 拦下 0 | 答 23.65 / 标准 23.8079848462374
+  r1-metric-global-noguard-named holdout  B M3-T1  wrong    轮 14 工具 30 拦下 0 | 答 0.05 / 标准 0.00992199034104
+  r1-metric-global-noguard-named holdout  B M3-T2  correct  轮  8 工具 18 拦下 0 | 答 7 / 标准 7
+  正常新增：补录 27095 行
+  r1-metric-global-noguard-named growth   B M1-P1  correct  轮  4 工具  5 拦下 0 | 答 26139303.60 / 标准 26139303.60
+  r1-metric-global-noguard-named growth   B M1-T1  correct  轮  4 工具  6 拦下 0 | 答 13057644.10 / 标准 13057644.10
+  r1-metric-global-noguard-named growth   B M1-T2  correct  轮  5 工具  6 拦下 0 | 答 9 / 标准 9
+  r1-metric-global-noguard-named growth   B M3-P1  wrong    轮 20 工具 46 拦下 0 | 答 20.00 / 标准 11.9039924231187
+  r1-metric-global-noguard-named growth   B M3-T1  wrong    轮 16 工具 43 拦下 0 | 答 0.05 / 标准 0.00992199034104
+  r1-metric-global-noguard-named growth   B M3-T2  correct  轮 13 工具 27 拦下 0 | 答 7 / 标准 7
+  ETL v2：新增“申请”行 170816 条
+  r1-metric-global-noguard-named v2       B M2-P1  wrong    轮  3 工具  4 拦下 0 | 答 6588699.86 / 标准 3294349.93
+  r1-metric-global-noguard-named v2       B M2-T1  wrong    轮  3 工具  5 拦下 0 | 答 2880692.21 / 标准 -212139.52
+  r1-metric-global-noguard-named v2       B M2-T2  wrong    轮  4 工具  5 拦下 0 | 答 10 / 标准 7
+  r1-metric-global-noguard-named v2       B M3-P1  wrong    轮 13 工具 30 拦下 3 | 答 11.83 / 标准 11.9039924231187
+  r1-metric-global-noguard-named v2       B M3-T1  wrong    轮 20 工具 50 拦下 1 | 答  / 标准 0.00992199034104
+  r1-metric-global-noguard-named v2       B M3-T2  correct  轮 10 工具 19 拦下 2 | 答 7 / 标准 7
+指标经验评测报告：results/metric-1790700840466648/report.md
+EXIT 0

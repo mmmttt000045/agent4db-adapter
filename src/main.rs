@@ -71,7 +71,7 @@ enum Cmd {
         #[arg(long, default_value = "127.0.0.1:8088")]
         addr: String,
         /// 管理 adapter 的模型服务（与 llm 实验中的查询 Agent 独立）
-        #[arg(long, value_parser = ["mock", "openai", "anthropic", "claude"])]
+        #[arg(long, value_parser = ["mock", "openai", "deepseek", "zhipu", "anthropic", "claude"])]
         optimizer_provider: Option<String>,
         /// 定期生成建议；省略时仅通过 HTTP 手动触发
         #[arg(long, value_parser = positive_usize, requires = "optimizer_provider")]
@@ -124,7 +124,7 @@ enum Cmd {
     },
     /// 真实 LLM Agent：直连 vs 中间层（key 写在 .env）
     Llm {
-        /// agent 名=provider，如 claude-agent=claude,gpt-agent=openai；或 mock
+        /// agent 名=provider，如 ds=deepseek,glm=zhipu,claude-agent=claude；或 mock
         #[arg(long, value_delimiter = ',', default_value = "mock-a=mock,mock-b=mock")]
         agents: Vec<String>,
         #[arg(long, value_delimiter = ',', default_value = "direct,middle", value_parser = ["direct", "middle"])]

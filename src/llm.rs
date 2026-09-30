@@ -46,11 +46,20 @@ pub struct OpenAiOptions {
     preserve_reasoning: bool,
 }
 
+/// OpenAi.vendor：报告中的服务名；openai 配置记为 openai-compatible，与旧报告一致
 pub enum Provider {
     Anthropic { key: String, base: String, model: String, http: reqwest::Client },
-    OpenAi { key: String, base: String, model: String, options: OpenAiOptions, http: reqwest::Client },
+    OpenAi { vendor: &'static str, key: String, base: String, model: String, options: OpenAiOptions, http: reqwest::Client },
     Mock,
 }
+
+/// OpenAI 兼容服务的内置配置：(provider 名, 环境变量前缀, 默认 base URL)。
+/// 各服务的 key 与模型分别写在 .env（如 DEEPSEEK_API_KEY、ZHIPU_MODEL），切换或对照时只改 provider 名。
+const OPENAI_PROFILES: [(&str, &str, &str); 3] = [
+    ("openai", "OPENAI", "https://api.openai.com/v1"),
+    ("deepseek", "DEEPSEEK", "https://api.deepseek.com"),
+    ("zhipu", "ZHIPU", "https://open.bigmodel.cn/api/paas/v4"),
+];
 
 fn http() -> reqwest::Client {
     reqwest::Client::builder().timeout(Duration::from_secs(900)).build().expect("http client")
@@ -58,7 +67,30 @@ fn http() -> reqwest::Client {
 
 impl Provider {
     pub fn from_env(kind: &str) -> Result<Provider> {
-        let env = |k: &str| std::env::var(k).ok().filter(|v| !v.is_empty());
+        Self::from_lookup(kind, |k| std::env::var(k).ok().filter(|v| !v.is_empty()))
+    }
+
+    fn from_lookup(kind: &str, env: impl Fn(&str) -> Option<String>) -> Result<Provider> {
+        if let Some(&(name, prefix, default_base)) = OPENAI_PROFILES.iter().find(|p| p.0 == kind) {
+            let var = |k: &str| env(&format!("{prefix}_{k}"));
+            let base = var("BASE_URL").unwrap_or_else(|| default_base.into());
+            let thinking = var("THINKING");
+            anyhow::ensure!(
+                thinking.as_deref().is_none_or(|v| matches!(v, "enabled" | "disabled")),
+                "{prefix}_THINKING 必须为 enabled 或 disabled"
+            );
+            // DeepSeek 与智谱 BigModel 的思考模式都要求在工具调用循环中原样回传 reasoning_content
+            let preserve_reasoning =
+                reqwest::Url::parse(&base).ok().is_some_and(|u| matches!(u.host_str(), Some("api.deepseek.com" | "open.bigmodel.cn")));
+            return Ok(Provider::OpenAi {
+                vendor: if name == "openai" { "openai-compatible" } else { name },
+                key: var("API_KEY").ok_or_else(|| anyhow!("缺少 {prefix}_API_KEY（写在 .env 里）"))?,
+                model: var("MODEL").ok_or_else(|| anyhow!("缺少 {prefix}_MODEL（如 deepseek-flash、glm-5.3、gpt-5）"))?,
+                base,
+                http: http(),
+                options: OpenAiOptions { reasoning_effort: var("REASONING_EFFORT"), thinking, preserve_reasoning },
+            });
+        }
         Ok(match kind {
             "claude" | "anthropic" => Provider::Anthropic {
                 key: env("ANTHROPIC_API_KEY").ok_or_else(|| anyhow!("缺少 ANTHROPIC_API_KEY（写在 .env 里）"))?,
@@ -66,39 +98,33 @@ impl Provider {
                 model: env("ANTHROPIC_MODEL").ok_or_else(|| anyhow!("缺少 ANTHROPIC_MODEL"))?,
                 http: http(),
             },
-            "openai" => {
-                let base = env("OPENAI_BASE_URL").unwrap_or_else(|| "https://api.openai.com/v1".into());
-                let thinking = env("OPENAI_THINKING");
-                anyhow::ensure!(
-                    thinking.as_deref().is_none_or(|v| matches!(v, "enabled" | "disabled")),
-                    "OPENAI_THINKING 必须为 enabled 或 disabled"
-                );
-                let preserve_reasoning = reqwest::Url::parse(&base).ok().is_some_and(|u| u.host_str() == Some("api.deepseek.com"));
-                Provider::OpenAi {
-                    key: env("OPENAI_API_KEY").ok_or_else(|| anyhow!("缺少 OPENAI_API_KEY（写在 .env 里）"))?,
-                    base,
-                    model: env("OPENAI_MODEL").ok_or_else(|| anyhow!("缺少 OPENAI_MODEL（如 deepseek-chat、qwen-plus、gpt-5）"))?,
-                    http: http(),
-                    options: OpenAiOptions { reasoning_effort: env("OPENAI_REASONING_EFFORT"), thinking, preserve_reasoning },
-                }
-            }
             "mock" => Provider::Mock,
-            _ => bail!("未知 provider：{kind}（可选 claude / openai / mock）"),
+            _ => bail!("未知 provider：{kind}（可选 openai / deepseek / zhipu / claude / mock）"),
         })
     }
 
     pub fn label(&self) -> String {
         match self {
             Provider::Anthropic { model, .. } => format!("anthropic:{model}"),
-            Provider::OpenAi { model, .. } => format!("openai-compatible:{model}"),
+            Provider::OpenAi { vendor, model, .. } => format!("{vendor}:{model}"),
             Provider::Mock => "mock".into(),
+        }
+    }
+
+    /// 报告中记录的模型配置（不含 key）
+    pub fn config(&self) -> Value {
+        match self {
+            Provider::Anthropic { base, model, .. } => json!({"provider": "anthropic", "base_url": base, "model": model}),
+            Provider::OpenAi { vendor, base, model, options, .. } => json!({"provider": vendor, "base_url": base, "model": model,
+                "reasoning_effort": options.reasoning_effort, "thinking": options.thinking}),
+            Provider::Mock => json!({"provider": "mock"}),
         }
     }
 
     pub async fn chat(&self, system: &str, turns: &[Turn], tools: &[ToolSpec]) -> Result<Reply> {
         match self {
             Provider::Anthropic { key, base, model, http } => anthropic_chat(http, base, key, model, system, turns, tools).await,
-            Provider::OpenAi { key, base, model, options, http } => {
+            Provider::OpenAi { key, base, model, options, http, .. } => {
                 openai_chat(http, base, key, (model, options), system, turns, tools).await
             }
             Provider::Mock => mock_chat(turns),
@@ -118,7 +144,8 @@ async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> 
                     return serde_json::from_str(&text).context("响应不是 JSON");
                 }
                 last = format!("HTTP {status}: {}", text.chars().take(500).collect::<String>());
-                if !(status.as_u16() == 429 || status.as_u16() == 529 || status.is_server_error()) {
+                let retry = (status.as_u16() == 429 && !futile_429(&text)) || status.as_u16() == 529 || status.is_server_error();
+                if !retry {
                     bail!(last);
                 }
             }
@@ -127,6 +154,13 @@ async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> 
         tokio::time::sleep(Duration::from_secs(2u64.pow(attempt + 1))).await;
     }
     bail!("多次重试后仍失败：{last}")
+}
+
+/// 智谱 BigModel 也用 429 表示欠费（1113）、内容审核拦截（1301）和额度用尽（1308 / 1310），重试无效
+fn futile_429(body: &str) -> bool {
+    let v: Value = serde_json::from_str(body).unwrap_or_default();
+    let code = &v["error"]["code"];
+    matches!(code.as_str().map_or_else(|| code.to_string(), str::to_string).as_str(), "1113" | "1301" | "1308" | "1310")
 }
 
 // ───────────────────────── Anthropic Messages API（原始 HTTP） ─────────────────────────
@@ -239,6 +273,10 @@ async fn openai_chat(
     }
     let req = http.post(format!("{}/chat/completions", base.trim_end_matches('/'))).bearer_auth(key);
     let v = post_json(req, &body).await?;
+    // 智谱 BigModel：输出被内容审核截断或超出上下文窗口时回复不完整，按调用失败处理
+    if let Some(r @ ("sensitive" | "model_context_window_exceeded")) = v["choices"][0]["finish_reason"].as_str() {
+        bail!("模型回复不完整：finish_reason={r}");
+    }
     let msg = v["choices"][0]["message"].clone();
     let mut r = Reply {
         raw: msg.clone(),
@@ -549,6 +587,7 @@ mod provider_tests {
         let addr = listener.local_addr().unwrap();
         let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
         let provider = Provider::OpenAi {
+            vendor: "openai-compatible",
             key: "test-key".into(),
             base: format!("http://{addr}/v1"),
             model: "test-model".into(),
@@ -579,6 +618,7 @@ mod provider_tests {
         let addr = listener.local_addr().unwrap();
         let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
         let provider = Provider::OpenAi {
+            vendor: "openai-compatible",
             key: "test-key".into(),
             base: format!("http://{addr}"),
             model: "deepseek-flash".into(),
@@ -596,6 +636,59 @@ mod provider_tests {
         ];
         let reply = provider.chat("test", &turns, &tool_specs(true)).await.unwrap();
         assert_eq!(reply.text, "OK");
+        server.abort();
+    }
+
+    #[test]
+    fn named_profiles_read_their_own_variables() {
+        let vars = std::collections::HashMap::from([
+            ("ZHIPU_API_KEY", "zhipu-key"),
+            ("ZHIPU_MODEL", "glm-5.3"),
+            ("OPENAI_API_KEY", "openai-key"),
+            ("OPENAI_MODEL", "other"),
+        ]);
+        let lookup = |k: &str| vars.get(k).map(|v| v.to_string());
+        let zhipu = Provider::from_lookup("zhipu", lookup).unwrap();
+        assert_eq!(zhipu.label(), "zhipu:glm-5.3");
+        let Provider::OpenAi { key, base, options, .. } = &zhipu else { panic!("zhipu 应为 OpenAI 兼容") };
+        assert_eq!((key.as_str(), base.as_str()), ("zhipu-key", "https://open.bigmodel.cn/api/paas/v4"));
+        assert!(options.preserve_reasoning);
+        assert_eq!(Provider::from_lookup("openai", lookup).unwrap().label(), "openai-compatible:other");
+        assert!(Provider::from_lookup("deepseek", lookup).is_err());
+    }
+
+    #[tokio::test]
+    async fn zhipu_content_filter_fails_without_retry() {
+        use axum::http::StatusCode;
+        let app = Router::new().route(
+            "/chat/completions",
+            post(|Json(body): Json<Value>| async move {
+                if body["model"] == "blocked-input" {
+                    (StatusCode::TOO_MANY_REQUESTS, Json(json!({"error": {"code": "1301", "message": "test fixture"}})))
+                } else {
+                    (
+                        StatusCode::OK,
+                        Json(json!({"choices": [{"finish_reason": "sensitive", "message": {"role": "assistant", "content": ""}}]})),
+                    )
+                }
+            }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+        for model in ["blocked-input", "blocked-output"] {
+            let provider = Provider::OpenAi {
+                vendor: "zhipu",
+                key: "test-key".into(),
+                base: format!("http://{addr}"),
+                model: model.into(),
+                options: OpenAiOptions::default(),
+                http: reqwest::Client::builder().no_proxy().build().unwrap(),
+            };
+            let start = Instant::now();
+            assert!(provider.chat("test", &[Turn::User("test".into())], &[]).await.is_err());
+            assert!(start.elapsed() < Duration::from_secs(2), "{model} 不应重试");
+        }
         server.abort();
     }
 }

@@ -32,6 +32,9 @@ pub struct Options {
     /// Real PostgreSQL check measurements with chronological holdout; separate from end-to-end tasks.
     #[arg(long)]
     check_study: bool,
+    /// Model service for the L-mode manager; configured in .env.
+    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "anthropic", "claude"])]
+    provider: String,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -78,7 +81,7 @@ fn queries(variants: u32) -> Vec<Task> {
 pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     std::fs::create_dir_all(out)?;
     if o.check_study {
-        return check_study(url, out, &o.mode).await;
+        return check_study(url, out, &o.mode, &o.provider).await;
     }
     if o.oracle_only {
         let db = Db::connect(url, pool, true)?;
@@ -118,7 +121,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     }
     let manager = match o.mode.as_str() {
         "M" => Some(Optimizer::new(Provider::Mock, out)?),
-        "L" => Some(Optimizer::new(Provider::from_env("openai")?, out)?),
+        "L" => Some(Optimizer::new(Provider::from_env(&o.provider)?, out)?),
         _ => None,
     };
     let mut decisions = vec![];
@@ -184,7 +187,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
 }
 
 /// This is a check-order microbenchmark, not an end-to-end adapter speedup claim.
-async fn check_study(url: &str, out: &str, mode: &str) -> Result<()> {
+async fn check_study(url: &str, out: &str, mode: &str, provider: &str) -> Result<()> {
     use crate::checks::{Check, Outcome};
     use crate::feedback::{Feedback, Obs};
     let db = Db::connect(url, 1, true)?;
@@ -194,7 +197,7 @@ async fn check_study(url: &str, out: &str, mode: &str) -> Result<()> {
         // Same train/validation/deployment boundaries for Mock and the real model.
         let manager = match mode {
             "M" => Some(Optimizer::new(Provider::Mock, &format!("{out}/manager-{probe_key}"))?),
-            "L" => Some(Optimizer::new(Provider::from_env("openai")?, &format!("{out}/manager-{probe_key}"))?),
+            "L" => Some(Optimizer::new(Provider::from_env(provider)?, &format!("{out}/manager-{probe_key}"))?),
             _ => None,
         };
         let mut decisions = vec![];

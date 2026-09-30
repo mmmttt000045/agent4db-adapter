@@ -22,11 +22,11 @@ pub struct Options {
     /// 门店销售行数（目录渠道为其一半）
     #[arg(long, default_value_t = 1_000_000, value_parser = clap::value_parser!(u32).range(10_000..=20_000_000))]
     rows: u32,
-    /// 查询 Agent 的模型服务（配置写在 .env）
-    #[arg(long, default_value = "openai", value_parser = ["openai", "anthropic", "claude"])]
+    /// 查询 Agent 的模型服务（配置写在 .env，如 deepseek 读 DEEPSEEK_*，zhipu 读 ZHIPU_*）
+    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "anthropic", "claude"])]
     agent: String,
     /// 提炼器的模型服务
-    #[arg(long, default_value = "openai", value_parser = ["openai", "anthropic", "claude"])]
+    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "anthropic", "claude"])]
     extractor: String,
     /// metric-global 为条件级维护；-schema / -revoke / -def 只改变维护方式（只看结构、逐写入撤销后重新提炼、定义级重验）
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",
@@ -813,11 +813,10 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 }
             }
         }
-        let env_opt = |k: &str| std::env::var(k).ok().filter(|v| !v.is_empty());
         Ok(json!({
             "options": o, "pool": pool,
             "providers": {"agent": agent.label(), "extractor": extractor.label(), "temperature": "未设置（服务端默认）",
-                          "openai_reasoning_effort": env_opt("OPENAI_REASONING_EFFORT"), "openai_thinking": env_opt("OPENAI_THINKING")},
+                          "agent_config": agent.config(), "extractor_config": extractor.config()},
             "dataset": dataset,
             "tasks": tasks.iter().map(|t| json!({"id": t.id, "metric": t.def.id, "set": t.set, "ask": t.ask, "growth": t.def.growth, "v2": t.def.v2})).collect::<Vec<_>>(),
             "methodology": {

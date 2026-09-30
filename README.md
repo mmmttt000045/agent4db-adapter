@@ -171,26 +171,46 @@ cargo run --locked -- serve --optimizer-provider mock --optimizer-interval-secs 
 
 Anthropic 可使用 `--optimizer-provider anthropic`，并设置 `ANTHROPIC_API_KEY`、`ANTHROPIC_MODEL`，以及可选的 `ANTHROPIC_BASE_URL`。模型名称需由使用者显式指定。
 
-### DeepSeek 官方 V4.1 Flash（max 思考）
+### 多模型服务与一键切换
 
-在本地 `.env` 设置以下配置，密钥只保存在被 Git 忽略的 `.env`，不要写进脚本：
+除通用的 `openai` 配置外，内置两个官方 OpenAI 兼容服务的配置，各读各的环境变量，可同时写在被 Git 忽略的 `.env` 中（密钥不要写进脚本）：
+
+| provider | 环境变量 | 默认 base URL |
+| --- | --- | --- |
+| `openai` | `OPENAI_API_KEY`、`OPENAI_MODEL`，可选 `OPENAI_BASE_URL`、`OPENAI_REASONING_EFFORT`、`OPENAI_THINKING` | `https://api.openai.com/v1` |
+| `deepseek` | `DEEPSEEK_*`（同上） | `https://api.deepseek.com` |
+| `zhipu` | `ZHIPU_*`（同上） | `https://open.bigmodel.cn/api/paas/v4` |
 
 ```dotenv
-OPENAI_API_KEY=替换为自己的密钥
-OPENAI_BASE_URL=https://api.deepseek.com
-OPENAI_MODEL=deepseek-flash
-OPENAI_REASONING_EFFORT=max
-OPENAI_THINKING=enabled
+DEEPSEEK_API_KEY=替换为自己的密钥
+DEEPSEEK_MODEL=deepseek-flash
+DEEPSEEK_REASONING_EFFORT=max
+DEEPSEEK_THINKING=enabled
+ZHIPU_API_KEY=替换为自己的密钥
+ZHIPU_MODEL=glm-5.3
+ZHIPU_REASONING_EFFORT=medium
+ZHIPU_THINKING=enabled
 ```
 
-根据 [DeepSeek 官方模型说明](https://api-docs.deepseek.com/news/news260910/)，V4.1 Flash 的 API 标识是 `deepseek-flash`。项目直接发送 `reasoning_effort` 和 `thinking` 请求字段；对 DeepSeek 官方地址保留工具对话所需的 `reasoning_content`，遵循其 [思考模式文档](https://api-docs.deepseek.com/guides/thinking_mode/)。其他兼容服务未配置这两个环境变量时不发送额外参数。
+切换模型只改 provider 名，不用改 `.env`：`serve --optimizer-provider`、`metric-bench --agent/--extractor`、`real-bench --provider`（L 模式）、`llm --agents 名=provider` 都接受 `openai` / `deepseek` / `zhipu` / `anthropic`。报告里的模型标识为 `deepseek:deepseek-flash`、`zhipu:glm-5.3`；`openai` 配置仍记为 `openai-compatible:模型名`，与旧报告一致。原来把 DeepSeek 写在 `OPENAI_*` 里的 `.env` 不用改。
 
 ```powershell
-# 极小的真实 API 连通性测试，会产生少量用量；不发送项目数据
-python tools/check-deepseek.py
-# 使用 DeepSeek 管理 adapter；仍须通过策略验证门槛
-cargo run --locked -- serve --optimizer-provider openai --optimizer-interval-secs 300 --optimizer-auto-apply
+# 极小的真实 API 连通性测试：一次普通回复 + 一次工具调用往返，会产生少量用量；不发送项目数据，只允许官方地址
+python tools/check-llm.py deepseek
+python tools/check-llm.py zhipu
+# 同一组 metric-bench 对照分别用两种模型跑（查询 Agent 与提炼器保持同一模型）
+cargo run --release --locked -- --pool 16 --out results/ds metric-bench --agent deepseek --extractor deepseek
+cargo run --release --locked -- --pool 16 --out results/glm metric-bench --agent zhipu --extractor zhipu
+# 同一次 llm 评估中并排比较两种模型
+cargo run --locked -- llm --agents ds=deepseek,glm=zhipu --modes direct,middle
 ```
+
+说明：
+
+- DeepSeek：根据 [官方模型说明](https://api-docs.deepseek.com/news/news260910/)，V4.1 Flash 的 API 标识是 `deepseek-flash`；工具对话需保留 `reasoning_content`，见其 [思考模式文档](https://api-docs.deepseek.com/guides/thinking_mode/)。
+- 智谱 BigModel：接口见 [HTTP 调用说明](https://docs.bigmodel.cn/cn/guide/develop/http/introduction)，使用 API key 直接作 Bearer 鉴权。GLM-5.2 及以上支持 `reasoning_effort`；GLM-5.3 强制思考，不能关闭。GLM-5.3 用 max 时，管理 adapter 的一次建议输出 1.1–1.7 万 tokens、耗时 185–300 秒以上，超过优化器 60 秒的等待上限，因此示例用 medium。[思考模式文档](https://docs.bigmodel.cn/cn/guide/capabilities/thinking-mode) 要求工具调用时原样回传 `reasoning_content`，项目对 `api.deepseek.com` 与 `open.bigmodel.cn` 都这样处理。
+- 智谱用 HTTP 429 同时表示限流和欠费（1113）、内容审核（1301）、额度用尽（1308 / 1310），后几种不重试直接报错；回复 `finish_reason` 为 `sensitive`（输出被审核截断）或 `model_context_window_exceeded` 时按调用失败处理，在 `metric-bench` 中记为“出错”而不是答错。
+- 只配置了 `*_REASONING_EFFORT` / `*_THINKING` 时才发送对应字段。用量里的推理 tokens 在两家都位于 `completion_tokens_details.reasoning_tokens`；智谱的缓存命中在 `prompt_tokens_details.cached_tokens`。
 
 修改配置后需重启已运行的服务。此前的 Mock/真实数据实验没有调用 DeepSeek；新增的真实调用、用量和性能比较见 [DeepSeek 对照报告](docs/deepseek-real-validation.md)，与极小连通性测试单独统计。
 
@@ -358,6 +378,7 @@ cargo run --locked -- exp3 --agents 3 --sessions 2 --tasks 6 --p-trap 0.5 --seed
 ```bash
 cargo run --locked -- llm
 cargo run --locked -- llm --agents analyst=openai --modes direct,middle --questions Q1,Q2 --max-steps 20
+cargo run --locked -- llm --agents ds=deepseek,glm=zhipu --modes direct,middle
 ```
 
 默认使用 `mock-a=mock,mock-b=mock`，无需模型 key，但仍需完整实验数据库。问题编号为 Q1–Q8；报告输出为 `results/llm.json` 和 `.md`。`direct` 是通过基础工具执行的对照组，关闭中间层部分复用和验证能力，并非独立的数据库驱动。

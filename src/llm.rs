@@ -124,28 +124,51 @@ impl Provider {
     }
 }
 
+/// 服务端错误与网络错误最多重试 3 次（2、4、8 秒）。限流（429）单独计数：优先按 Retry-After 等待，
+/// 否则 5 秒起指数退避、单次不超过 120 秒并加随机抖动，最多重试 8 次（网关的冷却期可达数分钟）。
 async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> {
     let mut last = String::new();
-    for attempt in 0..4 {
+    let (mut failures, mut limited) = (0u32, 0u32);
+    loop {
         let resp = req.try_clone().ok_or_else(|| anyhow!("请求无法重试"))?.json(body).send().await;
-        match resp {
+        let wait = match resp {
             Ok(r) => {
                 let status = r.status();
+                let retry_after = r.headers().get("retry-after").and_then(|v| v.to_str().ok()).and_then(|v| v.trim().parse::<u64>().ok());
                 let text = r.text().await.unwrap_or_default();
                 if status.is_success() {
                     return serde_json::from_str(&text).context("响应不是 JSON");
                 }
                 last = format!("HTTP {status}: {}", text.chars().take(500).collect::<String>());
-                let retry = (status.as_u16() == 429 && !futile_429(&text)) || status.as_u16() == 529 || status.is_server_error();
-                if !retry {
+                if status.as_u16() == 429 && !futile_429(&text) {
+                    limited += 1;
+                    if limited > 8 {
+                        bail!("限流重试 8 次后仍失败：{last}");
+                    }
+                    let secs = retry_after.unwrap_or(5 * 2u64.pow(limited - 1)).min(120);
+                    eprintln!("  限流 HTTP 429：{secs} 秒后重试（第 {limited} 次）");
+                    Duration::from_millis(secs * 1000 + (rand::random::<f64>() * 2000.0) as u64)
+                } else if status.as_u16() == 529 || status.is_server_error() {
+                    failures += 1;
+                    if failures > 3 {
+                        bail!("多次重试后仍失败：{last}");
+                    }
+                    Duration::from_secs(2u64.pow(failures))
+                } else {
                     bail!(last);
                 }
             }
-            Err(e) => last = e.to_string(),
-        }
-        tokio::time::sleep(Duration::from_secs(2u64.pow(attempt + 1))).await;
+            Err(e) => {
+                last = e.to_string();
+                failures += 1;
+                if failures > 3 {
+                    bail!("多次重试后仍失败：{last}");
+                }
+                Duration::from_secs(2u64.pow(failures))
+            }
+        };
+        tokio::time::sleep(wait).await;
     }
-    bail!("多次重试后仍失败：{last}")
 }
 
 /// 智谱 BigModel 也用 429 表示欠费（1113）、内容审核拦截（1301）和额度用尽（1308 / 1310），重试无效

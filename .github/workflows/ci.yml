@@ -40,11 +40,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --locked postgres_http_mock_lifecycle -- --ignored --nocapture
-      - run: cargo test --locked research_postgres_oracles_and_drift -- --ignored --nocapture
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: postgres-mock-reports
-          path: |
-            results/mock-*/
-            results/research-test-*/
+          path: results/mock-*/

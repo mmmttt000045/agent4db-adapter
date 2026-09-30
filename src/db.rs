@@ -58,10 +58,14 @@ pub struct MeterSnap {
     pub by_kind: BTreeMap<String, (u64, f64)>,
 }
 
-impl MeterSnap {
-    pub fn kind(&self, k: QKind) -> (u64, f64) {
-        self.by_kind.get(k.name()).copied().unwrap_or((0, 0.0))
+/// 两次快照之间的增量（b − a）。
+pub fn diff(a: &MeterSnap, b: &MeterSnap) -> MeterSnap {
+    let mut d = MeterSnap { queries: b.queries - a.queries, db_ms: b.db_ms - a.db_ms, by_kind: BTreeMap::new() };
+    for (k, (n, ms)) in &b.by_kind {
+        let (n0, ms0) = a.by_kind.get(k).copied().unwrap_or((0, 0.0));
+        d.by_kind.insert(k.clone(), (n - n0, ms - ms0));
     }
+    d
 }
 
 impl Meter {

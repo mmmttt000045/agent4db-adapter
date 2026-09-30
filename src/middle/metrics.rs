@@ -753,7 +753,7 @@ impl Middle {
                 }
             }
         };
-        let d = crate::sim::diff(&before, &self.db.meter.snap());
+        let d = crate::db::diff(&before, &self.db.meter.snap());
         let v = json!({
             "event": "maintenance", "policy": policy.name(), "key": e.key, "revision": e.revision, "agent": ctx.agent,
             "changed": changed, "conditions": conds, "outcome": outcome, "wall_ms": t0.elapsed().as_secs_f64() * 1000.0,

@@ -23,6 +23,8 @@ The default manuscript pairs English and Chinese paragraphs, headings, captions,
 | `main.tex` | 中英文双语全文；XeLaTeX。Complete bilingual manuscript; XeLaTeX. |
 | `main-en.tex` | 从同一正文生成的英文稿；pdfLaTeX 或 XeLaTeX。English export generated from the same manuscript. |
 | `export-english.ps1` | 编辑双语稿后重新生成英文稿。Regenerates the English export. |
+| `export-english.sh` | Linux 版英文稿导出，与 `.ps1` 等价。Linux equivalent of the PowerShell export. |
+| `build.sh` | 在 noctis 上导出英文稿、编译两份 PDF 到 `build/` 并报告页数：`./build.sh [en\|bi\|all]`。Exports, compiles both PDFs into build/, and reports page counts. |
 | `abstract-zh.md` | 当前中文摘要，与正文结果一致。Current Chinese abstract. |
 | `RESEARCH_STATUS.md` | 实验证据、边界与未完成机制。Evidence and remaining implementation work. |
 | `evidence/` | 本轮报告和每组合计的原样副本。Unmodified copies of current reports and cell summaries. |

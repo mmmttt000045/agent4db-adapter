@@ -93,7 +93,6 @@ pub struct MiddleConfig {
     pub version_ttl_ms: u64,
     pub max_rows: usize,
     pub verbose: bool,
-    pub trace_checks: bool,
     /// 实验可固定候选级审计抽样；None 保持逐次随机审计。
     pub audit_seed: Option<u64>,
     /// 指标经验的可见范围，与其他经验的 scope 分开设置
@@ -120,7 +119,6 @@ impl Default for MiddleConfig {
             version_ttl_ms: 200,
             max_rows: 50,
             verbose: false,
-            trace_checks: false,
             audit_seed: None,
             metric_scope: Scope::Global,
             metric_maint: Maint::Condition,
@@ -257,7 +255,6 @@ pub struct Middle {
     versions: Mutex<Option<(Instant, Versions)>>,
     notices: Mutex<HashMap<String, Vec<String>>>,
     pub stats: Stats,
-    traces: Mutex<Vec<Value>>,
     tasks: Mutex<HashMap<String, TaskLog>>,
     /// 指标经验的验证证据（按完整键），不随 find_metric 返回
     metric_evidence: Mutex<HashMap<String, MetricEvidence>>,
@@ -329,7 +326,6 @@ impl Middle {
             versions: Mutex::new(None),
             notices: Mutex::new(HashMap::new()),
             stats: Stats::default(),
-            traces: Mutex::new(Vec::new()),
             tasks: Mutex::new(HashMap::new()),
             metric_evidence: Mutex::new(HashMap::new()),
             metric_events: Mutex::new(Vec::new()),
@@ -340,20 +336,6 @@ impl Middle {
         if self.cfg.verbose {
             eprintln!("    · [{}] {}", ctx.agent, msg.as_ref());
         }
-    }
-
-    fn trace(&self, ctx: &Ctx, detail: Value) {
-        if self.cfg.trace_checks {
-            let mut traces = self.traces.lock();
-            if traces.len() < 20_000 {
-                let sequence = traces.len() + 1;
-                traces.push(json!({"sequence":sequence,"agent":ctx.agent,"session":ctx.session,"task":ctx.task,"detail":detail}));
-            }
-        }
-    }
-
-    pub fn take_check_traces(&self) -> Vec<Value> {
-        std::mem::take(&mut *self.traces.lock())
     }
 
     /// 取出并清空该任务的计算链记录。
@@ -591,10 +573,6 @@ impl Middle {
             .await?;
         let key = format!("check:{}", c.key());
         let content = Content::CheckResult { check: c.clone(), outcome: o.clone() };
-        self.trace(
-            ctx,
-            json!({"event":"check","check":c,"purpose":kind.name(),"source":if merged {"merged"} else {"executed"},"outcome":o}),
-        );
         self.store.put(&self.fk(ctx, &key), self.new_entry(ctx, &key, content, deps, vec![]));
         Ok((o, merged))
     }
@@ -609,7 +587,6 @@ impl Middle {
         if let Lookup::Hit(e) = self.lookup(ctx, &format!("check:{}", c.key())).await? {
             if let Content::CheckResult { outcome, .. } = e.content {
                 self.fb.record_reuse(c);
-                self.trace(ctx, json!({"event":"check","check":c,"source":"reused","outcome":outcome}));
                 self.log(ctx, format!("复用检查「{}」", c.describe()));
                 return Ok((outcome, false));
             }
@@ -807,10 +784,6 @@ impl Middle {
             ];
             let rows = self.rows();
             let ordered = self.fb.order(self.cfg.feedback, checks, &rows, &|c: &Check| self.cached(ctx, c));
-            self.trace(
-                ctx,
-                json!({"event":"planned_order","left":left,"right":right,"checks":ordered.iter().map(Check::kind).collect::<Vec<_>>()}),
-            );
             let mut seen: Vec<Obs> = vec![];
             let mut key_outcome: Option<Outcome> = None;
             let mut rc: Option<Outcome> = None;
@@ -856,10 +829,6 @@ impl Middle {
                 if probed {
                     key_outcome = Some(self.run_check(ctx, &key_check).await?.0);
                 }
-                self.trace(
-                    ctx,
-                    json!({"event":"validation_failed","left":left,"right":right,"first_failed":c.kind(),"audited":audited,"key_probe":probed}),
-                );
                 self.fb.episode(seen, audited, probe_key);
                 if let Some(ko) = key_outcome.as_ref().filter(|ko| !ko.pass) {
                     let avg = metric(ko, "avg_mult");
@@ -1146,10 +1115,6 @@ impl Middle {
     }
 
     // ───────────────────────── 工具：执行 ─────────────────────────
-
-    pub async fn run_sql(&self, ctx: &Ctx, sql: &str) -> Result<Value> {
-        self.run_sql_with(ctx, sql, &[]).await
-    }
 
     /// `refs`：本条 SQL 声明依据的指标经验 (key, revision)，执行前核对仍然有效。
     pub async fn run_sql_with(&self, ctx: &Ctx, sql: &str, refs: &[(String, u32)]) -> Result<Value> {

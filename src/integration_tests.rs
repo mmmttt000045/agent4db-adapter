@@ -1,10 +1,8 @@
-//! Opt-in PostgreSQL + HTTP + mock optimizer integration test.
+//! Opt-in PostgreSQL + HTTP integration test.
 //! Creates a uniquely named database, never loads fixtures into the supplied database.
 
 use crate::db::{Db, QKind};
-use crate::llm::Provider;
 use crate::middle::{Middle, MiddleConfig};
-use crate::optimizer::{Gate, Optimizer};
 use crate::{etl, server};
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
@@ -23,21 +21,18 @@ async fn tool(http: &reqwest::Client, base: &str, name: &str, args: Value) -> Re
     Ok(body)
 }
 
-async fn exercise(url: &str, out: &str) -> Result<Value> {
+async fn exercise(url: &str) -> Result<Value> {
     let admin = Arc::new(Db::connect(url, 2, false)?);
     admin.query(QKind::Meta, include_str!("../data/mock_fixture.sql")).await?;
     etl::setup(&admin).await?;
     let db = Arc::new(Db::connect(url, 4, true)?);
     let mid = Arc::new(Middle::new(db.clone(), MiddleConfig { version_ttl_ms: 0, ..Default::default() }).await?);
-    // The fixture only has valid joins, so no audited failures exist for replay; this test covers the
-    // management lifecycle, while the replay gate itself is unit-tested in optimizer/feedback.
-    let optimizer = Arc::new(Optimizer::with_gate(Provider::Mock, out, Gate::NoRegression)?);
     // Reserve an ephemeral address briefly; report a binding failure through readiness timeout.
     let listener = std::net::TcpListener::bind("127.0.0.1:0")?;
     let addr = listener.local_addr()?;
     drop(listener);
     let server_mid = mid.clone();
-    let server_task = tokio::spawn(async move { server::serve(server_mid, &addr.to_string(), Some(optimizer), Some(1), true).await });
+    let server_task = tokio::spawn(async move { server::serve(server_mid, &addr.to_string()).await });
     let base = format!("http://{addr}");
     let http = reqwest::Client::builder().no_proxy().timeout(Duration::from_secs(10)).build()?;
     let result = async {
@@ -47,8 +42,6 @@ async fn exercise(url: &str, out: &str) -> Result<Value> {
                 tokio::time::sleep(Duration::from_millis(50)).await;
             }
         }).await.context("HTTP 服务未启动")?;
-        let response = http.post(format!("{base}/v1/optimizer/propose")).send().await?;
-        ensure!(response.status() == 400, "样本不足时应拒绝生成策略");
         ensure!(db.query(QKind::Meta, "show default_transaction_read_only").await?.cell(0, 0) == Some("on"), "查询池应只读");
 
         let empty = tool(&http, &base, "run_sql", json!({"sql":"select ss_item_sk from store_sales where false"})).await?;
@@ -72,22 +65,6 @@ async fn exercise(url: &str, out: &str) -> Result<Value> {
             let v = tool(&http, &base, "check_join", json!({"left":"store_sales","right":table,"on":[[left_col,right_col]]})).await?;
             ensure!(v["valid"] == true, "合法关联失败：{v}");
         }
-        let applied: Value = tokio::time::timeout(Duration::from_secs(10), async {
-            loop {
-                let state: Value = http.get(format!("{base}/v1/optimizer")).send().await?.json().await?;
-                if state["state"]["active"].is_u64() { return Ok::<Value, anyhow::Error>(state); }
-                tokio::time::sleep(Duration::from_millis(100)).await;
-            }
-        }).await.context("自动应用策略超时")??;
-        tokio::time::sleep(Duration::from_millis(1200)).await;
-        let idle: Value = http.get(format!("{base}/v1/optimizer")).send().await?.json().await?;
-        ensure!(idle["state"]["proposals"] == applied["state"]["proposals"], "没有新增反馈时不应重复生成策略");
-        let rollback = http.post(format!("{base}/v1/optimizer/rollback")).send().await?;
-        ensure!(rollback.status().is_success(), "回滚应成功");
-        let old_id = applied["state"]["active"].as_u64().unwrap();
-        let stale = http.post(format!("{base}/v1/optimizer/apply/{old_id}")).send().await?;
-        ensure!(stale.status() == 400, "回滚后旧建议必须失效");
-
         let many_to_one = tool(&http, &base, "check_join", json!({"left":"store_sales","right":"date_dim","on":[["ss_sold_date_sk","d_date_sk"]]})).await?;
         ensure!(many_to_one["valid"] == true, "重复左键的一对多侧关联不应被误判：{many_to_one}");
 
@@ -107,66 +84,11 @@ async fn exercise(url: &str, out: &str) -> Result<Value> {
         let stats = mid.stats_json();
         ensure!(stats["guard_fails"].as_u64().unwrap_or(0) >= 1, "应观测到守卫失败");
         ensure!(stats["repairs"].as_u64().unwrap_or(0) >= 1, "应观测到粒度修复");
-        Ok(json!({"status":"passed","automatic_policy":applied,"many_to_one":many_to_one,"etl_inserted":inserted,"repaired_join":repaired,"correct_sum":sum,"stats":stats}))
+        Ok(json!({"status":"passed","many_to_one":many_to_one,"etl_inserted":inserted,"repaired_join":repaired,"correct_sum":sum,"stats":stats}))
     }.await;
     server_task.abort();
     let _ = server_task.await;
     result
-}
-
-// Deliberately controlled telemetry tests scheduling, not measured database performance.
-async fn exercise_manual_monitor(url: &str, out: &str) -> Result<Value> {
-    use crate::checks::{Check, Outcome};
-    use crate::feedback::{Obs, MIN_EVIDENCE};
-    let mid = Arc::new(Middle::new(Arc::new(Db::connect(url, 2, true)?), MiddleConfig::default()).await?);
-    let optimizer = Arc::new(Optimizer::with_gate(Provider::Mock, &format!("{out}/manual-monitor"), Gate::NoRegression)?);
-    let checks = vec![
-        Check::KeyUnique { table: "store_sales".into(), cols: vec!["ss_item_sk".into()], filter: None },
-        Check::RowConservation { left: "item".into(), right: "store_sales".into(), on: vec![], lf: None, rf: None },
-        Check::SampleFanout { left: "item".into(), right: "store_sales".into(), on: vec![], lf: None, rf: None, n: 1000 },
-    ];
-    for _ in 0..3 {
-        for c in &checks {
-            mid.fb.record(c, &Outcome { pass: c.kind() != "RowConservation", metrics: json!({}), ms: 10.0 }, &|_| 100.0);
-        }
-    }
-    let p = optimizer.propose(&mid.fb).await?;
-    optimizer.apply(p.id, &mid.fb)?;
-    for i in 0..MIN_EVIDENCE {
-        let mut candidate = checks.clone();
-        if let Check::KeyUnique { filter, .. } = &mut candidate[0] {
-            *filter = Some(format!("ss_item_sk>{i}"));
-        }
-        let obs = candidate
-            .iter()
-            .enumerate()
-            .map(|(j, c)| Obs::new(c, &Outcome { pass: j == 2, metrics: json!({}), ms: if j == 0 { 5.0 } else { 50.0 } }, true, &|_| 100.0))
-            .collect();
-        mid.fb.episode(obs, true, true);
-    }
-    let listener = std::net::TcpListener::bind("127.0.0.1:0")?;
-    let addr = listener.local_addr()?;
-    drop(listener);
-    let server_mid = mid.clone();
-    let task = tokio::spawn(async move { server::serve(server_mid, &addr.to_string(), Some(optimizer), None, false).await });
-    let http = reqwest::Client::builder().no_proxy().build()?;
-    let result = tokio::time::timeout(Duration::from_secs(5), async {
-        loop {
-            if let Ok(response) = http.get(format!("http://{addr}/v1/optimizer")).send().await {
-                let state: Value = response.json().await?;
-                if state["state"]["revision"] == 2 {
-                    ensure!(state["state"]["active"].is_null(), "manual mode should roll back");
-                    ensure!(state["state"]["proposals"].as_array().unwrap().len() == 1, "manual mode must not generate proposals");
-                    return Ok::<Value, anyhow::Error>(json!({"status":"passed","revision":2,"proposal_interval":null}));
-                }
-            }
-            tokio::time::sleep(Duration::from_millis(25)).await;
-        }
-    })
-    .await;
-    task.abort();
-    let _ = task.await;
-    result.context("manual-mode regression monitor did not run")?
 }
 
 #[tokio::test]
@@ -181,12 +103,7 @@ async fn postgres_http_mock_lifecycle() -> Result<()> {
     test_url.set_path(&format!("/{name}"));
     let out = format!("results/mock-{unique}");
     admin.query(QKind::Meta, &format!("create database {name}")).await.context("无法创建独立测试库")?;
-    let result = tokio::time::timeout(Duration::from_secs(90), async {
-        let mut report = exercise(test_url.as_str(), &out).await?;
-        report["manual_mode_monitor"] = exercise_manual_monitor(test_url.as_str(), &out).await?;
-        Ok::<Value, anyhow::Error>(report)
-    })
-    .await;
+    let result = tokio::time::timeout(Duration::from_secs(90), async { exercise(test_url.as_str()).await }).await;
     // The generated identifier contains only ASCII letters, digits and underscores.
     let cleanup = admin.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
     let report = match &result {

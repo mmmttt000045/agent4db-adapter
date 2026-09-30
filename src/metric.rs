@@ -5,7 +5,6 @@ use crate::catalog::Catalog;
 use crate::knowledge::{Basis, EmptyRule, JoinKind, Metric, TimeSpec};
 use crate::llm::{Provider, Turn};
 use crate::sqlscan;
-use crate::workload::Period;
 use anyhow::{anyhow, bail, ensure, Result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -13,6 +12,20 @@ use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::OnceLock;
 use std::time::Instant;
+
+/// 销售期间：年份 + 月份区间。
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct Period {
+    pub year: i32,
+    pub m1: u32,
+    pub m2: u32,
+}
+
+impl Period {
+    pub fn month(y: i32, m: u32) -> Period {
+        Period { year: y, m1: m, m2: m }
+    }
+}
 
 /// 题型：单期汇总、跨期差值（前者减后者）、全年中取值最高的月份。
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]

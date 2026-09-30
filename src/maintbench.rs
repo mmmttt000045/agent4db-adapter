@@ -7,14 +7,12 @@
 //! 共享度越低、写入涉及的条件越多，两种重验越接近。协议见 docs/metric-experience-protocol.md“维护方式对照”。
 
 use crate::catalog;
-use crate::db::{Db, QKind};
+use crate::db::{diff, Db, QKind};
 use crate::etl;
 use crate::knowledge::{Basis, Content, EmptyRule, JoinKind, JoinRef, Metric, Status, TimeSpec};
-use crate::metric::{self, parse_answer, same_value, Ask};
-use crate::metricbench::{self, GROWTH_OFFSET};
+use crate::metric::{self, parse_answer, same_value, Ask, Period};
+use crate::metricbench::{self, md_table, GROWTH_OFFSET};
 use crate::middle::{Ctx, Maint, Middle, MiddleConfig};
-use crate::sim::{diff, md_table};
-use crate::workload::Period;
 use anyhow::{Context, Result};
 use rand::{rngs::StdRng, seq::SliceRandom, SeedableRng};
 use serde::Serialize;

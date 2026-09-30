@@ -2,7 +2,7 @@
 name = "agentdb-mid"
 version = "0.1.0"
 edition = "2021"
-description = "中间层 Agent 原型：共享 · 守护 · 反馈（Agent 与数据库之间）"
+description = "MAVRA：为数据智能体维护共享指标定义的中间层（Agent 与 PostgreSQL 之间）"
 
 [dependencies]
 anyhow = "1"

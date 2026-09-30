@@ -1,14 +1,9 @@
-//! 真实 LLM Agent：Anthropic Messages API 与 OpenAI 兼容接口（DeepSeek / 通义 / Kimi / OpenAI 等），
-//! 以及一个脚本化的 mock（无 key 时测试工具循环）。Agent 只能通过中间层的工具访问数据库。
+//! 真实 LLM Agent：Anthropic Messages API 与 OpenAI 兼容接口（DeepSeek / 智谱 / OpenAI 等）。
+//! Agent 只能通过中间层的工具访问数据库。
 
-use crate::db::Db;
-use crate::etl;
-use crate::middle::{tool_specs, Ctx, GuardMode, Middle, MiddleConfig, Scope, ToolSpec};
-use crate::sim::{diff, md_table};
-use crate::workload::{grade, questions, Question};
+use crate::middle::{Ctx, Middle, ToolSpec};
 use anyhow::{anyhow, bail, Context, Result};
 use serde_json::{json, Value};
-use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 #[derive(Clone, Debug)]
@@ -36,7 +31,6 @@ pub struct Reply {
     pub calls: Vec<ToolCall>,
     pub input_tokens: u64,
     pub output_tokens: u64,
-    pub usage: Value,
 }
 
 #[derive(Default)]
@@ -50,7 +44,6 @@ pub struct OpenAiOptions {
 pub enum Provider {
     Anthropic { key: String, base: String, model: String, http: reqwest::Client },
     OpenAi { vendor: &'static str, key: String, base: String, model: String, options: OpenAiOptions, http: reqwest::Client },
-    Mock,
 }
 
 /// OpenAI 兼容服务的内置配置：(provider 名, 环境变量前缀, 默认 base URL)。
@@ -98,8 +91,7 @@ impl Provider {
                 model: env("ANTHROPIC_MODEL").ok_or_else(|| anyhow!("缺少 ANTHROPIC_MODEL"))?,
                 http: http(),
             },
-            "mock" => Provider::Mock,
-            _ => bail!("未知 provider：{kind}（可选 openai / deepseek / zhipu / claude / mock）"),
+            _ => bail!("未知 provider：{kind}（可选 openai / deepseek / zhipu / claude）"),
         })
     }
 
@@ -107,7 +99,6 @@ impl Provider {
         match self {
             Provider::Anthropic { model, .. } => format!("anthropic:{model}"),
             Provider::OpenAi { vendor, model, .. } => format!("{vendor}:{model}"),
-            Provider::Mock => "mock".into(),
         }
     }
 
@@ -117,7 +108,6 @@ impl Provider {
             Provider::Anthropic { base, model, .. } => json!({"provider": "anthropic", "base_url": base, "model": model}),
             Provider::OpenAi { vendor, base, model, options, .. } => json!({"provider": vendor, "base_url": base, "model": model,
                 "reasoning_effort": options.reasoning_effort, "thinking": options.thinking}),
-            Provider::Mock => json!({"provider": "mock"}),
         }
     }
 
@@ -127,7 +117,6 @@ impl Provider {
             Provider::OpenAi { key, base, model, options, http, .. } => {
                 openai_chat(http, base, key, (model, options), system, turns, tools).await
             }
-            Provider::Mock => mock_chat(turns),
         }
     }
 }
@@ -209,7 +198,6 @@ async fn anthropic_chat(
         raw: content.clone(),
         input_tokens: v["usage"]["input_tokens"].as_u64().unwrap_or(0),
         output_tokens: v["usage"]["output_tokens"].as_u64().unwrap_or(0),
-        usage: v["usage"].clone(),
         ..Default::default()
     };
     for b in content.as_array().into_iter().flatten() {
@@ -283,7 +271,6 @@ async fn openai_chat(
         text: msg["content"].as_str().unwrap_or_default().to_string(),
         input_tokens: v["usage"]["prompt_tokens"].as_u64().unwrap_or(0),
         output_tokens: v["usage"]["completion_tokens"].as_u64().unwrap_or(0),
-        usage: v["usage"].clone(),
         ..Default::default()
     };
     for c in msg["tool_calls"].as_array().into_iter().flatten() {
@@ -297,42 +284,7 @@ async fn openai_chat(
     Ok(r)
 }
 
-// ───────────────────────── Mock：脚本化“马虎”Agent，用于无 key 时测试 ─────────────────────────
-
-/// 先按只用单号关联的错误写法执行；被中间层拦下就改用标准 SQL；拿到结果后提交答案。
-fn mock_chat(turns: &[Turn]) -> Result<Reply> {
-    let Some(Turn::User(q)) = turns.first() else { bail!("mock：缺少问题") };
-    let gold = questions().into_iter().find(|x| q.contains(x.text)).map(|x| x.gold_sql).unwrap_or("select 1");
-    let trap = gold.replace(" and r.sr_item_sk = s.ss_item_sk", "").replace(" and r.cr_item_sk = s.cs_item_sk", "");
-    let last = turns.iter().rev().find_map(|t| match t {
-        Turn::ToolResults(rs) => rs.first().map(|r| r.1.clone()),
-        _ => None,
-    });
-    let n_asst = turns.iter().filter(|t| matches!(t, Turn::Assistant { .. })).count();
-    let call = |name: &str, input: Value| {
-        let id = format!("mock_{n_asst}");
-        let raw = json!([{"type": "tool_use", "id": id, "name": name, "input": input}]);
-        Ok(Reply { raw, calls: vec![ToolCall { id, name: name.into(), input }], ..Default::default() })
-    };
-    match n_asst {
-        0 => call("list_tables", json!({})),
-        1 => call("run_sql", json!({"sql": trap})),
-        _ => {
-            let last: Value = serde_json::from_str(&last.unwrap_or_default()).unwrap_or_default();
-            if last["rejected"].as_bool() == Some(true) || last.get("result").is_none() {
-                call("run_sql", json!({"sql": gold}))
-            } else {
-                let ans = last["result"]["rows"][0][0].as_str().unwrap_or_default().to_string();
-                call("final_answer", json!({"answer": ans, "sql": ""}))
-            }
-        }
-    }
-}
-
 // ───────────────────────── Agent 循环 ─────────────────────────
-
-const SYSTEM: &str = "你是一个数据分析 Agent，通过工具查询 PostgreSQL 上的 TPC-DS 零售数仓（门店 / 目录 / 网店三个渠道）。\
-先弄清表结构与关联方式，再写 SQL；不要猜测列的含义。得到结果后调用 final_answer：answer 只写最终值（数字或类别名，不带单位与说明），sql 写得到它的那条 SQL。";
 
 pub(crate) const SYSTEM_MIDDLE: &str = "工具由数据中间层提供：join_path 返回两表验证过的关联方式（含需要的行过滤）；\
 run_sql 可能拒绝不可靠的写法并说明原因与建议，请按提示修改后重试；返回中的 notices 是中间层对你此前结果的提醒。";
@@ -388,13 +340,6 @@ pub struct AgentRun {
     pub derivation: Option<String>,
     /// 调用了 ask_clarification（任务随即结束）
     pub clarification: Option<String>,
-}
-
-pub async fn run_agent(p: &Provider, mid: &Middle, ctx: &Ctx, question: &str, middle_tools: bool, max_steps: usize) -> Result<AgentRun> {
-    let mut tools = tool_specs(middle_tools);
-    tools.push(final_answer_spec(false));
-    let system = if middle_tools { format!("{SYSTEM}\n{SYSTEM_MIDDLE}") } else { SYSTEM.to_string() };
-    run_agent_with(p, mid, ctx, question, &system, &tools, max_steps).await
 }
 
 /// 通用 Agent 循环：由调用方给出系统提示与工具。final_answer 与 ask_clarification 结束任务，其余工具交给中间层。
@@ -463,117 +408,14 @@ pub async fn run_agent_with(
     Ok(run)
 }
 
-// ───────────────────────── LLM 实验：直连 vs 中间层 ─────────────────────────
-
-fn llm_cfg(mode: &str) -> Result<(MiddleConfig, bool)> {
-    Ok(match mode {
-        "direct" => (
-            MiddleConfig {
-                name: mode.into(),
-                scope: Scope::Session,
-                singleflight: false,
-                guard: GuardMode::Off,
-                feedback: false,
-                validate_sql: false,
-                result_cache: false,
-                ..Default::default()
-            },
-            false,
-        ),
-        "middle" => (MiddleConfig { name: mode.into(), ..Default::default() }, true),
-        _ => bail!("未知模式 {mode}（可选 direct / middle）"),
-    })
-}
-
-pub async fn llm_eval(
-    db: Arc<Db>,
-    admin: Arc<Db>,
-    agents: Vec<(String, Provider)>,
-    modes: &[String],
-    qids: Option<Vec<String>>,
-    max_steps: usize,
-) -> Result<(Value, String)> {
-    etl::setup(&admin).await?;
-    etl::reset(&admin).await?;
-    let qs: Vec<Question> = questions().into_iter().filter(|q| qids.as_ref().is_none_or(|v| v.iter().any(|x| x == q.id))).collect();
-    let mut gold = std::collections::HashMap::new();
-    for q in &qs {
-        let r = admin.query(crate::db::QKind::Meta, q.gold_sql).await?;
-        gold.insert(q.id, r.cell(0, 0).unwrap_or_default().to_string());
-    }
-    let mut runs = vec![];
-    let mut rows = vec![];
-    for mode in modes {
-        let (cfg, mid_tools) = llm_cfg(mode)?;
-        let mid = Middle::new(db.clone(), cfg).await?;
-        for phase in ["v1", "v2"] {
-            if phase == "v2" {
-                etl::apply_v2(&admin).await?;
-                mid.invalidate_versions();
-            }
-            for q in qs.iter().filter(|q| phase == "v1" || q.affected_by_v2) {
-                for (agent, p) in &agents {
-                    let ctx = Ctx::new(agent, &format!("{mode}-{phase}-{}", q.id), q.id);
-                    let before = db.meter.snap();
-                    let r = run_agent(p, &mid, &ctx, q.text, mid_tools, max_steps).await;
-                    let d = diff(&before, &db.meter.snap());
-                    let (ok, run) = match r {
-                        Ok(run) => (run.answer.as_deref().is_some_and(|a| grade(a, &gold[q.id], q.numeric)), run),
-                        Err(e) => {
-                            eprintln!("    {agent} {} 出错：{e:#}", q.id);
-                            (false, AgentRun::default())
-                        }
-                    };
-                    eprintln!(
-                        "  {mode:<6} {phase} {} {agent:<12} → {:<14} {} | 工具 {:>2} 次 | 拦下 {} | 数据库 {:>3} 条 {:>5.1} s | token {}/{}",
-                        q.id,
-                        run.answer.clone().unwrap_or_default().chars().take(14).collect::<String>(),
-                        if ok { "✓" } else { "✗" },
-                        run.tool_calls,
-                        run.rejections,
-                        d.queries,
-                        d.db_ms / 1000.0,
-                        run.input_tokens,
-                        run.output_tokens
-                    );
-                    rows.push(vec![
-                        mode.clone(),
-                        phase.into(),
-                        q.id.into(),
-                        agent.clone(),
-                        if ok { "✓".into() } else { "✗".into() },
-                        run.answer.clone().unwrap_or_default(),
-                        gold[q.id].clone(),
-                        run.tool_calls.to_string(),
-                        run.rejections.to_string(),
-                        d.queries.to_string(),
-                        format!("{:.1}", d.db_ms / 1000.0),
-                        format!("{}", run.input_tokens + run.output_tokens),
-                    ]);
-                    runs.push(json!({"mode": mode, "phase": phase, "question": q.id, "agent": agent, "provider": p.label(),
-                                     "correct": ok, "gold": gold[q.id], "run": run, "db_queries": d.queries, "db_seconds": d.db_ms / 1000.0}));
-                }
-            }
-        }
-        etl::reset(&admin).await?;
-    }
-    let md = format!(
-        "### LLM Agent：直连 vs 中间层\n\n{}",
-        md_table(&["模式", "数据", "题", "Agent", "对错", "回答", "标准答案", "工具调用", "拦下", "DB 查询", "DB s", "token"], &rows)
-    );
-    Ok((
-        json!({"experiment": "llm", "agents": agents.iter().map(|(a, p)| json!({"agent": a, "provider": p.label()})).collect::<Vec<_>>(), "runs": runs}),
-        md,
-    ))
-}
-
 #[cfg(test)]
 mod provider_tests {
     use super::*;
+    use crate::middle::tool_specs;
     use axum::{routing::post, Json, Router};
 
     #[tokio::test]
-    async fn management_request_uses_configured_model_without_tools() {
+    async fn request_without_tools_omits_tool_field() {
         let app = Router::new().route(
             "/v1/chat/completions",
             post(|Json(body): Json<Value>| async move {

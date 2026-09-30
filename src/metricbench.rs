@@ -2,14 +2,12 @@
 //! 在独立数据库上生成合成零售数据；查询 Agent 与提炼器都调用真实模型。协议见 docs/metric-experience-protocol.md。
 
 use crate::catalog;
-use crate::db::{lit, Db, QKind};
+use crate::db::{diff, lit, Db, QKind};
 use crate::etl;
 use crate::knowledge::{Basis, Content, Status};
 use crate::llm::{self, AgentRun, Provider};
-use crate::metric::{self, parse_answer, same_value, Ask, Trajectory};
+use crate::metric::{self, parse_answer, same_value, Ask, Period, Trajectory};
 use crate::middle::{tool_specs_with, Ctx, GuardMode, Maint, Middle, MiddleConfig, Scope, SqlCall, TaskLog, ToolSpec};
-use crate::sim::{diff, md_table};
-use crate::workload::Period;
 use anyhow::{ensure, Context, Result};
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -1251,5 +1249,13 @@ fn markdown(report: &Value) -> String {
          - 受限修复与 G8 使用学习集判题器，实验之外需要业务方确认。\n\
          - EXPLAIN 在任务结束后执行，会改变后续任务的缓存状态。\n",
     );
+    s
+}
+
+pub fn md_table(headers: &[&str], rows: &[Vec<String>]) -> String {
+    let mut s = format!("| {} |\n|{}|\n", headers.join(" | "), headers.iter().map(|_| "---").collect::<Vec<_>>().join("|"));
+    for r in rows {
+        s.push_str(&format!("| {} |\n", r.join(" | ")));
+    }
     s
 }

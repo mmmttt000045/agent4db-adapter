@@ -6,7 +6,6 @@
 //!
 //! 自适应顺序不会直接生效。被审计的失败候选（三项检查结果全知，抽样与顺序无关）可以离线
 //! 回放任意顺序的代价；只有回放显示比默认顺序显著更省时才采纳，证据增加后重新评估。
-//! 模型策略的采纳门槛与退化回滚也使用同一个评估器（见 `optimizer`）。
 
 use crate::checks::{Check, Outcome};
 use parking_lot::Mutex;
@@ -116,15 +115,13 @@ struct Episode {
     obs: Vec<Obs>,
     /// 首个失败的不是键唯一性时，是否还要补查它来决定粒度修复（与顺序无关，取决于修复进度）
     probe_key: bool,
-    /// 记录时的策略纪元；`set_priority` 每调用一次加一
-    epoch: u64,
     sequence: u64,
 }
 
 /// 可回放的排序策略。
 #[derive(Clone, Debug)]
 pub enum Order {
-    /// 按检查种类的固定排列：默认顺序或模型策略
+    /// 按检查种类的固定排列（回放基线用默认顺序）
     Fixed(Vec<String>),
     /// 内置自适应评分
     Adaptive,
@@ -156,10 +153,6 @@ impl Evidence {
     pub fn improves(&self) -> bool {
         self.episodes >= MIN_EVIDENCE && self.ci95[1] < 0.0
     }
-    /// 证据足够，且区间整体高于 0。
-    pub fn regresses(&self) -> bool {
-        self.episodes >= MIN_EVIDENCE && self.ci95[0] > 0.0
-    }
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -181,8 +174,6 @@ struct State {
     seen_groups: BTreeSet<String>,
     adaptive_uses: u64,
     order_calls: u64,
-    priority: Option<Vec<String>>,
-    epoch: u64,
     episodes: VecDeque<Episode>,
     /// 被审计失败候选的累计数（含已滑出窗口的）
     evidence_total: u64,
@@ -290,12 +281,12 @@ impl State {
         Checkpoint { cursor: self.evidence_total, groups: self.seen_groups.clone() }
     }
 
-    fn evaluate_batch(&self, policy: &Order, since_epoch: Option<u64>, boundary: Option<&Checkpoint>, scorer: &State) -> Evidence {
+    fn evaluate_batch(&self, policy: &Order, boundary: Option<&Checkpoint>, scorer: &State) -> Evidence {
         let baseline = Order::default_order();
         let mut groups: BTreeMap<String, Vec<(f64, f64)>> = BTreeMap::new();
         for e in &self.episodes {
             let key = signature(&e.obs);
-            if since_epoch.is_some_and(|s| e.epoch < s) || boundary.is_some_and(|b| e.sequence <= b.cursor || b.groups.contains(&key)) {
+            if boundary.is_some_and(|b| e.sequence <= b.cursor || b.groups.contains(&key)) {
                 continue;
             }
             groups.entry(key).or_default().push((scorer.replay(e, policy), scorer.replay(e, &baseline)));
@@ -310,10 +301,6 @@ impl State {
         summarize(&pairs)
     }
 
-    fn evaluate(&self, policy: &Order, since_epoch: Option<u64>) -> Evidence {
-        self.evaluate_batch(policy, since_epoch, None, self)
-    }
-
     /// Freeze a scorer, then decide once per fresh batch of distinct candidates.
     fn adaptive_adopted(&mut self) -> bool {
         if self.frozen.is_none() {
@@ -322,7 +309,7 @@ impl State {
             self.adaptive = Some(Decision { at: self.evidence_total, adopted: false, evidence: Evidence::default() });
             return false;
         }
-        let evidence = self.evaluate_batch(&Order::Adaptive, None, Some(&self.boundary), self.frozen.as_ref().unwrap());
+        let evidence = self.evaluate_batch(&Order::Adaptive, Some(&self.boundary), self.frozen.as_ref().unwrap());
         if evidence.episodes >= MIN_EVIDENCE {
             let adopted = evidence.improves();
             self.adaptive = Some(Decision { at: self.evidence_total, adopted, evidence });
@@ -341,14 +328,6 @@ pub struct Feedback {
 }
 
 impl Feedback {
-    /// 设置（或清除）固定排列，返回新的策略纪元；之后记录的证据都带这个纪元。
-    pub fn set_priority(&self, priority: Option<Vec<String>>) -> u64 {
-        let mut s = self.state.lock();
-        s.priority = priority;
-        s.epoch += 1;
-        s.epoch
-    }
-
     /// 一次实际执行（种类整体与具体上下文各记一份）。
     pub fn record(&self, c: &Check, o: &Outcome, rows: &dyn Fn(&str) -> f64) {
         let mrows = c.rows_touched(rows) / 1e6;
@@ -385,37 +364,17 @@ impl Feedback {
             s.unaudited_failures += 1;
             return;
         }
-        let epoch = s.epoch;
         let sequence = s.evidence_total + 1;
-        s.episodes.push_back(Episode { obs, probe_key, epoch, sequence });
+        s.episodes.push_back(Episode { obs, probe_key, sequence });
         while s.episodes.len() > WINDOW {
             s.episodes.pop_front();
         }
         s.evidence_total += 1;
     }
 
-    /// 策略相对默认顺序的回放证据；`since_epoch` 只看该纪元之后记录的候选。
-    pub fn evaluate(&self, policy: &Order, since_epoch: Option<u64>) -> Evidence {
-        self.state.lock().evaluate(policy, since_epoch)
-    }
-
-    pub fn checkpoint(&self) -> Checkpoint {
-        self.state.lock().checkpoint()
-    }
-
-    /// Monitoring is time-separated but may revisit existing workloads after data drift.
-    pub fn monitoring_checkpoint(&self) -> Checkpoint {
-        Checkpoint { cursor: self.state.lock().evidence_total, groups: BTreeSet::new() }
-    }
-
-    pub fn evaluate_after(&self, policy: &Order, boundary: &Checkpoint) -> Evidence {
-        let s = self.state.lock();
-        s.evaluate_batch(policy, None, Some(boundary), &s)
-    }
-
     /// `enabled=false` 时保持调用方给出的固定顺序（调用方按 `DEFAULT_ORDER` 构造）。
     /// `cached` 报告某检查的结果当前是否已在经验库中，它会被视为零代价。
-    pub fn order(&self, enabled: bool, mut checks: Vec<Check>, rows: &dyn Fn(&str) -> f64, cached: &dyn Fn(&Check) -> bool) -> Vec<Check> {
+    pub fn order(&self, enabled: bool, checks: Vec<Check>, rows: &dyn Fn(&str) -> f64, cached: &dyn Fn(&Check) -> bool) -> Vec<Check> {
         if !enabled {
             return checks;
         }
@@ -424,10 +383,6 @@ impl Feedback {
         let mut candidate_keys: Vec<String> = checks.iter().map(Check::key).collect();
         candidate_keys.sort();
         s.seen_groups.insert(candidate_keys.join("\n"));
-        if let Some(priority) = &s.priority {
-            checks.sort_by_key(|c| rank(priority, c.kind()));
-            return checks;
-        }
         if checks.iter().any(|c| s.kinds.get(c.kind()).is_none_or(|k| k.runs < MIN_RUNS)) || !s.adaptive_adopted() {
             return checks;
         }
@@ -439,19 +394,13 @@ impl Feedback {
         idx.into_iter().map(|i| checks[i].clone()).collect()
     }
 
-    pub fn snapshot(&self) -> BTreeMap<String, KindStats> {
-        self.state.lock().kinds.clone()
-    }
-
     /// 统计、证据与自适应采纳状态，供 `/v1/stats` 与实验报告使用。
     pub fn report(&self) -> Value {
         let s = self.state.lock();
-        let pending = s.frozen.as_ref().map(|scorer| s.evaluate_batch(&Order::Adaptive, None, Some(&s.boundary), scorer));
+        let pending = s.frozen.as_ref().map(|scorer| s.evaluate_batch(&Order::Adaptive, Some(&s.boundary), scorer));
         json!({
             "kinds": s.kinds,
             "contexts": s.contexts,
-            "policy": s.priority,
-            "epoch": s.epoch,
             "evidence": {"audited_failures_in_window": s.episodes.len(), "audited_failures_total": s.evidence_total,
                 "passed": s.passed, "unaudited_failures": s.unaudited_failures, "min_evidence": MIN_EVIDENCE},
             "adaptive": s.adaptive,
@@ -492,6 +441,16 @@ mod tests {
         fb.episode(obs, true, probe_key);
     }
 
+    fn evaluate(fb: &Feedback, policy: &Order, boundary: Option<&Checkpoint>) -> Evidence {
+        let s = fb.state.lock();
+        s.evaluate_batch(policy, boundary, &s)
+    }
+
+    /// 证据足够，且区间整体高于 0。
+    fn regresses(e: &Evidence) -> bool {
+        e.episodes >= MIN_EVIDENCE && e.ci95[0] > 0.0
+    }
+
     fn rc_first() -> Order {
         Order::Fixed(vec!["RowConservation".into(), "KeyUnique".into(), "SampleFanout".into()])
     }
@@ -502,18 +461,18 @@ mod tests {
         for _ in 0..MIN_EVIDENCE {
             audited(&fb, (false, 50.0), (false, 5.0), false);
         }
-        let e = fb.evaluate(&rc_first(), None);
+        let e = evaluate(&fb, &rc_first(), None);
         assert_eq!(e.episodes, MIN_EVIDENCE);
         assert!((e.policy_ms - 5.0).abs() < 1e-9 && (e.baseline_ms - 50.0).abs() < 1e-9);
-        assert!(e.improves() && !e.regresses());
+        assert!(e.improves() && !regresses(&e));
         // 需要补查键唯一性时，先跑行数守恒反而多花一次检查。
         let fb = Feedback::default();
         for _ in 0..MIN_EVIDENCE {
             audited(&fb, (false, 50.0), (false, 5.0), true);
         }
-        let e = fb.evaluate(&rc_first(), None);
+        let e = evaluate(&fb, &rc_first(), None);
         assert!((e.policy_ms - 55.0).abs() < 1e-9);
-        assert!(e.regresses() && !e.improves());
+        assert!(regresses(&e) && !e.improves());
     }
 
     #[test]
@@ -524,9 +483,9 @@ mod tests {
             fb.episode(c.iter().map(|x| Obs::new(x, &outcome(true, 3.0), true, &|_| 1.0)).collect(), false, true);
             fb.episode(vec![Obs::new(&c[0], &outcome(false, 3.0), true, &|_| 1.0)], false, true);
         }
-        let e = fb.evaluate(&rc_first(), None);
+        let e = evaluate(&fb, &rc_first(), None);
         assert_eq!(e.episodes, 0);
-        assert!(!e.improves() && !e.regresses());
+        assert!(!e.improves() && !regresses(&e));
         let r = fb.report();
         assert_eq!(r["evidence"]["passed"], MIN_EVIDENCE as u64 * 2);
         assert_eq!(r["evidence"]["unaudited_failures"], MIN_EVIDENCE as u64 * 2);
@@ -542,9 +501,9 @@ mod tests {
         for _ in 0..9 {
             fb.record_reuse(&checks()[0]);
         }
-        let e = fb.evaluate(&rc_first(), None);
+        let e = evaluate(&fb, &rc_first(), None);
         assert!((e.baseline_ms - 50.0).abs() < 1e-9);
-        assert!(e.improves() && !e.regresses());
+        assert!(e.improves() && !regresses(&e));
     }
 
     #[test]
@@ -590,19 +549,6 @@ mod tests {
     }
 
     #[test]
-    fn priority_overrides_adaptive_and_advances_epoch() {
-        let fb = Feedback::default();
-        let c = checks();
-        let epoch = fb.set_priority(Some(vec!["SampleFanout".into(), "KeyUnique".into(), "RowConservation".into()]));
-        assert_eq!(epoch, 1);
-        assert_eq!(fb.order(true, c.clone(), &|_| 1.0, &|_| false)[0].kind(), "SampleFanout");
-        audited(&fb, (false, 50.0), (false, 5.0), false);
-        assert_eq!(fb.evaluate(&rc_first(), Some(1)).episodes, 1);
-        assert_eq!(fb.set_priority(None), 2);
-        assert_eq!(fb.evaluate(&rc_first(), Some(2)).episodes, 0);
-    }
-
-    #[test]
     fn repeated_candidates_do_not_inflate_evidence_and_training_groups_are_excluded() {
         let fb = Feedback::default();
         let c = checks();
@@ -614,17 +560,13 @@ mod tests {
             ]
         };
         fb.episode(observations(), true, false);
-        let boundary = fb.checkpoint();
+        let boundary = fb.state.lock().checkpoint();
         for _ in 0..100 {
             fb.episode(observations(), true, false);
         }
-        assert_eq!(fb.evaluate(&rc_first(), None).episodes, 1);
-        assert_eq!(fb.evaluate_after(&rc_first(), &boundary).episodes, 0);
-        assert!(!fb.evaluate(&rc_first(), None).improves());
-        // A monitoring batch may revisit an existing group, but still counts it only once.
-        let monitor = fb.monitoring_checkpoint();
-        fb.episode(observations(), true, false);
-        assert_eq!(fb.evaluate_after(&rc_first(), &monitor).episodes, 1);
+        assert_eq!(evaluate(&fb, &rc_first(), None).episodes, 1);
+        assert_eq!(evaluate(&fb, &rc_first(), Some(&boundary)).episodes, 0);
+        assert!(!evaluate(&fb, &rc_first(), None).improves());
     }
 
     #[test]
@@ -632,7 +574,7 @@ mod tests {
         let fb = Feedback::default();
         audited(&fb, (true, 50.0), (false, 5.0), true);
         // Inconsistent observations can occur without a shared transaction snapshot.
-        let e = fb.evaluate(&Order::default_order(), None);
+        let e = evaluate(&fb, &Order::default_order(), None);
         assert_eq!(e.baseline_ms, 55.0);
         assert_eq!(e.policy_ms, 55.0);
     }

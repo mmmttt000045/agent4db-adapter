@@ -1,0 +1,28 @@
+# LaTeX build output
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.loa
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.pdf
+*.xdv
+*.zip
+!mavra-sigmod-bilingual.zip
+/build/
+
+# Local editor and environment files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.env
+.env.*

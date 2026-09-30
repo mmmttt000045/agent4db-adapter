@@ -1,0 +1,24 @@
+group | holdout | growth | v2 | total | scored_in_M | scored_out_M | avg_rounds | avg_tools | learn_in_k | learn_out_k | relearn_tasks | relearn_in_k | relearn_out_k | extract_in_out_k | wall_s
+direct(旧,M1M3) | 3/6 | 2/6 | 0/3 | 5/15 | 3.3 | 0.58 | 11.9 | 21.0 | 0 | 0 | 0 | 0 | 0 | 0/0 | 3007
+middle | 5/9 | 2/6 | 4/6 | 11/21 | 4.3 | 0.66 | 12.2 | 20.5 | 105 | 18 | 0 | 0 | 0 | 0/0 | 3306
+metric-global | 9/9 | 6/6 | 6/6 | 21/21 | 0.52 | 0.12 | 4.9 | 8.0 | 113 | 22 | 0 | 0 | 0 | 9/37 | 587
+metric-global-def | 9/9 | 6/6 | 6/6 | 21/21 | 0.49 | 0.13 | 4.9 | 8.1 | 311 | 92 | 0 | 0 | 0 | 9/34 | 613
+metric-global-schema | 9/9 | 6/6 | 3/6 | 18/21 | 0.43 | 0.07 | 4.8 | 7.3 | 124 | 42 | 0 | 0 | 0 | 9/43 | 331
+metric-global-revoke | 9/9 | 6/6 | 6/6 | 21/21 | 0.33 | 0.07 | 4.5 | 6.8 | 113 | 27 | 8 | 371 | 122 | 9/42 | 299
+metric-global-noguard | 7/9 | 4/6 | 1/6 | 12/21 | 1.84 | 0.34 | 8.1 | 16.7 | 225 | 72 | 0 | 0 | 0 | 9/34 | 1576
+--- noguard wrong tasks
+holdout M3-P1 wrong answer 23.65 gold 23.807984846 found [['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0]] declared [['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0]] steps 11
+holdout M3-T1 wrong answer 0.05 gold 0.0099219903 found [['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0]] declared [['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0]] steps 14
+growth M3-P1 wrong answer 20.00 gold 11.903992423 found [['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0]] declared [['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0]] steps 20
+growth M3-T1 wrong answer 0.05 gold 0.0099219903 found [['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0]] declared [['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0]] steps 16
+v2 M2-P1 wrong answer 6588699.86 gold 3294349.93 found [['metric:门店退货金额', 0]] declared [['metric:门店退货金额', 0]] steps 3
+v2 M2-T1 wrong answer 2880692.21 gold -212139.52 found [['metric:门店退货金额', 0]] declared [['metric:门店退货金额', 0], ['metric:门店退货金额', 0]] steps 3
+v2 M2-T2 wrong answer 10 gold 7 found [['metric:门店退货金额', 0]] declared [['metric:门店退货金额', 0]] steps 4
+v2 M3-P1 wrong answer 11.83 gold 11.903992423 found [['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0]] declared [['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0]] steps 13
+v2 M3-T1 wrong answer None gold 0.0099219903 found [['metric:门店营业额', 0], ['metric:门店退货金额', 0], ['metric:门店退货金额', 0], ['metric:门店退货金额', 0], ['metric:门店营业额', 0], ['metric:门店退货金额', 0]] declared [['metric:门店退货率', 0], ['metric:门店客单价', 0], ['metric:门店营业额', 999], ['metric:门店营业额', 0]] steps 20
+learn M1-L1 promoted metric:门店营业额 None 
+learn M1-L2 corroborated metric:门店营业额 None 
+learn M2-L1 promoted metric:门店退货金额 None 
+learn M2-L2 corroborated metric:门店退货金额 None 
+learn M3-L1 candidate metric:门店退货率 G3 聚合表达式：sr 不是已知列或允许的函数
+learn M3-L2 candidate metric:门店退货率#2 G3 聚合表达式：sr 不是已知列或允许的函数

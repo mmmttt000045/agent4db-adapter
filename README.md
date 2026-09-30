@@ -10,6 +10,16 @@
 
 新增 [DeepSeek 真实模型对照](docs/deepseek-real-validation.md)：官方 V4.1 Flash、`max` 思考强度，对照固定规则、统计反馈和 Mock；报告同时记录实际策略采纳、独立验证、模型 token 和全程等待。真实模型接入不保证额外性能收益，专项检查的毛收益不能代替包含观察与模型开销的总收益。
 
+## 论文与 Overleaf
+
+论文源文件与实验依据统一保存在本仓库的 [overleaf/](overleaf/README.md) 目录：
+
+- [中英文双语稿](overleaf/main.tex)：SIGMOD 双栏匿名格式，使用 XeLaTeX。
+- [英文稿](overleaf/main-en.tex)：与双语稿共享内容，可使用 pdfLaTeX。
+- [Overleaf 上传包](overleaf/mavra-sigmod-bilingual.zip)：包含稿件、使用说明和实验依据。
+
+`overleaf/` 是本仓库的普通目录，随代码一起提交和推送。修改稿件和更新实验时，可在仓库根目录统一管理；使用方法和编译验证状态见 [论文说明](overleaf/README.md)。
+
 ## 核心能力
 
 新一轮研究评测使用 `research` 命令。完整设计、计量边界、数据来源和复现方法见 [研究实验协议](docs/research-protocol.md)。它包含 15 张业务表、16 种 SQL 结构、参数/结构/领域留出、数据漂移，以及 A/B/C/D/Mock 五组对照。参数实例数量与独立 SQL 结构数量分别报告。

@@ -56,8 +56,9 @@ const OPENAI_PROFILES: [(&str, &str, &str); 4] = [
     ("cline", "CLINE", "https://api.cline.bot/api/v1"),
 ];
 
+/// 单次请求超时 300 秒：网关偶尔挂起不返回，超时后由 `post_json` 重试（最多 4 次）。
 fn http() -> reqwest::Client {
-    reqwest::Client::builder().timeout(Duration::from_secs(900)).build().expect("http client")
+    reqwest::Client::builder().timeout(Duration::from_secs(300)).build().expect("http client")
 }
 
 impl Provider {

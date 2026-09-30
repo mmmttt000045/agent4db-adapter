@@ -20,11 +20,11 @@ pub struct Options {
     /// 门店销售行数（目录渠道为其一半）
     #[arg(long, default_value_t = 1_000_000, value_parser = clap::value_parser!(u32).range(10_000..=20_000_000))]
     rows: u32,
-    /// 查询 Agent 的模型服务（配置写在 .env，如 deepseek 读 DEEPSEEK_*，zhipu 读 ZHIPU_*）
-    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "anthropic", "claude"])]
+    /// 查询 Agent 的模型服务（配置写在 .env，如 deepseek 读 DEEPSEEK_*，zhipu 读 ZHIPU_*，cline 读 CLINE_*）
+    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "cline", "anthropic", "claude"])]
     agent: String,
     /// 提炼器的模型服务
-    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "anthropic", "claude"])]
+    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "cline", "anthropic", "claude"])]
     extractor: String,
     /// metric-global 为条件级维护；-schema / -revoke / -def 只改变维护方式（只看结构、逐写入撤销后重新提炼、定义级重验）
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",

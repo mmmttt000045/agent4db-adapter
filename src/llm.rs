@@ -48,10 +48,12 @@ pub enum Provider {
 
 /// OpenAI 兼容服务的内置配置：(provider 名, 环境变量前缀, 默认 base URL)。
 /// 各服务的 key 与模型分别写在 .env（如 DEEPSEEK_API_KEY、ZHIPU_MODEL），切换或对照时只改 provider 名。
-const OPENAI_PROFILES: [(&str, &str, &str); 3] = [
+const OPENAI_PROFILES: [(&str, &str, &str); 4] = [
     ("openai", "OPENAI", "https://api.openai.com/v1"),
     ("deepseek", "DEEPSEEK", "https://api.deepseek.com"),
     ("zhipu", "ZHIPU", "https://open.bigmodel.cn/api/paas/v4"),
+    // Cline 网关：聚合多家模型，模型名带厂商前缀（如 deepseek/deepseek-v4.1-flash）；需要 x-client-type 头，响应外包一层 data
+    ("cline", "CLINE", "https://api.cline.bot/api/v1"),
 ];
 
 fn http() -> reqwest::Client {
@@ -91,7 +93,7 @@ impl Provider {
                 model: env("ANTHROPIC_MODEL").ok_or_else(|| anyhow!("缺少 ANTHROPIC_MODEL"))?,
                 http: http(),
             },
-            _ => bail!("未知 provider：{kind}（可选 openai / deepseek / zhipu / claude）"),
+            _ => bail!("未知 provider：{kind}（可选 openai / deepseek / zhipu / cline / claude）"),
         })
     }
 
@@ -259,8 +261,15 @@ async fn openai_chat(
     if !tools.is_empty() {
         body["tools"] = json!(tools);
     }
-    let req = http.post(format!("{}/chat/completions", base.trim_end_matches('/'))).bearer_auth(key);
-    let v = post_json(req, &body).await?;
+    let mut req = http.post(format!("{}/chat/completions", base.trim_end_matches('/'))).bearer_auth(key);
+    let cline = reqwest::Url::parse(base).ok().is_some_and(|u| u.host_str() == Some("api.cline.bot"));
+    if cline {
+        req = req.header("x-client-type", "cline-cli");
+    }
+    let mut v = post_json(req, &body).await?;
+    if cline && v.get("data").is_some() {
+        v = v["data"].take();
+    }
     // 智谱 BigModel：输出被内容审核截断或超出上下文窗口时回复不完整，按调用失败处理
     if let Some(r @ ("sensitive" | "model_context_window_exceeded")) = v["choices"][0]["finish_reason"].as_str() {
         bail!("模型回复不完整：finish_reason={r}");

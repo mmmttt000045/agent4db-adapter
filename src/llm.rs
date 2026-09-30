@@ -127,7 +127,6 @@ impl Provider {
 /// 服务端错误与网络错误最多重试 3 次（2、4、8 秒）。限流（429）单独计数：优先按 Retry-After 等待，
 /// 否则 5 秒起指数退避、单次不超过 120 秒并加随机抖动，最多重试 8 次（网关的冷却期可达数分钟）。
 async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> {
-    let mut last = String::new();
     let (mut failures, mut limited) = (0u32, 0u32);
     loop {
         let resp = req.try_clone().ok_or_else(|| anyhow!("请求无法重试"))?.json(body).send().await;
@@ -139,7 +138,7 @@ async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> 
                 if status.is_success() {
                     return serde_json::from_str(&text).context("响应不是 JSON");
                 }
-                last = format!("HTTP {status}: {}", text.chars().take(500).collect::<String>());
+                let last = format!("HTTP {status}: {}", text.chars().take(500).collect::<String>());
                 if status.as_u16() == 429 && !futile_429(&text) {
                     limited += 1;
                     if limited > 8 {
@@ -159,7 +158,7 @@ async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> 
                 }
             }
             Err(e) => {
-                last = e.to_string();
+                let last = e.to_string();
                 failures += 1;
                 if failures > 3 {
                     bail!("多次重试后仍失败：{last}");

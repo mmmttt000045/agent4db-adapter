@@ -194,7 +194,9 @@ fn expected(c: Change) -> [&'static str; 4] {
 
 async fn scenarios(url: &str) -> Result<Value> {
     let admin = Db::connect(url, 2, false)?;
-    admin.query(QKind::Meta, &metricbench::fixture(20_000)).await?;
+    // 默认 2 万行；AGENTDB_SCENARIO_ROWS 可改为评测规模（如 1000000）检查阈值、回滚与耗时
+    let rows = std::env::var("AGENTDB_SCENARIO_ROWS").ok().and_then(|v| v.parse().ok()).unwrap_or(20_000);
+    admin.query(QKind::Meta, &metricbench::fixture(rows)).await?;
     etl::setup(&admin).await?;
     scenario::setup(&admin).await?;
     let v1 = scenario::fingerprint(&admin).await?;
@@ -264,11 +266,13 @@ async fn scenarios(url: &str) -> Result<Value> {
             if got != want {
                 problems.push(format!("{} {}：维护结果 {got:?}，预期 {want:?}", maint.name(), ch.name()));
             }
-            out.push(json!({"maint": maint.name(), "change": ch.name(), "rows": [truth, hidden], "got": got, "want": want,
-                            "served": served, "events": mid.take_metric_events()}));
+            let events = mid.take_metric_events();
+            let t = std::time::Instant::now();
             ch.reset(&admin).await?;
             scenario::ensure_v1(&admin, &v1, ch.name()).await?;
             mid.restore(&checkpoint).await?;
+            out.push(json!({"maint": maint.name(), "change": ch.name(), "rows": [truth, hidden], "got": got, "want": want,
+                            "served": served, "events": events, "reset_seconds": t.elapsed().as_secs_f64()}));
         }
     }
     let report = json!({"status": if problems.is_empty() { "passed" } else { "failed" }, "problems": problems, "runs": out});
@@ -287,7 +291,7 @@ async fn postgres_change_scenarios() -> Result<()> {
     let mut test_url = reqwest::Url::parse(&url)?;
     test_url.set_path(&format!("/{name}"));
     admin.query(QKind::Meta, &format!("create database {name}")).await.context("无法创建独立测试库")?;
-    let result = tokio::time::timeout(Duration::from_secs(600), scenarios(test_url.as_str())).await;
+    let result = tokio::time::timeout(Duration::from_secs(3600), scenarios(test_url.as_str())).await;
     let cleanup = admin.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
     let out = format!("results/scenario-test-{unique}");
     std::fs::create_dir_all(&out)?;

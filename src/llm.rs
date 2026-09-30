@@ -4,7 +4,8 @@
 use crate::middle::{Ctx, Middle, ToolSpec};
 use anyhow::{anyhow, bail, Context, Result};
 use serde_json::{json, Value};
-use std::time::{Duration, Instant};
+use std::io::Write;
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 #[derive(Clone, Debug)]
 pub struct ToolCall {
@@ -374,6 +375,35 @@ pub struct AgentRun {
     pub clarification: Option<String>,
 }
 
+/// JSON Lines 记录（一行一个对象，每行写完即落盘）。`Middle::trace` 设置后，Agent 循环逐次记录工具调用。
+#[derive(Debug)]
+pub struct Trace(parking_lot::Mutex<std::fs::File>);
+
+impl Trace {
+    pub fn create(path: &str) -> Result<Trace> {
+        Ok(Trace(parking_lot::Mutex::new(std::fs::File::create(path).with_context(|| format!("创建 {path} 失败"))?)))
+    }
+
+    pub fn write(&self, v: &Value) {
+        let _ = self.0.lock().write_all(format!("{v}\n").as_bytes());
+    }
+}
+
+pub fn unix_ms() -> f64 {
+    SystemTime::now().duration_since(UNIX_EPOCH).map_or(0.0, |d| d.as_secs_f64() * 1000.0)
+}
+
+fn tail(s: &str, n: usize) -> String {
+    let k = s.chars().count();
+    s.chars().skip(k.saturating_sub(n)).collect()
+}
+
+/// 本轮调用工具前的思考与正文末尾，供事后判断每次调用的意图（探查、验证、作答）。
+fn thought(r: &Reply) -> Value {
+    let reasoning = r.raw["reasoning_content"].as_str().unwrap_or_default();
+    json!({"reasoning": tail(reasoning, 800), "text": tail(&r.text, 400)})
+}
+
 /// 通用 Agent 循环：由调用方给出系统提示与工具。final_answer 与 ask_clarification 结束任务，其余工具交给中间层。
 pub async fn run_agent_with(
     p: &Provider,
@@ -399,36 +429,51 @@ pub async fn run_agent_with(
         }
         let mut results = vec![];
         let mut done = false;
-        for c in &r.calls {
+        for (seq, c) in r.calls.iter().enumerate() {
             run.tool_calls += 1;
-            if c.name == "final_answer" {
+            let (t0, started) = (unix_ms(), Instant::now());
+            // (状态, 中间层返回；出错时为错误信息)
+            let (status, out) = if c.name == "final_answer" {
                 run.answer = c.input["answer"].as_str().map(str::to_string).or_else(|| Some(c.input["answer"].to_string()));
                 run.sql = c.input["sql"].as_str().map(str::to_string);
                 run.used = parse_used(&c.input["used"]);
                 run.derivation = c.input["derivation"].as_str().map(str::trim).filter(|s| !s.is_empty()).map(str::to_string);
                 done = true;
                 results.push((c.id.clone(), "已记录".to_string(), false));
-                continue;
-            }
-            if c.name == "ask_clarification" {
+                ("final", Value::Null)
+            } else if c.name == "ask_clarification" {
                 run.clarification = Some(c.input["question"].as_str().unwrap_or_default().to_string());
                 done = true;
                 results.push((c.id.clone(), "已记录；本实验没有人工答复，任务结束。".to_string(), false));
-                continue;
-            }
-            match mid.call_tool(ctx, &c.name, &c.input).await {
-                Ok(v) => {
-                    if v["rejected"].as_bool() == Some(true) {
-                        run.rejections += 1;
+                ("clarify", Value::Null)
+            } else {
+                match mid.call_tool(ctx, &c.name, &c.input).await {
+                    Ok(v) => {
+                        let rejected = v["rejected"].as_bool() == Some(true);
+                        if rejected {
+                            run.rejections += 1;
+                        }
+                        run.notices += v["notices"].as_array().map_or(0, |a| a.len());
+                        let s = v.to_string();
+                        results.push((c.id.clone(), s.chars().take(12000).collect(), false));
+                        (if rejected { "rejected" } else { "ok" }, v)
                     }
-                    run.notices += v["notices"].as_array().map_or(0, |a| a.len());
-                    let s = v.to_string();
-                    results.push((c.id.clone(), s.chars().take(12000).collect(), false));
+                    Err(e) => {
+                        run.tool_errors += 1;
+                        let msg = format!("错误：{e:#}");
+                        results.push((c.id.clone(), msg.clone(), true));
+                        ("error", Value::String(msg))
+                    }
                 }
-                Err(e) => {
-                    run.tool_errors += 1;
-                    results.push((c.id.clone(), format!("错误：{e:#}"), true));
-                }
+            };
+            if let Some(trace) = &mid.trace {
+                let result = if out.is_null() { Value::Null } else { Value::String(out.to_string().chars().take(600).collect()) };
+                trace.write(&json!({
+                    "agent": ctx.agent, "session": ctx.session, "task": ctx.task, "step": run.steps, "seq": seq,
+                    "tool": c.name, "args": c.input, "status": status, "t0_ms": t0, "ms": started.elapsed().as_secs_f64() * 1000.0,
+                    "rows": out["result"]["row_count"], "ref": out["ref"], "result": result,
+                    "thought": if seq == 0 { thought(&r) } else { Value::Null },
+                }));
             }
         }
         if done {

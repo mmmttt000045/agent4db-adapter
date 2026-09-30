@@ -59,8 +59,8 @@ pub struct Options {
 
 // ───────────────────────── 指标与题目 ─────────────────────────
 
-struct Def {
-    id: &'static str,
+pub(crate) struct Def {
+    pub(crate) id: &'static str,
     name: &'static str,
     definition: &'static str,
     /// 口径读到的表；数据变化场景只重问读到被写入表的指标
@@ -105,7 +105,7 @@ static DEFS: [Def; 5] = [
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
-enum Set {
+pub(crate) enum Set {
     Learn,
     /// 同题型换参数
     Param,
@@ -113,14 +113,14 @@ enum Set {
     Type,
 }
 
-struct Task {
-    id: String,
-    def: &'static Def,
-    ask: Ask,
-    set: Set,
+pub(crate) struct Task {
+    pub(crate) id: String,
+    pub(crate) def: &'static Def,
+    pub(crate) ask: Ask,
+    pub(crate) set: Set,
 }
 
-fn tasks(ids: &[String]) -> Vec<Task> {
+pub(crate) fn tasks(ids: &[String]) -> Vec<Task> {
     let p = Period::month;
     let single = |y, m| Ask::Single { period: p(y, m) };
     let diff = |a: (i32, u32), b: (i32, u32)| Ask::Diff { a: p(a.0, a.1), b: p(b.0, b.1) };
@@ -188,7 +188,7 @@ fn cn(p: &Period) -> String {
     }
 }
 
-fn text(t: &Task, defined: bool) -> String {
+pub(crate) fn text(t: &Task, defined: bool) -> String {
     let n = t.def.name;
     let body = match &t.ask {
         Ask::Single { period } => format!("{}的{n}是多少？", cn(period)),
@@ -203,7 +203,7 @@ fn text(t: &Task, defined: bool) -> String {
     }
 }
 
-fn decimals(ask: &Ask) -> u32 {
+pub(crate) fn decimals(ask: &Ask) -> u32 {
     if matches!(ask, Ask::RankMonth { .. }) {
         0
     } else {
@@ -268,7 +268,7 @@ pub(crate) fn gold_rank(def: &str, year: i32) -> String {
     }
 }
 
-fn gold_sql(t: &Task) -> String {
+pub(crate) fn gold_sql(t: &Task) -> String {
     match &t.ask {
         Ask::Single { period } => gold_period(t.def.id, period),
         Ask::Diff { a, b } => format!("select ({}) - ({})", gold_period(t.def.id, a), gold_period(t.def.id, b)),
@@ -277,7 +277,7 @@ fn gold_sql(t: &Task) -> String {
 }
 
 /// 当前快照上全部题目的标准答案（task → 首个单元格）。
-async fn gold_map(admin: &Db, tasks: &[Task]) -> Result<HashMap<String, String>> {
+pub(crate) async fn gold_map(admin: &Db, tasks: &[Task]) -> Result<HashMap<String, String>> {
     let mut out = HashMap::new();
     for t in tasks {
         let v = admin.query(QKind::Meta, &gold_sql(t)).await?.cell(0, 0).unwrap_or("NULL").to_string();
@@ -432,7 +432,7 @@ pub(crate) async fn reset_growth(db: &Db) -> Result<()> {
 
 /// (中间层配置, 是否提供中间层工具, 是否提供指标经验工具)。metric-local 与 metric-global 只改变指标经验的可见范围；
 /// metric-global-* 只改变维护方式，条件、受限修复与回归相同。
-fn config(mode: &str) -> (MiddleConfig, bool, bool) {
+pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
     let base = MiddleConfig { name: mode.into(), record: true, ..Default::default() };
     match mode {
         "direct" => (
@@ -468,7 +468,7 @@ derivation 用这些编号写出最终答案的算式（如 \"r2 - r3\"；答案
 const SYSTEM_METRIC: &str = "find_metric 返回中间层已验证的业务指标口径（含示例 SQL），可以作为参考。用某个口径写的 SQL，\
 请在 run_sql 的 metrics 参数中声明 [{\"key\": ..., \"revision\": ...}]；中间层会在执行前核对该口径是否仍然有效。";
 
-fn system(middle_tools: bool, metric_tools: bool) -> String {
+pub(crate) fn system(middle_tools: bool, metric_tools: bool) -> String {
     let mut s = SYSTEM.to_string();
     if middle_tools {
         s.push('\n');
@@ -539,7 +539,7 @@ fn fact_scans(plan: &Value) -> (f64, f64) {
     acc
 }
 
-fn used_refs(run: &AgentRun) -> HashSet<usize> {
+pub(crate) fn used_refs(run: &AgentRun) -> HashSet<usize> {
     let mut used: HashSet<usize> = run.used.iter().filter_map(|r| metric::ref_index(r)).collect();
     if let Some(d) = &run.derivation {
         used.extend(metric::refs_in(d).unwrap_or_default());

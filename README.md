@@ -93,6 +93,17 @@ Agent A 在学习题上探索并由提炼器生成候选口径，经准入后共
 
 `--phrasings named` 只报指标名，`defined` 在题面写出口径。
 
+### 工作负载刻画（`workload-bench`）
+
+刻画 Agent 负载与应用负载的差别。每个会话是一个全新的 Agent，只有直连工具（`list_tables`、`describe_table`、`run_sql`），会话之间不共享任何状态；多个会话以固定并发同时访问同一数据库。题目与 `metric-bench` 相同（5 个指标 × 5 道题 × 两种题面 × `--repeats` 次），顺序按种子打乱。
+
+```bash
+CLINE_MODEL=cline-pass/glm-5.3 ./target/release/agentdb-mid --pool 16 workload-bench --agent cline --repeats 2 --concurrency 3
+python3 tools/workload-stats.py results/workload-*/
+```
+
+输出目录里 `trace.jsonl` 逐次记录工具调用（参数、状态、耗时、返回摘要、调用前的思考末尾），`sessions.jsonl` 逐会话记录答案与判题，`app.json` 是应用把同样的题写成参数化 SQL 时的查询。
+
 ### 模型服务
 
 内置三个 OpenAI 兼容配置，各读各的环境变量；切换模型只改 provider 名（`metric-bench --agent/--extractor`），不用改 `.env`：

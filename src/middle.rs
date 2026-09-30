@@ -265,6 +265,8 @@ pub struct Middle {
     /// 指标经验的验证证据（按完整键），不随 find_metric 返回
     metric_evidence: Mutex<HashMap<String, MetricEvidence>>,
     metric_events: Mutex<Vec<Value>>,
+    /// 设置后，LLM Agent 循环逐次记录工具调用（工作负载刻画用）
+    pub trace: Option<crate::llm::Trace>,
 }
 
 fn join_key(a: &str, b: &str) -> String {
@@ -335,6 +337,7 @@ impl Middle {
             tasks: Mutex::new(HashMap::new()),
             metric_evidence: Mutex::new(HashMap::new()),
             metric_events: Mutex::new(Vec::new()),
+            trace: None,
         })
     }
 

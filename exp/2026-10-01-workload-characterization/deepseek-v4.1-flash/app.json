@@ -1,0 +1,357 @@
+[
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 3,
+        "m2": 3,
+        "year": 2001
+      }
+    },
+    "metric": "M1",
+    "set": "learn",
+    "sql": "select sum(s.ss_net_paid) from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and d_year = 2001 and d_moy between 3 and 3",
+    "task": "M1-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 11,
+        "m2": 11,
+        "year": 2000
+      }
+    },
+    "metric": "M1",
+    "set": "learn",
+    "sql": "select sum(s.ss_net_paid) from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and d_year = 2000 and d_moy between 11 and 11",
+    "task": "M1-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      }
+    },
+    "metric": "M1",
+    "set": "param",
+    "sql": "select sum(s.ss_net_paid) from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and d_year = 2002 and d_moy between 9 and 9",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M1",
+    "set": "type",
+    "sql": "select (select sum(s.ss_net_paid) from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and d_year = 2002 and d_moy between 9 and 9) - (select sum(s.ss_net_paid) from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and d_year = 2001 and d_moy between 6 and 6)",
+    "task": "M1-T1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 2002
+    },
+    "metric": "M1",
+    "set": "type",
+    "sql": "select d_moy from store_sales join date_dim on ss_sold_date_sk = d_date_sk where d_year = 2002 and ss_is_current = 1 group by d_moy order by sum(ss_net_paid) desc, d_moy limit 1",
+    "task": "M1-T2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 4,
+        "m2": 4,
+        "year": 2001
+      }
+    },
+    "metric": "M2",
+    "set": "learn",
+    "sql": "select sum(r.sr_return_amt) from store_returns r join date_dim d on r.sr_returned_date_sk = d.d_date_sk where r.sr_status = '完成' and d_year = 2001 and d_moy between 4 and 4",
+    "task": "M2-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 8,
+        "m2": 8,
+        "year": 2000
+      }
+    },
+    "metric": "M2",
+    "set": "learn",
+    "sql": "select sum(r.sr_return_amt) from store_returns r join date_dim d on r.sr_returned_date_sk = d.d_date_sk where r.sr_status = '完成' and d_year = 2000 and d_moy between 8 and 8",
+    "task": "M2-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 5,
+        "m2": 5,
+        "year": 2002
+      }
+    },
+    "metric": "M2",
+    "set": "param",
+    "sql": "select sum(r.sr_return_amt) from store_returns r join date_dim d on r.sr_returned_date_sk = d.d_date_sk where r.sr_status = '完成' and d_year = 2002 and d_moy between 5 and 5",
+    "task": "M2-P1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 3,
+        "m2": 3,
+        "year": 2002
+      },
+      "b": {
+        "m1": 3,
+        "m2": 3,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M2",
+    "set": "type",
+    "sql": "select (select sum(r.sr_return_amt) from store_returns r join date_dim d on r.sr_returned_date_sk = d.d_date_sk where r.sr_status = '完成' and d_year = 2002 and d_moy between 3 and 3) - (select sum(r.sr_return_amt) from store_returns r join date_dim d on r.sr_returned_date_sk = d.d_date_sk where r.sr_status = '完成' and d_year = 2001 and d_moy between 3 and 3)",
+    "task": "M2-T1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 2001
+    },
+    "metric": "M2",
+    "set": "type",
+    "sql": "select d_moy from store_returns join date_dim on sr_returned_date_sk = d_date_sk where d_year = 2001 and sr_status = '完成' group by d_moy order by sum(sr_return_amt) desc, d_moy limit 1",
+    "task": "M2-T2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 2,
+        "m2": 2,
+        "year": 2001
+      }
+    },
+    "metric": "M3",
+    "set": "learn",
+    "sql": "with s as (select ss_ticket_number as t, ss_item_sk as i, ss_net_paid as paid from store_sales join date_dim on ss_sold_date_sk = d_date_sk where ss_is_current = 1 and d_year = 2001 and d_moy between 2 and 2) select 100.0 * (select sum(r.sr_return_amt) from store_returns r join s on r.sr_ticket_number = s.t and r.sr_item_sk = s.i where r.sr_status = '完成') / (select sum(paid) from s)",
+    "task": "M3-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 7,
+        "m2": 7,
+        "year": 2000
+      }
+    },
+    "metric": "M3",
+    "set": "learn",
+    "sql": "with s as (select ss_ticket_number as t, ss_item_sk as i, ss_net_paid as paid from store_sales join date_dim on ss_sold_date_sk = d_date_sk where ss_is_current = 1 and d_year = 2000 and d_moy between 7 and 7) select 100.0 * (select sum(r.sr_return_amt) from store_returns r join s on r.sr_ticket_number = s.t and r.sr_item_sk = s.i where r.sr_status = '完成') / (select sum(paid) from s)",
+    "task": "M3-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      }
+    },
+    "metric": "M3",
+    "set": "param",
+    "sql": "with s as (select ss_ticket_number as t, ss_item_sk as i, ss_net_paid as paid from store_sales join date_dim on ss_sold_date_sk = d_date_sk where ss_is_current = 1 and d_year = 2002 and d_moy between 9 and 9) select 100.0 * (select sum(r.sr_return_amt) from store_returns r join s on r.sr_ticket_number = s.t and r.sr_item_sk = s.i where r.sr_status = '完成') / (select sum(paid) from s)",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2002
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M3",
+    "set": "type",
+    "sql": "select (with s as (select ss_ticket_number as t, ss_item_sk as i, ss_net_paid as paid from store_sales join date_dim on ss_sold_date_sk = d_date_sk where ss_is_current = 1 and d_year = 2002 and d_moy between 6 and 6) select 100.0 * (select sum(r.sr_return_amt) from store_returns r join s on r.sr_ticket_number = s.t and r.sr_item_sk = s.i where r.sr_status = '完成') / (select sum(paid) from s)) - (with s as (select ss_ticket_number as t, ss_item_sk as i, ss_net_paid as paid from store_sales join date_dim on ss_sold_date_sk = d_date_sk where ss_is_current = 1 and d_year = 2001 and d_moy between 6 and 6) select 100.0 * (select sum(r.sr_return_amt) from store_returns r join s on r.sr_ticket_number = s.t and r.sr_item_sk = s.i where r.sr_status = '完成') / (select sum(paid) from s))",
+    "task": "M3-T1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 2001
+    },
+    "metric": "M3",
+    "set": "type",
+    "sql": "with s as (select ss_ticket_number as t, ss_item_sk as i, ss_net_paid as paid, d_moy as mo from store_sales join date_dim on ss_sold_date_sk = d_date_sk where d_year = 2001 and ss_is_current = 1), r as (select s.mo, sum(r.sr_return_amt) as amt from store_returns r join s on r.sr_ticket_number = s.t and r.sr_item_sk = s.i where r.sr_status = '完成' group by s.mo), p as (select mo, sum(paid) as paid from s group by mo) select p.mo from p left join r using (mo) order by coalesce(r.amt, 0) / p.paid desc, p.mo limit 1",
+    "task": "M3-T2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 5,
+        "m2": 5,
+        "year": 2001
+      }
+    },
+    "metric": "M4",
+    "set": "learn",
+    "sql": "select sum(c.cs_net_paid) from catalog_sales c join date_dim d on c.cs_sold_date_sk = d.d_date_sk where d_year = 2001 and d_moy between 5 and 5",
+    "task": "M4-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 12,
+        "m2": 12,
+        "year": 2000
+      }
+    },
+    "metric": "M4",
+    "set": "learn",
+    "sql": "select sum(c.cs_net_paid) from catalog_sales c join date_dim d on c.cs_sold_date_sk = d.d_date_sk where d_year = 2000 and d_moy between 12 and 12",
+    "task": "M4-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 2,
+        "m2": 2,
+        "year": 2002
+      }
+    },
+    "metric": "M4",
+    "set": "param",
+    "sql": "select sum(c.cs_net_paid) from catalog_sales c join date_dim d on c.cs_sold_date_sk = d.d_date_sk where d_year = 2002 and d_moy between 2 and 2",
+    "task": "M4-P1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 2,
+        "m2": 2,
+        "year": 2002
+      },
+      "b": {
+        "m1": 2,
+        "m2": 2,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M4",
+    "set": "type",
+    "sql": "select (select sum(c.cs_net_paid) from catalog_sales c join date_dim d on c.cs_sold_date_sk = d.d_date_sk where d_year = 2002 and d_moy between 2 and 2) - (select sum(c.cs_net_paid) from catalog_sales c join date_dim d on c.cs_sold_date_sk = d.d_date_sk where d_year = 2001 and d_moy between 2 and 2)",
+    "task": "M4-T1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 2000
+    },
+    "metric": "M4",
+    "set": "type",
+    "sql": "select d_moy from catalog_sales join date_dim on cs_sold_date_sk = d_date_sk where d_year = 2000 group by d_moy order by sum(cs_net_paid) desc, d_moy limit 1",
+    "task": "M4-T2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 1,
+        "m2": 1,
+        "year": 2001
+      }
+    },
+    "metric": "M5",
+    "set": "learn",
+    "sql": "select sum(s.ss_net_paid) from store_sales s join item i on s.ss_item_sk = i.i_item_sk and i.i_is_current = 'Y' join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and i.i_category = '电子' and d_year = 2001 and d_moy between 1 and 1",
+    "task": "M5-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 10,
+        "m2": 10,
+        "year": 2000
+      }
+    },
+    "metric": "M5",
+    "set": "learn",
+    "sql": "select sum(s.ss_net_paid) from store_sales s join item i on s.ss_item_sk = i.i_item_sk and i.i_is_current = 'Y' join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and i.i_category = '电子' and d_year = 2000 and d_moy between 10 and 10",
+    "task": "M5-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      }
+    },
+    "metric": "M5",
+    "set": "param",
+    "sql": "select sum(s.ss_net_paid) from store_sales s join item i on s.ss_item_sk = i.i_item_sk and i.i_is_current = 'Y' join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and i.i_category = '电子' and d_year = 2002 and d_moy between 9 and 9",
+    "task": "M5-P1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      },
+      "b": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M5",
+    "set": "type",
+    "sql": "select (select sum(s.ss_net_paid) from store_sales s join item i on s.ss_item_sk = i.i_item_sk and i.i_is_current = 'Y' join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and i.i_category = '电子' and d_year = 2002 and d_moy between 9 and 9) - (select sum(s.ss_net_paid) from store_sales s join item i on s.ss_item_sk = i.i_item_sk and i.i_is_current = 'Y' join date_dim d on s.ss_sold_date_sk = d.d_date_sk where s.ss_is_current = 1 and i.i_category = '电子' and d_year = 2001 and d_moy between 9 and 9)",
+    "task": "M5-T1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 2002
+    },
+    "metric": "M5",
+    "set": "type",
+    "sql": "select d_moy from store_sales join item on ss_item_sk = i_item_sk and i_is_current = 'Y' join date_dim on ss_sold_date_sk = d_date_sk where d_year = 2002 and ss_is_current = 1 and i_category = '电子' group by d_moy order by sum(ss_net_paid) desc, d_moy limit 1",
+    "task": "M5-T2"
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "agent": "cline:deepseek/deepseek-v4.1-flash",
+  "agent_config": {
+    "base_url": "https://api.cline.bot/api/v1",
+    "model": "deepseek/deepseek-v4.1-flash",
+    "provider": "cline",
+    "reasoning_effort": "high",
+    "thinking": null
+  },
+  "database_cleaned_up": true,
+  "methodology": "直连工具（list_tables / describe_table / run_sql），中间层不复用、不合并、不审查；每个会话独立的 Agent 名与会话名；会话顺序按种子打乱后以固定并发执行；trace.jsonl 为逐次工具调用，sessions.jsonl 为逐会话结果，app.json 为应用的参数化 SQL",
+  "options": {
+    "agent": "cline",
+    "concurrency": 3,
+    "max_steps": 20,
+    "metrics": [
+      "M1",
+      "M2",
+      "M3",
+      "M4",
+      "M5"
+    ],
+    "phrasings": [
+      "named",
+      "defined"
+    ],
+    "repeats": 2,
+    "rows": 1000000,
+    "seed": 1,
+    "sql_timeout_secs": 60
+  },
+  "outcomes": {
+    "clarify": 5,
+    "correct": 63,
+    "error": 0,
+    "wrong": 32
+  },
+  "pool": 16,
+  "seconds": 1350.098498996,
+  "sessions": 100
+}

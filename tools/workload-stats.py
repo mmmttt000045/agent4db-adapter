@@ -12,6 +12,7 @@ DIR 为 workload-bench 的输出目录（含 trace.jsonl、sessions.jsonl、app.
   validate  检查假设或复核结果：SQL 含 count(distinct …)、having count、is [not] null、row_number() over (partition …)，
             或在最终答案查询之后、又对度量列做聚合的查询（复算）
   attempt   在最终答案查询之前对度量列做聚合、但未被采用的查询（中间尝试或被放弃的写法）
+  compute   不读任何表的 SQL（把 SQL 当计算器，如 SELECT ROUND(2893408.04 / 12179532.00 * 100, 2)）
   explore   其余成功的 SQL（取样、取值分布、范围、计数等数据探查）
 """
 
@@ -109,6 +110,8 @@ def classify(call, used, t_answer):
     ref = call.get("ref")
     if ref and int(ref.lstrip("r")) in used:
         return "answer"
+    if not TABLE_RE.search(s):
+        return "compute"
     if VALIDATE_RE.search(s):
         return "validate"
     if MEASURE_RE.search(s) and COL_RE.search(s):
@@ -252,14 +255,19 @@ def stats_for(model, sessions, by_sess, data):
         "sessions": len(sess),
         "outcomes": dict(outcomes),
         "calls": n,
-        "categories": {k: cats[k] for k in ("schema", "explore", "validate", "attempt", "answer", "error", "other")},
-        "category_pct": {k: pct(cats[k], n) for k in ("schema", "explore", "validate", "attempt", "answer", "error", "other")},
+        "categories": {k: cats[k] for k in ("schema", "explore", "validate", "attempt", "compute", "answer", "error", "other")},
+        "category_pct": {k: pct(cats[k], n) for k in ("schema", "explore", "validate", "attempt", "compute", "answer", "error", "other")},
         "exploration_pct": pct(cats["schema"] + cats["explore"], n),
         "sql_calls": len(sqls),
         "sql_error_pct": pct(sum(c["status"] == "error" for c in sqls), len(sqls)),
         "sql_templates": len(seen),
         "sql_templates_per_100": round(100.0 * len(seen) / len(sqls), 1) if sqls else None,
         "sql_template_repeat_pct": pct(rep, len(sqls)),
+        "sql_templates_per_100_block": round(statistics.mean(len({fingerprint(sql_of(c)) for c in sqls[i:i + 100]})
+                                                         for i in range(0, len(sqls) - 99, 100)), 1) if len(sqls) >= 100 else None,
+        "wrong_sessions_without_error_pct": pct(sum(1 for a, s in sessions.items() if s["outcome"] == "wrong"
+                                                    and not any(c["status"] == "error" for c in by_sess.get(a, []))),
+                                                sum(1 for s in sessions.values() if s["outcome"] == "wrong")),
         "session": {
             "median_calls": med([p["calls"] for p in per]),
             "median_sql": med([p["sql"] for p in per]),
@@ -345,6 +353,7 @@ def table(res):
         row("DB calls / session (median)", lambda m: m["session"]["median_calls"]),
         row("SQL templates per 100 SQL", lambda m: m["sql_templates_per_100"]),
         row("SQL whose template seen before %", lambda m: m["sql_template_repeat_pct"]),
+        row("distinct templates per 100-SQL block", lambda m: m["sql_templates_per_100_block"]),
         row("exploration calls % (schema+data)", lambda m: m["exploration_pct"]),
         row("  schema %", lambda m: m["category_pct"]["schema"]),
         row("  data explore %", lambda m: m["category_pct"]["explore"]),
@@ -353,6 +362,8 @@ def table(res):
         row("final-answer SQL %", lambda m: m["category_pct"]["answer"]),
         row("failed calls %", lambda m: m["category_pct"]["error"]),
         row("failed SQL % (of SQL)", lambda m: m["sql_error_pct"]),
+        row("  compute-only SQL %", lambda m: m["category_pct"]["compute"]),
+        row("wrong answers with no failed call %", lambda m: m["wrong_sessions_without_error_pct"]),
         row("sessions with >=1 failure %", lambda m: m["session"]["pct_with_error"]),
         row("sessions with >=1 validation %", lambda m: m["session"]["pct_with_validate"]),
         row("sessions starting with schema lookup %", lambda m: m["session"]["pct_start_with_schema"]),

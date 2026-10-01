@@ -1,0 +1,243 @@
+{
+ "rows": 200000,
+ "trials": 10,
+ "interleavings": [
+  {
+   "case": "write_during_pause",
+   "mode": "precheck",
+   "served": 0,
+   "violation": 10,
+   "rejected": 0,
+   "error": 0,
+   "latency_p50_ms": 2059.1
+  },
+  {
+   "case": "write_during_pause",
+   "mode": "snapshot",
+   "served": 10,
+   "violation": 0,
+   "rejected": 0,
+   "error": 0,
+   "latency_p50_ms": 2045.2
+  },
+  {
+   "case": "write_before_call",
+   "mode": "precheck",
+   "served": 0,
+   "violation": 7,
+   "rejected": 3,
+   "error": 0,
+   "latency_p50_ms": 195.1
+  },
+  {
+   "case": "write_before_call",
+   "mode": "snapshot",
+   "served": 0,
+   "violation": 0,
+   "rejected": 10,
+   "error": 0,
+   "latency_p50_ms": 1297.4
+  },
+  {
+   "case": "write_notified",
+   "mode": "precheck",
+   "served": 0,
+   "violation": 0,
+   "rejected": 10,
+   "error": 0,
+   "latency_p50_ms": 5787.7
+  },
+  {
+   "case": "write_notified",
+   "mode": "snapshot",
+   "served": 0,
+   "violation": 0,
+   "rejected": 10,
+   "error": 0,
+   "latency_p50_ms": 5310.8
+  }
+ ],
+ "stress": [
+  {
+   "notify": true,
+   "distinct": false,
+   "mode": "precheck",
+   "trials": 20,
+   "calls": 2928,
+   "served": 2840,
+   "violation": 8,
+   "rejected": 80,
+   "error": 0,
+   "violation_pct_of_answered": 0.28,
+   "violation_wilson95_upper_pct": 0.553,
+   "trials_with_violation": 2,
+   "violation_start_minus_commit_ms": {
+    "max": -1.6549869999998919,
+    "mean": -4.2605232500000625,
+    "n": 8,
+    "p50": -2.7653119999999944,
+    "p95": -1.6549869999998919
+   }
+  },
+  {
+   "notify": true,
+   "distinct": false,
+   "mode": "snapshot",
+   "trials": 20,
+   "calls": 2998,
+   "served": 2818,
+   "violation": 0,
+   "rejected": 180,
+   "error": 0,
+   "violation_pct_of_answered": 0.0,
+   "violation_wilson95_upper_pct": 0.136,
+   "trials_with_violation": 0,
+   "violation_start_minus_commit_ms": {
+    "n": 0
+   }
+  },
+  {
+   "notify": false,
+   "distinct": false,
+   "mode": "precheck",
+   "trials": 20,
+   "calls": 3157,
+   "served": 2936,
+   "violation": 141,
+   "rejected": 80,
+   "error": 0,
+   "violation_pct_of_answered": 4.58,
+   "violation_wilson95_upper_pct": 5.38,
+   "trials_with_violation": 19,
+   "violation_start_minus_commit_ms": {
+    "max": 152.56773299999998,
+    "mean": 53.0736656028369,
+    "n": 141,
+    "p50": 33.328665,
+    "p95": 139.73064900000008
+   }
+  },
+  {
+   "notify": false,
+   "distinct": false,
+   "mode": "snapshot",
+   "trials": 20,
+   "calls": 2917,
+   "served": 2767,
+   "violation": 0,
+   "rejected": 150,
+   "error": 0,
+   "violation_pct_of_answered": 0.0,
+   "violation_wilson95_upper_pct": 0.139,
+   "trials_with_violation": 0,
+   "violation_start_minus_commit_ms": {
+    "n": 0
+   }
+  },
+  {
+   "notify": true,
+   "distinct": true,
+   "mode": "precheck",
+   "trials": 20,
+   "calls": 3014,
+   "served": 2932,
+   "violation": 2,
+   "rejected": 80,
+   "error": 0,
+   "violation_pct_of_answered": 0.07,
+   "violation_wilson95_upper_pct": 0.248,
+   "trials_with_violation": 1,
+   "violation_start_minus_commit_ms": {
+    "max": -0.4253069999995205,
+    "mean": -0.7842234999995981,
+    "n": 2,
+    "p50": -0.4253069999995205,
+    "p95": -0.4253069999995205
+   }
+  },
+  {
+   "notify": true,
+   "distinct": true,
+   "mode": "snapshot",
+   "trials": 20,
+   "calls": 3064,
+   "served": 2863,
+   "violation": 0,
+   "rejected": 201,
+   "error": 0,
+   "violation_pct_of_answered": 0.0,
+   "violation_wilson95_upper_pct": 0.134,
+   "trials_with_violation": 0,
+   "violation_start_minus_commit_ms": {
+    "n": 0
+   }
+  },
+  {
+   "notify": false,
+   "distinct": true,
+   "mode": "precheck",
+   "trials": 20,
+   "calls": 3208,
+   "served": 3008,
+   "violation": 120,
+   "rejected": 80,
+   "error": 0,
+   "violation_pct_of_answered": 3.84,
+   "violation_wilson95_upper_pct": 4.568,
+   "trials_with_violation": 19,
+   "violation_start_minus_commit_ms": {
+    "max": 156.74397,
+    "mean": 52.48727896666663,
+    "n": 120,
+    "p50": 36.603853999999956,
+    "p95": 138.76328
+   }
+  },
+  {
+   "notify": false,
+   "distinct": true,
+   "mode": "snapshot",
+   "trials": 20,
+   "calls": 3152,
+   "served": 2849,
+   "violation": 0,
+   "rejected": 303,
+   "error": 0,
+   "violation_pct_of_answered": 0.0,
+   "violation_wilson95_upper_pct": 0.135,
+   "trials_with_violation": 0,
+   "violation_start_minus_commit_ms": {
+    "n": 0
+   }
+  }
+ ],
+ "reader_p50_ms": {
+  "precheck": {
+   "steady_ms": 5.1,
+   "first_after_write_ms": 1188.0,
+   "second_after_write_ms": 6.5
+  },
+  "snapshot": {
+   "steady_ms": 6.9,
+   "first_after_write_ms": 1095.1,
+   "second_after_write_ms": 5.7
+  }
+ },
+ "writer_median": {
+  "no_trigger": {
+   "sequential_stmt_per_s": 2995.9,
+   "concurrent8_stmt_per_s": 25231.0,
+   "bulk_ms_per_stmt": 17.5
+  },
+  "trigger": {
+   "sequential_stmt_per_s": 2339.4,
+   "concurrent8_stmt_per_s": 15731.3,
+   "bulk_ms_per_stmt": 17.8
+  }
+ },
+ "writer_ratio_trigger_over_none": {
+  "sequential_stmt_per_s": 0.78,
+  "concurrent8_stmt_per_s": 0.62,
+  "bulk_ms_per_stmt": 1.02
+ }
+}

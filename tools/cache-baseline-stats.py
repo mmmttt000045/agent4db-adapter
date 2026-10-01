@@ -25,14 +25,14 @@ def load(d):
         rows.append({
             "dir": os.path.basename(os.path.normpath(d)), "cell": c["cell"], "share": c.get("share"), "policy": c["policy"],
             "arrival": c["arrival"], "repeat": c.get("repeat", 1), "specs": c.get("specs"),
-            "db_s": sum(e["db"]["db_ms"] for e in ev) / 1000.0,
+            "db_s": sum(e["db"]["ms"] for e in ev) / 1000.0,
             "queries": sum(e["db"]["queries"] for e in ev),
             "wait_s": sum(e.get("wait_ms", 0) for e in ev) / 1000.0,
             "uses": sum(e.get("uses", 0) for e in ev),
             "stale": sum(e.get("stale_uses", 0) for e in ev),
             "false_revocations": sum(e.get("false_revocations", 0) for e in ev),
             "unavailable": sum(e.get("unavailable_uses", 0) for e in ev),
-            "per_change_db_s": {e["label"]: round(e["db"]["db_ms"] / 1000.0, 2) for e in ev},
+            "per_change_db_s": {e["event"]: round(e["db"]["ms"] / 1000.0, 2) for e in ev},
         })
     return rows
 

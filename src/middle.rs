@@ -112,6 +112,8 @@ pub struct MiddleConfig {
     pub snapshot_exec: bool,
     /// 实验用：核对之后、执行之前暂停的毫秒数，用来构造“核对与执行之间有写入提交”的交错
     pub exec_pause_ms: u64,
+    /// 轨迹记忆基线（AgentSM 式）：保存成功的解题轨迹，按题面相似度检索，不做任何有效性维护
+    pub traj_memory: bool,
 }
 
 impl Default for MiddleConfig {
@@ -135,6 +137,7 @@ impl Default for MiddleConfig {
             sql_cache: false,
             snapshot_exec: false,
             exec_pause_ms: 0,
+            traj_memory: false,
         }
     }
 }
@@ -219,6 +222,30 @@ pub struct TaskLog {
     pub found: Vec<(String, u32)>,
 }
 
+/// 轨迹记忆的一条：学习题的题面、参与答案的 SQL 与算式。
+#[derive(Clone, Debug, Serialize)]
+pub struct TrajMemo {
+    pub task: String,
+    pub agent: String,
+    pub question: String,
+    pub sqls: Vec<String>,
+    pub derivation: Option<String>,
+    pub answer: String,
+}
+
+/// 题面相似度：查询的字符二元组有多少出现在题面里（查询通常比题面短，用包含度而不是 Jaccard）。
+fn bigram_containment(query: &str, text: &str) -> f64 {
+    let grams = |s: &str| -> BTreeSet<(char, char)> {
+        let cs: Vec<char> = s.chars().filter(|c| !c.is_whitespace() && !c.is_ascii_punctuation()).flat_map(char::to_lowercase).collect();
+        cs.windows(2).map(|w| (w[0], w[1])).collect()
+    };
+    let (q, t) = (grams(query), grams(text));
+    if q.is_empty() {
+        return 0.0;
+    }
+    q.intersection(&t).count() as f64 / q.len() as f64
+}
+
 #[derive(Clone, Debug, Serialize)]
 pub struct SqlCall {
     /// 对 Agent 显示为 r{index}
@@ -285,6 +312,7 @@ pub struct Middle {
     vcache: Mutex<HashMap<String, crate::db::Rows>>,
     /// 绑定快照执行的条件结论：条件身份 + 读到的表的事务性版本 → 是否成立
     snap_verdicts: Mutex<HashMap<String, Outcome>>,
+    trajs: Mutex<Vec<TrajMemo>>,
     /// 设置后，LLM Agent 循环逐次记录工具调用（工作负载刻画用）
     pub trace: Option<crate::llm::Trace>,
 }
@@ -373,6 +401,7 @@ impl Middle {
             metric_events: Mutex::new(Vec::new()),
             vcache: Mutex::new(HashMap::new()),
             snap_verdicts: Mutex::new(HashMap::new()),
+            trajs: Mutex::new(vec![]),
             trace: None,
         })
     }
@@ -480,6 +509,29 @@ impl Middle {
         let (v, _) = self.flight_ver.run(true, "versions", || async { Ok(Arc::new(catalog::versions(&self.db).await?)) }).await?;
         *self.versions.lock() = Some((Instant::now(), v.clone()));
         Ok(v)
+    }
+
+    /// 轨迹记忆：保存一条成功轨迹（调用方负责判定成功）。
+    pub fn remember_trajectory(&self, memo: TrajMemo) {
+        self.trajs.lock().push(memo);
+    }
+
+    pub fn trajectories(&self) -> Vec<TrajMemo> {
+        self.trajs.lock().clone()
+    }
+
+    /// 工具 find_trajectory：按题面相似度返回最多 3 条以往的成功轨迹。不检查数据是否已经变化。
+    pub fn find_trajectory(&self, ctx: &Ctx, query: &str) -> Value {
+        let mut scored: Vec<(f64, TrajMemo)> =
+            self.trajs.lock().iter().map(|t| (bigram_containment(query, &t.question), t.clone())).filter(|(s, _)| *s >= 0.3).collect();
+        scored.sort_by(|a, b| b.0.total_cmp(&a.0));
+        scored.truncate(3);
+        if self.cfg.record {
+            self.tasks.lock().entry(task_key(ctx)).or_default().finds += 1;
+        }
+        json!({"trajectories": scored.iter().map(|(s, t)| json!({
+            "similarity": (s * 100.0).round() / 100.0, "question": t.question, "sql": t.sqls, "derivation": t.derivation,
+        })).collect::<Vec<_>>()})
     }
 
     /// 当前已提交的事务性版本（`catalog::install_tx_versions` 之后）。
@@ -1351,6 +1403,7 @@ impl Middle {
                 self.check_join(ctx, s("left")?, s("right")?, &on).await?
             }
             "run_sql" => self.run_sql_with(ctx, s("sql")?, &metric_refs(args)?).await?,
+            "find_trajectory" if self.cfg.traj_memory => self.find_trajectory(ctx, s("query")?),
             "find_metric" => {
                 let tables: Vec<String> = args
                     .get("tables")
@@ -1366,6 +1419,17 @@ impl Middle {
             v["notices"] = json!(notes);
         }
         Ok(v)
+    }
+}
+
+/// 轨迹记忆基线的检索工具。
+pub fn trajectory_tool_spec() -> ToolSpec {
+    ToolSpec {
+        name: "find_trajectory",
+        description: "检索以往相似问题的成功解题过程：题面、参与答案的 SQL 与算式。按题面或指标名称的相似度返回最多 3 条。",
+        schema: json!({"type": "object", "properties": {
+            "query": {"type": "string", "description": "题面或指标名称，如“门店营业额”"}
+        }, "required": ["query"]}),
     }
 }
 
@@ -1433,4 +1497,19 @@ pub fn tool_specs_with(middle_tools: bool, metric_tools: bool) -> Vec<ToolSpec> 
         });
     }
     v
+}
+
+#[cfg(test)]
+mod traj_tests {
+    use super::bigram_containment;
+
+    #[test]
+    fn containment_prefers_same_metric_questions() {
+        let q = "门店营业额";
+        let a = "2001 年 3 月的门店营业额是多少？保留两位小数。";
+        let b = "2001 年 3 月的目录渠道营业额是多少？保留两位小数。";
+        assert!(bigram_containment(q, a) > bigram_containment(q, b));
+        assert_eq!(bigram_containment(q, a), 1.0);
+        assert_eq!(bigram_containment("", a), 0.0);
+    }
 }

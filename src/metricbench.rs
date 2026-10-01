@@ -7,7 +7,9 @@ use crate::etl;
 use crate::knowledge::{Basis, Content, Status};
 use crate::llm::{self, AgentRun, Provider};
 use crate::metric::{self, parse_answer, same_value, Ask, Period, Trajectory};
-use crate::middle::{tool_specs_with, Ctx, GuardMode, Maint, Middle, MiddleConfig, Scope, SqlCall, TaskLog, ToolSpec};
+use crate::middle::{
+    tool_specs_with, trajectory_tool_spec, Ctx, GuardMode, Maint, Middle, MiddleConfig, Scope, SqlCall, TaskLog, ToolSpec, TrajMemo,
+};
 use crate::scenario::{self, Change};
 use anyhow::{ensure, Context, Result};
 use serde::Serialize;
@@ -30,7 +32,7 @@ pub struct Options {
     /// metric-global 为条件级维护；-schema / -revoke / -def 只改变维护方式（只看结构、逐写入撤销后重新提炼、定义级重验）
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",
           value_parser = ["direct", "middle", "metric-local", "metric-global", "metric-global-noguard",
-                          "metric-global-schema", "metric-global-revoke", "metric-global-def"])]
+                          "metric-global-schema", "metric-global-revoke", "metric-global-def", "traj-global"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
     phrasings: Vec<String>,
@@ -456,6 +458,8 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         "metric-global-schema" => (MiddleConfig { metric_maint: Maint::Schema, ..base }, true, true),
         "metric-global-revoke" => (MiddleConfig { metric_maint: Maint::Revoke, ..base }, true, true),
         "metric-global-def" => (MiddleConfig { metric_maint: Maint::Definition, ..base }, true, true),
+        // 匹配的轨迹检索基线：同样的中间层工具与学习题，学习成功的轨迹原样保存、按题面检索，不提炼、不维护
+        "traj-global" => (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false),
         _ => (MiddleConfig { metric_maint: Maint::Off, ..base }, true, true),
     }
 }
@@ -464,6 +468,8 @@ const SYSTEM: &str = "你是一个数据分析 Agent，通过工具查询 Postgr
 得到结果后调用 final_answer：answer 只写最终值（数字或月份数字，不带单位与说明）；used 写参与计算最终答案的查询编号（run_sql 返回的 ref，如 [\"r2\", \"r3\"]）；\
 derivation 用这些编号写出最终答案的算式（如 \"r2 - r3\"；答案直接来自一条查询时写 \"r2\"）。\
 如果题目的业务口径不明确，且无法从数据或工具得到可靠的定义，可以调用 ask_clarification 说明需要澄清的内容；调用后任务结束。";
+
+const SYSTEM_TRAJ: &str = "find_trajectory 返回以往相似问题的成功解题过程（题面、参与答案的 SQL 与算式），可以作为参考。";
 
 const SYSTEM_METRIC: &str = "find_metric 返回中间层已验证的业务指标口径（含示例 SQL），可以作为参考。用某个口径写的 SQL，\
 请在 run_sql 的 metrics 参数中声明 [{\"key\": ..., \"revision\": ...}]；中间层会在执行前核对该口径是否仍然有效。";
@@ -666,6 +672,39 @@ async fn learn_step(env: &Env<'_>, mid: &Middle, rec: &TaskRec, t: &Task) -> Res
               "gate_db": {"queries": d.queries, "ms": d.db_ms}, "gate_seconds": t0.elapsed().as_secs_f64()}))
 }
 
+/// 轨迹检索基线的学习：与 MAVRA 的提炼同样的前提（判题成功、计算链可复核），满足就把参与答案的 SQL 与算式原样保存。
+fn remember_step(mid: &Middle, rec: &TaskRec, t: &Task) -> Value {
+    let traj = Trajectory {
+        task: t.id.clone(),
+        question: rec.question.clone(),
+        ask: t.ask,
+        basis: Basis::ExplicitQuestion { task: t.id.clone() },
+        judged: rec.correct,
+        decimals: decimals(&t.ask),
+        answer: rec.run.answer.clone().unwrap_or_default(),
+        used: rec.run.used.clone(),
+        derivation: rec.run.derivation.clone(),
+        judge: Some(gold_sql(t)),
+    };
+    if !traj.judged {
+        return json!({"task": t.id, "stage": "judge", "reason": "来源任务未被判定为成功"});
+    }
+    if let Err(e) = rec.log.verify(&traj) {
+        return json!({"task": t.id, "stage": "chain", "reason": e});
+    }
+    let used = used_refs(&rec.run);
+    let sqls: Vec<String> = rec.log.calls.iter().filter(|c| used.contains(&c.index)).map(|c| c.sql.clone()).collect();
+    mid.remember_trajectory(TrajMemo {
+        task: t.id.clone(),
+        agent: rec.ctx.agent.clone(),
+        question: rec.question.clone(),
+        sqls: sqls.clone(),
+        derivation: rec.run.derivation.clone(),
+        answer: traj.answer.clone(),
+    });
+    json!({"task": t.id, "stage": "remembered", "sqls": sqls.len()})
+}
+
 /// v1 中值恒定、场景里用来区分记录版本或状态的列；审计记录口径是否已带上这些过滤。
 const GUARD_COLS: [&str; 3] = ["sr_status", "ss_is_current", "i_is_current"];
 
@@ -711,11 +750,17 @@ async fn audit(env: &Env<'_>, mid: &Middle, gold: &HashMap<String, String>) -> R
 
 async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u32) -> Result<Value> {
     let (cfg, middle_tools, metric_tools) = config(mode);
+    let traj = cfg.traj_memory;
     let mut tools = tool_specs_with(middle_tools, metric_tools);
+    let mut system_text = system(middle_tools, metric_tools);
+    if traj {
+        tools.push(trajectory_tool_spec());
+        system_text.push('\n');
+        system_text.push_str(SYSTEM_TRAJ);
+    }
     tools.push(llm::final_answer_spec(true));
     tools.push(llm::clarification_spec());
-    let cell =
-        Cell { id: format!("r{repeat}-{mode}-{phrasing}"), mode, phrasing, repeat, system: system(middle_tools, metric_tools), tools };
+    let cell = Cell { id: format!("r{repeat}-{mode}-{phrasing}"), mode, phrasing, repeat, system: system_text, tools };
     eprintln!("== {}", cell.id);
     scenario::ensure_v1(env.admin, env.v1, "上一组").await?;
     let mid = Middle::new(db, cfg).await?;
@@ -737,6 +782,8 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
             let rec = run_task(&ph, "A", t, true).await?;
             if metric_tools {
                 learning.push(learn_step(env, &mid, &rec, t).await?);
+            } else if traj {
+                learning.push(remember_step(&mid, &rec, t));
             }
             records.push(rec.json);
         }
@@ -809,7 +856,7 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     Ok(json!({
         "cell": cell.id, "mode": mode, "phrasing": phrasing, "repeat": repeat, "seconds": t0.elapsed().as_secs_f64(),
         "learning": learning, "relearning": relearning, "audits": audits, "events": events, "writes": writes,
-        "metric_report": mid.metric_report(), "stats": mid.stats_json(), "records": records,
+        "metric_report": mid.metric_report(), "trajectories": mid.trajectories(), "stats": mid.stats_json(), "records": records,
     }))
 }
 

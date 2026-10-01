@@ -28,7 +28,7 @@ pub struct Options {
     rows: u32,
     /// condition-scope：条件级重验但不复用条件结论（只看重验范围）；condition：再加上同一版本条件结论的跨定义复用
     #[arg(long, value_delimiter = ',', default_value = "revoke,schema,definition,condition-scope,condition",
-          value_parser = ["revoke", "schema", "definition", "condition-scope", "condition"])]
+          value_parser = ["revoke", "schema", "definition", "definition-cache", "condition-scope", "condition"])]
     policies: Vec<String>,
     /// 每次变化后使用口径的 Agent 数；每个 Agent 按各自的随机顺序把全部口径各用一次
     #[arg(long, default_value_t = 8, value_parser = clap::value_parser!(u32).range(1..=64))]
@@ -313,7 +313,7 @@ fn policy_of(p: &str) -> Maint {
     match p {
         "revoke" => Maint::Revoke,
         "schema" => Maint::Schema,
-        "definition" => Maint::Definition,
+        "definition" | "definition-cache" => Maint::Definition,
         _ => Maint::Condition,
     }
 }
@@ -502,6 +502,7 @@ async fn cell(env: &Env<'_>, policy_name: &str, arrival: &str, repeat: u32, shar
         name: format!("maint-{policy_name}"),
         metric_maint: policy,
         cond_reuse: policy_name == "condition",
+        sql_cache: policy_name == "definition-cache",
         ..Default::default()
     };
     let mid = Middle::new(db.clone(), cfg).await?;
@@ -594,6 +595,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 "revoke": "逐写入撤销：依赖表有写入即撤销；本次变化的使用结束后重新提交（代替重新学习与提炼，LLM 成本不计），恢复前的使用记为不可用",
                 "schema": "只看表结构：结构指纹不变就继续用",
                 "definition": "定义级重验：依赖表有写入即待验证，首次使用时重跑全部条件（关联守卫强制重跑）；同一定义的并发维护合并，相同检查 SQL 在途合并",
+                "definition_cache": "通用验证缓存基线：定义级重验，另把维护路径上的每条验证 SQL（检查、守卫、修复、回放与回归）按规范化 SQL 与读到的表的版本缓存结果；不知道条件类型、不做蕴含，在途合并与其余各组相同",
                 "condition_scope": "条件级重验：只重查读到了变化表的条件，关联经验在别处修订后按待验证处理；不复用条件结论",
                 "condition": "condition-scope 之外，同一条件在同一版本上的结论跨定义复用（关联守卫、修复回归与粒度修复也复用）",
                 "stale": "返回为有效的修订，其规范 SQL 在当前快照上答错探测题（2002-09）",
@@ -762,7 +764,7 @@ fn markdown(report: &Value) -> String {
                 (!g.is_empty()).then(|| [0usize, 1, 2].map(|i| g.iter().map(|t| t[i]).sum::<f64>() / g.len() as f64))
             };
             let base = mean("definition");
-            for p in ["revoke", "schema", "definition", "condition-scope", "condition"] {
+            for p in ["revoke", "schema", "definition", "definition-cache", "condition-scope", "condition"] {
                 let Some(t) = mean(p) else { continue };
                 rows.push(vec![
                     k.to_string(),

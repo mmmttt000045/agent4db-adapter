@@ -104,6 +104,9 @@ pub struct MiddleConfig {
     pub cond_reuse: bool,
     /// 按任务记录 run_sql 计算链（指标经验的提炼与评测用）
     pub record: bool,
+    /// 通用验证缓存（对照基线）：维护路径上的验证 SQL（检查、守卫、修复、回放与回归）按“规范化 SQL + 读到的表的版本”缓存结果，
+    /// 不区分条件类型、不做蕴含
+    pub sql_cache: bool,
 }
 
 impl Default for MiddleConfig {
@@ -124,6 +127,7 @@ impl Default for MiddleConfig {
             metric_maint: Maint::Condition,
             cond_reuse: false,
             record: false,
+            sql_cache: false,
         }
     }
 }
@@ -168,6 +172,8 @@ pub struct Stats {
     pub repairs: AtomicU64,
     pub rejections: AtomicU64,
     pub notices: AtomicU64,
+    pub sql_cache_hits: AtomicU64,
+    pub sql_cache_misses: AtomicU64,
 }
 
 fn inc(a: &AtomicU64) {
@@ -265,6 +271,8 @@ pub struct Middle {
     /// 指标经验的验证证据（按完整键），不随 find_metric 返回
     metric_evidence: Mutex<HashMap<String, MetricEvidence>>,
     metric_events: Mutex<Vec<Value>>,
+    /// 通用验证缓存：规范化 SQL + 版本签名 → 结果（`MiddleConfig::sql_cache`）
+    vcache: Mutex<HashMap<String, crate::db::Rows>>,
     /// 设置后，LLM Agent 循环逐次记录工具调用（工作负载刻画用）
     pub trace: Option<crate::llm::Trace>,
 }
@@ -337,6 +345,7 @@ impl Middle {
             tasks: Mutex::new(HashMap::new()),
             metric_evidence: Mutex::new(HashMap::new()),
             metric_events: Mutex::new(Vec::new()),
+            vcache: Mutex::new(HashMap::new()),
             trace: None,
         })
     }
@@ -423,6 +432,7 @@ impl Middle {
             "guard_runs": g(&s.guard_runs), "guard_fails": g(&s.guard_fails), "revocations": g(&s.revocations),
             "repairs": g(&s.repairs), "sql_rejections": g(&s.rejections), "notices": g(&s.notices),
             "entries": self.store.len(), "feedback": self.fb.report(), "db": self.db.meter.snap(),
+            "sql_cache": {"hits": g(&s.sql_cache_hits), "misses": g(&s.sql_cache_misses)},
         })
     }
 
@@ -478,6 +488,24 @@ impl Middle {
         self.notices.lock().clear();
         self.metric_events.lock().clear();
         Ok(())
+    }
+
+    /// 维护路径上的验证查询。开启 `sql_cache` 时按“规范化 SQL + 读到的表的当前版本”复用结果，这是不理解条件语义的通用缓存。
+    pub(crate) async fn vquery(&self, kind: QKind, sql: &str) -> Result<crate::db::Rows> {
+        if !self.cfg.sql_cache {
+            return self.db.query(kind, sql).await;
+        }
+        let tables: Vec<String> = sqlscan::tables(sql, &self.cat).into_iter().collect();
+        let deps = self.deps_for(&tables).await?;
+        let key = format!("{}@{}", sql.split_whitespace().collect::<Vec<_>>().join(" "), ver_sig(&deps));
+        if let Some(r) = self.vcache.lock().get(&key).cloned() {
+            inc(&self.stats.sql_cache_hits);
+            return Ok(r);
+        }
+        inc(&self.stats.sql_cache_misses);
+        let r = self.db.query(kind, sql).await?;
+        self.vcache.lock().insert(key, r.clone());
+        Ok(r)
     }
 
     async fn deps_for(&self, tables: &[String]) -> Result<BTreeMap<String, TableVersion>> {
@@ -604,7 +632,7 @@ impl Middle {
             .flight_c
             .run(self.cfg.singleflight, &fkey, || async {
                 let t = Instant::now();
-                let rows = self.db.query(kind, &sql).await?;
+                let rows = self.vquery(kind, &sql).await?;
                 let o = c.eval(&rows, t.elapsed().as_secs_f64() * 1000.0);
                 if kind == QKind::Check {
                     self.fb.record(c, &o, &self.rows());
@@ -985,15 +1013,13 @@ impl Middle {
         let key = if cols.len() == 1 { cols[0].clone() } else { format!("({})", cols.join(", ")) };
         let nn: Vec<String> = cols.iter().map(|c| format!("{c} is not null")).collect();
         let total = self
-            .db
-            .query(QKind::Repair, &format!("select count(distinct {key}) from {table} where {}", nn.join(" and ")))
+            .vquery(QKind::Repair, &format!("select count(distinct {key}) from {table} where {}", nn.join(" and ")))
             .await?
             .i64(0, 0)
             .unwrap_or(0);
         for (_, c) in cands {
             let r = self
-                .db
-                .query(
+                .vquery(
                     QKind::Repair,
                     &format!("select {c}::text, count(*), count(distinct {key}) from {table} where {} group by {c}", nn.join(" and ")),
                 )

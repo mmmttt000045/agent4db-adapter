@@ -501,7 +501,7 @@ impl Middle {
         gate!(gates, "G4", self.grain_gate(ctx, m, false).await);
         let example = m.examples.first().map(|x| x.sql.clone()).unwrap_or_default();
         gate!(gates, "G5", self.review_gate(ctx, &example).await?);
-        let g7 = match self.db.query(QKind::Metric, judge).await {
+        let g7 = match self.vquery(QKind::Metric, judge).await {
             Ok(r) => self.value_gate(&example, &metric::parse_answer(r.cell(0, 0).unwrap_or("NULL")), decimals).await,
             Err(e) => Err(format!("判题查询失败：{e:#}")),
         };
@@ -681,7 +681,7 @@ impl Middle {
     /// 执行 SQL，第一行须有一个单元格在答案精度上等于 `expect`（示例 SQL 常把中间量与结果放在同一行；
     /// 规范 SQL 只有一列）；执行失败算不通过。
     async fn value_gate(&self, sql: &str, expect: &Answer, decimals: u32) -> Gate {
-        match self.db.query(QKind::Metric, sql).await {
+        match self.vquery(QKind::Metric, sql).await {
             Err(e) => Err(format!("执行失败：{e:#}")),
             Ok(r) => match r.rows.first() {
                 None => Err("结果为空".into()),
@@ -1126,7 +1126,7 @@ impl Middle {
         let g8 = match (&ev.judge, metric::compile(m, &ev.ask)) {
             (None, _) => Err("没有学习题判题查询，需业务方确认".into()),
             (_, Err(e)) => Err(format!("{e:#}")),
-            (Some(judge), Ok(sql)) => match self.db.query(QKind::Metric, judge).await {
+            (Some(judge), Ok(sql)) => match self.vquery(QKind::Metric, judge).await {
                 Ok(r) => {
                     let expect = metric::parse_answer(r.cell(0, 0).unwrap_or("NULL"));
                     self.value_gate(&sql, &expect, ev.decimals).await

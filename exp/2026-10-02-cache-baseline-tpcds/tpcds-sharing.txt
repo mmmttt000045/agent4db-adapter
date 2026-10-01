@@ -1,0 +1,244 @@
+{
+ "templates": 99,
+ "parse_failures": [],
+ "queries_with_definitions": 82,
+ "definitions": 175,
+ "condition_instances": 559,
+ "distinct_conditions": 65,
+ "instances_per_distinct": 8.6,
+ "distinct_shared_by_2plus": 49,
+ "instances_on_shared_conditions_pct": 97.1,
+ "by_type": {
+  "grain": {
+   "instances": 175,
+   "distinct": 7
+  },
+  "time": {
+   "instances": 125,
+   "distinct": 9
+  },
+  "join": {
+   "instances": 221,
+   "distinct": 44
+  },
+  "factjoin": {
+   "instances": 38,
+   "distinct": 5
+  }
+ },
+ "top_conditions": [
+  {
+   "condition": [
+    "grain",
+    "('store_sales',)",
+    "('ss_item_sk', 'ss_ticket_number')"
+   ],
+   "definitions": 95
+  },
+  {
+   "condition": [
+    "time",
+    "('store_sales', 'date_dim')",
+    "('ss_sold_date_sk',)"
+   ],
+   "definitions": 57
+  },
+  {
+   "condition": [
+    "join",
+    "('store_sales', 'store')",
+    "(('ss_store_sk', 's_store_sk'),)"
+   ],
+   "definitions": 39
+  },
+  {
+   "condition": [
+    "join",
+    "('store_sales', 'item')",
+    "(('ss_item_sk', 'i_item_sk'),)"
+   ],
+   "definitions": 33
+  },
+  {
+   "condition": [
+    "grain",
+    "('web_sales',)",
+    "('ws_item_sk', 'ws_order_number')"
+   ],
+   "definitions": 27
+  },
+  {
+   "condition": [
+    "grain",
+    "('catalog_sales',)",
+    "('cs_item_sk', 'cs_order_number')"
+   ],
+   "definitions": 26
+  },
+  {
+   "condition": [
+    "time",
+    "('catalog_sales', 'date_dim')",
+    "('cs_sold_date_sk',)"
+   ],
+   "definitions": 23
+  },
+  {
+   "condition": [
+    "time",
+    "('web_sales', 'date_dim')",
+    "('ws_sold_date_sk',)"
+   ],
+   "definitions": 22
+  },
+  {
+   "condition": [
+    "join",
+    "('store_sales', 'household_demographics')",
+    "(('ss_hdemo_sk', 'hd_demo_sk'),)"
+   ],
+   "definitions": 16
+  },
+  {
+   "condition": [
+    "join",
+    "('store_sales', 'customer')",
+    "(('ss_customer_sk', 'c_customer_sk'),)"
+   ],
+   "definitions": 14
+  },
+  {
+   "condition": [
+    "join",
+    "('catalog_sales', 'item')",
+    "(('cs_item_sk', 'i_item_sk'),)"
+   ],
+   "definitions": 12
+  },
+  {
+   "condition": [
+    "join",
+    "('web_sales', 'item')",
+    "(('ws_item_sk', 'i_item_sk'),)"
+   ],
+   "definitions": 10
+  }
+ ],
+ "per_table_update": {
+  "call_center": {
+   "affected_definitions": 4,
+   "definition_level_checks": 17,
+   "condition_level_checks": 2
+  },
+  "catalog_page": {
+   "affected_definitions": 1,
+   "definition_level_checks": 6,
+   "condition_level_checks": 1
+  },
+  "catalog_returns": {
+   "affected_definitions": 13,
+   "definition_level_checks": 39,
+   "condition_level_checks": 7
+  },
+  "catalog_sales": {
+   "affected_definitions": 33,
+   "definition_level_checks": 113,
+   "condition_level_checks": 16
+  },
+  "customer": {
+   "affected_definitions": 24,
+   "definition_level_checks": 93,
+   "condition_level_checks": 4
+  },
+  "customer_address": {
+   "affected_definitions": 22,
+   "definition_level_checks": 96,
+   "condition_level_checks": 8
+  },
+  "customer_demographics": {
+   "affected_definitions": 8,
+   "definition_level_checks": 46,
+   "condition_level_checks": 3
+  },
+  "date_dim": {
+   "affected_definitions": 125,
+   "definition_level_checks": 453,
+   "condition_level_checks": 9
+  },
+  "household_demographics": {
+   "affected_definitions": 18,
+   "definition_level_checks": 82,
+   "condition_level_checks": 2
+  },
+  "inventory": {
+   "affected_definitions": 4,
+   "definition_level_checks": 15,
+   "condition_level_checks": 4
+  },
+  "item": {
+   "affected_definitions": 62,
+   "definition_level_checks": 250,
+   "condition_level_checks": 7
+  },
+  "promotion": {
+   "affected_definitions": 7,
+   "definition_level_checks": 44,
+   "condition_level_checks": 3
+  },
+  "reason": {
+   "affected_definitions": 1,
+   "definition_level_checks": 5,
+   "condition_level_checks": 1
+  },
+  "ship_mode": {
+   "affected_definitions": 4,
+   "definition_level_checks": 20,
+   "condition_level_checks": 2
+  },
+  "store": {
+   "affected_definitions": 40,
+   "definition_level_checks": 177,
+   "condition_level_checks": 2
+  },
+  "store_returns": {
+   "affected_definitions": 22,
+   "definition_level_checks": 87,
+   "condition_level_checks": 7
+  },
+  "store_sales": {
+   "affected_definitions": 101,
+   "definition_level_checks": 310,
+   "condition_level_checks": 12
+  },
+  "time_dim": {
+   "affected_definitions": 13,
+   "definition_level_checks": 54,
+   "condition_level_checks": 3
+  },
+  "warehouse": {
+   "affected_definitions": 8,
+   "definition_level_checks": 37,
+   "condition_level_checks": 3
+  },
+  "web_page": {
+   "affected_definitions": 5,
+   "definition_level_checks": 18,
+   "condition_level_checks": 2
+  },
+  "web_returns": {
+   "affected_definitions": 10,
+   "definition_level_checks": 34,
+   "condition_level_checks": 9
+  },
+  "web_sales": {
+   "affected_definitions": 30,
+   "definition_level_checks": 104,
+   "condition_level_checks": 15
+  },
+  "web_site": {
+   "affected_definitions": 4,
+   "definition_level_checks": 19,
+   "condition_level_checks": 1
+  }
+ }
+}

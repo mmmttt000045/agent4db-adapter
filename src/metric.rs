@@ -14,7 +14,7 @@ use std::sync::OnceLock;
 use std::time::Instant;
 
 /// 销售期间：年份 + 月份区间。
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Period {
     pub year: i32,
     pub m1: u32,
@@ -28,7 +28,7 @@ impl Period {
 }
 
 /// 题型：单期汇总、跨期差值（前者减后者）、全年中取值最高的月份。
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum Ask {
     Single { period: Period },

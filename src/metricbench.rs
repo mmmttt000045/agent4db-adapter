@@ -64,7 +64,7 @@ pub(crate) struct Def {
     name: &'static str,
     definition: &'static str,
     /// 口径读到的表；数据变化场景只重问读到被写入表的指标
-    tables: &'static [&'static str],
+    pub(crate) tables: &'static [&'static str],
 }
 
 static DEFS: [Def; 5] = [

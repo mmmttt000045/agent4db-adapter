@@ -12,6 +12,7 @@ mod maintbench;
 mod metric;
 mod metricbench;
 mod middle;
+mod replaybench;
 mod scenario;
 mod server;
 mod sqlscan;
@@ -45,6 +46,8 @@ enum Cmd {
     MetricBench(metricbench::Options),
     /// 指标经验维护方式对照：相同口径与数据变化序列下比较逐写入撤销、只看结构、定义级与条件级重验（不调用 LLM，独立数据库）
     MaintBench(maintbench::Options),
+    /// 配对回放：场景评测中学到的指标库，在相同变化与留出题上比较各维护方式（不调用 LLM，独立数据库）
+    ReplayBench(replaybench::Options),
     /// 工作负载刻画：互不共享的 Agent 会话并发回答同一批分析题，逐次记录工具调用（真实模型，独立数据库）
     WorkloadBench(workloadbench::Options),
     /// 初始化：状态列与 ETL 批次表（幂等）
@@ -74,6 +77,7 @@ async fn main() -> Result<()> {
     match cli.cmd {
         Cmd::MetricBench(options) => metricbench::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::MaintBench(options) => maintbench::run(&cli.db, cli.pool, &cli.out, options).await?,
+        Cmd::ReplayBench(options) => replaybench::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::WorkloadBench(options) => workloadbench::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::Setup => {
             etl::setup(&admin).await?;

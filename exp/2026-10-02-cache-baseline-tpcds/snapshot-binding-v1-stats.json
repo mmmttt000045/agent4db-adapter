@@ -1,0 +1,155 @@
+{
+ "rows": 200000,
+ "trials": 10,
+ "interleavings": [
+  {
+   "case": "write_during_pause",
+   "mode": "precheck",
+   "served": 0,
+   "violation": 10,
+   "rejected": 0,
+   "error": 0,
+   "latency_p50_ms": 2219.2
+  },
+  {
+   "case": "write_during_pause",
+   "mode": "snapshot",
+   "served": 10,
+   "violation": 0,
+   "rejected": 0,
+   "error": 0,
+   "latency_p50_ms": 2199.5
+  },
+  {
+   "case": "write_before_call",
+   "mode": "precheck",
+   "served": 0,
+   "violation": 0,
+   "rejected": 10,
+   "error": 0,
+   "latency_p50_ms": 3886.8
+  },
+  {
+   "case": "write_before_call",
+   "mode": "snapshot",
+   "served": 0,
+   "violation": 0,
+   "rejected": 10,
+   "error": 0,
+   "latency_p50_ms": 3866.4
+  },
+  {
+   "case": "write_notified",
+   "mode": "precheck",
+   "served": 0,
+   "violation": 0,
+   "rejected": 10,
+   "error": 0,
+   "latency_p50_ms": 5148.0
+  },
+  {
+   "case": "write_notified",
+   "mode": "snapshot",
+   "served": 0,
+   "violation": 0,
+   "rejected": 10,
+   "error": 0,
+   "latency_p50_ms": 5056.0
+  }
+ ],
+ "stress": [
+  {
+   "notify": true,
+   "mode": "precheck",
+   "trials": 20,
+   "calls": 656,
+   "served": 576,
+   "violation": 0,
+   "rejected": 80,
+   "error": 0,
+   "violation_pct_of_answered": 0.0,
+   "violation_wilson95_upper_pct": 0.663,
+   "trials_with_violation": 0,
+   "violation_start_minus_commit_ms": {
+    "n": 0
+   }
+  },
+  {
+   "notify": true,
+   "mode": "snapshot",
+   "trials": 20,
+   "calls": 346,
+   "served": 266,
+   "violation": 0,
+   "rejected": 80,
+   "error": 0,
+   "violation_pct_of_answered": 0.0,
+   "violation_wilson95_upper_pct": 1.424,
+   "trials_with_violation": 0,
+   "violation_start_minus_commit_ms": {
+    "n": 0
+   }
+  },
+  {
+   "notify": false,
+   "mode": "precheck",
+   "trials": 20,
+   "calls": 656,
+   "served": 576,
+   "violation": 0,
+   "rejected": 80,
+   "error": 0,
+   "violation_pct_of_answered": 0.0,
+   "violation_wilson95_upper_pct": 0.663,
+   "trials_with_violation": 0,
+   "violation_start_minus_commit_ms": {
+    "n": 0
+   }
+  },
+  {
+   "notify": false,
+   "mode": "snapshot",
+   "trials": 20,
+   "calls": 342,
+   "served": 256,
+   "violation": 0,
+   "rejected": 86,
+   "error": 0,
+   "violation_pct_of_answered": 0.0,
+   "violation_wilson95_upper_pct": 1.478,
+   "trials_with_violation": 0,
+   "violation_start_minus_commit_ms": {
+    "n": 0
+   }
+  }
+ ],
+ "reader_p50_ms": {
+  "precheck": {
+   "steady_ms": 4.1,
+   "first_after_write_ms": 998.4,
+   "second_after_write_ms": 4.8
+  },
+  "snapshot": {
+   "steady_ms": 5.4,
+   "first_after_write_ms": 2008.4,
+   "second_after_write_ms": 8.8
+  }
+ },
+ "writer_median": {
+  "no_trigger": {
+   "sequential_stmt_per_s": 3250.4,
+   "concurrent8_stmt_per_s": 20074.4,
+   "bulk_ms_per_stmt": 16.5
+  },
+  "trigger": {
+   "sequential_stmt_per_s": 2292.7,
+   "concurrent8_stmt_per_s": 16569.2,
+   "bulk_ms_per_stmt": 16.4
+  }
+ },
+ "writer_ratio_trigger_over_none": {
+  "sequential_stmt_per_s": 0.71,
+  "concurrent8_stmt_per_s": 0.83,
+  "bulk_ms_per_stmt": 0.99
+ }
+}

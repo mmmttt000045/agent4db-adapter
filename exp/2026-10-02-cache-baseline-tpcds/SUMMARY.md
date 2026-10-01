@@ -27,7 +27,7 @@
 
 ## 进行中
 
-- noctis `results/motiv-20261001/`：E1 16M（条件级部分）→ 通用缓存基线正式运行（1M 共享度 1/2/4/6 扫描、1M 零共享对照、4M）→ E1b（4M、32 个 Agent）。
+- noctis `results/motiv-20261001/`：通用缓存基线正式运行（05:18 开始；1M 共享度 1/2/4/6 扫描 → 1M 零共享对照 → 4M）→ E1b（4M、32 个 Agent）。使用 04:13 重新编译的二进制（含修复候选唯一性与等待修复）。汇总：`python3 tools/cache-baseline-stats.py results/motiv-20261001/cb-*`。
 - 需要 LLM（等 Cline 充值）：端到端（10M）与并发 8 的场景、MAVRA 缺失的重复、匹配的轨迹检索基线。
   - 轨迹检索基线已实现（`metric-bench --modes traj-global`）：与 MAVRA 相同的学习题、相同的入库前提（判题成功、计算链可复核），把参与答案的 SQL 与算式原样保存，留出与变化阶段用 `find_trajectory` 按题面相似度检索，不提炼、不维护。需要 LLM 才能跑。
 

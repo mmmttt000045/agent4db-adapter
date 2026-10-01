@@ -16,28 +16,39 @@
 \usepackage{colortbl}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
-% Categorical slots in fixed order (CVD-validated): blue, orange, aqua; text and axes stay neutral.
-\definecolor{accent}{HTML}{2A78D6}
-\definecolor{seriesA}{HTML}{2A78D6}
-\definecolor{seriesB}{HTML}{EB6834}
-\definecolor{seriesC}{HTML}{1BAF7A}
+% Method colors, fixed across every figure and table. Six slots in the CVD-validated order
+% (blue, orange, aqua, yellow, magenta, green), assigned in reverse along the bar order so
+% adjacent bars are validated pairs; scope-only (controlled benchmark only) uses violet.
+% Blue is reserved for MAVRA; accuracy shading uses a neutral ramp.
+\definecolor{mCond}{HTML}{2A78D6}
+\definecolor{mDef}{HTML}{EB6834}
+\definecolor{mRevoke}{HTML}{1BAF7A}
+\definecolor{mSchema}{HTML}{EDA100}
+\definecolor{mUnguarded}{HTML}{E87BA4}
+\definecolor{mNoShare}{HTML}{008300}
+\definecolor{mScope}{HTML}{4A3AA7}
+\definecolor{heat}{HTML}{8C8B86}
 \definecolor{inkmuted}{HTML}{52514E}
 \definecolor{gridline}{HTML}{DDDCD8}
+\newcommand{\swatch}[1]{\textcolor{#1}{\rule[-0.1ex]{0.8em}{0.8em}}}
 \pgfplotsset{
   mavra/.style={font=\footnotesize, axis line style={inkmuted}, tick style={inkmuted}, tick label style={font=\scriptsize},
     label style={font=\footnotesize}, legend style={font=\scriptsize, draw=none, fill=none}, legend cell align=left,
     ymajorgrids, grid style={gridline, line width=0.3pt}, axis x line*=bottom, axis y line*=left},
-  bars/.style={error bars/y dir=both, error bars/y explicit, error bars/error bar style={black!75, line width=0.4pt},
-    error bars/error mark options={rotate=90, mark size=1pt, black!75}},
-  mavraA/.style={bars, area legend, fill=seriesA, draw=seriesA!75!black, line width=0.3pt},
-  mavraB/.style={bars, area legend, fill=seriesB, draw=seriesB!75!black, line width=0.3pt, postaction={pattern=north east lines, pattern color=white!70!seriesB}},
-  mavraC/.style={bars, area legend, fill=seriesC, draw=seriesC!75!black, line width=0.3pt, postaction={pattern=north west lines, pattern color=white!70!seriesC}},
-  maintCondStag/.style={seriesA, line width=1pt, mark=*, mark size=1.6pt},
-  maintCondSim/.style={seriesA, line width=1pt, densely dashed, mark=o, mark size=1.8pt, mark options={solid}},
-  maintScopeStag/.style={seriesB, line width=1pt, mark=square*, mark size=1.5pt},
-  maintScopeSim/.style={seriesB, line width=1pt, densely dashed, mark=square, mark size=1.6pt, mark options={solid}},
+  bars/.style={area legend, line width=0.3pt, error bars/y dir=both, error bars/y explicit,
+    error bars/error bar style={black!75, line width=0.4pt}, error bars/error mark options={rotate=90, mark size=0.8pt, black!75}},
+  barNoShare/.style={bars, fill=mNoShare, draw=mNoShare!70!black},
+  barUnguarded/.style={bars, fill=mUnguarded, draw=mUnguarded!70!black},
+  barSchema/.style={bars, fill=mSchema, draw=mSchema!70!black},
+  barRevoke/.style={bars, fill=mRevoke, draw=mRevoke!70!black},
+  barDef/.style={bars, fill=mDef, draw=mDef!70!black},
+  barCond/.style={bars, fill=mCond, draw=mCond!70!black},
+  maintCondStag/.style={mCond, line width=1pt, mark=*, mark size=1.6pt},
+  maintCondSim/.style={mCond, line width=1pt, densely dashed, mark=o, mark size=1.8pt, mark options={solid}},
+  maintScopeStag/.style={mScope, line width=1pt, mark=square*, mark size=1.5pt},
+  maintScopeSim/.style={mScope, line width=1pt, densely dashed, mark=square, mark size=1.6pt, mark options={solid}},
 }
-\usetikzlibrary{patterns}
+\usetikzlibrary{patterns,shapes.geometric,calc,backgrounds}
 \input{gen/numbers}
 \setcopyright{none}
 \settopmatter{printacmref=false}
@@ -116,7 +127,7 @@
 \begin{table*}[t]
 \caption{\bt{Application and agent workloads. Application: Redset~\cite{vanrenen2024redset}, 441\,M queries from 400 Redshift clusters; pooled rates, with cross-cluster medians where clusters differ widely. Agent: 100 fresh sessions (25 questions, two phrasings, two repetitions, three concurrent) issuing 521 database calls, 176 of them SQL. A \emph{lookup} is a schema lookup, data probe, or validation call.}{应用与智能体负载。应用：Redset~\cite{vanrenen2024redset}，400 个 Redshift 集群的 4.41 亿条查询；给出汇总比例，集群差异大时同时给出跨集群中位数。智能体：100 个全新会话（25 道题、两种题面、各两次，三个并发），共 521 次数据库调用，其中 SQL 176 条。\emph{查找}指结构查找、数据探查或验证调用。}}
 \label{tab:workload-characterization}
-\small
+\footnotesize
 \begin{tabularx}{\textwidth}{@{}P{0.15\textwidth}LL@{}}
 \toprule
 \bt{Dimension}{维度} & \bt{Application (Redset)}{应用（Redset）} & \bt{Data agents (100 sessions)}{数据智能体（100 个会话）}\\
@@ -154,58 +165,109 @@
 {每项要求都能用读取少数几张表的 SQL 探查来检查：用分组计数找出过滤后重复的键，或比较连接前后的行数。数据画像能够发现这类唯一列组合和依赖，同时指出它们只对某一时刻的数据实例成立~\cite{abedjan2015profiling}；数据验证系统能在不断增长的数据集上声明式地执行这类检查~\cite{schelter2018deequ}，并按模式验证每个新数据批次~\cite{breck2019validation}。智能体场景中缺少的是把学到的定义与支撑它的检查联系起来：定义所依赖的数据一变，检查就执行，其结果决定智能体能否继续使用该定义。}
 
 \subsection{\bt{Maintenance alternatives}{维护方式}}
-\bi{Table~\ref{tab:ladder} compares maintenance strategies on benign appends and data-only breakage. Schema-only maintenance retains the stale definition, while revoke-on-write uses LLM relearning after every write. Definition-level lazy revalidation, adapted from lazy view maintenance~\cite{zhou2007lazy}, preserves correctness through checks and repair. Condition-level maintenance shares condition verdicts across definitions when the condition identity and dependency versions match. For an update of \code{store\_returns}, definition-level revalidation checks every condition of the five returns definitions and three return-ratio definitions, including unchanged sales conditions. Condition-level maintenance checks the three distinct conditions that read the updated table and serves all eight definitions from their verdicts.}
-{表~\ref{tab:ladder} 比较各种维护方式在正常追加与纯数据破坏下的行为。只看结构的维护保留过期定义，写入即撤销则在每次写入后调用大模型重学。借鉴物化视图懒维护~\cite{zhou2007lazy}的定义级懒重验证通过检查和修复保持正确性，条件身份与依赖版本相同时，条件级维护在定义之间共享检查结论。以 \code{store\_returns} 的一次更新为例，定义级重验证检查 5 个退货定义和 3 个退货比率定义的全部条件，包括未变化的销售条件。条件级维护检查读取更新表的 3 个不同条件，并用结论服务全部 8 个定义。}
+\bi{Table~\ref{tab:ladder} compares maintenance strategies on benign appends and data-only breakage. Schema-only maintenance retains the stale definition, while revoke-on-write uses LLM relearning after every write. Definition-level lazy revalidation, adapted from lazy view maintenance~\cite{zhou2007lazy}, preserves correctness through checks and repair. Condition-level maintenance shares condition verdicts across definitions when the condition identity and dependency versions match. Figure~\ref{fig:sharing} shows why the difference matters. For an update of \code{store\_returns}, definition-level revalidation checks every condition of the five returns definitions and three return-ratio definitions, including unchanged sales conditions, 19 checks in all. Condition-level maintenance checks the three distinct conditions that read the updated table and serves all eight definitions from their verdicts.}
+{表~\ref{tab:ladder} 比较各种维护方式在正常追加与纯数据破坏下的行为。只看结构的维护保留过期定义，写入即撤销则在每次写入后调用大模型重学。借鉴物化视图懒维护~\cite{zhou2007lazy}的定义级懒重验证通过检查和修复保持正确性，条件身份与依赖版本相同时，条件级维护在定义之间共享检查结论。图~\ref{fig:sharing} 说明了差别所在。以 \code{store\_returns} 的一次更新为例，定义级重验证检查 5 个退货定义和 3 个退货比率定义的全部条件，包括未变化的销售条件，共 19 次。条件级维护只检查读取更新表的 3 个不同条件，并用结论服务全部 8 个定义。}
 
 \begin{table}[t]
 \caption{\bt{Maintenance strategies for shared definitions.}{共享定义的维护方式。}}
 \label{tab:ladder}
-\small
-\begin{tabularx}{\linewidth}{@{}lXXX@{}}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}lLLL@{}}
 \toprule
 \bt{Strategy}{方式} & \bt{Benign append}{正常追加} & \bt{Data-only break}{纯数据破坏} & \bt{Work per update}{每次更新的工作}\\
 \midrule
-\bt{Schema-only}{只看结构} & \bt{keep}{保留} & \bt{stale use}{过期使用} & \bt{none}{无}\\
-\bt{Revoke-on-write}{写入即撤销} & \bt{revoke, relearn}{撤销并重学} & \bt{revoke, relearn}{撤销并重学} & \bt{LLM relearning}{大模型重学}\\
-\bt{Definition-level}{定义级} & \bt{keep}{保留} & \bt{revoke, repair}{撤销并修复} & \bt{all conditions of affected definitions}{受影响定义的全部条件}\\
-\bt{Condition-level}{条件级} & \bt{keep}{保留} & \bt{revoke, repair}{撤销并修复} & \bt{distinct changed conditions}{变化的不同条件}\\
+\swatch{mSchema}\ \bt{Schema-only}{只看结构} & \bt{keep}{保留} & \bt{stale use}{过期使用} & \bt{none}{无}\\
+\swatch{mRevoke}\ \bt{Revoke-on-write}{写入即撤销} & \bt{revoke, relearn}{撤销并重学} & \bt{revoke, relearn}{撤销并重学} & \bt{LLM relearning}{大模型重学}\\
+\swatch{mDef}\ \bt{Definition-level}{定义级} & \bt{keep}{保留} & \bt{revoke, repair}{撤销并修复} & \bt{all conditions of affected definitions}{受影响定义的全部条件}\\
+\swatch{mCond}\ \bt{Condition-level}{条件级} & \bt{keep}{保留} & \bt{revoke, repair}{撤销并修复} & \bt{distinct changed conditions}{变化的不同条件}\\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm, font=\scriptsize,
+  fam/.style={draw=inkmuted, fill=black!4, rounded corners=2pt, align=left, text width=23mm, minimum height=7mm, inner sep=2pt, line width=0.4pt},
+  famhit/.style={fam, draw=mDef!85!black, fill=mDef!10, line width=0.7pt},
+  cond/.style={draw=inkmuted, fill=white, rounded corners=2pt, align=left, text width=33mm, minimum height=4.4mm, inner sep=1.5pt, line width=0.4pt},
+  condhit/.style={cond, draw=mCond!80!black, fill=mCond!16, line width=0.7pt},
+  ref/.style={black!35, line width=0.45pt},
+  refhit/.style={mDef!85!black, line width=0.75pt}]
+\node[fam] (st) at (1.25,3.05) {\textbf{\bt{Store sales}{门店销售}} (6)\\\bt{revenue, profit, \ldots}{营业额、利润……}};
+\node[famhit] (ra) at (1.25,2.05) {\textbf{\bt{Return ratios}{退货比率}} (3)\\\bt{return rate, \ldots}{退货率……}};
+\node[famhit] (re) at (1.25,1.05) {\textbf{\bt{Store returns}{门店退货}} (5)\\\bt{amount, tax, fee, \ldots}{金额、税额……}};
+\node[fam] (ca) at (1.25,0.05) {\textbf{\bt{Catalog sales}{目录销售}} (5)\\\bt{revenue, shipping, \ldots}{营业额、运费……}};
+\node[cond] (c1) at (6.15,3.35) {\bt{Grain}{粒度} \code{store\_sales}(ticket, item)};
+\node[cond] (c2) at (6.15,2.85) {\bt{Time}{时间} \code{store\_sales}$\to$\code{date\_dim}};
+\node[condhit] (c3) at (6.15,2.25) {\bt{Join}{连接} \code{store\_sales}$\to$\code{store\_returns}};
+\node[condhit] (c4) at (6.15,1.65) {\bt{Grain}{粒度} \code{store\_returns}(ticket, item)};
+\node[condhit] (c5) at (6.15,1.15) {\bt{Time}{时间} \code{store\_returns}$\to$\code{date\_dim}};
+\node[cond] (c6) at (6.15,0.35) {\bt{Grain}{粒度} \code{catalog\_sales}(order, item)};
+\node[cond] (c7) at (6.15,-0.15) {\bt{Time}{时间} \code{catalog\_sales}$\to$\code{date\_dim}};
+\foreach \c in {c1,c2} \draw[ref] (st.east) -- (\c.west);
+\foreach \c in {c6,c7} \draw[ref] (ca.east) -- (\c.west);
+\foreach \c in {c1,c2,c3} \draw[refhit] (ra.east) -- (\c.west);
+\foreach \c in {c4,c5} \draw[refhit] (re.east) -- (\c.west);
+\node[anchor=north west, text width=82mm, align=left, inner sep=0pt] at (0.0,-0.6) {\swatch{mDef}\ \bt{8 pending definitions; definition-level reruns $5\times2+3\times3=19$ checks.}{8 个待验证定义；定义级重跑 $5\times2+3\times3=19$ 次检查。}\\[1pt]\swatch{mCond}\ \bt{3 conditions read \code{store\_returns}; \system\ runs 3 checks and serves all 8.}{3 个条件读取 \code{store\_returns}；\system\ 只跑 3 次检查并服务全部 8 个定义。}};
+\end{tikzpicture}
+\caption{\bt{Definitions share conditions. The 19 definitions of the controlled workload reference 41 condition instances but only seven distinct conditions. After an update of \code{store\_returns}, the eight definitions on orange edges become pending.}{定义共享条件。受控负载的 19 个定义引用 41 个条件实例，但不同的条件只有 7 个。\code{store\_returns} 更新后，橙色边上的 8 个定义变为待验证。}}
+\label{fig:sharing}
+\Description{Bipartite graph from four definition families to seven conditions. Returns and return-ratio families connect to three conditions that read store_returns; definition-level revalidation reruns 19 checks, condition-level runs three.}
+\end{figure}
 
 \bi{Concurrency sharpens the difference. After an update, many agents may request pending definitions at once. Coalescing identical in-flight work, as caches do to mitigate thundering herds~\cite{nishtala2013memcache}, helps both strategies, so the gain from condition-level maintenance should be largest when uses are spread out in time and definitions share many conditions. Our evaluation measures exactly where the gain holds and where it vanishes.}
 {并发会放大两者的差别。更新之后，许多智能体可能同时请求待验证的定义。像缓存系统缓解惊群那样合并相同的在途工作~\cite{nishtala2013memcache}，对两种方式都有帮助；因此条件级维护的收益应当在使用分散在时间上、定义大量共享条件时最大。我们的实验正是测量收益在哪里成立、在哪里消失。}
 
 \section{\bt{System Overview}{系统概览}}
 \label{sec:overview}
-\bi{\system\ sits between agents and PostgreSQL (Figure~\ref{fig:architecture}). It exposes tool-style HTTP endpoints for listing and describing tables, finding and checking join paths, looking up metric definitions (\code{find\_metric}), and running SQL (\code{run\_sql}). Agents submit final answers with the query references and arithmetic that produced them, so the middleware records a calculation chain for every task. An in-memory store keeps versioned definitions, join paths, grain entries, and evidence. Version detection reads table fingerprints, DML statistics, and an ETL batch log.}
-{\system\ 位于智能体与 PostgreSQL 之间（图~\ref{fig:architecture}）。它通过工具式 HTTP 接口提供列出和描述表、查找与检查连接路径、查找指标定义（\code{find\_metric}）以及执行 SQL（\code{run\_sql}）等功能。智能体提交最终答案时附上产生答案的查询编号和算式，因此中间层为每个任务记录一条计算链。内存知识库保存版本化的定义、连接路径、粒度条目和证据。版本检测读取表指纹、DML 统计和 ETL 批次日志。}
+\bi{\system\ sits between agents and PostgreSQL (Figure~\ref{fig:architecture}). It exposes tool-style HTTP endpoints for listing and describing tables, finding and checking join paths, looking up metric definitions (\code{find\_metric}), and running SQL (\code{run\_sql}). Agents submit final answers with the query references and arithmetic that produced them, so the middleware records a calculation chain for every task. An in-memory store keeps versioned definitions, join paths, grain entries, and evidence. Version detection reads table fingerprints, DML statistics, and an ETL batch log. The prototype comprises about 9,000 lines of Rust, including 36 unit and integration tests.}
+{\system\ 位于智能体与 PostgreSQL 之间（图~\ref{fig:architecture}）。它通过工具式 HTTP 接口提供列出和描述表、查找与检查连接路径、查找指标定义（\code{find\_metric}）以及执行 SQL（\code{run\_sql}）等功能。智能体提交最终答案时附上产生答案的查询编号和算式，因此中间层为每个任务记录一条计算链。内存知识库保存版本化的定义、连接路径、粒度条目和证据。版本检测读取表指纹、DML 统计和 ETL 批次日志。原型约 9,000 行 Rust 代码，含 36 个单元与集成测试。}
 
 \begin{figure*}[t]
 \centering
-\begin{tikzpicture}[
-box/.style={draw,rounded corners=2pt,align=center,minimum height=13mm,text width=45mm,font=\small,inner sep=4pt},
-flow/.style={-{Latex[length=2mm]},thick},every node/.style={font=\small}]
-\node[box] (learning) at (0,0) {\bl{Grounded learning traces}{有业务依据的学习轨迹}};
-\node[box] (agents) at (7,0) {\bl{Data agents: lookup and SQL}{数据智能体：查找与 SQL}};
-\node[box] (admission) at (0,-1.8) {\bl{Extraction and gates G1--G7}{提炼与门槛 G1--G7}};
-\node[box] (execution) at (7,-1.8) {\bl{Declared revision checks}{声明修订核对}};
-\node[box] (store) at (0,-3.6) {\bl{Shared definitions and evidence}{共享定义与证据}};
-\node[box] (maintenance) at (7,-3.6) {\bl{Condition maintenance and repair}{条件维护与修复}};
-\node[box] (database) at (3.5,-5.4) {\bl{PostgreSQL data, versions, and checks}{PostgreSQL 数据、版本与检查}};
-\draw[flow] (learning) -- (admission);
-\draw[flow] (agents) -- (execution);
-\draw[flow] (admission) -- node[left,align=center]{\bl{publish}{发布}} (store);
-\draw[flow] (store.east) -- node[above,align=center]{\bl{conditions}{条件}} (maintenance.west);
-\draw[flow] (execution) -- (maintenance);
-\draw[flow] (maintenance.south) -- (database.north east);
-\draw[flow] (store.south) -- (database.north west);
-\draw[flow] (maintenance.east) -- ++(0.6,0) |- (execution.east);
-\draw[flow] (execution.east) -- ++(1.2,0) |- (database.east);
+\begin{tikzpicture}[x=1cm, y=1cm, font=\footnotesize,
+  comp/.style={draw=mCond!75!black, fill=white, rounded corners=2pt, align=center, text width=26mm, minimum height=9.5mm, inner sep=2pt, line width=0.5pt},
+  actor/.style={draw=inkmuted, fill=black!4, rounded corners=5pt, align=center, text width=22mm, minimum height=9.5mm, inner sep=2pt, line width=0.5pt},
+  flow/.style={-{Latex[length=1.8mm]}, line width=0.6pt, black!75},
+  both/.style={{Latex[length=1.8mm]}-{Latex[length=1.8mm]}, line width=0.6pt, black!75},
+  data/.style={-{Latex[length=1.6mm]}, line width=0.5pt, inkmuted, densely dashed},
+  stepno/.style={circle, fill=mCond, text=white, font=\scriptsize\bfseries, inner sep=0pt, minimum size=3.6mm},
+  lbl/.style={font=\scriptsize, text=inkmuted, inner sep=1pt}]
+\fill[mCond!5, draw=mCond!55, rounded corners=4pt, line width=0.6pt] (2.75,-0.65) rectangle (13.7,4.45);
+\node[anchor=north east, font=\footnotesize\bfseries, text=mCond!75!black] at (13.62,4.42) {\bt{\system\ middleware}{\system\ 中间层}};
+\node[actor, text width=19mm] (A) at (0.95,3.5) {\textbf{\bt{Agent A}{智能体 A}}\\\bt{learning tasks}{学习任务}};
+\node[actor, text width=19mm, minimum height=27mm] (B) at (0.95,0.875) {\textbf{\bt{Agents B, C, \ldots}{智能体 B、C……}}\\\bt{questions with metric names only}{只给指标名的问题}};
+\node[actor, text width=20mm] (X) at (7.6,5.2) {\textbf{\bt{LLM extractor}{大模型提炼器}}};
+\node[actor] (ETL) at (15.6,3.5) {\textbf{\bt{ETL and writers}{ETL 与写入方}}};
+\node[cylinder, shape border rotate=90, aspect=0.12, draw=inkmuted, fill=black!4, align=center, minimum height=27mm, minimum width=27mm, inner sep=1pt, line width=0.5pt] (PG) at (15.6,0.875) {\textbf{PostgreSQL}\\\bt{tables, DML statistics,}{表、DML 统计、}\\\bt{ETL batch log}{ETL 批次日志}};
+\node[comp] (adm) at (4.65,3.5) {\textbf{\bt{Admission}{准入}}\\\bt{calculation chain, G1--G7}{计算链、门槛 G1--G7}};
+\node[comp] (look) at (4.65,1.75) {\textbf{\bt{Lookup}{查找}}\\\code{find\_metric}, \bt{version check}{版本比较}};
+\node[comp] (guard) at (4.65,0) {\textbf{\bt{Execution guard}{执行守护}}\\\code{run\_sql}, \bt{revision check}{修订核对}};
+\node[comp] (maint) at (8.2,1.75) {\textbf{\bt{Condition maintenance}{条件维护}}\\\bt{reuse, imply, merge}{复用、蕴含、合并}};
+\node[comp] (rep) at (8.2,0) {\textbf{\bt{Restricted repair}{受限修复}}\\\bt{filters, coverage, G8}{过滤、覆盖、G8}};
+\node[comp, text width=20mm] (ver) at (12.45,0) {\textbf{\bt{Version tracker}{版本跟踪}}\\\bt{fingerprints, DML, batches}{指纹、DML、批次}};
+\node[draw=mCond!75!black, fill=mCond!10, rounded corners=2pt, minimum width=31mm, minimum height=27.5mm, line width=0.5pt] (store) at (11.95,2.6) {};
+\draw[mCond!55, line width=0.5pt] ($(store.west)+(0,-0.12)$) -- ($(store.east)+(0,-0.12)$);
+\node[align=center, text width=30mm] at (11.95,3.3) {\textbf{\bt{Definitions}{定义}}\\$m^r=(B,I,C,E,r)$\\\bt{valid, pending, revoked}{有效、待验证、已撤销}};
+\node[align=center, text width=30mm] at (11.95,1.75) {\textbf{\bt{Conditions and verdicts}{条件与结论}}\\$(\mathrm{id}(c),\,V(\mathrm{dep}(c)))$};
+\draw[flow] (A) -- node[stepno, above=1pt]{1} (adm);
+\draw[both] (adm.north) |- node[lbl, pos=0.75, above]{\bt{chain / candidate}{计算链／候选}} node[stepno, pos=0.25, left=2pt]{2} (X.west);
+\draw[flow] (adm.east) -- node[lbl, above]{\bt{publish}{发布}} node[stepno, below=2pt]{3} (adm.east -| store.west);
+\draw[both] (B.east |- look.west) -- node[stepno, above=1pt]{4} (look.west);
+\draw[flow] (look) -- node[lbl, above]{\bt{pending}{待验证}} node[stepno, below=2pt]{5} (maint);
+\draw[both] (maint.east) -- node[lbl, above]{\bt{reuse}{复用}} node[stepno, below=2pt]{6} (maint.east -| store.west);
+\draw[flow] (maint) -- node[lbl, right]{\bt{failed $c$}{条件失败}} node[stepno, left=2pt]{7} (rep);
+\draw[flow] (rep.east) -| node[lbl, pos=0.75, right]{\bt{new revision}{新修订}} ($(store.south west)+(0.4,0)$);
+\draw[data] (store.east |- maint.east) -- node[lbl, above]{$Q_c$} (PG.west |- maint.east);
+\draw[data] (PG.west |- ver.east) -- (ver.east);
+\draw[flow] (ver.north) -- node[lbl, right]{\bt{versions}{版本}} (ver.north |- store.south);
+\draw[both] (B.east |- guard.west) -- node[stepno, above=1pt]{8} (guard.west);
+\draw[flow] (guard.south) -- ++(0,-0.8) -| node[lbl, pos=0.25, above]{\bt{business SQL}{业务 SQL}} node[stepno, pos=0.25, below=2pt]{9} (PG.south);
+\draw[flow] (ETL) -- node[lbl, right]{\bt{updates}{更新}} (PG);
 \end{tikzpicture}
-\caption{\bt{\system\ architecture. Admission publishes validated definitions; maintenance shares condition verdicts; execution checks declared revisions.}{\system\ 架构：准入发布已验证定义，维护共享条件结论，执行核对声明修订。}}
+\caption{\bt{\system\ architecture. Learning path (1--3): calculation chains of agent A's judged tasks are extracted into candidates and published after gates G1--G7. Use path (4--7): a lookup compares dependency versions; condition maintenance reuses verdicts keyed by condition identity and versions, runs only the remaining checks, and repairs failed definitions under regression (G8). Execution path (8--9): queries that declare revisions are checked and reviewed before they run. Dashed arrows are reads of database state.}{\system\ 架构。学习路径（1--3）：智能体 A 判题成功任务的计算链被提炼为候选，通过门槛 G1--G7 后发布。使用路径（4--7）：查找比较依赖版本；条件维护按条件身份与版本复用结论，只执行其余检查，并在回归测试（G8）下修复失效定义。执行路径（8--9）：声明了修订的查询在执行前接受核对与审查。虚线为读取数据库状态。}}
 \label{fig:architecture}
-\Description{Learning feeds admission and a shared store. Agents feed revision checks and maintenance. Both paths access PostgreSQL.}
+\Description{Agents on the left, the MAVRA middleware in the middle with admission, lookup, execution guard, condition maintenance, restricted repair, version tracker, and a shared store of definitions and condition verdicts, and PostgreSQL with ETL writers on the right. Numbered arrows mark the learning, use, and execution paths.}
 \end{figure*}
 
 \bi{A definition moves through three paths. On the \emph{learning path}, an agent answers a question whose business meaning is stated explicitly; if an independent judge accepts the answer, an offline extractor turns the recorded calculation chain into a structured candidate, which the admission gates validate before publication. On the \emph{use path}, another agent calls \code{find\_metric}; if any dependency version has changed, the lookup first runs condition maintenance and then returns the current valid revision with its fields and caveats. On the \emph{execution path}, the agent's \code{run\_sql} declares the metric keys and revisions it uses; the middleware rejects absent, revoked, or superseded revisions and reviews the SQL against recorded grain and join requirements. Revocations reach agents as notices on their next tool response.}
@@ -285,30 +347,46 @@ flow/.style={-{Latex[length=2mm]},thick},every node/.style={font=\small}]
 \section{\bt{Evaluation}{实验评估}}
 \label{sec:evaluation}
 \subsection{\bt{Environment and questions}{环境与研究问题}}
-\bi{The evaluation answers five questions. (Q1) Does maintenance detect data-only failures while retaining valid definitions? (Q2) How much does condition reuse save over definition-level revalidation, and how do request arrivals affect the savings? (Q3) What does concurrent repair cost in availability? (Q4) Do maintained definitions keep LLM agents accurate across data changes and models? (Q5) Which changes does the validity model detect and repair, and where does it stop? The machine has 48 Hygon cores and 98\,GiB RAM. PostgreSQL 18.6 runs in disposable isolated databases with WAL and fsync disabled. The synthetic retail fixture uses TPC-DS-style column names and contains one million store-sales rows, about 396,000 returns, and 500,000 catalog-sales rows. Table~\ref{tab:baselines} lists the compared methods.}
-{评估回答五个问题。（Q1）维护能否检测纯数据失效并保留有效定义？（Q2）条件复用相对定义级重验证节省多少，请求到达方式如何影响节省？（Q3）并发修复在可用性上有何代价？（Q4）维护后的定义能否在数据变化和不同模型下保持大模型智能体的正确率？（Q5）有效性模型能检测并修复哪些变化，边界在哪里？实验机有 48 核 Hygon 和 98\,GiB 内存。PostgreSQL 18.6 在可丢弃的隔离库中运行，关闭 WAL 与 fsync。合成零售数据采用 TPC-DS 风格列名，包含 100 万行门店销售、约 39.6 万行退货和 50 万行目录销售。表~\ref{tab:baselines} 列出被比较的方法。}
+\bi{The evaluation answers five questions. (Q1) Does maintenance detect data-only failures while retaining valid definitions? (Q2) How much does condition reuse save over definition-level revalidation, and how do request arrivals affect the savings? (Q3) What does concurrent repair cost in availability? (Q4) Do maintained definitions keep LLM agents accurate across data changes and models? (Q5) Which changes does the validity model detect and repair, and where does it stop? The machine has 48 Hygon cores and 98\,GiB RAM. PostgreSQL 18.6 runs in disposable isolated databases with WAL and fsync disabled. The synthetic retail fixture uses TPC-DS-style column names and contains one million store-sales rows, about 396,000 returns, and 500,000 catalog-sales rows. Table~\ref{tab:baselines} lists the compared methods, and Table~\ref{tab:experiments} summarizes the scale of each study.}
+{评估回答五个问题。（Q1）维护能否检测纯数据失效并保留有效定义？（Q2）条件复用相对定义级重验证节省多少，请求到达方式如何影响节省？（Q3）并发修复在可用性上有何代价？（Q4）维护后的定义能否在数据变化和不同模型下保持大模型智能体的正确率？（Q5）有效性模型能检测并修复哪些变化，边界在哪里？实验机有 48 核 Hygon 和 98\,GiB 内存。PostgreSQL 18.6 在可丢弃的隔离库中运行，关闭 WAL 与 fsync。合成零售数据采用 TPC-DS 风格列名，包含 100 万行门店销售、约 39.6 万行退货和 50 万行目录销售。表~\ref{tab:baselines} 列出被比较的方法，表~\ref{tab:experiments} 概括各项实验的规模。}
 
 
 \begin{table}[t]
-\caption{\bt{Compared methods. C: controlled benchmark; E: end-to-end scenarios. Revalidation methods share conditions, repair, regression, and in-flight merging.}{被比较的方法。C：受控实验；E：端到端场景。各重验证方法使用相同的条件、修复、回归与在途合并。}}
+\caption{\bt{Compared methods and their colors in all figures. C: controlled benchmark; E: end-to-end scenarios. Revalidation methods share conditions, repair, regression, and in-flight merging.}{被比较的方法及其在各图中的颜色。C：受控实验；E：端到端场景。各重验证方法使用相同的条件、修复、回归与在途合并。}}
 \label{tab:baselines}
-\small
+\footnotesize
 \begin{tabularx}{\linewidth}{@{}llL@{}}
 \toprule
 \bt{Method}{方法} & & \bt{After a dependency update}{依赖更新后}\\
 \midrule
-\bt{No sharing}{不共享} & E & \bt{Middleware tools and SQL review; no shared definitions.}{中间层工具与 SQL 审查，不共享定义。}\\
-\bt{Unguarded}{无守护} & E & \bt{Shared definitions without maintenance or reference checks.}{共享定义，不维护、不核对引用。}\\
-\bt{Schema-only}{只看结构} & C, E & \bt{Check structure only.}{仅检查结构。}\\
-\bt{Revoke}{撤销重学} & C, E & \bt{Revoke on write; relearn from the LLM.}{写入即撤销，由大模型重学。}\\
-\bt{Definition}{定义级} & C, E & \bt{Recheck all conditions of a definition on use.}{使用时重查定义的全部条件。}\\
-\bt{Scope}{仅范围} & C & \bt{Recheck affected conditions, no verdict reuse.}{重查受影响条件，不复用结论。}\\
-\bt{Condition (\system)}{条件级} & C, E & \bt{Scope plus verdict and repair reuse.}{范围加结论及修复复用。}\\
+\swatch{mNoShare}\ \bt{No sharing}{不共享} & E & \bt{Middleware tools and SQL review; no shared definitions.}{中间层工具与 SQL 审查，不共享定义。}\\
+\swatch{mUnguarded}\ \bt{Unguarded}{无守护} & E & \bt{Shared definitions without maintenance or reference checks.}{共享定义，不维护、不核对引用。}\\
+\swatch{mSchema}\ \bt{Schema-only}{只看结构} & C, E & \bt{Check structure only.}{仅检查结构。}\\
+\swatch{mRevoke}\ \bt{Revoke-on-write}{写入即撤销} & C, E & \bt{Revoke on write; relearn from the LLM.}{写入即撤销，由大模型重学。}\\
+\swatch{mDef}\ \bt{Definition-level}{定义级} & C, E & \bt{Recheck all conditions of a definition on use.}{使用时重查定义的全部条件。}\\
+\swatch{mScope}\ \bt{Scope-only}{仅范围} & C & \bt{Recheck affected conditions, no verdict reuse.}{重查受影响条件，不复用结论。}\\
+\swatch{mCond}\ \bt{Condition-level (\system)}{条件级（\system）} & C, E & \bt{Scope-only plus verdict and repair reuse.}{仅范围加结论及修复复用。}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[t]
+\caption{\bt{Experiments at a glance.}{实验概览。}}
+\label{tab:experiments}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}P{0.25\linewidth}L@{}}
+\toprule
+\bt{Study}{实验} & \bt{Scale}{规模}\\
+\midrule
+\bt{Workload (Section~\ref{sec:workload-characterization})}{负载刻画（第~\ref{sec:workload-characterization} 节）} & \bt{100 fresh agent sessions, 459 LLM calls, 521 database calls; 441\,M Redset queries from 400 clusters.}{100 个全新智能体会话，459 次大模型调用，521 次数据库调用；Redset 400 个集群的 4.41 亿条查询。}\\
+\bt{Controlled maintenance (Sections~\ref{sec:controlled}--\ref{sec:availability})}{受控维护（第~\ref{sec:controlled}--\ref{sec:availability} 节）} & \bt{80 cells: 5 methods $\times$ 4 sharing levels $\times$ 2 arrival modes $\times$ 2 policy orders; 19 definitions, 8 agents, 4 updates, 1\,M sales rows.}{80 组：5 种方法 $\times$ 4 个共享度 $\times$ 2 种到达方式 $\times$ 2 种策略顺序；19 个定义、8 个智能体、4 次更新、100 万行销售。}\\
+\bt{Data-change scenarios (Section~\ref{sec:scenarios})}{数据变化场景（第~\ref{sec:scenarios} 节）} & \bt{3 LLMs $\times$ 6 methods $\times$ 10 changes; \ScenCells\ cells, \ScenAgentTasks\ agent tasks, \ScenLLMCalls\ LLM calls, \ScenTokensM\,M tokens, \ScenAgentHours\ agent-hours.}{3 个大模型 $\times$ 6 种方法 $\times$ 10 种变化；\ScenCells\ 组，\ScenAgentTasks\ 个智能体任务，\ScenLLMCalls\ 次大模型调用，\ScenTokensM{} 百万 token，\ScenAgentHours\ 智能体小时。}\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \subsection{\bt{Controlled maintenance workload}{受控维护负载}}
+\label{sec:controlled}
 \bi{To isolate database maintenance, the benchmark admits structured definitions directly through the validation gates. Four families contain six sales definitions, five returns definitions, three return-ratio definitions, and five catalog definitions. Taking up to $k\in\{1,2,4,6\}$ per family yields 4, 8, 15, and 19 definitions; $k=1$ retains sharing between the sales and return-ratio families. After each update, eight scripted agents each use every definition in shuffled order, with staggered or simultaneous arrivals. Five policies, four sharing levels, and two arrival modes yield 40 cells. We run all cells under forward and reversed policy orders, yielding 80 measurements that control for policy order. The four update events are three benign appends (sales, returns, and catalog sales) and a grain-breaking update, v2, which adds 170,816 application-state rows for returns dated from 2001-10-01 under the existing schema; it breaks ticket-and-item uniqueness, and repair adds a completed-status filter.}
 {为单独测量数据库维护，基准把结构化定义直接通过验证门槛准入。四个族包含 6 个销售、5 个退货、3 个退货比率及 5 个目录指标。每族最多取 $k\in\{1,2,4,6\}$ 条，对应 4、8、15 和 19 个定义；$k=1$ 保留销售与退货比率族之间的共享。更新后，8 个脚本智能体各按打乱的顺序使用所有定义，采用错峰或同时到达。5 种策略、4 个共享度和 2 种到达方式构成 40 组。全部配置按正反策略顺序运行，共得到 80 次用于控制策略顺序的测量。四次更新包括三次正常追加（门店销售、退货和目录销售）与一次破坏粒度的更新 v2：v2 在现有表结构下为 2001-10-01 起的退货追加 170,816 条申请状态行，破坏小票与商品键上的唯一性，修复添加完成状态过滤。}
 
@@ -323,12 +401,14 @@ flow/.style={-{Latex[length=2mm]},thick},every node/.style={font=\small}]
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}
-\begin{axis}[mavra, width=\linewidth, height=46mm, xmin=2, xmax=21, ymin=0, ymax=100,
+\begin{axis}[mavra, width=\linewidth, height=48mm, xmin=2, xmax=21, ymin=0, ymax=106,
   xtick={4,8,15,19}, ytick={0,25,50,75,100}, yticklabel={\pgfmathprintnumber{\tick}\%},
   xlabel={\bt{Definitions sharing conditions ($k=1,2,4,6$)}{共享条件的定义数（$k=1,2,4,6$）}},
   ylabel={\bt{DB time vs.\ definition-level}{相对定义级的 DB 时间}},
   legend columns=2, legend style={at={(0.5,1.02)}, anchor=south}]
 \input{gen/maint-ratio}
+\addplot[mDef, line width=0.9pt, densely dotted, domain=2:21, samples=2] {100};
+\addlegendentry{\bt{Definition-level (= 100\%)}{定义级（= 100\%）}}
 \end{axis}
 \end{tikzpicture}
 \caption{\bt{Maintenance database time relative to definition-level revalidation (100\%); mean of the forward and reversed policy orders. Scope-only rechecks only affected conditions; \system\ also reuses completed verdicts.}{相对定义级重验证（100\%）的维护数据库时间，取正反两种策略顺序的平均。仅范围只重查受影响条件，\system\ 还复用已完成结论。}}
@@ -375,16 +455,16 @@ flow/.style={-{Latex[length=2mm]},thick},every node/.style={font=\small}]
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}
-\begin{axis}[mavra, ybar=1pt, width=\linewidth, height=48mm, bar width=4.2pt, ymin=0, ymax=100, enlarge x limits=0.09,
-  xtick={0,1,2,3,4,5}, xticklabels={\bl{No share}{不共享}, \bl{Ungd.}{无守护}, \bl{Schema}{结构}, \bl{Revoke}{撤销}, \bl{Def.}{定义级}, \bl{Cond.}{条件级}},
-  xticklabel style={align=center, font=\scriptsize}, ytick={0,25,50,75,100}, yticklabel={\pgfmathprintnumber{\tick}\%},
+\begin{axis}[mavra, ybar=0.5pt, width=\linewidth, height=48mm, bar width=5.4pt, ymin=0, ymax=100, enlarge x limits=0.2,
+  xtick={0,1,2}, xticklabels={DeepSeek V4.1 Flash, GLM-5.3, GLM-5.3 Flash}, xticklabel style={font=\scriptsize},
+  ytick={0,25,50,75,100}, yticklabel={\pgfmathprintnumber{\tick}\%},
   ylabel={\bt{Accuracy}{正确率}}, legend columns=3, legend style={at={(0.5,1.02)}, anchor=south}]
 \input{gen/scen-models}
 \end{axis}
 \end{tikzpicture}
-\caption{\bt{Accuracy per model, averaged over the settings in which all six methods have tasks for that model (11, 11, and 8 settings); bars show 95\% bootstrap intervals.}{各模型的正确率：在该模型下六种方法都有题的情形上平均（分别为 11、11、8 种情形），误差线为 95\% 自助法区间。}}
+\caption{\bt{Accuracy per model and method, averaged over the settings in which all six methods have tasks for that model (11, 11, and 8 settings); error bars show 95\% bootstrap intervals.}{各模型的正确率：在该模型下六种方法都有题的情形上平均（分别为 11、11、8 种情形），误差线为 95\% 自助法区间。}}
 \label{fig:models}
-\Description{Grouped bars of accuracy for six methods and three models. Sharing methods exceed no sharing for every model; condition-level and definition-level are close for DeepSeek and GLM-5.3.}
+\Description{Grouped bars of accuracy for three models, six methods each. Sharing methods exceed no sharing for every model; MAVRA and definition-level are close for DeepSeek and GLM-5.3.}
 \end{figure}
 
 \bi{\emph{Across models (Q4).} The gain from sharing holds for every model (Figure~\ref{fig:models}): accuracy rises from \ScenAccNoShareModelA\% to \ScenAccCondModelA\% for DeepSeek V4.1 Flash, from \ScenAccNoShareModelB\% to \ScenAccCondModelB\% for GLM-5.3, and from \ScenAccNoShareModelC\% to \ScenAccCondModelC\% for GLM-5.3 Flash. Condition-level and definition-level maintenance use the same conditions and repairs and answer equally well for the two stronger models (\ScenAccCondModelA\% vs.\ \ScenAccDefModelA\%, \ScenAccCondModelB\% vs.\ \ScenAccDefModelB\%). For the weakest model, whose intervals are widest and which has fewer complete settings, condition-level cells trail definition-level ones (\ScenAccCondModelC\% vs.\ \ScenAccDefModelC\%); the remaining repetitions will show whether this gap is specific to the model.}

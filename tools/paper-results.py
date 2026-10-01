@@ -31,22 +31,31 @@ MODELS = [  # (任务目录前缀, 显示名)；前缀长的先匹配
     ("dsv41flash", "DeepSeek V4.1 Flash"),
 ]
 MODEL_ORDER = ["DeepSeek V4.1 Flash", "GLM-5.3", "GLM-5.3 Flash"]
-METHODS = [  # (mode, 英文, 中文)
+METHODS = [  # (mode, 英文, 中文)；全文统一的方法名
     ("middle", "No sharing", "不共享"),
     ("metric-global-noguard", "Unguarded", "无守护"),
     ("metric-global-schema", "Schema-only", "只看结构"),
-    ("metric-global-revoke", "Revoke", "撤销重学"),
-    ("metric-global-def", "Definition", "定义级"),
-    ("metric-global", r"Condition (\system)", "条件级"),
+    ("metric-global-revoke", "Revoke-on-write", "写入即撤销"),
+    ("metric-global-def", "Definition-level", "定义级"),
+    ("metric-global", r"\system", "条件级"),
 ]
-HEAD = {  # 表头用的两行英文
+HEAD = {  # 表头用的两行英文（与方法名一致）
     "middle": r"No\\sharing",
-    "metric-global-noguard": r"Unguarded\\sharing",
-    "metric-global-schema": r"Schema\\only",
-    "metric-global-revoke": r"Revoke\\on write",
-    "metric-global-def": r"Definition\\level",
-    "metric-global": r"Condition\\(\system)",
+    "metric-global-noguard": r"Un-\\guarded",
+    "metric-global-schema": r"Schema-\\only",
+    "metric-global-revoke": r"Revoke-\\on-write",
+    "metric-global-def": r"Definition-\\level",
+    "metric-global": r"\system\\(condition)",
 }
+COLOR = {  # 与正文导言的方法颜色一致
+    "middle": "mNoShare",
+    "metric-global-noguard": "mUnguarded",
+    "metric-global-schema": "mSchema",
+    "metric-global-revoke": "mRevoke",
+    "metric-global-def": "mDef",
+    "metric-global": "mCond",
+}
+STYLE = {mode: "bar" + c[1:] for mode, c in COLOR.items()}
 CLASSES = {  # 类别：英文、中文
     "none": ("None", "无变化"),
     "benign": ("Benign", "正常"),
@@ -223,8 +232,8 @@ def per_model(acc, model, mode, reps=4000, seed=7):
 
 
 def heat(v):
-    """正确率 → 单色蓝阶底纹（\\cellcolor{accent!x}），越深越高；文字保持黑色。"""
-    return f"\\cellcolor{{accent!{round(8 + 52 * v)}}}"
+    """正确率 → 中性灰阶底纹（\\cellcolor{heat!x}），越深越高；文字保持黑色。蓝色只留给 MAVRA。"""
+    return f"\\cellcolor{{heat!{round(6 + 50 * v)}}}"
 
 
 def tex_heat_table(A):
@@ -232,7 +241,7 @@ def tex_heat_table(A):
     lines = []
     lines.append(r"\begin{tabularx}{\textwidth}{@{}llL" + "r" * len(METHODS) + r"@{}}")
     lines.append(r"\toprule")
-    head = " & ".join(rf"\bh{{{HEAD.get(mode, en)}}}{{{zh}}}" for mode, en, zh in METHODS)
+    head = " & ".join(rf"\bh{{\swatch{{{COLOR[mode]}}}\\{HEAD[mode]}}}{{{zh}}}" for mode, en, zh in METHODS)
     lines.append(rf"\bt{{Class}}{{类别}} & \bt{{Change}}{{数据变化}} & \bt{{What the update does}}{{更新内容}} & {head}\\")
     lines.append(r"\midrule")
     prev = None
@@ -264,18 +273,17 @@ def tex_heat_table(A):
 
 
 def tex_model_bars(A):
-    """pgfplots：每个模型一条 \\addplot（方法序号 → 正确率，误差线为 Wilson 95% 区间），样式 mavraA/B/C 在正文导言定义。"""
-    allp = [p for p, *_ in PHASES]
+    """pgfplots：每种方法一条 \\addplot（x 为模型序号，y 为正确率，误差线为 95% 自助法区间），颜色与全文方法颜色一致。"""
     out = []
-    for i, m in enumerate(MODEL_ORDER):
+    for mode, en, zh in METHODS:
         pts = []
-        for j, (mode, *_rest) in enumerate(METHODS):
+        for i, m in enumerate(MODEL_ORDER):
             p, lo, hi, _ = per_model(A["acc"], m, mode)
             if p is None:
                 continue
-            pts.append(f"({j},{100 * p:.1f}) += (0,{100 * max(0.0, hi - p):.1f}) -= (0,{100 * max(0.0, p - lo):.1f})")
-        out.append(rf"\addplot[mavra{chr(65 + i)}] coordinates {{" + " ".join(pts) + "};")
-        out.append(rf"\addlegendentry{{{m}}}")
+            pts.append(f"({i},{100 * p:.1f}) += (0,{100 * max(0.0, hi - p):.1f}) -= (0,{100 * max(0.0, p - lo):.1f})")
+        out.append(rf"\addplot[{STYLE[mode]}] coordinates {{" + " ".join(pts) + "};")
+        out.append(rf"\addlegendentry{{\bt{{{en}}}{{{zh}}}}}")
     return "\n".join(out) + "\n"
 
 
@@ -298,7 +306,7 @@ def tex_cost_table(A):
         tk = mean([mean(xs) for (m, mo), xs in A["hold_tokens"].items() if mo == mode and xs])
         ms_s = "--" if mode in ("middle",) else f"{ms:.0f}"
         rr = "--" if mode in ("middle", "metric-global-noguard", "metric-global-schema") else f"{rev:.1f} / {rep:.1f}"
-        lines.append(rf"\bhl{{{en}}}{{{zh}}} & {100 * v:.0f} & {st} & {rr} & {ms_s} & {tk / 1000:.1f}\\")
+        lines.append(rf"\swatch{{{COLOR[mode]}}}\ \bhl{{{en}}}{{{zh}}} & {100 * v:.0f} & {st} & {rr} & {ms_s} & {tk / 1000:.1f}\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines) + "\n"
 
@@ -335,10 +343,10 @@ def maint_ratios(fwd, rev):
 def tex_maint_plot(R):
     """pgfplots：条件级与仅范围两种方法 × 错峰与同时到达，样式在正文导言定义（颜色区分方法，线型区分到达方式）。"""
     out = []
-    legend = {("condition", "staggered"): (r"\system, staggered", "条件级，错峰"),
-              ("condition-scope", "staggered"): ("Scope only, staggered", "仅范围，错峰"),
-              ("condition", "simultaneous"): (r"\system, simultaneous", "条件级，同时"),
-              ("condition-scope", "simultaneous"): ("Scope only, simultaneous", "仅范围，同时")}
+    legend = {("condition", "staggered"): (r"\system, staggered", r"\system，错峰"),
+              ("condition-scope", "staggered"): ("Scope-only, staggered", "仅范围，错峰"),
+              ("condition", "simultaneous"): (r"\system, simultaneous", r"\system，同时"),
+              ("condition-scope", "simultaneous"): ("Scope-only, simultaneous", "仅范围，同时")}
     for key in [("condition", "staggered"), ("condition-scope", "staggered"), ("condition", "simultaneous"), ("condition-scope", "simultaneous")]:
         pol, arr = key
         style = ("maintCond" if pol == "condition" else "maintScope") + ("Stag" if arr == "staggered" else "Sim")
@@ -402,6 +410,24 @@ def numbers(A, dropped, cells, R):
     q["MaintStagMax"] = f"{max(y for _, y in R[('condition', 'staggered')]):.1f}"
     q["MaintSimMin"] = f"{min(y for _, y in R[('condition', 'simultaneous')]):.1f}"
     q["MaintSimMax"] = f"{max(y for _, y in R[('condition', 'simultaneous')]):.1f}"
+    # 实验规模：分析所用各组的全部智能体任务（含学习与重新学习，不含服务失败）及提炼
+    tasks = calls = tokens = 0
+    secs = 0.0
+    for c in cells:
+        for r in c["d"]["records"]:
+            if r["outcome"] == "error":
+                continue
+            tasks += 1
+            calls += r["run"]["steps"]
+            tokens += r["run"]["input_tokens"] + r["run"]["output_tokens"]
+            secs += r["run"]["seconds"]
+        for x in c["d"].get("learning", []) + [y.get("step", {}) for y in c["d"].get("relearning", [])]:
+            e = x.get("extraction") or {}
+            tokens += (e.get("input_tokens") or 0) + (e.get("output_tokens") or 0)
+    q["ScenAgentTasks"] = f"{tasks:,}"
+    q["ScenLLMCalls"] = f"{calls:,}"
+    q["ScenTokensM"] = f"{tokens / 1e6:.0f}"
+    q["ScenAgentHours"] = f"{secs / 3600:.0f}"
     return q
 
 

@@ -1,24 +1,24 @@
 % 由 tools/paper-results.py 生成，请勿手改。
 \begin{tabularx}{\textwidth}{@{}llLrrrrrr@{}}
 \toprule
-\bt{Class}{类别} & \bt{Change}{数据变化} & \bt{What the update does}{更新内容} & \bh{No\\sharing}{不共享} & \bh{Unguarded\\sharing}{无守护} & \bh{Schema\\only}{只看结构} & \bh{Revoke\\on write}{撤销重学} & \bh{Definition\\level}{定义级} & \bh{Condition\\(\system)}{条件级}\\
+\bt{Class}{类别} & \bt{Change}{数据变化} & \bt{What the update does}{更新内容} & \bh{\swatch{mNoShare}\\No\\sharing}{不共享} & \bh{\swatch{mUnguarded}\\Un-\\guarded}{无守护} & \bh{\swatch{mSchema}\\Schema-\\only}{只看结构} & \bh{\swatch{mRevoke}\\Revoke-\\on-write}{写入即撤销} & \bh{\swatch{mDef}\\Definition-\\level}{定义级} & \bh{\swatch{mCond}\\\system\\(condition)}{条件级}\\
 \midrule
-\bt{None}{无变化} & \bt{Held-out}{留出} & \bt{No update; new parameters and question types}{无更新；新参数与新题型} & \cellcolor{accent!34}50 & \cellcolor{accent!58}96 & \cellcolor{accent!56}92 & \cellcolor{accent!56}92 & \cellcolor{accent!58}96 & \cellcolor{accent!58}96\\
+\bt{None}{无变化} & \bt{Held-out}{留出} & \bt{No update; new parameters and question types}{无更新；新参数与新题型} & \cellcolor{heat!31}50 & \cellcolor{heat!54}96 & \cellcolor{heat!52}92 & \cellcolor{heat!52}92 & \cellcolor{heat!54}96 & \cellcolor{heat!54}96\\
 \addlinespace[2pt]
-\bt{Benign}{正常} & \bt{Append}{正常追加} & \bt{Copy one month of sales under new tickets}{复制一个月销售并换新小票号} & \cellcolor{accent!28}38 & \cellcolor{accent!56}91 & \cellcolor{accent!51}83 & \cellcolor{accent!51}83 & \cellcolor{accent!56}93 & \cellcolor{accent!55}91\\
- & \bt{Late backfill}{迟到回填} & \bt{Add returns with new keys}{补写新键的退货} & \cellcolor{accent!34}50 & \cellcolor{accent!51}83 & \cellcolor{accent!46}72 & \cellcolor{accent!40}61 & \cellcolor{accent!54}89 & \cellcolor{accent!51}83\\
- & \bt{In-place fix}{原地更正} & \bt{Update net paid of some sales}{原地修改部分销售的净支付额} & \cellcolor{accent!21}25 & \cellcolor{accent!56}93 & \cellcolor{accent!54}88 & \cellcolor{accent!50}80 & \cellcolor{accent!57}94 & \cellcolor{accent!56}93\\
- & \bt{New column}{新增无关列} & \bt{Add an empty column to returns}{退货表新增空列} & \cellcolor{accent!43}67 & \cellcolor{accent!54}89 & \cellcolor{accent!50}81 & \cellcolor{accent!47}74 & \cellcolor{accent!56}93 & \cellcolor{accent!54}89\\
+\bt{Benign}{正常} & \bt{Append}{正常追加} & \bt{Copy one month of sales under new tickets}{复制一个月销售并换新小票号} & \cellcolor{heat!25}38 & \cellcolor{heat!52}91 & \cellcolor{heat!47}83 & \cellcolor{heat!47}83 & \cellcolor{heat!53}93 & \cellcolor{heat!51}91\\
+ & \bt{Late backfill}{迟到回填} & \bt{Add returns with new keys}{补写新键的退货} & \cellcolor{heat!31}50 & \cellcolor{heat!48}83 & \cellcolor{heat!42}72 & \cellcolor{heat!37}61 & \cellcolor{heat!50}89 & \cellcolor{heat!48}83\\
+ & \bt{In-place fix}{原地更正} & \bt{Update net paid of some sales}{原地修改部分销售的净支付额} & \cellcolor{heat!18}25 & \cellcolor{heat!52}93 & \cellcolor{heat!50}88 & \cellcolor{heat!46}80 & \cellcolor{heat!53}94 & \cellcolor{heat!52}93\\
+ & \bt{New column}{新增无关列} & \bt{Add an empty column to returns}{退货表新增空列} & \cellcolor{heat!39}67 & \cellcolor{heat!50}89 & \cellcolor{heat!47}81 & \cellcolor{heat!43}74 & \cellcolor{heat!52}93 & \cellcolor{heat!50}89\\
 \addlinespace[2pt]
-\bt{Grain}{粒度} & \bt{Status history}{状态流水} & \bt{Add an application-state row per return}{每笔退货追加申请状态行} & \cellcolor{accent!21}24 & \cellcolor{accent!25}33$^\dagger$ & \cellcolor{accent!21}26$^\dagger$ & \cellcolor{accent!41}63 & \cellcolor{accent!54}89 & \cellcolor{accent!48}78\\
- & \bt{Versioning}{版本化更正} & \bt{Keep old sales versions as non-current rows}{旧版本销售保留为非当前行} & \cellcolor{accent!23}30 & \cellcolor{accent!48}78$^\dagger$ & \cellcolor{accent!35}52$^\dagger$ & \cellcolor{accent!43}68 & \cellcolor{accent!57}94 & \cellcolor{accent!55}91\\
- & \bt{Duplicate load}{重复装载} & \bt{Reload four months of identical sales rows}{四个月销售整批重复装载} & \cellcolor{accent!20}22 & \cellcolor{accent!30}43$^\dagger$ & \cellcolor{accent!24}30$^\dagger$ & \cellcolor{accent!20}22 & \cellcolor{accent!28}39 & \cellcolor{accent!25}33\\
+\bt{Grain}{粒度} & \bt{Status history}{状态流水} & \bt{Add an application-state row per return}{每笔退货追加申请状态行} & \cellcolor{heat!18}24 & \cellcolor{heat!23}33$^\dagger$ & \cellcolor{heat!19}26$^\dagger$ & \cellcolor{heat!37}63 & \cellcolor{heat!50}89 & \cellcolor{heat!45}78\\
+ & \bt{Versioning}{版本化更正} & \bt{Keep old sales versions as non-current rows}{旧版本销售保留为非当前行} & \cellcolor{heat!21}30 & \cellcolor{heat!45}78$^\dagger$ & \cellcolor{heat!32}52$^\dagger$ & \cellcolor{heat!40}68 & \cellcolor{heat!53}94 & \cellcolor{heat!51}91\\
+ & \bt{Duplicate load}{重复装载} & \bt{Reload four months of identical sales rows}{四个月销售整批重复装载} & \cellcolor{heat!17}22 & \cellcolor{heat!27}43$^\dagger$ & \cellcolor{heat!21}30$^\dagger$ & \cellcolor{heat!17}22 & \cellcolor{heat!25}39 & \cellcolor{heat!23}33\\
 \addlinespace[2pt]
-\bt{Fan-out}{连接放大} & \bt{Dim.\ history}{维表拉链} & \bt{Add old-version rows to the item dimension}{商品维表增加旧版本行} & \cellcolor{accent!12}7 & \cellcolor{accent!60}100$^\dagger$ & \cellcolor{accent!60}100$^\dagger$ & \cellcolor{accent!60}100 & \cellcolor{accent!60}100 & \cellcolor{accent!60}100\\
+\bt{Fan-out}{连接放大} & \bt{Dim.\ history}{维表拉链} & \bt{Add old-version rows to the item dimension}{商品维表增加旧版本行} & \cellcolor{heat!10}7 & \cellcolor{heat!56}100$^\dagger$ & \cellcolor{heat!56}100$^\dagger$ & \cellcolor{heat!56}100 & \cellcolor{heat!56}100 & \cellcolor{heat!56}100\\
 \addlinespace[2pt]
-\bt{Coverage}{覆盖} & \bt{Key format}{日期键格式} & \bt{Append sales whose date keys use yyyymmdd}{追加日期键为 yyyymmdd 的销售} & \cellcolor{accent!14}11 & \cellcolor{accent!19}21$^\dagger$ & \cellcolor{accent!16}16$^\dagger$ & \cellcolor{accent!15}14 & \cellcolor{accent!15}13 & \cellcolor{accent!17}17\\
+\bt{Coverage}{覆盖} & \bt{Key format}{日期键格式} & \bt{Append sales whose date keys use yyyymmdd}{追加日期键为 yyyymmdd 的销售} & \cellcolor{heat!12}11 & \cellcolor{heat!17}21$^\dagger$ & \cellcolor{heat!14}16$^\dagger$ & \cellcolor{heat!13}14 & \cellcolor{heat!13}13 & \cellcolor{heat!14}17\\
 \addlinespace[2pt]
-\bt{Not modeled}{未建模} & \bt{Unit change}{金额单位} & \bt{Multiply sales amounts by 100 from 2002-07}{2002-07 起销售金额乘以 100} & \cellcolor{accent!21}26 & \cellcolor{accent!30}43$^\dagger$ & \cellcolor{accent!29}40$^\dagger$ & \cellcolor{accent!28}38 & \cellcolor{accent!32}46$^\dagger$ & \cellcolor{accent!28}39$^\dagger$\\
+\bt{Not modeled}{未建模} & \bt{Unit change}{金额单位} & \bt{Multiply sales amounts by 100 from 2002-07}{2002-07 起销售金额乘以 100} & \cellcolor{heat!19}26 & \cellcolor{heat!27}43$^\dagger$ & \cellcolor{heat!26}40$^\dagger$ & \cellcolor{heat!25}38 & \cellcolor{heat!29}46$^\dagger$ & \cellcolor{heat!25}39$^\dagger$\\
 \midrule
 \multicolumn{3}{@{}l}{\bt{Mean over the 11 settings}{11 种情形平均}} & \textbf{32} & \textbf{70} & \textbf{62} & \textbf{63} & \textbf{77} & \textbf{74}\\
 \bottomrule

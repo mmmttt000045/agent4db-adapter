@@ -58,9 +58,9 @@ The manuscript reports the controlled maintenance sweeps, the workload character
 
 ## 图表风格 / Figure style
 
-图用 pgfplots 在 TeX 中绘制，字体与正文一致，轴标签和图例支持双语。类别色固定顺序取经色觉缺陷校验的蓝、橙、青，第二、三个序列另加斜线纹理，黑白打印也能区分；准确率表用单色蓝阶底纹，文字始终为黑色。
+图用 TikZ／pgfplots 在 TeX 中绘制，字体与正文一致，轴标签和图例支持双语。每种方法在所有图表中颜色固定（导言 `mCond`、`mDef` 等，表 3 的色块即图例）：\system 为蓝色且蓝色只用于它，定义级为橙色，其余方法按经色觉缺陷校验的顺序取色；准确率表用中性灰阶底纹。方法名全文统一为 No sharing、Unguarded、Schema-only、Revoke-on-write、Definition-level、Scope-only、Condition-level（\system）。全部表格用 `\footnotesize`。
 
-Figures are drawn with pgfplots so fonts match the text and labels are bilingual. Categorical colors use a fixed, CVD-checked order (blue, orange, aqua), with hatching on the second and third series for grayscale printing; the accuracy table uses a single-hue blue ramp with black text.
+Figures are drawn with TikZ/pgfplots. Each method keeps one color across all figures and tables (Table 3 shows the swatches): MAVRA is blue and blue is reserved for it, definition-level is orange, others follow a CVD-checked order; the accuracy table uses a neutral gray ramp. Method names are uniform across text, tables, and figures, and all tables use `\footnotesize`.
 
 ## 编译 / Compilation
 

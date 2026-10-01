@@ -1158,11 +1158,23 @@ impl Middle {
                     o
                 }
                 None => {
-                    let t = Instant::now();
-                    let o = c.eval(&snap.query(QKind::Metric, &c.sql()).await?, t.elapsed().as_secs_f64() * 1000.0);
-                    self.snap_verdicts.lock().insert(vkey, o.clone());
-                    run += 1;
-                    inc(&self.stats.snapshot_checks_run);
+                    // 同版本的快照看到的这些表的数据相同，并发的同一检查只在其中一个快照里执行，结果分给其余请求
+                    let (o, merged) = self
+                        .flight_c
+                        .run(self.cfg.singleflight, &format!("snap:{vkey}"), || async {
+                            let t = Instant::now();
+                            let o = c.eval(&snap.query(QKind::Metric, &c.sql()).await?, t.elapsed().as_secs_f64() * 1000.0);
+                            self.snap_verdicts.lock().insert(vkey.clone(), o.clone());
+                            Ok(o)
+                        })
+                        .await?;
+                    if merged {
+                        reused += 1;
+                        inc(&self.stats.snapshot_checks_reused);
+                    } else {
+                        run += 1;
+                        inc(&self.stats.snapshot_checks_run);
+                    }
                     o
                 }
             };

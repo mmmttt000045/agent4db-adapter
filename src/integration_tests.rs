@@ -598,7 +598,11 @@ impl SnapBench {
         self.admin.query(QKind::Meta, "vacuum analyze store_sales").await?;
         tokio::time::sleep(Duration::from_millis(1500)).await;
         s.mid.invalidate_versions();
-        s.mid.restore(&s.cp).await
+        s.mid.restore(&s.cp).await?;
+        // 恢复只改写经验库，不含快照结论；预热一次，让两种模式都从稳态开始下一次试验
+        let warm = s.mid.run_sql_with(&Ctx::new("W", "snapshot", "warm"), &s.probe, &s.refs).await;
+        ensure!(classify(&warm) == "served", "恢复后预热应在干净数据上执行：{warm:?}");
+        Ok(())
     }
 
     /// 实验 A：确定性交错。write_during_pause = 核对通过后、执行前提交写入（未通知）；write_before_call = 写入刚提交、

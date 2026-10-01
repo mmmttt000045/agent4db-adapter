@@ -527,8 +527,10 @@ struct SnapMid {
     refs: Vec<(String, u32)>,
     /// 引用修订的规范 SQL（2002-07，落在重复区间内）
     canon: String,
-    /// 规范 SQL 加上同一语句里的重复键计数（判定答案所在数据是否满足粒度条件）
+    /// 规范 SQL 加上同一语句里、该月销售行的重复键计数（判定答案所汇总的数据是否满足粒度条件）
     probe: String,
+    /// 同样的探针，期间为 2002-06 至 2002-09 各月（都在重复区间内）；随机并发里各读者问不同的月份，查询不会在途合并
+    probes: Vec<String>,
 }
 
 impl SnapBench {
@@ -560,12 +562,18 @@ impl SnapBench {
         ensure!(u["status"] == "valid", "M1 不可用：{u}");
         let m: Metric = serde_json::from_value(u["metric"].clone())?;
         let canon = metric::compile(&m, &Ask::Single { period: Period::month(2002, 7) })?;
-        let probe = format!(
-            "select ({}) as v, (select count(*) - count(distinct (ss_ticket_number, ss_item_sk)) from store_sales) as dup",
-            canon.trim().trim_end_matches(';')
-        );
+        let wrap = |mo: u32| -> Result<String> {
+            let c = metric::compile(&m, &Ask::Single { period: Period::month(2002, mo) })?;
+            Ok(format!(
+                "select ({}) as v, (select count(*) - count(distinct (s.ss_ticket_number, s.ss_item_sk)) from store_sales s \
+                 join date_dim d on s.ss_sold_date_sk = d.d_date_sk where d.d_year = 2002 and d.d_moy = {mo}) as dup",
+                c.trim().trim_end_matches(';')
+            ))
+        };
+        let probe = wrap(7)?;
+        let probes = (6..=9).map(wrap).collect::<Result<Vec<_>>>()?;
         let refs = vec![(key, u["revision"].as_u64().unwrap_or(0) as u32)];
-        Ok(SnapMid { cp: mid.checkpoint(), mid, refs, canon, probe })
+        Ok(SnapMid { cp: mid.checkpoint(), mid, refs, canon, probe, probes })
     }
 
     async fn dml(&self) -> Result<i64> {
@@ -643,11 +651,13 @@ impl SnapBench {
 
     /// 实验 B：随机并发。readers 个读者在窗口内连续调用（每次间隔 think_ms）；写者在随机时刻提交违反粒度的写入。
     /// notify = 提交后立即登记批次并通知（ETL 的正常顺序）；否则不通知，中间层只能从统计计数发现写入。
+    /// distinct = 各读者问不同的月份；否则都问同一个月，相同的查询会合并到在途执行。
     #[allow(clippy::too_many_arguments)]
     async fn stress(
         &self,
         snapshot: bool,
         notify: bool,
+        distinct: bool,
         trials: usize,
         readers: usize,
         window_ms: u64,
@@ -669,7 +679,8 @@ impl SnapBench {
                     let mut out = vec![];
                     while start.elapsed() < Duration::from_millis(window_ms) {
                         let t0 = start.elapsed().as_secs_f64() * 1000.0;
-                        let r = s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await;
+                        let probe = if distinct { &s.probes[k % s.probes.len()] } else { &s.probe };
+                        let r = s.mid.run_sql_with(&ctx, probe, &s.refs).await;
                         out.push((classify(&r), t0, start.elapsed().as_secs_f64() * 1000.0));
                         tokio::time::sleep(Duration::from_millis(think_ms)).await;
                     }
@@ -700,9 +711,11 @@ impl SnapBench {
             per_trial.push(json!({"commit_ms": committed, "notify_ms": notified, "counts": trial}));
             self.reset(&s).await?;
         }
-        Ok(json!({"mode": if snapshot { "snapshot" } else { "precheck" }, "notify": notify, "trials": trials, "readers": readers,
+        Ok(
+            json!({"mode": if snapshot { "snapshot" } else { "precheck" }, "notify": notify, "distinct": distinct, "trials": trials, "readers": readers,
                   "window_ms": window_ms, "think_ms": think_ms, "counts": counts, "latency_ms": summary(&mut lat),
-                  "violation_start_minus_commit_ms": summary(&mut after_commit), "per_trial": per_trial, "stats": s.mid.stats_json()}))
+                  "violation_start_minus_commit_ms": summary(&mut after_commit), "per_trial": per_trial, "stats": s.mid.stats_json()}),
+        )
     }
 
     /// 实验 C1：读者开销。无写入时（版本未变，结论直接用）与良性写入后（版本变了，条件在快照里重查）的调用延迟。
@@ -829,9 +842,11 @@ async fn snapshot_binding(url: &str) -> Result<Value> {
         }
     }
     let mut stress = vec![];
-    for notify in [true, false] {
-        for snapshot in [false, true] {
-            stress.push(b.stress(snapshot, notify, 2 * trials, 4, 3000, 10, 20261002).await?);
+    for distinct in [false, true] {
+        for notify in [true, false] {
+            for snapshot in [false, true] {
+                stress.push(b.stress(snapshot, notify, distinct, 2 * trials, 4, 3000, 10, 20261002).await?);
+            }
         }
     }
     Ok(json!({"rows": rows, "trials": trials, "interleavings": interleavings, "stress": stress,

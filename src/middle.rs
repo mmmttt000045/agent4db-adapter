@@ -284,7 +284,7 @@ pub struct Middle {
     /// 通用验证缓存：规范化 SQL + 版本签名 → 结果（`MiddleConfig::sql_cache`）
     vcache: Mutex<HashMap<String, crate::db::Rows>>,
     /// 绑定快照执行的条件结论：条件身份 + 读到的表的事务性版本 → 是否成立
-    snap_verdicts: Mutex<HashMap<String, bool>>,
+    snap_verdicts: Mutex<HashMap<String, Outcome>>,
     /// 设置后，LLM Agent 循环逐次记录工具调用（工作负载刻画用）
     pub trace: Option<crate::llm::Trace>,
 }
@@ -304,6 +304,20 @@ fn audit_candidate(seed: u64, candidate: &str) -> bool {
         hash = (hash ^ u64::from(*byte)).wrapping_mul(1099511628211);
     }
     hash % 10_000 < (AUDIT_RATE * 10_000.0) as u64
+}
+
+/// 绑定快照执行的条件结论键：条件（键唯一性的键列排序后）+ 它读到的表的事务性版本。
+fn snap_key(c: &Check, vers: &HashMap<String, i64>) -> String {
+    let c = match c {
+        Check::KeyUnique { table, cols, filter } => {
+            let mut cols = cols.clone();
+            cols.sort();
+            Check::KeyUnique { table: table.clone(), cols, filter: filter.clone() }
+        }
+        other => other.clone(),
+    };
+    let sig: Vec<String> = c.tables().iter().map(|t| format!("{t}={}", vers.get(t).copied().unwrap_or(-1))).collect();
+    format!("{}@{}", c.key(), sig.join(","))
 }
 
 fn ver_sig(deps: &BTreeMap<String, TableVersion>) -> String {
@@ -466,6 +480,13 @@ impl Middle {
         let (v, _) = self.flight_ver.run(true, "versions", || async { Ok(Arc::new(catalog::versions(&self.db).await?)) }).await?;
         *self.versions.lock() = Some((Instant::now(), v.clone()));
         Ok(v)
+    }
+
+    /// 当前已提交的事务性版本（`catalog::install_tx_versions` 之后）。
+    async fn tx_now(&self, tables: &[String]) -> Result<HashMap<String, i64>> {
+        let list: Vec<String> = tables.iter().map(|t| lit(t)).collect();
+        let sql = format!("select table_name, v from mavra_versions where table_name in ({})", list.join(", "));
+        Ok(catalog::tx_versions(&self.db.query(QKind::Meta, &sql).await?))
     }
 
     /// 让下一次请求重新读取版本（ETL 通知钩子；实验里也用来消除轮询间隔的影响）。
@@ -646,9 +667,17 @@ impl Middle {
         let (o, merged) = self
             .flight_c
             .run(self.cfg.singleflight, &fkey, || async {
+                // 绑定快照执行时，检查前后各读一次事务性版本：两次相同说明其间没有写入提交，检查所在快照恰好对应
+                // 这组版本，结论可供之后同版本的快照直接使用（结果缓存可能返回旧数据，开着时不记录）
+                let before = if self.cfg.snapshot_exec && !self.cfg.sql_cache { Some(self.tx_now(&c.tables()).await?) } else { None };
                 let t = Instant::now();
                 let rows = self.vquery(kind, &sql).await?;
                 let o = c.eval(&rows, t.elapsed().as_secs_f64() * 1000.0);
+                if let Some(v) = before {
+                    if self.tx_now(&c.tables()).await? == v {
+                        self.snap_verdicts.lock().insert(snap_key(c, &v), o.clone());
+                    }
+                }
                 if kind == QKind::Check {
                     self.fb.record(c, &o, &self.rows());
                 }

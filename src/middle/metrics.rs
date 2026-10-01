@@ -1,7 +1,7 @@
 //! 指标经验的生命周期：提炼输入、晋升门槛（G1–G7）、查找与守护、执行端引用检查、受限修复与学习题回归（G8）。
 //! 依赖表有写入后的维护方式见 `Maint`：逐写入撤销、只看结构、定义级重验、条件级重验。
 
-use super::{inc, join_key, outcome_text, scope_prefix, ver_sig, Ctx, Maint, Middle, SqlCall, TaskLog};
+use super::{inc, join_key, outcome_text, scope_prefix, snap_key, ver_sig, Ctx, Maint, Middle, SqlCall, TaskLog};
 use crate::catalog::{self, TableVersion};
 use crate::checks::{same_on, Check, On, Outcome};
 use crate::db::QKind;
@@ -1148,27 +1148,27 @@ impl Middle {
         let vers = catalog::tx_versions(&snap.query(QKind::Metric, "select table_name, v from mavra_versions").await?);
         let (mut run, mut reused) = (0u32, 0u32);
         for (c, baseline) in &conds {
-            let sig: Vec<String> = c.tables().iter().map(|t| format!("{t}={}", vers.get(t).copied().unwrap_or(-1))).collect();
-            let vkey = format!("{}@{}", c.key(), sig.join(","));
-            let known = self.snap_verdicts.lock().get(&vkey).copied();
-            let pass = match known {
-                Some(p) => {
+            // 同一条件在相同事务性版本上的结论（来自更早的快照，或前后版本一致的维护检查）直接用
+            let vkey = snap_key(c, &vers);
+            let known = self.snap_verdicts.lock().get(&vkey).cloned();
+            let o = match known {
+                Some(o) => {
                     reused += 1;
                     inc(&self.stats.snapshot_checks_reused);
-                    p
+                    o
                 }
                 None => {
                     let t = Instant::now();
                     let o = c.eval(&snap.query(QKind::Metric, &c.sql()).await?, t.elapsed().as_secs_f64() * 1000.0);
-                    let p = match baseline {
-                        Some(b) => loss_of(&o) <= *b,
-                        None => o.pass,
-                    };
-                    self.snap_verdicts.lock().insert(vkey, p);
+                    self.snap_verdicts.lock().insert(vkey, o.clone());
                     run += 1;
                     inc(&self.stats.snapshot_checks_run);
-                    p
+                    o
                 }
+            };
+            let pass = match baseline {
+                Some(b) => loss_of(&o) <= *b,
+                None => o.pass,
             };
             if !pass {
                 drop(snap);

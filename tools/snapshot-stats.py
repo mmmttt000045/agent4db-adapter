@@ -42,7 +42,7 @@ def main():
     for x in r["stress"]:
         c = x["counts"]
         answered = c.get("served", 0) + c.get("violation", 0)
-        st.append({"notify": x["notify"], "mode": x["mode"], "trials": x["trials"], "calls": sum(c.values()),
+        st.append({"notify": x["notify"], "distinct": x.get("distinct", False), "mode": x["mode"], "trials": x["trials"], "calls": sum(c.values()),
                    "served": c.get("served", 0), "violation": c.get("violation", 0), "rejected": c.get("rejected", 0),
                    "error": c.get("error", 0),
                    "violation_pct_of_answered": round(100 * c.get("violation", 0) / answered, 2) if answered else None,

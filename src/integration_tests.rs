@@ -327,7 +327,7 @@ async fn repair_ambiguity(url: &str) -> Result<Value> {
 /// 变体：来源列 sr_source 在学习前就存在（全为 primary），排除目录未刷新带来的偶然拦截。
 /// 比较三种 G8 参照：未预见（学习参照 SQL 不含 sr_source，在当前数据上重算）、已预见（参照含 sr_source = 'primary'，
 /// 相当于本文基准中预先写入 sr_status / ss_is_current 的判题 SQL）、存档答案（学习时的答案值）。
-/// 对前两种参照各跑一次条件级维护，记录 MAVRA 实际发布的过滤。
+/// 对前两种参照各跑一次条件级维护（修复候选唯一性要求关闭与打开各一次），记录 MAVRA 实际发布的过滤。
 async fn repair_ambiguity_precolumn(url: &str, admin: &Db, returns: &[(&str, Metric)], learn: Period, asks: &[Ask]) -> Result<Value> {
     let answer =
         |sql: String| async move { Ok::<_, anyhow::Error>(admin.query(QKind::Meta, &sql).await?.cell(0, 0).unwrap_or("NULL").to_string()) };
@@ -392,9 +392,17 @@ async fn repair_ambiguity_precolumn(url: &str, admin: &Db, returns: &[(&str, Met
         settle(b).await
     };
     let mut runs = vec![];
-    for (oracle, use_anticipated) in [("unanticipated", false), ("anticipated", true)] {
+    for ((oracle, use_anticipated), unique) in
+        [("unanticipated", false), ("anticipated", true)].into_iter().flat_map(|o| [false, true].map(move |u| (o, u)))
+    {
         let db = Arc::new(Db::connect(url, 4, true)?);
-        let cfg = MiddleConfig { version_ttl_ms: 0, metric_maint: Maint::Condition, cond_reuse: true, ..Default::default() };
+        let cfg = MiddleConfig {
+            version_ttl_ms: 0,
+            metric_maint: Maint::Condition,
+            cond_reuse: true,
+            repair_unique: unique,
+            ..Default::default()
+        };
         let mid = Middle::new(db, cfg).await?;
         let seed = Ctx::new("A", "seed", "seed");
         for (id, m) in returns {
@@ -430,7 +438,7 @@ async fn repair_ambiguity_precolumn(url: &str, admin: &Db, returns: &[(&str, Met
             }
         }
         let events: Vec<Value> = mid.take_metric_events().into_iter().filter(|e| e["event"] != "maintenance").collect();
-        runs.push(json!({"oracle": oracle, "served": served, "events": events}));
+        runs.push(json!({"oracle": oracle, "repair_unique": unique, "served": served, "events": events}));
         undo().await?;
     }
     // 三种 G8 参照下两个候选各自是否通过

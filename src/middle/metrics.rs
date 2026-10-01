@@ -1043,8 +1043,11 @@ impl Middle {
                         format!("{} 增加粒度过滤 {f}", m.fact)
                     }
                     None => {
-                        self.metric_event(json!({"event": "repair_failed", "key": old.key, "revision": old.revision,
-                                                 "reason": "没有找到能恢复唯一性的过滤"}));
+                        let reason = match self.ambiguous_repair(&m.fact) {
+                            Some(c) => format!("多个过滤都能恢复唯一性，结构上分不出哪个对：{}", c.join("；")),
+                            None => "没有找到能恢复唯一性的过滤".into(),
+                        };
+                        self.metric_event(json!({"event": "repair_failed", "key": old.key, "revision": old.revision, "reason": reason}));
                         return Ok(());
                     }
                 }

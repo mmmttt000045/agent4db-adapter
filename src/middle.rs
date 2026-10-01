@@ -114,6 +114,9 @@ pub struct MiddleConfig {
     pub exec_pause_ms: u64,
     /// 轨迹记忆基线（AgentSM 式）：保存成功的解题轨迹，按题面相似度检索，不做任何有效性维护
     pub traj_memory: bool,
+    /// 粒度修复要求唯一：不止一个过滤都能恢复“每键一行、不丢键”时（例如主数据与备份副本），结构判定分不出
+    /// 哪个是业务上对的，不自动修复。关闭时取搜索到的第一个（早期行为）
+    pub repair_unique: bool,
 }
 
 impl Default for MiddleConfig {
@@ -138,6 +141,7 @@ impl Default for MiddleConfig {
             snapshot_exec: false,
             exec_pause_ms: 0,
             traj_memory: false,
+            repair_unique: true,
         }
     }
 }
@@ -313,6 +317,8 @@ pub struct Middle {
     /// 绑定快照执行的条件结论：条件身份 + 读到的表的事务性版本 → 是否成立
     snap_verdicts: Mutex<HashMap<String, Outcome>>,
     trajs: Mutex<Vec<TrajMemo>>,
+    /// 最近一次粒度修复因候选不唯一而放弃时的候选（表 → 过滤），供修复事件说明原因
+    ambiguous: Mutex<HashMap<String, Vec<String>>>,
     /// 设置后，LLM Agent 循环逐次记录工具调用（工作负载刻画用）
     pub trace: Option<crate::llm::Trace>,
 }
@@ -402,6 +408,7 @@ impl Middle {
             vcache: Mutex::new(HashMap::new()),
             snap_verdicts: Mutex::new(HashMap::new()),
             trajs: Mutex::new(vec![]),
+            ambiguous: Mutex::new(HashMap::new()),
             trace: None,
         })
     }
@@ -1114,7 +1121,8 @@ impl Middle {
             .await?
             .i64(0, 0)
             .unwrap_or(0);
-        for (_, c) in cands {
+        let mut found: Vec<String> = vec![];
+        'search: for (_, c) in cands {
             let r = self
                 .vquery(
                     QKind::Repair,
@@ -1124,16 +1132,39 @@ impl Middle {
             for i in 0..r.rows.len() {
                 let (Some(v), Some(n), Some(k)) = (r.cell(i, 0), r.i64(i, 1), r.i64(i, 2)) else { continue };
                 if n == k && k == total {
-                    let f = format!("{c} = {}", lit(v));
-                    inc(&self.stats.repairs);
-                    self.log(ctx, format!("粒度修复：{table} 取 {f} 后每个键恰好一行"));
-                    self.save_grain(ctx, table, cols, &f).await?;
-                    return Ok(Some(f));
+                    found.push(format!("{c} = {}", lit(v)));
+                    if !self.cfg.repair_unique {
+                        break 'search;
+                    }
                 }
             }
         }
-        self.log(ctx, format!("粒度修复：{table} 没找到能恢复唯一性的过滤"));
-        Ok(None)
+        self.ambiguous.lock().remove(table);
+        match found.as_slice() {
+            [] => {
+                self.log(ctx, format!("粒度修复：{table} 没找到能恢复唯一性的过滤"));
+                Ok(None)
+            }
+            [f] => {
+                inc(&self.stats.repairs);
+                self.log(ctx, format!("粒度修复：{table} 取 {f} 后每个键恰好一行"));
+                self.save_grain(ctx, table, cols, f).await?;
+                Ok(Some(f.clone()))
+            }
+            _ => {
+                self.log(
+                    ctx,
+                    format!("粒度修复：{table} 有多个过滤都能恢复唯一性（{}），结构上分不出哪个对，不自动修复", found.join("；")),
+                );
+                self.ambiguous.lock().insert(table.to_string(), found);
+                Ok(None)
+            }
+        }
+    }
+
+    /// 最近一次粒度修复因候选不唯一而放弃时的候选。
+    pub(crate) fn ambiguous_repair(&self, table: &str) -> Option<Vec<String>> {
+        self.ambiguous.lock().get(table).cloned()
     }
 
     async fn save_grain(&self, ctx: &Ctx, table: &str, cols: &[String], filter: &str) -> Result<()> {

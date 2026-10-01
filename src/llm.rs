@@ -127,8 +127,9 @@ impl Provider {
 
 /// 服务端错误与网络错误最多重试 3 次（2、4、8 秒）。限流（429）单独计数：优先按 Retry-After 等待，
 /// 否则 5 秒起指数退避、单次不超过 120 秒并加随机抖动，最多重试 8 次（网关的冷却期可达数分钟）。
+/// ClinePass 的 5 小时用量上限（INFERENCE_CAP_ERROR）按返回的重置时间等待后重试，不计入限流次数，最多等 12 次。
 async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> {
-    let (mut failures, mut limited) = (0u32, 0u32);
+    let (mut failures, mut limited, mut capped) = (0u32, 0u32, 0u32);
     loop {
         let resp = req.try_clone().ok_or_else(|| anyhow!("请求无法重试"))?.json(body).send().await;
         let wait = match resp {
@@ -140,7 +141,14 @@ async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> 
                     return serde_json::from_str(&text).context("响应不是 JSON");
                 }
                 let last = format!("HTTP {status}: {}", text.chars().take(500).collect::<String>());
-                if status.as_u16() == 429 && !futile_429(&text) {
+                if let Some(reset) = (status.as_u16() == 429).then(|| cap_reset_secs(&text)).flatten() {
+                    capped += 1;
+                    if capped > 12 {
+                        bail!("用量上限等待 12 次后仍失败：{last}");
+                    }
+                    eprintln!("  用量上限 HTTP 429：{} 秒后重置，届时重试（第 {capped} 次）", reset);
+                    Duration::from_millis((reset + 60) * 1000 + (rand::random::<f64>() * 30_000.0) as u64)
+                } else if status.as_u16() == 429 && !futile_429(&text) {
                     limited += 1;
                     if limited > 8 {
                         bail!("限流重试 8 次后仍失败：{last}");
@@ -169,6 +177,22 @@ async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> 
         };
         tokio::time::sleep(wait).await;
     }
+}
+
+/// ClinePass 用量上限：`{"error":{"code":"INFERENCE_CAP_ERROR","message":"... The limit resets in 41m, ..."}}`，
+/// 返回距重置的秒数；读不出时间时按 10 分钟。
+fn cap_reset_secs(body: &str) -> Option<u64> {
+    let v: Value = serde_json::from_str(body).ok()?;
+    if v["error"]["code"] != "INFERENCE_CAP_ERROR" {
+        return None;
+    }
+    let msg = v["error"]["message"].as_str().unwrap_or_default();
+    let re = regex::Regex::new(r"resets in\s+(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s)?").expect("正则");
+    let secs = re.captures(msg).map_or(0, |c| {
+        let n = |i: usize, k: u64| c.get(i).and_then(|m| m.as_str().parse::<u64>().ok()).unwrap_or(0) * k;
+        n(1, 3600) + n(2, 60) + n(3, 1)
+    });
+    Some(if secs == 0 { 600 } else { secs })
 }
 
 /// 智谱 BigModel 也用 429 表示欠费（1113）、内容审核拦截（1301）和额度用尽（1308 / 1310），重试无效
@@ -556,6 +580,17 @@ mod provider_tests {
         let reply = provider.chat("test", &turns, &tool_specs(true)).await.unwrap();
         assert_eq!(reply.text, "OK");
         server.abort();
+    }
+
+    #[test]
+    fn inference_cap_waits_for_reset() {
+        let body = |m: &str| json!({"error": {"code": "INFERENCE_CAP_ERROR", "message": m}}).to_string();
+        let msg = "Error 429: You have reached your 5-hour Clinepass limit. The limit resets in 41m, please try again later.";
+        assert_eq!(cap_reset_secs(&body(msg)), Some(41 * 60));
+        assert_eq!(cap_reset_secs(&body("The limit resets in 1h 5m")), Some(3900));
+        assert_eq!(cap_reset_secs(&body("limit reached")), Some(600));
+        assert_eq!(cap_reset_secs(r#"{"error":{"code":"1302","message":"rate"}}"#), None);
+        assert_eq!(cap_reset_secs("<html>429</html>"), None);
     }
 
     #[test]

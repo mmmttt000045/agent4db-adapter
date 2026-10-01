@@ -24,7 +24,7 @@ pub struct Options {
     #[arg(long, default_value_t = 1_000_000, value_parser = clap::value_parser!(u32).range(10_000..=20_000_000))]
     rows: u32,
     /// 查询 Agent 的模型服务（配置写在 .env）
-    #[arg(long, default_value = "cline", value_parser = ["openai", "deepseek", "zhipu", "cline", "anthropic", "claude"])]
+    #[arg(long, default_value = "cline", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "anthropic", "claude"])]
     agent: String,
     #[arg(long, value_delimiter = ',', default_value = "M1,M2,M3,M4,M5", value_parser = ["M1", "M2", "M3", "M4", "M5"])]
     metrics: Vec<String>,

@@ -32,6 +32,8 @@ pub struct Reply {
     pub calls: Vec<ToolCall>,
     pub input_tokens: u64,
     pub output_tokens: u64,
+    /// 服务端回报的实际模型名（中转站可能与请求的模型不同）
+    pub model: Option<String>,
 }
 
 #[derive(Default)]
@@ -49,17 +51,23 @@ pub enum Provider {
 
 /// OpenAI 兼容服务的内置配置：(provider 名, 环境变量前缀, 默认 base URL)。
 /// 各服务的 key 与模型分别写在 .env（如 DEEPSEEK_API_KEY、ZHIPU_MODEL），切换或对照时只改 provider 名。
-const OPENAI_PROFILES: [(&str, &str, &str); 4] = [
+const OPENAI_PROFILES: [(&str, &str, &str); 5] = [
     ("openai", "OPENAI", "https://api.openai.com/v1"),
     ("deepseek", "DEEPSEEK", "https://api.deepseek.com"),
     ("zhipu", "ZHIPU", "https://open.bigmodel.cn/api/paas/v4"),
     // Cline 网关：聚合多家模型，模型名带厂商前缀（如 deepseek/deepseek-v4.1-flash）；需要 x-client-type 头，响应外包一层 data
     ("cline", "CLINE", "https://api.cline.bot/api/v1"),
+    // kunyou 中转：转发 DeepSeek 等模型；在 Cloudflare 之后，需要 User-Agent；回报的模型名可能与请求不同，逐次记录
+    ("kunyou", "KUNYOU", "https://api.kunyou.asia/v1"),
 ];
 
 /// 单次请求超时 300 秒：网关偶尔挂起不返回，超时后由 `post_json` 重试（最多 4 次）。
 fn http() -> reqwest::Client {
-    reqwest::Client::builder().timeout(Duration::from_secs(300)).build().expect("http client")
+    reqwest::Client::builder()
+        .timeout(Duration::from_secs(300))
+        .user_agent(concat!("agentdb-mid/", env!("CARGO_PKG_VERSION")))
+        .build()
+        .expect("http client")
 }
 
 impl Provider {
@@ -76,9 +84,10 @@ impl Provider {
                 thinking.as_deref().is_none_or(|v| matches!(v, "enabled" | "disabled")),
                 "{prefix}_THINKING 必须为 enabled 或 disabled"
             );
-            // DeepSeek 与智谱 BigModel 的思考模式都要求在工具调用循环中原样回传 reasoning_content
-            let preserve_reasoning =
-                reqwest::Url::parse(&base).ok().is_some_and(|u| matches!(u.host_str(), Some("api.deepseek.com" | "open.bigmodel.cn")));
+            // DeepSeek 与智谱 BigModel 的思考模式都要求在工具调用循环中原样回传 reasoning_content；kunyou 转发 DeepSeek，同样回传
+            let preserve_reasoning = reqwest::Url::parse(&base)
+                .ok()
+                .is_some_and(|u| matches!(u.host_str(), Some("api.deepseek.com" | "open.bigmodel.cn" | "api.kunyou.asia")));
             return Ok(Provider::OpenAi {
                 vendor: if name == "openai" { "openai-compatible" } else { name },
                 key: var("API_KEY").ok_or_else(|| anyhow!("缺少 {prefix}_API_KEY（写在 .env 里）"))?,
@@ -95,7 +104,7 @@ impl Provider {
                 model: env("ANTHROPIC_MODEL").ok_or_else(|| anyhow!("缺少 ANTHROPIC_MODEL"))?,
                 http: http(),
             },
-            _ => bail!("未知 provider：{kind}（可选 openai / deepseek / zhipu / cline / claude）"),
+            _ => bail!("未知 provider：{kind}（可选 openai / deepseek / zhipu / cline / kunyou / claude）"),
         })
     }
 
@@ -332,6 +341,7 @@ async fn openai_chat(
         text: msg["content"].as_str().unwrap_or_default().to_string(),
         input_tokens: v["usage"]["prompt_tokens"].as_u64().unwrap_or(0),
         output_tokens: v["usage"]["completion_tokens"].as_u64().unwrap_or(0),
+        model: v["model"].as_str().map(str::to_string),
         ..Default::default()
     };
     for c in msg["tool_calls"].as_array().into_iter().flatten() {
@@ -401,6 +411,8 @@ pub struct AgentRun {
     pub derivation: Option<String>,
     /// 调用了 ask_clarification（任务随即结束）
     pub clarification: Option<String>,
+    /// 服务端回报的实际模型名 → 次数
+    pub served_models: std::collections::BTreeMap<String, u32>,
 }
 
 /// JSON Lines 记录（一行一个对象，每行写完即落盘）。`Middle::trace` 设置后，Agent 循环逐次记录工具调用。
@@ -450,6 +462,9 @@ pub async fn run_agent_with(
         run.steps += 1;
         run.input_tokens += r.input_tokens;
         run.output_tokens += r.output_tokens;
+        if let Some(m) = &r.model {
+            *run.served_models.entry(m.clone()).or_default() += 1;
+        }
         turns.push(Turn::Assistant { raw: r.raw.clone() });
         if r.calls.is_empty() {
             run.answer = Some(r.text.trim().to_string());
@@ -500,7 +515,7 @@ pub async fn run_agent_with(
                     "agent": ctx.agent, "session": ctx.session, "task": ctx.task, "step": run.steps, "seq": seq,
                     "tool": c.name, "args": c.input, "status": status, "t0_ms": t0, "ms": started.elapsed().as_secs_f64() * 1000.0,
                     "rows": out["result"]["row_count"], "ref": out["ref"], "result": result,
-                    "thought": if seq == 0 { thought(&r) } else { Value::Null },
+                    "thought": if seq == 0 { thought(&r) } else { Value::Null }, "served_model": r.model,
                 }));
             }
         }

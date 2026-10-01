@@ -485,7 +485,8 @@ impl Middle {
     /// 当前已提交的事务性版本（`catalog::install_tx_versions` 之后）。
     async fn tx_now(&self, tables: &[String]) -> Result<HashMap<String, i64>> {
         let list: Vec<String> = tables.iter().map(|t| lit(t)).collect();
-        let sql = format!("select table_name, v from mavra_versions where table_name in ({})", list.join(", "));
+        let sql =
+            format!("select table_name, sum(v)::bigint from mavra_versions where table_name in ({}) group by table_name", list.join(", "));
         Ok(catalog::tx_versions(&self.db.query(QKind::Meta, &sql).await?))
     }
 

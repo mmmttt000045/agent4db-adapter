@@ -767,11 +767,11 @@ impl SnapBench {
     /// 实验 C2：写者开销。单行更新的吞吐：顺序、以及 8 个连接并发（各改不同的行，但同表的版本行要排队）；
     /// 以及批量写入（每条语句 1 万行）的耗时。
     async fn writer_overhead(&self, per_worker: usize) -> Result<Value> {
-        let pool = Db::connect(&self.url, 8, false)?;
+        let pool = Db::connect(&self.url, 32, false)?;
         pool.query(
             QKind::Meta,
             "drop table if exists bench_w; create table bench_w (id int primary key, x int not null default 0); \
-                                 insert into bench_w (id) select g from generate_series(0, 7999) g",
+                                 insert into bench_w (id) select g from generate_series(0, 31999) g",
         )
         .await?;
         let run = |workers: usize| {
@@ -792,14 +792,17 @@ impl SnapBench {
         };
         let mut out = vec![];
         for round in 0..3 {
-            for trig in [false, true] {
+            // 0 = 无触发器；1 = 每表一行版本计数；TX_SHARDS = 分片计数（默认）
+            for shards in [0, 1, catalog::TX_SHARDS] {
+                let trig = shards > 0;
                 if trig {
-                    catalog::install_tx_versions(&pool, &["bench_w"]).await?;
+                    catalog::install_tx_versions_sharded(&pool, &["bench_w"], shards).await?;
                 } else {
                     pool.query(QKind::Meta, "drop trigger if exists mavra_bump on bench_w").await?;
                 }
                 let seq = run(1).await?;
                 let conc = run(8).await?;
+                let conc32 = run(32).await?;
                 let t = Instant::now();
                 for b in 0..20 {
                     pool.execute(&format!("update bench_w set x = x + 1 where id between {} and {}", (b % 8) * 1000, (b % 8) * 1000 + 999))
@@ -812,8 +815,8 @@ impl SnapBench {
                     .await?;
                 }
                 let bulk = t.elapsed().as_secs_f64() * 1000.0 / 60.0;
-                out.push(json!({"round": round, "trigger": trig, "sequential_stmt_per_s": seq, "concurrent8_stmt_per_s": conc,
-                                "bulk_ms_per_stmt": bulk}));
+                out.push(json!({"round": round, "trigger": trig, "shards": shards, "sequential_stmt_per_s": seq,
+                                "concurrent8_stmt_per_s": conc, "concurrent32_stmt_per_s": conc32, "bulk_ms_per_stmt": bulk}));
             }
         }
         pool.query(QKind::Meta, "drop table bench_w; delete from mavra_versions where table_name = 'bench_w'").await?;
@@ -831,25 +834,34 @@ async fn snapshot_binding(url: &str) -> Result<Value> {
     admin.query(QKind::Meta, "analyze").await?;
     let b = SnapBench { url: url.to_string(), admin, learn: Period::month(2001, 3) };
     let trials = std::env::var("AGENTDB_SNAP_TRIALS").ok().and_then(|v| v.parse().ok()).unwrap_or(10);
+    // AGENTDB_SNAP_PARTS 选择要跑的部分（默认全部）：readers,writers,interleave,stress
+    let parts = std::env::var("AGENTDB_SNAP_PARTS").unwrap_or_else(|_| "readers,writers,interleave,stress".into());
+    let on = |p: &str| parts.split(',').any(|x| x.trim() == p);
     // 开销先测（表还没有经历重复写入与删除），两种模式交替两轮
     let mut readers = vec![];
-    for _ in 0..2 {
-        for snapshot in [false, true] {
-            readers.push(b.reader_overhead(snapshot, 40, trials).await?);
+    if on("readers") {
+        for _ in 0..2 {
+            for snapshot in [false, true] {
+                readers.push(b.reader_overhead(snapshot, 40, trials).await?);
+            }
         }
     }
-    let writers = b.writer_overhead(500).await?;
+    let writers = if on("writers") { b.writer_overhead(500).await? } else { json!([]) };
     let mut interleavings = vec![];
-    for case in ["write_during_pause", "write_before_call", "write_notified"] {
-        for snapshot in [false, true] {
-            interleavings.push(b.interleave(snapshot, case, trials).await?);
+    if on("interleave") {
+        for case in ["write_during_pause", "write_before_call", "write_notified"] {
+            for snapshot in [false, true] {
+                interleavings.push(b.interleave(snapshot, case, trials).await?);
+            }
         }
     }
     let mut stress = vec![];
-    for distinct in [false, true] {
-        for notify in [true, false] {
-            for snapshot in [false, true] {
-                stress.push(b.stress(snapshot, notify, distinct, 2 * trials, 4, 3000, 10, 20261002).await?);
+    if on("stress") {
+        for distinct in [false, true] {
+            for notify in [true, false] {
+                for snapshot in [false, true] {
+                    stress.push(b.stress(snapshot, notify, distinct, 2 * trials, 4, 3000, 10, 20261002).await?);
+                }
             }
         }
     }

@@ -8,22 +8,38 @@ use std::collections::{BTreeMap, HashMap};
 /// 不对 Agent 暴露的内部表。
 pub const INTERNAL_TABLES: &[&str] = &["etl_batch_log", "mavra_versions"];
 
-/// 事务性表版本：语句级触发器在写入事务里把表的版本号加一，随写入一起提交，因此任一快照里读到的版本
-/// 与该快照看到的数据一致（pg_stat 的 DML 计数不随事务提交、且异步上报，做不到这一点）。幂等。
+/// 事务性表版本：语句级触发器在写入事务里把表的版本计数加一，随写入一起提交，因此任一快照里读到的版本
+/// 与该快照看到的数据一致（pg_stat 的 DML 计数不随事务提交、且异步上报，做不到这一点）。
+/// 每张表的计数分成 `shards` 行（按后端进程号选行），版本取各行之和：并发写入同一张表的事务不再争同一行。
+/// PostgreSQL 中后取的快照看到的已提交事务集合包含先取的，所以两个快照读到的和相同，就说明它们看到的
+/// 对这张表的写入完全相同。幂等；重复安装会按新的分片数重建触发器函数。
 #[cfg_attr(not(test), allow(dead_code))] // 目前只有快照绑定实验调用
 pub async fn install_tx_versions(db: &Db, tables: &[&str]) -> Result<()> {
-    let mut sql = String::from(
-        "create table if not exists mavra_versions (table_name text primary key, v bigint not null default 0); \
+    install_tx_versions_sharded(db, tables, TX_SHARDS).await
+}
+
+#[cfg_attr(not(test), allow(dead_code))]
+pub const TX_SHARDS: u32 = 16;
+
+/// 读事务性版本（各表分片之和）。
+pub const TX_VERSIONS_SQL: &str = "select table_name, sum(v)::bigint from mavra_versions group by table_name";
+
+#[cfg_attr(not(test), allow(dead_code))]
+pub async fn install_tx_versions_sharded(db: &Db, tables: &[&str], shards: u32) -> Result<()> {
+    anyhow::ensure!(shards > 0, "分片数必须大于 0");
+    let mut sql = format!(
+        "create table if not exists mavra_versions (table_name text not null, shard int not null, v bigint not null default 0, \
+                                                    primary key (table_name, shard)); \
          create or replace function mavra_bump() returns trigger language plpgsql as $$ \
          begin \
-           insert into mavra_versions as m values (tg_table_name, 1) \
-             on conflict (table_name) do update set v = m.v + 1; \
+           insert into mavra_versions as m values (tg_table_name, pg_backend_pid() % {shards}, 1) \
+             on conflict (table_name, shard) do update set v = m.v + 1; \
            return null; \
-         end $$; ",
+         end $$; "
     );
     for t in tables {
         sql.push_str(&format!(
-            "insert into mavra_versions values ('{t}', 0) on conflict do nothing; \
+            "insert into mavra_versions values ('{t}', 0, 0) on conflict do nothing; \
              drop trigger if exists mavra_bump on {t}; \
              create trigger mavra_bump after insert or update or delete or truncate on {t} \
                for each statement execute function mavra_bump(); "
@@ -33,7 +49,7 @@ pub async fn install_tx_versions(db: &Db, tables: &[&str]) -> Result<()> {
     Ok(())
 }
 
-/// 当前快照里各表的事务性版本（`install_tx_versions` 之后）。
+/// 读到的各表事务性版本（行为 表名, 版本）。
 pub fn tx_versions(rows: &crate::db::Rows) -> HashMap<String, i64> {
     (0..rows.rows.len()).filter_map(|i| Some((rows.cell(i, 0)?.to_string(), rows.i64(i, 1)?))).collect()
 }

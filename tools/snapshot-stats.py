@@ -50,19 +50,22 @@ def main():
                    "trials_with_violation": sum(1 for t in x["per_trial"] if t["counts"].get("violation", 0) > 0),
                    "violation_start_minus_commit_ms": x["violation_start_minus_commit_ms"]})
     res["stress"] = st
-    ro = collections.defaultdict(lambda: collections.defaultdict(list))
+    ro = collections.defaultdict(lambda: collections.defaultdict(list))  # noqa: E501
     for x in r["reader_overhead"]:
         for k in ("steady_ms", "first_after_write_ms", "second_after_write_ms"):
             ro[x["mode"]][k].append(x[k]["p50"])
     res["reader_p50_ms"] = {m: {k: round(statistics.mean(v), 1) for k, v in d.items()} for m, d in ro.items()}
     wo = collections.defaultdict(lambda: collections.defaultdict(list))
     for x in r["writer_overhead"]:
-        for k in ("sequential_stmt_per_s", "concurrent8_stmt_per_s", "bulk_ms_per_stmt"):
-            wo["trigger" if x["trigger"] else "no_trigger"][k].append(x[k])
+        name = "no_trigger" if not x["trigger"] else ("trigger" if "shards" not in x else f"shards{x['shards']}")
+        for k in ("sequential_stmt_per_s", "concurrent8_stmt_per_s", "concurrent32_stmt_per_s", "bulk_ms_per_stmt"):
+            if k in x:
+                wo[name][k].append(x[k])
     res["writer_median"] = {m: {k: round(statistics.median(v), 1) for k, v in d.items()} for m, d in wo.items()}
-    if "trigger" in res["writer_median"] and "no_trigger" in res["writer_median"]:
-        a, b = res["writer_median"]["trigger"], res["writer_median"]["no_trigger"]
-        res["writer_ratio_trigger_over_none"] = {k: round(a[k] / b[k], 2) for k in a}
+    base = res["writer_median"].get("no_trigger")
+    if base:
+        res["writer_ratio_over_none"] = {m: {k: round(v[k] / base[k], 2) for k in v if k in base}
+                                         for m, v in res["writer_median"].items() if m != "no_trigger"}
     if o.json:
         json.dump(res, open(o.json, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(json.dumps(res, ensure_ascii=False, indent=1))

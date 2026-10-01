@@ -1145,7 +1145,7 @@ impl Middle {
             }
         }
         let snap = self.db.snapshot().await?;
-        let vers = catalog::tx_versions(&snap.query(QKind::Metric, "select table_name, v from mavra_versions").await?);
+        let vers = catalog::tx_versions(&snap.query(QKind::Metric, catalog::TX_VERSIONS_SQL).await?);
         let (mut run, mut reused) = (0u32, 0u32);
         for (c, baseline) in &conds {
             // 同一条件在相同事务性版本上的结论（来自更早的快照，或前后版本一致的维护检查）直接用

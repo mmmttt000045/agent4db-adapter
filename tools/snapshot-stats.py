@@ -50,7 +50,7 @@ def main():
                    "trials_with_violation": sum(1 for t in x["per_trial"] if t["counts"].get("violation", 0) > 0),
                    "violation_start_minus_commit_ms": x["violation_start_minus_commit_ms"]})
     res["stress"] = st
-    ro = collections.defaultdict(lambda: collections.defaultdict(list))  # noqa: E501
+    ro = collections.defaultdict(lambda: collections.defaultdict(list))
     for x in r["reader_overhead"]:
         for k in ("steady_ms", "first_after_write_ms", "second_after_write_ms"):
             ro[x["mode"]][k].append(x[k]["p50"])

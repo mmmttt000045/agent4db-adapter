@@ -54,7 +54,7 @@ def main():
                 cat = {(True, True): "follow", (True, False): "deviate", (False, True): "override", (False, False): "stale"}[(def_ok, ans_ok)]
                 if cat == "deviate" and len(examples) < 12:
                     examples.append({"file": f.split("results/")[-1], "task": r["task"], "phase": r["phase"], "declared": own,
-                                     "answer": r["answer"], "gold": r["gold"], "sql": (r["run"] or {}).get("sql", "")[:400]})
+                                     "answer": r["answer"], "gold": r["gold"], "sql": ((r["run"] or {}).get("sql") or "")[:400]})
             total[cat] += 1
             by_mode[mode][cat] += 1
             by_model[model][cat] += 1

@@ -192,3 +192,24 @@
 | Databricks | Databricks 文档，Unity Catalog metric views，“Model star schemas”. https://docs.databricks.com/aws/en/uc-semantics/metric-views/basic-modeling（2026-09-29 访问） |
 
 标“待核”的条目写进 bib 前补全作者与标题。
+
+## 11. 2026-09-30 补充核对（论文参考文献即 `overleaf/main.tex` 的 58 条）
+
+出处均在官方页面或 Crossref 记录核对；引文来自出版方 PDF，标 [作者版] 的来自作者自存版本。以下是正文用到的关键说法及原文依据。
+
+| 说法 | 依据 |
+|---|---|
+| 探索高度重复 | Liu26 §2：“Across queries, the number of distinct sub-plans of each size is often a small fraction of less than 10-20% of the total”（图 2：BIRD 每题 GPT-4o-mini 50 次尝试）。原文说的是“persistent, queryable agentic memory store”，不是“shared memory store” |
+| 过期记忆是开放问题 | Liu26 §6.1 “Updates to the Store”；Luo26（SIGMOD'26 教程，pp. 571–579）§2.4.4 “difficulty adapting to dynamic environments with changing data”；Li26（PVLDB 19(12):4888–4892，题为 Data Management for Agentic Memory）§2.1 “redundant, outdated, or conflicting information” |
+| 业务知识决定正确率 | BIRD 表 2：GPT-4 无证据 34.88 → 有证据 54.89；Spider 2.0：o1-preview 智能体只完成 21.3%；Sequeda24 §5.1：SQL 16.7% → 知识图谱 54.2%（43 题，GPT-4 零样本）；Floratou24 §2：632 张表、4000 多列，“custom terminology” |
+| 纯数据变化静默出错 | Auto-Validate（SIGMOD'21）摘要：“upstream data feeds can change in unexpected ways, causing downstream applications to break silently”；Breck19 例 1.1：“the data looks perfectly fine for the training code” |
+| 可汇总性条件 | Lenz97：不相交、完备、类型相容是必要条件，可在数据实例上检查 [作者版]；Mazón09 §4.1：实例级检查“must be incorporated and executed for every update” [作者版] |
+| 软约束需随更新维护 | Godfrey01 摘要：“future updates may undermine it”；§3：发现、选择、维护三阶段 [作者版]。讨论的是优化器使用，不是汇总正确性 |
+| 发现的唯一性只对某一时刻的实例成立 | Abedjan15 §5.1 [作者版]；动态数据上维护：Swan（**ICDE 2014**，不是 EDBT）、DynFD（EDBT 2019） |
+| 选择性检查早有先例 | Nicolas82（按更新类型简化约束）、Ceri & Widom VLDB'90（invalidating operations）、Blakeley89 TODS（irrelevant updates）；Zhou07 §3.5 已提出不影响被访问部分的待处理更新可以不立即维护 |
+| 共享检查 | Deequ §4：一次运行内各约束共享扫描（scan-sharing）；我们的区别是结论按依赖版本跨定义、跨时间复用 |
+| 在途合并先例 | Memcache（NSDI'13）租约 §3.2.1，原文不用 “coalesce” 一词 |
+| 智能体记忆不在外部数据上验证 | AWM、ExpeL、ReasoningBank（ICLR'26）、ACE（ICLR'26）、A-Mem、Mem0、MemGPT（仅 arXiv）逐篇核对：都不在外部数据库上检查记忆，也不因数据变化失效 |
+| 半导/无同行评审 | AgentSM、MemGPT 只有 arXiv；Gupta & Mumick 1995 是 Data Eng. Bull. 邀稿；“fan trap / chasm trap” 找不到同行评审出处（可改引 Mazón09 §2.3 或 Hyde & Fremlin, SIGMOD-Companion'24） |
+
+作者顺序以论文 PDF 为准：Breck19（Breck, Polyzotis, Roy, Whang, Zinkevich）、DynFD（第五作者 Torben Meyer）、DataLab（按 IEEE/PDF）。

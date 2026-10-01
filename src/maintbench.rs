@@ -46,6 +46,9 @@ pub struct Options {
     repeats: u32,
     #[arg(long, default_value_t = 42)]
     seed: u64,
+    /// 修复进行中到达的使用直接返回不可用（早期行为），不等那次维护结束
+    #[arg(long)]
+    no_wait_repair: bool,
 }
 
 // ───────────────────────── 口径族 ─────────────────────────
@@ -516,6 +519,7 @@ async fn cell(env: &Env<'_>, policy_name: &str, arrival: &str, repeat: u32, shar
         metric_maint: policy,
         cond_reuse: policy_name == "condition",
         sql_cache: policy_name == "definition-cache",
+        wait_repair: !env.o.no_wait_repair,
         ..Default::default()
     };
     let mid = Middle::new(db.clone(), cfg).await?;

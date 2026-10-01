@@ -765,6 +765,22 @@ impl Middle {
             return Ok(Checked::Missing);
         }
         if let Some(r) = blocked(&e.status) {
+            // 正在维护（已撤销、修复回归中）：加入那次维护，结束后读最新状态（维护刚结束时也重读一次）
+            if self.cfg.wait_repair {
+                let pending = self.maint_inflight.lock().get(fk).cloned();
+                if let Some(key) = pending {
+                    self.flight_v.run(self.cfg.singleflight, &key, || async { Ok(Value::Null) }).await?;
+                    self.metric_event(json!({"event": "repair_waited", "key": e.key, "revision": e.revision, "agent": ctx.agent}));
+                }
+                return Ok(match self.store.get(fk) {
+                    Some(x) if x.status == Status::Valid => Checked::Valid(x),
+                    Some(x) => {
+                        let r = blocked(&x.status).unwrap_or_default();
+                        Checked::Unavailable(x, r)
+                    }
+                    None => Checked::Missing,
+                });
+            }
             return Ok(Checked::Unavailable(e, r));
         }
         if self.cfg.metric_maint == Maint::Off {
@@ -775,7 +791,15 @@ impl Middle {
             return Ok(Checked::Valid(e));
         }
         let key = format!("maint:{fk}@{}", ver_sig(&e.deps));
-        let (_, merged) = self.flight_v.run(self.cfg.singleflight, &key, || self.maintain(ctx, fk, &e, &cur)).await?;
+        self.maint_inflight.lock().insert(fk.to_string(), key.clone());
+        let r = self.flight_v.run(self.cfg.singleflight, &key, || self.maintain(ctx, fk, &e, &cur)).await;
+        {
+            let mut m = self.maint_inflight.lock();
+            if m.get(fk) == Some(&key) {
+                m.remove(fk);
+            }
+        }
+        let (_, merged) = r?;
         if merged {
             self.metric_event(json!({"event": "maintenance_merged", "key": e.key, "revision": e.revision, "agent": ctx.agent}));
         }

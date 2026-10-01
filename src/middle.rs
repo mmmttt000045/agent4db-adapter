@@ -117,6 +117,8 @@ pub struct MiddleConfig {
     /// 粒度修复要求唯一：不止一个过滤都能恢复“每键一行、不丢键”时（例如主数据与备份副本），结构判定分不出
     /// 哪个是业务上对的，不自动修复。关闭时取搜索到的第一个（早期行为）
     pub repair_unique: bool,
+    /// 定义正在被别的请求维护（已撤销、修复回归中）时，后到的使用等这次维护结束再读结果，而不是直接返回不可用
+    pub wait_repair: bool,
 }
 
 impl Default for MiddleConfig {
@@ -142,6 +144,7 @@ impl Default for MiddleConfig {
             exec_pause_ms: 0,
             traj_memory: false,
             repair_unique: true,
+            wait_repair: true,
         }
     }
 }
@@ -319,6 +322,8 @@ pub struct Middle {
     trajs: Mutex<Vec<TrajMemo>>,
     /// 最近一次粒度修复因候选不唯一而放弃时的候选（表 → 过滤），供修复事件说明原因
     ambiguous: Mutex<HashMap<String, Vec<String>>>,
+    /// 进行中的指标维护：完整键 → 在途合并的键（供修复期间到达的使用加入等待）
+    maint_inflight: Mutex<HashMap<String, String>>,
     /// 设置后，LLM Agent 循环逐次记录工具调用（工作负载刻画用）
     pub trace: Option<crate::llm::Trace>,
 }
@@ -409,6 +414,7 @@ impl Middle {
             snap_verdicts: Mutex::new(HashMap::new()),
             trajs: Mutex::new(vec![]),
             ambiguous: Mutex::new(HashMap::new()),
+            maint_inflight: Mutex::new(HashMap::new()),
             trace: None,
         })
     }

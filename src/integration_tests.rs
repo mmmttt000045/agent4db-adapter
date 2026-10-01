@@ -319,7 +319,141 @@ async fn repair_ambiguity(url: &str) -> Result<Value> {
     }
     ch.reset(&admin).await?;
     scenario::ensure_v1(&admin, &v1, ch.name()).await?;
-    Ok(json!({"rows": rows, "change": ch.describe(), "learn": learn, "runs": runs, "candidates": candidates}))
+    let variant = repair_ambiguity_precolumn(url, &admin, &returns, learn, &asks).await?;
+    Ok(json!({"rows": rows, "change": ch.describe(), "learn": learn, "runs": runs, "candidates": candidates,
+              "precolumn_variant": variant}))
+}
+
+/// 变体：来源列 sr_source 在学习前就存在（全为 primary），排除目录未刷新带来的偶然拦截。
+/// 比较三种 G8 参照：未预见（学习参照 SQL 不含 sr_source，在当前数据上重算）、已预见（参照含 sr_source = 'primary'，
+/// 相当于本文基准中预先写入 sr_status / ss_is_current 的判题 SQL）、存档答案（学习时的答案值）。
+/// 对前两种参照各跑一次条件级维护，记录 MAVRA 实际发布的过滤。
+async fn repair_ambiguity_precolumn(url: &str, admin: &Db, returns: &[(&str, Metric)], learn: Period, asks: &[Ask]) -> Result<Value> {
+    let answer =
+        |sql: String| async move { Ok::<_, anyhow::Error>(admin.query(QKind::Meta, &sql).await?.cell(0, 0).unwrap_or("NULL").to_string()) };
+    let same = |a: &Ask, x: &str, y: &str| {
+        let dec = if matches!(a, Ask::RankMonth { .. }) { 0 } else { 2 };
+        metric::same_value(&metric::parse_answer(x), &metric::parse_answer(y), dec)
+    };
+    let gold = |id: &str, a: &Ask| match a {
+        Ask::Single { period } => metricbench::gold_period(id, period),
+        Ask::RankMonth { year } => metricbench::gold_rank(id, *year),
+        Ask::Diff { .. } => unreachable!(),
+    };
+    // 预见来源列的参照：在退货表上多一个 sr_source = 'primary'
+    let anticipated = |sql: String| sql.replace("r.sr_status = '完成'", "r.sr_status = '完成' and r.sr_source = 'primary'");
+    admin
+        .query(QKind::Meta, "alter table store_returns add column sr_source varchar(10) not null default 'primary'; analyze store_returns")
+        .await?;
+    let stored: BTreeMap<&str, String> = {
+        let mut m = BTreeMap::new();
+        for (id, _) in returns {
+            m.insert(*id, answer(metricbench::gold_period(id, &learn)).await?);
+        }
+        m
+    };
+    // 每次写入后等 DML 计数上报，保证版本变化能被维护感知
+    let before =
+        || async { Ok::<_, anyhow::Error>(crate::catalog::versions(admin).await?.get("store_returns").map(|v| v.dml).unwrap_or(0)) };
+    let settle = |b: i64| async move {
+        admin.query(QKind::Meta, "select pg_stat_force_next_flush(); analyze store_returns").await?;
+        etl::wait_table_stats(admin, "store_returns", b).await
+    };
+    let apply = || async {
+        let b = before().await?;
+        admin
+            .execute(
+                "update store_returns set sr_return_amt = sr_return_amt - 1 where sr_ticket_number % 10 = 3 and sr_returned_date_sk >= 732",
+            )
+            .await?;
+        settle(b).await
+    };
+    let hide = || async {
+        let b = before().await?;
+        admin
+            .execute(
+                "insert into store_returns (sr_returned_date_sk, sr_item_sk, sr_ticket_number, sr_return_quantity, sr_return_amt, \
+                 sr_return_tax, sr_fee, sr_net_loss, sr_status, sr_source) \
+                 select sr_returned_date_sk, sr_item_sk, sr_ticket_number, sr_return_quantity, \
+                        sr_return_amt + case when sr_ticket_number % 10 = 3 and sr_returned_date_sk >= 732 then 1 else 0 end, \
+                        sr_return_tax, sr_fee, sr_net_loss, sr_status, 'backup' from store_returns where sr_source = 'primary'",
+            )
+            .await?;
+        settle(b).await
+    };
+    let undo = || async {
+        let b = before().await?;
+        admin.execute("delete from store_returns where sr_source = 'backup'").await?;
+        admin
+            .execute(
+                "update store_returns set sr_return_amt = sr_return_amt + 1 where sr_ticket_number % 10 = 3 and sr_returned_date_sk >= 732",
+            )
+            .await?;
+        settle(b).await
+    };
+    let mut runs = vec![];
+    for (oracle, use_anticipated) in [("unanticipated", false), ("anticipated", true)] {
+        let db = Arc::new(Db::connect(url, 4, true)?);
+        let cfg = MiddleConfig { version_ttl_ms: 0, metric_maint: Maint::Condition, cond_reuse: true, ..Default::default() };
+        let mid = Middle::new(db, cfg).await?;
+        let seed = Ctx::new("A", "seed", "seed");
+        for (id, m) in returns {
+            let judge = metricbench::gold_period(id, &learn);
+            let judge = if use_anticipated { anticipated(judge) } else { judge };
+            let v = mid.seed_metric(&seed, m.clone(), Ask::Single { period: learn }, 2, &judge).await?;
+            ensure!(v["promoted"] == true, "{id} 未晋升：{v}");
+        }
+        apply().await?;
+        let mut expect = BTreeMap::new();
+        for (id, _) in returns {
+            for (i, a) in asks.iter().enumerate() {
+                expect.insert((*id, i), answer(gold(id, a)).await?);
+            }
+        }
+        hide().await?;
+        mid.invalidate_versions();
+        let ctx = Ctx::new("B", "mirror-pre", "use");
+        let mut served = vec![];
+        for (id, m) in returns {
+            let v = mid.use_metric(&ctx, &format!("metric:{}", m.name)).await?;
+            if v["status"] == "valid" {
+                let got: Metric = serde_json::from_value(v["metric"].clone())?;
+                let mut oks = vec![];
+                for (i, a) in asks.iter().enumerate() {
+                    let value = answer(metric::compile(&got, a)?).await?;
+                    oks.push(same(a, &value, &expect[&(*id, i)]));
+                }
+                served.push(json!({"metric": id, "status": "valid", "revision": v["revision"], "filters": got.filters,
+                                   "join_filters": got.joins.iter().map(|j| &j.filters).collect::<Vec<_>>(), "asks_ok": oks}));
+            } else {
+                served.push(json!({"metric": id, "status": v["status"]}));
+            }
+        }
+        let events: Vec<Value> = mid.take_metric_events().into_iter().filter(|e| e["event"] != "maintenance").collect();
+        runs.push(json!({"oracle": oracle, "served": served, "events": events}));
+        undo().await?;
+    }
+    // 三种 G8 参照下两个候选各自是否通过
+    apply().await?;
+    hide().await?;
+    let mut candidates = vec![];
+    for v in ["primary", "backup"] {
+        let f = format!("sr_source = '{v}'");
+        let mut per = vec![];
+        for (id, m) in returns {
+            let got = answer(metric::compile(&with_returns_filter(id, m, &f), &Ask::Single { period: learn })?).await?;
+            let rerun = answer(metricbench::gold_period(id, &learn)).await?;
+            let rerun_anticipated = answer(anticipated(metricbench::gold_period(id, &learn))).await?;
+            let la = Ask::Single { period: learn };
+            per.push(json!({"metric": id, "canonical": got,
+                            "g8_unanticipated": same(&la, &got, &rerun), "g8_anticipated": same(&la, &got, &rerun_anticipated),
+                            "g8_stored_answer": same(&la, &got, &stored[id])}));
+        }
+        candidates.push(json!({"filter": f, "metrics": per}));
+    }
+    undo().await?;
+    admin.query(QKind::Meta, "alter table store_returns drop column sr_source; analyze store_returns").await?;
+    Ok(json!({"runs": runs, "candidates": candidates}))
 }
 
 #[tokio::test]

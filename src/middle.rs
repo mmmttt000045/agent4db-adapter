@@ -107,6 +107,11 @@ pub struct MiddleConfig {
     /// 通用验证缓存（对照基线）：维护路径上的验证 SQL（检查、守卫、修复、回放与回归）按“规范化 SQL + 读到的表的版本”缓存结果，
     /// 不区分条件类型、不做蕴含
     pub sql_cache: bool,
+    /// 绑定快照的执行：声明了指标修订的 run_sql 在一个可重复读快照里先核对该修订的条件（同一事务性版本上已通过的结论直接用，
+    /// 否则在该快照里检查），再在同一快照里执行；需要先 `catalog::install_tx_versions`
+    pub snapshot_exec: bool,
+    /// 实验用：核对之后、执行之前暂停的毫秒数，用来构造“核对与执行之间有写入提交”的交错
+    pub exec_pause_ms: u64,
 }
 
 impl Default for MiddleConfig {
@@ -128,6 +133,8 @@ impl Default for MiddleConfig {
             cond_reuse: false,
             record: false,
             sql_cache: false,
+            snapshot_exec: false,
+            exec_pause_ms: 0,
         }
     }
 }
@@ -174,6 +181,9 @@ pub struct Stats {
     pub notices: AtomicU64,
     pub sql_cache_hits: AtomicU64,
     pub sql_cache_misses: AtomicU64,
+    pub snapshot_checks_run: AtomicU64,
+    pub snapshot_checks_reused: AtomicU64,
+    pub snapshot_rejections: AtomicU64,
 }
 
 fn inc(a: &AtomicU64) {
@@ -273,6 +283,8 @@ pub struct Middle {
     metric_events: Mutex<Vec<Value>>,
     /// 通用验证缓存：规范化 SQL + 版本签名 → 结果（`MiddleConfig::sql_cache`）
     vcache: Mutex<HashMap<String, crate::db::Rows>>,
+    /// 绑定快照执行的条件结论：条件身份 + 读到的表的事务性版本 → 是否成立
+    snap_verdicts: Mutex<HashMap<String, bool>>,
     /// 设置后，LLM Agent 循环逐次记录工具调用（工作负载刻画用）
     pub trace: Option<crate::llm::Trace>,
 }
@@ -346,6 +358,7 @@ impl Middle {
             metric_evidence: Mutex::new(HashMap::new()),
             metric_events: Mutex::new(Vec::new()),
             vcache: Mutex::new(HashMap::new()),
+            snap_verdicts: Mutex::new(HashMap::new()),
             trace: None,
         })
     }
@@ -433,6 +446,8 @@ impl Middle {
             "repairs": g(&s.repairs), "sql_rejections": g(&s.rejections), "notices": g(&s.notices),
             "entries": self.store.len(), "feedback": self.fb.report(), "db": self.db.meter.snap(),
             "sql_cache": {"hits": g(&s.sql_cache_hits), "misses": g(&s.sql_cache_misses)},
+            "snapshot_exec": {"checks_run": g(&s.snapshot_checks_run), "checks_reused": g(&s.snapshot_checks_reused),
+                              "rejections": g(&s.snapshot_rejections)},
         })
     }
 
@@ -1206,6 +1221,20 @@ impl Middle {
                 self.note_rejection(ctx, s, refs, &rej);
                 return Ok(rej);
             }
+        }
+        if self.cfg.snapshot_exec && !refs.is_empty() && self.cfg.metric_maint != Maint::Off {
+            let deps = self.deps_for(&tables).await?;
+            let mut out = self.run_bound(ctx, s, refs).await?;
+            if out.get("rejected").is_some() {
+                self.log(ctx, format!("拦下 SQL：{}", out["reason"].as_str().unwrap_or("")));
+                self.note_rejection(ctx, s, refs, &out);
+            } else if let Some(r) = self.note_call(ctx, s, refs, &out["result"], "snapshot", deps) {
+                out["ref"] = json!(r);
+            }
+            return Ok(out);
+        }
+        if self.cfg.exec_pause_ms > 0 && !refs.is_empty() {
+            tokio::time::sleep(Duration::from_millis(self.cfg.exec_pause_ms)).await;
         }
         let norm = sqlscan::normalize(s);
         let key = format!("result:{norm}");

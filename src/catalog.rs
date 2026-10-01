@@ -6,7 +6,36 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
 
 /// 不对 Agent 暴露的内部表。
-pub const INTERNAL_TABLES: &[&str] = &["etl_batch_log"];
+pub const INTERNAL_TABLES: &[&str] = &["etl_batch_log", "mavra_versions"];
+
+/// 事务性表版本：语句级触发器在写入事务里把表的版本号加一，随写入一起提交，因此任一快照里读到的版本
+/// 与该快照看到的数据一致（pg_stat 的 DML 计数不随事务提交、且异步上报，做不到这一点）。幂等。
+pub async fn install_tx_versions(db: &Db, tables: &[&str]) -> Result<()> {
+    let mut sql = String::from(
+        "create table if not exists mavra_versions (table_name text primary key, v bigint not null default 0); \
+         create or replace function mavra_bump() returns trigger language plpgsql as $$ \
+         begin \
+           insert into mavra_versions as m values (tg_table_name, 1) \
+             on conflict (table_name) do update set v = m.v + 1; \
+           return null; \
+         end $$; ",
+    );
+    for t in tables {
+        sql.push_str(&format!(
+            "insert into mavra_versions values ('{t}', 0) on conflict do nothing; \
+             drop trigger if exists mavra_bump on {t}; \
+             create trigger mavra_bump after insert or update or delete or truncate on {t} \
+               for each statement execute function mavra_bump(); "
+        ));
+    }
+    db.query(QKind::Meta, &sql).await?;
+    Ok(())
+}
+
+/// 当前快照里各表的事务性版本（`install_tx_versions` 之后）。
+pub fn tx_versions(rows: &crate::db::Rows) -> HashMap<String, i64> {
+    (0..rows.rows.len()).filter_map(|i| Some((rows.cell(i, 0)?.to_string(), rows.i64(i, 1)?))).collect()
+}
 
 #[derive(Clone, Debug, Serialize)]
 pub struct Column {

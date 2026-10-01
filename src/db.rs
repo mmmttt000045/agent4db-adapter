@@ -146,23 +146,17 @@ impl Db {
 
     pub async fn query(&self, kind: QKind, sql: &str) -> Result<Rows> {
         let client = self.pool.get().await.context("获取数据库连接失败")?;
-        let t = Instant::now();
-        let res = client.simple_query(sql).await;
-        self.meter.record(kind, t.elapsed().as_micros() as u64);
-        let msgs = res.map_err(|e| anyhow!("SQL 执行失败：{}", db_err(&e)))?;
-        let mut out = Rows::default();
-        for m in msgs {
-            if let SimpleQueryMessage::RowDescription(ref cols) = m {
-                out.cols = cols.iter().map(|c| c.name().to_string()).collect();
-            }
-            if let SimpleQueryMessage::Row(r) = m {
-                if out.cols.is_empty() {
-                    out.cols = r.columns().iter().map(|c| c.name().to_string()).collect();
-                }
-                out.rows.push((0..r.len()).map(|i| r.get(i).map(|s| s.to_string())).collect());
-            }
-        }
-        Ok(out)
+        timed_query(&client, &self.meter, kind, sql).await
+    }
+
+    /// 开启一个可重复读、只读的事务：之后经 `Snapshot::query` 的查询都看到同一个快照（取自事务里的第一条查询）。
+    pub async fn snapshot(&self) -> Result<Snapshot<'_>> {
+        let client = self.pool.get().await.context("获取数据库连接失败")?;
+        client
+            .simple_query("begin isolation level repeatable read read only")
+            .await
+            .map_err(|e| anyhow!("开启快照事务失败：{}", db_err(&e)))?;
+        Ok(Snapshot { client: Some(client), meter: &self.meter })
     }
 
     /// 执行写入语句（初始化与 ETL 用），返回最后一条命令影响的行数。
@@ -173,6 +167,54 @@ impl Db {
         self.meter.record(QKind::Meta, t.elapsed().as_micros() as u64);
         let msgs = res.map_err(|e| anyhow!("SQL 执行失败：{}", db_err(&e)))?;
         Ok(msgs.iter().filter_map(|m| if let SimpleQueryMessage::CommandComplete(n) = m { Some(*n) } else { None }).last().unwrap_or(0))
+    }
+}
+
+async fn timed_query(client: &tokio_postgres::Client, meter: &Meter, kind: QKind, sql: &str) -> Result<Rows> {
+    let t = Instant::now();
+    let res = client.simple_query(sql).await;
+    meter.record(kind, t.elapsed().as_micros() as u64);
+    let msgs = res.map_err(|e| anyhow!("SQL 执行失败：{}", db_err(&e)))?;
+    let mut out = Rows::default();
+    for m in msgs {
+        if let SimpleQueryMessage::RowDescription(ref cols) = m {
+            out.cols = cols.iter().map(|c| c.name().to_string()).collect();
+        }
+        if let SimpleQueryMessage::Row(r) = m {
+            if out.cols.is_empty() {
+                out.cols = r.columns().iter().map(|c| c.name().to_string()).collect();
+            }
+            out.rows.push((0..r.len()).map(|i| r.get(i).map(|s| s.to_string())).collect());
+        }
+    }
+    Ok(out)
+}
+
+/// 一个可重复读、只读事务。`commit` 后连接回到连接池；未提交就被丢弃时连接直接关闭（不回池），事务随之回滚，
+/// 半开的事务不会被后来的请求拿到。
+pub struct Snapshot<'a> {
+    client: Option<deadpool_postgres::Object>,
+    meter: &'a Meter,
+}
+
+impl Snapshot<'_> {
+    pub async fn query(&self, kind: QKind, sql: &str) -> Result<Rows> {
+        let client = self.client.as_ref().ok_or_else(|| anyhow!("快照事务已结束"))?;
+        timed_query(client, self.meter, kind, sql).await
+    }
+
+    pub async fn commit(mut self) -> Result<()> {
+        let client = self.client.take().ok_or_else(|| anyhow!("快照事务已结束"))?;
+        client.simple_query("commit").await.map_err(|e| anyhow!("提交快照事务失败：{}", db_err(&e)))?;
+        Ok(())
+    }
+}
+
+impl Drop for Snapshot<'_> {
+    fn drop(&mut self) {
+        if let Some(client) = self.client.take() {
+            drop(deadpool_postgres::Object::take(client));
+        }
     }
 }
 

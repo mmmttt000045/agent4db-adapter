@@ -1,8 +1,8 @@
 //! 指标经验的生命周期：提炼输入、晋升门槛（G1–G7）、查找与守护、执行端引用检查、受限修复与学习题回归（G8）。
 //! 依赖表有写入后的维护方式见 `Maint`：逐写入撤销、只看结构、定义级重验、条件级重验。
 
-use super::{join_key, outcome_text, scope_prefix, ver_sig, Ctx, Maint, Middle, SqlCall, TaskLog};
-use crate::catalog::TableVersion;
+use super::{inc, join_key, outcome_text, scope_prefix, ver_sig, Ctx, Maint, Middle, SqlCall, TaskLog};
+use crate::catalog::{self, TableVersion};
 use crate::checks::{same_on, Check, On, Outcome};
 use crate::db::QKind;
 use crate::knowledge::{Basis, Content, Entry, Example, JoinPath, Metric, Status};
@@ -215,6 +215,25 @@ fn grain_check(m: &Metric) -> Check {
     let mut cols = m.grain.clone();
     cols.sort();
     Check::KeyUnique { table: m.fact.clone(), cols, filter: fact_filter(m) }
+}
+
+/// 绑定快照执行要核对的条件（与 `metric_breach` 维护的条件一致）：各关联一侧的键唯一性、时间维度键的唯一性、
+/// 覆盖（附准入基线）、粒度。返回条件与覆盖基线（只有覆盖条件有）。
+fn bound_conditions(m: &Metric) -> Vec<(Check, Option<f64>)> {
+    let mut out = vec![];
+    for j in &m.joins {
+        let mut cols: Vec<String> = j.on.iter().map(|(_, r)| r.clone()).collect();
+        cols.sort();
+        out.push((Check::KeyUnique { table: j.right.clone(), cols, filter: j.filters.get(&j.right).cloned() }, None));
+    }
+    if let Some(t) = &m.time {
+        out.push((Check::KeyUnique { table: t.dim.clone(), cols: vec![t.dim_col.clone()], filter: None }, None));
+        if let Some(c) = coverage_check(m) {
+            out.push((c, Some(t.loss_ratio + COVERAGE_TOLERANCE)));
+        }
+    }
+    out.push((grain_check(m), None));
+    out
 }
 
 impl TaskLog {
@@ -1109,6 +1128,65 @@ impl Middle {
             }
         }
         Ok(None)
+    }
+
+    /// 绑定快照执行：在一个可重复读的只读事务里，先读事务性版本，逐条核对所引用修订的条件（同一条件在相同版本上
+    /// 已有结论就直接用，否则在该快照上执行检查），全部成立后在同一快照上执行业务 SQL。版本由写入事务内的触发器
+    /// 维护，所以快照读到的版本恰好对应它能看到的数据：核对与执行之间提交的写入对本次执行不可见。
+    /// 任一条件不成立即放弃快照并拒绝，同时让下一次请求重读版本，后续使用按常规维护处理。
+    pub(super) async fn run_bound(&self, ctx: &Ctx, sql: &str, refs: &[(String, u32)]) -> Result<Value> {
+        let mut conds: Vec<(Check, Option<f64>)> = vec![];
+        for (key, _) in refs {
+            let Some(e) = self.store.get(&self.mfk(ctx, key)) else { continue };
+            for c in metric_of(&e).map(bound_conditions).unwrap_or_default() {
+                if !conds.iter().any(|(k, _)| same_cond(k, &c.0) || k.key() == c.0.key()) {
+                    conds.push(c);
+                }
+            }
+        }
+        let snap = self.db.snapshot().await?;
+        let vers = catalog::tx_versions(&snap.query(QKind::Metric, "select table_name, v from mavra_versions").await?);
+        let (mut run, mut reused) = (0u32, 0u32);
+        for (c, baseline) in &conds {
+            let sig: Vec<String> = c.tables().iter().map(|t| format!("{t}={}", vers.get(t).copied().unwrap_or(-1))).collect();
+            let vkey = format!("{}@{}", c.key(), sig.join(","));
+            let known = self.snap_verdicts.lock().get(&vkey).copied();
+            let pass = match known {
+                Some(p) => {
+                    reused += 1;
+                    inc(&self.stats.snapshot_checks_reused);
+                    p
+                }
+                None => {
+                    let t = Instant::now();
+                    let o = c.eval(&snap.query(QKind::Metric, &c.sql()).await?, t.elapsed().as_secs_f64() * 1000.0);
+                    let p = match baseline {
+                        Some(b) => loss_of(&o) <= *b,
+                        None => o.pass,
+                    };
+                    self.snap_verdicts.lock().insert(vkey, p);
+                    run += 1;
+                    inc(&self.stats.snapshot_checks_run);
+                    p
+                }
+            };
+            if !pass {
+                drop(snap);
+                inc(&self.stats.snapshot_rejections);
+                self.invalidate_versions();
+                let reason = format!("执行快照上条件不成立：{}", c.describe());
+                self.metric_event(
+                    json!({"event": "snapshot_rejected", "refs": refs, "agent": ctx.agent, "reason": reason, "versions": vers}),
+                );
+                return Ok(json!({"rejected": true, "reason": reason, "metric": refs.first().map(|r| r.0.clone())}));
+            }
+        }
+        if self.cfg.exec_pause_ms > 0 {
+            tokio::time::sleep(std::time::Duration::from_millis(self.cfg.exec_pause_ms)).await;
+        }
+        let v = snap.query(QKind::Exec, sql).await?.to_json(self.cfg.max_rows);
+        snap.commit().await?;
+        Ok(json!({"result": v, "source": "snapshot", "snapshot": {"versions": vers, "checks_run": run, "checks_reused": reused}}))
     }
 
     async fn repair_gates(

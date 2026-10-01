@@ -4,14 +4,14 @@
 use crate::db::{Db, QKind};
 use crate::knowledge::{Basis, EmptyRule, JoinKind, JoinRef, Metric, TimeSpec};
 use crate::metric::{self, Ask, Period};
-use crate::middle::{Ctx, Maint, Middle, MiddleConfig};
+use crate::middle::{Checkpoint, Ctx, Maint, Middle, MiddleConfig};
 use crate::scenario::{self, Change};
-use crate::{etl, metricbench, server};
+use crate::{catalog, etl, metricbench, server};
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::sync::Arc;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 async fn tool(http: &reqwest::Client, base: &str, name: &str, args: Value) -> Result<Value> {
     let response = http
@@ -478,6 +478,347 @@ async fn postgres_repair_ambiguity() -> Result<()> {
     };
     std::fs::write(format!("{out}/report.json"), serde_json::to_string_pretty(&report)?)?;
     println!("修复歧义实验报告：{out}/report.json；测试库清理：{}", cleanup.is_ok());
+    cleanup.context("测试库清理失败")?;
+    result.context("实验超时")??;
+    Ok(())
+}
+
+// ───────────────────────── 快照绑定：核对与执行之间的并发写入（不调用 LLM） ─────────────────────────
+
+/// 违反 M1 粒度条件的写入：2002-06 至 2002-09 的门店销售整批重复一次（与重复装载场景相同，但不经过 ETL 通知）。
+const DUP_INJECT: &str = "insert into store_sales select s.* from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk \
+                          where d.d_date between date '2002-06-01' and date '2002-09-30'";
+const DUP_RESET: &str = "delete from store_sales a using store_sales b \
+                         where a.ss_ticket_number = b.ss_ticket_number and a.ss_item_sk = b.ss_item_sk and a.ctid > b.ctid";
+const SNAP_TABLES: [&str; 4] = ["store_sales", "store_returns", "date_dim", "item"];
+
+/// 一次带指标引用的 run_sql：served = 答案所在的数据满足所引用修订的粒度条件；violation = 不满足
+/// （探针在同一语句、同一快照里数出重复键）；rejected = 拒绝或指标不可用；error = 执行出错。
+fn classify(r: &Result<Value>) -> &'static str {
+    match r {
+        Err(_) => "error",
+        Ok(v) if v.get("rejected").is_some() => "rejected",
+        Ok(v) => match v["result"]["rows"][0][1].as_str().and_then(|d| d.parse::<i64>().ok()) {
+            Some(0) => "served",
+            Some(_) => "violation",
+            None => "error",
+        },
+    }
+}
+
+fn summary(xs: &mut [f64]) -> Value {
+    if xs.is_empty() {
+        return json!({"n": 0});
+    }
+    xs.sort_by(|a, b| a.total_cmp(b));
+    let q = |p: f64| xs[((xs.len() - 1) as f64 * p).round() as usize];
+    json!({"n": xs.len(), "mean": xs.iter().sum::<f64>() / xs.len() as f64, "p50": q(0.5), "p95": q(0.95), "max": q(1.0)})
+}
+
+struct SnapBench {
+    url: String,
+    admin: Db,
+    learn: Period,
+}
+
+struct SnapMid {
+    mid: Middle,
+    cp: Checkpoint,
+    refs: Vec<(String, u32)>,
+    /// 引用修订的规范 SQL（2002-07，落在重复区间内）加上同一语句里的重复键计数
+    probe: String,
+}
+
+impl SnapBench {
+    async fn middle(&self, snapshot: bool, pause_ms: u64) -> Result<SnapMid> {
+        let db = Arc::new(Db::connect(&self.url, 8, true)?);
+        let cfg = MiddleConfig {
+            name: if snapshot { "snapshot" } else { "precheck" }.into(),
+            metric_maint: Maint::Condition,
+            cond_reuse: true,
+            result_cache: false,
+            snapshot_exec: snapshot,
+            exec_pause_ms: pause_ms,
+            ..Default::default()
+        };
+        let mid = Middle::new(db, cfg).await?;
+        let m1 = seeded_metrics().into_iter().find(|(id, _)| *id == "M1").map(|x| x.1).context("缺少 M1")?;
+        let key = format!("metric:{}", m1.name);
+        let v = mid
+            .seed_metric(
+                &Ctx::new("A", "seed", "seed"),
+                m1,
+                Ask::Single { period: self.learn },
+                2,
+                &metricbench::gold_period("M1", &self.learn),
+            )
+            .await?;
+        ensure!(v["promoted"] == true, "M1 未晋升：{v}");
+        let u = mid.use_metric(&Ctx::new("B", "snapshot", "use"), &key).await?;
+        ensure!(u["status"] == "valid", "M1 不可用：{u}");
+        let m: Metric = serde_json::from_value(u["metric"].clone())?;
+        let canon = metric::compile(&m, &Ask::Single { period: Period::month(2002, 7) })?;
+        let probe = format!(
+            "select ({}) as v, (select count(*) - count(distinct (ss_ticket_number, ss_item_sk)) from store_sales) as dup",
+            canon.trim().trim_end_matches(';')
+        );
+        let refs = vec![(key, u["revision"].as_u64().unwrap_or(0) as u32)];
+        Ok(SnapMid { cp: mid.checkpoint(), mid, refs, probe })
+    }
+
+    async fn dml(&self) -> Result<i64> {
+        Ok(catalog::versions(&self.admin).await?.get("store_sales").map(|v| v.dml).unwrap_or(0))
+    }
+
+    /// 写入提交后再通知（ETL 的正常顺序）：登记批次、使中间层重读版本。
+    async fn inject_then_notify(&self, mid: &Middle) -> Result<()> {
+        self.admin.execute(DUP_INJECT).await?;
+        metricbench::log_batch(&self.admin, "store_sales", "重复装载（快照实验）").await?;
+        mid.invalidate_versions();
+        Ok(())
+    }
+
+    /// 去掉重复行，等统计计数稳定后把经验库恢复到写入前（数据内容已回到写入前）。
+    async fn reset(&self, s: &SnapMid) -> Result<()> {
+        let before = self.dml().await?;
+        if self.admin.execute(DUP_RESET).await? > 0 {
+            etl::wait_table_stats(&self.admin, "store_sales", before).await?;
+        }
+        tokio::time::sleep(Duration::from_millis(1500)).await;
+        s.mid.invalidate_versions();
+        s.mid.restore(&s.cp).await
+    }
+
+    /// 实验 A：确定性交错。write_during_pause = 核对通过后、执行前提交写入（未通知）；write_before_call = 写入刚提交、
+    /// 尚未通知时调用；write_notified = 写入提交并通知、统计已刷新后调用。每次先在干净数据上预热一次。
+    async fn interleave(&self, snapshot: bool, case: &str, trials: usize) -> Result<Value> {
+        let s = self.middle(snapshot, if case == "write_during_pause" { 2000 } else { 0 }).await?;
+        let ctx = Ctx::new("B", "snapshot", "use");
+        let mut counts: BTreeMap<&str, u32> = BTreeMap::new();
+        let (mut samples, mut lat) = (vec![], vec![]);
+        for i in 0..trials {
+            let warm = s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await;
+            ensure!(classify(&warm) == "served", "第 {i} 次预热应在干净数据上执行：{warm:?}");
+            let t = Instant::now();
+            let r = match case {
+                "write_during_pause" => {
+                    let (r, w) = tokio::join!(s.mid.run_sql_with(&ctx, &s.probe, &s.refs), async {
+                        tokio::time::sleep(Duration::from_millis(700)).await;
+                        self.admin.execute(DUP_INJECT).await
+                    });
+                    w?;
+                    r
+                }
+                "write_before_call" => {
+                    self.admin.execute(DUP_INJECT).await?;
+                    s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await
+                }
+                _ => {
+                    let before = self.dml().await?;
+                    self.inject_then_notify(&s.mid).await?;
+                    etl::wait_table_stats(&self.admin, "store_sales", before).await?;
+                    s.mid.invalidate_versions();
+                    s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await
+                }
+            };
+            lat.push(t.elapsed().as_secs_f64() * 1000.0);
+            let c = classify(&r);
+            *counts.entry(c).or_default() += 1;
+            if i < 2 {
+                let resp = match &r {
+                    Ok(v) => v.clone(),
+                    Err(e) => json!(format!("{e:#}")),
+                };
+                samples.push(json!({"class": c, "response": resp}));
+            }
+            self.reset(&s).await?;
+        }
+        Ok(json!({"mode": if snapshot { "snapshot" } else { "precheck" }, "case": case, "trials": trials, "counts": counts,
+                  "latency_ms": summary(&mut lat), "stats": s.mid.stats_json(), "samples": samples}))
+    }
+
+    /// 实验 B：随机并发。readers 个读者在窗口内连续调用；写者在随机时刻提交违反粒度的写入，随后登记批次并通知。
+    async fn stress(&self, snapshot: bool, trials: usize, readers: usize, window_ms: u64, seed: u64) -> Result<Value> {
+        use rand::{Rng, SeedableRng};
+        let s = self.middle(snapshot, 0).await?;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+        let mut counts: BTreeMap<&str, u32> = BTreeMap::new();
+        let (mut lat, mut after_commit, mut per_trial) = (vec![], vec![], vec![]);
+        for _ in 0..trials {
+            let at = rng.gen_range(300..window_ms - 300);
+            let start = Instant::now();
+            let reader = |k: usize| {
+                let s = &s;
+                async move {
+                    let ctx = Ctx::new(&format!("R{k}"), "snapshot", "use");
+                    let mut out = vec![];
+                    while start.elapsed() < Duration::from_millis(window_ms) {
+                        let t0 = start.elapsed().as_secs_f64() * 1000.0;
+                        let r = s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await;
+                        out.push((classify(&r), t0, start.elapsed().as_secs_f64() * 1000.0));
+                    }
+                    out
+                }
+            };
+            let writer = async {
+                tokio::time::sleep(Duration::from_millis(at)).await;
+                self.admin.execute(DUP_INJECT).await?;
+                let committed = start.elapsed().as_secs_f64() * 1000.0;
+                metricbench::log_batch(&self.admin, "store_sales", "重复装载（快照实验）").await?;
+                s.mid.invalidate_versions();
+                Ok::<_, anyhow::Error>((committed, start.elapsed().as_secs_f64() * 1000.0))
+            };
+            let (calls, w) = tokio::join!(futures::future::join_all((0..readers).map(reader)), writer);
+            let (committed, notified) = w?;
+            let mut trial: BTreeMap<&str, u32> = BTreeMap::new();
+            for (c, t0, t1) in calls.into_iter().flatten() {
+                *counts.entry(c).or_default() += 1;
+                *trial.entry(c).or_default() += 1;
+                lat.push(t1 - t0);
+                if c == "violation" {
+                    after_commit.push(t0 - committed);
+                }
+            }
+            per_trial.push(json!({"commit_ms": committed, "notify_ms": notified, "counts": trial}));
+            self.reset(&s).await?;
+        }
+        Ok(json!({"mode": if snapshot { "snapshot" } else { "precheck" }, "trials": trials, "readers": readers, "window_ms": window_ms,
+                  "counts": counts, "latency_ms": summary(&mut lat),
+                  "violation_start_minus_commit_ms": summary(&mut after_commit), "per_trial": per_trial, "stats": s.mid.stats_json()}))
+    }
+
+    /// 实验 C1：读者开销。无写入时（版本未变，结论直接用）与良性写入后（版本变了，条件在快照里重查）的调用延迟。
+    async fn reader_overhead(&self, snapshot: bool, calls: usize, writes: usize) -> Result<Value> {
+        let s = self.middle(snapshot, 0).await?;
+        let ctx = Ctx::new("B", "snapshot", "use");
+        for _ in 0..3 {
+            ensure!(classify(&s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await) == "served", "预热失败");
+        }
+        let mut steady = vec![];
+        for _ in 0..calls {
+            let t = Instant::now();
+            let r = s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await;
+            ensure!(classify(&r) == "served", "无写入时应正常执行：{r:?}");
+            steady.push(t.elapsed().as_secs_f64() * 1000.0);
+        }
+        let (mut first, mut second) = (vec![], vec![]);
+        for _ in 0..writes {
+            // 良性写入：内容不变，但版本前进（触发器与统计计数都会变）
+            let before = self.dml().await?;
+            self.admin
+                .execute(
+                    "update store_sales set ss_net_paid = ss_net_paid where (ss_ticket_number, ss_item_sk) = \
+                     (select ss_ticket_number, ss_item_sk from store_sales order by ss_ticket_number, ss_item_sk limit 1)",
+                )
+                .await?;
+            metricbench::log_batch(&self.admin, "store_sales", "良性写入（快照实验）").await?;
+            etl::wait_table_stats(&self.admin, "store_sales", before).await?;
+            s.mid.invalidate_versions();
+            for out in [&mut first, &mut second] {
+                let t = Instant::now();
+                let r = s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await;
+                ensure!(classify(&r) == "served", "良性写入后应正常执行：{r:?}");
+                out.push(t.elapsed().as_secs_f64() * 1000.0);
+            }
+        }
+        Ok(json!({"mode": if snapshot { "snapshot" } else { "precheck" }, "steady_ms": summary(&mut steady),
+                  "first_after_write_ms": summary(&mut first), "second_after_write_ms": summary(&mut second), "stats": s.mid.stats_json()}))
+    }
+
+    /// 实验 C2：写者开销。单行更新的吞吐：顺序、以及 8 个连接并发（各改不同的行，但同表的版本行要排队）。
+    async fn writer_overhead(&self, per_worker: usize) -> Result<Value> {
+        let pool = Db::connect(&self.url, 8, false)?;
+        pool.query(
+            QKind::Meta,
+            "drop table if exists bench_w; create table bench_w (id int primary key, x int not null default 0); \
+                                 insert into bench_w (id) select g from generate_series(0, 7999) g",
+        )
+        .await?;
+        let run = |workers: usize| {
+            let pool = &pool;
+            async move {
+                let t = Instant::now();
+                let jobs = (0..workers).map(|w| async move {
+                    for i in 0..per_worker {
+                        pool.execute(&format!("update bench_w set x = x + 1 where id = {}", w * 1000 + i % 1000)).await?;
+                    }
+                    Ok::<_, anyhow::Error>(())
+                });
+                for r in futures::future::join_all(jobs).await {
+                    r?;
+                }
+                Ok::<_, anyhow::Error>((workers * per_worker) as f64 / t.elapsed().as_secs_f64())
+            }
+        };
+        let mut out = vec![];
+        for round in 0..3 {
+            for trig in [false, true] {
+                if trig {
+                    catalog::install_tx_versions(&pool, &["bench_w"]).await?;
+                } else {
+                    pool.query(QKind::Meta, "drop trigger if exists mavra_bump on bench_w").await?;
+                }
+                let seq = run(1).await?;
+                let conc = run(8).await?;
+                out.push(json!({"round": round, "trigger": trig, "sequential_stmt_per_s": seq, "concurrent8_stmt_per_s": conc}));
+            }
+        }
+        pool.query(QKind::Meta, "drop table bench_w; delete from mavra_versions where table_name = 'bench_w'").await?;
+        Ok(json!(out))
+    }
+}
+
+async fn snapshot_binding(url: &str) -> Result<Value> {
+    let admin = Db::connect(url, 2, false)?;
+    let rows = std::env::var("AGENTDB_SCENARIO_ROWS").ok().and_then(|v| v.parse().ok()).unwrap_or(200_000);
+    admin.query(QKind::Meta, &metricbench::fixture(rows)).await?;
+    etl::setup(&admin).await?;
+    scenario::setup(&admin).await?;
+    catalog::install_tx_versions(&admin, &SNAP_TABLES).await?;
+    admin.query(QKind::Meta, "analyze").await?;
+    let b = SnapBench { url: url.to_string(), admin, learn: Period::month(2001, 3) };
+    let trials = std::env::var("AGENTDB_SNAP_TRIALS").ok().and_then(|v| v.parse().ok()).unwrap_or(10);
+    let mut interleavings = vec![];
+    for case in ["write_during_pause", "write_before_call", "write_notified"] {
+        for snapshot in [false, true] {
+            interleavings.push(b.interleave(snapshot, case, trials).await?);
+        }
+    }
+    let mut stress = vec![];
+    for snapshot in [false, true] {
+        stress.push(b.stress(snapshot, 2 * trials, 4, 3000, 20261002).await?);
+    }
+    let mut readers = vec![];
+    for snapshot in [false, true] {
+        readers.push(b.reader_overhead(snapshot, 40, trials).await?);
+    }
+    let writers = b.writer_overhead(500).await?;
+    Ok(json!({"rows": rows, "trials": trials, "interleavings": interleavings, "stress": stress,
+              "reader_overhead": readers, "writer_overhead": writers}))
+}
+
+#[tokio::test]
+#[ignore = "experiment; requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission"]
+async fn postgres_snapshot_binding() -> Result<()> {
+    let _ = dotenvy::dotenv();
+    let url = std::env::var("AGENTDB_TEST_URL").context("设置 AGENTDB_TEST_URL 为测试服务器连接串")?;
+    let admin = Db::connect(&url, 1, false)?;
+    let unique = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
+    let name = format!("agentdb_snap_{}_{unique}", std::process::id());
+    let mut test_url = reqwest::Url::parse(&url)?;
+    test_url.set_path(&format!("/{name}"));
+    admin.query(QKind::Meta, &format!("create database {name}")).await.context("无法创建独立测试库")?;
+    let result = tokio::time::timeout(Duration::from_secs(5400), snapshot_binding(test_url.as_str())).await;
+    let cleanup = admin.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
+    let out = format!("results/snapshot-binding-{unique}");
+    std::fs::create_dir_all(&out)?;
+    let report = match &result {
+        Ok(Ok(v)) => v.clone(),
+        Ok(Err(e)) => json!({"status": "failed", "error": format!("{e:#}")}),
+        Err(_) => json!({"status": "failed", "error": "实验超时"}),
+    };
+    std::fs::write(format!("{out}/report.json"), serde_json::to_string_pretty(&report)?)?;
+    println!("快照绑定实验报告：{out}/report.json；测试库清理：{}", cleanup.is_ok());
     cleanup.context("测试库清理失败")?;
     result.context("实验超时")??;
     Ok(())

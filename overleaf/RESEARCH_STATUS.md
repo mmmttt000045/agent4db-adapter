@@ -53,7 +53,7 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 | 相同条件的在途合并 / in-flight merging | 各重验证方法相同 / shared by revalidation baselines |
 | 修订引用检查与 SQL 审查 / revision checks and SQL review | 已实现，仅覆盖显式声明；维表拉链中 SQL 审查挡住了过期定义的放大连接 / implemented for declared uses |
 | 受限修复及 G8 回归 / restricted repair and regression | 已实现；只能加过滤，无法去重或重映射键 / filter-only repair |
-| 同快照验证与执行 / same-snapshot validation and execution | **未实现**；正文明确标为设计协议 / not implemented |
+| 同快照验证与执行 / same-snapshot validation and execution | 已实现，默认关闭（事务性版本 + 可重复读快照内核对并执行）；并发写入实验见 `exp/2026-10-02-cache-baseline-tpcds`；**正文尚未更新**，仍写作设计协议 / implemented (opt-in), paper text not yet updated |
 | 取值层面的条件（如单位）/ value-level conditions | **未建模**；单位变化场景为对照 / not modeled |
 | 修复进行中的请求等待 / wait for in-progress repair | **未完成**，不可用数如上 / incomplete |
 | AgentSM 式轨迹检索基线 / matched trajectory retrieval | **未实现**，不填写相对它的正确率优势 / not implemented |

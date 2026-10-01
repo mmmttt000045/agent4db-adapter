@@ -10,6 +10,7 @@ pub const INTERNAL_TABLES: &[&str] = &["etl_batch_log", "mavra_versions"];
 
 /// 事务性表版本：语句级触发器在写入事务里把表的版本号加一，随写入一起提交，因此任一快照里读到的版本
 /// 与该快照看到的数据一致（pg_stat 的 DML 计数不随事务提交、且异步上报，做不到这一点）。幂等。
+#[cfg_attr(not(test), allow(dead_code))] // 目前只有快照绑定实验调用
 pub async fn install_tx_versions(db: &Db, tables: &[&str]) -> Result<()> {
     let mut sql = String::from(
         "create table if not exists mavra_versions (table_name text primary key, v bigint not null default 0); \

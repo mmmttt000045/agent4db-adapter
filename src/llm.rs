@@ -34,6 +34,9 @@ pub struct Reply {
     pub output_tokens: u64,
     /// 服务端回报的实际模型名（中转站可能与请求的模型不同）
     pub model: Option<String>,
+    /// 因回报模型不符而丢弃的回复数及其 token（不计入 input/output_tokens）
+    pub discarded: u32,
+    pub discarded_tokens: u64,
 }
 
 #[derive(Default)]
@@ -41,6 +44,10 @@ pub struct OpenAiOptions {
     reasoning_effort: Option<String>,
     thinking: Option<String>,
     preserve_reasoning: bool,
+    /// 只接受服务端回报为该模型名的回复（`*_REQUIRE_MODEL`）；不符的丢弃重发
+    require_model: Option<String>,
+    /// 设置 require_model 时每轮并发发出的相同请求数（`*_HEDGE`，默认 1）
+    hedge: usize,
 }
 
 /// OpenAi.vendor：报告中的服务名；openai 配置记为 openai-compatible，与旧报告一致
@@ -94,7 +101,13 @@ impl Provider {
                 model: var("MODEL").ok_or_else(|| anyhow!("缺少 {prefix}_MODEL（如 deepseek-flash、glm-5.3、gpt-5）"))?,
                 base,
                 http: http(),
-                options: OpenAiOptions { reasoning_effort: var("REASONING_EFFORT"), thinking, preserve_reasoning },
+                options: OpenAiOptions {
+                    reasoning_effort: var("REASONING_EFFORT"),
+                    thinking,
+                    preserve_reasoning,
+                    require_model: var("REQUIRE_MODEL"),
+                    hedge: var("HEDGE").and_then(|h| h.parse().ok()).unwrap_or(1).clamp(1, 8),
+                },
             });
         }
         Ok(match kind {
@@ -120,7 +133,8 @@ impl Provider {
         match self {
             Provider::Anthropic { base, model, .. } => json!({"provider": "anthropic", "base_url": base, "model": model}),
             Provider::OpenAi { vendor, base, model, options, .. } => json!({"provider": vendor, "base_url": base, "model": model,
-                "reasoning_effort": options.reasoning_effort, "thinking": options.thinking}),
+                "reasoning_effort": options.reasoning_effort, "thinking": options.thinking,
+                "require_model": options.require_model, "hedge": options.hedge}),
         }
     }
 
@@ -147,10 +161,21 @@ async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> 
                 let status = r.status();
                 let retry_after = r.headers().get("retry-after").and_then(|v| v.to_str().ok()).and_then(|v| v.trim().parse::<u64>().ok());
                 let text = r.text().await.unwrap_or_default();
-                if status.is_success() {
-                    return serde_json::from_str(&text).context("响应不是 JSON");
-                }
                 let last = format!("HTTP {status}: {}", text.chars().take(500).collect::<String>());
+                if status.is_success() {
+                    // 中转站偶尔以 200 返回错误页，按服务端错误重试
+                    match serde_json::from_str(&text) {
+                        Ok(v) => return Ok(v),
+                        Err(_) => {
+                            failures += 1;
+                            if failures > 3 {
+                                bail!("响应多次不是 JSON：{last}");
+                            }
+                            tokio::time::sleep(Duration::from_secs(2u64.pow(failures))).await;
+                            continue;
+                        }
+                    }
+                }
                 if let Some(reset) = (status.as_u16() == 429).then(|| cap_reset_secs(&text)).flatten() {
                     capped += 1;
                     if reset > 3 * 3600 {
@@ -279,6 +304,33 @@ async fn anthropic_chat(
 
 // ───────────────────────── OpenAI 兼容 Chat Completions ─────────────────────────
 
+/// 设置了 require_model 时最多发出的轮数（每轮 hedge 个并发请求）
+const MODEL_ROUNDS: u32 = 15;
+
+/// 发出请求；设置了 require_model 时，回报模型不符的回复丢弃，每轮并发 hedge 份，取第一个相符的。
+/// 返回 (响应, 丢弃数, 丢弃回复的 token)。
+async fn post_model(req: &reqwest::RequestBuilder, body: &Value, options: &OpenAiOptions) -> Result<(Value, u32, u64)> {
+    let clone = || req.try_clone().ok_or_else(|| anyhow!("请求无法重试"));
+    let Some(want) = &options.require_model else { return Ok((post_json(clone()?, body).await?, 0, 0)) };
+    let (mut discarded, mut wasted, mut last) = (0u32, 0u64, String::new());
+    for _ in 0..MODEL_ROUNDS {
+        let mut pending: futures::stream::FuturesUnordered<_> =
+            (0..options.hedge.max(1)).map(|_| clone().map(|r| post_json(r, body))).collect::<Result<_>>()?;
+        while let Some(r) = futures::StreamExt::next(&mut pending).await {
+            match r {
+                Ok(v) if v["model"].as_str() == Some(want.as_str()) => return Ok((v, discarded, wasted)),
+                Ok(v) => {
+                    discarded += 1;
+                    wasted += v["usage"]["total_tokens"].as_u64().unwrap_or(0);
+                    last = format!("服务端回报模型 {}", v["model"].as_str().unwrap_or("?"));
+                }
+                Err(e) => last = format!("{e:#}"),
+            }
+        }
+    }
+    bail!("{MODEL_ROUNDS} 轮内没有拿到 {want} 的回复（丢弃 {discarded} 个；最后：{last}）")
+}
+
 async fn openai_chat(
     http: &reqwest::Client,
     base: &str,
@@ -327,7 +379,7 @@ async fn openai_chat(
     if cline {
         req = req.header("x-client-type", "cline-cli");
     }
-    let mut v = post_json(req, &body).await?;
+    let (mut v, discarded, discarded_tokens) = post_model(&req, &body, options).await?;
     if cline && v.get("data").is_some() {
         v = v["data"].take();
     }
@@ -342,6 +394,8 @@ async fn openai_chat(
         input_tokens: v["usage"]["prompt_tokens"].as_u64().unwrap_or(0),
         output_tokens: v["usage"]["completion_tokens"].as_u64().unwrap_or(0),
         model: v["model"].as_str().map(str::to_string),
+        discarded,
+        discarded_tokens,
         ..Default::default()
     };
     for c in msg["tool_calls"].as_array().into_iter().flatten() {
@@ -413,6 +467,9 @@ pub struct AgentRun {
     pub clarification: Option<String>,
     /// 服务端回报的实际模型名 → 次数
     pub served_models: std::collections::BTreeMap<String, u32>,
+    /// 因回报模型不符而丢弃的回复数与 token（中转站的额外代价，不进入轨迹）
+    pub discarded_replies: u32,
+    pub discarded_tokens: u64,
 }
 
 /// JSON Lines 记录（一行一个对象，每行写完即落盘）。`Middle::trace` 设置后，Agent 循环逐次记录工具调用。
@@ -465,6 +522,8 @@ pub async fn run_agent_with(
         if let Some(m) = &r.model {
             *run.served_models.entry(m.clone()).or_default() += 1;
         }
+        run.discarded_replies += r.discarded;
+        run.discarded_tokens += r.discarded_tokens;
         turns.push(Turn::Assistant { raw: r.raw.clone() });
         if r.calls.is_empty() {
             run.answer = Some(r.text.trim().to_string());
@@ -515,7 +574,7 @@ pub async fn run_agent_with(
                     "agent": ctx.agent, "session": ctx.session, "task": ctx.task, "step": run.steps, "seq": seq,
                     "tool": c.name, "args": c.input, "status": status, "t0_ms": t0, "ms": started.elapsed().as_secs_f64() * 1000.0,
                     "rows": out["result"]["row_count"], "ref": out["ref"], "result": result,
-                    "thought": if seq == 0 { thought(&r) } else { Value::Null }, "served_model": r.model,
+                    "thought": if seq == 0 { thought(&r) } else { Value::Null }, "served_model": r.model, "discarded": r.discarded,
                 }));
             }
         }
@@ -584,7 +643,12 @@ mod provider_tests {
             key: "test-key".into(),
             base: format!("http://{addr}"),
             model: "deepseek-flash".into(),
-            options: OpenAiOptions { reasoning_effort: Some("max".into()), thinking: Some("enabled".into()), preserve_reasoning: true },
+            options: OpenAiOptions {
+                reasoning_effort: Some("max".into()),
+                thinking: Some("enabled".into()),
+                preserve_reasoning: true,
+                ..Default::default()
+            },
             http: reqwest::Client::builder().no_proxy().build().unwrap(),
         };
         let turns = vec![
@@ -598,6 +662,35 @@ mod provider_tests {
         ];
         let reply = provider.chat("test", &turns, &tool_specs(true)).await.unwrap();
         assert_eq!(reply.text, "OK");
+        server.abort();
+    }
+
+    #[tokio::test]
+    async fn required_model_discards_other_replies() {
+        use std::sync::atomic::{AtomicU32, Ordering};
+        static CALLS: AtomicU32 = AtomicU32::new(0);
+        let app = Router::new().route(
+            "/chat/completions",
+            post(|| async {
+                let n = CALLS.fetch_add(1, Ordering::SeqCst);
+                let model = if n < 2 { "old-model" } else { "want-model" };
+                Json(json!({"model": model, "usage": {"prompt_tokens": 5, "completion_tokens": 1, "total_tokens": 6},
+                            "choices": [{"message": {"role": "assistant", "content": model}}]}))
+            }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+        let provider = Provider::OpenAi {
+            vendor: "kunyou",
+            key: "test-key".into(),
+            base: format!("http://{addr}"),
+            model: "want-model".into(),
+            options: OpenAiOptions { require_model: Some("want-model".into()), hedge: 1, ..Default::default() },
+            http: reqwest::Client::builder().no_proxy().build().unwrap(),
+        };
+        let reply = provider.chat("test", &[Turn::User("test".into())], &[]).await.unwrap();
+        assert_eq!((reply.text.as_str(), reply.discarded, reply.discarded_tokens), ("want-model", 2, 12));
         server.abort();
     }
 

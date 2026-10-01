@@ -39,6 +39,9 @@ pub struct Options {
     /// 共享度：每个口径族取前 k 个口径（族不足 k 个时取全部），可给多个值做扫描，如 1,2,4,6；6 为全部 19 个
     #[arg(long, value_delimiter = ',', default_value = "6", value_parser = clap::value_parser!(u32).range(1..=6))]
     share: Vec<u32>,
+    /// 参与的口径族。只取 store,returns,catalog 并配合 --share 1 时，三个口径的条件互不重叠（零共享对照）
+    #[arg(long, value_delimiter = ',', default_value = "store,returns,ratio,catalog", value_parser = ["store", "returns", "ratio", "catalog"])]
+    families: Vec<String>,
     #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=10))]
     repeats: u32,
     #[arg(long, default_value_t = 42)]
@@ -61,6 +64,15 @@ enum Family {
 }
 
 impl Family {
+    fn name(self) -> &'static str {
+        match self {
+            Family::Store => "store",
+            Family::Returns => "returns",
+            Family::Ratio => "ratio",
+            Family::Catalog => "catalog",
+        }
+    }
+
     /// (事实表, 粒度键, 时间键)
     fn fact(self) -> (&'static str, [&'static str; 2], &'static str) {
         match self {
@@ -103,10 +115,11 @@ static SPECS: [Spec; 19] = [
 ];
 
 /// 共享度 k：每个族取前 k 个。k 越小，共享同一条件的口径越少（门店销售族与比率族之间仍共享门店销售的条件）。
-fn specs(share: u32) -> Vec<&'static Spec> {
+fn specs(share: u32, families: &[String]) -> Vec<&'static Spec> {
     SPECS
         .iter()
         .enumerate()
+        .filter(|(_, s)| families.iter().any(|f| f == s.family.name()))
         .filter(|(i, s)| SPECS[..*i].iter().filter(|x| x.family == s.family).count() < share as usize)
         .map(|(_, s)| s)
         .collect()
@@ -512,7 +525,7 @@ async fn cell(env: &Env<'_>, policy_name: &str, arrival: &str, repeat: u32, shar
     let m0 = db.meter.snap();
     let t0 = Instant::now();
     let mut seeded = vec![];
-    let chosen = specs(share);
+    let chosen = specs(share, &env.o.families);
     for sp in &chosen {
         seeded.push(mid.seed_metric(&ctx, metric(sp), Ask::Single { period: learn_period() }, 2, &gold(sp, &learn_period())).await?);
     }

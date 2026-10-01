@@ -34,6 +34,9 @@ pub enum Change {
     LateKey,
     /// 未建模：2002-07 起门店销售金额改以“分”记录
     Unit,
+    /// 粒度（语义歧义，受限修复的反例）：退货表写入整份备份副本（来源列取 backup），2002 年被更正的退货在副本里仍是旧金额。
+    /// 取 primary 或 backup 都能恢复唯一性且不丢键，只有业务语义能区分；不在 ALL 中，需显式指定
+    Mirror,
 }
 
 pub const ALL: [Change; 10] = [
@@ -56,11 +59,20 @@ const DUP_FROM: &str = "2002-06-01";
 const DUP_TO: &str = "2002-09-30";
 const UNIT_FROM: &str = "2002-07-01";
 
+/// 备份副本场景中被更正的退货（2002 年起、小票号尾数为 3）。
+const MIRROR_FIXED: &str = "sr_ticket_number % 10 = 3 and sr_returned_date_sk >= 732";
+
+const RETURNS_COLS: &str = "sr_returned_date_sk, sr_item_sk, sr_ticket_number, sr_return_quantity, sr_return_amt, sr_return_tax, \
+                            sr_fee, sr_net_loss, sr_status";
+
 const SALES_COLS: &str = "ss_sold_date_sk, ss_item_sk, ss_ticket_number, ss_quantity, ss_sales_price, ss_ext_sales_price, \
                           ss_ext_discount_amt, ss_net_paid, ss_net_paid_inc_tax, ss_net_profit";
 
 impl Change {
     pub fn parse(s: &str) -> Result<Change> {
+        if s == "mirror" {
+            return Ok(Change::Mirror);
+        }
         match NAMES.iter().position(|n| *n == s) {
             Some(i) => Ok(ALL[i]),
             None => bail!("未知场景：{s}（可选 {}）", NAMES.join(" / ")),
@@ -68,7 +80,10 @@ impl Change {
     }
 
     pub fn name(self) -> &'static str {
-        NAMES[ALL.iter().position(|c| *c == self).unwrap_or(0)]
+        match self {
+            Change::Mirror => "mirror",
+            _ => NAMES[ALL.iter().position(|c| *c == self).unwrap_or(0)],
+        }
     }
 
     /// 报告中的中文名称
@@ -84,6 +99,7 @@ impl Change {
             Change::DimHistory => "维表拉链",
             Change::LateKey => "日期键格式变化",
             Change::Unit => "金额单位变化",
+            Change::Mirror => "备份副本",
         }
     }
 
@@ -91,7 +107,7 @@ impl Change {
     pub fn class(self) -> &'static str {
         match self {
             Change::Append | Change::Backfill | Change::Correct | Change::AddColumn => "正常",
-            Change::Status | Change::Revision | Change::Duplicate => "粒度",
+            Change::Status | Change::Revision | Change::Duplicate | Change::Mirror => "粒度",
             Change::DimHistory => "连接放大",
             Change::LateKey => "覆盖",
             Change::Unit => "未建模",
@@ -110,13 +126,16 @@ impl Change {
             Change::DimHistory => "商品键能被 3 整除的商品增加一条旧版本行（i_is_current = 'N'，类别为旧类别）",
             Change::LateKey => "先按“正常追加”补录 2002-09 销售，再把这批行的日期键改为 yyyymmdd",
             Change::Unit => "2002-07-01 起门店销售的价格与金额列乘以 100",
+            Change::Mirror => {
+                "2002 年小票号尾数为 3 的退货金额更正减 1；另写入整份退货备份副本（sr_source = 'backup'），被更正的行在副本里仍是旧金额"
+            }
         }
     }
 
     /// 被写入的表；评测只重问读这些表的指标
     pub fn tables(self) -> &'static [&'static str] {
         match self {
-            Change::Backfill | Change::AddColumn | Change::Status => &["store_returns"],
+            Change::Backfill | Change::AddColumn | Change::Status | Change::Mirror => &["store_returns"],
             Change::DimHistory => &["item"],
             _ => &["store_sales"],
         }
@@ -173,6 +192,16 @@ impl Change {
                 )
                 .await?;
                 Ok(n)
+            }
+            Change::Mirror => {
+                write(
+                    db,
+                    "store_returns",
+                    "更正 2002 年部分退货金额",
+                    "update store_returns set sr_return_amt = sr_return_amt - 1 \
+                     where sr_ticket_number % 10 = 3 and sr_returned_date_sk >= 732",
+                )
+                .await
             }
             Change::AddColumn | Change::Status | Change::Duplicate | Change::DimHistory | Change::Unit => Ok(0),
         }
@@ -240,6 +269,26 @@ impl Change {
                 )
                 .await
             }
+            Change::Mirror => {
+                db.query(
+                    QKind::Meta,
+                    "alter table store_returns add column sr_source varchar(10) not null default 'primary'; \
+                     comment on column store_returns.sr_source is '来源系统标识'",
+                )
+                .await?;
+                write(
+                    db,
+                    "store_returns",
+                    "写入退货备份副本",
+                    &format!(
+                        "insert into store_returns ({RETURNS_COLS}, sr_source) \
+                         select sr_returned_date_sk, sr_item_sk, sr_ticket_number, sr_return_quantity, \
+                                sr_return_amt + case when {MIRROR_FIXED} then 1 else 0 end, \
+                                sr_return_tax, sr_fee, sr_net_loss, sr_status, 'backup' from store_returns where sr_source = 'primary'"
+                    ),
+                )
+                .await
+            }
             Change::Append | Change::Backfill | Change::Correct | Change::Revision => Ok(0),
         }
     }
@@ -297,6 +346,18 @@ impl Change {
             }
             Change::DimHistory => {
                 write(db, "item", "撤回商品历史版本", "delete from item where i_is_current = 'N'").await?;
+                Ok(())
+            }
+            Change::Mirror => {
+                write(db, "store_returns", "删除退货备份副本", "delete from store_returns where sr_source = 'backup'").await?;
+                db.query(QKind::Meta, "alter table store_returns drop column if exists sr_source").await?;
+                write(
+                    db,
+                    "store_returns",
+                    "撤回退货金额更正",
+                    &format!("update store_returns set sr_return_amt = sr_return_amt + 1 where {MIRROR_FIXED}"),
+                )
+                .await?;
                 Ok(())
             }
             Change::Unit => {

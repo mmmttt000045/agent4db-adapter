@@ -189,7 +189,164 @@ fn expected(c: Change) -> [&'static str; 4] {
         Change::Revision => [V1, V0, V1, V1],
         Change::Duplicate | Change::LateKey => [NA, V0, NA, NA],
         Change::DimHistory => [V0, V0, V0, V1],
+        Change::Mirror => [V0, V1, V1, V0],
     }
+}
+
+/// M2 / M3 换上指定的退货表过滤（M2 在事实表上，M3 在与退货的关联上），用于逐个评估修复候选。
+fn with_returns_filter(id: &str, m: &Metric, f: &str) -> Metric {
+    let mut m = m.clone();
+    if id == "M2" {
+        m.filters.insert("store_returns".into(), f.into());
+    } else if let Some(j) = m.joins.iter_mut().find(|j| j.right == "store_returns") {
+        j.filters.insert("store_returns".into(), f.into());
+    }
+    m
+}
+
+/// 受限修复的语义歧义（实验，只记录不断言答对）。备份副本场景下 sr_source = 'primary' 与 'backup' 都能恢复
+/// 退货粒度且不丢键，学习期（2001-03）不受更正影响，两者都能通过 G8；只有 2002 年的新问题能分出对错。
+/// 记录 MAVRA 两种维护方式实际选出的过滤与回答，以及两个候选在修复判定、G8 与新问题上的逐项结果。
+async fn repair_ambiguity(url: &str) -> Result<Value> {
+    let admin = Db::connect(url, 2, false)?;
+    let rows = std::env::var("AGENTDB_SCENARIO_ROWS").ok().and_then(|v| v.parse().ok()).unwrap_or(200_000);
+    admin.query(QKind::Meta, &metricbench::fixture(rows)).await?;
+    etl::setup(&admin).await?;
+    scenario::setup(&admin).await?;
+    let v1 = scenario::fingerprint(&admin).await?;
+    let ch = Change::Mirror;
+    let learn = Period::month(2001, 3);
+    let asks = [
+        Ask::Single { period: Period::month(2002, 9) },
+        Ask::Single { period: Period::month(2002, 5) },
+        Ask::RankMonth { year: 2002 },
+        Ask::Single { period: Period::month(2001, 6) },
+    ];
+    let gold = |id: &str, a: &Ask| match a {
+        Ask::Single { period } => metricbench::gold_period(id, period),
+        Ask::RankMonth { year } => metricbench::gold_rank(id, *year),
+        Ask::Diff { .. } => unreachable!(),
+    };
+    let returns: Vec<(&str, Metric)> = seeded_metrics().into_iter().filter(|(id, _)| matches!(*id, "M2" | "M3")).collect();
+    let answer = |sql: String| {
+        let admin = &admin;
+        async move { Ok::<_, anyhow::Error>(admin.query(QKind::Meta, &sql).await?.cell(0, 0).unwrap_or("NULL").to_string()) }
+    };
+    let same = |a: &Ask, x: &str, y: &str| {
+        let dec = if matches!(a, Ask::RankMonth { .. }) { 0 } else { 2 };
+        metric::same_value(&metric::parse_answer(x), &metric::parse_answer(y), dec)
+    };
+    let mut runs = vec![];
+    for maint in [Maint::Condition, Maint::Definition] {
+        let db = Arc::new(Db::connect(url, 4, true)?);
+        let cfg = MiddleConfig {
+            name: maint.name().into(),
+            version_ttl_ms: 0,
+            metric_maint: maint,
+            cond_reuse: maint == Maint::Condition,
+            ..Default::default()
+        };
+        let mid = Middle::new(db, cfg).await?;
+        let seed = Ctx::new("A", "seed", "seed");
+        for (id, m) in &returns {
+            let v = mid.seed_metric(&seed, m.clone(), Ask::Single { period: learn }, 2, &metricbench::gold_period(id, &learn)).await?;
+            ensure!(v["promoted"] == true, "{id} 未晋升：{v}");
+        }
+        ch.apply_truth(&admin).await?;
+        let mut expect = BTreeMap::new();
+        for (id, _) in &returns {
+            for (i, a) in asks.iter().enumerate() {
+                expect.insert((*id, i), answer(gold(id, a)).await?);
+            }
+        }
+        ch.apply_hidden(&admin).await?;
+        mid.invalidate_versions();
+        let ctx = Ctx::new("B", ch.name(), "use");
+        let mut served = vec![];
+        for (id, m) in &returns {
+            let v = mid.use_metric(&ctx, &format!("metric:{}", m.name)).await?;
+            let mut answers = vec![];
+            if v["status"] == "valid" {
+                let got: Metric = serde_json::from_value(v["metric"].clone())?;
+                for (i, a) in asks.iter().enumerate() {
+                    let value = answer(metric::compile(&got, a)?).await?;
+                    answers.push(json!({"ask": a, "value": value, "gold": expect[&(*id, i)], "ok": same(a, &value, &expect[&(*id, i)])}));
+                }
+                served.push(json!({"metric": id, "status": "valid", "revision": v["revision"], "filters": got.filters,
+                                   "join_filters": got.joins.iter().map(|j| &j.filters).collect::<Vec<_>>(), "answers": answers}));
+            } else {
+                served.push(json!({"metric": id, "status": v["status"]}));
+            }
+        }
+        runs.push(json!({"maint": maint.name(), "served": served, "events": mid.take_metric_events()}));
+        ch.reset(&admin).await?;
+        scenario::ensure_v1(&admin, &v1, ch.name()).await?;
+    }
+    // 两个候选逐项评估：修复判定（每键恰一行、不丢键）、G8（学习期规范 SQL 与判题查询一致）、新问题是否答对
+    ch.apply_truth(&admin).await?;
+    let mut expect = BTreeMap::new();
+    for (id, _) in &returns {
+        for (i, a) in asks.iter().enumerate() {
+            expect.insert((*id, i), answer(gold(id, a)).await?);
+        }
+    }
+    ch.apply_hidden(&admin).await?;
+    let total = answer("select count(distinct (sr_ticket_number, sr_item_sk)) from store_returns".into()).await?;
+    let mut candidates = vec![];
+    for v in ["primary", "backup"] {
+        let f = format!("sr_source = '{v}'");
+        let r = admin
+            .query(QKind::Meta, &format!("select count(*), count(distinct (sr_ticket_number, sr_item_sk)) from store_returns where {f}"))
+            .await?;
+        let (n, k) = (r.cell(0, 0).unwrap_or("0").to_string(), r.cell(0, 1).unwrap_or("0").to_string());
+        let mut per_metric = vec![];
+        for (id, m) in &returns {
+            let mm = with_returns_filter(id, m, &f);
+            let g8_expect = answer(metricbench::gold_period(id, &learn)).await?;
+            let g8_got = answer(metric::compile(&mm, &Ask::Single { period: learn })?).await?;
+            let learn_ask = Ask::Single { period: learn };
+            let mut new_asks = vec![];
+            for (i, a) in asks.iter().enumerate() {
+                let value = answer(metric::compile(&mm, a)?).await?;
+                new_asks.push(json!({"ask": a, "value": value, "gold": expect[&(*id, i)], "ok": same(a, &value, &expect[&(*id, i)])}));
+            }
+            per_metric
+                .push(json!({"metric": id, "g8": {"value": g8_got, "judge": g8_expect, "pass": same(&learn_ask, &g8_got, &g8_expect)},
+                                   "asks": new_asks}));
+        }
+        candidates.push(json!({"filter": f, "rows": n, "keys": k, "total_keys": total, "repair_test_passes": n == k && k == total,
+                               "metrics": per_metric}));
+    }
+    ch.reset(&admin).await?;
+    scenario::ensure_v1(&admin, &v1, ch.name()).await?;
+    Ok(json!({"rows": rows, "change": ch.describe(), "learn": learn, "runs": runs, "candidates": candidates}))
+}
+
+#[tokio::test]
+#[ignore = "experiment; requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission"]
+async fn postgres_repair_ambiguity() -> Result<()> {
+    let _ = dotenvy::dotenv();
+    let url = std::env::var("AGENTDB_TEST_URL").context("设置 AGENTDB_TEST_URL 为测试服务器连接串")?;
+    let admin = Db::connect(&url, 1, false)?;
+    let unique = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
+    let name = format!("agentdb_repair_{}_{unique}", std::process::id());
+    let mut test_url = reqwest::Url::parse(&url)?;
+    test_url.set_path(&format!("/{name}"));
+    admin.query(QKind::Meta, &format!("create database {name}")).await.context("无法创建独立测试库")?;
+    let result = tokio::time::timeout(Duration::from_secs(3600), repair_ambiguity(test_url.as_str())).await;
+    let cleanup = admin.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
+    let out = format!("results/repair-ambiguity-{unique}");
+    std::fs::create_dir_all(&out)?;
+    let report = match &result {
+        Ok(Ok(v)) => v.clone(),
+        Ok(Err(e)) => json!({"status": "failed", "error": format!("{e:#}")}),
+        Err(_) => json!({"status": "failed", "error": "实验超时"}),
+    };
+    std::fs::write(format!("{out}/report.json"), serde_json::to_string_pretty(&report)?)?;
+    println!("修复歧义实验报告：{out}/report.json；测试库清理：{}", cleanup.is_ok());
+    cleanup.context("测试库清理失败")?;
+    result.context("实验超时")??;
+    Ok(())
 }
 
 async fn scenarios(url: &str) -> Result<Value> {

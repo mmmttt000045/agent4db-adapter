@@ -38,7 +38,7 @@ pub struct Options {
     metrics: Vec<String>,
     /// 留出之后依次评测的数据变化场景；每个场景从 v1 独立施加，结束后回滚并恢复留出后的经验库
     #[arg(long, value_delimiter = ',', default_value = "append,status",
-          value_parser = ["append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit"])]
+          value_parser = ["append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"])]
     changes: Vec<String>,
     /// 做留出题的 Agent；学习只由 A 完成，默认由未接触过指标的 B 做留出
     #[arg(long, value_delimiter = ',', default_value = "B")]

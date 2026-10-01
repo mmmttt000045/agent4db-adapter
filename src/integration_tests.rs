@@ -525,7 +525,9 @@ struct SnapMid {
     mid: Middle,
     cp: Checkpoint,
     refs: Vec<(String, u32)>,
-    /// 引用修订的规范 SQL（2002-07，落在重复区间内）加上同一语句里的重复键计数
+    /// 引用修订的规范 SQL（2002-07，落在重复区间内）
+    canon: String,
+    /// 规范 SQL 加上同一语句里的重复键计数（判定答案所在数据是否满足粒度条件）
     probe: String,
 }
 
@@ -563,7 +565,7 @@ impl SnapBench {
             canon.trim().trim_end_matches(';')
         );
         let refs = vec![(key, u["revision"].as_u64().unwrap_or(0) as u32)];
-        Ok(SnapMid { cp: mid.checkpoint(), mid, refs, probe })
+        Ok(SnapMid { cp: mid.checkpoint(), mid, refs, canon, probe })
     }
 
     async fn dml(&self) -> Result<i64> {
@@ -584,6 +586,8 @@ impl SnapBench {
         if self.admin.execute(DUP_RESET).await? > 0 {
             etl::wait_table_stats(&self.admin, "store_sales", before).await?;
         }
+        // 回收删掉的重复行，保持各次试验的表状态与计划一致（不改变 DML 计数与模式）
+        self.admin.query(QKind::Meta, "vacuum analyze store_sales").await?;
         tokio::time::sleep(Duration::from_millis(1500)).await;
         s.mid.invalidate_versions();
         s.mid.restore(&s.cp).await
@@ -637,8 +641,19 @@ impl SnapBench {
                   "latency_ms": summary(&mut lat), "stats": s.mid.stats_json(), "samples": samples}))
     }
 
-    /// 实验 B：随机并发。readers 个读者在窗口内连续调用；写者在随机时刻提交违反粒度的写入，随后登记批次并通知。
-    async fn stress(&self, snapshot: bool, trials: usize, readers: usize, window_ms: u64, seed: u64) -> Result<Value> {
+    /// 实验 B：随机并发。readers 个读者在窗口内连续调用（每次间隔 think_ms）；写者在随机时刻提交违反粒度的写入。
+    /// notify = 提交后立即登记批次并通知（ETL 的正常顺序）；否则不通知，中间层只能从统计计数发现写入。
+    #[allow(clippy::too_many_arguments)]
+    async fn stress(
+        &self,
+        snapshot: bool,
+        notify: bool,
+        trials: usize,
+        readers: usize,
+        window_ms: u64,
+        think_ms: u64,
+        seed: u64,
+    ) -> Result<Value> {
         use rand::{Rng, SeedableRng};
         let s = self.middle(snapshot, 0).await?;
         let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
@@ -656,6 +671,7 @@ impl SnapBench {
                         let t0 = start.elapsed().as_secs_f64() * 1000.0;
                         let r = s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await;
                         out.push((classify(&r), t0, start.elapsed().as_secs_f64() * 1000.0));
+                        tokio::time::sleep(Duration::from_millis(think_ms)).await;
                     }
                     out
                 }
@@ -664,8 +680,10 @@ impl SnapBench {
                 tokio::time::sleep(Duration::from_millis(at)).await;
                 self.admin.execute(DUP_INJECT).await?;
                 let committed = start.elapsed().as_secs_f64() * 1000.0;
-                metricbench::log_batch(&self.admin, "store_sales", "重复装载（快照实验）").await?;
-                s.mid.invalidate_versions();
+                if notify {
+                    metricbench::log_batch(&self.admin, "store_sales", "重复装载（快照实验）").await?;
+                    s.mid.invalidate_versions();
+                }
                 Ok::<_, anyhow::Error>((committed, start.elapsed().as_secs_f64() * 1000.0))
             };
             let (calls, w) = tokio::join!(futures::future::join_all((0..readers).map(reader)), writer);
@@ -682,23 +700,27 @@ impl SnapBench {
             per_trial.push(json!({"commit_ms": committed, "notify_ms": notified, "counts": trial}));
             self.reset(&s).await?;
         }
-        Ok(json!({"mode": if snapshot { "snapshot" } else { "precheck" }, "trials": trials, "readers": readers, "window_ms": window_ms,
-                  "counts": counts, "latency_ms": summary(&mut lat),
+        Ok(json!({"mode": if snapshot { "snapshot" } else { "precheck" }, "notify": notify, "trials": trials, "readers": readers,
+                  "window_ms": window_ms, "think_ms": think_ms, "counts": counts, "latency_ms": summary(&mut lat),
                   "violation_start_minus_commit_ms": summary(&mut after_commit), "per_trial": per_trial, "stats": s.mid.stats_json()}))
     }
 
     /// 实验 C1：读者开销。无写入时（版本未变，结论直接用）与良性写入后（版本变了，条件在快照里重查）的调用延迟。
+    /// 只执行规范 SQL（不带重复键计数），排除判定探针本身的代价。
     async fn reader_overhead(&self, snapshot: bool, calls: usize, writes: usize) -> Result<Value> {
+        self.admin.query(QKind::Meta, "vacuum analyze store_sales").await?;
         let s = self.middle(snapshot, 0).await?;
         let ctx = Ctx::new("B", "snapshot", "use");
+        let ok = |r: &Result<Value>| r.as_ref().is_ok_and(|v| v.get("rejected").is_none() && v.get("result").is_some());
         for _ in 0..3 {
-            ensure!(classify(&s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await) == "served", "预热失败");
+            let r = s.mid.run_sql_with(&ctx, &s.canon, &s.refs).await;
+            ensure!(ok(&r), "预热失败：{r:?}");
         }
         let mut steady = vec![];
         for _ in 0..calls {
             let t = Instant::now();
-            let r = s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await;
-            ensure!(classify(&r) == "served", "无写入时应正常执行：{r:?}");
+            let r = s.mid.run_sql_with(&ctx, &s.canon, &s.refs).await;
+            ensure!(ok(&r), "无写入时应正常执行：{r:?}");
             steady.push(t.elapsed().as_secs_f64() * 1000.0);
         }
         let (mut first, mut second) = (vec![], vec![]);
@@ -716,8 +738,8 @@ impl SnapBench {
             s.mid.invalidate_versions();
             for out in [&mut first, &mut second] {
                 let t = Instant::now();
-                let r = s.mid.run_sql_with(&ctx, &s.probe, &s.refs).await;
-                ensure!(classify(&r) == "served", "良性写入后应正常执行：{r:?}");
+                let r = s.mid.run_sql_with(&ctx, &s.canon, &s.refs).await;
+                ensure!(ok(&r), "良性写入后应正常执行：{r:?}");
                 out.push(t.elapsed().as_secs_f64() * 1000.0);
             }
         }
@@ -725,7 +747,8 @@ impl SnapBench {
                   "first_after_write_ms": summary(&mut first), "second_after_write_ms": summary(&mut second), "stats": s.mid.stats_json()}))
     }
 
-    /// 实验 C2：写者开销。单行更新的吞吐：顺序、以及 8 个连接并发（各改不同的行，但同表的版本行要排队）。
+    /// 实验 C2：写者开销。单行更新的吞吐：顺序、以及 8 个连接并发（各改不同的行，但同表的版本行要排队）；
+    /// 以及批量写入（每条语句 1 万行）的耗时。
     async fn writer_overhead(&self, per_worker: usize) -> Result<Value> {
         let pool = Db::connect(&self.url, 8, false)?;
         pool.query(
@@ -760,7 +783,20 @@ impl SnapBench {
                 }
                 let seq = run(1).await?;
                 let conc = run(8).await?;
-                out.push(json!({"round": round, "trigger": trig, "sequential_stmt_per_s": seq, "concurrent8_stmt_per_s": conc}));
+                let t = Instant::now();
+                for b in 0..20 {
+                    pool.execute(&format!("update bench_w set x = x + 1 where id between {} and {}", (b % 8) * 1000, (b % 8) * 1000 + 999))
+                        .await?;
+                    pool.execute(&format!(
+                        "insert into bench_w (id) select g from generate_series({lo}, {hi}) g; delete from bench_w where id between {lo} and {hi}",
+                        lo = 100_000 + b * 10_000,
+                        hi = 100_000 + b * 10_000 + 9_999
+                    ))
+                    .await?;
+                }
+                let bulk = t.elapsed().as_secs_f64() * 1000.0 / 60.0;
+                out.push(json!({"round": round, "trigger": trig, "sequential_stmt_per_s": seq, "concurrent8_stmt_per_s": conc,
+                                "bulk_ms_per_stmt": bulk}));
             }
         }
         pool.query(QKind::Meta, "drop table bench_w; delete from mavra_versions where table_name = 'bench_w'").await?;
@@ -778,6 +814,14 @@ async fn snapshot_binding(url: &str) -> Result<Value> {
     admin.query(QKind::Meta, "analyze").await?;
     let b = SnapBench { url: url.to_string(), admin, learn: Period::month(2001, 3) };
     let trials = std::env::var("AGENTDB_SNAP_TRIALS").ok().and_then(|v| v.parse().ok()).unwrap_or(10);
+    // 开销先测（表还没有经历重复写入与删除），两种模式交替两轮
+    let mut readers = vec![];
+    for _ in 0..2 {
+        for snapshot in [false, true] {
+            readers.push(b.reader_overhead(snapshot, 40, trials).await?);
+        }
+    }
+    let writers = b.writer_overhead(500).await?;
     let mut interleavings = vec![];
     for case in ["write_during_pause", "write_before_call", "write_notified"] {
         for snapshot in [false, true] {
@@ -785,14 +829,11 @@ async fn snapshot_binding(url: &str) -> Result<Value> {
         }
     }
     let mut stress = vec![];
-    for snapshot in [false, true] {
-        stress.push(b.stress(snapshot, 2 * trials, 4, 3000, 20261002).await?);
+    for notify in [true, false] {
+        for snapshot in [false, true] {
+            stress.push(b.stress(snapshot, notify, 2 * trials, 4, 3000, 10, 20261002).await?);
+        }
     }
-    let mut readers = vec![];
-    for snapshot in [false, true] {
-        readers.push(b.reader_overhead(snapshot, 40, trials).await?);
-    }
-    let writers = b.writer_overhead(500).await?;
     Ok(json!({"rows": rows, "trials": trials, "interleavings": interleavings, "stress": stress,
               "reader_overhead": readers, "writer_overhead": writers}))
 }

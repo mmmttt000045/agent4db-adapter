@@ -1,0 +1,14 @@
+% 由 tools/paper-results.py 生成，请勿手改。
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\bt{Method}{方法} & \bt{Correct}{正确率} & \bt{Stale}{过期使用} & \bt{Revoked / repaired}{撤销／修复} & \bt{Maint.\ DB}{维护 DB} & \bt{Input tokens}{输入 token}\\
+ & \bt{(\%)}{（\%）} & \bt{(tasks)}{（题）} & \bt{(per cell)}{（每组）} & \bt{(s/cell)}{（秒/组）} & \bt{(k/held-out task)}{（千/留出题）}\\
+\midrule
+\bt{No sharing}{不共享} & 32 & 0 & -- & -- & 12.1\\
+\bt{Unguarded}{无守护} & 70 & 257 & -- & 0 & 8.9\\
+\bt{Schema-only}{只看结构} & 62 & 254 & -- & 0 & 10.2\\
+\bt{Revoke}{撤销重学} & 63 & 0 & 23.7 / 0.0 & 0 & 10.7\\
+\bt{Definition}{定义级} & 77 & 57 & 14.6 / 7.1 & 367 & 8.9\\
+\bt{Condition (\system)}{条件级} & 74 & 48 & 14.5 / 7.0 & 180 & 8.5\\
+\bottomrule
+\end{tabular}

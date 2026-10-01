@@ -27,12 +27,13 @@ The default manuscript pairs English and Chinese paragraphs, headings, captions,
 | `build.sh` | 在 noctis 上导出英文稿、编译两份 PDF 到 `build/` 并报告页数：`./build.sh [en\|bi\|all]`。Exports, compiles both PDFs into build/, and reports page counts. |
 | `abstract-zh.md` | 当前中文摘要，与正文结果一致。Current Chinese abstract. |
 | `RESEARCH_STATUS.md` | 实验证据、边界与未完成机制。Evidence and remaining implementation work. |
+| `gen/` | 由 `tools/paper-results.py` 从原始实验输出生成的场景表、图的坐标和正文数值宏，正文用 `\input` 引入，请勿手改。Generated tables, plot coordinates, and number macros; do not edit by hand. |
 | `evidence/` | 本轮报告和每组合计的原样副本。Unmodified copies of current reports and cell summaries. |
 | `mavra-sigmod-bilingual.zip` | 可直接上传 Overleaf 的源文件包。Source package for Overleaf. |
 
-两个 TeX 文件都独立包含 TikZ 架构图和参考文献，编译不依赖父仓库或 `evidence/`。
+两个 TeX 文件包含 TikZ 架构图、pgfplots 图和参考文献，编译只依赖本目录的 `gen/`，不依赖父仓库或 `evidence/`。
 
-Both TeX files contain the architecture figure and bibliography and compile independently of the system repository or evidence directory. They use standard packages supplied by Overleaf, including `acmart`, TikZ, and, in bilingual mode, `ctex` with Fandol fonts.
+Both TeX files contain the figures and bibliography and compile with only this directory's `gen/`, independently of the system repository or evidence directory. They use standard packages supplied by Overleaf, including `acmart`, TikZ, pgfplots, colortbl, and, in bilingual mode, `ctex` with Fandol fonts.
 
 ## Overleaf 设置 / Overleaf setup
 
@@ -49,17 +50,23 @@ Both TeX files contain the architecture figure and bibliography and compile inde
 
 You can also change the standalone source's sole `\bilingualtrue` line to `\bilingualfalse` to hide Chinese without duplicating the manuscript. The English file retains Chinese source arguments but does not typeset them or load CJK packages. The system name remains centralized in `\system`.
 
-## 新实验 / New experiments
+## 实验与数值来源 / Experiments and number provenance
 
-系统仓库已快进至 `743041f`，实验为 2026-09-29 至 2026-09-30 的单模型、合成数据结果。论文写入 80 组维护配置、19 个定义、8 个脚本智能体，以及 6 组模型端到端对照。
+论文写入四组证据：受控维护实验（80 组）、工作负载刻画（Redset 4.41 亿条查询对 100 个智能体会话）、三模型十种数据变化的端到端场景（43 组），以及早期单模型运行中的准入拒绝。第 2.1 节表格数值直接写在正文；第 7 节场景表、两张图和正文中的场景数值以宏（如 `\ScenAccCond`）引用 `gen/numbers.tex`。场景补跑完成后，在 noctis 仓库根目录运行 `python3 tools/paper-results.py --scen results/scen-20260930 --out overleaf/gen`，再编译即可更新全文数值。口径与边界见 `RESEARCH_STATUS.md`。
 
-The system repository is synchronized to `743041f`. The manuscript uses the September 29–30 maintenance sweeps and end-to-end experiment. It distinguishes maintenance DB time from whole-workload DB time, scripted concurrency from LLM concurrency, and measured behavior from the proposed snapshot protocol. See RESEARCH_STATUS.md for provenance and limits.
+The manuscript reports the controlled maintenance sweeps, the workload characterization, the three-model data-change scenarios, and admission rejections from an earlier run. Section 7's scenario table, figures, and in-text scenario numbers come from `gen/`; rerun `tools/paper-results.py` after the remaining repetitions. Definitions and limits are in RESEARCH_STATUS.md.
 
-## 本地验证 / Local validation
+## 图表风格 / Figure style
 
-Codex 内置 LaTeX 编译器返回运行环境错误 `Unable to find standard directories for platform`，未进入 TeX 源码诊断。当前环境也没有可用的终端 TeX 编译器，因此本次没有确认 PDF 编译成功、页数或实际页面效果。源文件已经打开在内置编辑器，并完成语言开关、LaTeX 结构、结果数值及打包检查。
+图用 pgfplots 在 TeX 中绘制，字体与正文一致，轴标签和图例支持双语。类别色固定顺序取经色觉缺陷校验的蓝、橙、青，第二、三个序列另加斜线纹理，黑白打印也能区分；准确率表用单色蓝阶底纹，文字始终为黑色。
 
-The built-in compiler fails at environment initialization, before source diagnostics. No terminal TeX compiler is available, so PDF compilation, page count, and rendered layout remain unverified. Sources are preserved and opened in the built-in editor; structural, language-export, result, and packaging checks are recorded separately from compilation.
+Figures are drawn with pgfplots so fonts match the text and labels are bilingual. Categorical colors use a fixed, CVD-checked order (blue, orange, aqua), with hatching on the second and third series for grayscale printing; the accuracy table uses a single-hue blue ramp with black text.
+
+## 编译 / Compilation
+
+2026-10-01 在 noctis 用 `./build.sh all` 编译：英文稿 11 页（正文在第 9 页结束），双语稿 16 页。
+
+Compiled on noctis on 2026-10-01: English 11 pages including references (body ends on page 9), bilingual 16 pages.
 
 ## 仓库 / Repositories
 

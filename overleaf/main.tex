@@ -1,7 +1,7 @@
 % !TeX program = xelatex
 % SIGMOD 2027 research submission layout, checked on 2026-09-30.
 % Self-contained bilingual manuscript; English export: main-en.tex.
-% Evidence: agent4db-adapter@743041f, experiments of 2026-09-29/30.
+% Evidence: experiments of 2026-09-29 to 2026-10-01; numbers in gen/ come from tools/paper-results.py.
 \documentclass[sigconf,review,anonymous]{acmart}
 \newif\ifbilingual
 \bilingualtrue
@@ -13,6 +13,32 @@
 \usepackage{tabularx}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit}
+\usepackage{colortbl}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+% Categorical slots in fixed order (CVD-validated): blue, orange, aqua; text and axes stay neutral.
+\definecolor{accent}{HTML}{2A78D6}
+\definecolor{seriesA}{HTML}{2A78D6}
+\definecolor{seriesB}{HTML}{EB6834}
+\definecolor{seriesC}{HTML}{1BAF7A}
+\definecolor{inkmuted}{HTML}{52514E}
+\definecolor{gridline}{HTML}{DDDCD8}
+\pgfplotsset{
+  mavra/.style={font=\footnotesize, axis line style={inkmuted}, tick style={inkmuted}, tick label style={font=\scriptsize},
+    label style={font=\footnotesize}, legend style={font=\scriptsize, draw=none, fill=none}, legend cell align=left,
+    ymajorgrids, grid style={gridline, line width=0.3pt}, axis x line*=bottom, axis y line*=left},
+  bars/.style={error bars/y dir=both, error bars/y explicit, error bars/error bar style={black!75, line width=0.4pt},
+    error bars/error mark options={rotate=90, mark size=1pt, black!75}},
+  mavraA/.style={bars, area legend, fill=seriesA, draw=seriesA!75!black, line width=0.3pt},
+  mavraB/.style={bars, area legend, fill=seriesB, draw=seriesB!75!black, line width=0.3pt, postaction={pattern=north east lines, pattern color=white!70!seriesB}},
+  mavraC/.style={bars, area legend, fill=seriesC, draw=seriesC!75!black, line width=0.3pt, postaction={pattern=north west lines, pattern color=white!70!seriesC}},
+  maintCondStag/.style={seriesA, line width=1pt, mark=*, mark size=1.6pt},
+  maintCondSim/.style={seriesA, line width=1pt, densely dashed, mark=o, mark size=1.8pt, mark options={solid}},
+  maintScopeStag/.style={seriesB, line width=1pt, mark=square*, mark size=1.5pt},
+  maintScopeSim/.style={seriesB, line width=1pt, densely dashed, mark=square, mark size=1.6pt, mark options={solid}},
+}
+\usetikzlibrary{patterns}
+\input{gen/numbers}
 \setcopyright{none}
 \settopmatter{printacmref=false}
 \citestyle{acmnumeric}
@@ -20,7 +46,11 @@
 \newcommand{\bi}[2]{#1\par\ifbilingual #2\par\fi}
 \newcommand{\bt}[2]{#1\ifbilingual\space / #2\fi}
 \newcommand{\bl}[2]{#1\ifbilingual\\#2\fi}
+\newcommand{\bh}[2]{\begin{tabular}[b]{@{}c@{}}#1\ifbilingual\\#2\fi\end{tabular}}
+\newcommand{\bhl}[2]{\begin{tabular}[b]{@{}l@{}}#1\ifbilingual\\#2\fi\end{tabular}}
 \newcommand{\code}[1]{\texttt{#1}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
 \title{\system: Maintaining Shared Metric Definitions for Data Agents}
 \ifbilingual
   \subtitle{面向数据智能体的共享指标定义维护}
@@ -29,77 +59,127 @@
 \begin{document}
 
 \begin{abstract}
-\bi{Sharing learned metric definitions can reduce repeated exploration by LLM data agents, but database updates can invalidate the data assumptions behind their implementations. Schema-only invalidation misses data-only failures, while definition-level on-demand revalidation repeats conditions shared by multiple definitions. We present \system, a middleware system that maintains shared metric definitions through executable validity conditions. It separates declared business semantics from filtered key uniqueness, join multiplicity, and time-role requirements, validates candidates extracted from judged-successful trajectories, and reuses condition verdicts across definitions at compatible dependency versions. Failed conditions trigger revocation and restricted, regression-tested repair; execution checks explicitly declared definition revisions. On synthetic retail data with one million sales rows, an eight-agent maintenance benchmark covers 19 definitions, four update events, and 80 configurations across forward and reverse policy orders. Condition-level maintenance uses 12.5--37.8\% of definition-level database time under staggered arrivals and 44.6--75.5\% under simultaneous arrivals, using the mean of the two per-order ratios. In a single-run DeepSeek experiment, maintained sharing answers 21/21 scored tasks correctly, versus 11/21 for middleware without shared definitions; maintenance database time is 22.36\,s versus 52.96\,s for definition-level revalidation. Both revalidation methods prevent observed stale-definition use. Schema-only maintenance executes six stale references and answers three post-update tasks incorrectly. These descriptive results support condition reuse, while concurrent repair availability and snapshot-bound execution remain open implementation issues.}
-{共享已学习的指标定义能够减少大语言模型数据智能体的重复探索，但数据库更新可能破坏其实现所依赖的数据假设。只看表结构的失效策略会遗漏纯数据变化造成的错误，定义级按需重验证则会重复检查多个定义共享的条件。本文提出 \system，一种通过可执行有效性条件维护共享指标定义的中间层系统。它将显式业务语义与过滤后的键唯一性、连接多重性和时间角色要求分离，验证从判题成功轨迹中提取的候选，并在兼容的依赖版本上跨定义复用条件结论。条件失败触发撤销及经过回归测试的受限修复，执行端核对显式声明的定义修订。在含 100 万行销售记录的合成零售数据上，8 个智能体的维护实验覆盖 19 个定义、4 次更新，以及按正反策略顺序执行的 80 组配置。按两轮各自耗时比取平均，条件级维护在错峰到达时使用定义级数据库时间的 12.5--37.8\%，同时到达时为 44.6--75.5\%。单次 DeepSeek 实验中，维护后的共享口径答对 21/21 道计分题，无共享口径的中间层答对 11/21；维护数据库时间为 22.36 秒，定义级重验证为 52.96 秒。两种重验证方法均未观察到过期定义使用。只看结构的方法执行了 6 次过期引用，并答错 3 道更新后的题。这些描述性结果支持条件复用的价值；并发修复期间的可用性和绑定查询快照的执行仍是待完成的实现问题。}
+\bi{LLM data agents answer business questions by exploring schemas, probing values, and composing SQL. This work is highly redundant: in our traces, fresh agent sessions spend two thirds of their database calls on lookups, and 93\% of those lookups rediscover a fact that an earlier session already obtained, whereas application workloads repeat stable query templates. Sharing the metric definitions that agents learn removes this redundancy and keeps answers consistent, but it turns each definition into long-lived state over a changing database. A definition's SQL is correct only while data properties hold that the SQL does not state: a filtered key identifies one business record, joins do not fan out, and dates join through the intended role. A data-only update can break these properties without changing the schema, so the query still runs and silently returns a wrong aggregate. We present \system, a middleware that makes executable validity conditions the shared maintenance unit for metric definitions. \system\ admits definitions extracted from judged-successful trajectories, keys their conditions by dependency versions, rechecks only conditions whose tables changed, reuses verdicts across definitions and agents, revokes and repairs failed definitions with regression tests, and checks declared revisions at execution. In a controlled benchmark with 19 definitions and eight agents, condition-level maintenance uses \MaintStagMin--\MaintStagMax\% of the database time of definition-level revalidation under staggered arrivals and \MaintSimMin--\MaintSimMax\% under simultaneous arrivals, with equal correctness. Across ten data-change scenarios and three LLMs, maintained sharing raises accuracy from \ScenAccNoShare\% without shared definitions to \ScenAccCond\%, never uses a stale definition under the modeled breaking changes, where schema-only maintenance and unguarded sharing do so in \ScenStaleModeledSchema\ and \ScenStaleModeledNoguard\ tasks, and needs \ScenMaintRatio\% of the maintenance database time of definition-level revalidation.}
+{大语言模型数据智能体通过探索表结构、探查取值和编写 SQL 回答业务问题。这一过程高度重复：在我们的轨迹中，全新的智能体会话把三分之二的数据库调用用于查找，其中 93\% 的查找重新获取了此前会话已经得到的事实；应用负载重复的则是稳定的查询模板。共享智能体学到的指标定义可以消除这类重复并保持答案口径一致，但也使每个定义成为变化数据库上的长期状态。定义的 SQL 只在一些 SQL 本身没有写明的数据性质成立时才正确：过滤后的键对应一条业务记录，连接不放大行数，日期按预期角色关联。纯数据更新可以在不改表结构的情况下破坏这些性质，查询照常执行，却静默返回错误的汇总值。本文提出 \system，一个把可执行有效性条件作为共享指标定义维护单位的中间层。\system\ 只准入从判题成功轨迹中提炼的定义，按依赖版本索引定义的条件，只重查依赖表发生变化的条件，跨定义和智能体复用条件结论，对失效定义撤销并做经过回归测试的修复，并在执行端核对声明的定义修订。在 19 个定义、8 个智能体的受控实验中，正确性相同时，条件级维护的数据库时间在错峰到达时为定义级重验证的 \MaintStagMin--\MaintStagMax\%，同时到达时为 \MaintSimMin--\MaintSimMax\%。在 10 种数据变化场景和 3 个大模型上，维护后的共享定义把正确率从不共享时的 \ScenAccNoShare\% 提高到 \ScenAccCond\%，在已建模的破坏性变化下从不使用过期定义，而只看结构的维护和无守护共享分别在 \ScenStaleModeledSchema\ 和 \ScenStaleModeledNoguard\ 道题中使用了过期定义；其维护数据库时间为定义级重验证的 \ScenMaintRatio\%。}
 \end{abstract}
 \keywords{\bt{data agents, metric definitions, shared memory, validity conditions, database updates}{数据智能体，指标定义，共享记忆，有效性条件，数据库更新}}
 \maketitle
 
 \section{\bt{Introduction}{引言}}
 \label{sec:introduction}
-\bi{Data agents explore schemas, inspect values, test joins, and construct SQL to answer business questions. Repeating this process incurs database work and model reasoning, while independently generated queries can implement different meanings of the same metric. Agent-oriented data systems identify redundant exploration as an opportunity for sharing~\cite{liu2026agents}, and semantic memory makes earlier execution traces reusable~\cite{biswal2026agentsm}. Metric definitions capture which facts to aggregate, which business records to include, and how measurements relate across tables.}
-{数据智能体通过探索表结构、检查取值、验证连接及构造 SQL 回答业务问题。重复探索会消耗数据库和模型推理资源，独立生成的查询还可能对同一指标采用不同口径。面向智能体的数据系统将重复探索视为共享的机会~\cite{liu2026agents}，语义记忆则使已有执行轨迹能够被复用~\cite{biswal2026agentsm}。指标定义记录应聚合哪些事实、纳入哪些业务记录，以及跨表的度量关系。}
+\bi{LLM-based data agents are becoming a primary client of data systems~\cite{liu2026agents,luo2026dataagents}. To answer a question such as ``What was the store return amount in September 2002?'', an agent lists tables, inspects columns and values, validates candidate joins, and composes SQL over many turns. The hard part is rarely SQL syntax; it is business semantics. Enterprise warehouses name columns in terminology that only domain experts understand~\cite{floratou2024nl2sql}, and an o1-preview agent solves only 21.3\% of real enterprise text-to-SQL workflows~\cite{lei2025spider2}. Business knowledge closes much of the gap: attaching external-knowledge evidence raises GPT-4's execution accuracy on BIRD from 34.9\% to 54.9\%~\cite{li2023bird}, and answering enterprise insurance questions over a knowledge graph that captures business semantics raises GPT-4's accuracy from 16.7\% to 54.2\%~\cite{sequeda2024kg}.}
+{基于大语言模型的数据智能体正在成为数据系统的主要使用者~\cite{liu2026agents,luo2026dataagents}。为回答“2002 年 9 月门店退货金额是多少”这样的问题，智能体需要多轮列出表、查看列和取值、验证候选连接并编写 SQL。难点很少在 SQL 语法，而在业务语义。企业数仓的列名使用只有领域专家才懂的术语~\cite{floratou2024nl2sql}；在真实企业 Text-to-SQL 工作流上，基于 o1-preview 的智能体只能完成 21.3\%~\cite{lei2025spider2}。业务知识能弥补很大一部分差距：在 BIRD 上附加外部知识证据使 GPT-4 的执行正确率从 34.9\% 提高到 54.9\%~\cite{li2023bird}；在刻画业务语义的知识图谱上回答企业保险问题，使 GPT-4 的正确率从 16.7\% 提高到 54.2\%~\cite{sequeda2024kg}。}
 
-\bi{Sharing turns a learned definition into long-lived state over a changing database. Its implementation relies on data properties: a filtered key identifies one business record, a join preserves the intended multiplicity, and a date relation uses the intended business role. These properties are not automatically enforced by the definition's SQL. Updates can break them without changing a table or column. The query still executes, but its aggregate can cease to implement the intended measurement.}
-{共享会使学习得到的定义成为变化数据库上的长期状态。其实现依赖数据属性：过滤后的键对应一条业务记录，连接保持预期多重性，日期关联使用预期业务角色。这些属性不会由定义中的 SQL 自动保证。更新可能在不改变表或列的情况下破坏它们，查询仍能执行，但聚合结果可能偏离预期业务度量。}
+\bi{Metric definitions carry much of this semantics. A definition fixes which fact rows to aggregate, which records count as one business event, and how measurements relate across tables. Data warehouses have long required such definitions to be conformed across uses~\cite{kimball2013toolkit}. Agents need not rely on hand-written definitions: systems derive domain knowledge, including the calculation logic of derived columns, from script histories and lineage~\cite{weng2025datalab}, organize successful trajectories as reusable semantic memory~\cite{biswal2026agentsm}, and, more generally, distill reusable workflows and insights from past experience~\cite{wang2025awm,zhao2024expel}. Sharing a learned definition across agents amortizes exploration, which is highly redundant: across 50 attempts per BIRD question, distinct sub-plans are often under 10--20\% of the total~\cite{liu2026agents}. Our traces show the same redundancy at the database interface: 93\% of the lookups and checks issued by fresh agent sessions re-derive a fact that an earlier session had already obtained, and with only three concurrent agents, 91\% of lookups are duplicated by another agent within 60\,s (Section~\ref{sec:workload-characterization}). Sharing also keeps answers consistent: one agent's verified meaning of ``return amount'' becomes every agent's.}
+{指标定义承载了其中大部分语义。一个定义规定聚合哪些事实行、哪些记录算作一次业务事件，以及度量如何跨表关联。数据仓库长期要求这类定义在各处保持一致（conformed）~\cite{kimball2013toolkit}。智能体不必依赖人工编写的定义：已有系统从脚本历史和血缘中推导领域知识（包括派生列的计算逻辑）~\cite{weng2025datalab}，把成功轨迹组织成可复用的语义记忆~\cite{biswal2026agentsm}，更一般的智能体记忆工作则从经验中提炼可复用的工作流和洞见~\cite{wang2025awm,zhao2024expel}。在智能体之间共享学到的定义能摊薄高度重复的探索：在 BIRD 的每道题上尝试 50 次，不同子计划往往只占总数的 10--20\% 以下~\cite{liu2026agents}。我们的轨迹在数据库接口上观察到同样的重复：全新智能体会话发出的查找与检查中，93\% 重新获取了此前会话已经得到的事实；即使只有 3 个并发智能体，也有 91\% 的查找在 60 秒内被另一个智能体重复（第~\ref{sec:workload-characterization} 节）。共享还能保持答案一致：一个智能体验证过的“退货金额”含义，成为所有智能体的含义。}
 
-\bi{Consider a returns table that initially contains one completed record per return. An ETL update appends an application-state record for an existing return. A definition that sums all rows now counts a business event twice. In our experiment, the unmodified single-period definition returns 6,588,699.86 instead of 3,294,349.93. Recovery requires identifying the broken grain condition, finding a filter consistent with completed returns, and validating a new revision against approved evidence.}
-{例如，退货表最初对每笔退货只保留一条完成记录，ETL 随后为已有退货追加申请状态行。对所有行求和的定义便会重复计数。在本次实验中，未修改的单期定义返回 6,588,699.86，正确值为 3,294,349.93。恢复需要识别失效的粒度条件，找到符合已完成退货含义的过滤规则，并依据已认可的证据验证新修订。}
+\bi{Sharing, however, turns a learned definition into long-lived state over a changing database. Liu et al.\ propose that data systems keep a persistent agentic memory store for grounding agents, and caution that if the store drifts from the data, ``the stale information may lead a new probe to make a mistake''~\cite{liu2026agents}; recent tutorials likewise list outdated memory and changing data among the open problems of data agents~\cite{luo2026dataagents,li2026agenticmemory}. For metric definitions the risk is specific. A definition's SQL is correct only while certain data properties hold: the filtered key identifies one business record, joins do not fan out, and dates join through the intended role. These properties are instances of the summarizability conditions that govern correct aggregation~\cite{lenz1997summarizability,mazon2009summarizability}. The SQL text does not state them and the schema does not enforce them. Like the soft constraints exploited by query optimizers~\cite{godfrey2001soft}, they hold on the current data and can be broken by the next load.}
+{然而，共享使学到的定义成为变化数据库上的长期状态。Liu 等提出数据系统应保存持久的智能体记忆库，为智能体提供依据，并提醒若记忆库与数据不一致，“过期信息可能导致新的探查出错”~\cite{liu2026agents}；近期的教程同样把过时记忆和不断变化的数据列为数据智能体的开放问题~\cite{luo2026dataagents,li2026agenticmemory}。对指标定义而言，这一风险有具体形态。定义的 SQL 只在某些数据性质成立时才正确：过滤后的键对应一条业务记录，连接不放大行数，日期按预期角色关联。这些性质是决定汇总正确性的可汇总性条件的具体实例~\cite{lenz1997summarizability,mazon2009summarizability}。SQL 文本不写明它们，表结构也不强制它们。与查询优化器利用的软约束一样~\cite{godfrey2001soft}，它们在当前数据上成立，却可能被下一次装载破坏。}
 
-\bi{Schema-only invalidation misses this failure. Definition-level on-demand revalidation detects it but repeats work when several definitions share conditions. Lazy maintenance~\cite{zhou2007lazy} determines when to perform the work. A reusable condition determines its scope and how much evidence can be shared. A baseline that marks definitions pending and revalidates them remains usable after benign writes; avoiding unnecessary revocation is therefore not a claimed advantage over that baseline.}
-{只看结构的失效策略无法发现这种错误。定义级按需重验证能够发现，但多个定义共享条件时会重复检查。懒维护~\cite{zhou2007lazy}决定何时维护，可复用条件决定维护范围及证据共享程度。将定义标为待验证并正确重查的基线在正常写入后仍可继续使用，因此本文不把避免不必要撤销作为相对该基线的优势。}
+\bi{Consider a returns table that stores one completed row per return. An ETL change starts to append an application-state row for each new return. No table or column changes, and the shared definition \code{SUM(sr\_return\_amt)} still executes. It now counts many returns twice: in our experiment a single-period query returns 6,588,699.86 instead of 3,294,349.93. Nothing fails loudly. Such failures are familiar from data pipelines: upstream feeds change in unexpected ways and downstream applications break silently~\cite{song2021autovalidate}, and a seemingly innocuous upstream change can produce data that ``looks perfectly fine'' to its consumer~\cite{breck2019validation}.}
+{例如，退货表对每笔退货保存一条完成记录。一次 ETL 改动开始为每笔新退货追加一条申请状态记录。表和列都没有变化，共享定义 \code{SUM(sr\_return\_amt)} 照常执行，却把许多退货计算了两次：在我们的实验中，一个单期查询返回 6,588,699.86，正确值是 3,294,349.93。整个过程没有任何报错。这类失效在数据管道中并不陌生：上游数据源以意想不到的方式变化，下游应用随之静默出错~\cite{song2021autovalidate}；一次看似无害的上游改动，产出的数据在使用方看来可能“完全正常”~\cite{breck2019validation}。}
 
-\bi{We present \system\ (\textbf{M}etric-\textbf{A}ware \textbf{V}alidation and \textbf{R}euse for \textbf{A}gents). Definitions with different formulas can share validity evidence. \system\ connects executable conditions to their data dependencies, reuses completed verdicts across definitions and agents, and shares compatible in-flight checks. Revision checks and restricted repair govern the use and replacement of shared knowledge. The paper makes three contributions:}
-{本文提出 \system\（Metric-Aware Validation and Reuse for Agents，面向智能体的指标感知验证与复用）。不同公式的定义能够共享有效性证据。系统将可执行条件关联到数据依赖，跨定义和智能体复用已完成结论，并合并兼容的在途检查。修订检查与受限修复共同控制共享知识的使用和替换。本文有三项贡献：}
-\begin{enumerate}
-\item \bi{\textbf{An executable validity model.} Business definitions are coupled with typed conditions and grounded evidence, giving learned definitions a criterion for continued use.}
-{\textbf{可执行有效性模型。}将业务定义与类型化条件、有依据的证据结合，为已学习定义的持续使用提供判断标准。}
-\item \bi{\textbf{Condition-level maintenance.} Selective revalidation, completed-verdict reuse, and in-flight merging factor common validation and repair work out of individual definitions.}
-{\textbf{条件级维护。}通过选择性重验证、已完成结论复用与在途合并，将共同验证和修复工作从各定义中提取出来。}
-\item \bi{\textbf{Revision-aware use and empirical characterization.} Declared revisions are checked and failed definitions undergo regression-tested repair. Experiments separate correctness, database work, and availability; snapshot-bound execution is specified as a design extension.}
-{\textbf{修订感知使用及实证分析。}核对声明修订，对失败定义执行经过回归测试的修复。实验分别分析正确性、数据库工作和可用性，并将绑定快照的执行明确作为设计扩展。}
-\end{enumerate}
+\bi{Maintaining shared definitions requires detecting data-only failures while retaining valid knowledge after routine writes. Schema-change invalidation~\cite{curino2008prism,zhang2025evoschema} misses the returns-table break above, and revoking every affected definition forces LLM relearning after benign appends. Definition-level lazy revalidation~\cite{zhou2007lazy} marks affected definitions pending and checks each on first use. Its conditions provide the required checks, but the work is organized by definition. Store revenue, net profit, and return rate all rely on the same sales grain, so checking each definition repeats that condition and may rescan a large fact table.}
+{维护共享定义需要检测纯数据失效，同时在正常写入后保留有效知识。按表结构变化失效~\cite{curino2008prism,zhang2025evoschema}会漏掉上述退货表破坏，撤销全部受影响定义则迫使系统在正常追加后调用大模型重学。定义级懒重验证~\cite{zhou2007lazy}把受影响定义标为待验证，并在首次使用时逐个检查。其条件提供所需的验证，但工作按定义组织。门店营业额、净利润和退货率都依赖同一个销售粒度，逐个检查定义会重复执行该条件，并可能反复扫描大事实表。}
 
-\section{\bt{Metric Definitions and Validity Conditions}{指标定义与有效性条件}}
-\label{sec:model}
-\subsection{\bt{Definitions and evidence}{定义与证据}}
-\bi{A definition revision is represented conceptually as $m^r=(B,I,C,E,r)$, where $B$ is its business meaning, $I$ its structured implementation, $C$ a set of executable conditions, $E$ supporting evidence, and $r$ its revision identifier. The implementation records the fact table, aggregate expression, grain, time role, join references, persistent filters, and empty-input convention. Query parameters, such as the requested month, are separate from persistent filters.}
-{定义修订可概念化为 $m^r=(B,I,C,E,r)$，其中 $B$ 为业务含义，$I$ 为结构化实现，$C$ 为可执行条件集，$E$ 为支撑证据，$r$ 为修订号。实现记录事实表、聚合表达式、粒度、时间角色、连接引用、持久过滤和空输入约定。查询参数（如月份）与持久过滤分开。}
+\bi{Our key observation is that the validity conditions underlying metric definitions can be maintained independently and reused across definitions. A condition such as ``ticket and item identify one store-sales row'' has an identity independent of the formulas that rely on it and a specific set of table dependencies. Making these conditions first-class, versioned objects lets one check support every definition that requires it. Maintenance then follows the distinct conditions touched by an update, sharing common work across definitions and agents, much as multiple-query optimization shares a common subexpression across queries~\cite{sellis1988mqo}. In our 19-definition workload, 41 condition references reduce to seven distinct conditions.}
+{我们的核心观察是：指标定义所依赖的有效性条件可以独立维护，并跨定义复用。像“小票号与商品确定一条门店销售记录”这样的条件，其身份独立于使用它的公式，并具有明确的依赖表集合。把这些条件作为一等、版本化对象，一次检查就能支撑所有需要该条件的定义。维护由此沿着更新触及的不同条件展开，在定义和智能体之间共享公共工作；这与多查询优化在多个查询之间共享公共子表达式同理~\cite{sellis1988mqo}。在本文的 19 个定义负载中，41 个条件引用对应 7 个不同条件。}
 
-\bi{Evidence includes the source task, explicit business-definition basis, tool results, a task-success judgment, and database-version information. Answer production and successful SQL execution do not imply verified completion. The experiments use hand-written reference queries independent of the agent's answer but sharing the workload generator; they are not an externally certified business standard. Applications would need approved business tests or confirmed examples.}
-{证据包括来源任务、显式业务定义依据、工具结果、任务成功判定及数据库版本信息。产出答案或成功执行 SQL 不等于任务通过验证。实验以手写参考查询判题，独立于智能体答案但与负载生成器同源，并非外部认证的业务标准；实际应用需要已认可的业务测试或确认示例。}
+\bi{We present \system\ (\textbf{M}etric-\textbf{A}ware \textbf{V}alidation and \textbf{R}euse for \textbf{A}gents), a middleware between data agents and PostgreSQL that gives shared metric definitions an executable validity model and an update-driven maintenance lifecycle. \emph{Admission} extracts structured definitions from judged-successful trajectories with explicit business evidence, then validates their grain and replays their canonical SQL. \emph{Maintenance} selects conditions whose dependencies changed, shares completed verdicts across definitions and agents, applies a supported implication rule, and coalesces concurrent checks. A failed condition triggers revocation and filter-based repair; regression against learning evidence validates the replacement revision. \emph{Execution} checks the revisions declared by a query and rejects revoked or superseded references.}
+{本文提出 \system（Metric-Aware Validation and Reuse for Agents，面向智能体的指标感知验证与复用），一个位于数据智能体与 PostgreSQL 之间的中间层，为共享指标定义提供可执行的有效性模型与更新驱动的维护生命周期。\emph{准入}从具备显式业务依据且判题成功的轨迹中提炼结构化定义，再检查其粒度并重放规范 SQL。\emph{维护}选择依赖发生变化的条件，跨定义和智能体共享已完成结论，应用支持的蕴含规则，并合并并发检查。条件失败触发撤销和基于过滤的修复，针对学习证据的回归测试验证替代修订。\emph{执行}核对查询声明的修订，拒绝已撤销或已被替代的引用。}
 
-\subsection{\bt{Conditions and their scope}{条件及其范围}}
-\bi{Let $D_s$ denote database snapshot $s$. A condition $c$ is a predicate over the tables in $\operatorname{dep}(c)$. The model distinguishes the following requirements.}
-{记 $D_s$ 为数据库快照 $s$。条件 $c$ 是其依赖表集合 $\operatorname{dep}(c)$ 上的谓词，模型区分以下要求。}
-\begin{description}
-\item[\bt{Filtered key uniqueness}{过滤后键唯一性}]
-\bi{The selected key identifies at most one relevant row under the declared filter and null policy.}
-{在声明的过滤与空值规则下，所选键最多对应一条相关记录。}
-\item[\bt{Join multiplicity}{连接多重性}]
-\bi{The join direction, keys, and required filters preserve the permitted number of matches per fact.}
-{连接方向、键和必需过滤应保持每条事实记录允许的匹配数。}
-\item[\bt{Coverage and time role}{覆盖与时间角色}]
-\bi{Required business keys remain represented and dates use the intended relation. Coverage requires an explicit population and tolerance; full independent coverage maintenance extends beyond the evaluated grain and join checks.}
-{要求覆盖的业务键总体保持可表示，日期通过预期关系关联。覆盖需要显式总体和容差；完整的独立覆盖维护超出本次评估的粒度与连接检查。}
-\end{description}
+\bi{We evaluate \system\ on synthetic retail data with one million store-sales rows. In a controlled benchmark with 19 definitions, eight concurrent scripted agents, and four update events, condition-level maintenance uses \MaintStagMin--\MaintStagMax\% of the database time of definition-level revalidation under staggered arrivals and \MaintSimMin--\MaintSimMax\% under simultaneous arrivals, with zero stale uses and zero false revocations for both. End to end, agents built on three LLMs face ten data-change scenarios, from benign appends to status histories, duplicate loads, and unit changes. Maintained sharing raises accuracy from \ScenAccNoShare\% without shared definitions to \ScenAccCond\%, and it never uses a stale definition under the five modeled breaking changes, whereas schema-only maintenance and unguarded sharing use stale definitions in \ScenStaleModeledSchema\ and \ScenStaleModeledNoguard\ tasks. Condition-level and definition-level maintenance answer equally well for the two stronger models (\ScenAccCondModelA\% vs.\ \ScenAccDefModelA\% and \ScenAccCondModelB\% vs.\ \ScenAccDefModelB\%), and condition-level maintenance needs \ScenMaintRatio\% of the maintenance database time. The scenarios also expose the boundary of the approach: duplicate loads and re-keyed dates are detected and revoked but not repaired, and a unit change that no condition models goes unnoticed.}
+{我们在含 100 万行门店销售记录的合成零售数据上评估 \system。在包含 19 个定义、8 个并发脚本智能体和 4 次更新的受控实验中，条件级维护的数据库时间在错峰到达时为定义级重验证的 \MaintStagMin--\MaintStagMax\%，同时到达时为 \MaintSimMin--\MaintSimMax\%，两者均为零过期使用、零误撤销。在端到端实验中，基于 3 个大模型的智能体面对 10 种数据变化场景，从正常追加到状态流水、重复装载和单位变化。维护后的共享定义把正确率从不共享时的 \ScenAccNoShare\% 提高到 \ScenAccCond\%，并在 5 种已建模的破坏性变化下从不使用过期定义；只看结构的维护与无守护共享则分别在 \ScenStaleModeledSchema\ 和 \ScenStaleModeledNoguard\ 道题中使用过期定义。对两个较强的模型，条件级与定义级维护的正确率相当（\ScenAccCondModelA\% 对 \ScenAccDefModelA\%，\ScenAccCondModelB\% 对 \ScenAccDefModelB\%），而条件级维护只需 \ScenMaintRatio\% 的维护数据库时间。这些场景也揭示了方法的边界：重复装载和日期键改写能被检测并撤销，却无法修复；没有任何条件刻画的单位变化则不会被发现。}
 
-\subsection{\bt{Pending validation and revocation}{待验证与撤销}}
-\bi{A dependency change makes relevant validation pending; it does not itself prove a definition invalid. Passing revalidation refreshes evidence. A failed required condition revokes the revision, and repair creates a candidate replacement. For a snapshot-bound realization, the intended admission contract is}
-{依赖变化使相关验证进入待验证状态，本身不证明定义失效。重验证通过后刷新证据，必需条件失败则撤销修订，修复产生候选替代。对绑定快照的实现，预期准入契约为}
-\begin{equation}
-\begin{split}
-\operatorname{Admit}(q,m^r,s)\Longrightarrow {}& \operatorname{Available}(m^r,s)\\
-&{}\land\bigwedge_{c\in C(m^r)}c(D_s).
-\end{split}
-\end{equation}
-\bi{The contract governs explicitly declared revision use, not arbitrary SQL correctness, and requires validation and execution on the same snapshot. Section~\ref{sec:execution} distinguishes that design from the prototype. Canonical compilation and answer evaluation separately address adherence to business semantics.}
-{该契约约束显式声明的修订使用，不能等同于任意 SQL 正确性，并要求验证与执行使用同一快照。第~\ref{sec:execution} 节区分此设计与原型。规范查询编译及答案评估另行判断是否遵守业务语义。}
+\bi{This paper makes the following contributions:}
+{本文的贡献如下：}
+\begin{itemize}
+\item \bi{We characterize how data-agent workloads differ from application workloads, comparing agent traces with 441 million queries from the Amazon Redshift fleet. Agents issue unstable SQL, spend most calls on lookups, and repeatedly rediscover the same database facts, including concurrently (Section~\ref{sec:workload-characterization}).}
+{我们刻画数据智能体负载与应用负载的差别，把智能体轨迹与 Amazon Redshift 集群的 4.41 亿条查询对照。智能体发出的 SQL 不稳定，大部分调用用于查找，并反复（包括并发地）重新获取相同的数据库事实（第~\ref{sec:workload-characterization} 节）。}
+\item \bi{We formulate shared metric definitions as maintainable knowledge: business evidence supplies their meaning, and typed executable conditions express the grain, join multiplicity, and time role on which their SQL depends. This model connects data-only changes to explicit pending, revoked, and repaired states (Sections~\ref{sec:background} and~\ref{sec:model}).}
+{我们把共享指标定义建模为可维护的知识：业务证据提供含义，类型化可执行条件表达其 SQL 所依赖的粒度、连接多重性和时间角色。该模型把纯数据变化与显式的待验证、撤销和修复状态联系起来（第~\ref{sec:background} 和~\ref{sec:model} 节）。}
+\item \bi{We make validity conditions the shared maintenance unit. Condition identity and dependency versions govern selective revalidation and verdict reuse across definitions and agents; a supported implication rule and in-flight merging share further work, while regression-tested repair restores failed definitions (Section~\ref{sec:maintenance}).}
+{我们把有效性条件作为共享的维护单位。条件身份与依赖版本决定选择性重验证及跨定义、跨智能体的结论复用；支持的蕴含规则与在途合并进一步共享工作，经过回归测试的修复恢复失效定义（第~\ref{sec:maintenance} 节）。}
+\item \bi{We build \system, which combines trajectory-based admission gates with revision-aware execution in a Rust middleware exposing tool-style endpoints to agents (Sections~\ref{sec:overview} and~\ref{sec:execution}).}
+{我们实现了 \system，它在一个向智能体提供工具式接口的 Rust 中间层中，结合了基于轨迹的准入门槛与修订感知执行（第~\ref{sec:overview} 和~\ref{sec:execution} 节）。}
+\item \bi{We evaluate correctness, database work, and availability through 80 controlled maintenance measurements and \ScenCells\ end-to-end cells covering three LLMs, six maintenance methods, and ten data-change scenarios. The evaluation shows when condition sharing saves work, which changes the validity model detects and repairs, and where it stops (Section~\ref{sec:evaluation}).}
+{我们通过 80 次受控维护测量，以及覆盖 3 个大模型、6 种维护方法和 10 种数据变化场景的 \ScenCells\ 组端到端实验，评估正确性、数据库工作量与可用性。评估揭示条件共享何时节省工作、有效性模型能检测和修复哪些变化，以及它的适用边界（第~\ref{sec:evaluation} 节）。}
+\end{itemize}
+
+\section{\bt{Background and Motivation}{背景与动机}}
+\label{sec:background}
+\subsection{\bt{Application and agent workloads}{应用与智能体工作负载}}
+\label{sec:workload-characterization}
+\bi{In a parameterized application, query templates and database knowledge reside in code. A fresh data-agent session must acquire that knowledge through schema lookups, data probes, and checks before it can write the query that answers its question. To quantify the difference, we compare two workloads (Table~\ref{tab:workload-characterization}). The application side is Redset~\cite{vanrenen2024redset}, the query metadata of 200 provisioned and 200 serverless Amazon Redshift clusters over three months: 441 million queries, analyzed as complete per-cluster streams. Its template identifier is a feature fingerprint that the dataset documents as a proxy that overestimates repetition. The agent side consists of 100 fresh DeepSeek V4.1 Flash sessions, each answering one of the 25 questions of Section~\ref{sec:evaluation} with only table listing, table description, and SQL tools, three sessions at a time on one database and with no shared state. SQL templates are libpg\_query fingerprints with constants removed. A rule-based classifier, checked on a random sample of calls, labels each call as a schema lookup, data probe, validation, abandoned attempt, final answer, or failure. A lookup's \emph{fact} is its purpose together with the tables and columns it reads, so differently written SQL that probes the same columns counts as the same fact.}
+{在参数化应用中，查询模板和数据库知识保存在代码里。全新的数据智能体会话则必须先通过结构查找、数据探查和检查获得这些知识，才能写出回答问题的查询。为量化这一差别，我们对照两类负载（表~\ref{tab:workload-characterization}）。应用侧采用 Redset~\cite{vanrenen2024redset}，即 Amazon Redshift 中 200 个预置集群和 200 个无服务器集群三个月的查询元数据，共 4.41 亿条查询，按每个集群的完整查询流分析。其模板标识是一种特征指纹，数据集文档说明它是会高估重复程度的近似。智能体侧是 100 个全新的 DeepSeek V4.1 Flash 会话，每个会话回答第~\ref{sec:evaluation} 节 25 道题中的一道，只有列出表、描述表和执行 SQL 三种工具；三个会话同时访问同一数据库，会话之间不共享状态。SQL 模板使用去掉常量的 libpg\_query 指纹。基于规则的分类器（在随机抽样的调用上人工核对）把每次调用标为结构查找、数据探查、验证、放弃的尝试、最终答案或失败。查找所获得的\emph{事实}由其目的及读取的表和列确定，因此写法不同、但探查相同列的 SQL 算作同一事实。}
+
+\begin{table*}[t]
+\caption{\bt{Application and agent workloads. Application: Redset~\cite{vanrenen2024redset}, 441\,M queries from 400 Redshift clusters; pooled rates, with cross-cluster medians where clusters differ widely. Agent: 100 fresh sessions (25 questions, two phrasings, two repetitions, three concurrent) issuing 521 database calls, 176 of them SQL. A \emph{lookup} is a schema lookup, data probe, or validation call.}{应用与智能体负载。应用：Redset~\cite{vanrenen2024redset}，400 个 Redshift 集群的 4.41 亿条查询；给出汇总比例，集群差异大时同时给出跨集群中位数。智能体：100 个全新会话（25 道题、两种题面、各两次，三个并发），共 521 次数据库调用，其中 SQL 176 条。\emph{查找}指结构查找、数据探查或验证调用。}}
+\label{tab:workload-characterization}
+\small
+\begin{tabularx}{\textwidth}{@{}P{0.15\textwidth}LL@{}}
+\toprule
+\bt{Dimension}{维度} & \bt{Application (Redset)}{应用（Redset）} & \bt{Data agents (100 sessions)}{数据智能体（100 个会话）}\\
+\midrule
+\bt{SQL stability}{SQL 稳定性} & \bt{93.4\% of read queries repeat an earlier template (90.1\% of SELECTs); 6.6 templates per 100 queries.}{93.4\% 的读查询重复已出现的模板（SELECT 中 90.1\%）；每 100 条查询 6.6 个模板。} & \bt{24\% of SQL statements repeat an earlier template; 133 templates for 176 statements.}{24\% 的 SQL 重复已出现的模板；176 条 SQL 有 133 个模板。}\\
+\bt{Exploration}{探索} & \bt{System-table-only queries: 7.6\% pooled, 2.2\% median.}{只访问系统表的查询：汇总 7.6\%，中位数 2.2\%。} & \bt{68\% of database calls explore, mostly schema lookups; every session starts with one.}{68\% 的数据库调用用于探索，以结构查找为主；每个会话都以结构查找开始。}\\
+\bt{Failures}{失败} & \bt{0.35\% of read queries abort (0.54\% of SELECTs).}{0.35\% 的读查询中止（SELECT 中 0.54\%）。} & \bt{1.7\% of SQL fails, but all 32 wrong answers come from SQL that ran without error.}{1.7\% 的 SQL 出错；但 32 个错误答案全部来自执行成功的 SQL。}\\
+\bt{Validation}{验证} & \bt{None in parameterized SQL.}{参数化 SQL 中没有。} & \bt{4.8\% of calls; 16\% of sessions check key uniqueness or duplicate keys themselves.}{占调用的 4.8\%；16\% 的会话自行检查键唯一性或重复键。}\\
+\bt{Same meaning, different SQL}{同义不同 SQL} & \bt{One template per question type.}{每类题一个模板。} & \bt{87.5\% of questions are answered correctly with $\geq 2$ templates; 47 templates for 15 question types.}{87.5\% 的题目以至少 2 个模板答对；15 类题共 47 个模板。}\\
+\bt{Session lifetime}{会话寿命} & \bt{97.8\% of queries come from principals active on $\geq 7$ days; median activity span 80 days.}{97.8\% 的查询来自活跃天数至少 7 天的用户主体；活跃跨度中位数 80 天。} & \bt{Median session lasts 36\,s and makes 5 calls; nothing carries over.}{会话时长中位数 36 秒、5 次调用；不保留任何状态。}\\
+\bt{Where DB knowledge lives}{数据库知识的位置} & \bt{In application code.}{在应用代码中。} & \bt{Rediscovered per session: 93\% of lookups repeat a fact an earlier session obtained, taking 77\% of lookup database time.}{每个会话重新获取：93\% 的查找重复此前会话得到的事实，占查找数据库时间的 77\%。}\\
+\bt{Concurrent repeated work}{并发重复工作} & \bt{Same template from another user within 60\,s: 0.61\% pooled, 0.01\% median.}{60 秒内其他用户使用同一模板：汇总 0.61\%，中位数 0.01\%。} & \bt{91\% of lookups are repeated by another session within 60\,s.}{91\% 的查找在 60 秒内被其他会话重复。}\\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\bi{The two workloads repeat different things. Applications repeat queries: long-lived principals issue the same templates, which prepared statements and result caches serve well; Redshift's own analysis finds that in half of the clusters, 80\% of queries are exact repetitions~\cite{vanrenen2024redset}. Agents repeat knowledge. Their SQL changes from session to session, and correct answers to the same question use different templates, yet nearly every session looks up the same tables and probes the same columns, and concurrent sessions do so at the same moment. Two dimensions differ less than often assumed. SQL failures are rare, but answers are wrong without any failure: 31 of the 32 wrong answers occur when the question names a metric without defining it. Validation appears in only 16\% of sessions, and what agents check is key uniqueness, a validity condition of the kind \system\ maintains, rechecked independently in every session. The comparison locates both the work that shared definitions save, namely rediscovered schema facts and business meaning, and the risk they must manage: a reused fact remains correct only while the data it was derived from does not change in the wrong way.}
+{两类负载重复的东西不同。应用重复的是查询：长期存在的用户主体发出相同模板，预编译语句和结果缓存能很好地服务它们；Redshift 自身的分析发现，在一半集群中 80\% 的查询是完全相同的重复~\cite{vanrenen2024redset}。智能体重复的是知识。它们的 SQL 在会话之间不断变化，同一道题的正确答案也使用不同模板；但几乎每个会话都查找相同的表、探查相同的列，并发会话甚至同时这样做。有两个维度的差别比通常设想的小。SQL 很少出错，答案却在没有任何报错的情况下出错：32 个错误答案中有 31 个出现在题目只给出指标名而不给定义时。只有 16\% 的会话做验证，而智能体检查的是键唯一性，正是 \system\ 所维护的那类有效性条件，却在每个会话中各自重查。这一对照既指出了共享定义可以节省的工作，即重新获取的结构事实与业务含义，也指出了它必须管理的风险：被复用的事实只有在其来源数据没有发生错误变化时才保持正确。}
+
+\subsection{\bt{Data agents and metric definitions}{数据智能体与指标定义}}
+\bi{A data agent interacts with the database through tools: it lists tables, describes columns, validates joins, and runs SQL, and it submits an answer together with the queries that produced it. A metric definition packages what the agent had to discover. Our running example is store return amount: its definition records the fact table (\code{store\_returns}), the measure (the amount of completed returns), the grain (ticket and item identify one return), the time role (return date), persistent filters, and the convention for empty input. Initially, every return has one completed row, so no status filter is needed. Question parameters such as the month are not part of the definition. A return-rate definition additionally joins sales to returns on the same business key and uses sale date to assign the sale to a period; it can share the returns-grain condition with the return-amount definition.}
+{数据智能体通过工具与数据库交互：列出表、查看列、验证连接、执行 SQL，并在提交答案时附上产生答案的查询。指标定义把智能体需要摸索出来的内容打包保存。本文以门店退货金额为贯穿例子：其定义记录事实表（\code{store\_returns}）、度量（已完成退货的金额）、粒度（小票号与商品确定一笔退货）、时间角色（退货日）、持久过滤，以及无输入行时的约定。最初每笔退货只有一条完成记录，因此无需状态过滤。月份等题目参数不属于定义。退货率定义还按同一业务键连接销售与退货，并用销售日把销售归入某个期间；它可以与退货金额定义共享退货粒度条件。}
+
+\bi{Definitions come from two sources. Semantic layers let engineers declare measures, keys, and relationships by hand; the declarations document intent but are not necessarily checked against the data at query time. The documentation of one commercial metric layer, for instance, states that a declared join property ``is not validated at runtime'' and that measures return incorrect results if the join fans out~\cite{databricks2026metricviews}. Increasingly, definitions are also learned from agent trajectories and query histories~\cite{weng2025datalab,biswal2026agentsm}. Learned definitions reach many agents quickly, but their assumptions are recorded, at best, only implicitly in the exploration that produced them.}
+{定义有两个来源。语义层让工程师手工声明度量、键和关系；这些声明记录了意图，但查询时不一定在数据上检查。例如，某商用指标层的文档写明，声明的连接性质“不在运行时验证”，一旦连接放大行数，度量就会返回错误结果~\cite{databricks2026metricviews}。越来越多的定义则从智能体轨迹和查询历史中学得~\cite{weng2025datalab,biswal2026agentsm}。学到的定义能迅速传到许多智能体，但其前提假设至多只隐含在产生它的探索过程中。}
+
+\subsection{\bt{How updates break a correct definition}{更新如何破坏正确的定义}}
+\bi{Continue the return-amount example. An ETL update adds an application-state row for each new return while retaining the completed row. The shared SQL, \code{SUM(sr\_return\_amt)}, still runs, but the ticket-and-item key is no longer unique and the aggregate counts some returns twice. Revalidation discovers this broken grain. Adding a completed-status filter is a repair candidate: it restores one row per return while retaining the business keys. The filter must also preserve the stated business meaning and pass regression against learning evidence. The return-rate definition needs the same filtered uniqueness to avoid join fan-out, so one verdict can justify both definitions. This progression---a valid definition, a data-only break, a failed condition, and a checked replacement---is the maintenance lifecycle developed below.}
+{继续退货金额的例子。一次 ETL 更新在保留完成记录的同时，为新退货追加申请状态行。共享 SQL \code{SUM(sr\_return\_amt)} 仍能执行，但小票号与商品键不再唯一，聚合把部分退货计算了两次。重验证发现粒度被破坏。添加完成状态过滤是一个修复候选：它保留业务键，并恢复每笔退货一条记录。该过滤还必须保留声明的业务含义，并通过学习证据的回归测试。退货率定义也需要同一个过滤后唯一性条件来避免连接放大，因此一个验证结论可以支撑两个定义。从有效定义、纯数据破坏、条件失败到经过检查的替代修订，这一过程就是下文展开的维护生命周期。}
+
+\bi{An aggregate is summarizable only if the grouped records are disjoint and complete and the measure is compatible with the aggregation~\cite{lenz1997summarizability}; violations make analysis tools return wrong results~\cite{mazon2009summarizability}. For a learned definition, disjointness becomes two executable requirements, filtered key uniqueness and bounded join multiplicity, and completeness becomes a coverage requirement on business keys. A third requirement, the time role, fixes which date relation assigns a fact to a period. Data-only updates break each of them in practice: status-history rows or duplicate loads violate grain, reused dimension keys make a many-to-one join fan out, and late or re-keyed rows shift a fact to another period. Schema-based invalidation observes none of these changes. Because the conditions are properties of data instances, checking them at the instance level means rerunning the checks after every update~\cite{mazon2009summarizability}.}
+{只有当被分组的记录互不相交且完备、度量与聚合方式相容时，汇总才是可汇总的~\cite{lenz1997summarizability}；违反这些条件会使分析工具给出错误结果~\cite{mazon2009summarizability}。对学到的定义而言，不相交性对应两项可执行要求，即过滤后键唯一性和有界的连接多重性；完备性对应业务键上的覆盖要求。第三项要求是时间角色，它规定由哪种日期关系把事实归入某个期间。纯数据更新在实践中会分别破坏它们：状态流水行或重复装载破坏粒度，被复用的维度键使多对一连接放大行数，迟到或重新赋键的记录把事实移到另一个期间。按表结构失效观察不到其中任何一种变化。由于这些条件是数据实例的性质，在实例层面检查它们就意味着每次更新后都要重新检查~\cite{mazon2009summarizability}。}
+
+\bi{Each requirement can be checked with a SQL probe over a few tables: a grouped count that finds a duplicated key under the filter, or a comparison of row counts before and after a join. Data profiling discovers such unique column combinations and dependencies, while noting that they are valid only for the instance at a specific point in time~\cite{abedjan2015profiling}; data-validation systems run such checks declaratively over changing datasets~\cite{schelter2018deequ,breck2019validation}. What is missing for agents is the link between a learned definition and the checks that justify it, so that the checks run when the definition's data changes and their outcome governs whether agents may use the definition.}
+{每项要求都能用读取少数几张表的 SQL 探查来检查：用分组计数找出过滤后重复的键，或比较连接前后的行数。数据画像能够发现这类唯一列组合和依赖，同时指出它们只对某一时刻的数据实例成立~\cite{abedjan2015profiling}；数据验证系统能在不断变化的数据集上声明式地执行这类检查~\cite{schelter2018deequ,breck2019validation}。智能体场景中缺少的是把学到的定义与支撑它的检查联系起来：定义所依赖的数据一变，检查就执行，其结果决定智能体能否继续使用该定义。}
+
+\subsection{\bt{Maintenance alternatives}{维护方式}}
+\bi{Table~\ref{tab:ladder} compares maintenance strategies on benign appends and data-only breakage. Schema-only maintenance retains the stale definition, while revoke-on-write uses LLM relearning after every write. Definition-level lazy revalidation~\cite{zhou2007lazy} preserves correctness through checks and repair. Condition-level maintenance shares condition verdicts across definitions when the condition identity and dependency versions match. For an update of \code{store\_returns}, definition-level revalidation checks every condition of the five returns definitions and three return-ratio definitions, including unchanged sales conditions. Condition-level maintenance checks the three distinct conditions that read the updated table and serves all eight definitions from their verdicts.}
+{表~\ref{tab:ladder} 比较各种维护方式在正常追加与纯数据破坏下的行为。只看结构的维护保留过期定义，写入即撤销则在每次写入后调用大模型重学。定义级懒重验证~\cite{zhou2007lazy}通过检查和修复保持正确性，条件身份与依赖版本相同时，条件级维护在定义之间共享检查结论。以 \code{store\_returns} 的一次更新为例，定义级重验证检查 5 个退货定义和 3 个退货比率定义的全部条件，包括未变化的销售条件。条件级维护检查读取更新表的 3 个不同条件，并用结论服务全部 8 个定义。}
+
+\begin{table}[t]
+\caption{\bt{Maintenance strategies for shared definitions.}{共享定义的维护方式。}}
+\label{tab:ladder}
+\small
+\begin{tabularx}{\linewidth}{@{}lXXX@{}}
+\toprule
+\bt{Strategy}{方式} & \bt{Benign append}{正常追加} & \bt{Data-only break}{纯数据破坏} & \bt{Work per update}{每次更新的工作}\\
+\midrule
+\bt{Schema-only}{只看结构} & \bt{keep}{保留} & \bt{stale use}{过期使用} & \bt{none}{无}\\
+\bt{Revoke-on-write}{写入即撤销} & \bt{revoke, relearn}{撤销并重学} & \bt{revoke, relearn}{撤销并重学} & \bt{LLM relearning}{大模型重学}\\
+\bt{Definition-level}{定义级} & \bt{keep}{保留} & \bt{revoke, repair}{撤销并修复} & \bt{all conditions of affected definitions}{受影响定义的全部条件}\\
+\bt{Condition-level}{条件级} & \bt{keep}{保留} & \bt{revoke, repair}{撤销并修复} & \bt{distinct changed conditions}{变化的不同条件}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\bi{Concurrency sharpens the difference. After an update, many agents may request pending definitions at once. Coalescing identical in-flight work, as caches do to avoid thundering herds~\cite{nishtala2013memcache}, helps both strategies, so the gain from condition-level maintenance should be largest when uses are spread out in time and definitions share many conditions. Our evaluation measures exactly where the gain holds and where it vanishes.}
+{并发会放大两者的差别。更新之后，许多智能体可能同时请求待验证的定义。像缓存系统避免惊群那样合并相同的在途工作~\cite{nishtala2013memcache}，对两种方式都有帮助；因此条件级维护的收益应当在使用分散在时间上、定义大量共享条件时最大。我们的实验正是测量收益在哪里成立、在哪里消失。}
 
 \section{\bt{System Overview}{系统概览}}
 \label{sec:overview}
-\bi{Figure~\ref{fig:architecture} separates learning admission, shared maintenance, and execution. The Rust adapter exposes tool-style HTTP endpoints for exploration, join validation, metric lookup, and SQL execution. Its in-memory store contains versioned definitions and supporting knowledge. Table fingerprints, DML statistics, and ETL batches drive dependency-version detection. The optional check-order optimizer is outside this comparison.}
-{图~\ref{fig:architecture}区分学习准入、共享维护和执行。Rust 中间层通过工具风格的 HTTP 接口提供探索、连接验证、指标查找及 SQL 执行，内存知识库保存版本化定义和支撑知识。表指纹、DML 统计和 ETL 批次驱动依赖版本检测。可选的检查顺序优化器不属于本次比较。}
+\bi{\system\ sits between agents and PostgreSQL (Figure~\ref{fig:architecture}). It exposes tool-style HTTP endpoints for listing and describing tables, finding and checking join paths, looking up metric definitions (\code{find\_metric}), and running SQL (\code{run\_sql}). Agents submit final answers with the query references and arithmetic that produced them, so the middleware records a calculation chain for every task. An in-memory store keeps versioned definitions, join paths, grain entries, and evidence. Version detection reads table fingerprints, DML statistics, and an ETL batch log.}
+{\system\ 位于智能体与 PostgreSQL 之间（图~\ref{fig:architecture}）。它通过工具式 HTTP 接口提供列出和描述表、查找与检查连接路径、查找指标定义（\code{find\_metric}）以及执行 SQL（\code{run\_sql}）等功能。智能体提交最终答案时附上产生答案的查询编号和算式，因此中间层为每个任务记录一条计算链。内存知识库保存版本化的定义、连接路径、粒度条目和证据。版本检测读取表指纹、DML 统计和 ETL 批次日志。}
 
 \begin{figure*}[t]
 \centering
@@ -108,241 +188,438 @@ box/.style={draw,rounded corners=2pt,align=center,minimum height=13mm,text width
 flow/.style={-{Latex[length=2mm]},thick},every node/.style={font=\small}]
 \node[box] (learning) at (0,0) {\bl{Grounded learning traces}{有业务依据的学习轨迹}};
 \node[box] (agents) at (7,0) {\bl{Data agents: lookup and SQL}{数据智能体：查找与 SQL}};
-\node[box] (admission) at (0,-1.8) {\bl{Extraction, validation, replay}{提炼、验证与重放}};
+\node[box] (admission) at (0,-1.8) {\bl{Extraction and gates G1--G7}{提炼与门槛 G1--G7}};
 \node[box] (execution) at (7,-1.8) {\bl{Declared revision checks}{声明修订核对}};
 \node[box] (store) at (0,-3.6) {\bl{Shared definitions and evidence}{共享定义与证据}};
-\node[box] (maintenance) at (7,-3.6) {\bl{Revalidation and restricted repair}{重验证与受限修复}};
-\node[box] (database) at (3.5,-5.4) {\bl{PostgreSQL data and checks}{PostgreSQL 数据与检查}};
+\node[box] (maintenance) at (7,-3.6) {\bl{Condition maintenance and repair}{条件维护与修复}};
+\node[box] (database) at (3.5,-5.4) {\bl{PostgreSQL data, versions, and checks}{PostgreSQL 数据、版本与检查}};
 \draw[flow] (learning) -- (admission);
 \draw[flow] (agents) -- (execution);
 \draw[flow] (admission) -- node[left,align=center]{\bl{publish}{发布}} (store);
-\draw[flow] (store.east) -- node[above,align=center]{\bl{dependencies}{依赖}} (maintenance.west);
+\draw[flow] (store.east) -- node[above,align=center]{\bl{conditions}{条件}} (maintenance.west);
 \draw[flow] (execution) -- (maintenance);
 \draw[flow] (maintenance.south) -- (database.north east);
 \draw[flow] (store.south) -- (database.north west);
 \draw[flow] (maintenance.east) -- ++(0.6,0) |- (execution.east);
 \draw[flow] (execution.east) -- ++(1.2,0) |- (database.east);
 \end{tikzpicture}
-\caption{\bt{\system\ architecture. Admission publishes validated definitions; maintenance shares evidence; execution checks declared revisions.}{\system\ 架构：准入发布已验证定义，维护共享证据，执行核对声明修订。}}
+\caption{\bt{\system\ architecture. Admission publishes validated definitions; maintenance shares condition verdicts; execution checks declared revisions.}{\system\ 架构：准入发布已验证定义，维护共享条件结论，执行核对声明修订。}}
 \label{fig:architecture}
 \Description{Learning feeds admission and a shared store. Agents feed revision checks and maintenance. Both paths access PostgreSQL.}
 \end{figure*}
 
-\bi{Different formulas can share the same condition. Revenue and return rate may require the same sales-grain check. A completed verdict serves both at compatible dependency versions; concurrent requests share an in-flight computation. Completed-verdict reuse and in-flight merging are controlled separately in the evaluation.}
-{不同公式能够共享条件，例如营业额与退货率依赖同一销售粒度检查。兼容依赖版本上的已完成结论可供两者使用，并发请求共享在途计算。评估对已完成结论复用与在途合并分别控制。}
+\bi{A definition moves through three paths. On the \emph{learning path}, an agent answers a question whose business meaning is stated explicitly; if an independent judge accepts the answer, an offline extractor turns the recorded calculation chain into a structured candidate, which the admission gates validate before publication. On the \emph{use path}, another agent calls \code{find\_metric}; if any dependency version has changed, the lookup first runs condition maintenance and then returns the current valid revision with its fields and caveats. On the \emph{execution path}, the agent's \code{run\_sql} declares the metric keys and revisions it uses; the middleware rejects absent, revoked, or superseded revisions and reviews the SQL against recorded grain and join requirements. Revocations reach agents as notices on their next tool response.}
+{一个定义经过三条路径。在\emph{学习路径}上，智能体回答一道显式给出业务含义的题目；若独立判题接受其答案，离线提炼器把记录的计算链转成结构化候选，由准入门槛验证后发布。在\emph{使用路径}上，另一个智能体调用 \code{find\_metric}；若有依赖版本变化，查找先执行条件维护，再返回当前有效修订及其字段和注意事项。在\emph{执行路径}上，智能体在 \code{run\_sql} 中声明所用的指标键和修订号；中间层拒绝不存在、已撤销或已被替代的修订，并按记录的粒度和连接要求审查 SQL。撤销通过智能体下一次工具调用的返回中的通知传达。}
+
+\bi{Different formulas can share a condition: revenue and return rate both need the sales grain. A completed verdict serves both at compatible versions, and concurrent requests for the same check share one in-flight computation. The evaluation controls completed-verdict reuse and in-flight merging separately.}
+{不同公式可以共享同一条件：营业额和退货率都需要销售粒度。兼容版本上的已完成结论同时服务两者，对同一检查的并发请求共享一次在途计算。评估对已完成结论复用和在途合并分别控制。}
+
+\section{\bt{Metric Definitions and Validity Conditions}{指标定义与有效性条件}}
+\label{sec:model}
+\subsection{\bt{Definitions and evidence}{定义与证据}}
+\bi{A definition revision is $m^r=(B,I,C,E,r)$, where $B$ is its business meaning, $I$ its structured implementation, $C$ its set of executable conditions, $E$ its supporting evidence, and $r$ its revision number. The implementation records the fact table, aggregate expression, grain, time role, join references, persistent filters, and empty-input convention. Canonical SQL is compiled from $I$ for any question parameters, giving agents a common representation of the calculation. Evidence includes the source task, the explicit basis of the business meaning, tool results, an independent task-success judgment, and the table versions at learning time. Admission requires this judgment together with the executable gates in Section~\ref{sec:maintenance}.}
+{定义修订记为 $m^r=(B,I,C,E,r)$，其中 $B$ 为业务含义，$I$ 为结构化实现，$C$ 为可执行条件集，$E$ 为支撑证据，$r$ 为修订号。实现记录事实表、聚合表达式、粒度、时间角色、连接引用、持久过滤和空输入约定。对任意题目参数，规范 SQL 都由 $I$ 编译得到，为智能体提供统一的计算表示。证据包括来源任务、业务含义的显式依据、工具结果、独立的任务成功判定以及学习时的表版本。准入同时要求这一判定和第~\ref{sec:maintenance} 节的可执行门槛。}
+
+\subsection{\bt{Validity conditions}{有效性条件}}
+\bi{A condition $c$ is a predicate over the tables $\operatorname{dep}(c)$ with a check query $Q_c$ that returns a violation witness or nothing. Its identity $\operatorname{id}(c)$ consists of its type, tables, keys, join direction, filters, and null policy. \system\ derives conditions from the implementation:}
+{条件 $c$ 是依赖表集合 $\operatorname{dep}(c)$ 上的谓词，附带一个检查查询 $Q_c$，返回违例证据或空。其身份 $\operatorname{id}(c)$ 由类型、表、键、连接方向、过滤和空值规则组成。\system\ 从定义的实现中推导条件：}
+\begin{description}
+\item[\bt{Filtered key uniqueness}{过滤后键唯一性}]
+\bi{$\operatorname{KeyUnique}(T,K,\varphi)$: no two rows of $\sigma_\varphi(T)$ agree on $K$. It is derived from the grain and the fact table's persistent filters.}
+{$\operatorname{KeyUnique}(T,K,\varphi)$：$\sigma_\varphi(T)$ 中没有两行在 $K$ 上取值相同。由粒度和事实表上的持久过滤推出。}
+\item[\bt{Join multiplicity}{连接多重性}]
+\bi{For a join reference $L\to R$ on keys $K$ with filters, each $L$ row matches at most the permitted number of $R$ rows and row loss stays within the recorded ratio. It is derived from each join reference.}
+{对按键 $K$、带过滤的连接引用 $L\to R$，每条 $L$ 记录匹配的 $R$ 记录数不超过允许值，丢行比例不超过记录值。由每个连接引用推出。}
+\item[\bt{Time role}{时间角色}]
+\bi{The fact's date key joins the date dimension many-to-one through the declared role. It is derived from the time specification.}
+{事实表的日期键按声明的角色与日期维度多对一关联。由时间规格推出。}
+\end{description}
+\bi{Repair also checks business-key coverage against an explicit population and tolerance. This check rejects filters that restore uniqueness by discarding required keys, preserving the population represented by the definition.}
+{修复还依据显式总体与容差检查业务键覆盖。该检查排除通过丢弃必需键来恢复唯一性的过滤，保留定义所代表的总体。}
+
+\subsection{\bt{Versions, verdicts, and reuse}{版本、结论与复用}}
+\bi{The version $V(T)$ of a table combines its schema fingerprint, DML counters, and ETL batch identifier. A verdict is the outcome of $Q_c$ at the versions it read and is indexed by}
+{表的版本 $V(T)$ 由结构指纹、DML 计数和 ETL 批次号组成。结论是 $Q_c$ 在其所读版本上的执行结果，以如下键索引：}
+\[
+\bigl(\operatorname{id}(c),\,V(\operatorname{dep}(c))\bigr).
+\]
+\bi{A verdict serves every definition that requires the same condition at the same dependency versions. Reuse is governed by the condition's type, keys, filters, null policy, and versions. \system\ also supports a key implication: with identical filters and null semantics, uniqueness on $K$ implies uniqueness on each superset of $K$. These rules let different formulas share executable evidence while retaining the conditions' precise populations and semantics.}
+{一个结论服务于所有在相同依赖版本上需要同一条件的定义。条件的类型、键、过滤、空值规则与版本共同决定复用。\system\ 还支持一条键蕴含规则：过滤与空值语义相同时，键 $K$ 上的唯一性蕴含其每个超集上的唯一性。这些规则使不同公式可以共享可执行证据，同时保持条件所指总体与语义的精确性。}
+
+\subsection{\bt{States and the target execution contract}{状态与目标执行契约}}
+\bi{A revision is \emph{valid} when its conditions hold at the current versions of their dependencies. A dependency-version change makes it \emph{pending}, a state derived by version comparison that triggers revalidation. Revalidation either refreshes the evidence or \emph{revokes} the revision when a required condition fails. Repair produces a new \emph{candidate} revision, which becomes valid after passing the gates in Section~\ref{sec:maintenance}. For snapshot-bound execution, the target contract for a query $q$ declaring $m^r$ on snapshot $s$ is}
+{当修订的全部条件在其依赖的当前版本上成立时，修订是\emph{有效}的。依赖版本变化使其进入\emph{待验证}状态；这一状态由版本比较得出，并触发重验证。重验证要么刷新证据，要么在必需条件失败时\emph{撤销}修订。修复产生新的\emph{候选}修订，通过第~\ref{sec:maintenance} 节的门槛后变为有效。对于绑定快照的执行，在快照 $s$ 上声明使用 $m^r$ 的查询 $q$ 的目标契约为}
+\begin{equation}
+\begin{split}
+\operatorname{Admit}(q,m^r,s)\Longrightarrow {}& \operatorname{Available}(m^r,s)\\
+&{}\land\bigwedge_{c\in C(m^r)}c(D_s),
+\end{split}
+\end{equation}
+\bi{where $D_s$ is the database at snapshot $s$. The contract links a declared revision's availability to its executable conditions on that snapshot. Canonical compilation expresses the definition's recorded business formula. The prototype implements pre-execution revision checks (Section~\ref{sec:execution}); the snapshot-bound realization of this contract is the extension described in Section~\ref{sec:limitations}.}
+{其中 $D_s$ 为快照 $s$ 上的数据库。该契约把声明修订的可用性与其条件在该快照上的成立联系起来，规范编译表达定义记录的业务公式。原型实现了执行前修订检查（第~\ref{sec:execution} 节）；满足该契约的绑定快照执行是第~\ref{sec:limitations} 节介绍的扩展设计。}
 
 \section{\bt{Admission and Condition Maintenance}{准入与条件维护}}
 \label{sec:maintenance}
 \subsection{\bt{Admission from successful trajectories}{从成功轨迹准入}}
-\bi{Candidates are extracted only from tasks with explicit business evidence and a successful judgment. Gates G1--G7 check business evidence, provenance and calculation chains, static well-formedness, grain, SQL review, example replay, and canonical-query replay. Learning questions supply admission evidence; held-out questions measure transfer. Current replay uses version checks and reference queries rather than a transactionally bound admission snapshot.}
-{只从具备显式业务依据且判题成功的任务中提取候选。G1--G7 检查业务依据、结果来源及计算链、静态合法性、粒度、SQL 审查、示例重放和规范查询重放。学习题提供准入证据，留出题测量迁移。当前重放使用版本核对和参考查询，尚未绑定事务性准入快照。}
-
-\subsection{\bt{Condition identities and dependencies}{条件身份与依赖}}
-\bi{A condition identity includes its check type, table, keys, join direction, filters, and null policy. Sharing requires equality under supported normalization or a justified implication; textual similarity is insufficient. A reusable verdict is conceptually indexed by}
-{条件身份包括检查类型、表、键、连接方向、过滤和空值规则。共享要求在支持的规范化下相等或满足有依据的蕴含，仅文本相似不足以共享。可复用结论概念上以如下键索引：}
-\[
-\bigl(\operatorname{id}(c),V(\operatorname{dep}(c))\bigr).
-\]
-\bi{Here $V$ is the detected dependency version. Referenced join revisions also propagate changes to definitions. These versions support prototype maintenance but do not establish equivalence between arbitrary database snapshots.}
-{其中 $V$ 是检测到的依赖版本。引用的连接修订变化也会传播到定义。这些版本支撑原型维护，但不能证明任意数据库快照等价。}
+\bi{Candidates are extracted only from tasks with explicit business evidence and a successful judgment. The extractor sees the question, the SQL and derivation of the calculation chain, rejected queries, and metadata, but no business rows or result values. Deterministic gates then check the candidate: G1 business basis, G2 judged success, G3 static well-formedness (columns exist, the measure uses only permitted columns, joins follow validated paths, and required grain filters are present without question literals), G4 grain on the current snapshot, G5 SQL review, G6 replay of the example SQL, and G7 replay of the canonical SQL compiled from the fields. G7 checks what other agents will actually read, so a candidate that omits a filter or hard-codes a parameter fails it. Learning questions supply admission evidence; held-out questions only measure transfer.}
+{只从具备显式业务依据且判题成功的任务中提炼候选。提炼器能看到题面、计算链中的 SQL 与算式、被拦下的查询以及元数据，但看不到业务行和结果值。随后由确定性门槛检查候选：G1 业务依据，G2 判题成功，G3 静态合法性（列存在、度量只用允许的列、连接沿已验证路径、包含必需的粒度过滤且不含题目字面量），G4 当前快照上的粒度，G5 SQL 审查，G6 示例 SQL 重放，G7 由字段编译的规范 SQL 重放。G7 检查的是其他智能体实际会读到的内容，因此遗漏过滤或把参数写死的候选会失败。学习题提供准入证据，留出题只用于测量迁移。}
 
 \subsection{\bt{Selective revalidation and reuse}{选择性重验证与复用}}
-\bi{On use, the adapter rechecks conditions whose dependencies changed, retains evidence over unchanged tables, and reuses compatible completed verdicts. Otherwise, compatible concurrent requests share a check. The definition-level baseline rechecks the entire condition set and forces join guards to rerun, using identical conditions, repair, regression, and in-flight merging.}
-{使用时，中间层重查依赖变化的条件，保留未变化表上的证据，并复用兼容的已完成结论；否则，兼容的并发请求共享检查。定义级基线重查全部条件并强制重跑连接守卫，同时使用相同条件、修复、回归和在途合并。}
+\bi{On use, maintenance compares the recorded versions of each condition's dependencies with the current versions. Conditions over unchanged tables keep their evidence. For each remaining condition, \system\ looks up a completed verdict for the same identity at the current versions, or one implied by a passed stronger condition; otherwise it runs $Q_c$, and concurrent requests for the same check share that execution. Join references are checked through the shared join entries, so a revised or vanished join path also makes the definition pending. The definition-level baseline uses the same conditions, repair, regression, and in-flight merging but rechecks the entire condition set of the definition and forces join guards to rerun.}
+{使用时，维护过程把每个条件所依赖表的记录版本与当前版本比较。未变化表上的条件保留原有证据。对其余条件，\system\ 查找同一身份在当前版本上的已完成结论，或由已通过的更强条件蕴含的结论；否则执行 $Q_c$，对同一检查的并发请求共享这次执行。连接引用通过共享的连接条目检查，因此连接路径被修订或消失时，定义同样变为待验证。定义级基线使用相同的条件、修复、回归和在途合并，但重查定义的全部条件，并强制重跑连接守卫。}
 
-\bi{Under identical filters and null semantics, uniqueness on a subset of key columns implies uniqueness on a superset. This restricted implication does not cross incompatible populations. Repair searches over the same table and business key can also share a candidate filter, subject to revalidation and regression.}
-{过滤及空值语义相同时，键列子集上的唯一性蕴含其超集上的唯一性。该受限蕴含不跨越不兼容总体。同表、同业务键的修复搜索也可共享候选过滤，但仍需重验证与回归。}
+\subsection{\bt{Revocation and regression-tested repair}{撤销与回归修复}}
+\bi{A failed condition revokes the revision and records the reason. Repair searches filters on low-cardinality columns to restore a failed fact-table grain or a join path. Candidates must preserve business keys and pass G3--G5 plus G8, which compares canonical SQL against judged learning queries on current data. In the returns example, an application-state filter restores uniqueness but loses returns that never had an application-state row; the coverage check rejects it. The completed-status filter retains the population and proceeds to regression. Repair searches over the same table and key are shared across definitions. Failed repair leaves the definition unavailable until new evidence is learned.}
+{条件失败会撤销修订并记录原因。修复搜索低基数列上的过滤，恢复失效的事实表粒度或连接路径。候选必须保留业务键，并通过 G3--G5 及 G8；G8 在当前数据上把规范 SQL 与经过判题的学习查询比较。退货例子中，申请状态过滤恢复了唯一性，却丢掉从未有过申请状态行的退货，覆盖检查将其拒绝。完成状态过滤保留总体，进入回归测试。同一张表、同一个键上的修复搜索在定义之间共享。修复失败的定义保持不可用，直到学到新的证据。}
 
-\subsection{\bt{Revocation and restricted repair}{撤销与受限修复}}
-\bi{A failed condition revokes the revision and records a reason. Repairs are restricted to supported filters and revalidated join paths. Restoring uniqueness alone does not establish business meaning. Before publication, a candidate repeats static, grain, and SQL checks and passes G8 regression against learning evidence on current data. Failed repair leaves it unavailable.}
-{条件失败撤销修订并记录原因，修复限定在支持的过滤与重新验证的连接路径内。恢复唯一性本身不证明业务含义正确。候选发布前需重复静态、粒度及 SQL 检查，在当前数据上通过基于学习证据的 G8 回归；失败则保持不可用。}
-
-\bi{Repair can finish in the triggering request. Some concurrent arrivals instead observe a revoked state while repair is running. Section~\ref{sec:availability} measures this availability gap; the prototype does not yet make every such arrival wait for the repair outcome.}
-{修复可在触发请求中完成，但部分并发请求在修复进行时看到撤销状态。第~\ref{sec:availability} 节测量这一可用性缺口，原型尚未让所有此类请求等待修复结果。}
+\bi{The triggering request can complete repair and receive the replacement revision. Concurrent requests that observe the revoked revision are rejected while repair runs. Section~\ref{sec:availability} measures this publication window and its coordination cost.}
+{触发请求可以完成修复并获得替代修订。修复期间看到撤销状态的并发请求会被拒绝。第~\ref{sec:availability} 节测量这一发布窗口及其协调代价。}
 
 \section{\bt{Revision-Aware Execution}{修订感知执行}}
 \label{sec:execution}
-\bi{Agents declare metric keys and revisions used by a query. Checks reject absent, revoked, inaccessible, or superseded references, and SQL review checks supported structural requirements. A retrieved definition is checked again when explicitly declared SQL relies on it. Undeclared use and arbitrary adherence to the business formula remain outside the revision-check guarantee.}
-{智能体声明查询所用指标键及修订号。检查拒绝不存在、已撤销、不可访问或已被替代的引用，SQL 审查核对支持的结构要求。检索出的定义在显式声明的 SQL 使用时再次核对。未声明使用及任意 SQL 是否遵守业务公式超出修订检查的保证范围。}
+\bi{Revision-aware execution connects definition lookup to query use. Agents declare the metric keys and revisions used by a query; the middleware checks those references at execution and rejects absent, revoked, inaccessible, or superseded revisions. SQL review checks the supported grain and join requirements. Explicit rechecking at use makes a definition's maintained state actionable, and revocation notices reach agents on their next tool response. Canonical compilation supplies the calculation encoded by the recorded fields.}
+{修订感知执行把定义查找与查询使用联系起来。智能体声明查询所用的指标键和修订号，中间层在执行时核对这些引用，拒绝不存在、已撤销、不可访问或已被替代的修订。SQL 审查检查支持的粒度与连接要求。使用时的显式重查使定义的维护状态直接约束执行，撤销通知通过智能体下一次工具响应传达。规范编译提供记录字段所表达的计算。}
 
-\bi{A stronger snapshot-bound protocol acquires a query snapshot, resolves declared revisions and compatible evidence, validates remaining conditions against that snapshot, and executes on the same snapshot. Replacements require renewed resolution and declaration. A stable transaction or exported snapshot can realize this protocol. Cross-snapshot reuse additionally needs evidence of unchanged dependency data. TxCache provides precedent for consistent cached reuse~\cite{ports2010txcache}.}
-{更强的绑定快照协议获取查询快照，解析声明修订及兼容证据，在该快照上验证剩余条件，并在同一快照上执行。使用替代修订需重新解析和声明。稳定事务或导出快照可实现该协议，跨快照复用还需依赖数据未变化的证据。TxCache 提供了一致性缓存复用的技术先例~\cite{ports2010txcache}。}
 
-\bi{The evaluated prototype checks before execution but does not bind validation and business SQL to one repeatable-read transaction. Experiments use controlled update phases rather than adversarial concurrent writers. Absence of observed stale use is therefore an empirical result for those phases, not a proved snapshot-consistency guarantee.}
-{被测原型在执行前检查，但未将验证和业务 SQL 绑定到同一个可重复读事务。实验采用受控更新阶段，没有对抗性的并发写入。因此，未观察到过期使用是这些阶段下的实证结果，不是已证明的快照一致性保证。}
 
 \section{\bt{Evaluation}{实验评估}}
 \label{sec:evaluation}
 \subsection{\bt{Environment and questions}{环境与研究问题}}
-\bi{We ask whether maintenance detects data-only failures, how much condition reuse saves beyond definition-level revalidation, how arrivals affect the gain, and whether learned sharing transfers to another agent. The machine has 48 Hygon cores and 98\,GiB RAM. PostgreSQL 18.6 runs with WAL and fsync disabled in disposable isolated databases. Synthetic retail data uses TPC-DS-style column names, not an official TPC-DS benchmark: one million store-sales rows, about 396,000 returns, and 500,000 catalog-sales rows.}
-{实验研究维护能否检测纯数据变化失效、条件复用相对定义级节省多少、到达方式如何影响收益，以及共享学习结果能否迁移到另一智能体。实验机有 48 核 Hygon 和 98\,GiB 内存。PostgreSQL 18.6 在可丢弃的隔离库中运行，关闭 WAL 与 fsync。合成零售数据采用 TPC-DS 风格列名，并非官方 TPC-DS 基准，含 100 万行门店销售、约 39.6 万行退货和 50 万行目录销售。}
+\bi{The evaluation answers five questions. (Q1) Does maintenance detect data-only failures while retaining valid definitions? (Q2) How much does condition reuse save over definition-level revalidation, and how do request arrivals affect the savings? (Q3) What does concurrent repair cost in availability? (Q4) Do maintained definitions keep LLM agents accurate across data changes and models? (Q5) Which changes does the validity model detect and repair, and where does it stop? The machine has 48 Hygon cores and 98\,GiB RAM. PostgreSQL 18.6 runs in disposable isolated databases with WAL and fsync disabled. The synthetic retail fixture uses TPC-DS-style column names and contains one million store-sales rows, about 396,000 returns, and 500,000 catalog-sales rows. Table~\ref{tab:baselines} lists the compared methods.}
+{评估回答五个问题。（Q1）维护能否检测纯数据失效并保留有效定义？（Q2）条件复用相对定义级重验证节省多少，请求到达方式如何影响节省？（Q3）并发修复在可用性上有何代价？（Q4）维护后的定义能否在数据变化和不同模型下保持大模型智能体的正确率？（Q5）有效性模型能检测并修复哪些变化，边界在哪里？实验机有 48 核 Hygon 和 98\,GiB 内存。PostgreSQL 18.6 在可丢弃的隔离库中运行，关闭 WAL 与 fsync。合成零售数据采用 TPC-DS 风格列名，包含 100 万行门店销售、约 39.6 万行退货和 50 万行目录销售。表~\ref{tab:baselines} 列出被比较的方法。}
 
-\bi{Benign events append sales, returns, and catalog sales. The breaking event v2 appends 170,816 application-state rows for returns dated from 2001-10-01 without changing the schema. It breaks ticket-and-item uniqueness; repair adds a completed-status filter. These are four update events, three benign and one data-only breaking, not four independently varied failure classes.}
-{正常事件分别追加门店销售、退货和目录销售。破坏性事件 v2 为 2001-10-01 起的退货追加 170,816 条申请状态行，表结构不变。小票与商品键上的唯一性被破坏，修复添加完成状态过滤。这是 4 次更新事件，3 次正常、1 次纯数据破坏，不是 4 类独立变化的故障。}
 
 \begin{table}[t]
-\caption{\bt{Maintenance methods. Revalidation methods share conditions, repair, regression, and in-flight merging.}{维护方法：重验证方法具有相同条件、修复、回归与在途合并。}}
+\caption{\bt{Compared methods. C: controlled benchmark; E: end-to-end scenarios. Revalidation methods share conditions, repair, regression, and in-flight merging.}{被比较的方法。C：受控实验；E：端到端场景。各重验证方法使用相同的条件、修复、回归与在途合并。}}
 \label{tab:baselines}
-\begin{tabularx}{\linewidth}{@{}lX@{}}
+\small
+\begin{tabularx}{\linewidth}{@{}llL@{}}
 \toprule
-\bt{Method}{方法} & \bt{After a dependency update}{依赖更新后}\\
+\bt{Method}{方法} & & \bt{After a dependency update}{依赖更新后}\\
 \midrule
-\bt{Schema}{结构} & \bt{Check structure only.}{仅检查结构。}\\
-\bt{Revoke}{撤销} & \bt{Revoke and relearn.}{撤销并重学。}\\
-\bt{Definition}{定义级} & \bt{Recheck all conditions on use.}{使用时重查全部条件。}\\
-\bt{Scope}{范围} & \bt{Recheck affected conditions, no verdict reuse.}{重查受影响条件，不复用结论。}\\
-\bt{Condition}{条件级} & \bt{Scope plus verdict and repair reuse.}{范围加结论及修复复用。}\\
+\bt{No sharing}{不共享} & E & \bt{Middleware tools and SQL review; no shared definitions.}{中间层工具与 SQL 审查，不共享定义。}\\
+\bt{Unguarded}{无守护} & E & \bt{Shared definitions without maintenance or reference checks.}{共享定义，不维护、不核对引用。}\\
+\bt{Schema-only}{只看结构} & C, E & \bt{Check structure only.}{仅检查结构。}\\
+\bt{Revoke}{撤销重学} & C, E & \bt{Revoke on write; relearn from the LLM.}{写入即撤销，由大模型重学。}\\
+\bt{Definition}{定义级} & C, E & \bt{Recheck all conditions of a definition on use.}{使用时重查定义的全部条件。}\\
+\bt{Scope}{仅范围} & C & \bt{Recheck affected conditions, no verdict reuse.}{重查受影响条件，不复用结论。}\\
+\bt{Condition (\system)}{条件级} & C, E & \bt{Scope plus verdict and repair reuse.}{范围加结论及修复复用。}\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\subsection{\bt{Controlled maintenance benchmark}{受控维护实验}}
-\bi{Definitions are admitted directly through validation gates without LLM extraction. Four families contain six sales definitions, five returns definitions, three return-ratio definitions, and five catalog definitions. Taking up to $k\in\{1,2,4,6\}$ per family yields 4, 8, 15, and 19 definitions. After each update, eight scripted agents each use every definition in shuffled order. Arrivals are staggered or simultaneous. Five policies, four sharing levels, and two arrival modes yield 40 cells; forward and reversed policy orders yield 80 cells. These are two order-controlled passes, not independent repeated trials for confidence intervals.}
-{定义直接通过验证门槛准入，不调用模型提炼。四个族包含 6 个销售、5 个退货、3 个退货比率及 5 个目录指标。每族最多取 $k\in\{1,2,4,6\}$ 条，对应 4、8、15 和 19 个定义。更新后，8 个脚本智能体各按打乱的顺序使用所有定义，采用错峰或同时到达。5 种策略、4 个共享度和 2 种到达方式构成 40 组，正反策略顺序共 80 组。这是两轮顺序控制实验，不是用于置信区间的独立重复试验。}
+\subsection{\bt{Controlled maintenance workload}{受控维护负载}}
+\bi{To isolate database maintenance, the benchmark admits structured definitions directly through the validation gates. Four families contain six sales definitions, five returns definitions, three return-ratio definitions, and five catalog definitions. Taking up to $k\in\{1,2,4,6\}$ per family yields 4, 8, 15, and 19 definitions; $k=1$ retains sharing between the sales and return-ratio families. After each update, eight scripted agents each use every definition in shuffled order, with staggered or simultaneous arrivals. Five policies, four sharing levels, and two arrival modes yield 40 cells. We run all cells under forward and reversed policy orders, yielding 80 measurements that control for policy order. The four update events are three benign appends (sales, returns, and catalog sales) and a grain-breaking update, v2, which adds 170,816 application-state rows for returns dated from 2001-10-01 under the existing schema; it breaks ticket-and-item uniqueness, and repair adds a completed-status filter.}
+{为单独测量数据库维护，基准把结构化定义直接通过验证门槛准入。四个族包含 6 个销售、5 个退货、3 个退货比率及 5 个目录指标。每族最多取 $k\in\{1,2,4,6\}$ 条，对应 4、8、15 和 19 个定义；$k=1$ 保留销售与退货比率族之间的共享。更新后，8 个脚本智能体各按打乱的顺序使用所有定义，采用错峰或同时到达。5 种策略、4 个共享度和 2 种到达方式构成 40 组。全部配置按正反策略顺序运行，共得到 80 次用于控制策略顺序的测量。四次更新包括三次正常追加（门店销售、退货和目录销售）与一次破坏粒度的更新 v2：v2 在现有表结构下为 2001-10-01 起的退货追加 170,816 条申请状态行，破坏小票与商品键上的唯一性，修复添加完成状态过滤。}
 
-\bi{Database time sums actual operations during post-update uses, including maintenance and version reads, but excludes admission. Waiting sums uses that perform or join maintenance; under simultaneous arrivals it is aggregate agent waiting, not benchmark elapsed time. Stale use means a revision returned as valid whose canonical SQL fails a current-data probe. False revocation and unavailable use are separate counts.}
-{数据库时间累计更新后使用期间的实际操作，包含维护及版本读取，不含准入。等待累计执行或合并维护的使用耗时，同时到达时是智能体等待之和，不是实验墙钟时间。过期使用指返回为有效的修订，其规范 SQL 未通过当前数据探测。误撤销和不可用单独计数。}
+\bi{Database time sums actual operations during post-update uses, including maintenance and version reads. Admission precedes this measurement window. Maintenance waiting sums the time spent by uses that perform or join maintenance, including aggregate agent waiting under simultaneous arrivals. A stale use returns a revision as valid whose canonical SQL fails a current-data probe. False revocations and unavailable uses are counted separately.}
+{数据库时间累计更新后使用期间的实际操作，包含维护及版本读取；准入发生在该测量窗口之前。维护等待累计执行或合并维护的使用耗时，同时到达时累计各智能体的等待。过期使用指返回为有效的修订，其规范 SQL 未通过当前数据探测。误撤销与不可用使用分别计数。}
 
-\begin{table*}[t]
-\caption{\bt{Maintenance DB-time ratios relative to definition-level revalidation. Means are arithmetic means of the two per-order ratios. Scope means omit completed-verdict reuse.}{相对定义级的维护数据库耗时比：平均值为正反两轮各自比值的算术平均，范围组不复用已完成结论。}}
-\label{tab:sharing}
-\begin{tabularx}{\textwidth}{@{}Xrrrrr@{}}
-\toprule
-\bt{Arrival}{到达} & $k$ (\bt{definitions}{定义数}) & \bt{Forward}{正序} & \bt{Reverse}{反序} & \bt{Mean}{平均} & \bt{Scope mean}{范围组平均}\\
-\midrule
-\bt{Staggered}{错峰} & 1 (4) & 39.1\% & 36.4\% & 37.8\% & 89.3\%\\
- & 2 (8) & 23.3\% & 19.5\% & 21.4\% & 76.1\%\\
- & 4 (15) & 15.5\% & 16.2\% & 15.8\% & 82.7\%\\
- & 6 (19) & 12.5\% & 12.5\% & 12.5\% & 80.7\%\\
-\midrule
-\bt{Simultaneous}{同时} & 1 (4) & 63.9\% & 73.0\% & 68.4\% & 84.0\%\\
- & 2 (8) & 74.4\% & 76.6\% & 75.5\% & 78.2\%\\
- & 4 (15) & 58.9\% & 59.5\% & 59.2\% & 87.3\%\\
- & 6 (19) & 47.8\% & 41.3\% & 44.6\% & 90.3\%\\
-\bottomrule
-\end{tabularx}
-\end{table*}
+\subsection{\bt{Correctness under updates}{更新下的正确性}}
+\bi{All three revalidation methods preserve valid definitions and reject stale ones: they record zero stale uses and zero false revocations across the maintenance cells. Schema-only maintenance returns stale definitions after v2, with 16, 32, 56, and 64 uses per pass at the four sharing levels. Revoke-on-write discards 5, 10, 18, and 22 still-valid revisions across the benign events per cell. Condition-level maintenance therefore retains the observed correctness of definition-level revalidation while enabling the work sharing measured next.}
+{三种重验证方法都保留有效定义并阻止过期使用，在全部维护配置中记录零过期使用、零误撤销。只看结构的维护在 v2 后返回过期定义，四个共享度每轮分别有 16、32、56、64 次过期使用。写入即撤销在各组正常事件中丢弃 5、10、18、22 个仍有效修订。因此，条件级维护保留了定义级重验证在实验中表现出的正确性，同时支持下文测量的工作共享。}
 
-\bi{Table~\ref{tab:sharing} shows that verdict reuse drives most of the saving. Scope-only maintenance remains at 76.1--89.3\% of baseline time under staggered arrivals, while condition reuse falls to 12.5--37.8\%. At $k=6$, mean database time and aggregate maintenance waiting both fall from 180.2 to 22.6\,s. At $k=1$, families still share conditions with the return-ratio family; this is not a zero-sharing control.}
-{表~\ref{tab:sharing}显示，大部分节省来自结论复用。错峰时仅缩小范围的耗时仍为基线的 76.1--89.3\%，条件复用降至 12.5--37.8\%。$k=6$ 时平均数据库时间及累计维护等待均从 180.2 降至 22.6 秒。$k=1$ 仍与退货比率族共享条件，不是零共享对照。}
+\subsection{\bt{Maintenance cost and sharing}{维护成本与共享}}
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[mavra, width=\linewidth, height=46mm, xmin=2, xmax=21, ymin=0, ymax=100,
+  xtick={4,8,15,19}, ytick={0,25,50,75,100}, yticklabel={\pgfmathprintnumber{\tick}\%},
+  xlabel={\bt{Definitions sharing conditions ($k=1,2,4,6$)}{共享条件的定义数（$k=1,2,4,6$）}},
+  ylabel={\bt{DB time vs.\ definition-level}{相对定义级的 DB 时间}},
+  legend columns=2, legend style={at={(0.5,1.02)}, anchor=south}]
+\input{gen/maint-ratio}
+\end{axis}
+\end{tikzpicture}
+\caption{\bt{Maintenance database time relative to definition-level revalidation (100\%); mean of the forward and reversed policy orders. Scope-only rechecks only affected conditions; \system\ also reuses completed verdicts.}{相对定义级重验证（100\%）的维护数据库时间，取正反两种策略顺序的平均。仅范围只重查受影响条件，\system\ 还复用已完成结论。}}
+\label{fig:maint-ratio}
+\Description{Line chart. Under staggered arrivals, the condition-level ratio falls from 37.8\% to 12.5\% as definitions grow; scope-only stays at 76--89\%. Under simultaneous arrivals, condition-level lies at 45--76\%, scope-only at 78--90\%.}
+\end{figure}
 
-\bi{With simultaneous arrivals, condition reuse uses 44.6--75.5\% of baseline time because the baseline also coalesces overlapping checks. At $k=6$, mean DB time is 123.4 versus 54.7\,s and aggregate waiting 546.5 versus 171.3\,s. Reversing policy order preserves the direction of results, but two passes cannot exclude all caching, scheduling, or order effects.}
-{同时到达时条件复用耗时为基线的 44.6--75.5\%，因为基线也合并重叠检查。$k=6$ 时平均 DB 时间为 123.4 对 54.7 秒，累计等待为 546.5 对 171.3 秒。反转顺序后结论方向一致，但两轮不足以排除全部缓存、调度或顺序效应。}
+\bi{Figure~\ref{fig:maint-ratio} identifies verdict reuse as the main source of savings. Under staggered arrivals, scope-only maintenance uses 76.1--89.3\% of baseline time, while condition-level reuse lowers this to 12.5--37.8\%. At $k=6$, mean database time and aggregate maintenance waiting both fall from 180.2 to 22.6\,s. Sharing completed verdicts avoids rescanning the same data for later uses by other definitions and agents.}
+{图~\ref{fig:maint-ratio} 显示，结论复用是节省的主要来源。错峰到达时，仅缩小检查范围的维护耗时为基线的 76.1--89.3\%，条件级复用进一步降至 12.5--37.8\%。$k=6$ 时，平均数据库时间与累计维护等待均从 180.2 降至 22.6 秒。共享已完成结论使其他定义和智能体的后续使用可以跳过对相同数据的重复扫描。}
 
-\subsection{\bt{Correctness and repair availability}{正确性与修复可用性}}
+\bi{Under simultaneous arrivals, condition-level maintenance uses 44.6--75.5\% of baseline time. Overlapping requests allow both methods to merge in-flight checks, while completed-verdict reuse provides the additional savings. At $k=6$, mean database time falls from 123.4 to 54.7\,s and aggregate waiting from 546.5 to 171.3\,s. Reversing policy order preserves the direction of the results in every reported configuration.}
+{同时到达时，条件级维护耗时为基线的 44.6--75.5\%。重叠请求使两种方法都能合并在途检查，已完成结论的复用带来额外节省。$k=6$ 时，平均数据库时间从 123.4 降至 54.7 秒，累计等待从 546.5 降至 171.3 秒。反转策略顺序后，每个报告配置的结果方向均保持一致。}
+
+\subsection{\bt{Concurrent repair availability}{并发修复可用性}}
 \label{sec:availability}
-\bi{All three revalidation methods show zero stale uses and zero false revocations in the maintenance cells. Schema-only maintenance returns stale definitions after v2: 16, 32, 56, and 64 uses per pass at the four sharing levels. Revoke-on-write falsely revokes 5, 10, 18, and 22 still-valid revisions across the benign events per cell. Definition-level revalidation is equally correct under the modeled changes.}
-{三种重验证方法在维护配置中均为零过期使用、零误撤销。只看结构在 v2 后返回过期定义，四个共享度每轮分别有 16、32、56、64 次过期使用。写入即撤销在各组正常事件中合计错误撤销 5、10、18、22 个仍有效修订。在已建模变化下，定义级重验证具有相同正确性。}
+\bi{Concurrent repair reveals a publication-coordination bottleneck. At $k=6$, across two passes, condition-level maintenance rejects 43 of 304 post-v2 uses during repair, versus 24 for definition-level maintenance; staggered arrivals have zero unavailable uses. Requests encountering a revoked revision during repair need coordination with replacement publication. A per-revision wait queue that resumes requests after repair is the next implementation step.}
+{并发修复揭示了替代修订发布时的协调瓶颈。$k=6$ 时，两轮合计 304 次 v2 后使用中，条件级在修复期间拒绝 43 次，定义级拒绝 24 次；错峰到达为零不可用使用。修复期间遇到撤销修订的请求需要与替代修订的发布协调。下一步实现是按修订等待，并在修复完成后恢复请求。}
 
-\bi{Concurrent repair exposes an availability cost. At $k=6$, across two passes, condition-level maintenance rejects 43 of 304 post-v2 uses during repair, versus 24 for definition-level. No staggered use is unavailable. Faster checks can place more requests inside the repair window; less database work does not imply better availability. Making arrivals wait for repair publication remains unfinished.}
-{并发修复暴露出可用性代价。$k=6$ 时两轮合计 304 次 v2 后使用中，条件级在修复窗口拒绝 43 次，定义级拒绝 24 次。错峰没有不可用使用。更快检查可能让更多请求落入修复窗口，数据库工作减少不保证可用性更好。让请求等待修复发布尚未完成。}
+\subsection{\bt{Data-change scenarios with LLM agents}{大模型智能体的数据变化场景}}
+\label{sec:scenarios}
+\bi{\emph{Protocol.} Five metrics, store revenue, store return amount, store return rate, catalog revenue, and electronics store revenue, each have two learning questions and three scored questions: a new period, a period difference, and a monthly ranking. Agent A answers the learning questions with explicit business definitions; the extractor turns judged-successful trajectories into candidates, which pass admission. Agent B, which has never seen the metrics, answers the scored questions given only metric names, first on unchanged data and then once per data-change scenario. Each scenario starts from the same initial snapshot and shared store, applies one update, re-asks the questions whose metric reads an updated table, and is rolled back. The reference answers reflect the update's business effect, computed before representation changes such as duplicate rows, status rows, or old versions are applied; an agent must therefore filter those rows out to answer correctly. Table~\ref{tab:scenarios} groups the ten scenarios by the condition they target; the unit change is a control that no condition models.}
+{\emph{实验流程。}5 个指标为门店营业额、门店退货金额、门店退货率、目录渠道营业额和电子品类门店营业额，各有 2 道学习题和 3 道计分题（新期间、跨期差值和按月排名）。智能体 A 在给出显式业务定义的学习题上作答，提炼器把判题成功的轨迹转成候选，经准入后发布。从未接触过这些指标的智能体 B 只拿到指标名，先在未变化的数据上回答计分题，再在每个数据变化场景下各答一次。每个场景都从相同的初始快照和共享知识库出发，施加一次更新，只重问读到被更新表的指标，结束后回滚。标准答案反映更新的业务效果，在施加重复行、状态行或旧版本等表示变化之前计算，因此智能体必须过滤掉这些行才能答对。表~\ref{tab:scenarios} 按目标条件对 10 个场景分组，其中单位变化是任何条件都没有刻画的对照。}
 
-\subsection{\bt{End-to-end LLM experiment}{端到端模型实验}}
-\bi{The agent and extractor use DeepSeek V4.1 Flash (\code{deepseek-flash}) with maximum reasoning effort. Each cell has six learning questions for A and 21 scored questions for B: nine held-out, six after a benign sales append, and six after v2. B receives metric names without definitions; A receives explicit meanings. M1 is store revenue, M2 return amount, M3 return rate. Tasks include parameter transfer, period differences, and monthly ranking. Cells run sequentially with a 20-turn limit and 60\,s SQL timeout.}
-{查询智能体与提炼器使用 DeepSeek V4.1 Flash（\code{deepseek-flash}），推理强度 max。每组 A 执行 6 道学习题，B 执行 21 道计分题：9 道留出、6 道正常销售追加后及 6 道 v2 后任务。B 只获指标名，A 获显式含义。M1 为门店营业额，M2 为退货金额，M3 为退货率，题型含参数迁移、跨期差值和按月排名。各组顺序运行，每题最多 20 轮，SQL 超时 60 秒。}
-
-\bi{Table~\ref{tab:accuracy} compares six cells. Ordinary middleware has join tools and SQL review but no shared definitions. Sharing cells add metric lookup and declaration; the unguarded cell also disables execution-side reference checks. Ordinary middleware comes from an earlier extraction-prompt revision and does no extraction, but future repeats should align all prompts and code. Five sharing cells use the corrected extractor. There is one run per cell and one model.}
-{表~\ref{tab:accuracy}比较六组。普通中间层有连接工具和 SQL 审查，不共享定义；共享组添加指标查找与声明，无守护组还关闭执行端引用检查。普通中间层来自较早提炼提示版本且不执行提炼，但后续重复应统一全部提示和代码。五个共享组使用修正提炼器，每组一次运行且只用一个模型。}
+\bi{Agent and extractor use the same model: DeepSeek V4.1 Flash, GLM-5.3, or GLM-5.3 Flash, served through the Cline gateway with high reasoning effort, a 20-turn limit, and a 60\,s SQL timeout. Each model and method is planned for three repetitions, but the provider's usage cap interrupted part of the runs. We analyze \ScenCells\ cells. Tasks that failed with provider errors (\ScenQuotaTasks) are excluded, leaving \ScenValidTasks\ scored tasks; \ScenCellsDropped\ cells whose learning phase was interrupted are dropped because they never acquired the definitions. Accuracies are computed per model and then averaged, and summary rows weight each setting equally.}
+{智能体与提炼器使用同一模型：DeepSeek V4.1 Flash、GLM-5.3 或 GLM-5.3 Flash，经 Cline 网关调用，推理强度为 high，每题最多 20 轮，SQL 超时 60 秒。每个模型与方法计划重复 3 次，但服务商的用量上限中断了部分运行。我们分析 \ScenCells\ 组：因服务错误失败的题（\ScenQuotaTasks\ 道）不计入，余下 \ScenValidTasks\ 道计分题；学习阶段被中断的 \ScenCellsDropped\ 组没有学到定义，整组剔除。正确率先在每个模型内计算再取平均，汇总行对各情形等权平均。}
 
 \begin{table*}[t]
-\caption{\bt{Correct scored tasks; learning questions are excluded.}{答对计分题数，不含学习题。}}
-\label{tab:accuracy}
-\begin{tabularx}{\textwidth}{@{}Xrrrr@{}}
-\toprule
-\bt{Method}{方法} & \bt{Holdout (9)}{留出} & \bt{Append (6)}{追加后} & \bt{v2 (6)}{v2 后} & \bt{Total (21)}{合计}\\
-\midrule
-\bt{Middleware without shared definitions}{无共享定义的中间层} & 5 & 2 & 4 & 11\\
-\bt{Condition-level (\system)}{条件级} & 9 & 6 & 6 & 21\\
-\bt{Definition-level}{定义级} & 9 & 6 & 6 & 21\\
-\bt{Revoke and relearn}{撤销重学} & 9 & 6 & 6 & 21\\
-\bt{Schema-only}{只看结构} & 9 & 6 & 3 & 18\\
-\bt{Unguarded sharing}{无守护共享} & 7 & 4 & 1 & 12\\
-\bottomrule
-\end{tabularx}
+\caption{\bt{Accuracy (\%) of agent B by data change and method, averaged over three LLMs; darker cells are more accurate. $^\dagger$: at least 25\% of the tasks used a stale definition, i.e., one whose canonical SQL answers that setting's questions incorrectly.}{按数据变化与方法划分的智能体 B 正确率（\%），对三个大模型取平均，底色越深越高。$^\dagger$：至少 25\% 的题使用了过期定义，即其规范 SQL 在该情形下答错的定义。}}
+\label{tab:scenarios}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\input{gen/scen-heat}
 \end{table*}
 
-\bi{Maintained sharing answers 21/21 tasks versus 11/21 without shared definitions, a descriptive 47.6-percentage-point difference. Definition-level and revoke-and-relearn are equally accurate. Schema-only maintenance executes six stale references after v2, and all three M2 tasks are wrong. M3 remains correct because its join guard requires a status filter: stale reference use and answer error are distinct. The unguarded cell's six errors outside post-v2 M2 also involve failure to learn M3, so its total is not a pure maintenance ablation.}
-{维护共享答对 21/21，无共享定义答对 11/21，描述性差值 47.6 个百分点。定义级与撤销重学同样全部正确。只看结构在 v2 后执行 6 次过期引用，M2 的 3 道题全错；M3 因连接守卫要求状态过滤仍正确，故过期引用和答案错误不同。无守护组除 v2 后 M2 以外的 6 个错误还涉及未学到 M3，总正确率不是纯维护消融。}
+\bi{\emph{Sharing and benign updates (Q4).} Shared definitions transfer across agents: on held-out questions, accuracy rises from \ScenHoldoutNoShare\% without shared definitions to \ScenHoldoutCond\% with condition-level maintenance. After the four benign updates, condition-level maintenance keeps \ScenBenignCond\% accuracy, compared with \ScenBenignNoShare\% without sharing. Revoke-on-write falls to \ScenBenignRevoke\% because it discards valid definitions on every write, and about a third of its relearning attempts (93 of 284) do not restore a valid definition.}
+{\emph{共享与正常更新（Q4）。}共享定义能在智能体之间迁移：在留出题上，正确率从不共享时的 \ScenHoldoutNoShare\% 提高到条件级维护的 \ScenHoldoutCond\%。四种正常更新之后，条件级维护保持 \ScenBenignCond\% 的正确率，不共享时为 \ScenBenignNoShare\%。写入即撤销降到 \ScenBenignRevoke\%，因为它每次写入都丢弃有效定义，而约三分之一的重新学习（284 次中的 93 次）没有恢复出有效定义。}
 
-\begin{table*}[t]
-\caption{\bt{Costs for 21 scored tasks. Tokens and wall time exclude initial learning and extraction; maintenance DB time covers append and v2. Relearning is additional. Values are rounded.}{21 道计分题成本：token 与墙钟时间不含初始学习和提炼，维护 DB 时间覆盖追加及 v2，重学另计，数值舍入。}}
-\label{tab:cost}
-\begin{tabularx}{\textwidth}{@{}Xrrrrr@{}}
-\toprule
-\bt{Method}{方法} & \bt{Input M}{输入百万} & \bt{Output M}{输出百万} & \bt{Turns/task}{轮数/题} & \bt{Wall s}{墙钟秒} & \bt{Maint. DB s}{维护 DB 秒}\\
-\midrule
-\bt{No shared definitions}{无共享定义} & 4.30 & 0.66 & 12.2 & 3306 & ---\\
-\bt{Condition-level}{条件级} & 0.52 & 0.12 & 4.9 & 587 & 22.36\\
-\bt{Definition-level}{定义级} & 0.49 & 0.13 & 4.9 & 613 & 52.96\\
-\bt{Revoke and relearn}{撤销重学} & 0.33 & 0.07 & 4.5 & 299 & 0\\
-\bt{Schema-only}{只看结构} & 0.43 & 0.07 & 4.8 & 331 & 0\\
-\bt{Unguarded}{无守护} & 1.84 & 0.34 & 8.1 & 1576 & 0\\
-\bottomrule
-\end{tabularx}
-\end{table*}
+\bi{\emph{Modeled breaking changes (Q1, Q5).} Maintenance separates the five modeled breaking changes from benign ones. Condition-level and definition-level maintenance and revoke-on-write never return or execute a stale revision in these settings, whereas schema-only maintenance and unguarded sharing do so in \ScenStaleModeledSchema\ and \ScenStaleModeledNoguard\ tasks (Table~\ref{tab:scen-cost}). Where restricted repair succeeds, accuracy recovers. Under the status history, condition-level maintenance answers \ScenAccCondStatus\% correctly, versus \ScenAccSchemaStatus\% for schema-only maintenance and \ScenAccNoShareStatus\% without sharing; under versioned corrections, \ScenAccCondRevision\% versus \ScenAccSchemaRevision\%. In both cases repair finds the status or current-version filter, regression accepts it, and agents receive the new revision. Under dimension history, every method that shares definitions answers correctly: execution-side SQL review rejects the item join that fans out, and agents add the current-version filter even when they declare a stale revision.}
+{\emph{已建模的破坏性变化（Q1、Q5）。}维护把 5 种已建模的破坏性变化与正常变化区分开。条件级、定义级维护和写入即撤销在这些情形中从不返回或执行过期修订；只看结构的维护和无守护共享则分别在 \ScenStaleModeledSchema\ 和 \ScenStaleModeledNoguard\ 道题中这样做（表~\ref{tab:scen-cost}）。受限修复成功时，正确率得以恢复。状态流水下，条件级维护答对 \ScenAccCondStatus\%，只看结构为 \ScenAccSchemaStatus\%，不共享为 \ScenAccNoShareStatus\%；版本化更正下为 \ScenAccCondRevision\% 对 \ScenAccSchemaRevision\%。两种情形中，修复都找到了状态或当前版本过滤，回归测试予以接受，智能体拿到新修订。维表拉链下，所有共享定义的方法都能答对：执行端 SQL 审查拒绝放大行数的商品连接，即使智能体声明了过期修订，也会自行补上当前版本过滤。}
 
-\bi{Condition-level event-accounted maintenance DB time is 22.363\,s versus 52.960\,s, a 57.8\% reduction. Components are 5.466 versus 19.027\,s after the append and 16.896 versus 33.933\,s after v2. This is maintenance time, not whole-workload DB time. Both methods revoke and repair three revisions after v2 and answer all six post-v2 tasks correctly.}
-{条件级按事件计量的维护 DB 时间为 22.363 秒，定义级为 52.960 秒，减少 57.8\%。追加后分别为 5.466 对 19.027 秒，v2 后为 16.896 对 33.933 秒。这是维护时间，不是全负载 DB 时间。两组在 v2 后都撤销并修复 3 个修订，答对全部 6 道 v2 后题。}
+\bi{\emph{Where the model stops (Q5).} Three settings bound the approach. A duplicate load breaks the sales grain and is revoked (\ScenRevokedDupload\ revocations), but no low-cardinality filter can separate identical rows, so repair fails and accuracy falls to the level without sharing (\ScenAccCondDupload\% versus \ScenAccNoShareDupload\%). Re-keyed dates break the coverage of the date join and are likewise revoked without a repair candidate (\ScenAccCondLatekey\% versus \ScenAccNoShareLatekey\%). In both cases maintenance is safe but the definition becomes unavailable; repairs that deduplicate or remap keys would be needed. The unit change violates no condition: \ScenUnitStaleTasks\ of \ScenUnitTasks\ condition-level tasks use the unchanged definition, and every method that shares definitions inherits the error. Validity conditions capture grain, multiplicity, and coverage, not the meaning of values.}
+{\emph{模型的边界（Q5）。}三种情形划出了方法的边界。重复装载破坏销售粒度并被撤销（\ScenRevokedDupload\ 次撤销），但低基数过滤无法区分完全相同的行，修复失败，正确率降到不共享的水平（\ScenAccCondDupload\% 对 \ScenAccNoShareDupload\%）。日期键改写破坏日期连接的覆盖，同样被撤销且没有修复候选（\ScenAccCondLatekey\% 对 \ScenAccNoShareLatekey\%）。这两种情形下维护是安全的，但定义变得不可用，需要能去重或重映射键的修复。单位变化不违反任何条件：条件级的 \ScenUnitTasks\ 道题中有 \ScenUnitStaleTasks\ 道使用了未变化的定义，所有共享定义的方法都继承了这一错误。有效性条件刻画粒度、多重性与覆盖，而不刻画取值的含义。}
 
-\bi{Relative to ordinary middleware, scored-task input tokens fall from 4.30\,M to 0.52\,M and wall time from 3306 to 587\,s. These are sharing effects, not an LLM advantage over definition-level maintenance. Initial learning adds about 0.11--0.31\,M input tokens per sharing cell, and extraction 0.043--0.052\,M total tokens. Revoke-and-relearn adds eight learning tasks, 569,178 tokens including extraction, and 904\,s before scoring resumes; zero maintenance DB time does not mean zero restoration cost.}
-{相对普通中间层，计分题输入 token 从 430 万降至 52 万，墙钟时间从 3306 降至 587 秒。这反映共享效果，不是模型相对定义级维护的优势。各共享组初始学习另耗约 11--31 万输入 token，提炼约 4.3--5.2 万总 token。撤销重学在恢复计分前额外耗费 8 道学习题、569,178 个含提炼 token 及 904 秒；维护 DB 为零不代表恢复无成本。}
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[mavra, ybar=1pt, width=\linewidth, height=48mm, bar width=4.2pt, ymin=0, ymax=100, enlarge x limits=0.09,
+  xtick={0,1,2,3,4,5}, xticklabels={\bl{No share}{不共享}, \bl{Ungd.}{无守护}, \bl{Schema}{结构}, \bl{Revoke}{撤销}, \bl{Def.}{定义级}, \bl{Cond.}{条件级}},
+  xticklabel style={align=center, font=\scriptsize}, ytick={0,25,50,75,100}, yticklabel={\pgfmathprintnumber{\tick}\%},
+  ylabel={\bt{Accuracy}{正确率}}, legend columns=3, legend style={at={(0.5,1.02)}, anchor=south}]
+\input{gen/scen-models}
+\end{axis}
+\end{tikzpicture}
+\caption{\bt{Accuracy per model, averaged over the settings in which all six methods have tasks for that model (11, 11, and 8 settings); bars show 95\% bootstrap intervals.}{各模型的正确率：在该模型下六种方法都有题的情形上平均（分别为 11、11、8 种情形），误差线为 95\% 自助法区间。}}
+\label{fig:models}
+\Description{Grouped bars of accuracy for six methods and three models. Sharing methods exceed no sharing for every model; condition-level and definition-level are close for DeepSeek and GLM-5.3.}
+\end{figure}
 
-\bi{Four of 30 initial extractions fail static validation because an aggregate uses an alias absent from canonical SQL. No incorrectly promoted definition is found by recorded audits. Two extraction-related bugs were corrected before the sharing runs; discarded runs are excluded. Artifact documentation records code and report provenance.}
-{30 次初始提炼中，4 次因聚合使用规范 SQL 中不存在的别名而未通过静态验证。记录审计未发现错误晋升定义。两个提炼问题在正式共享实验前修正，作废运行不计结果，附带文档记录代码及报告来源。}
+\bi{\emph{Across models (Q4).} The gain from sharing holds for every model (Figure~\ref{fig:models}): accuracy rises from \ScenAccNoShareModelA\% to \ScenAccCondModelA\% for DeepSeek V4.1 Flash, from \ScenAccNoShareModelB\% to \ScenAccCondModelB\% for GLM-5.3, and from \ScenAccNoShareModelC\% to \ScenAccCondModelC\% for GLM-5.3 Flash. Condition-level and definition-level maintenance use the same conditions and repairs and answer equally well for the two stronger models (\ScenAccCondModelA\% vs.\ \ScenAccDefModelA\%, \ScenAccCondModelB\% vs.\ \ScenAccDefModelB\%). For the weakest model, whose intervals are widest and which has fewer complete settings, condition-level cells trail definition-level ones (\ScenAccCondModelC\% vs.\ \ScenAccDefModelC\%); the remaining repetitions will show whether this gap is specific to the model.}
+{\emph{跨模型（Q4）。}共享带来的提升对每个模型都成立（图~\ref{fig:models}）：DeepSeek V4.1 Flash 从 \ScenAccNoShareModelA\% 提高到 \ScenAccCondModelA\%，GLM-5.3 从 \ScenAccNoShareModelB\% 提高到 \ScenAccCondModelB\%，GLM-5.3 Flash 从 \ScenAccNoShareModelC\% 提高到 \ScenAccCondModelC\%。条件级与定义级维护使用相同的条件和修复，对两个较强模型的正确率相当（\ScenAccCondModelA\% 对 \ScenAccDefModelA\%，\ScenAccCondModelB\% 对 \ScenAccDefModelB\%）。最弱的模型区间最宽、完整情形更少，其条件级各组落后于定义级（\ScenAccCondModelC\% 对 \ScenAccDefModelC\%）；尚待完成的重复将表明这一差距是否为该模型所特有。}
+
+\begin{table}[t]
+\caption{\bt{End-to-end safety and cost per method. Correct: mean over the 11 settings. Stale: scored tasks after an update that used a stale definition. Revoked/repaired and maintenance DB time: per cell, summed over the ten scenarios. Input tokens: per held-out task.}{各方法的端到端安全性与代价。正确率：11 种情形平均。过期使用：更新后使用过期定义的计分题数。撤销／修复与维护 DB 时间：每组十个场景合计。输入 token：每道留出题。}}
+\label{tab:scen-cost}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\input{gen/scen-cost}
+\end{table}
+
+\bi{\emph{Maintenance and agent cost (Q2).} Condition-level maintenance needs \ScenMaintCond\,s of maintenance database time per cell, versus \ScenMaintDef\,s for definition-level revalidation (\ScenMaintRatio\%), while revoking and repairing about the same number of revisions (Table~\ref{tab:scen-cost}). Revoke-on-write spends no maintenance database time, but it revokes about 24 revisions per cell and relearns them with \ScenRelearnTok\,M LLM tokens per cell. Sharing also shortens agent work on held-out questions: turns per task fall from \ScenHoldTurnsNoShareModelA\ to \ScenHoldTurnsCondModelA\ for DeepSeek and from \ScenHoldTurnsNoShareModelB\ to \ScenHoldTurnsCondModelB\ for GLM-5.3, and input tokens by \ScenHoldTokSaveModelA\% and \ScenHoldTokSaveModelB\%. GLM-5.3 Flash saves only \ScenHoldTokSaveModelC\%. In an earlier single-model run, static admission rejected four of 30 initial extractions whose aggregate expressions used aliases absent from canonical SQL, before any of them reached another agent.}
+{\emph{维护与智能体代价（Q2）。}条件级维护每组需要 \ScenMaintCond\ 秒维护数据库时间，定义级重验证为 \ScenMaintDef\ 秒（\ScenMaintRatio\%），两者撤销和修复的修订数大致相同（表~\ref{tab:scen-cost}）。写入即撤销不花维护数据库时间，但每组撤销约 24 个修订，并用每组 \ScenRelearnTok\ 百万个大模型 token 重新学习。共享还缩短了智能体在留出题上的工作：DeepSeek 每题轮数从 \ScenHoldTurnsNoShareModelA\ 降至 \ScenHoldTurnsCondModelA{}，GLM-5.3 从 \ScenHoldTurnsNoShareModelB\ 降至 \ScenHoldTurnsCondModelB{}，输入 token 分别减少 \ScenHoldTokSaveModelA\% 和 \ScenHoldTokSaveModelB\%；GLM-5.3 Flash 只减少 \ScenHoldTokSaveModelC\%。在较早的单模型运行中，30 次初始提炼里有 4 次因聚合表达式使用规范 SQL 中不存在的别名而被静态准入拒绝，未传到任何其他智能体。}
 
 \section{\bt{Related Work}{相关工作}}
 \label{sec:related}
-\paragraph{\bt{Agent-oriented systems and semantic memory}{面向智能体的系统与语义记忆}}
-\bi{Liu et al.~\cite{liu2026agents} discuss redundant exploration and shared agentic memory. AgentSM~\cite{biswal2026agentsm} represents traces as structured semantic memory for agentic Text-to-SQL. \system\ studies maintenance through explicit data conditions. A matched AgentSM-style retrieval baseline is not implemented in these experiments, so no accuracy improvement over it is claimed.}
-{Liu 等~\cite{liu2026agents}讨论重复探索与共享智能体记忆，AgentSM~\cite{biswal2026agentsm}将轨迹表示为支持智能体 Text-to-SQL 的结构化语义记忆。\system\ 研究通过显式数据条件维护定义。本次尚未实现匹配的 AgentSM 式检索基线，因此不主张相对它的正确率提升。}
-\paragraph{\bt{Lazy maintenance and consistent reuse}{懒维护与一致性复用}}
-\bi{Lazy materialized-view maintenance~\cite{zhou2007lazy} defers work until use. \system\ factors repeated validation into shared conditions. TxCache~\cite{ports2010txcache} links application caching to transactional consistency, motivating the snapshot-compatible design in Section~\ref{sec:execution}, distinct from the evaluated version detection.}
-{物化视图懒维护~\cite{zhou2007lazy}将工作推迟到使用时，\system\ 将重复验证分解为共享条件。TxCache~\cite{ports2010txcache}将应用缓存与事务一致性联系起来，为第~\ref{sec:execution} 节的快照兼容设计提供参考，该设计与本次评估的版本检测保持区分。}
+\paragraph{\bt{Data agents and business semantics}{数据智能体与业务语义}}
+\bi{Agent-first data systems~\cite{liu2026agents} and recent tutorials~\cite{luo2026dataagents,li2026agenticmemory} identify redundant exploration, persistent agent memory, and changing data as open problems. Text-to-SQL benchmarks and studies show the importance of business knowledge on realistic schemas~\cite{li2023bird,lei2025spider2,huo2026birdinteract,floratou2024nl2sql,li2024dawn}, and explicit semantics improves accuracy~\cite{sequeda2024kg}. Business-intelligence platforms maintain term definitions~\cite{jiang2025siriusbi} or generate calculation logic from script history and lineage~\cite{weng2025datalab}; AgentSM organizes trajectories as structured semantic memory~\cite{biswal2026agentsm}. \system\ adds a maintenance lifecycle to shared learned definitions: executable conditions connect their recorded meaning and implementation to current database state, and updates trigger revalidation, revocation, and repair. Schema and data-model robustness studies~\cite{zhang2025evoschema,furst2025datamodel} address complementary changes; our evaluation isolates data-only breakage under a fixed schema.}
+{面向智能体的数据系统~\cite{liu2026agents}和近期教程~\cite{luo2026dataagents,li2026agenticmemory}把重复探索、持久的智能体记忆和变化的数据列为开放问题。Text-to-SQL 基准与研究表明，业务知识对真实表结构上的准确性至关重要~\cite{li2023bird,lei2025spider2,huo2026birdinteract,floratou2024nl2sql,li2024dawn}，显式语义能够提高正确率~\cite{sequeda2024kg}。商业智能平台维护术语定义~\cite{jiang2025siriusbi}，或从脚本历史和血缘中生成计算逻辑~\cite{weng2025datalab}；AgentSM 把轨迹组织为结构化语义记忆~\cite{biswal2026agentsm}。\system\ 为共享的学习定义增加维护生命周期：可执行条件把定义记录的含义与实现联系到当前数据库状态，更新触发重验证、撤销和修复。表结构与数据模型鲁棒性研究~\cite{zhang2025evoschema,furst2025datamodel}处理互补的变化；本文评估单独考察固定表结构下的纯数据破坏。}
+
+\paragraph{\bt{Agent memory and experience reuse}{智能体记忆与经验复用}}
+\bi{Agent memory systems induce workflows from successful trajectories~\cite{wang2025awm}, distill insights or strategies from experience~\cite{zhao2024expel,ouyang2026reasoningbank}, evolve context playbooks~\cite{zhang2026ace}, link and update notes~\cite{xu2025amem}, manage long-term facts~\cite{chhikara2025mem0,packer2023memgpt}, and cache plan templates~\cite{zhang2025apc} or past solutions~\cite{guo2024dsagent}. These representations organize knowledge across tasks and conversations. \system\ represents shared metric knowledge together with typed database conditions and versioned evidence. Condition outcomes govern admission and continued use, while a failed condition leads to a new regression-tested revision. This connects experience reuse to the evolving external state on which that experience depends.}
+{智能体记忆系统从成功轨迹中归纳工作流~\cite{wang2025awm}，从经验中提炼洞见或策略~\cite{zhao2024expel,ouyang2026reasoningbank}，演化上下文手册~\cite{zhang2026ace}，链接并更新笔记~\cite{xu2025amem}，管理长期事实~\cite{chhikara2025mem0,packer2023memgpt}，并缓存计划模板~\cite{zhang2025apc}或既往方案~\cite{guo2024dsagent}。这些表示在任务与对话之间组织知识。\system\ 把共享指标知识与类型化数据库条件、版本化证据一起表示。条件结论决定准入与持续使用，条件失败则产生经过回归测试的新修订，由此把经验复用联系到经验所依赖、不断变化的外部状态。}
+
+\paragraph{\bt{Metric layers and summarizability}{指标层与可汇总性}}
+\bi{Dimensional modeling requires conformed definitions across data marts~\cite{kimball2013toolkit}, and measures in SQL attach aggregation semantics to tables so that joins do not double count~\cite{hyde2024measures}. Summarizability research identifies disjointness, completeness, and type compatibility as necessary conditions for correct aggregation~\cite{lenz1997summarizability}, surveys how multidimensional models violate them~\cite{mazon2009summarizability}, and proposes summary constraints analogous to integrity constraints~\cite{horner2004additivity}. Commercial metric layers declare keys and join properties, and at least one documents that they are not validated at runtime~\cite{databricks2026metricviews}. \system\ turns these conditions into executable checks attached to learned definitions and maintains them as the data changes.}
+{维度建模要求在各数据集市间使用一致的定义~\cite{kimball2013toolkit}；SQL 中的度量把聚合语义附着在表上，使连接不再重复计数~\cite{hyde2024measures}。可汇总性研究指出，不相交、完备和类型相容是正确汇总的必要条件~\cite{lenz1997summarizability}，综述了多维模型违反这些条件的方式~\cite{mazon2009summarizability}，并提出类似完整性约束的汇总约束~\cite{horner2004additivity}。商用指标层声明键与连接性质，至少有一家在文档中写明这些性质不在运行时验证~\cite{databricks2026metricviews}。\system\ 把这些条件变成附着在学到的定义上的可执行检查，并在数据变化时维护它们。}
+
+\paragraph{\bt{Constraints, profiling, and data validation}{约束、数据画像与数据验证}}
+\bi{Integrity checking specializes verification to updates that can violate a constraint~\cite{nicolas1982integrity,ceri1990constraint}, and derived-relation maintenance can first identify irrelevant updates~\cite{blakeley1989irrelevant}. Soft constraints describe properties that hold on current data and support optimization while valid~\cite{godfrey2001soft,ilyas2004cords}. Profiling discovers and maintains unique column combinations and dependencies~\cite{abedjan2015profiling,abedjan2014swan,schirmer2019dynfd}. Data-validation systems check declarative constraints on changing batches, share scans~\cite{schelter2018deequ}, and infer constraints from data~\cite{breck2019validation,song2021autovalidate,redyuk2021dynamic}. \system\ couples executable checking to the validity of shared agent knowledge. Conditions are derived from structured learned definitions; versioned verdicts serve every definition that requires them and determine whether an agent may use a revision. Regression-tested repair then restores the definition's implementation when an update breaks a required condition.}
+{完整性检查按可能违反约束的更新执行验证~\cite{nicolas1982integrity,ceri1990constraint}，派生关系维护可以先识别无关更新~\cite{blakeley1989irrelevant}。软约束描述当前数据上成立的性质，并在有效时支持优化~\cite{godfrey2001soft,ilyas2004cords}。数据画像发现并维护唯一列组合与依赖~\cite{abedjan2015profiling,abedjan2014swan,schirmer2019dynfd}；数据验证系统对变化的批次检查声明式约束、共享扫描~\cite{schelter2018deequ}，并从数据中推断约束~\cite{breck2019validation,song2021autovalidate,redyuk2021dynamic}。\system\ 把可执行检查与共享智能体知识的有效性结合起来。条件由结构化的学习定义推出，版本化结论服务于所有需要该条件的定义，并决定智能体能否使用某个修订。当更新破坏必需条件时，经过回归测试的修复恢复定义的实现。}
+
+\paragraph{\bt{View maintenance, shared work, and caching}{视图维护、共享计算与缓存}}
+\bi{Materialized-view maintenance~\cite{gupta1995maintenance,blakeley1986efficiently} can defer work off the update path~\cite{colby1996deferred} or until a view is referenced~\cite{zhou2007lazy}; our definition-level baseline applies this lazy strategy. Multiple-query optimization and shared execution evaluate common work once~\cite{sellis1988mqo,harizopoulos2005qpipe,giannikis2012shareddb}, while recycling reuses intermediate results under updates~\cite{ivanova2010recycling}. Cache designs use semantic descriptions~\cite{dar1996semantic}, update-driven invalidation~\cite{garrod2008ferdinand}, validity intervals~\cite{ports2010txcache}, input-dependent keys~\cite{gunda2010nectar}, and leases that merge concurrent misses~\cite{nishtala2013memcache}. Build systems track dependency hashes~\cite{mokhov2018build}, demand-driven incremental computation recomputes requested dependencies~\cite{hammer2014adapton}, and LLM caches combine reuse with selective recomputation~\cite{agarwal2025cachecraft}. In \system, the maintained object is a condition verdict supporting the recorded implementation of a learned metric definition. Its identity and dependency versions define the reuse boundary across formulas and agents; a failing verdict drives revocation and repair for affected definitions.}
+{物化视图维护~\cite{gupta1995maintenance,blakeley1986efficiently}可以把工作移出更新路径~\cite{colby1996deferred}，或推迟到视图被引用时~\cite{zhou2007lazy}；本文定义级基线采用这一懒维护策略。多查询优化与共享执行对公共工作只计算一次~\cite{sellis1988mqo,harizopoulos2005qpipe,giannikis2012shareddb}，中间结果回收在更新中复用结果~\cite{ivanova2010recycling}。缓存设计使用语义描述~\cite{dar1996semantic}、更新驱动失效~\cite{garrod2008ferdinand}、有效区间~\cite{ports2010txcache}、依赖输入的键~\cite{gunda2010nectar}及合并并发未命中的租约~\cite{nishtala2013memcache}。构建系统跟踪依赖哈希~\cite{mokhov2018build}，按需增量计算重算被请求的依赖~\cite{hammer2014adapton}，大模型缓存结合复用与选择性重算~\cite{agarwal2025cachecraft}。在 \system\ 中，维护对象是支撑学习指标定义所记录实现的条件结论。条件身份与依赖版本界定跨公式、跨智能体的复用边界，失败结论驱动受影响定义的撤销与修复。}
 
 \section{\bt{Discussion and Limitations}{讨论与局限}}
 \label{sec:limitations}
 \paragraph{\bt{Evidence and guarantee scope}{证据与保证范围}}
-\bi{Business evidence supplies meaning; executable conditions describe implementation requirements. Restoring a condition does not prove all semantics. Reference queries and repair regression are necessary but share the synthetic generator. The prototype has no same-snapshot execution guarantee, complete independent coverage maintenance, or protection for undeclared metric use.}
-{业务证据提供含义，可执行条件描述实现要求。恢复条件不证明全部语义，参考查询与修复回归仍有必要，但与合成生成器同源。原型尚无同快照执行保证、完整独立覆盖维护，以及对未声明指标使用的保护。}
+\bi{Business evidence supplies metric meaning, and executable conditions encode the data properties required by its implementation. Repair combines grain and coverage checks with regression against judged learning queries. The reference queries and regression evidence share the synthetic workload generator, so independent business-grounded evaluation remains an important extension. The current prototype checks declared metric references and uses coverage during repair; undeclared use and independently maintained coverage lie beyond this implementation.}
+{业务证据提供指标含义，可执行条件编码实现所需的数据性质。修复把粒度、覆盖检查与经过判题的学习查询回归结合起来。参考查询与回归证据来自同一合成负载生成器，独立的业务依据评估是后续扩展的重要方向。当前原型检查显式声明的指标引用，并在修复中使用覆盖检查；未声明使用与独立维护的覆盖条件超出当前实现范围。}
+\paragraph{\bt{Proposed snapshot-bound execution}{绑定快照的执行设计}}
+\bi{Snapshot-bound execution is a proposed extension for concurrent writers. The current prototype checks before execution, with validation and business SQL on separate snapshots; the evaluation uses controlled update phases. To realize the target contract in Section~\ref{sec:model}, the extension acquires a query snapshot, resolves declared revisions and compatible evidence, validates remaining conditions on that snapshot, and executes on it. Replacements require renewed resolution and declaration. A stable transaction or exported snapshot can support this protocol, and cross-snapshot reuse requires evidence of unchanged dependency data. TxCache provides precedent for consistent cached reuse~\cite{ports2010txcache}.}
+{绑定快照执行是面向并发写入的扩展设计。当前原型在执行前检查，验证与业务 SQL 使用不同快照；评估采用受控更新阶段。为实现第~\ref{sec:model} 节的目标契约，该扩展获取查询快照，解析声明修订及兼容证据，在该快照上验证剩余条件并执行。替代修订需要重新解析和声明。稳定事务或导出快照可以支持这一协议，跨快照复用需要依赖数据未变化的证据。TxCache 提供了一致性缓存复用的技术先例~\cite{ports2010txcache}。}
 \paragraph{\bt{Generalization and attribution}{泛化与归因}}
-\bi{End-to-end evidence covers three metric concepts, one model, synthetic data, and one run per cell. The 19-definition maintenance benchmark has eight scripted concurrent agents, not eight concurrent LLMs. Two policy orders do not establish significance. Disabled WAL and fsync limit absolute-time interpretation in durable deployments. Future whole-workload comparisons must include admission, all DB work, and failed extraction effort.}
-{端到端证据仅覆盖 3 个指标概念、1 个模型、合成数据及每组 1 次运行。19 个定义的维护实验使用 8 个脚本并发智能体，不是 8 个并发模型。两种策略顺序不建立显著性。关闭 WAL 和 fsync 限制绝对耗时对持久化部署的解释。未来全负载比较应纳入准入、全部 DB 工作及失败提炼成本。}
+\bi{The controlled sweeps isolate maintenance across sharing levels and arrival patterns with eight scripted agents and two policy orders. The end-to-end scenarios cover three LLMs, six methods, and ten updates, but a single synthetic schema, and provider usage caps left the planned three repetitions incomplete, so the comparison for the weakest model remains uncertain. The reference queries and the regression evidence share the synthetic workload generator. The workload study uses one model on this schema; its contrast with Redset is large, but the absolute rates depend on the tools and schema. With WAL and fsync disabled, the reported timings characterize this configuration; durable deployments require separate measurement. A second schema with real update histories and a matched trajectory-retrieval baseline would further isolate the contribution of structured definitions and update-driven maintenance.}
+{受控扫描使用 8 个脚本智能体与两种策略顺序，单独测量共享程度和到达方式对维护的影响。端到端场景覆盖 3 个大模型、6 种方法和 10 种更新，但只有一个合成表结构；服务商用量上限使计划的 3 次重复尚未完成，因此最弱模型上的比较仍不确定。参考查询与回归证据来自同一合成负载生成器。负载刻画在该表结构上只用了一个模型，它与 Redset 的差别很大，但绝对比例取决于工具与表结构。关闭 WAL 与 fsync 的耗时刻画当前实验配置，持久化部署需要单独测量。具有真实更新历史的第二个表结构，以及匹配的轨迹检索基线，可以进一步分离结构化定义与更新驱动维护的贡献。}
 \paragraph{\bt{Operating range}{适用范围}}
-\bi{Reuse benefits common conditions and staggered arrivals. A true zero-sharing workload is still needed because $k=1$ retains cross-family sharing. Simultaneous arrivals let the baseline merge work, reducing the extra gain; updates touching all dependencies reduce scope savings. Repair-window rejections require separate availability analysis. Broader evaluation should add late data, duplicate loads, soft deletes, dimension-key reuse, schema changes, more models, repeated trials, and matched retrieval.}
-{共同条件与错峰到达有利于复用。仍需真正零共享负载，因为 $k=1$ 保留跨族共享。同时到达让基线也能合并工作，减少额外收益；更新触及全部依赖会减少范围收益。修复窗口拒绝需要单独分析可用性。后续应加入迟到数据、重复加载、软删除、维度键复用、结构变化、更多模型、重复试验及匹配检索。}
+\bi{Two factors determine reuse gains: overlap in definitions' conditions and temporal separation of requests. Shared conditions multiply the uses served by one verdict; staggered requests extend that reuse beyond an in-flight check. Simultaneous arrivals also help the baseline merge work, while updates touching all dependencies reduce scope savings. The measured repair window identifies publication coordination as a separate design dimension. Zero-sharing workloads can quantify fixed overhead. The scenarios mark the model's coverage: duplicate loads and re-keyed dates are detected but cannot be repaired by filters, and value-level changes such as units are not modeled. Repair operators that deduplicate rows or remap keys, and conditions on value distributions, are natural extensions.}
+{两个因素决定复用收益：定义所需条件的重叠程度，以及请求在时间上的分散程度。共享条件扩大一个结论服务的使用范围，错峰请求把复用延伸到在途检查结束之后。同时到达也使基线能够合并工作，触及全部依赖的更新则减少检查范围带来的节省。实测修复窗口把发布协调确立为独立的设计维度。零共享负载可以量化固定开销。场景实验标出了模型的覆盖范围：重复装载与日期键改写能被检测，却无法用过滤修复；单位等取值层面的变化没有被刻画。能够去重或重映射键的修复算子，以及关于取值分布的条件，是自然的扩展。}
 
 \section{\bt{Conclusion}{结论}}
-\bi{\system\ treats continued validity of shared metric definitions as a maintenance problem. Executable conditions connect business evidence to data assumptions, and condition-level maintenance shares validation and repair. The experiments show substantial savings under staggered use and expose data-only failure and concurrent repair availability. Revision checks support controlled use; snapshot-bound execution and broader evaluation are needed for stronger guarantees.}
-{\system\ 将共享指标定义的持续有效性作为维护问题。可执行条件连接业务证据与数据假设，条件级维护共享验证和修复。实验显示错峰使用下明显节省，并揭示纯数据失效与并发修复可用性问题。修订检查支撑受控使用，更强保证需要绑定快照执行与更广泛评估。}
+\bi{Data agents repeat knowledge rather than queries: fresh sessions rediscover the same database facts that an application keeps in code. \system\ turns that knowledge into shared metric definitions and keeps them correct as the database changes. It represents the data assumptions behind learned formulas as executable conditions, maintains their verdicts by dependency version, and shares that evidence across definitions and agents. Admission, revalidation, revocation, regression-tested repair, and declared revision checks support definitions from initial learning through reuse under updates. In the controlled benchmark, condition-level maintenance uses \MaintStagMin--\MaintStagMax\% of the database time of definition-level revalidation under staggered arrivals and \MaintSimMin--\MaintSimMax\% under simultaneous arrivals, with zero stale uses and zero false revocations. Across ten data changes and three LLMs, maintained sharing raises accuracy from \ScenAccNoShare\% to \ScenAccCond\% and never uses a stale definition under the modeled breaking changes. Changes that no filter can repair, and changes to the meaning of values, mark the next steps.}
+{数据智能体重复的是知识而非查询：全新会话反复获取应用早已写在代码里的数据库事实。\system\ 把这些知识变成共享的指标定义，并在数据库变化时保持其正确。它把学习公式背后的数据假设表示为可执行条件，按依赖版本维护条件结论，并跨定义、跨智能体共享这些证据。准入、重验证、撤销、回归修复及声明修订核对，支撑定义从首次学习到更新后的复用。受控实验中，条件级维护在错峰到达时使用定义级重验证 \MaintStagMin--\MaintStagMax\% 的数据库时间，同时到达时为 \MaintSimMin--\MaintSimMax\%，且为零过期使用、零误撤销。在 10 种数据变化和 3 个大模型上，维护后的共享定义把正确率从 \ScenAccNoShare\% 提高到 \ScenAccCond\%，并在已建模的破坏性变化下从不使用过期定义。无法用过滤修复的变化，以及取值含义的变化，是下一步的方向。}
 
-\begin{thebibliography}{4}
-\bibitem{liu2026agents}
-Shu Liu, Soujanya Ponnapalli, Shreya Shankar, Sepanta Zeighami, Alan Zhu,
-Shubham Agarwal, Ruiqi Chen, Samion Suwito, Shuo Yuan, Ion Stoica,
-Matei Zaharia, Alvin Cheung, Natacha Crooks, Joseph E. Gonzalez,
-and Aditya G. Parameswaran.
-2026. Supporting Our AI Overlords: Redesigning Data Systems to be Agent-First.
-In \emph{Conference on Innovative Data Systems Research (CIDR)}.
-\url{https://www.cidrdb.org/cidr2026/papers/p32-liu.pdf}
+\begin{thebibliography}{59}
+
+\bibitem{abedjan2015profiling}
+Ziawasch Abedjan, Lukasz Golab, and Felix Naumann. 2015. Profiling Relational Data: A Survey. \emph{The VLDB Journal} 24, 4 (2015), 557--581. \url{https://doi.org/10.1007/s00778-015-0389-y}
+
+\bibitem{abedjan2014swan}
+Ziawasch Abedjan, Jorge-Arnulfo Quian{\'e}-Ruiz, and Felix Naumann. 2014. Detecting Unique Column Combinations on Dynamic Data. In \emph{Proceedings of the 30th IEEE International Conference on Data Engineering (ICDE)}. 1036--1047. \url{https://doi.org/10.1109/ICDE.2014.6816721}
+
+\bibitem{agarwal2025cachecraft}
+Shubham Agarwal, Sai Sundaresan, Subrata Mitra, Debabrata Mahapatra, Archit Gupta, Rounak Sharma, Nirmal Joshua Kapu, Tong Yu, and Shiv Saini. 2025. Cache-Craft: Managing Chunk-Caches for Efficient Retrieval-Augmented Generation. \emph{Proceedings of the ACM on Management of Data} 3, 3 (2025). \url{https://doi.org/10.1145/3725273}
 
 \bibitem{biswal2026agentsm}
-Asim Biswal, Chuan Lei, Xiao Qin, Aodong Li, Balakrishnan Narayanaswamy,
-and Tim Kraska.
-2026. AgentSM: Semantic Memory for Agentic Text-to-SQL.
-\emph{arXiv preprint arXiv:2601.15709}.
-\url{https://arxiv.org/abs/2601.15709}
+Asim Biswal, Chuan Lei, Xiao Qin, Aodong Li, Balakrishnan Narayanaswamy, and Tim Kraska. 2026. AgentSM: Semantic Memory for Agentic Text-to-SQL. arXiv:2601.15709 (preprint). \url{https://arxiv.org/abs/2601.15709}
 
-\bibitem{zhou2007lazy}
-Jingren Zhou, Per-\AA ke Larson, and Hicham G. Elmongui.
-2007. Lazy Maintenance of Materialized Views.
-In \emph{Proceedings of the 33rd International Conference on Very Large Data Bases (VLDB)}, 231--242.
-\url{https://www.vldb.org/conf/2007/papers/research/p231-zhou.pdf}
+\bibitem{blakeley1989irrelevant}
+Jos{\'e} A. Blakeley, Neil Coburn, and Per-{\AA}ke Larson. 1989. Updating Derived Relations: Detecting Irrelevant and Autonomously Computable Updates. \emph{ACM Transactions on Database Systems} 14, 3 (1989), 369--400. \url{https://doi.org/10.1145/68012.68015}
+
+\bibitem{blakeley1986efficiently}
+Jos{\'e} A. Blakeley, Per-{\AA}ke Larson, and Frank Wm. Tompa. 1986. Efficiently Updating Materialized Views. In \emph{Proceedings of the 1986 ACM SIGMOD International Conference on Management of Data}. 61--71. \url{https://doi.org/10.1145/16894.16861}
+
+\bibitem{breck2019validation}
+Eric Breck, Neoklis Polyzotis, Sudip Roy, Steven Euijong Whang, and Martin Zinkevich. 2019. Data Validation for Machine Learning. In \emph{Proceedings of Machine Learning and Systems (MLSys)}, Vol.~1. 334--347.
+
+\bibitem{ceri1990constraint}
+Stefano Ceri and Jennifer Widom. 1990. Deriving Production Rules for Constraint Maintenance. In \emph{Proceedings of the 16th International Conference on Very Large Data Bases (VLDB)}. 566--577.
+
+\bibitem{chhikara2025mem0}
+Prateek Chhikara, Dev Khant, Saket Aryan, Taranjeet Singh, and Deshraj Yadav. 2025. Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory. In \emph{ECAI 2025} (Frontiers in Artificial Intelligence and Applications, Vol.~413). 2993--3000. \url{https://doi.org/10.3233/FAIA251160}
+
+\bibitem{colby1996deferred}
+Latha S. Colby, Timothy Griffin, Leonid Libkin, Inderpal Singh Mumick, and Howard Trickey. 1996. Algorithms for Deferred View Maintenance. In \emph{Proceedings of the 1996 ACM SIGMOD International Conference on Management of Data}. 469--480. \url{https://doi.org/10.1145/233269.233364}
+
+\bibitem{curino2008prism}
+Carlo A. Curino, Hyun J. Moon, and Carlo Zaniolo. 2008. Graceful Database Schema Evolution: The PRISM Workbench. \emph{Proceedings of the VLDB Endowment} 1, 1 (2008), 761--772. \url{https://doi.org/10.14778/1453856.1453939}
+
+\bibitem{dar1996semantic}
+Shaul Dar, Michael J. Franklin, Bj{\"o}rn T. J{\'o}nsson, Divesh Srivastava, and Michael Tan. 1996. Semantic Data Caching and Replacement. In \emph{Proceedings of the 22nd International Conference on Very Large Data Bases (VLDB)}. 330--341.
+
+\bibitem{databricks2026metricviews}
+Databricks. 2026. Unity Catalog Metric Views: Model Star Schemas. Product documentation. \url{https://docs.databricks.com/aws/en/uc-semantics/metric-views/basic-modeling}. Accessed 2026-09-29.
+
+\bibitem{floratou2024nl2sql}
+Avrilia Floratou, Fotis Psallidas, Fuheng Zhao, Shaleen Deep, Gunther Hagleither, Wangda Tan, Joyce Cahoon, Rana Alotaibi, Jordan Henkel, Abhik Singla, Alex van Grootel, Brandon Chow, Kai Deng, Katherine Lin, Marcos Campos, Venkatesh Emani, Vivek Pandit, Victor Shnayder, Wenjing Wang, and Carlo Curino. 2024. NL2SQL is a Solved Problem... Not!. In \emph{14th Annual Conference on Innovative Data Systems Research (CIDR)}. \url{https://www.cidrdb.org/cidr2024/papers/p74-floratou.pdf}
+
+\bibitem{furst2025datamodel}
+Jonathan F{\"u}rst, Catherine Kosten, Farhad Nooralahzadeh, Yi Zhang, and Kurt Stockinger. 2025. Evaluating the Data Model Robustness of Text-to-SQL Systems Based on Real User Queries. In \emph{Proceedings of the 28th International Conference on Extending Database Technology (EDBT)}. 158--170. \url{https://doi.org/10.48786/edbt.2025.13}
+
+\bibitem{garrod2008ferdinand}
+Charles Garrod, Amit Manjhi, Anastasia Ailamaki, Bruce Maggs, Todd Mowry, Christopher Olston, and Anthony Tomasic. 2008. Scalable Query Result Caching for Web Applications. \emph{Proceedings of the VLDB Endowment} 1, 1 (2008), 550--561. \url{https://doi.org/10.14778/1453856.1453917}
+
+\bibitem{giannikis2012shareddb}
+Georgios Giannikis, Gustavo Alonso, and Donald Kossmann. 2012. SharedDB: Killing One Thousand Queries With One Stone. \emph{Proceedings of the VLDB Endowment} 5, 6 (2012), 526--537. \url{https://doi.org/10.14778/2168651.2168654}
+
+\bibitem{godfrey2001soft}
+Parke Godfrey, Jarek Gryz, and Calisto Zuzarte. 2001. Exploiting Constraint-Like Data Characterizations in Query Optimization. In \emph{Proceedings of the 2001 ACM SIGMOD International Conference on Management of Data}. 582--592. \url{https://doi.org/10.1145/375663.375749}
+
+\bibitem{gunda2010nectar}
+Pradeep Kumar Gunda, Lenin Ravindranath, Chandramohan A. Thekkath, Yuan Yu, and Li Zhuang. 2010. Nectar: Automatic Management of Data and Computation in Datacenters. In \emph{9th USENIX Symposium on Operating Systems Design and Implementation (OSDI)}. 75--88.
+
+\bibitem{guo2024dsagent}
+Siyuan Guo, Cheng Deng, Ying Wen, Hechang Chen, Yi Chang, and Jun Wang. 2024. DS-Agent: Automated Data Science by Empowering Large Language Models with Case-Based Reasoning. In \emph{Proceedings of the 41st International Conference on Machine Learning (ICML)} (PMLR, Vol.~235). 16813--16848.
+
+\bibitem{gupta1995maintenance}
+Ashish Gupta and Inderpal Singh Mumick. 1995. Maintenance of Materialized Views: Problems, Techniques, and Applications. \emph{IEEE Data Engineering Bulletin} 18, 2 (1995), 3--18.
+
+\bibitem{hammer2014adapton}
+Matthew A. Hammer, Khoo Yit Phang, Michael Hicks, and Jeffrey S. Foster. 2014. Adapton: Composable, Demand-Driven Incremental Computation. In \emph{Proceedings of the 35th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI)}. 156--166. \url{https://doi.org/10.1145/2594291.2594324}
+
+\bibitem{harizopoulos2005qpipe}
+Stavros Harizopoulos, Vladislav Shkapenyuk, and Anastassia Ailamaki. 2005. QPipe: A Simultaneously Pipelined Relational Query Engine. In \emph{Proceedings of the 2005 ACM SIGMOD International Conference on Management of Data}. 383--394. \url{https://doi.org/10.1145/1066157.1066201}
+
+\bibitem{horner2004additivity}
+John Horner, Il-Yeol Song, and Peter P. Chen. 2004. An Analysis of Additivity in OLAP Systems. In \emph{Proceedings of the 7th ACM International Workshop on Data Warehousing and OLAP (DOLAP)}. 83--91. \url{https://doi.org/10.1145/1031763.1031779}
+
+\bibitem{huo2026birdinteract}
+Nan Huo, Xiaohan Xu, Jinyang Li, Per Jacobsson, Shipei Lin, Bowen Qin, Binyuan Hui, Xiaolong Li, Ge Qu, Shuzheng Si, Linheng Han, Edward Alexander, Xintong Zhu, Rui Qin, Ruihan Yu, Yiyao Jin, Feige Zhou, Weihao Zhong, Yun Chen, Hongyu Liu, Chenhao Ma, Fatma Ozcan, Yannis Papakonstantinou, and Reynold Cheng. 2026. BIRD-INTERACT: Re-imagining Text-to-SQL Evaluation via Lens of Dynamic Interactions. In \emph{International Conference on Learning Representations (ICLR)}.
+
+\bibitem{hyde2024measures}
+Julian Hyde and John Fremlin. 2024. Measures in SQL. In \emph{Companion of the 2024 International Conference on Management of Data (SIGMOD-Companion)}. 31--40. \url{https://doi.org/10.1145/3626246.3653374}
+
+\bibitem{ilyas2004cords}
+Ihab F. Ilyas, Volker Markl, Peter Haas, Paul Brown, and Ashraf Aboulnaga. 2004. CORDS: Automatic Discovery of Correlations and Soft Functional Dependencies. In \emph{Proceedings of the 2004 ACM SIGMOD International Conference on Management of Data}. 647--658. \url{https://doi.org/10.1145/1007568.1007641}
+
+\bibitem{ivanova2010recycling}
+Milena G. Ivanova, Martin L. Kersten, Niels J. Nes, and Romulo A. P. Gon{\c{c}}alves. 2010. An Architecture for Recycling Intermediates in a Column-Store. \emph{ACM Transactions on Database Systems} 35, 4 (2010). \url{https://doi.org/10.1145/1862919.1862921}
+
+\bibitem{jiang2025siriusbi}
+Jie Jiang, Haining Xie, Siqi Shen, Yu Shen, Zihan Zhang, Meng Lei, Yifeng Zheng, Yang Li, Chunyou Li, Danqing Huang, Yinjun Wu, Wentao Zhang, Bin Cui, and Peng Chen. 2025. SiriusBI: A Comprehensive LLM-Powered Solution for Data Analytics in Business Intelligence. \emph{Proceedings of the VLDB Endowment} 18, 12 (2025), 4860--4873. \url{https://doi.org/10.14778/3750601.3750610}
+
+\bibitem{kimball2013toolkit}
+Ralph Kimball and Margy Ross. 2013. \emph{The Data Warehouse Toolkit: The Definitive Guide to Dimensional Modeling} (3rd ed.). John Wiley \& Sons.
+
+\bibitem{lei2025spider2}
+Fangyu Lei, Jixuan Chen, Yuxiao Ye, Ruisheng Cao, Dongchan Shin, Hongjin Su, Zhaoqing Suo, Hongcheng Gao, Wenjing Hu, Pengcheng Yin, Victor Zhong, Caiming Xiong, Ruoxi Sun, Qian Liu, Sida Wang, and Tao Yu. 2025. Spider 2.0: Evaluating Language Models on Real-World Enterprise Text-to-SQL Workflows. In \emph{International Conference on Learning Representations (ICLR)}.
+
+\bibitem{lenz1997summarizability}
+Hans-J. Lenz and Arie Shoshani. 1997. Summarizability in OLAP and Statistical Data Bases. In \emph{Proceedings of the 9th International Conference on Scientific and Statistical Database Management (SSDBM)}. 132--143. \url{https://doi.org/10.1109/SSDM.1997.621175}
+
+\bibitem{li2024dawn}
+Boyan Li, Yuyu Luo, Chengliang Chai, Guoliang Li, and Nan Tang. 2024. The Dawn of Natural Language to SQL: Are We Fully Ready? \emph{Proceedings of the VLDB Endowment} 17, 11 (2024), 3318--3331. \url{https://doi.org/10.14778/3681954.3682003}
+
+\bibitem{li2026agenticmemory}
+Guoliang Li, Jiaqi Tian, and Xuanhe Zhou. 2026. Data Management for Agentic Memory: Foundations, Systems, and Challenges. \emph{Proceedings of the VLDB Endowment} 19, 12 (2026), 4888--4892. \url{https://doi.org/10.14778/3827998.3828145}
+
+\bibitem{li2023bird}
+Jinyang Li, Binyuan Hui, Ge Qu, Jiaxi Yang, Binhua Li, Bowen Li, Bailin Wang, Bowen Qin, Ruiying Geng, Nan Huo, Xuanhe Zhou, Chenhao Ma, Guoliang Li, Kevin Chang, Fei Huang, Reynold Cheng, and Yongbin Li. 2023. Can LLM Already Serve as a Database Interface? A BIg Bench for Large-Scale Database Grounded Text-to-SQLs. In \emph{Advances in Neural Information Processing Systems 36 (NeurIPS), Datasets and Benchmarks Track}. 42330--42357.
+
+\bibitem{liu2026agents}
+Shu Liu, Soujanya Ponnapalli, Shreya Shankar, Sepanta Zeighami, Alan Zhu, Shubham Agarwal, Ruiqi Chen, Samion Suwito, Shuo Yuan, Ion Stoica, Matei Zaharia, Alvin Cheung, Natacha Crooks, Joseph E. Gonzalez, and Aditya G. Parameswaran. 2026. Supporting Our AI Overlords: Redesigning Data Systems to be Agent-First. In \emph{16th Annual Conference on Innovative Data Systems Research (CIDR)}. \url{https://www.cidrdb.org/cidr2026/papers/p32-liu.pdf}
+
+\bibitem{luo2026dataagents}
+Yuyu Luo, Guoliang Li, Ju Fan, and Nan Tang. 2026. Data Agents: Levels, State of the Art, and Open Problems. In \emph{Companion of the 2026 International Conference on Management of Data (SIGMOD-Companion)}. 571--579. \url{https://doi.org/10.1145/3788853.3801878}
+
+\bibitem{mazon2009summarizability}
+Jose-Norberto Maz{\'o}n, Jens Lechtenb{\"o}rger, and Juan Trujillo. 2009. A Survey on Summarizability Issues in Multidimensional Modeling. \emph{Data \& Knowledge Engineering} 68, 12 (2009), 1452--1469. \url{https://doi.org/10.1016/j.datak.2009.07.010}
+
+\bibitem{mokhov2018build}
+Andrey Mokhov, Neil Mitchell, and Simon Peyton Jones. 2018. Build Systems {\`a} la Carte. \emph{Proceedings of the ACM on Programming Languages} 2, ICFP, Article 79 (2018). \url{https://doi.org/10.1145/3236774}
+
+\bibitem{nicolas1982integrity}
+Jean-Marie Nicolas. 1982. Logic for Improving Integrity Checking in Relational Data Bases. \emph{Acta Informatica} 18, 3 (1982), 227--253. \url{https://doi.org/10.1007/BF00263192}
+
+\bibitem{nishtala2013memcache}
+Rajesh Nishtala, Hans Fugal, Steven Grimm, Marc Kwiatkowski, Herman Lee, Harry C. Li, Ryan McElroy, Mike Paleczny, Daniel Peek, Paul Saab, David Stafford, Tony Tung, and Venkateshwaran Venkataramani. 2013. Scaling Memcache at Facebook. In \emph{10th USENIX Symposium on Networked Systems Design and Implementation (NSDI)}. 385--398.
+
+\bibitem{ouyang2026reasoningbank}
+Siru Ouyang, Jun Yan, I-Hung Hsu, Yanfei Chen, Ke Jiang, Zifeng Wang, Rujun Han, Long T. Le, Samira Daruki, Xiangru Tang, Vishy Tirumalashetty, George Lee, Mahsan Rofouei, Hangfei Lin, Jiawei Han, Chen-Yu Lee, and Tomas Pfister. 2026. ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory. In \emph{International Conference on Learning Representations (ICLR)}.
+
+\bibitem{packer2023memgpt}
+Charles Packer, Sarah Wooders, Kevin Lin, Vivian Fang, Shishir G. Patil, Ion Stoica, and Joseph E. Gonzalez. 2023. MemGPT: Towards LLMs as Operating Systems. arXiv:2310.08560 (preprint). \url{https://arxiv.org/abs/2310.08560}
 
 \bibitem{ports2010txcache}
-Dan R. K. Ports, Austin T. Clements, Irene Zhang, Samuel Madden,
-and Barbara Liskov.
-2010. Transactional Consistency and Automatic Management in an Application Data Cache.
-In \emph{9th USENIX Symposium on Operating Systems Design and Implementation (OSDI)}.
-\url{https://www.usenix.org/conference/osdi10/transactional-consistency-and-automatic-management-application-data-cache}
+Dan R. K. Ports, Austin T. Clements, Irene Zhang, Samuel Madden, and Barbara Liskov. 2010. Transactional Consistency and Automatic Management in an Application Data Cache. In \emph{9th USENIX Symposium on Operating Systems Design and Implementation (OSDI)}. 279--292.
+
+\bibitem{redyuk2021dynamic}
+Sergey Redyuk, Zoi Kaoudi, Volker Markl, and Sebastian Schelter. 2021. Automating Data Quality Validation for Dynamic Data Ingestion. In \emph{Proceedings of the 24th International Conference on Extending Database Technology (EDBT)}. 61--72. \url{https://doi.org/10.5441/002/edbt.2021.07}
+
+\bibitem{schelter2018deequ}
+Sebastian Schelter, Dustin Lange, Philipp Schmidt, Meltem Celikel, Felix Biessmann, and Andreas Grafberger. 2018. Automating Large-Scale Data Quality Verification. \emph{Proceedings of the VLDB Endowment} 11, 12 (2018), 1781--1794. \url{https://doi.org/10.14778/3229863.3229867}
+
+\bibitem{schirmer2019dynfd}
+Philipp Schirmer, Thorsten Papenbrock, Sebastian Kruse, Dennis Hempfing, Torben Meyer, Daniel Neusch{\"a}fer-Rube, and Felix Naumann. 2019. DynFD: Functional Dependency Discovery in Dynamic Datasets. In \emph{Proceedings of the 22nd International Conference on Extending Database Technology (EDBT)}. 253--264. \url{https://doi.org/10.5441/002/edbt.2019.23}
+
+\bibitem{sellis1988mqo}
+Timos K. Sellis. 1988. Multiple-Query Optimization. \emph{ACM Transactions on Database Systems} 13, 1 (1988), 23--52. \url{https://doi.org/10.1145/42201.42203}
+
+\bibitem{sequeda2024kg}
+Juan Sequeda, Dean Allemang, and Bryon Jacob. 2024. A Benchmark to Understand the Role of Knowledge Graphs on Large Language Model's Accuracy for Question Answering on Enterprise SQL Databases. In \emph{Proceedings of the 7th Joint Workshop on Graph Data Management Experiences \& Systems (GRADES) and Network Data Analytics (NDA)}. 1--12. \url{https://doi.org/10.1145/3661304.3661901}
+
+\bibitem{song2021autovalidate}
+Jie Song and Yeye He. 2021. Auto-Validate: Unsupervised Data Validation Using Data-Domain Patterns Inferred from Data Lakes. In \emph{Proceedings of the 2021 International Conference on Management of Data (SIGMOD)}. 1678--1691. \url{https://doi.org/10.1145/3448016.3457250}
+
+\bibitem{vanrenen2024redset}
+Alexander van Renen, Dominik Horn, Pascal Pfeil, Kapil Vaidya, Wenjian Dong, Murali Narayanaswamy, Zhengchun Liu, Gaurav Saxena, Andreas Kipf, and Tim Kraska. 2024. Why TPC Is Not Enough: An Analysis of the Amazon Redshift Fleet. \emph{Proceedings of the VLDB Endowment} 17, 11 (2024), 3694--3706. \url{https://doi.org/10.14778/3681954.3682031}
+
+\bibitem{wang2025awm}
+Zora Zhiruo Wang, Jiayuan Mao, Daniel Fried, and Graham Neubig. 2025. Agent Workflow Memory. In \emph{Proceedings of the 42nd International Conference on Machine Learning (ICML)} (PMLR, Vol.~267). 63897--63911.
+
+\bibitem{weng2025datalab}
+Luoxuan Weng, Yinghao Tang, Yingchaojie Feng, Zhuo Chang, Ruiqin Chen, Haozhe Feng, Chen Hou, Danqing Huang, Yang Li, Huaming Rao, Haonan Wang, Canshi Wei, Xiaofeng Yang, Yuhui Zhang, Yifeng Zheng, Xiuqi Huang, Minfeng Zhu, Yuxin Ma, Bin Cui, Peng Chen, and Wei Chen. 2025. DataLab: A Unified Platform for LLM-Powered Business Intelligence. In \emph{Proceedings of the 41st IEEE International Conference on Data Engineering (ICDE)}. 4346--4359. \url{https://doi.org/10.1109/ICDE65448.2025.00326}
+
+\bibitem{xu2025amem}
+Wujiang Xu, Zujie Liang, Kai Mei, Hang Gao, Juntao Tan, and Yongfeng Zhang. 2025. A-Mem: Agentic Memory for LLM Agents. In \emph{Advances in Neural Information Processing Systems 38 (NeurIPS)}. 20004--20031.
+
+\bibitem{zhang2025apc}
+Qizheng Zhang, Michael Wornow, and Kunle Olukotun. 2025. Agentic Plan Caching: Test-Time Memory for Fast and Cost-Efficient LLM Agents. In \emph{Advances in Neural Information Processing Systems 38 (NeurIPS)}. 114372--114398.
+
+\bibitem{zhang2026ace}
+Qizheng Zhang, Changran Hu, Shubhangi Upasani, Boyuan Ma, Fenglu Hong, Vamsidhar Kamanuru, Jay Rainton, Chen Wu, Mengmeng Ji, Hanchen Li, Urmish Thakker, James Zou, and Kunle Olukotun. 2026. Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models. In \emph{International Conference on Learning Representations (ICLR)}.
+
+\bibitem{zhang2025evoschema}
+Tianshu Zhang, Kun Qian, Siddhartha Sahai, Yuan Tian, Shaddy Garg, Huan Sun, and Yunyao Li. 2025. EvoSchema: Towards Text-to-SQL Robustness against Schema Evolution. \emph{Proceedings of the VLDB Endowment} 18, 10 (2025), 3655--3668. \url{https://doi.org/10.14778/3748191.3748222}
+
+\bibitem{zhao2024expel}
+Andrew Zhao, Daniel Huang, Quentin Xu, Matthieu Lin, Yong-Jin Liu, and Gao Huang. 2024. ExpeL: LLM Agents Are Experiential Learners. In \emph{Proceedings of the AAAI Conference on Artificial Intelligence}, Vol.~38. 19632--19642. \url{https://doi.org/10.1609/aaai.v38i17.29936}
+
+\bibitem{zhou2007lazy}
+Jingren Zhou, Per-{\AA}ke Larson, and Hicham G. Elmongui. 2007. Lazy Maintenance of Materialized Views. In \emph{Proceedings of the 33rd International Conference on Very Large Data Bases (VLDB)}. 231--242.
+
 \end{thebibliography}
 \end{document}

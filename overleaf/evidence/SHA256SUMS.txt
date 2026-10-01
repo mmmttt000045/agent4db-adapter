@@ -1,13 +1,9 @@
-# SHA256; raw task files are in the parent system repository at 743041f.
-29d58cb0cf20b805825979d06f360df65b710c5878a00c076d7c26e18ea902fc  evidence/maint-forward-cells.txt
-137deb92ac448e312bc1f33cf57e9bf411eda0e4a45bcaec15f25d7509babd80  evidence/maint-reverse-cells.txt
-d8468be0c617c26c812264459b17b3fdf4dbf2e0b9e45119868607b515f5a70f  evidence/metric-maint-report.md
-41135d82dc3bab31e70757ef97414f7d9714b3bbfdcabaf17e83c307da75c9b6  evidence/metric-maintenance-report-2026-09-30.md
-c432e97f69660b56027116fb76a6e31f5b65b1b1a1db9f57370ac396f8033b12  evidence/metric-summary.txt
-9950e979338a8f32061175fe9a5b04f736d5be64f81bebb32d85b7c69151a1b2  evidence/verified-results.json
-82a99c9af1da0ba6cb593248fb100e6d01890941607aa3c75c7ce93112543b90  ../exp/2026-09-30-metric-maint-named/cell-r1-metric-global-def-named.json
-08330a48ac0798d1d36f7256891d84b3fb8b507830d8a6c082ec3e0ac43b6eae  ../exp/2026-09-30-metric-maint-named/cell-r1-metric-global-named.json
-bb16b0fd59c3577f91eee376b2bf427b004ccb23fc98faa15df627fcfc8bf6a0  ../exp/2026-09-30-metric-maint-named/cell-r1-metric-global-noguard-named.json
-83d874f69cc31856f7b585610ca3f3341e3902ce5d4c350804f44ae350a6fcc2  ../exp/2026-09-30-metric-maint-named/cell-r1-metric-global-revoke-named.json
-bc1ac5e48d45d0ac5b99bb961ce2a64ca80c8a2883d0a3ea02c5d43b4fa3b6e4  ../exp/2026-09-30-metric-maint-named/cell-r1-metric-global-schema-named.json
-ada44b142ee1d2f9b6d8255888a7d886ccbc509475c8f978c70fe9dbba205aa5  ../exp/2026-09-30-metric-maint-named/cell-r1-middle-named.json
+8e259f96d8c0f189d1f8247067cf0114f3f4a2d1b368c6bfbe12a71508865f4a  maint-forward-cells.txt
+c21ccf3cfc85c36b80abd038302733f91dc2c91dbeb655c162bc0811529d8294  maint-reverse-cells.txt
+5b6743c7c17615094509b4ef338ef0cd8d5a83a9d823fd34bd52207dd2c390c8  metric-maint-report.md
+2ca7d90c6d45ccd6afe9b2982ba1b0034a3b57ee0f4997e931d1485240318a0f  metric-maintenance-report-2026-09-30.md
+0634a000c845a3f68914025defdd266d34bba3af5aa9ab34bb141045de6bb8e4  metric-summary.txt
+29d0370dd003343a96c00a7b6dee4cfb3252e1429ca2cb423f6cfe908a3f0690  verified-results.json
+80382ee019c71c50f4217b5e8eaee3b9015e3dfb013e9f3f6ad54a11ce39a44e  workload-agent-stats.json
+f9a1e7961c0b5f3b228d5ebbb180b0f4f18ef5a5cafd7448b8cd7edbae2f8a39  redset-stats.json
+1290ac37155d437db125d95ddd13110c6102cb92e4811d4e0e93b293920b8528  scenario-results.json

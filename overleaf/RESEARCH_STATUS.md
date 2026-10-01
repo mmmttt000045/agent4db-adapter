@@ -55,7 +55,7 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 | 受限修复及 G8 回归 / restricted repair and regression | 已实现；只能加过滤，无法去重或重映射键；2026-10-02 起候选过滤不唯一时不自动修复（`repair_unique`，默认开），本文已有场景运行时尚无此规则 / filter-only repair; unique-candidate rule added after the reported runs |
 | 同快照验证与执行 / same-snapshot validation and execution | 已实现，默认关闭（事务性版本 + 可重复读快照内核对并执行）；并发写入实验见 `exp/2026-10-02-cache-baseline-tpcds`；**正文尚未更新**，仍写作设计协议 / implemented (opt-in), paper text not yet updated |
 | 取值层面的条件（如单位）/ value-level conditions | **未建模**；单位变化场景为对照 / not modeled |
-| 修复进行中的请求等待 / wait for in-progress repair | **未完成**，不可用数如上 / incomplete |
+| 修复进行中的请求等待 / wait for in-progress repair | 2026-10-02 已实现（`wait_repair`，默认开）；20 万行同时到达复测不可用降为 0；本文已报告的不可用数来自此前的运行 / implemented after the reported runs |
 | AgentSM 式轨迹检索基线 / matched trajectory retrieval | 已实现（`traj-global`），**尚未运行**（需要 LLM），不填写相对它的正确率优势 / implemented, not yet run |
 
 ## 评估边界 / Evaluation limits

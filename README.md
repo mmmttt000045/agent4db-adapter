@@ -172,7 +172,7 @@ AGENTDB_TEST_URL=postgres://postgres:postgres@127.0.0.1:55432/postgres \
 ## 已知边界
 
 - SQL 表依赖、关联与过滤识别使用轻量文本扫描，依赖列名前缀；不是完整 SQL 解析，过滤条件的文本匹配不是语义证明。
-- 同快照验证与执行已实现但默认关闭（`MiddleConfig::snapshot_exec`，需先 `catalog::install_tx_versions` 安装版本触发器）；修复进行中的请求等待尚未实现，见 [研究状态](overleaf/RESEARCH_STATUS.md)。
+- 同快照验证与执行已实现但默认关闭（`MiddleConfig::snapshot_exec`，需先 `catalog::install_tx_versions` 安装版本触发器）；修复进行中到达的使用会等待那次维护结束（`MiddleConfig::wait_repair`，默认打开），见 [研究状态](overleaf/RESEARCH_STATUS.md)。
 - 默认的版本来源是异步刷新的统计计数（缓存 200 ms），不提供事务级一致性；打开快照绑定执行后改用事务性版本。表目录在启动时加载。
 - HTTP 接口没有认证、租户隔离或速率限制，默认只监听本机；数据库连接使用 `NoTls`。
 - 经验库与反馈状态只在内存中，没有持久化与容量淘汰。

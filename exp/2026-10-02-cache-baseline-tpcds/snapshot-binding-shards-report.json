@@ -1,0 +1,1072 @@
+{
+  "interleavings": [
+    {
+      "case": "write_during_pause",
+      "counts": {
+        "violation": 10
+      },
+      "latency_ms": {
+        "max": 2056.1901159999998,
+        "mean": 2051.7553930000004,
+        "n": 10,
+        "p50": 2051.743541,
+        "p95": 2056.1901159999998
+      },
+      "mode": "precheck",
+      "samples": [
+        {
+          "class": "violation",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "5390129.00",
+                  "5595"
+                ]
+              ],
+              "truncated": false
+            },
+            "source": "executed"
+          }
+        },
+        {
+          "class": "violation",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "5390129.00",
+                  "5595"
+                ]
+              ],
+              "truncated": false
+            },
+            "source": "executed"
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              96.329
+            ],
+            "exec": [
+              30,
+              987.804
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              44,
+              160.569
+            ],
+            "metric": [
+              3,
+              935.693
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "db_ms": 2180.395,
+          "queries": 80
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.9390779999999999,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 90.616336,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.813465,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.9390779999999999,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 90.616336,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.813465,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 31,
+        "knowledge_misses": 4,
+        "notices": 0,
+        "repairs": 0,
+        "revocations": 0,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_during_pause",
+      "counts": {
+        "served": 10
+      },
+      "latency_ms": {
+        "max": 2052.818624,
+        "mean": 2038.0749537,
+        "n": 10,
+        "p50": 2037.5831610000002,
+        "p95": 2052.818624
+      },
+      "mode": "snapshot",
+      "samples": [
+        {
+          "class": "served",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "2695064.50",
+                  "0"
+                ]
+              ],
+              "truncated": false
+            },
+            "snapshot": {
+              "checks_reused": 3,
+              "checks_run": 0,
+              "versions": {
+                "date_dim": 0,
+                "item": 0,
+                "store_returns": 0,
+                "store_sales": 20
+              }
+            },
+            "source": "snapshot"
+          }
+        },
+        {
+          "class": "served",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "2695064.50",
+                  "0"
+                ]
+              ],
+              "truncated": false
+            },
+            "snapshot": {
+              "checks_reused": 3,
+              "checks_run": 0,
+              "versions": {
+                "date_dim": 0,
+                "item": 0,
+                "store_returns": 0,
+                "store_sales": 22
+              }
+            },
+            "source": "snapshot"
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              54.322
+            ],
+            "exec": [
+              30,
+              888.257
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              41,
+              115.057
+            ],
+            "metric": [
+              53,
+              11335.249
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "db_ms": 12392.885,
+          "queries": 127
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.12778,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 50.27218,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.953087,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.12778,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 50.27218,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.953087,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 31,
+        "knowledge_misses": 4,
+        "notices": 0,
+        "repairs": 0,
+        "revocations": 0,
+        "snapshot_exec": {
+          "checks_reused": 70,
+          "checks_run": 20,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_before_call",
+      "counts": {
+        "rejected": 3,
+        "violation": 7
+      },
+      "latency_ms": {
+        "max": 4035.127074,
+        "mean": 1313.0053065,
+        "n": 10,
+        "p50": 192.482434,
+        "p95": 4035.127074
+      },
+      "mode": "precheck",
+      "samples": [
+        {
+          "class": "violation",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "5390129.00",
+                  "5595"
+                ]
+              ],
+              "truncated": false
+            },
+            "source": "executed"
+          }
+        },
+        {
+          "class": "violation",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "5390129.00",
+                  "5595"
+                ]
+              ],
+              "truncated": false
+            },
+            "source": "executed"
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              53.171
+            ],
+            "exec": [
+              27,
+              826.468
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              20,
+              62.492
+            ],
+            "metric": [
+              9,
+              4131.253
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              9,
+              8139.182
+            ]
+          },
+          "db_ms": 13212.565999999999,
+          "queries": 68
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.345111,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 48.590263,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.267798,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.345111,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 48.590263,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.267798,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 28,
+        "knowledge_misses": 4,
+        "notices": 3,
+        "repairs": 0,
+        "revocations": 3,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_before_call",
+      "counts": {
+        "rejected": 10
+      },
+      "latency_ms": {
+        "max": 1340.4819420000001,
+        "mean": 1252.014301,
+        "n": 10,
+        "p50": 1244.9614339999998,
+        "p95": 1340.4819420000001
+      },
+      "mode": "snapshot",
+      "samples": [
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "执行快照上条件不成立：store_sales(ss_item_sk, ss_ticket_number) 是否唯一",
+            "rejected": true
+          }
+        },
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "执行快照上条件不成立：store_sales(ss_item_sk, ss_ticket_number) 是否唯一",
+            "rejected": true
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              59.581
+            ],
+            "exec": [
+              20,
+              579.876
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              31,
+              159.363
+            ],
+            "metric": [
+              73,
+              22023.71
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "db_ms": 22822.53,
+          "queries": 127
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.20526,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 55.488478,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.928176,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.20526,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 55.488478,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.928176,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 31,
+        "knowledge_misses": 4,
+        "notices": 0,
+        "repairs": 0,
+        "revocations": 0,
+        "snapshot_exec": {
+          "checks_reused": 50,
+          "checks_run": 40,
+          "rejections": 10
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_notified",
+      "counts": {
+        "rejected": 10
+      },
+      "latency_ms": {
+        "max": 5335.151677,
+        "mean": 5260.8029105000005,
+        "n": 10,
+        "p50": 5256.205782,
+        "p95": 5335.151677
+      },
+      "mode": "precheck",
+      "samples": [
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        },
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              53.086
+            ],
+            "exec": [
+              20,
+              539.568
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              34,
+              106.549
+            ],
+            "metric": [
+              23,
+              11894.805
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              30,
+              27425.145
+            ]
+          },
+          "db_ms": 40019.153,
+          "queries": 110
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.30684,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 48.435672,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.4040179999999998,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.30684,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 48.435672,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.4040179999999998,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 21,
+        "knowledge_misses": 4,
+        "notices": 10,
+        "repairs": 0,
+        "revocations": 10,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_notified",
+      "counts": {
+        "rejected": 10
+      },
+      "latency_ms": {
+        "max": 5392.04007,
+        "mean": 5277.284637600001,
+        "n": 10,
+        "p50": 5289.05725,
+        "p95": 5392.04007
+      },
+      "mode": "snapshot",
+      "samples": [
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        },
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              54.854
+            ],
+            "exec": [
+              20,
+              549.288
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              91,
+              146.262
+            ],
+            "metric": [
+              63,
+              22432.48
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              30,
+              27464.755
+            ]
+          },
+          "db_ms": 50647.638999999996,
+          "queries": 207
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.127389,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 50.646783,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.1182060000000003,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.127389,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 50.646783,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.1182060000000003,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 21,
+        "knowledge_misses": 4,
+        "notices": 10,
+        "repairs": 0,
+        "revocations": 10,
+        "snapshot_exec": {
+          "checks_reused": 40,
+          "checks_run": 20,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    }
+  ],
+  "reader_overhead": [],
+  "rows": 200000,
+  "stress": [],
+  "trials": 10,
+  "writer_overhead": [
+    {
+      "bulk_ms_per_stmt": 14.618998233333334,
+      "concurrent32_stmt_per_s": 25279.770868707204,
+      "concurrent8_stmt_per_s": 25063.63625916657,
+      "round": 0,
+      "sequential_stmt_per_s": 4468.750914138859,
+      "shards": 0,
+      "trigger": false
+    },
+    {
+      "bulk_ms_per_stmt": 16.668616916666668,
+      "concurrent32_stmt_per_s": 9194.544215369566,
+      "concurrent8_stmt_per_s": 14473.13387437164,
+      "round": 0,
+      "sequential_stmt_per_s": 1309.9944958485264,
+      "shards": 1,
+      "trigger": true
+    },
+    {
+      "bulk_ms_per_stmt": 17.16788723333333,
+      "concurrent32_stmt_per_s": 24916.272254145704,
+      "concurrent8_stmt_per_s": 14455.157904802196,
+      "round": 0,
+      "sequential_stmt_per_s": 1457.9615592105745,
+      "shards": 16,
+      "trigger": true
+    },
+    {
+      "bulk_ms_per_stmt": 16.229433616666668,
+      "concurrent32_stmt_per_s": 26716.613955316097,
+      "concurrent8_stmt_per_s": 20722.84613329746,
+      "round": 1,
+      "sequential_stmt_per_s": 2082.5972740367797,
+      "shards": 0,
+      "trigger": false
+    },
+    {
+      "bulk_ms_per_stmt": 16.063241583333333,
+      "concurrent32_stmt_per_s": 9309.575505333374,
+      "concurrent8_stmt_per_s": 13954.023995681537,
+      "round": 1,
+      "sequential_stmt_per_s": 1534.3595250539843,
+      "shards": 1,
+      "trigger": true
+    },
+    {
+      "bulk_ms_per_stmt": 16.548207950000002,
+      "concurrent32_stmt_per_s": 26756.06232756491,
+      "concurrent8_stmt_per_s": 17312.14666476712,
+      "round": 1,
+      "sequential_stmt_per_s": 1659.0227910479011,
+      "shards": 16,
+      "trigger": true
+    },
+    {
+      "bulk_ms_per_stmt": 15.684449050000001,
+      "concurrent32_stmt_per_s": 25787.156082219393,
+      "concurrent8_stmt_per_s": 21428.265119174503,
+      "round": 2,
+      "sequential_stmt_per_s": 2124.003080569108,
+      "shards": 0,
+      "trigger": false
+    },
+    {
+      "bulk_ms_per_stmt": 16.024334166666666,
+      "concurrent32_stmt_per_s": 9475.621330496793,
+      "concurrent8_stmt_per_s": 13220.108261912275,
+      "round": 2,
+      "sequential_stmt_per_s": 1596.835190180133,
+      "shards": 1,
+      "trigger": true
+    },
+    {
+      "bulk_ms_per_stmt": 16.243093083333335,
+      "concurrent32_stmt_per_s": 24886.16918453365,
+      "concurrent8_stmt_per_s": 17960.52855051642,
+      "round": 2,
+      "sequential_stmt_per_s": 1484.3181035359198,
+      "shards": 16,
+      "trigger": true
+    }
+  ]
+}

@@ -150,3 +150,15 @@
 - 命令：`agentdb-mid --pool 16 replay-bench --schema tpcds --libs results/tpcds-library.json --policies condition,schema,revoke,tabletest --oracles judge,example --sql-timeout-secs 1800`。定义级（带或不带版本缓存）未在 TPC-DS 上运行：290 万行上它对每个受影响定义各做一次修复搜索（候选过滤逐个在全表上检查），第一次运行在“重复装载”上耗时超过 90 分钟仍未完成而被中止（`results/tpcds-replay-aborted-*`）；条件级跨定义共享修复搜索，每个变化只需数十秒。各实例的准入并发进行（提交 `Replay: seed all instances concurrently`），条件级准入复用粒度结论。
 - 冒烟（condition + tabletest，append/status/dimhist）：91 个定义通过准入，2 个（query61 的两个块）学习期为空未通过 G7；正常追加 45 个定义刷新、135 题全对；状态流水 3 个退货定义撤销后修复（找到 `sr_status = '完成'`），9 题全对，表级测试隔离 9 题；维表拉链 45 个关联商品表的定义撤销后修复（关联路径修订为 `i_is_current = 'Y'`），135 题全对，表级测试隔离 141 题（91 必要、50 不必要）；条件级每个变化维护 DB 时间约 8–10 秒。
 - 结果：`tpcds-replay-stats.json`、`tpcds-replay-outcomes.json.gz`、`tpcds-library.json`；宏 `\Tr*` 由 `tools/review-results.py` 生成，正文第 7.2 节。
+- 结果（2026-10-03 06:10，`tpcds-replay-stats.json`；每种方法 981 道计分题，表级测试 1,023 道，因为它不经准入、含 2 个未通过 G7 的定义）：
+
+  | 方法 | 答对 | 提供但答错 | 不可用（必要） | 不可用（不必要） | 维护 DB 秒 |
+  |---|---|---|---|---|---|
+  | 只看结构 | 472 | 509（已建模变化下 437） | 0 | 0 | 0 |
+  | 表级测试 | 369 | 72 | 437 | 145 | 98 |
+  | 写入即撤销（不重学） | 0 | 0 | 419 | 562 | 0 |
+  | MAVRA（判题参照） | **630** | 72（全部为单位变化） | 250 | 29 | 2,602 |
+  | MAVRA（智能体参照） | 360 | 72 | 431 | 118 | 2,592 |
+
+  按变化（MAVRA）：正常追加、原地更正各 135 题全对，迟到回填、新增列各 9 题全对；状态流水 9 题修复后全对；版本化更正 135 题修复后全对（找到 `ss_is_current = 1`）；维表拉链 135 题修复后全对（关联路径修订为 `i_is_current = 'Y'`）；重复装载与日期键改写各 135 题不可用（122 必要、13 不必要）；备份副本 9 题不可用（候选不唯一）；单位变化 72 题答错、63 题（排名题）仍对。智能体参照拒绝触及学习期的修复：版本化更正 135 题、维表拉链 135 题不可用，没有一题变错。表级测试少答对的 279 题全部是 MAVRA 修复的题。维护 DB 时间 2,602 秒中 2,381 秒是重复装载下的修复搜索（300 万行上逐个检查候选过滤后撤下定义）。
+- 第一次（标准答案未带区分列过滤）的运行存档在 noctis `results/tpcds-replay-gold-v1/`：版本化更正下旧版本行被算进了“业务真值”，使修复后的正确答案被判为错；修正见提交 `TPC-DS replay: gold answers use the distinguishing-column filters`。

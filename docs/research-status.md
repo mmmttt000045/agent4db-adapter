@@ -62,6 +62,7 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 - 论文形式化（10-03）：命题 1（四类条件在业务前提 B1/B2 下充分；边界：取值含义、同构总体、合法但错误的日期键）、引理 1（事务性版本相同 ⇒ 结论可复用，依赖快照嵌套与写入—计数同事务）、算法 1（有界修复：不丢键、唯一、G3–G5 与 G8）。
 
 - 增补方法（10-03，DeepSeek V4.1 Flash × 3 次，预先写定比较）：MAVRA 以智能体提炼的学习查询为 G8 参照时，全部情形 81%、已建模破坏 **74%**（判题参照 73%，差 +1，区间 −1–3）；每次运行发布的修复从 8.0 降到 4.7，被拒绝的修复撤下定义后智能体自行重推过滤，正确率不变。轨迹检索 + 自验证提示：已建模破坏 **63%**（轨迹检索 57%，+5，区间 1–10），每题轮数 5.0 → 5.8；MAVRA 仍领先 11（6–15）。
+- TPC-DS SF1 上的配对回放（10-03）：93 个模板导出的定义（91 个通过准入），每种方法 981 道计分题。MAVRA 答对 **630**，已建模变化下零错误答案（72 个错误全部来自单位变化），状态流水、版本化更正、维表拉链下 279 道题经修复后作答，重复装载、日期键改写、备份副本下撤下定义；只看结构在已建模变化下 437 个错误答案；表级测试隔离 437 道必要 + 145 道不必要，少答对的 279 题正是 MAVRA 修复的题；智能体参照答对 360（拒绝触及学习期的修复，0 题变错）。维护 DB 时间 2,602 秒中 2,381 秒是重复装载下的修复搜索。定义级未在 TPC-DS 上运行（逐定义修复搜索在 300 万行上超过 90 分钟）。
 ## 实现边界 / Implementation boundaries
 
 | 机制 / Mechanism | 状态 / Status |
@@ -78,7 +79,7 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 
 ## 评估边界 / Evaluation limits
 
-只有一个合成表结构；机制层回放用 20 万行（场景用 100 万行），结果类别与规模无关、耗时有关；场景运行早于唯一性规则、修复等待与绑定快照执行。场景实验计划 3 模型 × 6 方法 × 3 次重复共 54 组，因 ClinePass 5 小时与周用量上限，目前分析 43 组（DeepSeek 与 GLM-5.3 较完整，GLM-5.3 Flash 缺得多）；周上限约 2026-10-07 重置后补跑，再重跑 `tools/paper-results.py`。工作负载刻画只用一个模型；两个 GLM 模型的轨迹因 Cline 余额耗尽未完成。维护正反序是顺序控制，不是统计显著性检验；8 个并发 Agent 是脚本 Agent。数据库关闭 WAL 和 fsync。参考 SQL 与任务生成器同源。
+合成表结构之外增加了 TPC-DS SF1（模板导出的定义库），两者的变化都由我们注入；机制层回放用 20 万行（场景用 100 万行），结果类别与规模无关、耗时有关；场景运行早于唯一性规则、修复等待与绑定快照执行。场景实验计划 3 模型 × 6 方法 × 3 次重复共 54 组，因 ClinePass 5 小时与周用量上限，目前分析 43 组（DeepSeek 与 GLM-5.3 较完整，GLM-5.3 Flash 缺得多）；周上限约 2026-10-07 重置后补跑，再重跑 `tools/paper-results.py`。工作负载刻画只用一个模型；两个 GLM 模型的轨迹因 Cline 余额耗尽未完成。维护正反序是顺序控制，不是统计显著性检验；8 个并发 Agent 是脚本 Agent。数据库关闭 WAL 和 fsync。参考 SQL 与任务生成器同源。
 
 Only one synthetic schema is used. The scenario design has 54 cells; usage caps leave 43 analyzed cells, mostly missing GLM-5.3 Flash repetitions. The workload study uses one model. Reference SQL and the task generator share origins.
 

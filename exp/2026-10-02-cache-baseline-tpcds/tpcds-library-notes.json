@@ -1,0 +1,842 @@
+[
+ {
+  "query": "query6",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "indirect join",
+  "pred": "ca_address_sk = c_current_addr_sk"
+ },
+ {
+  "query": "query6",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "d_month_seq = (SELECT DISTINCT d_month_seq FROM date_dim WHERE d_year = 1998 AND d_moy = 1)"
+ },
+ {
+  "query": "query6",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "i_current_price > (1.2 * (SELECT avg(i_current_price) FROM item AS j WHERE i_category = i_category))"
+ },
+ {
+  "query": "query7",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cd_gender = '__param__'"
+ },
+ {
+  "query": "query7",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cd_marital_status = '__param__'"
+ },
+ {
+  "query": "query7",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cd_education_status = '__param__'"
+ },
+ {
+  "query": "query7",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "p_channel_email = 'N' OR p_channel_event = 'N'"
+ },
+ {
+  "query": "query8",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "substr(s_zip, 1, 2) = substr(ca_zip, 1, 2)"
+ },
+ {
+  "query": "query12",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "i_category IN ('__param__', '__param__', '__param__')"
+ },
+ {
+  "query": "query13",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "(ss_hdemo_sk = hd_demo_sk AND cd_demo_sk = ss_cdemo_sk AND cd_marital_status = '__param__' AND cd_education_status = '__"
+ },
+ {
+  "query": "query13",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "(ss_addr_sk = ca_address_sk AND ca_country = 'United States' AND ca_state IN ('__param__', '__param__', '__param__') AND"
+ },
+ {
+  "query": "query14",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "ss_item_sk IN (SELECT ss_item_sk FROM cross_items)"
+ },
+ {
+  "query": "query14",
+  "block": 4,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "cs_item_sk IN (SELECT ss_item_sk FROM cross_items)"
+ },
+ {
+  "query": "query14",
+  "block": 7,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "ws_item_sk IN (SELECT ss_item_sk FROM cross_items)"
+ },
+ {
+  "query": "query14",
+  "block": 19,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "ss_item_sk IN (SELECT ss_item_sk FROM cross_items)"
+ },
+ {
+  "query": "query14",
+  "block": 19,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "d_week_seq = (SELECT d_week_seq FROM date_dim WHERE d_year = (1998 + 1) AND d_moy = 12 AND d_dom = 1)"
+ },
+ {
+  "query": "query14",
+  "block": 23,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "ss_item_sk IN (SELECT ss_item_sk FROM cross_items)"
+ },
+ {
+  "query": "query14",
+  "block": 23,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "d_week_seq = (SELECT d_week_seq FROM date_dim WHERE d_year = 1998 AND d_moy = 12 AND d_dom = 1)"
+ },
+ {
+  "query": "query15",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "indirect join",
+  "pred": "c_current_addr_sk = ca_address_sk"
+ },
+ {
+  "query": "query15",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "substr(ca_zip, 1, 5) IN ('85669', '86197', '88274', '83405', '86475', '85392', '85460', '80348', '81792') OR ca_state IN"
+ },
+ {
+  "query": "query16",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "ca_state = '__param__'"
+ },
+ {
+  "query": "query16",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cc_county IN ('__param__', '__param__', '__param__', '__param__', '__param__')"
+ },
+ {
+  "query": "query16",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "EXISTS (SELECT * FROM catalog_sales AS cs2 WHERE cs_order_number = cs_order_number AND cs_warehouse_sk <> cs_warehouse_s"
+ },
+ {
+  "query": "query16",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "NOT EXISTS (SELECT * FROM catalog_returns AS cr1 WHERE cs_order_number = cr_order_number)"
+ },
+ {
+  "query": "query18",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "indirect join",
+  "pred": "c_current_cdemo_sk = cd_demo_sk"
+ },
+ {
+  "query": "query18",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "indirect join",
+  "pred": "c_current_addr_sk = ca_address_sk"
+ },
+ {
+  "query": "query19",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "indirect join",
+  "pred": "c_current_addr_sk = ca_address_sk"
+ },
+ {
+  "query": "query19",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "i_manager_id = __param__"
+ },
+ {
+  "query": "query19",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "substr(ca_zip, 1, 5) <> substr(s_zip, 1, 5)"
+ },
+ {
+  "query": "query20",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "i_category IN ('__param__', '__param__', '__param__')"
+ },
+ {
+  "query": "query23",
+  "block": 13,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "cs_item_sk IN (SELECT item_sk FROM frequent_ss_items)"
+ },
+ {
+  "query": "query23",
+  "block": 13,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "cs_bill_customer_sk IN (SELECT c_customer_sk FROM best_ss_customer)"
+ },
+ {
+  "query": "query23",
+  "block": 16,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "ws_item_sk IN (SELECT item_sk FROM frequent_ss_items)"
+ },
+ {
+  "query": "query23",
+  "block": 16,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "ws_bill_customer_sk IN (SELECT c_customer_sk FROM best_ss_customer)"
+ },
+ {
+  "query": "query26",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cd_gender = '__param__'"
+ },
+ {
+  "query": "query26",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cd_marital_status = '__param__'"
+ },
+ {
+  "query": "query26",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cd_education_status = '__param__'"
+ },
+ {
+  "query": "query26",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "p_channel_email = 'N' OR p_channel_event = 'N'"
+ },
+ {
+  "query": "query27",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cd_gender = '__param__'"
+ },
+ {
+  "query": "query27",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cd_marital_status = '__param__'"
+ },
+ {
+  "query": "query27",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "cd_education_status = '__param__'"
+ },
+ {
+  "query": "query27",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "s_state IN ('__param__', '__param__', '__param__', '__param__', '__param__', '__param__')"
+ },
+ {
+  "query": "query32",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "cs_ext_discount_amt > (SELECT 1.3 * avg(cs_ext_discount_amt) FROM catalog_sales, date_dim WHERE cs_item_sk = i_item_sk A"
+ },
+ {
+  "query": "query32",
+  "block": 1,
+  "fact": "catalog_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "cs_item_sk = i_item_sk"
+ },
+ {
+  "query": "query33",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "i_manufact_id IN (SELECT i_manufact_id FROM item WHERE i_category IN ('Books'))"
+ },
+ {
+  "query": "query33",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ca_gmt_offset = __param__"
+ },
+ {
+  "query": "query33",
+  "block": 6,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "i_manufact_id IN (SELECT i_manufact_id FROM item WHERE i_category IN ('Books'))"
+ },
+ {
+  "query": "query33",
+  "block": 6,
+  "fact": "catalog_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ca_gmt_offset = __param__"
+ },
+ {
+  "query": "query33",
+  "block": 8,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "i_manufact_id IN (SELECT i_manufact_id FROM item WHERE i_category IN ('Books'))"
+ },
+ {
+  "query": "query33",
+  "block": 8,
+  "fact": "web_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ca_gmt_offset = __param__"
+ },
+ {
+  "query": "query34",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "hd_buy_potential = '1001-5000' OR hd_buy_potential = '0-500'"
+ },
+ {
+  "query": "query34",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "s_county IN ('__param__', '__param__', '__param__', '__param__', '__param__', '__param__', '__param__', '__param__')"
+ },
+ {
+  "query": "query36",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "s_state IN ('__param__', '__param__', '__param__', '__param__', '__param__', '__param__', '__param__', '__param__')"
+ },
+ {
+  "query": "query37",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "indirect join",
+  "pred": "inv_item_sk = i_item_sk"
+ },
+ {
+  "query": "query37",
+  "block": 0,
+  "fact": "catalog_sales",
+  "drop": "indirect join",
+  "pred": "d_date_sk = inv_date_sk"
+ },
+ {
+  "query": "query45",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "indirect join",
+  "pred": "c_current_addr_sk = ca_address_sk"
+ },
+ {
+  "query": "query45",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "substr(ca_zip, 1, 5) IN ('85669', '86197', '88274', '83405', '86475', '85392', '85460', '80348', '81792') OR i_item_id I"
+ },
+ {
+  "query": "query46",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "s_city IN ('__param__', '__param__', '__param__', '__param__', '__param__')"
+ },
+ {
+  "query": "query48",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "(cd_demo_sk = ss_cdemo_sk AND cd_marital_status = '__param__' AND cd_education_status = '__param__' AND ss_sales_price B"
+ },
+ {
+  "query": "query48",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "(ss_addr_sk = ca_address_sk AND ca_country = 'United States' AND ca_state IN ('__param__', '__param__', '__param__') AND"
+ },
+ {
+  "query": "query53",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "(i_category IN ('Books', 'Children', 'Electronics') AND i_class IN ('personal', 'portable', 'reference', 'self-help') AN"
+ },
+ {
+  "query": "query54",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "indirect join",
+  "pred": "ca_county = s_county"
+ },
+ {
+  "query": "query54",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "indirect join",
+  "pred": "ca_state = s_state"
+ },
+ {
+  "query": "query54",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "c_current_addr_sk = ca_address_sk"
+ },
+ {
+  "query": "query54",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "c_customer_sk = ss_customer_sk"
+ },
+ {
+  "query": "query54",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "d_month_seq BETWEEN (SELECT DISTINCT d_month_seq + 1 FROM date_dim WHERE d_year = 1998 AND d_moy = 1) AND (SELECT DISTIN"
+ },
+ {
+  "query": "query56",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "i_item_id IN (SELECT i_item_id FROM item WHERE i_color IN ('__param__', '__param__', '__param__'))"
+ },
+ {
+  "query": "query56",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ca_gmt_offset = __param__"
+ },
+ {
+  "query": "query56",
+  "block": 6,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "i_item_id IN (SELECT i_item_id FROM item WHERE i_color IN ('__param__', '__param__', '__param__'))"
+ },
+ {
+  "query": "query56",
+  "block": 6,
+  "fact": "catalog_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ca_gmt_offset = __param__"
+ },
+ {
+  "query": "query56",
+  "block": 8,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "i_item_id IN (SELECT i_item_id FROM item WHERE i_color IN ('__param__', '__param__', '__param__'))"
+ },
+ {
+  "query": "query56",
+  "block": 8,
+  "fact": "web_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ca_gmt_offset = __param__"
+ },
+ {
+  "query": "query58",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "d_date IN (SELECT d_date FROM date_dim WHERE d_week_seq = (SELECT d_week_seq FROM date_dim WHERE d_date = '__param__'))"
+ },
+ {
+  "query": "query58",
+  "block": 4,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "d_date IN (SELECT d_date FROM date_dim WHERE d_week_seq = (SELECT d_week_seq FROM date_dim WHERE d_date = '__param__'))"
+ },
+ {
+  "query": "query58",
+  "block": 7,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "d_date IN (SELECT d_date FROM date_dim WHERE d_week_seq = (SELECT d_week_seq FROM date_dim WHERE d_date = '__param__'))"
+ },
+ {
+  "query": "query60",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "i_item_id IN (SELECT i_item_id FROM item WHERE i_category IN ('Children'))"
+ },
+ {
+  "query": "query60",
+  "block": 4,
+  "fact": "store_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ca_gmt_offset = __param__"
+ },
+ {
+  "query": "query60",
+  "block": 6,
+  "fact": "catalog_sales",
+  "drop": "subquery",
+  "pred": "i_item_id IN (SELECT i_item_id FROM item WHERE i_category IN ('Children'))"
+ },
+ {
+  "query": "query60",
+  "block": 6,
+  "fact": "catalog_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ca_gmt_offset = __param__"
+ },
+ {
+  "query": "query60",
+  "block": 8,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "i_item_id IN (SELECT i_item_id FROM item WHERE i_category IN ('Children'))"
+ },
+ {
+  "query": "query60",
+  "block": 8,
+  "fact": "web_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ca_gmt_offset = __param__"
+ },
+ {
+  "query": "query61",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "indirect join",
+  "pred": "ca_address_sk = c_current_addr_sk"
+ },
+ {
+  "query": "query61",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "table not directly joined",
+  "pred": "ca_gmt_offset = -6"
+ },
+ {
+  "query": "query61",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "i_category = 'Books'"
+ },
+ {
+  "query": "query61",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "p_channel_dmail = 'Y' OR p_channel_email = 'Y' OR p_channel_tv = 'Y'"
+ },
+ {
+  "query": "query61",
+  "block": 2,
+  "fact": "store_sales",
+  "drop": "indirect join",
+  "pred": "ca_address_sk = c_current_addr_sk"
+ },
+ {
+  "query": "query61",
+  "block": 2,
+  "fact": "store_sales",
+  "drop": "table not directly joined",
+  "pred": "ca_gmt_offset = -6"
+ },
+ {
+  "query": "query61",
+  "block": 2,
+  "fact": "store_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "i_category = 'Books'"
+ },
+ {
+  "query": "query63",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "(i_category IN ('Books', 'Children', 'Electronics') AND i_class IN ('personal', 'portable', 'reference', 'self-help') AN"
+ },
+ {
+  "query": "query68",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "s_city IN ('__param__', '__param__')"
+ },
+ {
+  "query": "query70",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "subquery",
+  "pred": "s_state IN (SELECT s_state FROM (SELECT s_state AS s_state, rank() OVER (PARTITION BY s_state ORDER BY sum(ss_net_profit"
+ },
+ {
+  "query": "query73",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "hd_buy_potential = '1001-5000' OR hd_buy_potential = '0-500'"
+ },
+ {
+  "query": "query73",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "s_county IN ('__param__', '__param__', '__param__', '__param__')"
+ },
+ {
+  "query": "query82",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "indirect join",
+  "pred": "inv_item_sk = i_item_sk"
+ },
+ {
+  "query": "query82",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "indirect join",
+  "pred": "d_date_sk = inv_date_sk"
+ },
+ {
+  "query": "query83",
+  "block": 1,
+  "fact": "store_returns",
+  "drop": "subquery",
+  "pred": "d_date IN (SELECT d_date FROM date_dim WHERE d_week_seq IN (SELECT d_week_seq FROM date_dim WHERE d_date IN ('__param__'"
+ },
+ {
+  "query": "query83",
+  "block": 4,
+  "fact": "catalog_returns",
+  "drop": "subquery",
+  "pred": "d_date IN (SELECT d_date FROM date_dim WHERE d_week_seq IN (SELECT d_week_seq FROM date_dim WHERE d_date IN ('__param__'"
+ },
+ {
+  "query": "query83",
+  "block": 7,
+  "fact": "web_returns",
+  "drop": "subquery",
+  "pred": "d_date IN (SELECT d_date FROM date_dim WHERE d_week_seq IN (SELECT d_week_seq FROM date_dim WHERE d_date IN ('__param__'"
+ },
+ {
+  "query": "query84",
+  "block": 0,
+  "fact": "store_returns",
+  "drop": "indirect join",
+  "pred": "c_current_addr_sk = ca_address_sk"
+ },
+ {
+  "query": "query84",
+  "block": 0,
+  "fact": "store_returns",
+  "drop": "indirect join",
+  "pred": "ib_income_band_sk = hd_income_band_sk"
+ },
+ {
+  "query": "query84",
+  "block": 0,
+  "fact": "store_returns",
+  "drop": "indirect join",
+  "pred": "cd_demo_sk = c_current_cdemo_sk"
+ },
+ {
+  "query": "query84",
+  "block": 0,
+  "fact": "store_returns",
+  "drop": "indirect join",
+  "pred": "hd_demo_sk = c_current_hdemo_sk"
+ },
+ {
+  "query": "query89",
+  "block": 1,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "(i_category IN ('__param__', '__param__', '__param__') AND i_class IN ('__param__', '__param__', '__param__')) OR (i_cat"
+ },
+ {
+  "query": "query91",
+  "block": 0,
+  "fact": "catalog_returns",
+  "drop": "indirect join",
+  "pred": "cd_demo_sk = c_current_cdemo_sk"
+ },
+ {
+  "query": "query91",
+  "block": 0,
+  "fact": "catalog_returns",
+  "drop": "indirect join",
+  "pred": "hd_demo_sk = c_current_hdemo_sk"
+ },
+ {
+  "query": "query91",
+  "block": 0,
+  "fact": "catalog_returns",
+  "drop": "indirect join",
+  "pred": "ca_address_sk = c_current_addr_sk"
+ },
+ {
+  "query": "query91",
+  "block": 0,
+  "fact": "catalog_returns",
+  "drop": "table not directly joined",
+  "pred": "(cd_marital_status = 'M' AND cd_education_status = 'Unknown') OR (cd_marital_status = 'W' AND cd_education_status = 'Adv"
+ },
+ {
+  "query": "query91",
+  "block": 0,
+  "fact": "catalog_returns",
+  "drop": "table not directly joined",
+  "pred": "hd_buy_potential LIKE '1001-5000%'"
+ },
+ {
+  "query": "query91",
+  "block": 0,
+  "fact": "catalog_returns",
+  "drop": "table not directly joined",
+  "pred": "ca_gmt_offset = -6"
+ },
+ {
+  "query": "query92",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "ws_ext_discount_amt > (SELECT 1.3 * avg(ws_ext_discount_amt) FROM web_sales, date_dim WHERE ws_item_sk = i_item_sk AND d"
+ },
+ {
+  "query": "query92",
+  "block": 1,
+  "fact": "web_sales",
+  "drop": "multi-table or unresolved",
+  "pred": "ws_item_sk = i_item_sk"
+ },
+ {
+  "query": "query94",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "ca_state = '__param__'"
+ },
+ {
+  "query": "query94",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "web_company_name = 'pri'"
+ },
+ {
+  "query": "query94",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "EXISTS (SELECT * FROM web_sales AS ws2 WHERE ws_order_number = ws_order_number AND ws_warehouse_sk <> ws_warehouse_sk)"
+ },
+ {
+  "query": "query94",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "NOT EXISTS (SELECT * FROM web_returns AS wr1 WHERE ws_order_number = wr_order_number)"
+ },
+ {
+  "query": "query95",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "ca_state = '__param__'"
+ },
+ {
+  "query": "query95",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "not expressible as a persistent filter",
+  "pred": "web_company_name = 'pri'"
+ },
+ {
+  "query": "query95",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "ws_order_number IN (SELECT ws_order_number FROM ws_wh)"
+ },
+ {
+  "query": "query95",
+  "block": 0,
+  "fact": "web_sales",
+  "drop": "subquery",
+  "pred": "ws_order_number IN (SELECT wr_order_number FROM web_returns, ws_wh WHERE wr_order_number = ws_order_number)"
+ },
+ {
+  "query": "query98",
+  "block": 0,
+  "fact": "store_sales",
+  "drop": "uninstantiated template parameter",
+  "pred": "i_category IN ('__param__', '__param__', '__param__')"
+ }
+]

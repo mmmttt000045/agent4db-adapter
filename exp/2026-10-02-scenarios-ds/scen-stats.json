@@ -2,11 +2,13 @@
  "cells": {
   "middle": 3,
   "traj-global": 3,
+  "traj-verify": 3,
   "metric-global-noguard": 3,
   "metric-global-schema": 3,
   "metric-global-revoke": 3,
   "metric-global-def": 3,
-  "metric-global": 3
+  "metric-global": 3,
+  "metric-global-exref": 3
  },
  "replaced_cells_excluded": 3,
  "methods": {
@@ -127,6 +129,65 @@
    "maint_db_s_per_cell": 0.0,
    "turns_per_task": 5.03125,
    "input_tokens_per_task": 15749.225694444445
+  },
+  "traj-verify": {
+   "name": "Trajectory retrieval + self-verification",
+   "cells": 3,
+   "provider_errors": 0,
+   "all": {
+    "acc": 0.773148148148148,
+    "ci95": [
+     0.7407407407407408,
+     0.8009259259259257
+    ]
+   },
+   "holdout": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "benign": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "modeled": {
+    "acc": 0.625925925925926,
+    "ci95": [
+     0.5888888888888889,
+     0.6777777777777778
+    ]
+   },
+   "mirror": {
+    "acc": 0.6666666666666666,
+    "ci95": [
+     0.5,
+     0.8333333333333334
+    ]
+   },
+   "unit": {
+    "acc": 0.48148148148148145,
+    "ci95": [
+     0.4444444444444444,
+     0.5555555555555556
+    ]
+   },
+   "stale_tasks": {
+    "holdout": 0,
+    "benign": 0,
+    "modeled": 0,
+    "mirror": 0,
+    "unit": 0
+   },
+   "revoked_per_cell": 0.0,
+   "repaired_per_cell": 0.0,
+   "maint_db_s_per_cell": 0.0,
+   "turns_per_task": 5.826388888888889,
+   "input_tokens_per_task": 21686.32986111111
   },
   "metric-global-noguard": {
    "name": "Unguarded",
@@ -422,6 +483,65 @@
    "maint_db_s_per_cell": 325.77001433333356,
    "turns_per_task": 5.215277777777778,
    "input_tokens_per_task": 23961.9375
+  },
+  "metric-global-exref": {
+   "name": "MAVRA, agent reference for G8",
+   "cells": 3,
+   "provider_errors": 0,
+   "all": {
+    "acc": 0.8132716049382714,
+    "ci95": [
+     0.8009259259259259,
+     0.8240740740740741
+    ]
+   },
+   "holdout": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "benign": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "modeled": {
+    "acc": 0.7407407407407407,
+    "ci95": [
+     0.7333333333333333,
+     0.7555555555555555
+    ]
+   },
+   "mirror": {
+    "acc": 0.6111111111111112,
+    "ci95": [
+     0.5,
+     0.6666666666666666
+    ]
+   },
+   "unit": {
+    "acc": 0.4444444444444444,
+    "ci95": [
+     0.4444444444444444,
+     0.4444444444444444
+    ]
+   },
+   "stale_tasks": {
+    "holdout": 0,
+    "benign": 0,
+    "modeled": 0,
+    "mirror": 0,
+    "unit": 27
+   },
+   "revoked_per_cell": 18.666666666666668,
+   "repaired_per_cell": 4.666666666666667,
+   "maint_db_s_per_cell": 342.2503536666666,
+   "turns_per_task": 5.232638888888889,
+   "input_tokens_per_task": 23103.38888888889
   }
  },
  "comparisons": {
@@ -435,7 +555,7 @@
   "a2 modeled: MAVRA - definition-level": {
    "diff": 0.0888888888888888,
    "ci95": [
-    0.0,
+    0.007407407407407418,
     0.14814814814814814
    ]
   },
@@ -451,6 +571,41 @@
    "ci95": [
     0.0,
     0.0
+   ]
+  },
+  "d1 modeled: MAVRA agent-ref - trajectory": {
+   "diff": 0.16666666666666663,
+   "ci95": [
+    0.1518518518518518,
+    0.18148148148148158
+   ]
+  },
+  "d2 modeled: MAVRA agent-ref - MAVRA": {
+   "diff": 0.007407407407407418,
+   "ci95": [
+    -0.014814814814814836,
+    0.029629629629629672
+   ]
+  },
+  "e1 modeled: trajectory+verify - trajectory": {
+   "diff": 0.05185185185185193,
+   "ci95": [
+    0.014814814814814836,
+    0.10370370370370374
+   ]
+  },
+  "e2 modeled: MAVRA - trajectory+verify": {
+   "diff": 0.10740740740740728,
+   "ci95": [
+    0.05555555555555558,
+    0.1518518518518518
+   ]
+  },
+  "e3 all: MAVRA - trajectory+verify": {
+   "diff": 0.03395061728395077,
+   "ci95": [
+    0.007716049382716195,
+    0.06635802469135799
    ]
   }
  },
@@ -482,6 +637,20 @@
    "latekey": 0.2222222222222222,
    "unit": 0.48148148148148145,
    "mirror": 0.7222222222222222
+  },
+  "traj-verify": {
+   "holdout": 1.0,
+   "append": 1.0,
+   "backfill": 1.0,
+   "correct": 1.0,
+   "addcol": 1.0,
+   "status": 0.6111111111111112,
+   "revision": 0.8518518518518519,
+   "dupload": 0.4444444444444444,
+   "dimhist": 1.0,
+   "latekey": 0.2222222222222222,
+   "unit": 0.48148148148148145,
+   "mirror": 0.6666666666666666
   },
   "metric-global-noguard": {
    "holdout": 1.0,
@@ -547,6 +716,20 @@
    "addcol": 1.0,
    "status": 1.0,
    "revision": 0.9629629629629629,
+   "dupload": 0.5925925925925926,
+   "dimhist": 1.0,
+   "latekey": 0.1111111111111111,
+   "unit": 0.4444444444444444,
+   "mirror": 0.6111111111111112
+  },
+  "metric-global-exref": {
+   "holdout": 1.0,
+   "append": 1.0,
+   "backfill": 1.0,
+   "correct": 1.0,
+   "addcol": 1.0,
+   "status": 1.0,
+   "revision": 1.0,
    "dupload": 0.5925925925925926,
    "dimhist": 1.0,
    "latekey": 0.1111111111111111,

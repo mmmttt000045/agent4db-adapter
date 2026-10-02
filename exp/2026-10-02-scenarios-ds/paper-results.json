@@ -1,9 +1,9 @@
 {
  "numbers": {
   "ScenModels": 1,
-  "ScenCells": 21,
+  "ScenCells": 27,
   "ScenCellsDropped": 3,
-  "ScenValidTasks": 2010,
+  "ScenValidTasks": 2586,
   "ScenQuotaTasks": 6,
   "ScenAccNoShare": "32",
   "ScenHoldoutNoShare": "49",
@@ -23,6 +23,15 @@
   "ScenStaleUnitTraj": 0,
   "ScenTokTraj": "15.7",
   "ScenMaintTraj": "0.0",
+  "ScenAccTrajVerify": "77",
+  "ScenHoldoutTrajVerify": "100",
+  "ScenModeledTrajVerify": "63",
+  "ScenBenignTrajVerify": "100",
+  "ScenStaleTrajVerify": 0,
+  "ScenStaleModeledTrajVerify": 0,
+  "ScenStaleUnitTrajVerify": 0,
+  "ScenTokTrajVerify": "21.7",
+  "ScenMaintTrajVerify": "0.0",
   "ScenAccNoguard": "75",
   "ScenHoldoutNoguard": "100",
   "ScenModeledNoguard": "59",
@@ -68,6 +77,15 @@
   "ScenStaleUnitCond": 27,
   "ScenTokCond": "24.0",
   "ScenMaintCond": "325.8",
+  "ScenAccCondExref": "81",
+  "ScenHoldoutCondExref": "100",
+  "ScenModeledCondExref": "74",
+  "ScenBenignCondExref": "100",
+  "ScenStaleCondExref": 27,
+  "ScenStaleModeledCondExref": 0,
+  "ScenStaleUnitCondExref": 27,
+  "ScenTokCondExref": "23.1",
+  "ScenMaintCondExref": "342.3",
   "ScenMaintRatio": "90",
   "ScenRelearnTok": "1.22",
   "ScenAccCondDupload": "59",
@@ -123,10 +141,10 @@
   "MaintStagMax": "37.8",
   "MaintSimMin": "44.6",
   "MaintSimMax": "75.5",
-  "ScenAgentTasks": "2,362",
-  "ScenLLMCalls": "12,285",
-  "ScenTokensM": "55",
-  "ScenAgentHours": "32"
+  "ScenAgentTasks": "2,998",
+  "ScenLLMCalls": "15,764",
+  "ScenTokensM": "70",
+  "ScenAgentHours": "45"
  },
  "cells": [
   {
@@ -172,6 +190,18 @@
    "excluded_phases": []
   },
   {
+   "file": "results/scen-20261002/dsv41flash-r1-exref/metric-1790956275696455/cell-r1-metric-global-exref-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-trajv/metric-1790956335712338/cell-r1-traj-verify-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-verify",
+   "excluded_phases": []
+  },
+  {
    "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790907425882543/cell-r1-metric-global-noguard-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "metric-global-noguard",
@@ -214,6 +244,18 @@
    "excluded_phases": []
   },
   {
+   "file": "results/scen-20261002/dsv41flash-r2-exref/metric-1790956395729880/cell-r1-metric-global-exref-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-trajv/metric-1790956455748438/cell-r1-traj-verify-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-verify",
+   "excluded_phases": []
+  },
+  {
    "file": "results/scen-20261002/dsv41flash-r3-a-rerun/metric-1790919022641243/cell-r1-metric-global-revoke-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "metric-global-revoke",
@@ -253,6 +295,18 @@
    "file": "results/scen-20261002/dsv41flash-r3-b/metric-1790915378185021/cell-r1-metric-global-schema-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-exref/metric-1790956515766498/cell-r1-metric-global-exref-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-trajv/metric-1790956575788666/cell-r1-traj-verify-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-verify",
    "excluded_phases": []
   }
  ],
@@ -606,6 +660,102 @@
   "DeepSeek V4.1 Flash|metric-global|mirror": [
    11,
    18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|append": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|status": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|revision": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|dupload": [
+   16,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|latekey": [
+   3,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|unit": [
+   12,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|mirror": [
+   11,
+   18
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|append": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|status": [
+   11,
+   18
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|revision": [
+   23,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|dupload": [
+   12,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|latekey": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|unit": [
+   13,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|mirror": [
+   12,
+   18
   ]
  },
  "quota_failed_tasks": {
@@ -949,6 +1099,102 @@
   "metric-global|mirror": [
    0,
    18
+  ],
+  "metric-global-exref|holdout": [
+   0,
+   45
+  ],
+  "metric-global-exref|append": [
+   0,
+   27
+  ],
+  "metric-global-exref|backfill": [
+   0,
+   18
+  ],
+  "metric-global-exref|correct": [
+   0,
+   27
+  ],
+  "metric-global-exref|addcol": [
+   0,
+   18
+  ],
+  "metric-global-exref|status": [
+   0,
+   18
+  ],
+  "metric-global-exref|revision": [
+   0,
+   27
+  ],
+  "metric-global-exref|dupload": [
+   0,
+   27
+  ],
+  "metric-global-exref|dimhist": [
+   0,
+   9
+  ],
+  "metric-global-exref|latekey": [
+   0,
+   27
+  ],
+  "metric-global-exref|unit": [
+   27,
+   27
+  ],
+  "metric-global-exref|mirror": [
+   0,
+   18
+  ],
+  "traj-verify|holdout": [
+   0,
+   45
+  ],
+  "traj-verify|append": [
+   0,
+   27
+  ],
+  "traj-verify|backfill": [
+   0,
+   18
+  ],
+  "traj-verify|correct": [
+   0,
+   27
+  ],
+  "traj-verify|addcol": [
+   0,
+   18
+  ],
+  "traj-verify|status": [
+   0,
+   18
+  ],
+  "traj-verify|revision": [
+   0,
+   27
+  ],
+  "traj-verify|dupload": [
+   0,
+   27
+  ],
+  "traj-verify|dimhist": [
+   0,
+   9
+  ],
+  "traj-verify|latekey": [
+   0,
+   27
+  ],
+  "traj-verify|unit": [
+   0,
+   27
+  ],
+  "traj-verify|mirror": [
+   0,
+   18
   ]
  },
  "events": {
@@ -1168,6 +1414,61 @@
    "repair_skipped": 4,
    "ref_rejected": 3
   },
+  "metric-global-exref|append": {
+   "maintenance": 12
+  },
+  "metric-global-exref|backfill": {
+   "maintenance": 8
+  },
+  "metric-global-exref|correct": {
+   "maintenance": 12
+  },
+  "metric-global-exref|addcol": {
+   "maintenance": 8
+  },
+  "metric-global-exref|status": {
+   "revoked": 8,
+   "repair_candidate": 8,
+   "repair_promoted": 8,
+   "maintenance": 8,
+   "repair_reused": 1
+  },
+  "metric-global-exref|revision": {
+   "revoked": 12,
+   "repair_candidate": 12,
+   "repair_rejected": 6,
+   "maintenance": 12,
+   "repair_promoted": 6,
+   "repair_reused": 1
+  },
+  "metric-global-exref|dupload": {
+   "revoked": 12,
+   "repair_failed": 12,
+   "maintenance": 12,
+   "ref_rejected": 6
+  },
+  "metric-global-exref|dimhist": {
+   "revoked": 4,
+   "repair_candidate": 4,
+   "repair_rejected": 4,
+   "maintenance": 4
+  },
+  "metric-global-exref|latekey": {
+   "revoked": 12,
+   "repair_skipped": 12,
+   "maintenance": 12,
+   "ref_rejected": 3
+  },
+  "metric-global-exref|unit": {
+   "maintenance": 12
+  },
+  "metric-global-exref|mirror": {
+   "revoked": 8,
+   "repair_failed": 5,
+   "maintenance": 8,
+   "repair_skipped": 3,
+   "ref_rejected": 3
+  },
   "middle|append": {},
   "middle|backfill": {},
   "middle|correct": {},
@@ -1190,6 +1491,17 @@
   "traj-global|latekey": {},
   "traj-global|unit": {},
   "traj-global|mirror": {},
+  "traj-verify|append": {},
+  "traj-verify|backfill": {},
+  "traj-verify|correct": {},
+  "traj-verify|addcol": {},
+  "traj-verify|status": {},
+  "traj-verify|revision": {},
+  "traj-verify|dupload": {},
+  "traj-verify|dimhist": {},
+  "traj-verify|latekey": {},
+  "traj-verify|unit": {},
+  "traj-verify|mirror": {},
   "metric-global-noguard|append": {},
   "metric-global-noguard|backfill": {},
   "metric-global-noguard|correct": {},
@@ -1237,6 +1549,16 @@
    245.98104000000004,
    346.0997900000001,
    385.2292130000006
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref": [
+   385.54504400000013,
+   288.2610699999999,
+   352.944947
+  ],
+  "DeepSeek V4.1 Flash|traj-verify": [
+   0.0,
+   0.0,
+   0.0
   ]
  },
  "maint_ratios": {

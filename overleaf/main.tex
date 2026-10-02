@@ -473,7 +473,7 @@
   xtick={4,8,15,19}, ytick={0,25,50,75,100}, yticklabel={\pgfmathprintnumber{\tick}\%},
   xlabel={\bt{Definitions}{定义数}}, title style={font=\footnotesize, yshift=-1ex}]
 \nextgroupplot[title={\bt{Staggered}{错峰}}, ylabel={\bt{DB time vs.\ definition-level}{相对定义级的 DB 时间}},
-  legend to name=costlegend, legend columns=4, legend style={font=\scriptsize, draw=none, column sep=3pt}]
+  legend to name=costlegend, legend columns=\ifbilingual 2\else 4\fi, legend style={font=\scriptsize, draw=none, column sep=3pt}]
 \input{gen/cache-ratio-stag}
 \addplot[mDef, line width=0.9pt, densely dotted, domain=2:21, samples=2] {100};
 \addlegendentry{\bt{Scope-only}{仅范围}}

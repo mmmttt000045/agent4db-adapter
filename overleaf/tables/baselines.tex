@@ -1,8 +1,8 @@
-\begin{table}[t]
+\ifbilingual\begin{table*}[t]\else\begin{table}[t]\fi
 \caption{\bt{Compared methods and their colors in all figures. R: paired replay; C: controlled cost benchmark; E: end-to-end scenarios. Revalidation methods share conditions, repair, regression, and in-flight merging.}{被比较的方法及其在各图中的颜色。R：配对回放；C：受控代价实验；E：端到端场景。各重验证方法使用相同的条件、修复、回归与在途合并。}}
 \label{tab:baselines}
 \footnotesize
-\begin{tabularx}{\linewidth}{@{}llL@{}}
+\begin{tabularx}{\ifbilingual\textwidth\else\linewidth\fi}{@{}llL@{}}
 \toprule
 \bt{Method}{方法} & & \bt{After a dependency update}{依赖更新后}\\
 \midrule
@@ -20,4 +20,4 @@
 \swatch{mCondExref}\ \bt{\system, agent ref.}{\system，智能体参照} & R, E & \bt{\system\ with the agent's extracted learning query as the regression reference.}{\system，回归参照改为从智能体轨迹提炼的学习查询。}\\
 \bottomrule
 \end{tabularx}
-\end{table}
+\ifbilingual\end{table*}\else\end{table}\fi

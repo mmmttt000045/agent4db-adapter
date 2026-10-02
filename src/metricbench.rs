@@ -29,10 +29,12 @@ pub struct Options {
     /// 提炼器的模型服务
     #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "anthropic", "claude"])]
     extractor: String,
-    /// metric-global 为条件级维护；-schema / -revoke / -def 只改变维护方式（只看结构、逐写入撤销后重新提炼、定义级重验）
+    /// metric-global 为条件级维护；-schema / -revoke / -def 只改变维护方式（只看结构、逐写入撤销后重新提炼、定义级重验）；
+    /// -exref 的修复回归以提炼出的示例 SQL 为参照；traj-verify 在轨迹检索基线上加一句“复用前先核对前提”的提示
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",
           value_parser = ["direct", "middle", "metric-local", "metric-global", "metric-global-noguard",
-                          "metric-global-schema", "metric-global-revoke", "metric-global-def", "traj-global"])]
+                          "metric-global-schema", "metric-global-revoke", "metric-global-def", "metric-global-exref",
+                          "traj-global", "traj-verify"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
     phrasings: Vec<String>,
@@ -458,8 +460,13 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         "metric-global-schema" => (MiddleConfig { metric_maint: Maint::Schema, ..base }, true, true),
         "metric-global-revoke" => (MiddleConfig { metric_maint: Maint::Revoke, ..base }, true, true),
         "metric-global-def" => (MiddleConfig { metric_maint: Maint::Definition, ..base }, true, true),
-        // 匹配的轨迹检索基线：同样的中间层工具与学习题，学习成功的轨迹原样保存、按题面检索，不提炼、不维护
-        "traj-global" => (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false),
+        // 条件级维护，但修复回归以提炼出的示例 SQL 为参照（部署中真正可得的参照），而不是基准的判题 SQL
+        "metric-global-exref" => {
+            (MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, ..base }, true, true)
+        }
+        // 匹配的轨迹检索基线：同样的中间层工具与学习题，学习成功的轨迹原样保存、按题面检索，不提炼、不维护；
+        // traj-verify 只多一句提示：复用前先在当前数据上核对 SQL 依赖的前提
+        "traj-global" | "traj-verify" => (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false),
         _ => (MiddleConfig { metric_maint: Maint::Off, ..base }, true, true),
     }
 }
@@ -470,6 +477,11 @@ derivation 用这些编号写出最终答案的算式（如 \"r2 - r3\"；答案
 如果题目的业务口径不明确，且无法从数据或工具得到可靠的定义，可以调用 ask_clarification 说明需要澄清的内容；调用后任务结束。";
 
 const SYSTEM_TRAJ: &str = "find_trajectory 返回以往相似问题的成功解题过程（题面、参与答案的 SQL 与算式），可以作为参考。";
+
+/// 自验证基线：把 MAVRA 维护的四类条件直接告诉智能体，让它在复用检索到的 SQL 之前自己核对
+const SYSTEM_TRAJ_VERIFY: &str = "检索到的 SQL 写于以往的数据，数据可能已经变化。复用之前先在当前数据上核对它依赖的前提：\
+事实表在业务键上是否仍然每键一行（例如比较 count(*) 与 count(distinct 键列)），所关联的维表在关联键上是否唯一、关联是否丢行，\
+日期键是否都能关联到日期维度。前提不成立时先查看表结构与取值，补上需要的过滤之后再计算，不要照搬。";
 
 const SYSTEM_METRIC: &str = "find_metric 返回中间层已验证的业务指标口径（含示例 SQL），可以作为参考。用某个口径写的 SQL，\
 请在 run_sql 的 metrics 参数中声明 [{\"key\": ..., \"revision\": ...}]；中间层会在执行前核对该口径是否仍然有效。";
@@ -757,6 +769,10 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
         tools.push(trajectory_tool_spec());
         system_text.push('\n');
         system_text.push_str(SYSTEM_TRAJ);
+        if mode == "traj-verify" {
+            system_text.push('\n');
+            system_text.push_str(SYSTEM_TRAJ_VERIFY);
+        }
     }
     tools.push(llm::final_answer_spec(true));
     tools.push(llm::clarification_spec());

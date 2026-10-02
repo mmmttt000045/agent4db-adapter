@@ -36,29 +36,35 @@ MODEL_ORDER = ["DeepSeek V4.1 Flash", "GLM-5.3", "GLM-5.3 Flash"]
 METHODS = [  # (mode, 英文, 中文)；全文统一的方法名
     ("middle", "No sharing", "不共享"),
     ("traj-global", "Trajectory retrieval", "轨迹检索"),
+    ("traj-verify", "Trajectory retrieval + verify", "轨迹检索 + 自验证"),
     ("metric-global-noguard", "Unguarded", "无守护"),
     ("metric-global-schema", "Schema-only", "只看结构"),
     ("metric-global-revoke", "Revoke-on-write", "写入即撤销"),
     ("metric-global-def", "Definition-level", "定义级"),
     ("metric-global", r"\system", "条件级"),
+    ("metric-global-exref", r"\system, agent ref.", "条件级，智能体参照"),
 ]
 HEAD = {  # 表头用的两行英文（与方法名一致）
     "middle": r"No\\sharing",
     "traj-global": r"Trajectory\\retrieval",
+    "traj-verify": r"Trajectory\\+ verify",
     "metric-global-noguard": r"Un-\\guarded",
     "metric-global-schema": r"Schema-\\only",
     "metric-global-revoke": r"Revoke-\\on-write",
     "metric-global-def": r"Definition-\\level",
     "metric-global": r"\system\\(condition)",
+    "metric-global-exref": r"\system\\agent ref.",
 }
 COLOR = {  # 与正文导言的方法颜色一致
     "middle": "mNoShare",
     "traj-global": "mTraj",
+    "traj-verify": "mTrajVerify",
     "metric-global-noguard": "mUnguarded",
     "metric-global-schema": "mSchema",
     "metric-global-revoke": "mRevoke",
     "metric-global-def": "mDef",
     "metric-global": "mCond",
+    "metric-global-exref": "mCondExref",
 }
 STYLE = {mode: "bar" + c[1:] for mode, c in COLOR.items()}
 CLASSES = {  # 类别：英文、中文
@@ -318,8 +324,8 @@ def tex_cost_table(A):
         rep = sum(A["events"][(mode, p)]["repair_promoted"] for p in changed) / nc if nc else 0
         ms = mean([x for (m, mo), xs in A["maint"].items() if mo == mode for x in xs])
         tk = mean([mean(xs) for (m, mo), xs in A["hold_tokens"].items() if mo == mode and xs])
-        ms_s = "--" if mode in ("middle", "traj-global") or ms is None else f"{ms:.0f}"
-        rr = "--" if mode in ("middle", "traj-global", "metric-global-noguard", "metric-global-schema") else f"{rev:.1f} / {rep:.1f}"
+        ms_s = "--" if mode in ("middle", "traj-global", "traj-verify") or ms is None else f"{ms:.0f}"
+        rr = "--" if mode in ("middle", "traj-global", "traj-verify", "metric-global-noguard", "metric-global-schema") else f"{rev:.1f} / {rep:.1f}"
         lines.append(rf"\swatch{{{COLOR[mode]}}}\ \bhl{{{en}}}{{{zh}}} & {100 * v:.0f} & {st} & {rr} & {ms_s} & {tk / 1000:.1f}\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines) + "\n"
@@ -380,8 +386,9 @@ def numbers(A, dropped, cells, R):
     q["ScenValidTasks"] = sum(n for (_, _, _), (_, n) in A["acc"].items())
     q["ScenQuotaTasks"] = sum(A["err"].values())
     for mode, en, _ in METHODS:
-        key = {"middle": "NoShare", "traj-global": "Traj", "metric-global-noguard": "Noguard", "metric-global-schema": "Schema",
-               "metric-global-revoke": "Revoke", "metric-global-def": "Def", "metric-global": "Cond"}[mode]
+        key = {"middle": "NoShare", "traj-global": "Traj", "traj-verify": "TrajVerify", "metric-global-noguard": "Noguard",
+               "metric-global-schema": "Schema", "metric-global-revoke": "Revoke", "metric-global-def": "Def", "metric-global": "Cond",
+               "metric-global-exref": "CondExref"}[mode]
         pct = lambda v: f"{100 * v:.0f}" if v is not None else "--"
         q[f"ScenAcc{key}"] = pct(phase_mean(A["acc"], mode, allp))
         q[f"ScenHoldout{key}"] = pct(macro(A["acc"], mode, ["holdout"])[0])

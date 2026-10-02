@@ -20,11 +20,12 @@ import json
 import os
 import random
 
-METHODS = ["middle", "traj-global", "metric-global-noguard", "metric-global-schema", "metric-global-revoke", "metric-global-def",
-           "metric-global"]
-NAMES = {"middle": "No sharing", "traj-global": "Trajectory retrieval", "metric-global-noguard": "Unguarded",
-         "metric-global-schema": "Schema-only", "metric-global-revoke": "Revoke-on-write", "metric-global-def": "Definition-level",
-         "metric-global": "MAVRA (condition-level)"}
+METHODS = ["middle", "traj-global", "traj-verify", "metric-global-noguard", "metric-global-schema", "metric-global-revoke",
+           "metric-global-def", "metric-global", "metric-global-exref"]
+NAMES = {"middle": "No sharing", "traj-global": "Trajectory retrieval", "traj-verify": "Trajectory retrieval + self-verification",
+         "metric-global-noguard": "Unguarded", "metric-global-schema": "Schema-only", "metric-global-revoke": "Revoke-on-write",
+         "metric-global-def": "Definition-level", "metric-global": "MAVRA (condition-level)",
+         "metric-global-exref": "MAVRA, agent reference for G8"}
 PHASES = ["holdout", "append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"]
 GROUPS = {
     "all": PHASES,
@@ -109,13 +110,17 @@ def ci(xs):
     return [xs[int(0.025 * len(xs))], xs[int(0.975 * len(xs)) - 1]] if xs else [None, None]
 
 
-KEY = {"middle": "NoShare", "traj-global": "Traj", "metric-global-noguard": "Noguard", "metric-global-schema": "Schema",
-       "metric-global-revoke": "Revoke", "metric-global-def": "Def", "metric-global": "Cond"}
-STYLE = {"middle": "barNoShare", "traj-global": "barTraj", "metric-global-noguard": "barUnguarded", "metric-global-schema": "barSchema",
-         "metric-global-revoke": "barRevoke", "metric-global-def": "barDef", "metric-global": "barCond"}
-LEGEND = {"middle": ("No sharing", "不共享"), "traj-global": ("Trajectory retrieval", "轨迹检索"), "metric-global-noguard": ("Unguarded", "无守护"),
+KEY = {"middle": "NoShare", "traj-global": "Traj", "traj-verify": "TrajVerify", "metric-global-noguard": "Noguard",
+       "metric-global-schema": "Schema", "metric-global-revoke": "Revoke", "metric-global-def": "Def", "metric-global": "Cond",
+       "metric-global-exref": "CondExref"}
+STYLE = {"middle": "barNoShare", "traj-global": "barTraj", "traj-verify": "barTrajVerify", "metric-global-noguard": "barUnguarded",
+         "metric-global-schema": "barSchema", "metric-global-revoke": "barRevoke", "metric-global-def": "barDef", "metric-global": "barCond",
+         "metric-global-exref": "barCondExref"}
+LEGEND = {"middle": ("No sharing", "不共享"), "traj-global": ("Trajectory retrieval", "轨迹检索"),
+          "traj-verify": ("Trajectory retrieval + verify", "轨迹检索 + 自验证"), "metric-global-noguard": ("Unguarded", "无守护"),
           "metric-global-schema": ("Schema-only", "只看结构"), "metric-global-revoke": ("Revoke-on-write", "写入即撤销"),
-          "metric-global-def": ("Definition-level", "定义级"), "metric-global": (r"\system", r"\system")}
+          "metric-global-def": ("Definition-level", "定义级"), "metric-global": (r"\system", r"\system"),
+          "metric-global-exref": (r"\system, agent ref.", r"\system，智能体参照")}
 FIG_GROUPS = ["holdout", "benign", "modeled", "mirror", "unit"]
 
 
@@ -139,7 +144,12 @@ def tex(res, out):
         q[f"Ds{k}TokK"] = f"{r['input_tokens_per_task'] / 1000:.1f}" if r["input_tokens_per_task"] else "--"
         q[f"Ds{k}MaintS"] = f"{r['maint_db_s_per_cell']:.0f}"
     names = {"a1 modeled: MAVRA - trajectory": "DsCmpModeledTraj", "a2 modeled: MAVRA - definition-level": "DsCmpModeledDef",
-             "b all: MAVRA - no sharing": "DsCmpAllNoShare", "c holdout: MAVRA - trajectory": "DsCmpHoldoutTraj"}
+             "b all: MAVRA - no sharing": "DsCmpAllNoShare", "c holdout: MAVRA - trajectory": "DsCmpHoldoutTraj",
+             "d1 modeled: MAVRA agent-ref - trajectory": "DsCmpModeledExrefTraj",
+             "d2 modeled: MAVRA agent-ref - MAVRA": "DsCmpModeledExrefCond",
+             "e1 modeled: trajectory+verify - trajectory": "DsCmpModeledVerifyTraj",
+             "e2 modeled: MAVRA - trajectory+verify": "DsCmpModeledCondVerify",
+             "e3 all: MAVRA - trajectory+verify": "DsCmpAllCondVerify"}
     for label, name in names.items():
         c = res["comparisons"].get(label)
         if c:
@@ -217,7 +227,14 @@ def main():
         "a2 modeled: MAVRA - definition-level": diff("metric-global", "metric-global-def", "modeled"),
         "b all: MAVRA - no sharing": diff("metric-global", "middle", "all"),
         "c holdout: MAVRA - trajectory": diff("metric-global", "traj-global", "holdout"),
+        # 2026-10-03 增补（见 exp/2026-10-02-scenarios-ds/README.md 的分析方案增补）
+        "d1 modeled: MAVRA agent-ref - trajectory": diff("metric-global-exref", "traj-global", "modeled"),
+        "d2 modeled: MAVRA agent-ref - MAVRA": diff("metric-global-exref", "metric-global", "modeled"),
+        "e1 modeled: trajectory+verify - trajectory": diff("traj-verify", "traj-global", "modeled"),
+        "e2 modeled: MAVRA - trajectory+verify": diff("metric-global", "traj-verify", "modeled"),
+        "e3 all: MAVRA - trajectory+verify": diff("metric-global", "traj-verify", "all"),
     }
+    res["comparisons"] = {k: v for k, v in res["comparisons"].items() if v is not None}
     if o.json:
         json.dump(res, open(o.json, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     if o.tex_out:

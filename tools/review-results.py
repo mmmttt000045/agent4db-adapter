@@ -43,7 +43,10 @@ def main():
     m["RpDefs"] = sum(len(l["entries"]) for l in ro["libraries"])
     m["RpChanges"] = len(ro["changes"])
     for key, g in [("Cond", "condition/judge"), ("Ex", "condition/example"), ("Def", "definition/judge"),
-                   ("Cache", "definition-cache/judge"), ("Schema", "schema/judge"), ("Revoke", "revoke/judge")]:
+                   ("Cache", "definition-cache/judge"), ("Schema", "schema/judge"), ("Revoke", "revoke/judge"),
+                   ("Table", "tabletest/judge")]:
+        if g not in tl:
+            continue
         t = tl[g]
         m[f"Rp{key}N"] = t["n"]
         m[f"Rp{key}Correct"] = t["correct"]
@@ -56,6 +59,15 @@ def main():
     wrong_mod = collections.Counter((x["policy"], x["oracle"]) for x in outs if x["class"] == "served_wrong" and x["change"] != "unit")
     m["RpSchemaWrongModeled"] = wrong_mod[("schema", "judge")]
     m["RpCondWrongModeled"] = wrong_mod[("condition", "judge")]
+    if "tabletest/judge" in tl:
+        m["RpTableWrongModeled"] = wrong_mod[("tabletest", "judge")]
+        pair = rs["paired"].get("condition/judge vs tabletest/judge")
+        if pair:
+            m["RpTableVsCondDiff"] = pair["correct_diff_pp"]
+            m["RpTableVsCondLo"] = pair["ci95_pp"][0]
+            m["RpTableVsCondHi"] = pair["ci95_pp"][1]
+            m["RpTableOnlyCond"] = pair["cond_only_correct"]
+            m["RpTableOnlyTable"] = pair["other_only_correct"]
     m["RpCacheVsCond"] = rs["maintenance_db_s"]["definition-cache/judge"]["total"] / rs["maintenance_db_s"]["condition/judge"]["total"]
     m["RpDefVsCond"] = rs["maintenance_db_s"]["definition/judge"]["total"] / rs["maintenance_db_s"]["condition/judge"]["total"]
     pair = rs["paired"]["condition/example vs definition/example"]

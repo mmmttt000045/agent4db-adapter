@@ -16,7 +16,7 @@ use crate::scenario::{self, Change};
 use anyhow::{ensure, Context, Result};
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 use std::sync::Arc;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
@@ -29,8 +29,9 @@ pub struct Options {
     /// 门店销售行数（目录渠道为其一半）
     #[arg(long, default_value_t = 200_000, value_parser = clap::value_parser!(u32).range(10_000..=20_000_000))]
     rows: u32,
-    #[arg(long, value_delimiter = ',', default_value = "condition,definition,definition-cache,schema,revoke",
-          value_parser = ["condition", "definition", "definition-cache", "schema", "revoke"])]
+    /// 维护方式；tabletest 为 dbt 式表级测试基线（不经中间层，见 `TABLE_TESTS`）
+    #[arg(long, value_delimiter = ',', default_value = "condition,definition,definition-cache,schema,revoke,tabletest",
+          value_parser = ["condition", "definition", "definition-cache", "schema", "revoke", "tabletest"])]
     policies: Vec<String>,
     /// G8 参照（只对条件级与定义级区分；其余方式不修复，用 judge 准入）
     #[arg(long, value_delimiter = ',', default_value = "judge,example", value_parser = ["judge", "example"])]
@@ -142,6 +143,42 @@ fn affected(def: &str, ch: Change) -> bool {
     metricbench::tasks(&[def.to_string()]).first().is_some_and(|t| t.def.tables.iter().any(|x| ch.tables().contains(x)))
 }
 
+/// dbt 式表级测试基线（配对回放的对照）：每张表上人工声明的 unique / not_null / relationships 测试，按初始快照校准；
+/// 每次变化后像 `dbt test` 一样全部跑一遍，某张表有测试失败时读到该表的全部定义一律隔离（不可用），否则照原样提供，不修复。
+/// 与条件级维护的区别：测试按表声明而不由定义推出、不带定义自己的过滤、结论只说明表而不说明哪个定义受影响。
+const TABLE_TESTS: &[(&str, &str, &str)] = &[
+    ("store_sales", "unique(ss_ticket_number, ss_item_sk)",
+     "select 1 from store_sales group by ss_ticket_number, ss_item_sk having count(*) > 1 limit 1"),
+    ("store_sales", "relationships(ss_sold_date_sk -> date_dim.d_date_sk)",
+     "select 1 from store_sales s where s.ss_sold_date_sk is not null and not exists (select 1 from date_dim d where d.d_date_sk = s.ss_sold_date_sk) limit 1"),
+    ("store_sales", "relationships(ss_item_sk -> item.i_item_sk)",
+     "select 1 from store_sales s where not exists (select 1 from item i where i.i_item_sk = s.ss_item_sk) limit 1"),
+    ("store_returns", "unique(sr_ticket_number, sr_item_sk)",
+     "select 1 from store_returns group by sr_ticket_number, sr_item_sk having count(*) > 1 limit 1"),
+    ("store_returns", "relationships(sr_returned_date_sk -> date_dim.d_date_sk)",
+     "select 1 from store_returns r where r.sr_returned_date_sk is not null and not exists (select 1 from date_dim d where d.d_date_sk = r.sr_returned_date_sk) limit 1"),
+    ("store_returns", "relationships(sr_item_sk -> item.i_item_sk)",
+     "select 1 from store_returns r where not exists (select 1 from item i where i.i_item_sk = r.sr_item_sk) limit 1"),
+    ("catalog_sales", "unique(cs_order_number, cs_item_sk)",
+     "select 1 from catalog_sales group by cs_order_number, cs_item_sk having count(*) > 1 limit 1"),
+    ("catalog_sales", "relationships(cs_sold_date_sk -> date_dim.d_date_sk)",
+     "select 1 from catalog_sales c where c.cs_sold_date_sk is not null and not exists (select 1 from date_dim d where d.d_date_sk = c.cs_sold_date_sk) limit 1"),
+    ("catalog_sales", "relationships(cs_item_sk -> item.i_item_sk)",
+     "select 1 from catalog_sales c where not exists (select 1 from item i where i.i_item_sk = c.cs_item_sk) limit 1"),
+    ("item", "unique(i_item_sk)", "select 1 from item group by i_item_sk having count(*) > 1 limit 1"),
+    ("item", "not_null(i_item_sk)", "select 1 from item where i_item_sk is null limit 1"),
+    ("date_dim", "unique(d_date_sk)", "select 1 from date_dim group by d_date_sk having count(*) > 1 limit 1"),
+];
+
+async fn table_tests(db: &Db) -> Result<Vec<Value>> {
+    let mut out = vec![];
+    for (table, test, sql) in TABLE_TESTS {
+        let failed = db.query(QKind::Check, sql).await?.cell(0, 0).is_some();
+        out.push(json!({"table": table, "test": test, "failed": failed}));
+    }
+    Ok(out)
+}
+
 async fn answer(probe: &Db, sql: &str) -> String {
     match probe.query(QKind::Meta, sql).await {
         Ok(r) => r.cell(0, 0).unwrap_or("NULL").to_string(),
@@ -178,6 +215,11 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         etl::setup(&admin).await?;
         scenario::setup(&admin).await?;
         let v1 = scenario::fingerprint(&admin).await?;
+        let table_test = o.policies.iter().any(|p| p == "tabletest");
+        if table_test {
+            let failed: Vec<Value> = table_tests(&admin).await?.into_iter().filter(|x| x["failed"] == true).collect();
+            ensure!(failed.is_empty(), "表级测试在初始快照上就失败，无法作为校准过的基线：{failed:?}");
+        }
         let probe = Db::connect(isolated.as_str(), 2, true)?;
         let db = Arc::new(Db::connect_timeout(isolated.as_str(), pool, true, o.sql_timeout_secs)?);
         let defs: Vec<String> = ["M1", "M2", "M3", "M4", "M5"].iter().map(|s| s.to_string()).collect();
@@ -187,6 +229,9 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         let mut runs: Vec<Run> = vec![];
         for (li, lib) in libs.iter().enumerate() {
             for policy in &o.policies {
+                if policy == "tabletest" {
+                    continue; // 不经中间层，见下面的表级测试基线
+                }
                 let oracles: Vec<&str> = if matches!(policy.as_str(), "condition" | "definition") {
                     o.oracles.iter().map(String::as_str).collect()
                 } else {
@@ -287,6 +332,41 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                     "events": r.mid.take_metric_events(),
                 }));
             }
+            // 表级测试基线：每个库视作一个 dbt 项目，变化后跑一遍全部测试，失败的表上的定义全部隔离，其余照原样提供
+            if table_test {
+                for (li, lib) in libs.iter().enumerate() {
+                    let before = db.meter.snap();
+                    let t0 = Instant::now();
+                    let tests = table_tests(&db).await?;
+                    let d = crate::db::diff(&before, &db.meter.snap());
+                    let bad: BTreeSet<String> =
+                        tests.iter().filter(|x| x["failed"] == true).map(|x| x["table"].as_str().unwrap_or_default().to_string()).collect();
+                    let mut used = 0;
+                    for (ei, e) in lib.entries.iter().enumerate().filter(|(_, e)| affected(&e.def, ch)) {
+                        used += 1;
+                        let quarantined = e.metric.tables().iter().any(|t| bad.contains(t));
+                        for t in held.iter().filter(|t| t.def.id == e.def) {
+                            let (orig_value, orig_ok) = orig[&(li, ei, t.id.clone())].clone();
+                            let class = match (quarantined, orig_ok) {
+                                (false, true) => "correct",
+                                (false, false) => "served_wrong",
+                                (true, false) => "unavailable_needed",
+                                (true, true) => "unavailable_unneeded",
+                            };
+                            outcomes.push(json!({
+                                "lib": lib.id, "policy": "tabletest", "oracle": "judge", "change": ch.name(), "entry": e.name, "def": e.def,
+                                "task": t.id, "status": if quarantined { "quarantined" } else { "valid" }, "revision": 0, "repaired": false,
+                                "value": (!quarantined).then(|| orig_value.clone()), "gold": gold[&t.id], "orig_value": orig_value,
+                                "orig_ok": orig_ok, "class": class,
+                            }));
+                        }
+                    }
+                    maint.push(json!({
+                        "lib": lib.id, "policy": "tabletest", "oracle": "judge", "change": ch.name(), "entries_used": used,
+                        "db_ms": d.db_ms, "queries": d.queries, "wall_ms": t0.elapsed().as_secs_f64() * 1000.0, "events": tests,
+                    }));
+                }
+            }
             ch.reset(&admin).await?;
             scenario::ensure_v1(&admin, &v1, ch.name()).await?;
             for r in &runs {
@@ -315,6 +395,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 "answer": "答案 = 当时提供的修订的规范 SQL 在当前数据上的结果；不提供（撤销或候选）记为不可用",
                 "classes": "correct / served_wrong（提供了但答错：过期使用或错误修复）/ unavailable_needed（原定义已答错）/ unavailable_unneeded（原定义仍答对）",
                 "oracle": "judge = 学习题判题 SQL；example = 智能体学习时自己写的 SQL；只影响修复的 G8",
+                "tabletest": "dbt 式表级测试基线：按初始快照校准的 unique / not_null / relationships 测试，变化后全部重跑，失败的表上的定义全部隔离，不修复",
                 "db_time": "各实例按顺序评估，数据库耗时为评估前后中间层连接池计量的差值（答案查询走独立连接，不计入）",
             },
             "outcomes": outcomes, "maintenance": maint,

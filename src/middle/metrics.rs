@@ -368,6 +368,7 @@ impl Middle {
         let mut m = draft.metric;
         m.basis = traj.basis.clone();
         let sql = draft.example_sql.trim().trim_end_matches(';').trim().to_string();
+        let example_ref = sql.clone();
         m.examples = vec![Example { question: traj.question.clone(), sql }];
         let mut gates = vec![];
         let failed = self.promotion_gates(ctx, &mut m, traj, log, &mut gates).await?;
@@ -417,7 +418,7 @@ impl Middle {
             gates: gates.clone(),
             corroborations: 0,
             repaired: false,
-            judge: traj.judge.clone(),
+            judge: if self.cfg.g8_example { Some(example_ref) } else { traj.judge.clone() },
         };
         self.metric_evidence.lock().insert(fk, evidence);
         let v = json!({

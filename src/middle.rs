@@ -119,6 +119,9 @@ pub struct MiddleConfig {
     pub repair_unique: bool,
     /// 定义正在被别的请求维护（已撤销、修复回归中）时，后到的使用等这次维护结束再读结果，而不是直接返回不可用
     pub wait_repair: bool,
+    /// 修复回归（G8）的参照用提炼出的示例 SQL（由 G6 核实能复现智能体自己的答案），而不是基准的判题 SQL：
+    /// 部署中真正可得的参照。只影响修复，准入门槛不变
+    pub g8_example: bool,
 }
 
 impl Default for MiddleConfig {
@@ -145,6 +148,7 @@ impl Default for MiddleConfig {
             traj_memory: false,
             repair_unique: true,
             wait_repair: true,
+            g8_example: false,
         }
     }
 }

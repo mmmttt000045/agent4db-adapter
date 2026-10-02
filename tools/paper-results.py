@@ -4,6 +4,8 @@
 用法（在 noctis 的仓库根目录）：
   python3 tools/paper-results.py --scen results/scen-20260930 --out overleaf/gen \
       --json exp/2026-10-01-scenarios/paper-results.json
+  可给多个 --scen 目录；--models 只取部分模型（显示名，逗号分隔）。方法、场景与模型都按数据中实际出现的取
+  （例如 2026-10-02 起的 DeepSeek 主实验含轨迹检索基线 traj-global 与备份副本场景 mirror）。
 
 场景实验（metric-bench，三个模型 × 六种方法 × 十种数据变化）的口径：
 - 计分题：留出与各变化场景中的题目，不含学习题与 *-relearn 重新学习题。
@@ -33,6 +35,7 @@ MODELS = [  # (任务目录前缀, 显示名)；前缀长的先匹配
 MODEL_ORDER = ["DeepSeek V4.1 Flash", "GLM-5.3", "GLM-5.3 Flash"]
 METHODS = [  # (mode, 英文, 中文)；全文统一的方法名
     ("middle", "No sharing", "不共享"),
+    ("traj-global", "Trajectory retrieval", "轨迹检索"),
     ("metric-global-noguard", "Unguarded", "无守护"),
     ("metric-global-schema", "Schema-only", "只看结构"),
     ("metric-global-revoke", "Revoke-on-write", "写入即撤销"),
@@ -41,6 +44,7 @@ METHODS = [  # (mode, 英文, 中文)；全文统一的方法名
 ]
 HEAD = {  # 表头用的两行英文（与方法名一致）
     "middle": r"No\\sharing",
+    "traj-global": r"Trajectory\\retrieval",
     "metric-global-noguard": r"Un-\\guarded",
     "metric-global-schema": r"Schema-\\only",
     "metric-global-revoke": r"Revoke-\\on-write",
@@ -49,6 +53,7 @@ HEAD = {  # 表头用的两行英文（与方法名一致）
 }
 COLOR = {  # 与正文导言的方法颜色一致
     "middle": "mNoShare",
+    "traj-global": "mTraj",
     "metric-global-noguard": "mUnguarded",
     "metric-global-schema": "mSchema",
     "metric-global-revoke": "mRevoke",
@@ -63,6 +68,7 @@ CLASSES = {  # 类别：英文、中文
     "fanout": ("Fan-out", "连接放大"),
     "coverage": ("Coverage", "覆盖"),
     "unmodeled": ("Not modeled", "未建模"),
+    "ambiguous": ("Ambiguous fix", "修复有歧义"),
 }
 PHASES = [  # (phase, 类别, 英文, 中文, 英文说明, 中文说明)
     ("holdout", "none", "Held-out", "留出", "No update; new parameters and question types", "无更新；新参数与新题型"),
@@ -76,6 +82,7 @@ PHASES = [  # (phase, 类别, 英文, 中文, 英文说明, 中文说明)
     ("dimhist", "fanout", "Dim.\\ history", "维表拉链", "Add old-version rows to the item dimension", "商品维表增加旧版本行"),
     ("latekey", "coverage", "Key format", "日期键格式", "Append sales whose date keys use yyyymmdd", "追加日期键为 yyyymmdd 的销售"),
     ("unit", "unmodeled", "Unit change", "金额单位", "Multiply sales amounts by 100 from 2002-07", "2002-07 起销售金额乘以 100"),
+    ("mirror", "ambiguous", "Backup copy", "备份副本", "Append a full backup copy that keeps old amounts", "追加保留旧金额的整份备份副本"),
 ]
 QUOTA = ("INFERENCE_CAP_ERROR", "HTTP 429", "HTTP 402", "限流", "用量上限")
 
@@ -212,7 +219,7 @@ def phase_mean(acc, mode, phases):
 
 
 def common_phases(acc, model):
-    """该模型下六种方法都有有效题的场景。"""
+    """该模型下各方法都有有效题的场景。"""
     return [p for p, *_ in PHASES if all(acc[(model, mode, p)][1] for mode, *_ in METHODS)]
 
 
@@ -266,7 +273,7 @@ def tex_heat_table(A):
     cells = []
     for mode, *_ in METHODS:
         cells.append(rf"\textbf{{{round(100 * phase_mean(A['acc'], mode, allp))}}}")
-    lines.append(r"\multicolumn{3}{@{}l}{\bt{Mean over the 11 settings}{11 种情形平均}} & " + " & ".join(cells) + r"\\")
+    lines.append(rf"\multicolumn{{3}}{{@{{}}l}}{{\bt{{Mean over the {len(allp)} settings}}{{{len(allp)} 种情形平均}}}} & " + " & ".join(cells) + r"\\")
     lines.append(r"\bottomrule")
     lines.append(r"\end{tabularx}")
     return "\n".join(lines) + "\n"
@@ -304,8 +311,8 @@ def tex_cost_table(A):
         rep = sum(A["events"][(mode, p)]["repair_promoted"] for p in changed) / nc if nc else 0
         ms = mean([x for (m, mo), xs in A["maint"].items() if mo == mode for x in xs])
         tk = mean([mean(xs) for (m, mo), xs in A["hold_tokens"].items() if mo == mode and xs])
-        ms_s = "--" if mode in ("middle",) else f"{ms:.0f}"
-        rr = "--" if mode in ("middle", "metric-global-noguard", "metric-global-schema") else f"{rev:.1f} / {rep:.1f}"
+        ms_s = "--" if mode in ("middle", "traj-global") or ms is None else f"{ms:.0f}"
+        rr = "--" if mode in ("middle", "traj-global", "metric-global-noguard", "metric-global-schema") else f"{rev:.1f} / {rep:.1f}"
         lines.append(rf"\swatch{{{COLOR[mode]}}}\ \bhl{{{en}}}{{{zh}}} & {100 * v:.0f} & {st} & {rr} & {ms_s} & {tk / 1000:.1f}\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines) + "\n"
@@ -359,7 +366,6 @@ def tex_maint_plot(R):
 def numbers(A, dropped, cells, R):
     allp = [p for p, *_ in PHASES]
     modeled = [p for p, cls, *_ in PHASES if cls in ("grain", "fanout", "coverage")]
-    assert len(modeled) == 5
     q = {}
     q["ScenModels"] = len({c["model"] for c in cells})
     q["ScenCells"] = len(cells)
@@ -367,7 +373,7 @@ def numbers(A, dropped, cells, R):
     q["ScenValidTasks"] = sum(n for (_, _, _), (_, n) in A["acc"].items())
     q["ScenQuotaTasks"] = sum(A["err"].values())
     for mode, en, _ in METHODS:
-        key = {"middle": "NoShare", "metric-global-noguard": "Noguard", "metric-global-schema": "Schema",
+        key = {"middle": "NoShare", "traj-global": "Traj", "metric-global-noguard": "Noguard", "metric-global-schema": "Schema",
                "metric-global-revoke": "Revoke", "metric-global-def": "Def", "metric-global": "Cond"}[mode]
         q[f"ScenAcc{key}"] = f"{100 * phase_mean(A['acc'], mode, allp):.0f}"
         vh, _ = macro(A["acc"], mode, ["holdout"])
@@ -383,12 +389,15 @@ def numbers(A, dropped, cells, R):
         q[f"ScenMaint{key}"] = f"{ms:.1f}" if ms is not None else "--"
     cond = mean([x for (m, mo), xs in A["maint"].items() if mo == "metric-global" for x in xs])
     dfn = mean([x for (m, mo), xs in A["maint"].items() if mo == "metric-global-def" for x in xs])
-    q["ScenMaintRatio"] = f"{100 * cond / dfn:.0f}"
-    q["ScenRelearnTok"] = f"{mean([t for ts in A['relearn'].values() for t in ts]) / 1e6:.2f}"
-    for p in ("dupload", "latekey", "unit", "status", "revision", "dimhist"):
-        for mode, key in (("metric-global", "Cond"), ("middle", "NoShare"), ("metric-global-schema", "Schema"), ("metric-global-def", "Def")):
+    q["ScenMaintRatio"] = f"{100 * cond / dfn:.0f}" if cond is not None and dfn else "--"
+    rl = [t for ts in A["relearn"].values() for t in ts]
+    q["ScenRelearnTok"] = f"{mean(rl) / 1e6:.2f}" if rl else "--"
+    for p in ("dupload", "latekey", "unit", "status", "revision", "dimhist", "mirror"):
+        for mode, key in (("metric-global", "Cond"), ("middle", "NoShare"), ("metric-global-schema", "Schema"), ("metric-global-def", "Def"),
+                          ("traj-global", "Traj")):
             v, _ = macro(A["acc"], mode, [p])
-            q[f"ScenAcc{key}{p.capitalize()}"] = f"{100 * v:.0f}"
+            if v is not None:
+                q[f"ScenAcc{key}{p.capitalize()}"] = f"{100 * v:.0f}"
     ev = A["events"]
     q["ScenRepairFailedDupload"] = ev[("metric-global", "dupload")]["repair_failed"]
     q["ScenRepairSkippedLatekey"] = ev[("metric-global", "latekey")]["repair_skipped"]
@@ -397,15 +406,15 @@ def numbers(A, dropped, cells, R):
     q["ScenUnitStaleTasks"] = A["stale"][("metric-global", "unit")][0]
     q["ScenUnitTasks"] = A["stale"][("metric-global", "unit")][1]
     for m, tag in zip(MODEL_ORDER, "ABC"):
-        for mode, key in (("metric-global", "Cond"), ("middle", "NoShare"), ("metric-global-def", "Def")):
+        for mode, key in (("metric-global", "Cond"), ("middle", "NoShare"), ("metric-global-def", "Def"), ("traj-global", "Traj")):
             v, _, _, nph = per_model(A["acc"], m, mode)
             q[f"ScenAcc{key}Model{tag}"] = f"{100 * v:.0f}" if v is not None else "--"
             q[f"ScenCommonPhasesModel{tag}"] = nph
         a, b = mean(A["hold_tokens"][(m, "middle")]), mean(A["hold_tokens"][(m, "metric-global")])
-        q[f"ScenHoldTokSaveModel{tag}"] = f"{100 * (1 - b / a):.0f}"
+        q[f"ScenHoldTokSaveModel{tag}"] = f"{100 * (1 - b / a):.0f}" if a and b else "--"
         a, b = mean(A["hold_turns"][(m, "middle")]), mean(A["hold_turns"][(m, "metric-global")])
-        q[f"ScenHoldTurnsNoShareModel{tag}"] = f"{a:.1f}"
-        q[f"ScenHoldTurnsCondModel{tag}"] = f"{b:.1f}"
+        q[f"ScenHoldTurnsNoShareModel{tag}"] = f"{a:.1f}" if a else "--"
+        q[f"ScenHoldTurnsCondModel{tag}"] = f"{b:.1f}" if b else "--"
     q["MaintStagMin"] = f"{min(y for _, y in R[('condition', 'staggered')]):.1f}"
     q["MaintStagMax"] = f"{max(y for _, y in R[('condition', 'staggered')]):.1f}"
     q["MaintSimMin"] = f"{min(y for _, y in R[('condition', 'simultaneous')]):.1f}"
@@ -433,13 +442,28 @@ def numbers(A, dropped, cells, R):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--scen", required=True)
+    ap.add_argument("--scen", required=True, action="append")
+    ap.add_argument("--models", default=None, help="只取这些模型（显示名，逗号分隔）")
     ap.add_argument("--maint", default="exp/2026-09-29-maint-share/cells.txt")
     ap.add_argument("--maint-rev", default="exp/2026-09-30-maint-share-rev/cells.txt")
     ap.add_argument("--out", default="overleaf/gen")
     ap.add_argument("--json", default=None)
     o = ap.parse_args()
-    cells, dropped = load_scenarios(o.scen)
+    global METHODS, PHASES, MODEL_ORDER
+    cells, dropped = [], []
+    for root in o.scen:
+        c, d = load_scenarios(root)
+        cells += c
+        dropped += d
+    if o.models:
+        keep = {m.strip() for m in o.models.split(",")}
+        cells = [c for c in cells if c["model"] in keep]
+    # 方法、场景与模型按数据中实际出现的取，顺序沿用上面的全文约定
+    modes = {c["mode"] for c in cells}
+    phases = {r["phase"] for c in cells for r in c["d"]["records"]}
+    METHODS = [x for x in METHODS if x[0] in modes]
+    PHASES = [x for x in PHASES if x[0] in phases]
+    MODEL_ORDER = [m for m in MODEL_ORDER if any(c["model"] == m for c in cells)]
     A = analyze(cells)
     R = maint_ratios(load_maint(o.maint), load_maint(o.maint_rev))
     os.makedirs(o.out, exist_ok=True)

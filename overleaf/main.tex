@@ -440,15 +440,7 @@
 \label{tab:stress}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\linewidth}{@{}llLrr@{}}
-\toprule
-& & \multicolumn{2}{c}{\bt{Pre-check}{预检查}} & \bh{Snapshot-bound}{绑定快照}\\
-\cmidrule(lr){3-4}
-\bt{Writer}{写者} & \bt{Months}{月份} & \bt{violations / answered}{违规／作答} & \bh{trials}{试验} & \bh{violations / answered}{违规／作答}\\
-\midrule
 \input{gen/snapshot-stress}
-\bottomrule
-\end{tabularx}
 \end{table}
 
 \bi{\emph{Random concurrency.} Table~\ref{tab:stress} randomizes the interleaving. Without announcement, pre-check answers on violating data in \SnPreUnannMin--\SnPreUnannMax\% of answered queries, in at least \SnPreUnannTrials\ of \SnStressTrials\ trials, starting up to \SnUnannLagMax\,ms after the commit, the lag of its version source. Announcing the write immediately after commit narrows but does not close the window: \SnPreAnnViol\ violations remain, all from queries checked before the commit and executed after it. Snapshot-bound execution has no violation in \SnSnapAnswered\ answered queries (95\% upper bound \SnSnapUpper\% per row).}

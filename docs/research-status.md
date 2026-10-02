@@ -1,6 +1,6 @@
 # 研究状态与证据 / Research status and evidence
 
-更新日期 / Updated: **2026-10-02**（按外部评审改写主线：有效性模型、使用时的强制保证（含绑定快照执行）与有界修复；效率作为实现结论。新增机制层证据：配对回放、并发写入、通用缓存基线、TPC-DS 自然共享、规模扩展。数值由 `tools/paper-results.py` 与 `tools/review-results.py` 生成）。
+更新日期 / Updated: **2026-10-03**（10-03：补充命题 1、引理 1、算法 1；新增 dbt 式表级测试基线、真实 TPC-DS 数据上的配对回放、两种增补方法（智能体参照的 G8、轨迹检索 + 自验证）。10-02：按外部评审改写主线：有效性模型、使用时的强制保证（含绑定快照执行）与有界修复；效率作为实现结论。新增机制层证据：配对回放、并发写入、通用缓存基线、TPC-DS 自然共享、规模扩展。数值由 `tools/paper-results.py` 与 `tools/review-results.py` 生成）。
 
 系统仓库 / System repository: `agent4db-adapter`，场景实验代码 `26c2b48` 起，统计脚本见 `tools/`。
 论文仓库原始版本 / Original paper commit: `f33e2b8`。
@@ -27,6 +27,9 @@ The manuscript uses the SIGMOD 2027 research submission layout with anonymous re
 | 自然共享 / Natural sharing | TPC-DS 官方 99 个查询模板 | `exp/2026-10-02-cache-baseline-tpcds/tpcds-sharing.json` |
 | 修复边界与可用性 / Repair boundary, availability | 备份副本反例（唯一性规则开关）；同时到达下等待修复开关 | `exp/2026-10-02-cache-baseline-tpcds/repair-ambiguity-unique-report.json`、同目录的 `wait-repair-stats.json` |
 | 声明使用 / Declared use | 场景实验条件级与定义级 15 组的 1,289 条答案 | `exp/2026-10-02-cache-baseline-tpcds/declared-use.json` |
+| 表级测试基线 / Table-test baseline | 与配对回放同一次重跑：15 个库 × 6 种方法（含 tabletest）× 11 种变化 / same rerun of the paired replay with the dbt-style baseline | `exp/2026-10-02-cache-baseline-tpcds/replay-stats.json`（`tabletest/judge` 组）、`replay-outcomes.json.gz` |
+| TPC-DS 配对回放 / Paired replay on TPC-DS SF1 | 模板导出的 93 个定义 × 5 种方法（条件级两种参照）× 11 种变化，290 万行门店销售 / 93 template-derived definitions, real dsdgen data | `exp/2026-10-02-cache-baseline-tpcds/tpcds-replay-stats.json`、`tpcds-replay-outcomes.json.gz`、`tpcds-library.json` |
+| 增补方法 / Added end-to-end methods | DeepSeek V4.1 Flash × {MAVRA 智能体参照, 轨迹检索 + 自验证} × 3 次 / two added methods, three runs each | `results/scen-20261002/dsv41flash-r{1,2,3}-{exref,trajv}`（noctis），分析方案增补见 `exp/2026-10-02-scenarios-ds/README.md` |
 | 早期单模型端到端 / Earlier single-model run | 6 组，21 道计分题；论文只引用其准入拒绝与引言中的单期例子 / cited only for admission rejections and the introduction example | `exp/2026-09-30-metric-maint-named/report.md`、同目录的 `summary.txt`、`verified-results.json` |
 
 论文中第 2.1 节表格的数值直接写在正文里（来自上面两份工作负载证据）；第 7.6 节的场景表格、模型图和场景数值宏由 `tools/paper-results.py` 从原始输出生成到 `gen/`；机制层（第 7.2–7.5 节）的数值宏 `\Rp* \Sn* \Cb* \Eone* \Tp* \Wr* \Du*`、代价图坐标与随机并发表由 `tools/review-results.py` 从 `exp/2026-10-02-cache-baseline-tpcds` 的存档生成（实验数据统一保留在 `exp/`，Overleaf 工程只加载 `gen/` 的生成文件）：
@@ -54,6 +57,9 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 - 场景（当前设计，DeepSeek V4.1 Flash，3 次独立运行，按运行整群自助法 95% 区间）：全部情形 不共享 32%、轨迹检索 76%、无守护 75%、只看结构 75%、撤销重学 67%、定义级 69%、MAVRA **81%**（80–81）。留出题 MAVRA 与轨迹检索都是 100%。5 种已建模破坏性变化：MAVRA 73%（71–76）、定义级 64%、轨迹检索 57%；预先声明的比较 MAVRA − 轨迹检索 **+16**（14–18），MAVRA − 定义级 +9（0–15，配对回放表明维护相同、差别来自学习）。无守护与只看结构在已建模变化下提供过期定义 98、99 道。备份副本：轨迹检索 72% 高于 MAVRA 61%（MAVRA 撤下退货定义：退货金额 8/9 对 4/9 有利，退货率 0/6 对 6/6 不利）。端到端维护 DB 时间条件级为定义级的 90%（修复搜索为主）。此前一轮三模型（旧二进制、无轨迹基线）：不共享 32%，定义级 77%，条件级 74%，各模型共享提升一致。
 
 统计口径（排除用量上限失败的 136 道题、剔除学习阶段被中断的 2 组、场景等权、按题自助法区间）写在 `tools/paper-results.py` 文件头。早期单模型运行的舍入修正（52.96 秒、76.1%）仍记录在 `exp/2026-09-30-metric-maint-named/verified-results.json`。
+
+- 表级测试基线（dbt 式，按初始快照校准的 unique / relationships 测试，失败即隔离读该表的定义）：同一批 1,530 题次上答对 **631**（MAVRA 973），已建模变化下同样零错误答案；少答对的 342 题是 MAVRA 修复（状态流水 105、版本化更正 174、维表拉链 57）或因定义自带过滤而保留（6）的题；不必要的不可用 153 对 111。配对差 22.4 个百分点（整群自助 95% 区间 21.8–22.8）。
+- 论文形式化（10-03）：命题 1（四类条件在业务前提 B1/B2 下充分；边界：取值含义、同构总体、合法但错误的日期键）、引理 1（事务性版本相同 ⇒ 结论可复用，依赖快照嵌套与写入—计数同事务）、算法 1（有界修复：不丢键、唯一、G3–G5 与 G8）。
 
 ## 实现边界 / Implementation boundaries
 

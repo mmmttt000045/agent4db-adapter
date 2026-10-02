@@ -70,7 +70,7 @@ check_dependencies() {
     manyfoot.sty cmap.sty libertine.sty zi4.sty newtxmath.sty
     amssymb.sty pifont.sty caption.sty float.sty comment.sty
     fancyhdr.sty balance.sty amsmath.sty tabularx.sty tikz.sty
-    colortbl.sty pgfplots.sty
+    colortbl.sty pgfplots.sty algorithm.sty algpseudocode.sty
   )
   local -a missing_files=()
   if [ "$target" != en ]; then

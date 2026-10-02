@@ -22,14 +22,30 @@
 {关联不上日期维度的事实行比例不超过准入时记录的比例，使事实不会被静默地排除在所有期间之外。}
 \end{description}
 
+\subsection{\bt{What the conditions guarantee}{条件保证了什么}}
+\label{sec:sufficiency}
+\bi{For a period $p$, the canonical SQL of $I$ evaluates $\mathrm{AGG}(e)$ over the rows of $\sigma_\varphi(F)\bowtie R_1\bowtie\cdots\bowtie R_k$ whose role date, obtained by joining the date dimension through $\rho$, falls in $p$. The business meaning $B$ contributes two premises that no query can check: (B1) the business events of the metric correspond one-to-one to the values of $K$ in $\sigma_\varphi(F)$, and (B2) $e$ evaluates on an event's row to that event's measurement. The conditions turn these premises into a guarantee about the computed value.}
+{对期间 $p$，$I$ 的规范 SQL 在 $\sigma_\varphi(F)\bowtie R_1\bowtie\cdots\bowtie R_k$ 中、按角色 $\rho$ 关联日期维度所得角色日期落在 $p$ 内的行上计算 $\mathrm{AGG}(e)$。业务含义 $B$ 提供两条任何查询都无法检查的前提：（B1）该指标的业务事件与 $\sigma_\varphi(F)$ 中 $K$ 的取值一一对应；（B2）在事件对应的行上，$e$ 求值得到该事件的度量值。条件把这两条前提转化为对计算结果的保证。}
+\begin{proposition}[\bt{Sufficiency}{充分性}]
+\label{prop:sufficiency}
+\bi{If B1 and B2 hold on $D_s$ and every condition in $C(m^r)$ holds on $D_s$, then for every period $p$ the canonical SQL of $m^r$ returns $\mathrm{AGG}$ over the measurements of the events whose role date lies in $p$, each event contributing exactly once; the events it omits are those whose date key matches no row of the date dimension, and the coverage condition bounds their fraction.}
+{若 B1、B2 在 $D_s$ 上成立，且 $C(m^r)$ 中每个条件都在 $D_s$ 上成立，则对每个期间 $p$，$m^r$ 的规范 SQL 返回的是角色日期落在 $p$ 内的事件度量值的 $\mathrm{AGG}$，每个事件恰好贡献一次；被遗漏的只有日期键匹配不到日期维度任何行的事件，其比例受覆盖条件约束。}
+\end{proposition}
+\begin{proof}[\bt{Proof sketch}{证明概要}]
+\bi{By B1 and filtered key uniqueness, $\sigma_\varphi(F)$ holds exactly one row per event. Join multiplicity bounds the matches of each row in every $R_i$ by the permitted number, one for the dimension joins of $I$, so no join duplicates a row; the time role joins each row to at most one date-dimension row and hence to at most one period, and coverage bounds the rows that match none. Every surviving row therefore contributes its measurement (B2) exactly once, to the period of its role date.}
+{由 B1 和过滤后键唯一性，$\sigma_\varphi(F)$ 中每个事件恰有一行。连接多重性把每行在各 $R_i$ 中的匹配数限制在允许值以内（$I$ 的维度连接允许值为一），故连接不会复制任何行；时间角色把每行关联到至多一行日期维度、因而至多一个期间，覆盖条件约束匹配不到任何日期行的行数。于是每个保留下来的行把其度量值（B2）恰好贡献一次，归入其角色日期所在的期间。}
+\end{proof}
+\bi{The proposition also fixes the detection boundary, and each premise marks one side of it. B2 is about values: an update that rescales a measure column changes every answer and violates no condition (the unit change of Section~\ref{sec:scenarios}). B1 may be satisfied by several populations at once: after a full backup copy is appended, the primary rows and the backup rows each hold one row per key, and nothing structural tells which copy is the business population (Section~\ref{sec:repair-eval}). A fact whose date key is valid but wrong is assigned to a period, not detected. Conversely, every data-only update that makes the canonical SQL count an event twice, through duplicate keys in $\sigma_\varphi(F)$ or a join that matches beyond its multiplicity, or that drops facts from all periods beyond the admitted fraction, violates a condition and is caught at the next maintenance or declared use.}
+{命题同时确定了检测的边界，两条前提各标出边界的一侧。B2 关乎取值：把度量列整体改变量纲的更新会改变每个答案，却不违反任何条件（第~\ref{sec:scenarios} 节的单位变化）。B1 可能同时被多个总体满足：追加整份备份副本后，主表行与备份行各自都是每键一行，结构上无从判断哪一份是业务总体（第~\ref{sec:repair-eval} 节）。日期键合法但错误的事实会被归入某个期间，而不会被发现。反过来，凡是使规范 SQL 把一个事件计数两次（$\sigma_\varphi(F)$ 中出现重复键，或连接匹配超出多重性）、或使超过准入比例的事实从所有期间消失的纯数据更新，都会违反某个条件，并在下一次维护或声明使用时被发现。}
+
 \subsection{\bt{Versions, verdicts, and reuse}{版本、结论与复用}}
 \bi{The version $V(T)$ of a table identifies the state of $T$ that a check read. \system\ supports two sources. The default combines the schema fingerprint, DML counters, and the ETL batch identifier; it is cheap but neither transactional nor immediate, because PostgreSQL reports DML statistics asynchronously after commit. \emph{Transactional versions} are maintained by a statement-level trigger that increments a per-table counter inside every writing transaction; the counter is sharded by backend process so that concurrent writers do not contend on one row, and the version is the sum of the shards. A verdict is the outcome of $Q_c$ at the versions it read and is indexed by}
 {表的版本 $V(T)$ 标识检查读到的 $T$ 的状态。\system\ 支持两种版本来源。默认来源组合结构指纹、DML 计数和 ETL 批次号，代价很低，但既不随事务提交也不即时可见，因为 PostgreSQL 在提交后异步上报 DML 统计。\emph{事务性版本}由语句级触发器维护：每个写事务内把对应表的计数加一；计数按后端进程分片，使并发写入者不争同一行，版本取各分片之和。结论是 $Q_c$ 在其所读版本上的执行结果，以如下键索引：}
 \[
 \bigl(\operatorname{id}(c),\,V(\operatorname{dep}(c))\bigr).
 \]
-\bi{A verdict serves every definition that requires the same condition at the same dependency versions. Identity is semantic rather than textual: the order of key columns and the formatting of filters do not change it, so a grain condition and a join guard that state the same key in different orders share one verdict. \system\ also supports a key implication (with identical filters and null semantics, uniqueness on $K$ implies uniqueness on each superset of $K$), which did not apply in our workloads.}
-{一个结论服务于所有在相同依赖版本上需要同一条件的定义。条件身份按语义而非文本确定：键列顺序与过滤的书写格式不影响身份，因此以不同顺序写出同一键的粒度条件与连接守卫共享一个结论。\system\ 还支持一条键蕴含规则（过滤与空值语义相同时，键 $K$ 上的唯一性蕴含其每个超集上的唯一性），在我们的负载中没有用上。}
+\bi{A verdict serves every definition that requires the same condition at the same dependency versions. Identity is semantic rather than textual: the order of key columns and the formatting of filters do not change it, so a grain condition and a join guard that state the same key in different orders share one verdict. \system\ also applies a key implication: with identical filters and null semantics, uniqueness on $K$ implies uniqueness on each superset of $K$.}
+{一个结论服务于所有在相同依赖版本上需要同一条件的定义。条件身份按语义而非文本确定：键列顺序与过滤的书写格式不影响身份，因此以不同顺序写出同一键的粒度条件与连接守卫共享一个结论。\system\ 还应用一条键蕴含规则：过滤与空值语义相同时，键 $K$ 上的唯一性蕴含其每个超集上的唯一性。}
 
 \subsection{\bt{States and the execution contract}{状态与执行契约}}
 \bi{A revision is \emph{valid} when its conditions hold at the current versions of their dependencies. A dependency-version change makes it \emph{pending}, a state derived by version comparison that triggers revalidation. Revalidation either refreshes the evidence or \emph{revokes} the revision when a required condition fails. Repair produces a new \emph{candidate} revision, which becomes valid after passing the gates in Section~\ref{sec:maintenance}. For a query $q$ that declares $m^r$ and executes on snapshot $s$, the execution contract is}

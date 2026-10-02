@@ -3,5 +3,7 @@
 \label{tab:scenarios}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
+% 双语稿：这张表只排中文（英汉并排会使行高超出整页）
+\ifbilingual\scriptsize\renewcommand{\bt}[2]{#2}\renewcommand{\bh}[2]{\begin{tabular}[b]{@{}c@{}}#2\end{tabular}}\fi
 \input{gen/scen-heat}
 \end{table*}

@@ -335,8 +335,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         let tasks = if bench { metricbench::tasks(&defs) } else { vec![] };
 
         // 每个库 × 维护方式 × G8 参照一个中间层实例，共用连接池；按顺序评估，数据库耗时按前后差值归属
-        let mut runs: Vec<Run> = vec![];
-        for (li, lib) in libs.iter().enumerate() {
+        let mut specs: Vec<(usize, String, String)> = vec![];
+        for (li, _) in libs.iter().enumerate() {
             for policy in &o.policies {
                 if policy == "tabletest" {
                     continue; // 不经中间层，见下面的表级测试基线
@@ -347,24 +347,35 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                     vec!["judge"]
                 };
                 for oracle in oracles {
-                    let mid = Middle::new(db.clone(), config(policy)).await?;
-                    let ctx = Ctx::new("A", &lib.id, "seed");
-                    let (mut seeded, mut seed_failed) = (vec![], vec![]);
-                    for (ei, e) in lib.entries.iter().enumerate() {
-                        let reference = if oracle == "judge" { &e.judge } else { &e.example };
-                        let v = mid.seed_metric(&ctx, e.metric.clone(), e.ask, e.decimals, reference).await?;
-                        if v["promoted"] == true {
-                            seeded.push((ei, v["key"].as_str().unwrap_or_default().to_string(), v["revision"].as_u64().unwrap_or(0) as u32));
-                        } else {
-                            seed_failed.push(json!({"entry": e.name, "gate": v["failed_gate"], "reason": v["reason"]}));
-                        }
-                    }
-                    eprintln!("  {} {policy}/{oracle}：准入 {}，未通过 {}", lib.id, seeded.len(), seed_failed.len());
-                    let _ = mid.take_metric_events();
-                    runs.push(Run { lib: li, policy: policy.clone(), oracle: oracle.into(), cp: mid.checkpoint(), mid, seeded, seed_failed });
+                    specs.push((li, policy.clone(), oracle.to_string()));
                 }
             }
         }
+        // 各实例的准入并发进行（共用连接池）；准入耗时不计入维护代价
+        let seeded_runs = futures::future::join_all(specs.iter().map(|(li, policy, oracle)| {
+            let lib = &libs[*li];
+            let db = db.clone();
+            async move {
+                let mid = Middle::new(db, config(policy)).await?;
+                let ctx = Ctx::new("A", &lib.id, "seed");
+                let (mut seeded, mut seed_failed) = (vec![], vec![]);
+                for (ei, e) in lib.entries.iter().enumerate() {
+                    let reference = if oracle == "judge" { &e.judge } else { &e.example };
+                    let v = mid.seed_metric(&ctx, e.metric.clone(), e.ask, e.decimals, reference).await?;
+                    if v["promoted"] == true {
+                        seeded.push((ei, v["key"].as_str().unwrap_or_default().to_string(), v["revision"].as_u64().unwrap_or(0) as u32));
+                    } else {
+                        seed_failed.push(json!({"entry": e.name, "gate": v["failed_gate"], "reason": v["reason"]}));
+                    }
+                }
+                eprintln!("  {} {policy}/{oracle}：准入 {}，未通过 {}", lib.id, seeded.len(), seed_failed.len());
+                let _ = mid.take_metric_events();
+                let cp = mid.checkpoint();
+                Ok::<Run, anyhow::Error>(Run { lib: *li, policy: policy.clone(), oracle: oracle.clone(), mid, cp, seeded, seed_failed })
+            }
+        }))
+        .await;
+        let runs: Vec<Run> = seeded_runs.into_iter().collect::<Result<_>>()?;
 
         let (mut outcomes, mut maint) = (vec![], vec![]);
         for (ci, &ch) in changes.iter().enumerate() {

@@ -518,7 +518,8 @@ impl Middle {
         gates: &mut Vec<Value>,
     ) -> Result<Option<(String, String)>> {
         gate!(gates, "G3", self.static_gate(ctx, m, ask).await?);
-        gate!(gates, "G4", self.grain_gate(ctx, m, false).await);
+        // 条件级维护下准入也复用同一粒度条件在当前版本上的结论（与修复回归相同）
+        gate!(gates, "G4", self.grain_gate(ctx, m, self.cfg.cond_reuse).await);
         let example = m.examples.first().map(|x| x.sql.clone()).unwrap_or_default();
         gate!(gates, "G5", self.review_gate(ctx, &example).await?);
         let g7 = match self.vquery(QKind::Metric, judge).await {

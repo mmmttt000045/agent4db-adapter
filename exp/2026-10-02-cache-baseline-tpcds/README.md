@@ -131,3 +131,22 @@
 
   破坏性变化（v2）的使用延迟 p95 与最大值在两种设置下相当（条件级 p95 122–286 对 168–374 ms，最大 3.2–3.5 对 3.3–3.9 s）。
 - 含义：同时到达下条件级更多的不可用来自“修复期间拒绝请求”，不是条件模型本身；等待进行中的修复后两种方式都为 0，等待时长与数据库代价不变。
+
+## 表级测试基线（dbt 式，2026-10-03 新增，不调用 LLM）
+
+- 问题：实践中数据团队用 dbt / Great Expectations 之类的工具按表声明 `unique`、`not_null`、`relationships` 测试，每次装载后重跑；这与按定义推出条件、按定义行动的 MAVRA 差在哪里。
+- 实现：`replay-bench --policies ...,tabletest`（`src/replaybench.rs` 的 `TABLE_TESTS`）：各事实表业务键与各维表键的唯一性、日期键与商品键的引用测试，按初始快照校准（初始快照上有测试失败即报错退出）；每次变化后全部重跑，读到测试失败的表的定义一律隔离（不可用），其余照原样提供，不修复。每个库视作一个项目，测试时间计入该库的维护 DB 时间。
+- 命令：`agentdb-mid --pool 8 replay-bench --libs results/scen-20260930 --rows 200000`（默认策略已含 tabletest；与配对回放同一次运行，其余策略结果一并重新生成）。
+- 冒烟（2 万行、1 个库、5 种变化）：状态流水下 MAVRA 修复后 12 题全对，表级测试隔离 12 题；维表拉链 6 对 6 隔离；日期键改写两者都不可用；单位变化两者都答错 8 题。
+- 结果：见 `replay-stats.json` 的 `tabletest/judge` 组与正文第 7.2 节；宏 `\RpTable*` 由 `tools/review-results.py` 生成。
+
+## 真实 TPC-DS 数据上的配对回放（2026-10-03 新增，不调用 LLM）
+
+- 问题：合成数据与 11 种变化都是本文构造的；需要一个不是为本文编写的定义库和真实数据。
+- 数据：`/root/tmp/tpcds-kit`（gregrahn/tpcds-kit，`make OS=LINUX LINUX_CFLAGS="-g -Wall -fcommon"`），`dsdgen -scale 1 -terminate n`，`tools/tpcds-load.sh` 装入模板库 `tpcds_sf1`（六张销售/退货事实表不建主键、`decimal(7,2)` 放宽为 `numeric(12,2)`，只改表示）。
+- 定义库：`python3 tools/tpcds-library.py --templates <query_templates> --schema tpcds.sql --out results/tpcds-library.json --notes results/tpcds-library-notes.json`。取每个 SELECT 块对六张事实表之一的聚合、恰一个日期角色、从事实表按维表主键发出的关联、单表持久过滤；模板参数 text 取第一项、random 取下界、其余（ulist/dist/date）换占位符并舍弃引用它的谓词（notes 记录舍弃原因）。得到 93 个定义（store_sales 47、catalog_sales 16、web_sales 20、store_returns 3、catalog_returns 4、web_returns 3），83 个带维表关联，15 个带持久过滤。
+- 变化：`src/tpcds.rs`，与 `scenario::Change` 同名同类，按 information_schema 整行复制、日期经 date_dim 换算；状态列、当前版本标志与批次日志用 `etl::setup`、`scenario::setup` 的同一套 SQL；回滚辅助表放在 `aux` 模式。
+- 标准答案：原定义的规范 SQL 在“业务事实已变、表示未变”的状态上算出（与合成基准在 `apply_truth` 与 `apply_hidden` 之间算标准答案的做法相同）；判题参照 = 规范 SQL 加上预知的区分列过滤（`sr_status`、`ss_is_current`、`i_is_current`），智能体侧参照 = 规范 SQL 本身。
+- 命令：`agentdb-mid --pool 16 replay-bench --schema tpcds --libs results/tpcds-library.json --policies condition,definition-cache,schema,revoke,tabletest --oracles judge,example --sql-timeout-secs 1800`（定义级不带缓存在 290 万行上每个变化要逐定义重跑粒度检查，逐题结果与带缓存的定义级相同，未单独运行）。
+- 冒烟（condition + tabletest，append/status/dimhist）：91 个定义通过准入，2 个（query61 的两个块）学习期为空未通过 G7；正常追加 45 个定义刷新、135 题全对；状态流水 3 个退货定义撤销后修复（找到 `sr_status = '完成'`），9 题全对，表级测试隔离 9 题；维表拉链 45 个关联商品表的定义撤销后修复（关联路径修订为 `i_is_current = 'Y'`），135 题全对，表级测试隔离 141 题（91 必要、50 不必要）；条件级每个变化维护 DB 时间约 8–10 秒。
+- 结果：`tpcds-replay-stats.json`、`tpcds-replay-outcomes.json.gz`、`tpcds-library.json`；宏 `\Tr*` 由 `tools/review-results.py` 生成，正文第 7.2 节。

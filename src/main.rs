@@ -16,6 +16,7 @@ mod replaybench;
 mod scenario;
 mod server;
 mod sqlscan;
+mod tpcds;
 mod workloadbench;
 
 use anyhow::Result;

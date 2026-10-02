@@ -13,10 +13,11 @@ use crate::metric::{self, parse_answer, same_value, Ask};
 use crate::metricbench::{self, Set};
 use crate::middle::{Checkpoint, Ctx, Maint, Middle, MiddleConfig};
 use crate::scenario::{self, Change};
-use anyhow::{ensure, Context, Result};
+use crate::tpcds;
+use anyhow::{bail, ensure, Context, Result};
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::path::Path;
 use std::sync::Arc;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
@@ -36,6 +37,13 @@ pub struct Options {
     /// G8 参照（只对条件级与定义级区分；其余方式不修复，用 judge 准入）
     #[arg(long, value_delimiter = ',', default_value = "judge,example", value_parser = ["judge", "example"])]
     oracles: Vec<String>,
+    /// 负载：synthetic = 合成零售数据（按 --rows 生成）；tpcds = 从模板库复制真实 TPC-DS 数据（tools/tpcds-load.sh 装入），
+    /// 变化为 `tpcds::Change`，库为 tools/tpcds-library.py 导出的模板定义库（留出题与标准答案随库给出）
+    #[arg(long, default_value = "synthetic", value_parser = ["synthetic", "tpcds"])]
+    schema: String,
+    /// --schema tpcds 时复制的模板库名
+    #[arg(long, default_value = "tpcds_sf1")]
+    template_db: String,
     #[arg(long, value_delimiter = ',',
           default_value = "append,backfill,correct,addcol,status,revision,dupload,dimhist,latekey,unit,mirror",
           value_parser = ["append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"])]
@@ -54,6 +62,65 @@ struct LibEntry {
     decimals: u32,
     judge: String,
     example: String,
+    /// 计分的留出题（编号, 参数）：合成基准取 `metricbench::tasks`，TPC-DS 库随库给出
+    held: Vec<(String, Ask)>,
+    /// 标准答案由原定义的规范 SQL 在“业务事实已变、表示未变”的状态上算出（TPC-DS 库）；合成基准用手写判题 SQL
+    own_gold: bool,
+}
+
+/// 两种负载上的同名变化。
+#[derive(Clone, Copy)]
+enum Ch {
+    Syn(Change),
+    Tp(tpcds::Change),
+}
+
+impl Ch {
+    fn parse(schema: &str, s: &str) -> Result<Ch> {
+        Ok(if schema == "tpcds" { Ch::Tp(tpcds::Change::parse(s)?) } else { Ch::Syn(Change::parse(s)?) })
+    }
+    fn syn(self) -> Change {
+        match self {
+            Ch::Syn(c) => c,
+            Ch::Tp(c) => c.syn(),
+        }
+    }
+    fn name(self) -> &'static str {
+        self.syn().name()
+    }
+    fn tables(self) -> &'static [&'static str] {
+        self.syn().tables()
+    }
+    async fn apply_truth(self, db: &Db) -> Result<i64> {
+        match self {
+            Ch::Syn(c) => c.apply_truth(db).await,
+            Ch::Tp(c) => c.apply_truth(db).await,
+        }
+    }
+    async fn apply_hidden(self, db: &Db) -> Result<i64> {
+        match self {
+            Ch::Syn(c) => c.apply_hidden(db).await,
+            Ch::Tp(c) => c.apply_hidden(db).await,
+        }
+    }
+    async fn reset(self, db: &Db) -> Result<()> {
+        match self {
+            Ch::Syn(c) => c.reset(db).await,
+            Ch::Tp(c) => c.reset(db).await,
+        }
+    }
+}
+
+/// TPC-DS 库的判题查询：规范 SQL 加上基准作者预知的区分列过滤，与合成基准手写判题 SQL 的做法相同。
+fn judge_metric(m: &Metric) -> Metric {
+    let mut j = m.clone();
+    for (t, f) in [("store_returns", "sr_status = '完成'"), ("store_sales", "ss_is_current = 1"), ("item", "i_is_current = 'Y'")] {
+        if m.tables().iter().any(|x| x == t) {
+            let v = j.filters.entry(t.to_string()).or_default();
+            *v = if v.is_empty() { f.to_string() } else { format!("({v}) and {f}") };
+        }
+    }
+    j
 }
 
 struct Library {
@@ -109,16 +176,31 @@ fn load(path: &str) -> Result<Library> {
             let mut metric: Metric = serde_json::from_value(e["metric"].clone())?;
             let name = key.strip_prefix("metric:").unwrap_or(key).to_string();
             metric.name = name.clone();
-            let example = metric.examples.first().map(|x| x.sql.clone()).context("缺少学习示例 SQL")?;
-            Ok(LibEntry {
-                name,
-                def: task.split('-').next().unwrap_or_default().to_string(),
-                metric,
-                ask: serde_json::from_value(ev["ask"].clone())?,
-                decimals: ev["decimals"].as_u64().unwrap_or(2) as u32,
-                judge: ev["judge"].as_str().context("缺少判题 SQL")?.to_string(),
-                example,
-            })
+            let ask: Ask = serde_json::from_value(ev["ask"].clone())?;
+            let holdout: Vec<(String, Ask)> = e["holdout"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .map(|h| Ok((h["id"].as_str().context("留出题缺少 id")?.to_string(), serde_json::from_value(h["ask"].clone())?)))
+                .collect::<Result<_>>()?;
+            let own_gold = !holdout.is_empty();
+            let def = if own_gold { name.clone() } else { task.split('-').next().unwrap_or_default().to_string() };
+            let held = if own_gold {
+                holdout
+            } else {
+                metricbench::tasks(&[def.clone()]).into_iter().filter(|t| t.set != Set::Learn).map(|t| (t.id, t.ask)).collect()
+            };
+            let example = match metric.examples.first() {
+                Some(x) => x.sql.clone(),
+                None if own_gold => metric::compile(&metric, &ask)?,
+                None => bail!("缺少学习示例 SQL"),
+            };
+            let judge = match ev["judge"].as_str() {
+                Some(j) => j.to_string(),
+                None if own_gold => metric::compile(&judge_metric(&metric), &ask)?,
+                None => bail!("缺少判题 SQL"),
+            };
+            Ok(LibEntry { name, def, metric, ask, decimals: ev["decimals"].as_u64().unwrap_or(2) as u32, judge, example, held, own_gold })
         })();
         match parsed {
             Ok(x) => entries.push(x),
@@ -139,8 +221,23 @@ fn config(policy: &str) -> MiddleConfig {
     }
 }
 
-fn affected(def: &str, ch: Change) -> bool {
-    metricbench::tasks(&[def.to_string()]).first().is_some_and(|t| t.def.tables.iter().any(|x| ch.tables().contains(x)))
+/// 条目是否读到了变化的表：合成基准按基准定义的表，TPC-DS 库按结构化实现涉及的表。
+fn affected(e: &LibEntry, ch: Ch) -> bool {
+    let tables: Vec<String> = match metricbench::tasks(&[e.def.clone()]).first() {
+        Some(t) if !e.own_gold => t.def.tables.iter().map(|s| s.to_string()).collect(),
+        _ => e.metric.tables(),
+    };
+    tables.iter().any(|x| ch.tables().contains(&x.as_str()))
+}
+
+/// 同一变化状态下相同 SQL 的答案只算一次（各实例提供的修订大多相同）。
+async fn answer_memo(probe: &Db, sql: &str, memo: &mut HashMap<String, String>) -> String {
+    if let Some(v) = memo.get(sql) {
+        return v.clone();
+    }
+    let v = answer(probe, sql).await;
+    memo.insert(sql.to_string(), v.clone());
+    v
 }
 
 /// dbt 式表级测试基线（配对回放的对照）：每张表上人工声明的 unique / not_null / relationships 测试，按初始快照校准；
@@ -192,7 +289,7 @@ fn db_ms(mid: &Middle) -> (f64, u64) {
 }
 
 pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
-    let changes = o.changes.iter().map(|c| Change::parse(c)).collect::<Result<Vec<_>>>()?;
+    let changes = o.changes.iter().map(|c| Ch::parse(&o.schema, c)).collect::<Result<Vec<_>>>()?;
     let mut files = vec![];
     for l in &o.libs {
         find_cells(Path::new(l), &mut files)?;
@@ -207,13 +304,23 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     let root = Db::connect(url, 1, false)?;
     let mut isolated = reqwest::Url::parse(url)?;
     isolated.set_path(&format!("/{name}"));
-    root.query(QKind::Meta, &format!("create database {name}")).await.context("创建隔离实验库失败（需要 CREATEDB）")?;
+    let create = if o.schema == "tpcds" {
+        format!("create database {name} template {}", o.template_db)
+    } else {
+        format!("create database {name}")
+    };
+    root.query(QKind::Meta, &create).await.context("创建隔离实验库失败（需要 CREATEDB；tpcds 还需要模板库存在且无人连接）")?;
     let result: Result<Value> = async {
         let admin = Db::connect(isolated.as_str(), 2, false)?;
-        eprintln!("生成合成零售数据：门店销售 {} 行，目录销售 {} 行", o.rows, o.rows / 2);
-        admin.query(QKind::Meta, &metricbench::fixture(o.rows)).await?;
-        etl::setup(&admin).await?;
-        scenario::setup(&admin).await?;
+        if o.schema == "tpcds" {
+            eprintln!("从模板库 {} 复制 TPC-DS 数据", o.template_db);
+            tpcds::setup(&admin).await?;
+        } else {
+            eprintln!("生成合成零售数据：门店销售 {} 行，目录销售 {} 行", o.rows, o.rows / 2);
+            admin.query(QKind::Meta, &metricbench::fixture(o.rows)).await?;
+            etl::setup(&admin).await?;
+            scenario::setup(&admin).await?;
+        }
         let v1 = scenario::fingerprint(&admin).await?;
         let table_test = o.policies.iter().any(|p| p == "tabletest");
         if table_test {
@@ -222,8 +329,10 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         }
         let probe = Db::connect(isolated.as_str(), 2, true)?;
         let db = Arc::new(Db::connect_timeout(isolated.as_str(), pool, true, o.sql_timeout_secs)?);
+        // 合成基准的留出题与手写标准答案；TPC-DS 库的留出题随条目给出，标准答案在每个变化下由原定义算出
         let defs: Vec<String> = ["M1", "M2", "M3", "M4", "M5"].iter().map(|s| s.to_string()).collect();
-        let tasks = metricbench::tasks(&defs);
+        let bench = libs.iter().any(|l| l.entries.iter().any(|e| !e.own_gold));
+        let tasks = if bench { metricbench::tasks(&defs) } else { vec![] };
 
         // 每个库 × 维护方式 × G8 参照一个中间层实例，共用连接池；按顺序评估，数据库耗时按前后差值归属
         let mut runs: Vec<Run> = vec![];
@@ -261,21 +370,32 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         for (ci, &ch) in changes.iter().enumerate() {
             scenario::ensure_v1(&admin, &v1, "上一个变化").await?;
             let truth = ch.apply_truth(&admin).await?;
-            let gold = metricbench::gold_map(&admin, &tasks).await?;
-            let hidden = ch.apply_hidden(&admin).await?;
-            eprintln!("变化 {}（{}）：写入 {truth} + {hidden} 行", ch.name(), ch.label());
-            let held: Vec<_> = tasks.iter().filter(|t| t.set != Set::Learn).collect();
-            // 不维护时原定义在变化后的数据上是否仍答对：区分必要与不必要的不可用
-            let mut orig: BTreeMap<(usize, usize, String), (String, bool)> = BTreeMap::new();
-            for (li, lib) in libs.iter().enumerate() {
-                for (ei, e) in lib.entries.iter().enumerate().filter(|(_, e)| affected(&e.def, ch)) {
-                    for t in held.iter().filter(|t| t.def.id == e.def) {
-                        let value = match metric::compile(&e.metric, &t.ask) {
+            let mut gold = metricbench::gold_map(&admin, &tasks).await?;
+            for lib in &libs {
+                for e in lib.entries.iter().filter(|e| e.own_gold && affected(e, ch)) {
+                    for (id, ask) in &e.held {
+                        let v = match metric::compile(&e.metric, ask) {
                             Ok(sql) => answer(&probe, &sql).await,
                             Err(err) => format!("ERROR: {err:#}"),
                         };
-                        let ok = same_value(&parse_answer(&value), &parse_answer(&gold[&t.id]), metricbench::decimals(&t.ask));
-                        orig.insert((li, ei, t.id.clone()), (value, ok));
+                        gold.insert(id.clone(), v);
+                    }
+                }
+            }
+            let hidden = ch.apply_hidden(&admin).await?;
+            eprintln!("变化 {}（{}）：写入 {truth} + {hidden} 行", ch.name(), ch.syn().label());
+            let mut memo: HashMap<String, String> = HashMap::new();
+            // 不维护时原定义在变化后的数据上是否仍答对：区分必要与不必要的不可用
+            let mut orig: BTreeMap<(usize, usize, String), (String, bool)> = BTreeMap::new();
+            for (li, lib) in libs.iter().enumerate() {
+                for (ei, e) in lib.entries.iter().enumerate().filter(|(_, e)| affected(e, ch)) {
+                    for (id, ask) in &e.held {
+                        let value = match metric::compile(&e.metric, ask) {
+                            Ok(sql) => answer_memo(&probe, &sql, &mut memo).await,
+                            Err(err) => format!("ERROR: {err:#}"),
+                        };
+                        let ok = same_value(&parse_answer(&value), &parse_answer(&gold[id]), metricbench::decimals(ask));
+                        orig.insert((li, ei, id.clone()), (value, ok));
                     }
                 }
             }
@@ -291,7 +411,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 let mut used = 0;
                 for (ei, key, rev) in &r.seeded {
                     let e = &lib.entries[*ei];
-                    if !affected(&e.def, ch) {
+                    if !affected(e, ch) {
                         continue;
                     }
                     used += 1;
@@ -299,15 +419,15 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                     let valid = v["status"] == "valid";
                     let served: Option<Metric> = if valid { serde_json::from_value(v["metric"].clone()).ok() } else { None };
                     let revision = v["revision"].as_u64().unwrap_or(0) as u32;
-                    for t in held.iter().filter(|t| t.def.id == e.def) {
-                        let (orig_value, orig_ok) = orig[&(r.lib, *ei, t.id.clone())].clone();
+                    for (tid, ask) in &e.held {
+                        let (orig_value, orig_ok) = orig[&(r.lib, *ei, tid.clone())].clone();
                         let (value, ok) = match &served {
                             Some(m) => {
-                                let value = match metric::compile(m, &t.ask) {
-                                    Ok(sql) => answer(&probe, &sql).await,
+                                let value = match metric::compile(m, ask) {
+                                    Ok(sql) => answer_memo(&probe, &sql, &mut memo).await,
                                     Err(err) => format!("ERROR: {err:#}"),
                                 };
-                                let ok = same_value(&parse_answer(&value), &parse_answer(&gold[&t.id]), metricbench::decimals(&t.ask));
+                                let ok = same_value(&parse_answer(&value), &parse_answer(&gold[tid]), metricbench::decimals(ask));
                                 (Some(value), ok)
                             }
                             None => (None, false),
@@ -320,8 +440,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                         };
                         outcomes.push(json!({
                             "lib": lib.id, "policy": r.policy, "oracle": r.oracle, "change": ch.name(), "entry": e.name, "def": e.def,
-                            "task": t.id, "status": v["status"], "revision": revision, "repaired": valid && revision != *rev,
-                            "value": value, "gold": gold[&t.id], "orig_value": orig_value, "orig_ok": orig_ok, "class": class,
+                            "task": tid, "status": v["status"], "revision": revision, "repaired": valid && revision != *rev,
+                            "value": value, "gold": gold[tid], "orig_value": orig_value, "orig_ok": orig_ok, "class": class,
                         }));
                     }
                 }
@@ -342,11 +462,11 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                     let bad: BTreeSet<String> =
                         tests.iter().filter(|x| x["failed"] == true).map(|x| x["table"].as_str().unwrap_or_default().to_string()).collect();
                     let mut used = 0;
-                    for (ei, e) in lib.entries.iter().enumerate().filter(|(_, e)| affected(&e.def, ch)) {
+                    for (ei, e) in lib.entries.iter().enumerate().filter(|(_, e)| affected(e, ch)) {
                         used += 1;
                         let quarantined = e.metric.tables().iter().any(|t| bad.contains(t));
-                        for t in held.iter().filter(|t| t.def.id == e.def) {
-                            let (orig_value, orig_ok) = orig[&(li, ei, t.id.clone())].clone();
+                        for (tid, _) in &e.held {
+                            let (orig_value, orig_ok) = orig[&(li, ei, tid.clone())].clone();
                             let class = match (quarantined, orig_ok) {
                                 (false, true) => "correct",
                                 (false, false) => "served_wrong",
@@ -355,8 +475,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                             };
                             outcomes.push(json!({
                                 "lib": lib.id, "policy": "tabletest", "oracle": "judge", "change": ch.name(), "entry": e.name, "def": e.def,
-                                "task": t.id, "status": if quarantined { "quarantined" } else { "valid" }, "revision": 0, "repaired": false,
-                                "value": (!quarantined).then(|| orig_value.clone()), "gold": gold[&t.id], "orig_value": orig_value,
+                                "task": tid, "status": if quarantined { "quarantined" } else { "valid" }, "revision": 0, "repaired": false,
+                                "value": (!quarantined).then(|| orig_value.clone()), "gold": gold[tid], "orig_value": orig_value,
                                 "orig_ok": orig_ok, "class": class,
                             }));
                         }
@@ -388,9 +508,10 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             .collect();
         Ok(json!({
             "options": o, "pool": pool, "libraries": libraries, "seeds": seeds,
-            "changes": changes.iter().map(|c| json!({"name": c.name(), "label": c.label(), "class": c.class(), "tables": c.tables(),
-                                                     "describe": c.describe()})).collect::<Vec<_>>(),
+            "changes": changes.iter().map(|c| json!({"name": c.name(), "label": c.syn().label(), "class": c.syn().class(), "tables": c.tables(),
+                                                     "describe": c.syn().describe()})).collect::<Vec<_>>(),
             "methodology": {
+                "schema": if o.schema == "tpcds" { "真实 TPC-DS 数据（dsdgen）上的同名变化，库为模板导出的定义，标准答案 = 原定义在业务事实变化后、表示变化前的值" } else { "合成零售数据" },
                 "pairing": "每个库在各维护方式下各有一个中间层实例，准入、变化、留出题完全相同；每个变化从 v1 施加，结束后回滚并恢复各实例的准入快照",
                 "answer": "答案 = 当时提供的修订的规范 SQL 在当前数据上的结果；不提供（撤销或候选）记为不可用",
                 "classes": "correct / served_wrong（提供了但答错：过期使用或错误修复）/ unavailable_needed（原定义已答错）/ unavailable_unneeded（原定义仍答对）",

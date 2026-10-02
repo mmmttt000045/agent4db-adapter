@@ -33,7 +33,8 @@ def macros(gen):
 
 
 def plain(t, m):
-    t = re.sub(r"\\([A-Za-z]+)(\\ |\{\})?", lambda x: m.get(x.group(1), x.group(0)), t)
+    t = re.sub(r"\\([A-Za-z]+)(\\ |\{\})?",
+               lambda x: m[x.group(1)] + (" " if x.group(2) == "\\ " else "") if x.group(1) in m else x.group(0), t)
     t = t.replace("{,}", ",").replace("\\%", "%").replace("--", "–").replace("~", " ").replace("\\ ", " ")
     t = re.sub(r"\\(emph|code|textbf)\{([^{}]*)\}", r"\2", t)
     t = re.sub(r"\s*\\cite\{[^}]*\}", "", t)

@@ -186,12 +186,15 @@ async fn post_json(req: reqwest::RequestBuilder, body: &Value) -> Result<Value> 
                     }
                     eprintln!("  用量上限 HTTP 429：{} 秒后重置，届时重试（第 {capped} 次）", reset);
                     Duration::from_millis((reset + 60) * 1000 + (rand::random::<f64>() * 30_000.0) as u64)
-                } else if status.as_u16() == 429 && !futile_429(&text) {
+                } else if (status.as_u16() == 429 && !futile_429(&text))
+                    || (status.is_server_error() && wrapped_rate_limit(&text).is_some())
+                {
+                    // Cline 网关会把上游（Vercel）的 429 包成 500 返回，正文给出 “Retry after 57s”：按限流处理并等足
                     limited += 1;
                     if limited > 8 {
                         bail!("限流重试 8 次后仍失败：{last}");
                     }
-                    let secs = retry_after.unwrap_or(5 * 2u64.pow(limited - 1)).min(120);
+                    let secs = retry_after.or(wrapped_rate_limit(&text).flatten()).unwrap_or(5 * 2u64.pow(limited - 1)).min(120);
                     eprintln!("  限流 HTTP 429：{secs} 秒后重试（第 {limited} 次）");
                     Duration::from_millis(secs * 1000 + (rand::random::<f64>() * 2000.0) as u64)
                 } else if status.as_u16() == 529 || status.is_server_error() {
@@ -231,6 +234,16 @@ fn cap_reset_secs(body: &str) -> Option<u64> {
         n(1, 86400) + n(2, 3600) + n(3, 60) + n(4, 1)
     });
     Some(if secs == 0 { 600 } else { secs })
+}
+
+/// 正文是否为（可能被包了一层的）上游限流；是则给出正文中 “Retry after Ns” 的秒数（没有时为 None）。
+fn wrapped_rate_limit(body: &str) -> Option<Option<u64>> {
+    let low = body.to_ascii_lowercase();
+    if !(low.contains("rate_limit_exceeded") || low.contains("rate limit exceeded")) {
+        return None;
+    }
+    let re = regex::Regex::new(r"(?i)retry after\s+(\d+)\s*s").expect("正则");
+    Some(re.captures(body).and_then(|c| c[1].parse::<u64>().ok()))
 }
 
 /// 智谱 BigModel 也用 429 表示欠费（1113）、内容审核拦截（1301）和额度用尽（1308 / 1310），重试无效
@@ -705,6 +718,9 @@ mod provider_tests {
         assert_eq!(cap_reset_secs(&body("limit reached")), Some(600));
         assert_eq!(cap_reset_secs(r#"{"error":{"code":"1302","message":"rate"}}"#), None);
         assert_eq!(cap_reset_secs("<html>429</html>"), None);
+        let wrapped = r#"{"error":"inference request failed: failed to invoke model 'deepseek/deepseek-v4.1-flash' from Vercel: request failed with status 429: {\"error\":{\"message\":\"Rate limit exceeded for deepseek/deepseek-v4.1-flash: this team's limit of 100000000 input tokens per minute (per region) was reached. Retry after 57s.\",\"type\":\"rate_limit_exceeded\"}}"}"#;
+        assert_eq!(wrapped_rate_limit(wrapped), Some(Some(57)));
+        assert_eq!(wrapped_rate_limit(r#"{"error":"Internal Server Error"}"#), None);
     }
 
     #[test]

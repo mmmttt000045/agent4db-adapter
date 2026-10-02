@@ -111,8 +111,14 @@ def wilson(k, n, z=1.96):
 
 def load_scenarios(root):
     cells, dropped = [], []
+    # 被整组重跑替换的原组（每行 “组目录/cell-r1-方法-named”），统计时排除
+    rp = os.path.join(root, "replaced.txt")
+    replaced = {x.strip() for x in open(rp, encoding="utf-8")} if os.path.exists(rp) else set()
     for f in sorted(glob.glob(os.path.join(root, "*", "metric-*", "cell-*.json"))):
         job = os.path.relpath(f, root).split(os.sep)[0]
+        if f"{job}/{os.path.basename(f)[:-5]}" in replaced:
+            dropped.append({"file": f, "reason": "replaced by a rerun (provider failure during learning or relearning)"})
+            continue
         d = json.load(open(f, encoding="utf-8"))
         learn = [r for r in d["records"] if r["phase"] == "learn"]
         if any(r["outcome"] == "error" for r in learn) or provider_failure(d.get("learning", [])):

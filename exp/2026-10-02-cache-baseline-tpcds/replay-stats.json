@@ -7,7 +7,8 @@
   "definition/judge",
   "definition-cache/judge",
   "revoke/judge",
-  "schema/judge"
+  "schema/judge",
+  "tabletest/judge"
  ],
  "task_level": {
   "condition/example": {
@@ -86,6 +87,17 @@
    "served_wrong_pct": 48.8,
    "unavailable_needed_pct": 0.0,
    "unavailable_unneeded_pct": 0.0
+  },
+  "tabletest/judge": {
+   "n": 1530,
+   "correct": 631,
+   "served_wrong": 101,
+   "unavailable_needed": 645,
+   "unavailable_unneeded": 153,
+   "correct_pct": 41.2,
+   "served_wrong_pct": 6.6,
+   "unavailable_needed_pct": 42.2,
+   "unavailable_unneeded_pct": 10.0
   }
  },
  "definition_level": {
@@ -131,6 +143,12 @@
   "schema/judge": {
    "needed:served_wrong": 306,
    "not_needed:served_ok": 204
+  },
+  "tabletest/judge": {
+   "needed:served_wrong": 58,
+   "needed:unavailable": 248,
+   "not_needed:served_ok": 186,
+   "not_needed:unavailable": 18
   }
  },
  "by_change": {
@@ -160,6 +178,10 @@
     "n": 105
    },
    "schema/judge": {
+    "correct_pct": 100.0,
+    "n": 105
+   },
+   "tabletest/judge": {
     "correct_pct": 100.0,
     "n": 105
    }
@@ -192,6 +214,10 @@
    "schema/judge": {
     "correct_pct": 100.0,
     "n": 174
+   },
+   "tabletest/judge": {
+    "correct_pct": 100.0,
+    "n": 174
    }
   },
   "backfill": {
@@ -220,6 +246,10 @@
     "n": 105
    },
    "schema/judge": {
+    "correct_pct": 100.0,
+    "n": 105
+   },
+   "tabletest/judge": {
     "correct_pct": 100.0,
     "n": 105
    }
@@ -252,6 +282,10 @@
    "schema/judge": {
     "correct_pct": 100.0,
     "n": 174
+   },
+   "tabletest/judge": {
+    "correct_pct": 100.0,
+    "n": 174
    }
   },
   "dimhist": {
@@ -281,6 +315,10 @@
    },
    "schema/judge": {
     "correct_pct": 42.4,
+    "n": 66
+   },
+   "tabletest/judge": {
+    "correct_pct": 0.0,
     "n": 66
    }
   },
@@ -312,6 +350,10 @@
    "schema/judge": {
     "correct_pct": 25.9,
     "n": 174
+   },
+   "tabletest/judge": {
+    "correct_pct": 0.0,
+    "n": 174
    }
   },
   "latekey": {
@@ -341,6 +383,10 @@
    },
    "schema/judge": {
     "correct_pct": 17.2,
+    "n": 174
+   },
+   "tabletest/judge": {
+    "correct_pct": 0.0,
     "n": 174
    }
   },
@@ -372,6 +418,10 @@
    "schema/judge": {
     "correct_pct": 33.3,
     "n": 105
+   },
+   "tabletest/judge": {
+    "correct_pct": 0.0,
+    "n": 105
    }
   },
   "revision": {
@@ -401,6 +451,10 @@
    },
    "schema/judge": {
     "correct_pct": 8.6,
+    "n": 174
+   },
+   "tabletest/judge": {
+    "correct_pct": 0.0,
     "n": 174
    }
   },
@@ -432,6 +486,10 @@
    "schema/judge": {
     "correct_pct": 0.0,
     "n": 105
+   },
+   "tabletest/judge": {
+    "correct_pct": 0.0,
+    "n": 105
    }
   },
   "unit": {
@@ -460,6 +518,10 @@
     "n": 174
    },
    "schema/judge": {
+    "correct_pct": 42.0,
+    "n": 174
+   },
+   "tabletest/judge": {
     "correct_pct": 42.0,
     "n": 174
    }
@@ -494,6 +556,10 @@
    "schema/judge": {
     "correct_pct": 51.4,
     "n": 657
+   },
+   "tabletest/judge": {
+    "correct_pct": 41.4,
+    "n": 657
    }
   },
   "glm53": {
@@ -524,6 +590,10 @@
    "schema/judge": {
     "correct_pct": 53.5,
     "n": 564
+   },
+   "tabletest/judge": {
+    "correct_pct": 42.0,
+    "n": 564
    }
   },
   "glm53flash": {
@@ -553,6 +623,10 @@
    },
    "schema/judge": {
     "correct_pct": 46.6,
+    "n": 309
+   },
+   "tabletest/judge": {
+    "correct_pct": 39.5,
     "n": 309
    }
   }
@@ -617,6 +691,21 @@
     "unavailable_unneeded->correct": 122
    }
   },
+  "condition/example vs tabletest/judge": {
+   "n": 1470,
+   "same_class_pct": 88.0,
+   "cond_only_correct": 177,
+   "other_only_correct": 0,
+   "correct_diff_pp": 12.0,
+   "ci95_pp": [
+    10.7,
+    13.1
+   ],
+   "discordant": {
+    "correct->unavailable_needed": 160,
+    "correct->unavailable_unneeded": 17
+   }
+  },
   "condition/judge vs definition/judge": {
    "n": 1530,
    "same_class_pct": 100.0,
@@ -672,113 +761,143 @@
     "unavailable_needed->served_wrong": 345,
     "unavailable_unneeded->correct": 111
    }
+  },
+  "condition/judge vs tabletest/judge": {
+   "n": 1530,
+   "same_class_pct": 77.6,
+   "cond_only_correct": 342,
+   "other_only_correct": 0,
+   "correct_diff_pp": 22.4,
+   "ci95_pp": [
+    21.8,
+    22.8
+   ],
+   "discordant": {
+    "correct->unavailable_needed": 300,
+    "correct->unavailable_unneeded": 42
+   }
   }
  },
  "maintenance_db_s": {
   "condition/judge": {
-   "total": 582.8,
-   "addcol": 4.21,
-   "append": 19.38,
-   "backfill": 5.83,
-   "correct": 19.02,
-   "dimhist": 1.41,
-   "dupload": 276.7,
-   "latekey": 10.87,
-   "mirror": 59.8,
-   "revision": 134.98,
-   "status": 31.01,
-   "unit": 19.57,
+   "total": 693.4,
+   "addcol": 4.19,
+   "append": 19.11,
+   "backfill": 5.77,
+   "correct": 18.79,
+   "dimhist": 1.32,
+   "dupload": 254.92,
+   "latekey": 10.63,
+   "mirror": 127.97,
+   "revision": 178.23,
+   "status": 53.23,
+   "unit": 19.21,
    "vs_condition_judge": 1.0
   },
   "condition/example": {
-   "total": 570.7,
-   "addcol": 4.27,
-   "append": 19.31,
-   "backfill": 5.76,
-   "correct": 18.91,
-   "dimhist": 1.33,
-   "dupload": 267.3,
-   "latekey": 9.98,
-   "mirror": 60.33,
-   "revision": 133.9,
-   "status": 30.13,
-   "unit": 19.54,
+   "total": 679.0,
+   "addcol": 4.22,
+   "append": 19.16,
+   "backfill": 5.81,
+   "correct": 18.78,
+   "dimhist": 1.32,
+   "dupload": 244.93,
+   "latekey": 9.76,
+   "mirror": 124.7,
+   "revision": 178.13,
+   "status": 53.0,
+   "unit": 19.16,
    "vs_condition_judge": 0.98
   },
   "definition/judge": {
-   "total": 1058.1,
-   "addcol": 41.62,
-   "append": 60.61,
-   "backfill": 32.76,
-   "correct": 76.5,
-   "dimhist": 20.77,
-   "dupload": 322.79,
-   "latekey": 21.83,
-   "mirror": 95.12,
-   "revision": 239.59,
-   "status": 71.5,
-   "unit": 75.01,
-   "vs_condition_judge": 1.82
+   "total": 1176.0,
+   "addcol": 41.16,
+   "append": 60.14,
+   "backfill": 32.79,
+   "correct": 75.66,
+   "dimhist": 21.0,
+   "dupload": 304.15,
+   "latekey": 21.24,
+   "mirror": 137.2,
+   "revision": 304.14,
+   "status": 104.93,
+   "unit": 73.6,
+   "vs_condition_judge": 1.7
   },
   "definition/example": {
-   "total": 1010.8,
-   "addcol": 37.16,
-   "append": 58.45,
-   "backfill": 29.82,
-   "correct": 75.15,
-   "dimhist": 20.53,
-   "dupload": 310.04,
-   "latekey": 19.33,
-   "mirror": 92.17,
-   "revision": 230.89,
-   "status": 66.29,
-   "unit": 70.93,
-   "vs_condition_judge": 1.73
+   "total": 1118.4,
+   "addcol": 36.89,
+   "append": 57.99,
+   "backfill": 29.6,
+   "correct": 70.9,
+   "dimhist": 20.9,
+   "dupload": 289.69,
+   "latekey": 18.78,
+   "mirror": 133.74,
+   "revision": 290.55,
+   "status": 99.95,
+   "unit": 69.38,
+   "vs_condition_judge": 1.61
   },
   "definition-cache/judge": {
-   "total": 613.0,
+   "total": 699.9,
    "addcol": 33.2,
-   "append": 28.22,
-   "backfill": 27.27,
-   "correct": 40.33,
-   "dimhist": 19.88,
-   "dupload": 149.41,
-   "latekey": 10.76,
-   "mirror": 83.98,
-   "revision": 136.24,
-   "status": 47.99,
-   "unit": 35.76,
-   "vs_condition_judge": 1.05
+   "append": 28.0,
+   "backfill": 27.31,
+   "correct": 39.71,
+   "dimhist": 20.1,
+   "dupload": 138.81,
+   "latekey": 10.64,
+   "mirror": 121.96,
+   "revision": 167.9,
+   "status": 77.06,
+   "unit": 35.17,
+   "vs_condition_judge": 1.01
   },
   "schema/judge": {
-   "total": 0.7,
-   "addcol": 0.05,
-   "append": 0.07,
-   "backfill": 0.05,
-   "correct": 0.07,
+   "total": 0.6,
+   "addcol": 0.04,
+   "append": 0.06,
+   "backfill": 0.04,
+   "correct": 0.06,
    "dimhist": 0.04,
-   "dupload": 0.08,
-   "latekey": 0.07,
+   "dupload": 0.06,
+   "latekey": 0.06,
    "mirror": 0.06,
-   "revision": 0.06,
-   "status": 0.06,
-   "unit": 0.07,
+   "revision": 0.07,
+   "status": 0.05,
+   "unit": 0.06,
    "vs_condition_judge": 0.0
   },
   "revoke/judge": {
    "total": 0.4,
-   "addcol": 0.04,
-   "append": 0.05,
+   "addcol": 0.03,
+   "append": 0.04,
    "backfill": 0.03,
-   "correct": 0.05,
+   "correct": 0.04,
    "dimhist": 0.04,
-   "dupload": 0.05,
+   "dupload": 0.04,
    "latekey": 0.04,
    "mirror": 0.03,
    "revision": 0.04,
-   "status": 0.04,
+   "status": 0.03,
    "unit": 0.04,
    "vs_condition_judge": 0.0
+  },
+  "tabletest/judge": {
+   "total": 49.9,
+   "addcol": 4.78,
+   "append": 4.04,
+   "backfill": 4.32,
+   "correct": 4.86,
+   "dimhist": 4.15,
+   "dupload": 4.43,
+   "latekey": 5.4,
+   "mirror": 3.94,
+   "revision": 3.86,
+   "status": 4.56,
+   "unit": 5.58,
+   "vs_condition_judge": 0.07
   }
  },
  "seed_failures": {

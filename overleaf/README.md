@@ -1,91 +1,89 @@
-# MAVRA：面向数据智能体的共享指标定义有效性维护
+# MAVRA Overleaf 工程
 
-English title: **MAVRA: Keeping Shared Metric Definitions Valid for Data Agents**.
+论文标题：**MAVRA: Keeping Shared Metric Definitions Valid for Data Agents**。
 
-## SIGMOD 模板与双语 / SIGMOD format and languages
+`main.tex` 是双语入口，`main-en.tex` 是英文入口，两者直接读取同一份 `paper.tex`。修改对应章节即可同时更新两种语言，不再生成或维护正文副本。本次拆分保留原有正文、公式、图表、数值、引用顺序和排版设置。
 
-已按 [SIGMOD 2027 Research 官方投稿要求](https://2027.sigmodconf.hosting.acm.org/calls_papers_sigmod_research.shtml) 改为 ACM 双栏匿名审稿格式：
+## 目录与编辑位置
 
-```latex
-\documentclass[sigconf,review,anonymous]{acmart}
-```
-
-SIGMOD research submissions use the ACM two-column proceedings template, Letter paper, double anonymity, and at most 12 pages excluding references. The submission and revision format is `sigconf`; accepted papers are converted to PACMMOD later. The source does not change the template's margins, column spacing, font sizes, or line spacing.
-
-主文件默认是逐段英文、中文对照，摘要、正文、标题、图表说明和表头均有中英文。参考文献保留原出版信息。双语稿供共同写作与核对；英文导出稿供准备投稿，页数需在最终 PDF 中核实。
-
-The default manuscript pairs English and Chinese paragraphs, headings, captions, and table headers. Bibliographic metadata stays in its original language. The bilingual manuscript is for joint editing; the English export uses the same layout and numerical results. Check the final PDF's page count before submission.
-
-## 文件 / Files
-
-| 文件 / File | 用途 / Purpose |
+| 路径 | 用途 |
 | --- | --- |
-| `main.tex` | 中英文双语全文；XeLaTeX。Complete bilingual manuscript; XeLaTeX. |
-| `main-en.tex` | 从同一正文生成的英文稿；pdfLaTeX 或 XeLaTeX。English export generated from the same manuscript. |
-| `export-english.ps1` | 编辑双语稿后重新生成英文稿。Regenerates the English export. |
-| `export-english.sh` | Linux 版英文稿导出，与 `.ps1` 等价。Linux equivalent of the PowerShell export. |
-| `build.sh` | 在 noctis 上导出英文稿、编译两份 PDF 到 `build/` 并报告页数：`./build.sh [en\|bi\|all]`。Exports, compiles both PDFs into build/, and reports page counts. |
-| `abstract-zh.md` | 当前中文摘要，与正文结果一致。Current Chinese abstract. |
-| `RESEARCH_STATUS.md` | 实验证据、边界与未完成机制。Evidence and remaining implementation work. |
-| `gen/` | 由 `tools/paper-results.py` 从原始实验输出生成的场景表、图的坐标和正文数值宏，正文用 `\input` 引入，请勿手改。Generated tables, plot coordinates, and number macros; do not edit by hand. |
-| `evidence/` | 本轮报告和每组合计的原样副本。Unmodified copies of current reports and cell summaries. |
-| `mavra-sigmod-bilingual.zip` | 可直接上传 Overleaf 的源文件包。Source package for Overleaf. |
+| `main.tex` | 双语入口，只设置文档类与语言开关 |
+| `main-en.tex` | 英文入口，只设置文档类与语言开关 |
+| `paper.tex` | 标题、作者、文档环境与章节顺序 |
+| `acmart.cls` | 随包提供的官方 ACM 文档类，不依赖编译环境预装此文件 |
+| `latex/preamble.tex` | 宏包、语言宏、颜色、图表样式和数值宏加载 |
+| `latex/acmart/acmart.dtx` | 官方文档类的对应源码，保留版权及 LPPL 许可说明 |
+| `sections/abstract.tex` | 中英文摘要、关键词与 `\maketitle` |
+| `sections/01-*.tex` 至 `10-*.tex` | 原论文的十个章节，编号和顺序不变 |
+| `sections/evaluation/` | 实验设置、有效性、并发、修复、维护代价与场景六个小节 |
+| `figures/` | 四幅 TikZ / pgfplots 图，包括标题与描述 |
+| `tables/` | 八张表，包括标题和原有生成数据的加载位置 |
+| `references.tex` | 原样保留的 `thebibliography`，引用键与条目顺序不变 |
+| `gen/` | 实验统计脚本生成的数值宏、表格数据和绘图坐标；不要手改 |
+| `build.sh` | 编译或生成 Overleaf 上传包 |
+| `mavra-sigmod-bilingual.zip` | 包含两个入口、论文源码与 ACM 文档类的 Overleaf 源码包；标准宏包和字体由 TeX 环境提供 |
 
-两个 TeX 文件包含 TikZ 架构图、pgfplots 图和参考文献，编译只依赖本目录的 `gen/`，不依赖父仓库或 `evidence/`。
+章节中的 `\bi{English}{中文}`、标题与图表中的 `\bt{English}{中文}` 保持原用法。论文的 LaTeX 文件均在本目录内；在安装了所需宏包与字体的 TeX 环境中，编译不依赖父目录、实验数据或实验服务器。
 
-Both TeX files contain the figures and bibliography and compile with only this directory's `gen/`, independently of the system repository or evidence directory. They use standard packages supplied by Overleaf, including `acmart`, TikZ, pgfplots, colortbl, and, in bilingual mode, `ctex` with Fandol fonts.
+## Overleaf 设置
 
-## Overleaf 设置 / Overleaf setup
+1. 上传 `mavra-sigmod-bilingual.zip`，保留包内目录结构。
+2. 双语稿：Main document 选择 `main.tex`，Compiler 选择 **XeLaTeX**。
+3. 英文稿：Main document 选择 `main-en.tex`，Compiler 选择 **pdfLaTeX**，也可使用 XeLaTeX。
 
-1. 上传 `mavra-sigmod-bilingual.zip`，或将仓库文件上传至已有项目。Upload the ZIP or files to your existing project.
-2. 双语稿：Main document 设为 `main.tex`，Compiler 设为 **XeLaTeX**。Bilingual: select main.tex and XeLaTeX.
-3. 英文稿：Main document 设为 `main-en.tex`，Compiler 可设为 **pdfLaTeX**。English: select main-en.tex and pdfLaTeX.
-4. 在 Overleaf 的项目设置中选择编译器，源码中的编辑器提示不自动改变 Overleaf 设置。Select the compiler in project settings; the source comment does not change that setting automatically.
+Overleaf 的编译器需要在项目设置中选择；源码顶部的 `% !TeX program` 注释不会自动改变这一设置。若使用 pdfLaTeX 编译双语入口 `main.tex`，应先改用 XeLaTeX。[官方编译器设置说明](https://docs.overleaf.com/getting-started/recompiling-your-project/selecting-a-tex-live-version-and-latex-compiler)。
 
-后续统一修改 `main.tex`，然后在本目录运行：
+上传包现已包含 `acmart.cls`，应放在与 `main.tex` 相同的项目根目录。模板使用 [CTAN / TeX Live 官方发行版](https://ctan.org/pkg/acmart) **2.20（2026-08-16）**，文件原样保留，随包携带对应的 `acmart.dtx` 源码。
 
-```powershell
-./export-english.ps1
-```
+保留 `\documentclass[sigconf,review,anonymous]{acmart}` 和模板原有排版。投稿格式参考 [SIGMOD 2027 Research 官方要求](https://2027.sigmod.org/calls_papers_sigmod_research.shtml)，最终页数应以投稿用编译器生成的 PDF 为准。
 
-You can also change the standalone source's sole `\bilingualtrue` line to `\bilingualfalse` to hide Chinese without duplicating the manuscript. The English file retains Chinese source arguments but does not typeset them or load CJK packages. The system name remains centralized in `\system`.
+## 编译与打包
 
-## 实验与数值来源 / Experiments and number provenance
-
-论文分两层证据。机制层（第 7.2–7.5 节，不调用 LLM）：学到的定义库的配对回放、并发写入下的绑定快照执行、修复边界与修复期间的等待、与通用版本缓存对比的维护代价（含零共享对照、4M 行与 32 个 Agent、1M–16M 规模）、TPC-DS 自然共享；数值宏（`\Rp*`、`\Sn*`、`\Cb*`、`\Eone*`、`\Tp*`、`\Wr*`、`\Du*`）、代价图坐标与随机并发表由 `tools/review-results.py` 从 `exp/2026-10-02-cache-baseline-tpcds` 的存档生成到 `gen/`。端到端层（第 7.6 节）：三模型十种数据变化场景，场景表、模型图与 `\Scen*` 宏由 `tools/paper-results.py` 生成。第 2.1 节工作负载表数值直接写在正文。摘要用 `tools/extract-abstract.py` 提取到 `abstract-zh.md`。口径与边界见 `RESEARCH_STATUS.md`。
+在本目录执行：
 
 ```bash
-# noctis，仓库根目录
-python3 tools/paper-results.py --scen results/scen-20260930 --out overleaf/gen
-python3 tools/review-results.py --exp exp/2026-10-02-cache-baseline-tpcds --out overleaf/gen
-python3 tools/extract-abstract.py
-cd overleaf && ./build.sh all
+./build.sh en    # 英文稿 → build/main-en.pdf
+./build.sh bi    # 双语稿 → build/main.pdf
+./build.sh all   # 两份都编译，默认选项
+./build.sh pack  # 更新 mavra-sigmod-bilingual.zip，不需要 LaTeX 环境
 ```
 
-The paper has two layers of evidence. Mechanism-layer numbers (Sections 7.2–7.5: paired replay, snapshot-bound execution under concurrent writes, repair boundary, maintenance cost against a generic version-keyed cache, TPC-DS sharing) are generated by `tools/review-results.py`; end-to-end scenario numbers (Section 7.6) by `tools/paper-results.py`. Definitions and limits are in RESEARCH_STATUS.md.
+编译优先使用 `latexmk`：英文调用 pdfLaTeX，双语调用 XeLaTeX；也支持已有的 Tectonic 环境。ACM 文档类已随包提供；环境仍需提供其标准宏包依赖、TikZ、pgfplots、colortbl，以及双语模式下的 `ctex` / Fandol 字体。打包只需要 Python 3，包含官方文档类及其源码，并按 `\input` 依赖收集论文文件，不包含实验附件、编译缓存或无关生成文件。构建不会改写论文源文件。
 
-## 图表风格 / Figure style
+### 缺少标准宏包时
 
-图用 TikZ／pgfplots 在 TeX 中绘制，字体与正文一致，轴标签和图例支持双语。每种方法在所有图表中颜色固定（导言 `mCond`、`mDef` 等，表 3 的色块即图例）：\system 为蓝色且蓝色只用于它，定义级为橙色，其余方法按经色觉缺陷校验的顺序取色；准确率表用中性灰阶底纹。方法名全文统一为 No sharing、Unguarded、Schema-only、Revoke-on-write、Definition-level、Scope-only、Condition-level（\system）。全部表格用 `\footnotesize`。
+`acmart.cls` 成功加载后仍报 `xkeyval.sty` 等文件缺失，说明编译环境未安装对应宏包。类文件不能替代宏包和字体安装。使用 `latexmk` 且存在 `kpsewhich` 时，`build.sh` 会在编译前一次列出缺失的直接依赖和双语字体；这项预检不覆盖所有间接依赖。Overleaf 网页中的直接编译不会执行此脚本。
 
-Figures are drawn with TikZ/pgfplots. Each method keeps one color across all figures and tables (Table 3 shows the swatches): MAVRA is blue and blue is reserved for it, definition-level is orange, others follow a CVD-checked order; the accuracy table uses a neutral gray ramp. Method names are uniform across text, tables, and figures, and all tables use `\footnotesize`.
+自建 Overleaf Community Edition 默认只有精简版 TeX Live。按照[官方安装说明](https://docs.overleaf.com/on-premises/installation/upgrading-tex-live)，管理员应在**实际编译容器**内补齐环境；使用 Overleaf Toolkit 时先执行 `bin/shell`，然后运行：
 
-## 编译 / Compilation
+```bash
+tlmgr install scheme-full
+tlmgr path add
+```
 
-2026-10-01 在 noctis 用 `./build.sh all` 编译：英文稿 11 页（正文在第 9 页结束），双语稿 16 页。
+安装后可用 `kpsewhich xkeyval.sty`、`kpsewhich ctex.sty` 和 `kpsewhich FandolSong-Regular.otf` 检查是否返回文件路径。容器升级或重建时，应按官方说明保留完整 TeX 安装；Server Pro 的独立编译容器应按[对应镜像配置说明](https://docs.overleaf.com/on-premises/maintenance/extending-tex-live)处理。
 
-Compiled on noctis on 2026-10-01: English 11 pages including references (body ends on page 9), bilingual 16 pages.
+如果使用官方 `overleaf.com`，可在项目设置中切换到另一年度 TeX Live 后重新编译；若仍缺少标准宏包，应交由平台排查编译环境。本地 TeX Live 则由其安装管理员通过包管理器补齐。Tectonic 会通过自己的资源包获取宏包，Tectonic 编译成功不能证明其他环境已安装相同依赖。
 
-## 仓库 / Repositories
+## 数值与实验存档
 
-主仓库 / Main repository: <https://github.com/mmmttt000045/agent4db-adapter>
+实验数据统一保存在仓库的 `exp/`，不再在 Overleaf 工程中保留副本。
 
-论文目录 / Paper directory: <https://github.com/mmmttt000045/agent4db-adapter/tree/main/overleaf>
+| 生成文件 | 来源与生成脚本 |
+| --- | --- |
+| `gen/numbers.tex`、`gen/scen-*.tex` | `tools/paper-results.py`；原始场景结果在 noctis 的 `results/scen-20260930/`，汇总存档在 `exp/2026-10-01-scenarios/paper-results.json` |
+| `gen/review.tex`、`gen/cache-ratio-*.tex`、`gen/snapshot-stress.tex` | `tools/review-results.py`；本地存档在 `exp/2026-10-02-cache-baseline-tpcds/` |
+| 工作负载表中的数值 | `exp/2026-10-01-workload-characterization/` |
 
-`overleaf/` 现在是主仓库的普通目录，与系统代码共享 Git 历史、`main` 分支和远程仓库。可以从仓库根目录统一提交代码、论文和实验更新；从本目录执行 Git 命令也会作用于同一主仓库。它不是子模块，编译缓存仍被忽略，Overleaf 上传包纳入版本控制。
+从仓库根目录重新生成实验输出：
 
-This is a regular directory of agent4db-adapter, tracked with the system code on the same main branch. Git commands here resolve to the main repository. It is not a submodule. Build output stays ignored, while the upload ZIP is tracked.
+```bash
+python3 tools/paper-results.py --scen results/scen-20260930 --out overleaf/gen \
+  --json exp/2026-10-01-scenarios/paper-results.json
+python3 tools/review-results.py --exp exp/2026-10-02-cache-baseline-tpcds --out overleaf/gen
+```
 
-此前的 [独立论文仓库](https://github.com/mmmttt000045/agent-adaper-paper) 保留早期历史，本地 Git 元数据也已备份在主仓库的 `.git/overleaf-repository-backup-10b3fbf/` 中。后续统一在主仓库维护。本目录尚未与在线 Overleaf 项目建立自动同步。
+场景生成命令需要服务器上完整的原始结果；正常编辑与编译不需要重新运行实验。研究状态与实现边界见 [docs/research-status.md](../docs/research-status.md)，实验索引见 [exp/README.md](../exp/README.md)，参考文献核对记录见 [docs/citation-audit-2026-10-01.md](../docs/citation-audit-2026-10-01.md)。
 
-The earlier paper repository preserves its history, and its local metadata has been archived under the main repository's .git directory. Ongoing paper work belongs in the main repository. There is no automatic synchronization with an online Overleaf project.
+`overleaf/` 是主仓库的普通目录。上传包可以手动导入 Overleaf，目前未配置在线项目自动同步。

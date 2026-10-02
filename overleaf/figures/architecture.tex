@@ -1,0 +1,46 @@
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm, font=\footnotesize,
+  comp/.style={draw=mCond!75!black, fill=white, rounded corners=2pt, align=center, text width=26mm, minimum height=9.5mm, inner sep=2pt, line width=0.5pt},
+  actor/.style={draw=inkmuted, fill=black!4, rounded corners=5pt, align=center, text width=22mm, minimum height=9.5mm, inner sep=2pt, line width=0.5pt},
+  flow/.style={-{Latex[length=1.8mm]}, line width=0.6pt, black!75},
+  both/.style={{Latex[length=1.8mm]}-{Latex[length=1.8mm]}, line width=0.6pt, black!75},
+  data/.style={-{Latex[length=1.6mm]}, line width=0.5pt, inkmuted, densely dashed},
+  stepno/.style={circle, fill=mCond, text=white, font=\scriptsize\bfseries, inner sep=0pt, minimum size=3.6mm},
+  lbl/.style={font=\scriptsize, text=inkmuted, inner sep=1pt}]
+\fill[mCond!5, draw=mCond!55, rounded corners=4pt, line width=0.6pt] (2.75,-0.65) rectangle (13.7,4.45);
+\node[anchor=north east, font=\footnotesize\bfseries, text=mCond!75!black] at (13.62,4.42) {\bt{\system\ middleware}{\system\ 中间层}};
+\node[actor, text width=19mm] (A) at (0.95,3.5) {\textbf{\bt{Agent A}{智能体 A}}\\\bt{learning tasks}{学习任务}};
+\node[actor, text width=19mm, minimum height=27mm] (B) at (0.95,0.875) {\textbf{\bt{Agents B, C, \ldots}{智能体 B、C……}}\\\bt{questions with metric names only}{只给指标名的问题}};
+\node[actor, text width=20mm] (X) at (7.6,5.2) {\textbf{\bt{LLM extractor}{大模型提炼器}}};
+\node[actor] (ETL) at (15.6,3.5) {\textbf{\bt{ETL and writers}{ETL 与写入方}}};
+\node[cylinder, shape border rotate=90, aspect=0.12, draw=inkmuted, fill=black!4, align=center, minimum height=27mm, minimum width=27mm, inner sep=1pt, line width=0.5pt] (PG) at (15.6,0.875) {\textbf{PostgreSQL}\\\bt{tables, DML statistics,}{表、DML 统计、}\\\bt{version triggers}{版本触发器}};
+\node[comp] (adm) at (4.65,3.5) {\textbf{\bt{Admission}{准入}}\\\bt{calculation chain, G1--G7}{计算链、门槛 G1--G7}};
+\node[comp] (look) at (4.65,1.75) {\textbf{\bt{Lookup}{查找}}\\\code{find\_metric}, \bt{version check}{版本比较}};
+\node[comp] (guard) at (4.65,0) {\textbf{\bt{Snapshot-bound execution}{绑定快照执行}}\\\code{run\_sql}, \bt{same-snapshot check}{同快照核对}};
+\node[comp] (maint) at (8.2,1.75) {\textbf{\bt{Condition maintenance}{条件维护}}\\\bt{reuse, merge, wait}{复用、合并、等待}};
+\node[comp] (rep) at (8.2,0) {\textbf{\bt{Bounded repair}{有界修复}}\\\bt{unique filter, G8}{唯一过滤、G8}};
+\node[comp, text width=20mm] (ver) at (12.45,0) {\textbf{\bt{Version tracker}{版本跟踪}}\\\bt{statistics, tx versions}{统计、事务性版本}};
+\node[draw=mCond!75!black, fill=mCond!10, rounded corners=2pt, minimum width=31mm, minimum height=27.5mm, line width=0.5pt] (store) at (11.95,2.6) {};
+\draw[mCond!55, line width=0.5pt] ($(store.west)+(0,-0.12)$) -- ($(store.east)+(0,-0.12)$);
+\node[align=center, text width=30mm] at (11.95,3.3) {\textbf{\bt{Definitions}{定义}}\\$m^r=(B,I,C,E,r)$\\\bt{valid, pending, revoked}{有效、待验证、已撤销}};
+\node[align=center, text width=30mm] at (11.95,1.75) {\textbf{\bt{Conditions and verdicts}{条件与结论}}\\$(\mathrm{id}(c),\,V(\mathrm{dep}(c)))$};
+\draw[flow] (A) -- node[stepno, above=1pt]{1} (adm);
+\draw[both] (adm.north) |- node[lbl, pos=0.75, above]{\bt{chain / candidate}{计算链／候选}} node[stepno, pos=0.25, left=2pt]{2} (X.west);
+\draw[flow] (adm.east) -- node[lbl, above]{\bt{publish}{发布}} node[stepno, below=2pt]{3} (adm.east -| store.west);
+\draw[both] (B.east |- look.west) -- node[stepno, above=1pt]{4} (look.west);
+\draw[flow] (look) -- node[lbl, above]{\bt{pending}{待验证}} node[stepno, below=2pt]{5} (maint);
+\draw[both] (maint.east) -- node[lbl, above]{\bt{reuse}{复用}} node[stepno, below=2pt]{6} (maint.east -| store.west);
+\draw[flow] (maint) -- node[lbl, right]{\bt{failed $c$}{条件失败}} node[stepno, left=2pt]{7} (rep);
+\draw[flow] (rep.east) -| node[lbl, pos=0.75, right]{\bt{new revision}{新修订}} ($(store.south west)+(0.4,0)$);
+\draw[data] (store.east |- maint.east) -- node[lbl, above]{$Q_c$} (PG.west |- maint.east);
+\draw[data] (PG.west |- ver.east) -- (ver.east);
+\draw[flow] (ver.north) -- node[lbl, right]{\bt{versions}{版本}} (ver.north |- store.south);
+\draw[both] (B.east |- guard.west) -- node[stepno, above=1pt]{8} (guard.west);
+\draw[flow] (guard.south) -- ++(0,-0.8) -| node[lbl, pos=0.25, above]{\bt{check $C(m^r)$ and run SQL on one snapshot}{在同一快照上核对 $C(m^r)$ 并执行 SQL}} node[stepno, pos=0.25, below=2pt]{9} (PG.south);
+\draw[flow] (ETL) -- node[lbl, right]{\bt{updates}{更新}} (PG);
+\end{tikzpicture}
+\caption{\bt{\system\ architecture. Learning path (1--3): calculation chains of agent A's judged tasks are extracted into candidates and published after gates G1--G7. Use path (4--7): a lookup compares dependency versions; condition maintenance reuses verdicts keyed by condition identity and versions, runs only the remaining checks, and repairs failed definitions only with a unique filter that passes regression (G8). Execution path (8--9): a query that declares revisions is checked against the revisions' conditions on its own snapshot and executed on that snapshot. Dashed arrows are reads of database state.}{\system\ 架构。学习路径（1--3）：智能体 A 判题成功任务的计算链被提炼为候选，通过门槛 G1--G7 后发布。使用路径（4--7）：查找比较依赖版本；条件维护按条件身份与版本复用结论，只执行其余检查，并只用通过回归测试（G8）的唯一过滤修复失效定义。执行路径（8--9）：声明了修订的查询在自身快照上核对这些修订的条件，并在该快照上执行。虚线为读取数据库状态。}}
+\label{fig:architecture}
+\Description{Agents on the left, the MAVRA middleware in the middle with admission, lookup, snapshot-bound execution, condition maintenance, bounded repair, version tracker, and a shared store of definitions and condition verdicts, and PostgreSQL with ETL writers on the right. Numbered arrows mark the learning, use, and execution paths.}
+\end{figure*}

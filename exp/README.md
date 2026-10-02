@@ -15,6 +15,6 @@
 - 两个评测命令的数据完全由确定性公式生成，同样行数下数据与标准答案相同，可跨目录比较。
 - 维护方式对照的 `report.json`（7 MB）与各组 `cell-*.json` 在 noctis 的 `/root/agentdb-mid/results/maint-1790686347212630/`；反序复验在 `/root/agentdb-mid/results/maint-1790707404365821/`；两个目录里的 `cells.txt` 是从中提取的每组合计（过期使用、误撤销、不可用、维护结果、条件处理计数、DB 时间、等待时长）。
 - 端到端实验的原始输出在 noctis 的 `/root/agentdb-mid/results/metric-1790700840466648/`（5 组共享口径）与 `results/metric-1790690815978959/`（其中只有 `cell-r1-middle-named.json` 被采用，其余组来自有提炼缺陷的一轮，已弃用）。
-- 分析与汇报见 `overleaf/evidence/metric-maintenance-report-2026-09-30.md`。更早的试跑（2×2 消融、M1–M3 试跑）已从仓库移除，需要时从 Git 历史 `d15e4af` 取回。
+- 早期维护与单模型实验的历史分析见 `2026-09-30-metric-maint-named/analysis.md`，原有核对数据保存在同目录的 `verified-results.json`。更早的试跑（2×2 消融、M1–M3 试跑）已从仓库移除，需要时从 Git 历史 `d15e4af` 取回。
 - 工作负载刻画：`deepseek-v4.1-flash/` 为原始轨迹，`workload-stats.*` 为统计结果，`audit-sample.jsonl` 为人工核对样本，`redset/` 为 Redset 统计与说明（原始 parquet 17 GB 只在 noctis 的 `results/workload-baselines/redset/data/`）。GLM-5.3 与 GLM-5.3 Flash 两组因 Cline 余额耗尽（HTTP 402）只完成 16 / 0 个会话，未纳入。
 - 数据变化场景：原始逐组 JSON 在 noctis 的 `results/scen-20260930/<任务>/metric-*/`（约 45 个 cell，每个 100–200 KB），这里只放 `paper-results.json`（使用了哪些组、剔除原因、逐模型逐场景计数）。ClinePass 周用量上限使 12 组含失败题、9 组未完成，约 2026-10-07 重置后补跑。

@@ -6,10 +6,10 @@ MAVRA（Maintaining Shared Metric Definitions for Data Agents）的系统原型�
 
 论文源文件与实验依据在 [overleaf/](overleaf/README.md)：
 
-- [中英文双语稿](overleaf/main.tex)：SIGMOD 2027 双栏匿名格式，XeLaTeX；改稿只改这一份。
-- [英文稿](overleaf/main-en.tex)：由 `overleaf/export-english.sh`（Linux）或 `export-english.ps1`（Windows）从双语稿生成。
-- `overleaf/build.sh`：在 noctis 上编译两份 PDF 并报告页数。
-- [研究状态](overleaf/RESEARCH_STATUS.md)：已有证据与尚未实现的机制。
+- [中英文双语入口](overleaf/main.tex)：SIGMOD 2027 双栏匿名格式，XeLaTeX。
+- [英文入口](overleaf/main-en.tex)：pdfLaTeX 或 XeLaTeX；两种语言共用 [paper.tex](overleaf/paper.tex) 与 `sections/` 正文，无需导出。
+- `overleaf/build.sh [en|bi|all|pack]`：编译 PDF 或更新 Overleaf 上传包。
+- [研究状态](docs/research-status.md)：已有证据与尚未实现的机制。
 
 ## 目录
 
@@ -17,7 +17,7 @@ MAVRA（Maintaining Shared Metric Definitions for Data Agents）的系统原型�
 | --- | --- |
 | `src/` | 中间层与两个评测命令 |
 | `exp/` | 论文所用实验的整理结果，索引见 [exp/README.md](exp/README.md) |
-| `docs/` | [指标经验设计与评测协议](docs/metric-experience-protocol.md)、[相关工作与审稿质疑](docs/related-work.md) |
+| `docs/` | [设计与评测协议](docs/metric-experience-protocol.md)、[相关工作](docs/related-work.md)、[引用核对](docs/citation-audit-2026-10-01.md)、[模型网关](docs/cline-gateway.md)与[研究状态](docs/research-status.md) |
 | `overleaf/` | 论文 |
 | `tools/check-llm.py` | 模型 API 的极小连通性测试 |
 | `data/mock_fixture.sql` | PostgreSQL 集成测试的最小数据 |
@@ -172,7 +172,7 @@ AGENTDB_TEST_URL=postgres://postgres:postgres@127.0.0.1:55432/postgres \
 ## 已知边界
 
 - SQL 表依赖、关联与过滤识别使用轻量文本扫描，依赖列名前缀；不是完整 SQL 解析，过滤条件的文本匹配不是语义证明。
-- 同快照验证与执行已实现但默认关闭（`MiddleConfig::snapshot_exec`，需先 `catalog::install_tx_versions` 安装版本触发器）；修复进行中到达的使用会等待那次维护结束（`MiddleConfig::wait_repair`，默认打开），见 [研究状态](overleaf/RESEARCH_STATUS.md)。
+- 同快照验证与执行已实现但默认关闭（`MiddleConfig::snapshot_exec`，需先 `catalog::install_tx_versions` 安装版本触发器）；修复进行中到达的使用会等待那次维护结束（`MiddleConfig::wait_repair`，默认打开），见 [研究状态](docs/research-status.md)。
 - 默认的版本来源是异步刷新的统计计数（缓存 200 ms），不提供事务级一致性；打开快照绑定执行后改用事务性版本。表目录在启动时加载。
 - HTTP 接口没有认证、租户隔离或速率限制，默认只监听本机；数据库连接使用 `NoTls`。
 - 经验库与反馈状态只在内存中，没有持久化与容量淘汰。

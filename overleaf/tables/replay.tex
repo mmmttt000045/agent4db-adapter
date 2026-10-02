@@ -1,0 +1,20 @@
+\begin{table}[t]
+\caption{\bt{Paired replay: \RpLibs\ learned libraries under \RpChanges\ data changes, \RpCondN\ scored questions per method. Revalidation methods serve wrong answers only under the unit change, which no condition models. $^a$Without relearning. $^b$G8 reference is the agent's own learning SQL instead of the judged learning query (\RpExN\ questions; two definitions do not pass admission against it).}{配对回放：\RpLibs\ 个学到的定义库，\RpChanges\ 种数据变化，每种方法 \RpCondN\ 道计分题。各重验证方法只在任何条件都不刻画的单位变化下提供错误答案。$^a$不重新学习。$^b$G8 参照为智能体自己的学习 SQL，而不是经过判题的学习查询（\RpExN\ 道题；有两个定义未能以它通过准入）。}}
+\label{tab:replay}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}Lrrrrr@{}}
+\toprule
+& & & \multicolumn{2}{c}{\bt{Unavailable}{不可用}} & \\
+\cmidrule(lr){4-5}
+\bt{Method}{方法} & \bh{Correct}{答对} & \bh{Served wrong}{提供但答错} & \bh{needed}{必要} & \bh{not needed}{不必要} & \bh{Maint.\ DB s}{维护 DB 秒}\\
+\midrule
+\swatch{mSchema}\ \bt{Schema-only}{只看结构} & \RpSchemaCorrect & \RpSchemaWrong & \RpSchemaNeeded & \RpSchemaUnneeded & \RpSchemaDB\\
+\swatch{mRevoke}\ \bt{Revoke-on-write$^a$}{写入即撤销$^a$} & \RpRevokeCorrect & \RpRevokeWrong & \RpRevokeNeeded & \RpRevokeUnneeded & \RpRevokeDB\\
+\swatch{mDef}\ \bt{Definition-level}{定义级} & \RpDefCorrect & \RpDefWrong & \RpDefNeeded & \RpDefUnneeded & \RpDefDB\\
+\swatch{mCache}\ \bt{Definition + cache}{定义级 + 缓存} & \RpCacheCorrect & \RpCacheWrong & \RpCacheNeeded & \RpCacheUnneeded & \RpCacheDB\\
+\swatch{mCond}\ \system & \RpCondCorrect & \RpCondWrong & \RpCondNeeded & \RpCondUnneeded & \RpCondDB\\
+\swatch{mCond}\ \bt{\system, agent ref.$^b$}{\system，智能体参照$^b$} & \RpExCorrect & \RpExWrong & \RpExNeeded & \RpExUnneeded & \RpExDB\\
+\bottomrule
+\end{tabularx}
+\end{table}

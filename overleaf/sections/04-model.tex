@@ -1,0 +1,45 @@
+\section{\bt{Metric Definitions and Validity Conditions}{指标定义与有效性条件}}
+\label{sec:model}
+\subsection{\bt{Definitions and evidence}{定义与证据}}
+\bi{A definition revision is $m^r=(B,I,C,E,r)$, where $B$ is its business meaning, $I$ its structured implementation, $C$ its set of executable conditions, $E$ its supporting evidence, and $r$ its revision number. The implementation records the fact table, aggregate expression, grain, time role, join references, persistent filters, and empty-input convention. Canonical SQL is compiled from $I$ for any question parameters, giving agents a common representation of the calculation. Evidence includes the source task, the explicit basis of the business meaning, tool results, an independent task-success judgment, the judged learning query, and the table versions at learning time. Admission requires this judgment together with the executable gates in Section~\ref{sec:maintenance}.}
+{定义修订记为 $m^r=(B,I,C,E,r)$，其中 $B$ 为业务含义，$I$ 为结构化实现，$C$ 为可执行条件集，$E$ 为支撑证据，$r$ 为修订号。实现记录事实表、聚合表达式、粒度、时间角色、连接引用、持久过滤和空输入约定。对任意题目参数，规范 SQL 都由 $I$ 编译得到，为智能体提供统一的计算表示。证据包括来源任务、业务含义的显式依据、工具结果、独立的任务成功判定、经过判题的学习查询以及学习时的表版本。准入同时要求这一判定和第~\ref{sec:maintenance} 节的可执行门槛。}
+
+\subsection{\bt{Validity conditions}{有效性条件}}
+\bi{A condition $c$ is a predicate over the tables $\operatorname{dep}(c)$ with a check query $Q_c$ that returns a violation witness or nothing. Its identity $\operatorname{id}(c)$ consists of its type, tables, key set, join direction, filters, and null policy. \system\ derives four kinds of conditions from the implementation:}
+{条件 $c$ 是依赖表集合 $\operatorname{dep}(c)$ 上的谓词，附带一个检查查询 $Q_c$，返回违例证据或空。其身份 $\operatorname{id}(c)$ 由类型、表、键集合、连接方向、过滤和空值规则组成。\system\ 从定义的实现中推导四类条件：}
+\begin{description}
+\item[\bt{Filtered key uniqueness}{过滤后键唯一性}]
+\bi{$\operatorname{KeyUnique}(T,K,\varphi)$: no two rows of $\sigma_\varphi(T)$ agree on $K$. It is derived from the grain and the fact table's persistent filters.}
+{$\operatorname{KeyUnique}(T,K,\varphi)$：$\sigma_\varphi(T)$ 中没有两行在 $K$ 上取值相同。由粒度和事实表上的持久过滤推出。}
+\item[\bt{Join multiplicity}{连接多重性}]
+\bi{For a join reference $L\to R$ on keys $K$ with filters, each $L$ row matches at most the permitted number of $R$ rows; it is checked through uniqueness of $K$ on the filtered one side.}
+{对按键 $K$、带过滤的连接引用 $L\to R$，每条 $L$ 记录匹配的 $R$ 记录数不超过允许值；通过过滤后一侧在 $K$ 上的唯一性检查。}
+\item[\bt{Time role}{时间角色}]
+\bi{The fact's date key joins the date dimension many-to-one through the declared role.}
+{事实表的日期键按声明的角色与日期维度多对一关联。}
+\item[\bt{Coverage}{覆盖}]
+\bi{The fraction of fact rows that fail to join the date dimension stays within the fraction recorded at admission, so that facts are not silently dropped from every period.}
+{关联不上日期维度的事实行比例不超过准入时记录的比例，使事实不会被静默地排除在所有期间之外。}
+\end{description}
+
+\subsection{\bt{Versions, verdicts, and reuse}{版本、结论与复用}}
+\bi{The version $V(T)$ of a table identifies the state of $T$ that a check read. \system\ supports two sources. The default combines the schema fingerprint, DML counters, and the ETL batch identifier; it is cheap but neither transactional nor immediate, because PostgreSQL reports DML statistics asynchronously after commit. \emph{Transactional versions} are maintained by a statement-level trigger that increments a per-table counter inside every writing transaction; the counter is sharded by backend process so that concurrent writers do not contend on one row, and the version is the sum of the shards. A verdict is the outcome of $Q_c$ at the versions it read and is indexed by}
+{表的版本 $V(T)$ 标识检查读到的 $T$ 的状态。\system\ 支持两种版本来源。默认来源组合结构指纹、DML 计数和 ETL 批次号，代价很低，但既不随事务提交也不即时可见，因为 PostgreSQL 在提交后异步上报 DML 统计。\emph{事务性版本}由语句级触发器维护：每个写事务内把对应表的计数加一；计数按后端进程分片，使并发写入者不争同一行，版本取各分片之和。结论是 $Q_c$ 在其所读版本上的执行结果，以如下键索引：}
+\[
+\bigl(\operatorname{id}(c),\,V(\operatorname{dep}(c))\bigr).
+\]
+\bi{A verdict serves every definition that requires the same condition at the same dependency versions. Identity is semantic rather than textual: the order of key columns and the formatting of filters do not change it, so a grain condition and a join guard that state the same key in different orders share one verdict. \system\ also supports a key implication (with identical filters and null semantics, uniqueness on $K$ implies uniqueness on each superset of $K$), which did not apply in our workloads.}
+{一个结论服务于所有在相同依赖版本上需要同一条件的定义。条件身份按语义而非文本确定：键列顺序与过滤的书写格式不影响身份，因此以不同顺序写出同一键的粒度条件与连接守卫共享一个结论。\system\ 还支持一条键蕴含规则（过滤与空值语义相同时，键 $K$ 上的唯一性蕴含其每个超集上的唯一性），在我们的负载中没有用上。}
+
+\subsection{\bt{States and the execution contract}{状态与执行契约}}
+\bi{A revision is \emph{valid} when its conditions hold at the current versions of their dependencies. A dependency-version change makes it \emph{pending}, a state derived by version comparison that triggers revalidation. Revalidation either refreshes the evidence or \emph{revokes} the revision when a required condition fails. Repair produces a new \emph{candidate} revision, which becomes valid after passing the gates in Section~\ref{sec:maintenance}. For a query $q$ that declares $m^r$ and executes on snapshot $s$, the execution contract is}
+{当修订的全部条件在其依赖的当前版本上成立时，修订是\emph{有效}的。依赖版本变化使其进入\emph{待验证}状态；这一状态由版本比较得出，并触发重验证。重验证要么刷新证据，要么在必需条件失败时\emph{撤销}修订。修复产生新的\emph{候选}修订，通过第~\ref{sec:maintenance} 节的门槛后变为有效。对声明使用 $m^r$、在快照 $s$ 上执行的查询 $q$，执行契约为}
+\begin{equation}
+\begin{split}
+\operatorname{Admit}(q,m^r,s)\Longrightarrow {}& \operatorname{Available}(m^r,s)\\
+&{}\land\bigwedge_{c\in C(m^r)}c(D_s),
+\end{split}
+\end{equation}
+\bi{where $D_s$ is the database at snapshot $s$. Revision checks alone enforce availability but establish the conditions on the snapshot of the most recent maintenance; snapshot-bound execution (Section~\ref{sec:snapshot}) establishes them on $s$ itself.}
+{其中 $D_s$ 为快照 $s$ 上的数据库。单靠修订核对只能保证可用性，条件则是在最近一次维护所在的快照上成立；绑定快照的执行（第~\ref{sec:snapshot} 节）使条件在 $s$ 本身上成立。}
+

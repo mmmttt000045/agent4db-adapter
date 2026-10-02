@@ -1,0 +1,14 @@
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[mavra, ybar=0.5pt, width=\linewidth, height=46mm, bar width=5.4pt, ymin=0, ymax=100, enlarge x limits=0.2,
+  xtick={0,1,2}, xticklabels={DeepSeek V4.1 Flash, GLM-5.3, GLM-5.3 Flash}, xticklabel style={font=\scriptsize},
+  ytick={0,25,50,75,100}, yticklabel={\pgfmathprintnumber{\tick}\%},
+  ylabel={\bt{Accuracy}{正确率}}, legend columns=3, legend style={at={(0.5,1.02)}, anchor=south}]
+\input{gen/scen-models}
+\end{axis}
+\end{tikzpicture}
+\caption{\bt{Accuracy per model and method, averaged over the settings in which all six methods have tasks for that model (11, 11, and 8 settings); error bars show 95\% bootstrap intervals.}{各模型的正确率：在该模型下六种方法都有题的情形上平均（分别为 11、11、8 种情形），误差线为 95\% 自助法区间。}}
+\label{fig:models}
+\Description{Grouped bars of accuracy for three models, six methods each. Sharing methods exceed no sharing for every model; MAVRA and definition-level are close for DeepSeek and GLM-5.3.}
+\end{figure}

@@ -1,0 +1,17 @@
+\begin{table}[t]
+\caption{\bt{Maintenance strategies for shared definitions. ``Write during use'': a write that commits between validation and the query that relies on it.}{共享定义的维护方式。“使用期间写入”：在验证与依赖它的查询之间提交的写入。}}
+\label{tab:ladder}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}lLLLL@{}}
+\toprule
+\bt{Strategy}{方式} & \bt{Benign append}{正常追加} & \bt{Data-only break}{纯数据破坏} & \bt{Write during use}{使用期间写入} & \bt{Work per update}{每次更新的工作}\\
+\midrule
+\swatch{mSchema}\ \bt{Schema-only}{只看结构} & \bt{keep}{保留} & \bt{stale use}{过期使用} & \bt{unchecked}{不检查} & \bt{none}{无}\\
+\swatch{mRevoke}\ \bt{Revoke-on-write}{写入即撤销} & \bt{relearn}{重学} & \bt{relearn}{重学} & \bt{pre-check}{执行前检查} & \bt{LLM relearning}{大模型重学}\\
+\swatch{mDef}\ \bt{Definition-level}{定义级} & \bt{keep}{保留} & \bt{repair}{修复} & \bt{pre-check}{执行前检查} & \bt{conditions of affected definitions}{受影响定义的条件}\\
+\swatch{mCache}\ \bt{+ version cache}{+ 版本缓存} & \bt{keep}{保留} & \bt{repair}{修复} & \bt{pre-check}{执行前检查} & \bt{distinct changed checks}{变化的不同检查}\\
+\swatch{mCond}\ \system & \bt{keep}{保留} & \bt{bounded repair}{有界修复} & \bt{same snapshot}{同一快照} & \bt{distinct changed conditions}{变化的不同条件}\\
+\bottomrule
+\end{tabularx}
+\end{table}

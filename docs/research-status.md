@@ -19,7 +19,8 @@ The manuscript uses the SIGMOD 2027 research submission layout with anonymous re
 | 维护反序 / Reverse maintenance | 相同 40 组，反转策略顺序 / same 40 cells, reversed policy order | `exp/2026-09-30-maint-share-rev/cells.txt` |
 | 工作负载：应用侧 / Workload, application | Amazon Redset 全部 400 个集群、4.41 亿条查询 / all 400 Redset clusters, 441M queries | `exp/2026-10-01-workload-characterization/redset/redset_stats.json`；脚本与说明在 `exp/2026-10-01-workload-characterization/redset/` |
 | 工作负载：智能体侧 / Workload, agents | 100 个 DeepSeek V4.1 Flash 全新会话，521 次调用 / 100 fresh sessions, 521 calls | `exp/2026-10-01-workload-characterization/workload-stats.json`；原始轨迹在 `exp/2026-10-01-workload-characterization/` |
-| 数据变化场景 / Data-change scenarios | 3 个模型 × 6 种方法 × 10 种变化，分析 43 组、3,701 道计分题 / 3 LLMs × 6 methods × 10 changes; 43 cells, 3,701 scored tasks | `exp/2026-10-01-scenarios/paper-results.json`；原始逐组 JSON 在 noctis `results/scen-20260930/` |
+| 数据变化场景（此前一轮）/ Earlier data-change scenarios | 3 个模型 × 6 种方法 × 10 种变化，分析 43 组、3,701 道计分题 / 3 LLMs × 6 methods × 10 changes; 43 cells, 3,701 scored tasks | `exp/2026-10-01-scenarios/paper-results.json`；原始逐组 JSON 在 noctis `results/scen-20260930/` |
+| 数据变化场景（当前设计）/ Data-change scenarios, current design | DeepSeek V4.1 Flash × 7 种方法（含轨迹检索基线）× 11 种变化（含备份副本）× 3 次独立运行，21 次有效运行（3 次因学习阶段服务失败按预定规则重跑）、2,010 道计分题 / DeepSeek × 7 methods × 11 changes × 3 runs | `exp/2026-10-02-scenarios-ds/`（分析方案、运行记录、`scen-stats.json`、`paper-results.json`）；原始逐组 JSON 在 noctis `results/scen-20261002/` |
 | 配对回放 / Paired replay | 15 个学到的定义库（97 个定义）× 5 种方法与 2 种 G8 参照 × 11 种变化，20 万行 / 15 learned libraries × 5 methods, 2 G8 references × 11 changes | `exp/2026-10-02-cache-baseline-tpcds/replay-stats.json`、同目录的 `replay-outcomes.json.gz` |
 | 并发写入 / Concurrent writes | 3 种确定性交错 × 2 种模式 × 10 次；4 种随机设置 × 2 种模式 × 20 次；写者代价（1/8/32 写者，16 分片） | `exp/2026-10-02-cache-baseline-tpcds/snapshot-binding-*.json` |
 | 维护代价 / Maintenance cost | 1M 行共享度 1/2/4/6 × 4 种方法 × 2 种到达；零共享对照；4M 行 8 与 32 个 Agent；1M–16M 规模 | `exp/2026-10-02-cache-baseline-tpcds/cb-*.json`、同目录的 `e1b-4m-a32-stats.json`、`e1-scaling-stats.json` |
@@ -32,7 +33,9 @@ The manuscript uses the SIGMOD 2027 research submission layout with anonymous re
 
 ```bash
 # noctis，仓库根目录
-python3 tools/paper-results.py --scen results/scen-20260930 --out overleaf/gen --json exp/2026-10-01-scenarios/paper-results.json
+python3 tools/paper-results.py --scen results/scen-20260930 --prefix PrevScen --numbers-only overleaf/gen/numbers-prev.tex   # 此前一轮三模型（\PrevScen*）
+python3 tools/paper-results.py --scen results/scen-20261002 --models "DeepSeek V4.1 Flash" --out overleaf/gen --json exp/2026-10-02-scenarios-ds/paper-results.json
+python3 tools/scen-stats.py --scen results/scen-20261002 --json exp/2026-10-02-scenarios-ds/scen-stats.json --tex-out overleaf/gen   # 预定分析方案：整群自助法区间与预先声明的比较（\Ds*、图坐标）
 python3 tools/review-results.py --exp exp/2026-10-02-cache-baseline-tpcds --out overleaf/gen
 ```
 
@@ -48,7 +51,7 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 - 维护代价：19 个定义错峰时条件级 14.0%、通用缓存 16.7%（相对定义级），仅范围 83–94%；只有共享最少时条件级明显更省（42.5% 对 56.8%，来自条件身份与写法无关）；同时到达 50–84%；零共享时各方法 95–102%；4M 行 13.7% / 16.6%；32 个 Agent 错峰 13.6% / 16.6%、同时 91.6% / 90.4%；1M–16M 行比例稳定在 12.0–13.0%。TPC-DS：175 个定义、65 个不同条件，更新 store_sales 影响 101 个定义、310 次检查、12 个不同条件。
 - 修复期间等待：同时到达下不可用从定义级 30、条件级 63 降为 0，等待与 DB 工作不变。
 - 声明使用：26% 的答案没有声明定义；声明了正确修订仍答错 11/834（1.3%）。
-- 场景（11 种情形等权、模型宏平均，运行早于唯一性规则、修复等待与绑定快照）：不共享 **32%**，无守护 70%，只看结构 62%，撤销重学 63%，定义级 **77%**，条件级 **74%**；留出题 50% → 96%。5 种已建模破坏性变化下条件级、定义级与撤销重学零过期使用，只看结构 195 道、无守护 201 道。重复装载与日期键改写被检测但无法修复；单位变化未建模。场景维护数据库时间：条件级每组 180 s，定义级 367 s（49%）。分模型：GLM-5.3 Flash 条件级 54%、定义级 65%，配对回放表明差距来自学到的库（条件级各组只晋升 3 个定义）。
+- 场景（当前设计，DeepSeek V4.1 Flash，3 次独立运行，按运行整群自助法 95% 区间）：全部情形 不共享 32%、轨迹检索 76%、无守护 75%、只看结构 75%、撤销重学 67%、定义级 69%、MAVRA **81%**（80–81）。留出题 MAVRA 与轨迹检索都是 100%。5 种已建模破坏性变化：MAVRA 73%（71–76）、定义级 64%、轨迹检索 57%；预先声明的比较 MAVRA − 轨迹检索 **+16**（14–18），MAVRA − 定义级 +9（0–15，配对回放表明维护相同、差别来自学习）。无守护与只看结构在已建模变化下提供过期定义 98、99 道。备份副本：轨迹检索 72% 高于 MAVRA 61%（MAVRA 撤下退货定义：退货金额 8/9 对 4/9 有利，退货率 0/6 对 6/6 不利）。端到端维护 DB 时间条件级为定义级的 90%（修复搜索为主）。此前一轮三模型（旧二进制、无轨迹基线）：不共享 32%，定义级 77%，条件级 74%，各模型共享提升一致。
 
 统计口径（排除用量上限失败的 136 道题、剔除学习阶段被中断的 2 组、场景等权、按题自助法区间）写在 `tools/paper-results.py` 文件头。早期单模型运行的舍入修正（52.96 秒、76.1%）仍记录在 `exp/2026-09-30-metric-maint-named/verified-results.json`。
 
@@ -64,7 +67,7 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 | 同快照验证与执行 / same-snapshot validation and execution | 已实现，默认关闭（事务性版本由语句级触发器维护、16 片；可重复读快照内核对并执行），正文第 6.2、7.3 节；不作为新意（技术先例 TxCache）/ implemented (opt-in), in the paper; TxCache is the precedent |
 | 取值层面的条件（如单位）/ value-level conditions | **未建模**；单位变化场景为对照 / not modeled |
 | 修复进行中的请求等待 / wait for in-progress repair | 2026-10-02 已实现（`wait_repair`，默认开），正文第 5.3、7.4 节；场景运行早于此机制 / implemented, in the paper |
-| AgentSM 式轨迹检索基线 / matched trajectory retrieval | 已实现（`traj-global`），**尚未运行**（需要 LLM），不填写相对它的正确率优势 / implemented, not yet run |
+| AgentSM 式轨迹检索基线 / matched trajectory retrieval | 已实现并运行（`traj-global`，DeepSeek V4.1 Flash × 3 次）；其他模型待补 / implemented and evaluated on DeepSeek |
 
 ## 评估边界 / Evaluation limits
 

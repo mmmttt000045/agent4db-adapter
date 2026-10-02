@@ -61,6 +61,7 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 - 表级测试基线（dbt 式，按初始快照校准的 unique / relationships 测试，失败即隔离读该表的定义）：同一批 1,530 题次上答对 **631**（MAVRA 973），已建模变化下同样零错误答案；少答对的 342 题是 MAVRA 修复（状态流水 105、版本化更正 174、维表拉链 57）或因定义自带过滤而保留（6）的题；不必要的不可用 153 对 111。配对差 22.4 个百分点（整群自助 95% 区间 21.8–22.8）。
 - 论文形式化（10-03）：命题 1（四类条件在业务前提 B1/B2 下充分；边界：取值含义、同构总体、合法但错误的日期键）、引理 1（事务性版本相同 ⇒ 结论可复用，依赖快照嵌套与写入—计数同事务）、算法 1（有界修复：不丢键、唯一、G3–G5 与 G8）。
 
+- 增补方法（10-03，DeepSeek V4.1 Flash × 3 次，预先写定比较）：MAVRA 以智能体提炼的学习查询为 G8 参照时，全部情形 81%、已建模破坏 **74%**（判题参照 73%，差 +1，区间 −1–3）；每次运行发布的修复从 8.0 降到 4.7，被拒绝的修复撤下定义后智能体自行重推过滤，正确率不变。轨迹检索 + 自验证提示：已建模破坏 **63%**（轨迹检索 57%，+5，区间 1–10），每题轮数 5.0 → 5.8；MAVRA 仍领先 11（6–15）。
 ## 实现边界 / Implementation boundaries
 
 | 机制 / Mechanism | 状态 / Status |
@@ -73,7 +74,7 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 | 同快照验证与执行 / same-snapshot validation and execution | 已实现，默认关闭（事务性版本由语句级触发器维护、16 片；可重复读快照内核对并执行），正文第 6.2、7.3 节；不作为新意（技术先例 TxCache）/ implemented (opt-in), in the paper; TxCache is the precedent |
 | 取值层面的条件（如单位）/ value-level conditions | **未建模**；单位变化场景为对照 / not modeled |
 | 修复进行中的请求等待 / wait for in-progress repair | 2026-10-02 已实现（`wait_repair`，默认开），正文第 5.3、7.4 节；场景运行早于此机制 / implemented, in the paper |
-| AgentSM 式轨迹检索基线 / matched trajectory retrieval | 已实现并运行（`traj-global`，DeepSeek V4.1 Flash × 3 次）；其他模型待补 / implemented and evaluated on DeepSeek |
+| AgentSM 式轨迹检索基线 / matched trajectory retrieval | 已实现并运行（`traj-global`，DeepSeek V4.1 Flash × 3 次）；自验证变体 `traj-verify` 与智能体参照的 `metric-global-exref` 同样各 3 次（10-03）；其他模型待补 / implemented and evaluated on DeepSeek |
 
 ## 评估边界 / Evaluation limits
 

@@ -23,6 +23,7 @@ import sys
 
 try:
     from pglast import ast, parse_sql
+    from pglast.enums import BoolExprType
     from pglast.stream import RawStream
 except ImportError:  # pragma: no cover
     sys.exit("需要 pglast：pip install --user pglast")
@@ -30,8 +31,8 @@ except ImportError:  # pragma: no cover
 FACTS = {"store_sales", "store_returns", "catalog_sales", "catalog_returns", "web_sales", "web_returns"}
 AGGS = {"sum", "avg", "count", "min", "max"}
 WORDS = {"sum", "count", "avg", "min", "max", "distinct", "coalesce", "nullif", "case", "when", "then", "else", "end", "and", "or",
-         "not", "null", "is", "in", "between", "like", "as", "round", "abs", "cast", "numeric", "integer", "int", "decimal", "true",
-         "false", "float", "bigint", "date", "char", "varchar", "text"}
+         "not", "null", "is", "in", "between", "like", "as", "round", "abs", "filter", "where", "true", "false", "cast", "numeric",
+         "decimal", "int", "integer", "bigint", "float", "double", "precision", "real", "text", "varchar"}  # = metric::SQL_WORDS
 ROLE = {"sold": "sold", "returned": "returned", "ship": "ship"}
 LEARN = {"kind": "single", "period": {"year": 2001, "m1": 3, "m2": 3}}
 HOLDOUT = [
@@ -53,16 +54,22 @@ def load_schema(path):
     return tables
 
 
+PARAM = "__param__"
+
+
 def instantiate(tpl):
+    """模板参数：text({...}) 取第一个选项，random(a, b, ...) 取 a；其余（ulist、dist、date 等）无法在不跑 dsqgen 的情况下
+    取到真实值，换成占位符，引用它的谓词在导出时舍弃并记入 notes。"""
     defs = {}
     for m in re.finditer(r"define\s+(\w+)\s*=\s*(.*?);", tpl, re.I | re.S):
-        name, expr = m.group(1).upper(), m.group(2)
+        name, expr = m.group(1).upper(), m.group(2).strip()
         t = re.search(r'text\(\s*\{\s*"([^"]+)"', expr)
-        defs[name] = t.group(1) if t else "1"
+        r = re.match(r"random\(\s*(-?\d+)\s*,", expr, re.I)
+        defs[name] = t.group(1) if t else r.group(1) if r else PARAM
     body = re.sub(r"^\s*define\s+.*?;\s*$", "", tpl, flags=re.I | re.M | re.S)
     body = re.sub(r"--.*", "", body)
     body = body.replace("[_LIMITA]", "").replace("[_LIMITB]", "").replace("[_LIMITC]", "limit 100")
-    body = re.sub(r"\[([A-Za-z_][A-Za-z0-9_.]*)\]", lambda m: defs.get(m.group(1).upper().split(".")[0], "1"), body)
+    body = re.sub(r"\[([A-Za-z_][A-Za-z0-9_.]*)\]", lambda m: defs.get(m.group(1).upper().split(".")[0], PARAM), body)
     body = re.sub(r"(\d+)\s+days\b", r"interval '\1 days'", body, flags=re.I)
     return body
 
@@ -128,7 +135,7 @@ def words_ok(expr, known_cols):
 
 
 def conjuncts(n):
-    if isinstance(n, ast.BoolExpr) and n.boolop == ast.BoolExprType.AND_EXPR:
+    if isinstance(n, ast.BoolExpr) and n.boolop == BoolExprType.AND_EXPR:
         for a in n.args:
             yield from conjuncts(a)
     elif n is not None:
@@ -212,7 +219,7 @@ def block_definition(sel, schema, qid, bid, notes):
         ts = tables_of(n.args, aliases, cols_of)
         if ts == {fact}:
             expr = deparse(n)
-            if words_ok(expr, known):
+            if PARAM not in expr and words_ok(expr, known):
                 measure = expr
                 break
     if measure is None:
@@ -233,6 +240,9 @@ def block_definition(sel, schema, qid, bid, notes):
             notes.append({"query": qid, "block": bid, "fact": fact, "drop": "table not directly joined", "pred": deparse(p)[:120]})
             continue
         expr = deparse(p)
+        if PARAM in expr:
+            notes.append({"query": qid, "block": bid, "fact": fact, "drop": "uninstantiated template parameter", "pred": expr[:120]})
+            continue
         if time_cols[0] in expr or not words_ok(expr, known) or re.search(r"\d{4}-\d{1,2}", expr):
             notes.append({"query": qid, "block": bid, "fact": fact, "drop": "not expressible as a persistent filter", "pred": expr[:120]})
             continue

@@ -2,7 +2,7 @@
 # 把 dsdgen 生成的 TPC-DS 数据装入 PostgreSQL 模板库（配对回放的第二个负载，`replay-bench --schema tpcds`）。
 #
 # 用法：AGENTDB_URL=postgres://user:pass@host:port/db tools/tpcds-load.sh DATA_DIR DDL_FILE [DBNAME]
-#   DATA_DIR  dsdgen -scale 1 -dir DATA_DIR 的输出（*.dat，竖线分隔、行尾多一个竖线）
+#   DATA_DIR  dsdgen -scale 1 -dir DATA_DIR -terminate n 的输出（*.dat，竖线分隔，行尾不带终止符）
 #   DDL_FILE  tpcds-kit 的 tools/tpcds.sql
 #   DBNAME    模板库名，默认 tpcds_sf1；已存在则先删除
 #
@@ -42,7 +42,8 @@ for f in "$dir"/*.dat; do
     echo "skip $t (no table)"; continue
   fi
   echo "load $t"
-  psql -X -q -v ON_ERROR_STOP=1 "$db" -c "\\copy $t from program 'sed \"s/|\$//\" \"$f\"' with (format text, delimiter '|', null '')"
+  # dsdgen -terminate n：行尾没有多余的竖线，直接装载
+  psql -X -q -v ON_ERROR_STOP=1 "$db" -c "\\copy $t from '$f' with (format text, delimiter '|', null '')"
 done
 
 psql -X -q -v ON_ERROR_STOP=1 "$db" <<'SQL'

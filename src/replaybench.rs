@@ -382,10 +382,12 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             scenario::ensure_v1(&admin, &v1, "上一个变化").await?;
             let truth = ch.apply_truth(&admin).await?;
             let mut gold = metricbench::gold_map(&admin, &tasks).await?;
+            // TPC-DS 库的标准答案：原定义加上区分列过滤（当前版本、完成状态、当前商品）的规范 SQL，在业务事实已变、
+            // 表示未变的状态上算出——与合成基准手写判题 SQL 预先带这些过滤的做法相同；v1 上这些过滤不起作用
             for lib in &libs {
                 for e in lib.entries.iter().filter(|e| e.own_gold && affected(e, ch)) {
                     for (id, ask) in &e.held {
-                        let v = match metric::compile(&e.metric, ask) {
+                        let v = match metric::compile(&judge_metric(&e.metric), ask) {
                             Ok(sql) => answer(&probe, &sql).await,
                             Err(err) => format!("ERROR: {err:#}"),
                         };
@@ -522,7 +524,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             "changes": changes.iter().map(|c| json!({"name": c.name(), "label": c.syn().label(), "class": c.syn().class(), "tables": c.tables(),
                                                      "describe": c.syn().describe()})).collect::<Vec<_>>(),
             "methodology": {
-                "schema": if o.schema == "tpcds" { "真实 TPC-DS 数据（dsdgen）上的同名变化，库为模板导出的定义，标准答案 = 原定义在业务事实变化后、表示变化前的值" } else { "合成零售数据" },
+                "schema": if o.schema == "tpcds" { "真实 TPC-DS 数据（dsdgen）上的同名变化，库为模板导出的定义，标准答案 = 原定义加区分列过滤的规范 SQL 在业务事实变化后、表示变化前的值" } else { "合成零售数据" },
                 "pairing": "每个库在各维护方式下各有一个中间层实例，准入、变化、留出题完全相同；每个变化从 v1 施加，结束后回滚并恢复各实例的准入快照",
                 "answer": "答案 = 当时提供的修订的规范 SQL 在当前数据上的结果；不提供（撤销或候选）记为不可用",
                 "classes": "correct / served_wrong（提供了但答错：过期使用或错误修复）/ unavailable_needed（原定义已答错）/ unavailable_unneeded（原定义仍答对）",

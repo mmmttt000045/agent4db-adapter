@@ -1,6 +1,6 @@
 # 研究状态与证据 / Research status and evidence
 
-更新日期 / Updated: **2026-10-01**（写入工作负载刻画与三模型数据变化场景；论文数值由 `tools/paper-results.py` 生成）。
+更新日期 / Updated: **2026-10-02**（按外部评审改写主线：有效性模型、使用时的强制保证（含绑定快照执行）与有界修复；效率作为实现结论。新增机制层证据：配对回放、并发写入、通用缓存基线、TPC-DS 自然共享、规模扩展。数值由 `tools/paper-results.py` 与 `tools/review-results.py` 生成）。
 
 系统仓库 / System repository: `agent4db-adapter`，场景实验代码 `26c2b48` 起，统计脚本见 `tools/`。
 论文仓库原始版本 / Original paper commit: `f33e2b8`。
@@ -20,27 +20,35 @@ The manuscript uses the SIGMOD 2027 research submission layout with anonymous re
 | 工作负载：应用侧 / Workload, application | Amazon Redset 全部 400 个集群、4.41 亿条查询 / all 400 Redset clusters, 441M queries | `evidence/redset-stats.json`；脚本与说明在 `exp/2026-10-01-workload-characterization/redset/` |
 | 工作负载：智能体侧 / Workload, agents | 100 个 DeepSeek V4.1 Flash 全新会话，521 次调用 / 100 fresh sessions, 521 calls | `evidence/workload-agent-stats.json`；原始轨迹在 `exp/2026-10-01-workload-characterization/` |
 | 数据变化场景 / Data-change scenarios | 3 个模型 × 6 种方法 × 10 种变化，分析 43 组、3,701 道计分题 / 3 LLMs × 6 methods × 10 changes; 43 cells, 3,701 scored tasks | `evidence/scenario-results.json`；原始逐组 JSON 在 noctis `results/scen-20260930/` |
+| 配对回放 / Paired replay | 15 个学到的定义库（97 个定义）× 5 种方法与 2 种 G8 参照 × 11 种变化，20 万行 / 15 learned libraries × 5 methods, 2 G8 references × 11 changes | `evidence/review/replay-stats.json`、`replay-outcomes.json.gz` |
+| 并发写入 / Concurrent writes | 3 种确定性交错 × 2 种模式 × 10 次；4 种随机设置 × 2 种模式 × 20 次；写者代价（1/8/32 写者，16 分片） | `evidence/review/snapshot-binding-*.json` |
+| 维护代价 / Maintenance cost | 1M 行共享度 1/2/4/6 × 4 种方法 × 2 种到达；零共享对照；4M 行 8 与 32 个 Agent；1M–16M 规模 | `evidence/review/cb-*.json`、`e1b-4m-a32-stats.json`、`e1-scaling-stats.json` |
+| 自然共享 / Natural sharing | TPC-DS 官方 99 个查询模板 | `evidence/review/tpcds-sharing.json` |
+| 修复边界与可用性 / Repair boundary, availability | 备份副本反例（唯一性规则开关）；同时到达下等待修复开关 | `evidence/review/repair-ambiguity-unique-report.json`、`wait-repair-stats.json` |
+| 声明使用 / Declared use | 场景实验条件级与定义级 15 组的 1,289 条答案 | `evidence/review/declared-use.json` |
 | 早期单模型端到端 / Earlier single-model run | 6 组，21 道计分题；论文只引用其准入拒绝与引言中的单期例子 / cited only for admission rejections and the introduction example | `evidence/metric-maint-report.md`、`evidence/metric-summary.txt`、`evidence/verified-results.json` |
 
-论文中第 2.1 节表格的数值直接写在正文里（来自上面两份工作负载证据）；第 7 节的场景表格、两张图和正文数值宏由 `tools/paper-results.py` 从原始输出生成到 `gen/`，场景补跑完成后重跑脚本即可更新：
+论文中第 2.1 节表格的数值直接写在正文里（来自上面两份工作负载证据）；第 7.6 节的场景表格、模型图和场景数值宏由 `tools/paper-results.py` 从原始输出生成到 `gen/`；机制层（第 7.2–7.5 节）的数值宏 `\Rp* \Sn* \Cb* \Eone* \Tp* \Wr* \Du*`、代价图坐标与随机并发表由 `tools/review-results.py` 从 `exp/2026-10-02-cache-baseline-tpcds` 的存档生成（`evidence/review/` 为同一批文件的副本）：
 
 ```bash
 # noctis，仓库根目录
 python3 tools/paper-results.py --scen results/scen-20260930 --out overleaf/gen --json exp/2026-10-01-scenarios/paper-results.json
+python3 tools/review-results.py --exp exp/2026-10-02-cache-baseline-tpcds --out overleaf/gen
 ```
 
 Section 2.1 values are written in the text from the two workload reports. Section 7's scenario table, both figures, and the in-text number macros are generated into `gen/` from raw outputs; rerun the script after the remaining scenario repetitions.
 
 ## 已支撑的结果 / Supported results
 
-- 工作负载：智能体 SQL 只有 24% 复用已出现模板（Redset 读查询 93.4%，SELECT 90.1%）；68% 的调用用于探索；93% 的查找重复此前会话获得的事实；91% 的查找在 60 秒内被其他会话重复（Redset 不同用户同模板 0.61%）；SQL 出错 1.7%，32 个错误答案全部没有任何失败调用。Agent workloads repeat knowledge, not templates.
-- 维护扫描错峰时条件级耗时比均值 **12.5%–37.8%**，同时到达 **44.6%–75.5%**；条件级和定义级零过期使用、零误撤销。Means average the two per-order ratios.
-- 同时到达、k=6，条件级修复窗口不可用 **43/304**，定义级 **24/304**。Lower DB work does not establish better availability.
-- 场景（11 种情形等权、模型宏平均）：不共享 **32%**，无守护 70%，只看结构 62%，撤销重学 63%，定义级 **77%**，条件级 **74%**；留出题 50% → 96%。
-- 5 种已建模破坏性变化下，条件级、定义级与撤销重学零过期使用；只看结构 **195** 道、无守护 **201** 道题使用过期定义。状态流水与版本化更正修复成功（条件级 78%、91%）。
-- 边界：重复装载与日期键改写被检测并撤销但无法修复（33%、17%，接近不共享）；单位变化未建模，条件级 54 道题中 48 道使用过期定义。
-- 场景维护数据库时间：条件级每组 **180 s**，定义级 **367 s**（49%）；撤销重学每组撤销约 24 个修订、重学约 0.55 M token。
-- 分模型：DeepSeek 与 GLM-5.3 条件级 82%／82%，定义级 81%／83%；GLM-5.3 Flash 条件级 54%、定义级 65%，区间宽、完整情形少（8 种）。
+- 工作负载：智能体 SQL 只有 24% 复用已出现模板（Redset 读查询 93.4%）；68% 的调用用于探索；93% 的查找重复此前会话获得的事实，其中大部分是表结构事实，SQL 查找中 38% 重复事实且没有一条 SQL 文本重复；32 个错误答案全部来自执行成功的 SQL。
+- 配对回放（固定学到的定义库，只换维护方式）：在已建模的变化下各重验证方法零错误答案，只看结构 **645** 个；各重验证方法只在单位变化下答错（101）。条件级、定义级、通用缓存逐题结果 **100%** 相同——场景中的正确率差来自学到的库。维护 DB 时间：条件级 583 s，通用缓存 613 s（1.05×），定义级 1,058 s（1.82×）。
+- G8 参照：同一批 1,470 题上，判题学习查询为参照答对 933，智能体自己的学习 SQL 为参照答对 780（−10.4 个百分点，95% 区间 9.4–11.8）；差别全部变为不可用，没有一题变错。
+- 修复唯一性：备份副本反例中，没有唯一性规则且参照预见来源列时发布错误修复（4 道新题答错 2 道）；有规则时在两种参照下都撤下定义；规则不改变 3,000 道配对题的任何结果。
+- 绑定快照执行：核对与执行之间提交写入时预检查 10/10 违规、快照 0/10；未通知的写入刚提交时预检查 7/10 违规、快照全部拒绝；随机并发下预检查 3.8–4.6%（不通知）与 0.07–0.28%（通知）的作答违规，快照 0/11,297；读者中位延迟相同，写者单行语句吞吐约 0.7×，32 并发写者 0.97×（不分片 0.36×），批量语句 1.05×。
+- 维护代价：19 个定义错峰时条件级 14.0%、通用缓存 16.7%（相对定义级），仅范围 83–94%；只有共享最少时条件级明显更省（42.5% 对 56.8%，来自条件身份与写法无关）；同时到达 50–84%；零共享时各方法 95–102%；4M 行 13.7% / 16.6%；32 个 Agent 错峰 13.6% / 16.6%、同时 91.6% / 90.4%；1M–16M 行比例稳定在 12.0–13.0%。TPC-DS：175 个定义、65 个不同条件，更新 store_sales 影响 101 个定义、310 次检查、12 个不同条件。
+- 修复期间等待：同时到达下不可用从定义级 30、条件级 63 降为 0，等待与 DB 工作不变。
+- 声明使用：26% 的答案没有声明定义；声明了正确修订仍答错 11/834（1.3%）。
+- 场景（11 种情形等权、模型宏平均，运行早于唯一性规则、修复等待与绑定快照）：不共享 **32%**，无守护 70%，只看结构 62%，撤销重学 63%，定义级 **77%**，条件级 **74%**；留出题 50% → 96%。5 种已建模破坏性变化下条件级、定义级与撤销重学零过期使用，只看结构 195 道、无守护 201 道。重复装载与日期键改写被检测但无法修复；单位变化未建模。场景维护数据库时间：条件级每组 180 s，定义级 367 s（49%）。分模型：GLM-5.3 Flash 条件级 54%、定义级 65%，配对回放表明差距来自学到的库（条件级各组只晋升 3 个定义）。
 
 统计口径（排除用量上限失败的 136 道题、剔除学习阶段被中断的 2 组、场景等权、按题自助法区间）写在 `tools/paper-results.py` 文件头。早期单模型运行的舍入修正（52.96 秒、76.1%）仍记录在 `evidence/verified-results.json`。
 
@@ -49,23 +57,23 @@ Section 2.1 values are written in the text from the two workload reports. Sectio
 | 机制 / Mechanism | 状态 / Status |
 | --- | --- |
 | 成功轨迹提炼、G1–G7 准入 / extraction and admission | 已实现；早期运行 30 次初始提炼中 4 次别名表达式未通过 G3 / implemented |
-| 条件级维护及结论复用 / condition maintenance and reuse | 受控实验与三模型场景均有结果 / evaluated in both benchmarks |
+| 条件级维护及结论复用 / condition maintenance and reuse | 受控实验、配对回放与三模型场景均有结果；节省可由通用版本缓存几乎全部获得，正文不再作为贡献 / evaluated; savings matched by a generic version-keyed cache |
 | 相同条件的在途合并 / in-flight merging | 各重验证方法相同 / shared by revalidation baselines |
 | 修订引用检查与 SQL 审查 / revision checks and SQL review | 已实现，仅覆盖显式声明；维表拉链中 SQL 审查挡住了过期定义的放大连接 / implemented for declared uses |
-| 受限修复及 G8 回归 / restricted repair and regression | 已实现；只能加过滤，无法去重或重映射键；2026-10-02 起候选过滤不唯一时不自动修复（`repair_unique`，默认开），本文已有场景运行时尚无此规则 / filter-only repair; unique-candidate rule added after the reported runs |
-| 同快照验证与执行 / same-snapshot validation and execution | 已实现，默认关闭（事务性版本 + 可重复读快照内核对并执行）；并发写入实验见 `exp/2026-10-02-cache-baseline-tpcds`；**正文尚未更新**，仍写作设计协议 / implemented (opt-in), paper text not yet updated |
+| 受限修复及 G8 回归 / restricted repair and regression | 已实现；只能加过滤，无法去重或重映射键；2026-10-02 起候选过滤不唯一时不自动修复（`repair_unique`，默认开），正文已写入；场景运行早于此规则，配对回放复核结果不变 / filter-only repair; unique-candidate rule described in the paper |
+| 同快照验证与执行 / same-snapshot validation and execution | 已实现，默认关闭（事务性版本由语句级触发器维护、16 片；可重复读快照内核对并执行），正文第 6.2、7.3 节；不作为新意（技术先例 TxCache）/ implemented (opt-in), in the paper; TxCache is the precedent |
 | 取值层面的条件（如单位）/ value-level conditions | **未建模**；单位变化场景为对照 / not modeled |
-| 修复进行中的请求等待 / wait for in-progress repair | 2026-10-02 已实现（`wait_repair`，默认开）；20 万行同时到达复测不可用降为 0；本文已报告的不可用数来自此前的运行 / implemented after the reported runs |
+| 修复进行中的请求等待 / wait for in-progress repair | 2026-10-02 已实现（`wait_repair`，默认开），正文第 5.3、7.4 节；场景运行早于此机制 / implemented, in the paper |
 | AgentSM 式轨迹检索基线 / matched trajectory retrieval | 已实现（`traj-global`），**尚未运行**（需要 LLM），不填写相对它的正确率优势 / implemented, not yet run |
 
 ## 评估边界 / Evaluation limits
 
-只有一个合成表结构。场景实验计划 3 模型 × 6 方法 × 3 次重复共 54 组，因 ClinePass 5 小时与周用量上限，目前分析 43 组（DeepSeek 与 GLM-5.3 较完整，GLM-5.3 Flash 缺得多）；周上限约 2026-10-07 重置后补跑，再重跑 `tools/paper-results.py`。工作负载刻画只用一个模型；两个 GLM 模型的轨迹因 Cline 余额耗尽未完成。维护正反序是顺序控制，不是统计显著性检验；8 个并发 Agent 是脚本 Agent。数据库关闭 WAL 和 fsync。参考 SQL 与任务生成器同源。
+只有一个合成表结构；机制层回放用 20 万行（场景用 100 万行），结果类别与规模无关、耗时有关；场景运行早于唯一性规则、修复等待与绑定快照执行。场景实验计划 3 模型 × 6 方法 × 3 次重复共 54 组，因 ClinePass 5 小时与周用量上限，目前分析 43 组（DeepSeek 与 GLM-5.3 较完整，GLM-5.3 Flash 缺得多）；周上限约 2026-10-07 重置后补跑，再重跑 `tools/paper-results.py`。工作负载刻画只用一个模型；两个 GLM 模型的轨迹因 Cline 余额耗尽未完成。维护正反序是顺序控制，不是统计显著性检验；8 个并发 Agent 是脚本 Agent。数据库关闭 WAL 和 fsync。参考 SQL 与任务生成器同源。
 
 Only one synthetic schema is used. The scenario design has 54 cells; usage caps leave 43 analyzed cells, mostly missing GLM-5.3 Flash repetitions. The workload study uses one model. Reference SQL and the task generator share origins.
 
 ## 编译验证 / Compilation verification
 
-2026-10-01 在 noctis（TeX Live 2026）用 `./build.sh all` 编译通过：英文稿 11 页（正文在第 9 页结束，其后为参考文献），双语稿 16 页。英文稿无未定义引用，只有一处 3.8pt 的溢出行已改写消除。
+2026-10-02 在 noctis（TeX Live 2026）用 `./build.sh all` 编译通过：英文稿 13 页（正文在第 12 页结束，其后为参考文献，未超过 12 页正文上限），双语稿 20 页。
 
-Compiled on noctis with TeX Live 2026: English 11 pages including references (body ends on page 9), bilingual 16 pages.
+Compiled on noctis with TeX Live 2026: English 13 pages including references (body ends on page 12), bilingual 20 pages.

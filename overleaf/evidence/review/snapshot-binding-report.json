@@ -1,0 +1,4040 @@
+{
+  "interleavings": [
+    {
+      "case": "write_during_pause",
+      "counts": {
+        "violation": 10
+      },
+      "latency_ms": {
+        "max": 2074.409845,
+        "mean": 2057.4140588,
+        "n": 10,
+        "p50": 2059.0731220000002,
+        "p95": 2074.409845
+      },
+      "mode": "precheck",
+      "samples": [
+        {
+          "class": "violation",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "5390129.00",
+                  "5595"
+                ]
+              ],
+              "truncated": false
+            },
+            "source": "executed"
+          }
+        },
+        {
+          "class": "violation",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "5390129.00",
+                  "5595"
+                ]
+              ],
+              "truncated": false
+            },
+            "source": "executed"
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              67.427
+            ],
+            "exec": [
+              30,
+              1084.53
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              44,
+              159.564
+            ],
+            "metric": [
+              3,
+              1074.501
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "db_ms": 2386.022,
+          "queries": 80
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.7548240000000002,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 61.978857,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.738929,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.7548240000000002,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 61.978857,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.738929,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 31,
+        "knowledge_misses": 4,
+        "notices": 0,
+        "repairs": 0,
+        "revocations": 0,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_during_pause",
+      "counts": {
+        "served": 10
+      },
+      "latency_ms": {
+        "max": 2056.4678289999997,
+        "mean": 2044.6970922,
+        "n": 10,
+        "p50": 2045.207971,
+        "p95": 2056.4678289999997
+      },
+      "mode": "snapshot",
+      "samples": [
+        {
+          "class": "served",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "2695064.50",
+                  "0"
+                ]
+              ],
+              "truncated": false
+            },
+            "snapshot": {
+              "checks_reused": 3,
+              "checks_run": 0,
+              "versions": {
+                "date_dim": 0,
+                "item": 0,
+                "store_returns": 0,
+                "store_sales": 60
+              }
+            },
+            "source": "snapshot"
+          }
+        },
+        {
+          "class": "served",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "2695064.50",
+                  "0"
+                ]
+              ],
+              "truncated": false
+            },
+            "snapshot": {
+              "checks_reused": 3,
+              "checks_run": 0,
+              "versions": {
+                "date_dim": 0,
+                "item": 0,
+                "store_returns": 0,
+                "store_sales": 62
+              }
+            },
+            "source": "snapshot"
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              57.381
+            ],
+            "exec": [
+              30,
+              1074.684
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              41,
+              133.693
+            ],
+            "metric": [
+              53,
+              12249.261
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "db_ms": 13515.019,
+          "queries": 127
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.986126,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.301189,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.142609,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.986126,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.301189,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.142609,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 31,
+        "knowledge_misses": 4,
+        "notices": 0,
+        "repairs": 0,
+        "revocations": 0,
+        "snapshot_exec": {
+          "checks_reused": 70,
+          "checks_run": 20,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_before_call",
+      "counts": {
+        "rejected": 3,
+        "violation": 7
+      },
+      "latency_ms": {
+        "max": 4959.812161000001,
+        "mean": 1440.970013,
+        "n": 10,
+        "p50": 195.14356899999999,
+        "p95": 4959.812161000001
+      },
+      "mode": "precheck",
+      "samples": [
+        {
+          "class": "violation",
+          "response": {
+            "result": {
+              "columns": [
+                "v",
+                "dup"
+              ],
+              "row_count": 1,
+              "rows": [
+                [
+                  "5390129.00",
+                  "5595"
+                ]
+              ],
+              "truncated": false
+            },
+            "source": "executed"
+          }
+        },
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              55.532
+            ],
+            "exec": [
+              27,
+              837.409
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              20,
+              69.228
+            ],
+            "metric": [
+              9,
+              4929.999
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              9,
+              8621.535
+            ]
+          },
+          "db_ms": 14513.703,
+          "queries": 68
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.363904,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 50.728368,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.4816510000000003,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.363904,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 50.728368,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.4816510000000003,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 28,
+        "knowledge_misses": 4,
+        "notices": 3,
+        "repairs": 0,
+        "revocations": 3,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_before_call",
+      "counts": {
+        "rejected": 10
+      },
+      "latency_ms": {
+        "max": 5151.762376,
+        "mean": 1925.5838738999998,
+        "n": 10,
+        "p50": 1297.391444,
+        "p95": 5151.762376
+      },
+      "mode": "snapshot",
+      "samples": [
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        },
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "执行快照上条件不成立：store_sales(ss_item_sk, ss_ticket_number) 是否唯一",
+            "rejected": true
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              56.995
+            ],
+            "exec": [
+              20,
+              674.652
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              43,
+              177.097
+            ],
+            "metric": [
+              71,
+              22560.648
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              6,
+              6260.803
+            ]
+          },
+          "db_ms": 29730.195,
+          "queries": 143
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.533016,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.30372199999999,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.197911,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.533016,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.30372199999999,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.197911,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 29,
+        "knowledge_misses": 4,
+        "notices": 2,
+        "repairs": 0,
+        "revocations": 2,
+        "snapshot_exec": {
+          "checks_reused": 48,
+          "checks_run": 36,
+          "rejections": 8
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_notified",
+      "counts": {
+        "rejected": 10
+      },
+      "latency_ms": {
+        "max": 7340.279188,
+        "mean": 5805.2419477,
+        "n": 10,
+        "p50": 5787.720752,
+        "p95": 7340.279188
+      },
+      "mode": "precheck",
+      "samples": [
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        },
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              58.232
+            ],
+            "exec": [
+              20,
+              591.205
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              34,
+              121.626
+            ],
+            "metric": [
+              23,
+              13255.548
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              30,
+              31464.34
+            ]
+          },
+          "db_ms": 45490.951,
+          "queries": 110
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.3528259999999999,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 53.792367,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.127062,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.3528259999999999,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 53.792367,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.127062,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 21,
+        "knowledge_misses": 4,
+        "notices": 10,
+        "repairs": 0,
+        "revocations": 10,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    },
+    {
+      "case": "write_notified",
+      "counts": {
+        "rejected": 10
+      },
+      "latency_ms": {
+        "max": 6585.778117,
+        "mean": 5490.3806538,
+        "n": 10,
+        "p50": 5310.79295,
+        "p95": 6585.778117
+      },
+      "mode": "snapshot",
+      "samples": [
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        },
+        {
+          "class": "rejected",
+          "response": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，222020 行只有 200000 个不同键（平均每键 1.11 行）",
+            "rejected": true
+          }
+        }
+      ],
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              63.995
+            ],
+            "exec": [
+              20,
+              551.763
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              91,
+              166.756
+            ],
+            "metric": [
+              63,
+              23830.156
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              30,
+              28484.463
+            ]
+          },
+          "db_ms": 53097.133,
+          "queries": 207
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.166484,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 59.780696,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.0838620000000003,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.166484,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 59.780696,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.0838620000000003,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 21,
+        "knowledge_misses": 4,
+        "notices": 10,
+        "repairs": 0,
+        "revocations": 10,
+        "snapshot_exec": {
+          "checks_reused": 40,
+          "checks_run": 20,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "trials": 10
+    }
+  ],
+  "reader_overhead": [
+    {
+      "first_after_write_ms": {
+        "max": 1794.665758,
+        "mean": 1355.1860895999998,
+        "n": 10,
+        "p50": 1330.069992,
+        "p95": 1794.665758
+      },
+      "mode": "precheck",
+      "second_after_write_ms": {
+        "max": 18.951653999999998,
+        "mean": 9.2347553,
+        "n": 10,
+        "p50": 7.922424000000001,
+        "p95": 18.951653999999998
+      },
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              93.969
+            ],
+            "exec": [
+              63,
+              377.462
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              25,
+              114.898
+            ],
+            "metric": [
+              23,
+              14330.956
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "db_ms": 14917.285,
+          "queries": 114
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.471972,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 88.55756600000001,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.980827,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.471972,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 88.55756600000001,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.980827,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 64,
+        "knowledge_misses": 4,
+        "notices": 0,
+        "repairs": 0,
+        "revocations": 0,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "steady_ms": {
+        "max": 9.200795,
+        "mean": 5.2911135,
+        "n": 40,
+        "p50": 5.148878,
+        "p95": 6.4401600000000006
+      }
+    },
+    {
+      "first_after_write_ms": {
+        "max": 1372.111312,
+        "mean": 1158.3871321,
+        "n": 10,
+        "p50": 1165.376499,
+        "p95": 1372.111312
+      },
+      "mode": "snapshot",
+      "second_after_write_ms": {
+        "max": 9.907179000000001,
+        "mean": 6.7451531000000005,
+        "n": 10,
+        "p50": 6.140623,
+        "p95": 9.907179000000001
+      },
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              72.146
+            ],
+            "exec": [
+              63,
+              409.134
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              73,
+              127.763
+            ],
+            "metric": [
+              86,
+              12560.116
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "db_ms": 13169.159,
+          "queries": 225
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.2620129999999996,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 66.266752,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.7288159999999997,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.2620129999999996,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 66.266752,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.7288159999999997,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 64,
+        "knowledge_misses": 4,
+        "notices": 0,
+        "repairs": 0,
+        "revocations": 0,
+        "snapshot_exec": {
+          "checks_reused": 189,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "steady_ms": {
+        "max": 11.655612,
+        "mean": 8.321168924999998,
+        "n": 40,
+        "p50": 8.354246,
+        "p95": 11.188071
+      }
+    },
+    {
+      "first_after_write_ms": {
+        "max": 1102.583636,
+        "mean": 1042.0178749,
+        "n": 10,
+        "p50": 1045.8641719999998,
+        "p95": 1102.583636
+      },
+      "mode": "precheck",
+      "second_after_write_ms": {
+        "max": 7.864917000000001,
+        "mean": 5.5486537,
+        "n": 10,
+        "p50": 5.106061,
+        "p95": 7.864917000000001
+      },
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              73.851
+            ],
+            "exec": [
+              63,
+              310.048
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              25,
+              85.026
+            ],
+            "metric": [
+              23,
+              11292.482
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "db_ms": 11761.407,
+          "queries": 114
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.680633,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 68.74200900000001,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.4615169999999997,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.680633,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 68.74200900000001,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.4615169999999997,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 64,
+        "knowledge_misses": 4,
+        "notices": 0,
+        "repairs": 0,
+        "revocations": 0,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "steady_ms": {
+        "max": 7.653995,
+        "mean": 4.9946281,
+        "n": 40,
+        "p50": 5.0200000000000005,
+        "p95": 5.863152
+      }
+    },
+    {
+      "first_after_write_ms": {
+        "max": 1223.3451579999999,
+        "mean": 1065.5479685,
+        "n": 10,
+        "p50": 1024.894415,
+        "p95": 1223.3451579999999
+      },
+      "mode": "snapshot",
+      "second_after_write_ms": {
+        "max": 7.929698000000001,
+        "mean": 5.6539894,
+        "n": 10,
+        "p50": 5.256501,
+        "p95": 7.929698000000001
+      },
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              57.083
+            ],
+            "exec": [
+              63,
+              286.827
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              73,
+              98.433
+            ],
+            "metric": [
+              86,
+              11457.33
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "db_ms": 11899.673,
+          "queries": 225
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.174724,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.977973999999996,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.966406,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.174724,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.977973999999996,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.966406,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 0,
+        "knowledge_hits": 64,
+        "knowledge_misses": 4,
+        "notices": 0,
+        "repairs": 0,
+        "revocations": 0,
+        "snapshot_exec": {
+          "checks_reused": 189,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "steady_ms": {
+        "max": 7.673997,
+        "mean": 5.5835946000000005,
+        "n": 40,
+        "p50": 5.506742,
+        "p95": 6.007414
+      }
+    }
+  ],
+  "rows": 200000,
+  "stress": [
+    {
+      "counts": {
+        "rejected": 80,
+        "served": 2840,
+        "violation": 8
+      },
+      "distinct": false,
+      "latency_ms": {
+        "max": 4439.903345000001,
+        "mean": 134.75520086577862,
+        "n": 2928,
+        "p50": 28.084926000000053,
+        "p95": 39.973096999999996
+      },
+      "mode": "precheck",
+      "notify": true,
+      "per_trial": [
+        {
+          "commit_ms": 1222.096643,
+          "counts": {
+            "rejected": 4,
+            "served": 132
+          },
+          "notify_ms": 1222.635695
+        },
+        {
+          "commit_ms": 1007.194291,
+          "counts": {
+            "rejected": 4,
+            "served": 108
+          },
+          "notify_ms": 1007.990494
+        },
+        {
+          "commit_ms": 1973.486345,
+          "counts": {
+            "rejected": 4,
+            "served": 200
+          },
+          "notify_ms": 1974.2190979999998
+        },
+        {
+          "commit_ms": 774.12943,
+          "counts": {
+            "rejected": 4,
+            "served": 72
+          },
+          "notify_ms": 774.866053
+        },
+        {
+          "commit_ms": 2448.589227,
+          "counts": {
+            "rejected": 4,
+            "served": 236
+          },
+          "notify_ms": 2449.2509189999996
+        },
+        {
+          "commit_ms": 2236.307607,
+          "counts": {
+            "rejected": 4,
+            "served": 228
+          },
+          "notify_ms": 2236.916729
+        },
+        {
+          "commit_ms": 2544.018377,
+          "counts": {
+            "rejected": 4,
+            "served": 256
+          },
+          "notify_ms": 2544.75936
+        },
+        {
+          "commit_ms": 1599.4822319999998,
+          "counts": {
+            "rejected": 4,
+            "served": 168
+          },
+          "notify_ms": 1600.2789549999998
+        },
+        {
+          "commit_ms": 1016.000405,
+          "counts": {
+            "rejected": 4,
+            "served": 104
+          },
+          "notify_ms": 1016.5962470000001
+        },
+        {
+          "commit_ms": 1446.6735390000001,
+          "counts": {
+            "rejected": 4,
+            "served": 148
+          },
+          "notify_ms": 1447.364362
+        },
+        {
+          "commit_ms": 1491.958478,
+          "counts": {
+            "rejected": 4,
+            "served": 152
+          },
+          "notify_ms": 1492.5029510000002
+        },
+        {
+          "commit_ms": 707.1835100000001,
+          "counts": {
+            "rejected": 4,
+            "served": 72
+          },
+          "notify_ms": 707.759334
+        },
+        {
+          "commit_ms": 708.583407,
+          "counts": {
+            "rejected": 4,
+            "served": 76
+          },
+          "notify_ms": 709.410101
+        },
+        {
+          "commit_ms": 1205.2310020000002,
+          "counts": {
+            "rejected": 4,
+            "served": 124
+          },
+          "notify_ms": 1205.9336039999998
+        },
+        {
+          "commit_ms": 474.19753199999997,
+          "counts": {
+            "rejected": 4,
+            "served": 48
+          },
+          "notify_ms": 475.011365
+        },
+        {
+          "commit_ms": 501.541129,
+          "counts": {
+            "rejected": 4,
+            "served": 52
+          },
+          "notify_ms": 502.176651
+        },
+        {
+          "commit_ms": 2455.616012,
+          "counts": {
+            "rejected": 4,
+            "served": 216,
+            "violation": 4
+          },
+          "notify_ms": 2456.1812760000003
+        },
+        {
+          "commit_ms": 1965.8904590000002,
+          "counts": {
+            "rejected": 4,
+            "served": 176,
+            "violation": 4
+          },
+          "notify_ms": 1966.645923
+        },
+        {
+          "commit_ms": 1849.0887470000002,
+          "counts": {
+            "rejected": 4,
+            "served": 188
+          },
+          "notify_ms": 1849.7678990000002
+        },
+        {
+          "commit_ms": 816.945124,
+          "counts": {
+            "rejected": 4,
+            "served": 84
+          },
+          "notify_ms": 817.614806
+        }
+      ],
+      "readers": 4,
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              58.087
+            ],
+            "exec": [
+              732,
+              20742.79
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              184,
+              599.554
+            ],
+            "metric": [
+              43,
+              23753.448
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              60,
+              55118.175
+            ]
+          },
+          "db_ms": 100272.054,
+          "queries": 1022
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.5793370000000002,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.552589,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.993176,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.5793370000000002,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.552589,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.993176,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 2196,
+        "knowledge_hits": 2869,
+        "knowledge_misses": 4,
+        "notices": 20,
+        "repairs": 0,
+        "revocations": 20,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "think_ms": 10,
+      "trials": 20,
+      "violation_start_minus_commit_ms": {
+        "max": -1.6549869999998919,
+        "mean": -4.2605232500000625,
+        "n": 8,
+        "p50": -2.7653119999999944,
+        "p95": -1.6549869999998919
+      },
+      "window_ms": 3000
+    },
+    {
+      "counts": {
+        "rejected": 180,
+        "served": 2818
+      },
+      "distinct": false,
+      "latency_ms": {
+        "max": 4199.923478,
+        "mean": 130.74429962008008,
+        "n": 2998,
+        "p50": 28.848573999999985,
+        "p95": 39.43787199999997
+      },
+      "mode": "snapshot",
+      "notify": true,
+      "per_trial": [
+        {
+          "commit_ms": 1208.905458,
+          "counts": {
+            "rejected": 4,
+            "served": 122
+          },
+          "notify_ms": 1209.621981
+        },
+        {
+          "commit_ms": 998.860746,
+          "counts": {
+            "rejected": 4,
+            "served": 102
+          },
+          "notify_ms": 999.515359
+        },
+        {
+          "commit_ms": 1963.251367,
+          "counts": {
+            "rejected": 4,
+            "served": 192
+          },
+          "notify_ms": 1963.8739300000002
+        },
+        {
+          "commit_ms": 747.6559940000001,
+          "counts": {
+            "rejected": 4,
+            "served": 76
+          },
+          "notify_ms": 748.4515269999999
+        },
+        {
+          "commit_ms": 2449.933357,
+          "counts": {
+            "rejected": 4,
+            "served": 239
+          },
+          "notify_ms": 2450.6907
+        },
+        {
+          "commit_ms": 2225.779,
+          "counts": {
+            "rejected": 4,
+            "served": 226
+          },
+          "notify_ms": 2226.545764
+        },
+        {
+          "commit_ms": 2552.890632,
+          "counts": {
+            "rejected": 4,
+            "served": 259
+          },
+          "notify_ms": 2553.500125
+        },
+        {
+          "commit_ms": 1608.1926549999998,
+          "counts": {
+            "rejected": 4,
+            "served": 150
+          },
+          "notify_ms": 1608.772817
+        },
+        {
+          "commit_ms": 1026.299592,
+          "counts": {
+            "rejected": 4,
+            "served": 107
+          },
+          "notify_ms": 1027.074606
+        },
+        {
+          "commit_ms": 1456.626614,
+          "counts": {
+            "rejected": 4,
+            "served": 152
+          },
+          "notify_ms": 1457.309238
+        },
+        {
+          "commit_ms": 1514.6084609999998,
+          "counts": {
+            "rejected": 4,
+            "served": 146
+          },
+          "notify_ms": 1515.324674
+        },
+        {
+          "commit_ms": 714.916462,
+          "counts": {
+            "rejected": 4,
+            "served": 71
+          },
+          "notify_ms": 715.541036
+        },
+        {
+          "commit_ms": 700.4197519999999,
+          "counts": {
+            "rejected": 104,
+            "served": 70
+          },
+          "notify_ms": 701.007644
+        },
+        {
+          "commit_ms": 1216.63384,
+          "counts": {
+            "rejected": 4,
+            "served": 118
+          },
+          "notify_ms": 1217.3150930000002
+        },
+        {
+          "commit_ms": 473.335865,
+          "counts": {
+            "rejected": 4,
+            "served": 46
+          },
+          "notify_ms": 474.084838
+        },
+        {
+          "commit_ms": 511.885241,
+          "counts": {
+            "rejected": 4,
+            "served": 52
+          },
+          "notify_ms": 512.612255
+        },
+        {
+          "commit_ms": 2464.0877950000004,
+          "counts": {
+            "rejected": 4,
+            "served": 241
+          },
+          "notify_ms": 2465.15071
+        },
+        {
+          "commit_ms": 1942.6956369999998,
+          "counts": {
+            "rejected": 4,
+            "served": 193
+          },
+          "notify_ms": 1943.4425609999998
+        },
+        {
+          "commit_ms": 1855.4352860000001,
+          "counts": {
+            "rejected": 4,
+            "served": 177
+          },
+          "notify_ms": 1856.1225590000001
+        },
+        {
+          "commit_ms": 837.235235,
+          "counts": {
+            "rejected": 4,
+            "served": 79
+          },
+          "notify_ms": 838.044168
+        }
+      ],
+      "readers": 4,
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              58.967
+            ],
+            "exec": [
+              2838,
+              79479.468
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              295,
+              687.436
+            ],
+            "metric": [
+              2931,
+              50329.269
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              60,
+              56412.046
+            ]
+          },
+          "db_ms": 186967.186,
+          "queries": 6127
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.2035150000000001,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 54.793746999999996,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.005703,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.2035150000000001,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 54.793746999999996,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.005703,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 58,
+        "knowledge_hits": 2843,
+        "knowledge_misses": 4,
+        "notices": 20,
+        "repairs": 0,
+        "revocations": 20,
+        "snapshot_exec": {
+          "checks_reused": 8480,
+          "checks_run": 46,
+          "rejections": 4
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "think_ms": 10,
+      "trials": 20,
+      "violation_start_minus_commit_ms": {
+        "n": 0
+      },
+      "window_ms": 3000
+    },
+    {
+      "counts": {
+        "rejected": 80,
+        "served": 2936,
+        "violation": 141
+      },
+      "distinct": false,
+      "latency_ms": {
+        "max": 4071.5922980000005,
+        "mean": 124.72418102090596,
+        "n": 3157,
+        "p50": 27.137528999999972,
+        "p95": 48.10694000000012
+      },
+      "mode": "precheck",
+      "notify": false,
+      "per_trial": [
+        {
+          "commit_ms": 1229.2855249999998,
+          "counts": {
+            "rejected": 4,
+            "served": 112,
+            "violation": 8
+          },
+          "notify_ms": 1229.285605
+        },
+        {
+          "commit_ms": 996.92343,
+          "counts": {
+            "rejected": 4,
+            "served": 100
+          },
+          "notify_ms": 996.92367
+        },
+        {
+          "commit_ms": 1968.7271389999999,
+          "counts": {
+            "rejected": 4,
+            "served": 204,
+            "violation": 4
+          },
+          "notify_ms": 1968.727609
+        },
+        {
+          "commit_ms": 727.6992220000001,
+          "counts": {
+            "rejected": 4,
+            "served": 80,
+            "violation": 8
+          },
+          "notify_ms": 727.699982
+        },
+        {
+          "commit_ms": 2447.24694,
+          "counts": {
+            "rejected": 4,
+            "served": 264,
+            "violation": 12
+          },
+          "notify_ms": 2447.2472199999997
+        },
+        {
+          "commit_ms": 2235.082576,
+          "counts": {
+            "rejected": 4,
+            "served": 236,
+            "violation": 12
+          },
+          "notify_ms": 2235.083326
+        },
+        {
+          "commit_ms": 2539.912119,
+          "counts": {
+            "rejected": 4,
+            "served": 276,
+            "violation": 4
+          },
+          "notify_ms": 2539.912569
+        },
+        {
+          "commit_ms": 1638.354026,
+          "counts": {
+            "rejected": 4,
+            "served": 164,
+            "violation": 4
+          },
+          "notify_ms": 1638.3548660000001
+        },
+        {
+          "commit_ms": 1011.23882,
+          "counts": {
+            "rejected": 4,
+            "served": 104,
+            "violation": 4
+          },
+          "notify_ms": 1011.2397500000001
+        },
+        {
+          "commit_ms": 1459.2640470000001,
+          "counts": {
+            "rejected": 4,
+            "served": 152,
+            "violation": 8
+          },
+          "notify_ms": 1459.264847
+        },
+        {
+          "commit_ms": 1503.8150030000002,
+          "counts": {
+            "rejected": 4,
+            "served": 160,
+            "violation": 4
+          },
+          "notify_ms": 1503.815293
+        },
+        {
+          "commit_ms": 717.699203,
+          "counts": {
+            "rejected": 4,
+            "served": 76,
+            "violation": 12
+          },
+          "notify_ms": 717.6992829999999
+        },
+        {
+          "commit_ms": 716.907284,
+          "counts": {
+            "rejected": 4,
+            "served": 76,
+            "violation": 12
+          },
+          "notify_ms": 716.9080329999999
+        },
+        {
+          "commit_ms": 1202.018641,
+          "counts": {
+            "rejected": 4,
+            "served": 128,
+            "violation": 8
+          },
+          "notify_ms": 1202.0191810000001
+        },
+        {
+          "commit_ms": 472.026695,
+          "counts": {
+            "rejected": 4,
+            "served": 52,
+            "violation": 9
+          },
+          "notify_ms": 472.027165
+        },
+        {
+          "commit_ms": 534.568227,
+          "counts": {
+            "rejected": 4,
+            "served": 48,
+            "violation": 4
+          },
+          "notify_ms": 534.5690870000001
+        },
+        {
+          "commit_ms": 2453.869335,
+          "counts": {
+            "rejected": 4,
+            "served": 244,
+            "violation": 12
+          },
+          "notify_ms": 2453.870306
+        },
+        {
+          "commit_ms": 1912.4730279999999,
+          "counts": {
+            "rejected": 4,
+            "served": 192,
+            "violation": 8
+          },
+          "notify_ms": 1912.473788
+        },
+        {
+          "commit_ms": 1876.011318,
+          "counts": {
+            "rejected": 4,
+            "served": 184,
+            "violation": 4
+          },
+          "notify_ms": 1876.012169
+        },
+        {
+          "commit_ms": 829.4913769999999,
+          "counts": {
+            "rejected": 4,
+            "served": 84,
+            "violation": 4
+          },
+          "notify_ms": 829.492567
+        }
+      ],
+      "readers": 4,
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              58.065
+            ],
+            "exec": [
+              790,
+              22093.213
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              184,
+              579.703
+            ],
+            "metric": [
+              43,
+              23095.143
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              60,
+              54265.39
+            ]
+          },
+          "db_ms": 100091.514,
+          "queries": 1080
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.615528,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.868581,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.640637,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.615528,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.868581,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.640637,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 2367,
+        "knowledge_hits": 3098,
+        "knowledge_misses": 4,
+        "notices": 20,
+        "repairs": 0,
+        "revocations": 20,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "think_ms": 10,
+      "trials": 20,
+      "violation_start_minus_commit_ms": {
+        "max": 152.56773299999998,
+        "mean": 53.0736656028369,
+        "n": 141,
+        "p50": 33.328665,
+        "p95": 139.73064900000008
+      },
+      "window_ms": 3000
+    },
+    {
+      "counts": {
+        "rejected": 150,
+        "served": 2767
+      },
+      "distinct": false,
+      "latency_ms": {
+        "max": 4127.3679919999995,
+        "mean": 130.36369217895106,
+        "n": 2917,
+        "p50": 29.35607300000001,
+        "p95": 62.245967
+      },
+      "mode": "snapshot",
+      "notify": false,
+      "per_trial": [
+        {
+          "commit_ms": 1218.132187,
+          "counts": {
+            "rejected": 8,
+            "served": 118
+          },
+          "notify_ms": 1218.1326669999999
+        },
+        {
+          "commit_ms": 1005.55997,
+          "counts": {
+            "rejected": 8,
+            "served": 97
+          },
+          "notify_ms": 1005.5607200000001
+        },
+        {
+          "commit_ms": 1971.470489,
+          "counts": {
+            "rejected": 4,
+            "served": 188
+          },
+          "notify_ms": 1971.4709689999997
+        },
+        {
+          "commit_ms": 739.1562379999999,
+          "counts": {
+            "rejected": 8,
+            "served": 72
+          },
+          "notify_ms": 739.156618
+        },
+        {
+          "commit_ms": 2463.535534,
+          "counts": {
+            "rejected": 4,
+            "served": 241
+          },
+          "notify_ms": 2463.535614
+        },
+        {
+          "commit_ms": 2236.451913,
+          "counts": {
+            "rejected": 4,
+            "served": 216
+          },
+          "notify_ms": 2236.452193
+        },
+        {
+          "commit_ms": 2549.814594,
+          "counts": {
+            "rejected": 4,
+            "served": 254
+          },
+          "notify_ms": 2549.815814
+        },
+        {
+          "commit_ms": 1615.711493,
+          "counts": {
+            "rejected": 8,
+            "served": 158
+          },
+          "notify_ms": 1615.711583
+        },
+        {
+          "commit_ms": 1023.891648,
+          "counts": {
+            "rejected": 8,
+            "served": 98
+          },
+          "notify_ms": 1023.8917590000001
+        },
+        {
+          "commit_ms": 1460.9014710000001,
+          "counts": {
+            "rejected": 29,
+            "served": 148
+          },
+          "notify_ms": 1460.902461
+        },
+        {
+          "commit_ms": 1510.804744,
+          "counts": {
+            "rejected": 8,
+            "served": 146
+          },
+          "notify_ms": 1510.804833
+        },
+        {
+          "commit_ms": 716.2962349999999,
+          "counts": {
+            "rejected": 8,
+            "served": 69
+          },
+          "notify_ms": 716.296605
+        },
+        {
+          "commit_ms": 755.762731,
+          "counts": {
+            "rejected": 8,
+            "served": 70
+          },
+          "notify_ms": 755.762881
+        },
+        {
+          "commit_ms": 1223.57126,
+          "counts": {
+            "rejected": 7,
+            "served": 116
+          },
+          "notify_ms": 1223.57158
+        },
+        {
+          "commit_ms": 470.203319,
+          "counts": {
+            "rejected": 8,
+            "served": 45
+          },
+          "notify_ms": 470.203509
+        },
+        {
+          "commit_ms": 508.647865,
+          "counts": {
+            "rejected": 8,
+            "served": 49
+          },
+          "notify_ms": 508.647945
+        },
+        {
+          "commit_ms": 2464.057484,
+          "counts": {
+            "rejected": 4,
+            "served": 241
+          },
+          "notify_ms": 2464.057564
+        },
+        {
+          "commit_ms": 1906.6182000000001,
+          "counts": {
+            "rejected": 4,
+            "served": 173
+          },
+          "notify_ms": 1906.6185600000001
+        },
+        {
+          "commit_ms": 1867.59524,
+          "counts": {
+            "rejected": 4,
+            "served": 187
+          },
+          "notify_ms": 1867.5953299999999
+        },
+        {
+          "commit_ms": 832.030153,
+          "counts": {
+            "rejected": 6,
+            "served": 81
+          },
+          "notify_ms": 832.030663
+        }
+      ],
+      "readers": 4,
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              56.922
+            ],
+            "exec": [
+              2787,
+              79802.391
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              265,
+              943.745
+            ],
+            "metric": [
+              2965,
+              61083.065
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              45,
+              41082.469
+            ]
+          },
+          "db_ms": 182968.592,
+          "queries": 6065
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.27278,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.710476,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.980352,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.27278,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.710476,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.980352,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 139,
+        "knowledge_hits": 2855,
+        "knowledge_misses": 4,
+        "notices": 15,
+        "repairs": 0,
+        "revocations": 15,
+        "snapshot_exec": {
+          "checks_reused": 8484,
+          "checks_run": 78,
+          "rejections": 67
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "think_ms": 10,
+      "trials": 20,
+      "violation_start_minus_commit_ms": {
+        "n": 0
+      },
+      "window_ms": 3000
+    },
+    {
+      "counts": {
+        "rejected": 80,
+        "served": 2932,
+        "violation": 2
+      },
+      "distinct": true,
+      "latency_ms": {
+        "max": 4189.4671180000005,
+        "mean": 133.14086970968813,
+        "n": 3014,
+        "p50": 27.56221899999997,
+        "p95": 37.48358199999984
+      },
+      "mode": "precheck",
+      "notify": true,
+      "per_trial": [
+        {
+          "commit_ms": 1212.782011,
+          "counts": {
+            "rejected": 4,
+            "served": 126
+          },
+          "notify_ms": 1213.485665
+        },
+        {
+          "commit_ms": 1010.3560090000001,
+          "counts": {
+            "rejected": 4,
+            "served": 108
+          },
+          "notify_ms": 1011.3318069999999
+        },
+        {
+          "commit_ms": 1976.3085230000002,
+          "counts": {
+            "rejected": 4,
+            "served": 200
+          },
+          "notify_ms": 1977.043786
+        },
+        {
+          "commit_ms": 757.807761,
+          "counts": {
+            "rejected": 4,
+            "served": 77
+          },
+          "notify_ms": 758.380502
+        },
+        {
+          "commit_ms": 2454.708663,
+          "counts": {
+            "rejected": 4,
+            "served": 260
+          },
+          "notify_ms": 2455.5843670000004
+        },
+        {
+          "commit_ms": 2247.740662,
+          "counts": {
+            "rejected": 4,
+            "served": 227
+          },
+          "notify_ms": 2248.5519470000004
+        },
+        {
+          "commit_ms": 2554.2924989999997,
+          "counts": {
+            "rejected": 4,
+            "served": 258,
+            "violation": 2
+          },
+          "notify_ms": 2554.950632
+        },
+        {
+          "commit_ms": 1606.6538339999997,
+          "counts": {
+            "rejected": 4,
+            "served": 164
+          },
+          "notify_ms": 1607.411947
+        },
+        {
+          "commit_ms": 1024.29807,
+          "counts": {
+            "rejected": 4,
+            "served": 106
+          },
+          "notify_ms": 1025.039033
+        },
+        {
+          "commit_ms": 1460.725728,
+          "counts": {
+            "rejected": 4,
+            "served": 150
+          },
+          "notify_ms": 1461.470861
+        },
+        {
+          "commit_ms": 1517.087387,
+          "counts": {
+            "rejected": 4,
+            "served": 153
+          },
+          "notify_ms": 1517.9685809999999
+        },
+        {
+          "commit_ms": 746.6467369999999,
+          "counts": {
+            "rejected": 4,
+            "served": 77
+          },
+          "notify_ms": 747.229398
+        },
+        {
+          "commit_ms": 706.6648250000001,
+          "counts": {
+            "rejected": 4,
+            "served": 75
+          },
+          "notify_ms": 707.2057040000001
+        },
+        {
+          "commit_ms": 1202.361175,
+          "counts": {
+            "rejected": 4,
+            "served": 125
+          },
+          "notify_ms": 1203.023816
+        },
+        {
+          "commit_ms": 463.76338499999997,
+          "counts": {
+            "rejected": 4,
+            "served": 45
+          },
+          "notify_ms": 464.499327
+        },
+        {
+          "commit_ms": 518.0324549999999,
+          "counts": {
+            "rejected": 4,
+            "served": 55
+          },
+          "notify_ms": 518.674425
+        },
+        {
+          "commit_ms": 2454.8928459999997,
+          "counts": {
+            "rejected": 4,
+            "served": 256
+          },
+          "notify_ms": 2455.600307
+        },
+        {
+          "commit_ms": 1900.8097109999999,
+          "counts": {
+            "rejected": 4,
+            "served": 203
+          },
+          "notify_ms": 1901.560932
+        },
+        {
+          "commit_ms": 1867.6366440000002,
+          "counts": {
+            "rejected": 4,
+            "served": 187
+          },
+          "notify_ms": 1868.6056089999997
+        },
+        {
+          "commit_ms": 823.395365,
+          "counts": {
+            "rejected": 4,
+            "served": 80
+          },
+          "notify_ms": 824.028185
+        }
+      ],
+      "readers": 4,
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              56.369
+            ],
+            "exec": [
+              2954,
+              81714.261
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              190,
+              555.186
+            ],
+            "metric": [
+              43,
+              24463.728
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              60,
+              56157.446
+            ]
+          },
+          "db_ms": 162946.99,
+          "queries": 3250
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.10927,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 50.95267,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.361813,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 2.10927,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 50.95267,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.361813,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 60,
+        "knowledge_hits": 2955,
+        "knowledge_misses": 4,
+        "notices": 20,
+        "repairs": 0,
+        "revocations": 20,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "think_ms": 10,
+      "trials": 20,
+      "violation_start_minus_commit_ms": {
+        "max": -0.4253069999995205,
+        "mean": -0.7842234999995981,
+        "n": 2,
+        "p50": -0.4253069999995205,
+        "p95": -0.4253069999995205
+      },
+      "window_ms": 3000
+    },
+    {
+      "counts": {
+        "rejected": 201,
+        "served": 2863
+      },
+      "distinct": true,
+      "latency_ms": {
+        "max": 4160.911868,
+        "mean": 124.2648422865535,
+        "n": 3064,
+        "p50": 28.135092999999983,
+        "p95": 39.80676500000004
+      },
+      "mode": "snapshot",
+      "notify": true,
+      "per_trial": [
+        {
+          "commit_ms": 1225.39667,
+          "counts": {
+            "rejected": 4,
+            "served": 119
+          },
+          "notify_ms": 1225.984119
+        },
+        {
+          "commit_ms": 1040.3226670000001,
+          "counts": {
+            "rejected": 71,
+            "served": 101
+          },
+          "notify_ms": 1041.000238
+        },
+        {
+          "commit_ms": 1967.953473,
+          "counts": {
+            "rejected": 4,
+            "served": 192
+          },
+          "notify_ms": 1968.609872
+        },
+        {
+          "commit_ms": 782.660398,
+          "counts": {
+            "rejected": 4,
+            "served": 70
+          },
+          "notify_ms": 783.336778
+        },
+        {
+          "commit_ms": 2449.482031,
+          "counts": {
+            "rejected": 4,
+            "served": 245
+          },
+          "notify_ms": 2450.07018
+        },
+        {
+          "commit_ms": 2228.95147,
+          "counts": {
+            "rejected": 4,
+            "served": 220
+          },
+          "notify_ms": 2229.7336419999997
+        },
+        {
+          "commit_ms": 2549.1453690000003,
+          "counts": {
+            "rejected": 4,
+            "served": 256
+          },
+          "notify_ms": 2549.910851
+        },
+        {
+          "commit_ms": 1616.4035989999998,
+          "counts": {
+            "rejected": 4,
+            "served": 158
+          },
+          "notify_ms": 1617.1596299999999
+        },
+        {
+          "commit_ms": 1007.601786,
+          "counts": {
+            "rejected": 4,
+            "served": 95
+          },
+          "notify_ms": 1008.3512670000001
+        },
+        {
+          "commit_ms": 1461.021266,
+          "counts": {
+            "rejected": 4,
+            "served": 141
+          },
+          "notify_ms": 1461.732827
+        },
+        {
+          "commit_ms": 1530.8541309999998,
+          "counts": {
+            "rejected": 4,
+            "served": 156
+          },
+          "notify_ms": 1531.709553
+        },
+        {
+          "commit_ms": 737.433901,
+          "counts": {
+            "rejected": 4,
+            "served": 70
+          },
+          "notify_ms": 738.210862
+        },
+        {
+          "commit_ms": 717.105321,
+          "counts": {
+            "rejected": 4,
+            "served": 78
+          },
+          "notify_ms": 717.734511
+        },
+        {
+          "commit_ms": 1219.432415,
+          "counts": {
+            "rejected": 57,
+            "served": 130
+          },
+          "notify_ms": 1220.0453630000002
+        },
+        {
+          "commit_ms": 484.220626,
+          "counts": {
+            "rejected": 4,
+            "served": 49
+          },
+          "notify_ms": 484.975947
+        },
+        {
+          "commit_ms": 511.020751,
+          "counts": {
+            "rejected": 5,
+            "served": 53
+          },
+          "notify_ms": 511.545118
+        },
+        {
+          "commit_ms": 2480.1191280000003,
+          "counts": {
+            "rejected": 4,
+            "served": 253
+          },
+          "notify_ms": 2480.8544779999997
+        },
+        {
+          "commit_ms": 1907.69324,
+          "counts": {
+            "rejected": 4,
+            "served": 194
+          },
+          "notify_ms": 1908.49506
+        },
+        {
+          "commit_ms": 1860.146276,
+          "counts": {
+            "rejected": 4,
+            "served": 198
+          },
+          "notify_ms": 1860.833935
+        },
+        {
+          "commit_ms": 823.614369,
+          "counts": {
+            "rejected": 4,
+            "served": 85
+          },
+          "notify_ms": 824.293087
+        }
+      ],
+      "readers": 4,
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              56.631
+            ],
+            "exec": [
+              2883,
+              79280.628
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              295,
+              730.277
+            ],
+            "metric": [
+              2988,
+              54547.765
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              60,
+              56111.054
+            ]
+          },
+          "db_ms": 190726.35499999998,
+          "queries": 6229
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.431752,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.038889,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.199821,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.431752,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.038889,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.199821,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 55,
+        "knowledge_hits": 2892,
+        "knowledge_misses": 4,
+        "notices": 20,
+        "repairs": 0,
+        "revocations": 20,
+        "snapshot_exec": {
+          "checks_reused": 8619,
+          "checks_run": 54,
+          "rejections": 8
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "think_ms": 10,
+      "trials": 20,
+      "violation_start_minus_commit_ms": {
+        "n": 0
+      },
+      "window_ms": 3000
+    },
+    {
+      "counts": {
+        "rejected": 80,
+        "served": 3008,
+        "violation": 120
+      },
+      "distinct": true,
+      "latency_ms": {
+        "max": 4021.851599,
+        "mean": 124.27802049345381,
+        "n": 3208,
+        "p50": 26.401737000000082,
+        "p95": 47.867131999999856
+      },
+      "mode": "precheck",
+      "notify": false,
+      "per_trial": [
+        {
+          "commit_ms": 1208.2637300000001,
+          "counts": {
+            "rejected": 4,
+            "served": 124,
+            "violation": 4
+          },
+          "notify_ms": 1208.26431
+        },
+        {
+          "commit_ms": 992.6198790000001,
+          "counts": {
+            "rejected": 4,
+            "served": 109,
+            "violation": 4
+          },
+          "notify_ms": 992.6199690000001
+        },
+        {
+          "commit_ms": 1974.6499800000001,
+          "counts": {
+            "rejected": 4,
+            "served": 217,
+            "violation": 8
+          },
+          "notify_ms": 1974.650071
+        },
+        {
+          "commit_ms": 736.400131,
+          "counts": {
+            "rejected": 4,
+            "served": 73,
+            "violation": 6
+          },
+          "notify_ms": 736.4002419999999
+        },
+        {
+          "commit_ms": 2458.540602,
+          "counts": {
+            "rejected": 4,
+            "served": 263,
+            "violation": 3
+          },
+          "notify_ms": 2458.540912
+        },
+        {
+          "commit_ms": 2229.017519,
+          "counts": {
+            "rejected": 4,
+            "served": 237,
+            "violation": 5
+          },
+          "notify_ms": 2229.017909
+        },
+        {
+          "commit_ms": 2560.1610360000004,
+          "counts": {
+            "rejected": 4,
+            "served": 276,
+            "violation": 12
+          },
+          "notify_ms": 2560.161136
+        },
+        {
+          "commit_ms": 1615.110927,
+          "counts": {
+            "rejected": 4,
+            "served": 175,
+            "violation": 4
+          },
+          "notify_ms": 1615.111007
+        },
+        {
+          "commit_ms": 1003.91717,
+          "counts": {
+            "rejected": 4,
+            "served": 106,
+            "violation": 1
+          },
+          "notify_ms": 1003.9173699999999
+        },
+        {
+          "commit_ms": 1449.6196189999998,
+          "counts": {
+            "rejected": 4,
+            "served": 155
+          },
+          "notify_ms": 1449.6203990000001
+        },
+        {
+          "commit_ms": 1515.869338,
+          "counts": {
+            "rejected": 4,
+            "served": 141,
+            "violation": 8
+          },
+          "notify_ms": 1515.869678
+        },
+        {
+          "commit_ms": 718.764794,
+          "counts": {
+            "rejected": 4,
+            "served": 75,
+            "violation": 6
+          },
+          "notify_ms": 718.7650249999999
+        },
+        {
+          "commit_ms": 700.4099620000001,
+          "counts": {
+            "rejected": 4,
+            "served": 75,
+            "violation": 8
+          },
+          "notify_ms": 700.410482
+        },
+        {
+          "commit_ms": 1206.8571880000002,
+          "counts": {
+            "rejected": 4,
+            "served": 128,
+            "violation": 1
+          },
+          "notify_ms": 1206.8575779999999
+        },
+        {
+          "commit_ms": 460.831817,
+          "counts": {
+            "rejected": 4,
+            "served": 52,
+            "violation": 11
+          },
+          "notify_ms": 460.831977
+        },
+        {
+          "commit_ms": 519.660297,
+          "counts": {
+            "rejected": 4,
+            "served": 56,
+            "violation": 8
+          },
+          "notify_ms": 519.661166
+        },
+        {
+          "commit_ms": 2464.5124809999998,
+          "counts": {
+            "rejected": 4,
+            "served": 256,
+            "violation": 6
+          },
+          "notify_ms": 2464.512691
+        },
+        {
+          "commit_ms": 1899.0367319999998,
+          "counts": {
+            "rejected": 4,
+            "served": 202,
+            "violation": 12
+          },
+          "notify_ms": 1899.036912
+        },
+        {
+          "commit_ms": 1861.624823,
+          "counts": {
+            "rejected": 4,
+            "served": 200,
+            "violation": 1
+          },
+          "notify_ms": 1861.625443
+        },
+        {
+          "commit_ms": 851.675929,
+          "counts": {
+            "rejected": 4,
+            "served": 88,
+            "violation": 12
+          },
+          "notify_ms": 851.6766289999999
+        }
+      ],
+      "readers": 4,
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              56.994
+            ],
+            "exec": [
+              3148,
+              86528.808
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              189,
+              534.16
+            ],
+            "metric": [
+              43,
+              23765.119
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              60,
+              55100.608
+            ]
+          },
+          "db_ms": 165985.689,
+          "queries": 3443
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.329288,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.314048,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.402244,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.329288,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.314048,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.402244,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 60,
+        "knowledge_hits": 3149,
+        "knowledge_misses": 4,
+        "notices": 20,
+        "repairs": 0,
+        "revocations": 20,
+        "snapshot_exec": {
+          "checks_reused": 0,
+          "checks_run": 0,
+          "rejections": 0
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "think_ms": 10,
+      "trials": 20,
+      "violation_start_minus_commit_ms": {
+        "max": 156.74397,
+        "mean": 52.48727896666663,
+        "n": 120,
+        "p50": 36.603853999999956,
+        "p95": 138.76328
+      },
+      "window_ms": 3000
+    },
+    {
+      "counts": {
+        "rejected": 303,
+        "served": 2849
+      },
+      "distinct": true,
+      "latency_ms": {
+        "max": 4068.324847,
+        "mean": 115.69121595114218,
+        "n": 3152,
+        "p50": 28.010532000000012,
+        "p95": 56.94386700000001
+      },
+      "mode": "snapshot",
+      "notify": false,
+      "per_trial": [
+        {
+          "commit_ms": 1249.512548,
+          "counts": {
+            "rejected": 97,
+            "served": 120
+          },
+          "notify_ms": 1249.5129279999999
+        },
+        {
+          "commit_ms": 1015.7756200000001,
+          "counts": {
+            "rejected": 8,
+            "served": 103
+          },
+          "notify_ms": 1015.7757300000001
+        },
+        {
+          "commit_ms": 1963.176218,
+          "counts": {
+            "rejected": 4,
+            "served": 194
+          },
+          "notify_ms": 1963.1764679999999
+        },
+        {
+          "commit_ms": 742.3910089999999,
+          "counts": {
+            "rejected": 8,
+            "served": 74
+          },
+          "notify_ms": 742.3914689999999
+        },
+        {
+          "commit_ms": 2468.158652,
+          "counts": {
+            "rejected": 4,
+            "served": 242
+          },
+          "notify_ms": 2468.159392
+        },
+        {
+          "commit_ms": 2239.27546,
+          "counts": {
+            "rejected": 4,
+            "served": 227
+          },
+          "notify_ms": 2239.2757300000003
+        },
+        {
+          "commit_ms": 2556.148339,
+          "counts": {
+            "rejected": 4,
+            "served": 257
+          },
+          "notify_ms": 2556.1485089999996
+        },
+        {
+          "commit_ms": 1608.3424289999998,
+          "counts": {
+            "rejected": 8,
+            "served": 161
+          },
+          "notify_ms": 1608.3425089999998
+        },
+        {
+          "commit_ms": 1023.371435,
+          "counts": {
+            "rejected": 8,
+            "served": 102
+          },
+          "notify_ms": 1023.3725440000001
+        },
+        {
+          "commit_ms": 1447.557982,
+          "counts": {
+            "rejected": 8,
+            "served": 149
+          },
+          "notify_ms": 1447.558071
+        },
+        {
+          "commit_ms": 1503.439181,
+          "counts": {
+            "rejected": 4,
+            "served": 149
+          },
+          "notify_ms": 1503.439281
+        },
+        {
+          "commit_ms": 738.320805,
+          "counts": {
+            "rejected": 8,
+            "served": 67
+          },
+          "notify_ms": 738.3212249999999
+        },
+        {
+          "commit_ms": 716.259692,
+          "counts": {
+            "rejected": 8,
+            "served": 71
+          },
+          "notify_ms": 716.259902
+        },
+        {
+          "commit_ms": 1217.560732,
+          "counts": {
+            "rejected": 8,
+            "served": 117
+          },
+          "notify_ms": 1217.5609920000002
+        },
+        {
+          "commit_ms": 464.313892,
+          "counts": {
+            "rejected": 8,
+            "served": 46
+          },
+          "notify_ms": 464.31417200000004
+        },
+        {
+          "commit_ms": 503.2762670000001,
+          "counts": {
+            "rejected": 8,
+            "served": 51
+          },
+          "notify_ms": 503.27642699999996
+        },
+        {
+          "commit_ms": 2464.6503119999998,
+          "counts": {
+            "rejected": 4,
+            "served": 256
+          },
+          "notify_ms": 2464.650622
+        },
+        {
+          "commit_ms": 1890.92559,
+          "counts": {
+            "rejected": 4,
+            "served": 188
+          },
+          "notify_ms": 1890.9258200000002
+        },
+        {
+          "commit_ms": 1849.969847,
+          "counts": {
+            "rejected": 4,
+            "served": 192
+          },
+          "notify_ms": 1849.9701960000002
+        },
+        {
+          "commit_ms": 841.264189,
+          "counts": {
+            "rejected": 94,
+            "served": 83
+          },
+          "notify_ms": 841.265039
+        }
+      ],
+      "readers": 4,
+      "stats": {
+        "db": {
+          "by_kind": {
+            "check": [
+              3,
+              57.213
+            ],
+            "exec": [
+              2869,
+              78712.764
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              257,
+              954.902
+            ],
+            "metric": [
+              3043,
+              58700.744
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              42,
+              38137.956
+            ]
+          },
+          "db_ms": 176563.579,
+          "queries": 6214
+        },
+        "entries": 6,
+        "feedback": {
+          "adaptive": null,
+          "adaptive_uses": 0,
+          "contexts": {
+            "KeyUnique|date_dim(d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.413997,
+              "runs": 1
+            },
+            "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.82777,
+              "runs": 1
+            },
+            "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.008135,
+              "runs": 1
+            }
+          },
+          "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+          "evidence": {
+            "audited_failures_in_window": 0,
+            "audited_failures_total": 0,
+            "min_evidence": 8,
+            "passed": 1,
+            "unaudited_failures": 0
+          },
+          "kinds": {
+            "KeyUnique": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 1.413997,
+              "runs": 1
+            },
+            "RowConservation": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.401096,
+              "ms": 52.82777,
+              "runs": 1
+            },
+            "SampleFanout": {
+              "fails": 0,
+              "hits": 0,
+              "mrows": 0.001096,
+              "ms": 3.008135,
+              "runs": 1
+            }
+          },
+          "order_calls": 1,
+          "pending_validation": null
+        },
+        "guard_fails": 0,
+        "guard_runs": 0,
+        "inflight_merged": 137,
+        "knowledge_hits": 2937,
+        "knowledge_misses": 4,
+        "notices": 14,
+        "repairs": 0,
+        "revocations": 14,
+        "snapshot_exec": {
+          "checks_reused": 8732,
+          "checks_run": 76,
+          "rejections": 67
+        },
+        "sql_cache": {
+          "hits": 0,
+          "misses": 0
+        },
+        "sql_rejections": 0
+      },
+      "think_ms": 10,
+      "trials": 20,
+      "violation_start_minus_commit_ms": {
+        "n": 0
+      },
+      "window_ms": 3000
+    }
+  ],
+  "trials": 10,
+  "writer_overhead": [
+    {
+      "bulk_ms_per_stmt": 17.5296244,
+      "concurrent8_stmt_per_s": 25231.02838448431,
+      "round": 0,
+      "sequential_stmt_per_s": 4984.564697267149,
+      "trigger": false
+    },
+    {
+      "bulk_ms_per_stmt": 18.222158533333335,
+      "concurrent8_stmt_per_s": 14575.472811211815,
+      "round": 0,
+      "sequential_stmt_per_s": 1355.1906577622763,
+      "trigger": true
+    },
+    {
+      "bulk_ms_per_stmt": 17.8790942,
+      "concurrent8_stmt_per_s": 24380.543270792386,
+      "round": 1,
+      "sequential_stmt_per_s": 2535.1223583651094,
+      "trigger": false
+    },
+    {
+      "bulk_ms_per_stmt": 17.552781433333333,
+      "concurrent8_stmt_per_s": 15731.323158641251,
+      "round": 1,
+      "sequential_stmt_per_s": 2339.4088248396183,
+      "trigger": true
+    },
+    {
+      "bulk_ms_per_stmt": 16.342108733333333,
+      "concurrent8_stmt_per_s": 26301.919191206518,
+      "round": 2,
+      "sequential_stmt_per_s": 2995.918043689964,
+      "trigger": false
+    },
+    {
+      "bulk_ms_per_stmt": 17.81843285,
+      "concurrent8_stmt_per_s": 17168.88672032496,
+      "round": 2,
+      "sequential_stmt_per_s": 2355.437519033113,
+      "trigger": true
+    }
+  ]
+}

@@ -1,0 +1,238 @@
+{
+ "cells": 15,
+ "records": 1289,
+ "counts": {
+  "follow": 823,
+  "undeclared": 331,
+  "deviate": 11,
+  "stale": 65,
+  "declared_other_or_unaudited": 56,
+  "override": 3
+ },
+ "declared_own": 902,
+ "deviate_pct_of_declared_own": 1.2,
+ "deviate_pct_of_valid_def": 1.3,
+ "by_mode": {
+  "metric-global-def": {
+   "follow": 504,
+   "undeclared": 179,
+   "deviate": 8,
+   "stale": 37,
+   "declared_other_or_unaudited": 19,
+   "override": 2
+  },
+  "metric-global": {
+   "follow": 319,
+   "deviate": 3,
+   "undeclared": 152,
+   "stale": 28,
+   "declared_other_or_unaudited": 37,
+   "override": 1
+  }
+ },
+ "by_model": {
+  "dsv41flash": {
+   "follow": 316,
+   "undeclared": 85,
+   "deviate": 8,
+   "stale": 26,
+   "declared_other_or_unaudited": 7,
+   "override": 2
+  },
+  "glm53": {
+   "follow": 325,
+   "undeclared": 73,
+   "declared_other_or_unaudited": 15,
+   "stale": 25,
+   "override": 1,
+   "deviate": 1
+  },
+  "glm53flash": {
+   "follow": 182,
+   "undeclared": 173,
+   "stale": 14,
+   "declared_other_or_unaudited": 34,
+   "deviate": 2
+  }
+ },
+ "deviate_examples": [
+  {
+   "file": "scen-20260930/dsv41flash-r1-a/metric-1790789353247539/cell-r1-metric-global-def-named.json",
+   "task": "M3-T1",
+   "phase": "dupload",
+   "declared": [
+    [
+     "metric:门店退货率#2",
+     0
+    ]
+   ],
+   "answer": "0.05",
+   "gold": "0.0099219903410416",
+   "sql": "SELECT ROUND(100.0 * (\n         (SELECT SUM(sr.sr_return_amt) FROM store_returns sr JOIN date_dim d ON d.d_date_sk = sr.sr_returned_date_sk\n          WHERE d.d_year = 2002 AND d.d_moy = 6)\n       / (SELECT SUM(t.ss_ext_sales_price)\n          FROM (SELECT DISTINCT ss_sold_date_sk, ss_item_sk, ss_ticket_number, ss_quantity, ss_sales_price,\n                       ss_ext_sales_price, ss_ext_discount_a"
+  },
+  {
+   "file": "scen-20260930/dsv41flash-r1-a/metric-1790789353247539/cell-r1-metric-global-def-named.json",
+   "task": "M3-T1",
+   "phase": "latekey",
+   "declared": [
+    [
+     "metric:门店退货率#2",
+     0
+    ]
+   ],
+   "answer": null,
+   "gold": "0.0099219903410416",
+   "sql": ""
+  },
+  {
+   "file": "scen-20260930/dsv41flash-r1-a/metric-1790789353247539/cell-r1-metric-global-named.json",
+   "task": "M5-T2",
+   "phase": "append",
+   "declared": [
+    [
+     "metric:电子品类门店营业额",
+     0
+    ],
+    [
+     "metric:电子品类门店营业额",
+     0
+    ],
+    [
+     "metric:电子品类门店营业额",
+     0
+    ]
+   ],
+   "answer": "8",
+   "gold": "9",
+   "sql": "SELECT d.d_moy AS month, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND i.i_category = '电子'\n  AND ss.ss_ticket_number < 1000000000  -- 剔除 2002-09 被重复加载的批次（票号偏移 1e9）\nGROUP BY d.d_moy\nORDER BY net_paid DESC"
+  },
+  {
+   "file": "scen-20260930/dsv41flash-r1-a/metric-1790789353247539/cell-r1-metric-global-named.json",
+   "task": "M3-T1",
+   "phase": "dupload",
+   "declared": [
+    [
+     "metric:门店退货率",
+     0
+    ]
+   ],
+   "answer": null,
+   "gold": "0.0099219903410416",
+   "sql": ""
+  },
+  {
+   "file": "scen-20260930/dsv41flash-r2-a/metric-1790789593316845/cell-r1-metric-global-def-named.json",
+   "task": "M1-T2",
+   "phase": "append",
+   "declared": [
+    [
+     "metric:门店营业额",
+     0
+    ],
+    [
+     "metric:门店营业额",
+     0
+    ]
+   ],
+   "answer": null,
+   "gold": "9",
+   "sql": ""
+  },
+  {
+   "file": "scen-20260930/dsv41flash-r2-a/metric-1790789593316845/cell-r1-metric-global-def-named.json",
+   "task": "M3-T1",
+   "phase": "dupload",
+   "declared": [
+    [
+     "metric:门店退货率",
+     0
+    ]
+   ],
+   "answer": "我需要澄清后才能给出可靠结果。\n\n**遇到的障碍：**\n1. `find_metric` 中\"门店退货率\"的口径已被**撤销**（粒度守卫失败）：`store_sales(ss_item_sk, ss_ticket_number)` 不唯一（1110165 行只有 1000000 个不同键），因此中间层无法提供已验证的\"门店退货率\"定义；用 `metrics` 声明该口径时 `run_sql` 直接被拒。\n2. 我核查了底层数据，`store_sales` 确实存在**整行完全重复**的记录，且重复高度集中在 2002 年 6 月：2002-06 有 54170 行但去重后仅 27085 行；而 2001-06 为 27090 行、无重复。这使分母（门店营业额）在\"是否去重\"上含义不同。\n3. 不同合理口径给出的答案差异巨大，无法从数据/工具判断哪个才是题目要的：\n   - 退货金额 / 净支付额（不去重）：2001-06 = 23.79%，2002-06 = 11.92% → 差 **-11.87**\n   - 退货金额 / 净支付额（对 store_sales 去重）：2001-06 = 23.79%，2002-06 = 23.84% → 差 **+0.05**\n   - 退货件数 / 销售件数（不去重）：39.99% vs 20.09%\n   - 用 `ss_ext_sales_price` 作分母：21.98% vs 11.02%\n4. 相关分母指标\"门店营业额\"同样已被撤销（无已验证口径），退货也存在\"金额比 vs 件数比\"的选择。\n\n**请澄清：**\n- \"门店退货率\"的定义：是**退货金额/营业额**，还是**退货件数/销售件数**？\n- 营业额用哪一列（`ss_net_paid` 还是 `ss_ext_sales_price`）？\n- `store_sales` 中完全重复的行（尤其 2002-06 翻倍）应**去重**还是按原样求和？\n- 退货按**退货日期**归属、销售按**销售日期**归属（同月对比）是否即为所需口径？\n\n由于题目口径不明确且工具层无法给出可靠定义，我在此请求澄清。",
+   "gold": "0.0099219903410416",
+   "sql": ""
+  },
+  {
+   "file": "scen-20260930/dsv41flash-r3-a/metric-1790808441525058/cell-r1-metric-global-def-named.json",
+   "task": "M3-T1",
+   "phase": "dupload",
+   "declared": [
+    [
+     "metric:门店退货率",
+     0
+    ]
+   ],
+   "answer": "-11.87",
+   "gold": "0.0099219903410416",
+   "sql": "with r as (\n  select d.d_year as y, sum(sr.sr_return_amt) as ret\n  from store_returns sr join date_dim d on sr.sr_returned_date_sk = d.d_date_sk\n  where (d.d_year=2001 and d.d_moy=6) or (d.d_year=2002 and d.d_moy=6)\n  group by 1),\ns as (\n  select d.d_year as y, sum(ss.ss_net_paid) as sales\n  from store_sales ss join date_dim d on ss.ss_sold_date_sk = d.d_date_sk\n  where (d.d_year=2001 and d.d_moy="
+  },
+  {
+   "file": "scen-20260930/dsv41flash-r3-a/metric-1790808441525058/cell-r1-metric-global-def-named.json",
+   "task": "M3-T1",
+   "phase": "latekey",
+   "declared": [
+    [
+     "metric:门店退货率",
+     0
+    ]
+   ],
+   "answer": null,
+   "gold": "0.0099219903410416",
+   "sql": ""
+  },
+  {
+   "file": "scen-20260930/glm53-r2/metric-1790789653334547/cell-r1-metric-global-def-named.json",
+   "task": "M3-T1",
+   "phase": "latekey",
+   "declared": [
+    [
+     "metric:门店退货率（%）",
+     0
+    ]
+   ],
+   "answer": null,
+   "gold": "0.0099219903410416",
+   "sql": ""
+  },
+  {
+   "file": "scen-20260930/glm53flash-r1/metric-1790789533298735/cell-r1-metric-global-named.json",
+   "task": "M5-T1",
+   "phase": "revision",
+   "declared": [
+    [
+     "metric:电子品类门店营业额",
+     1
+    ]
+   ],
+   "answer": "1859.08",
+   "gold": "1860.08",
+   "sql": "select round(sum(ss_net_paid) filter (where d_year = 2002), 2) - round(sum(ss_net_paid) filter (where d_year = 2001), 2) as value\nfrom store_sales\njoin item on ss_item_sk = i_item_sk\njoin date_dim on ss_sold_date_sk = d_date_sk\nwhere i_category = '电子' and ss_is_current = '1' and d_moy = 9 and d_year in (2001, 2002)"
+  },
+  {
+   "file": "scen-20260930/glm53flash-r2/metric-1790808381500949/cell-r1-metric-global-def-named.json",
+   "task": "M1-T1",
+   "phase": "correct",
+   "declared": [
+    [
+     "metric:门店营业额",
+     0
+    ],
+    [
+     "metric:门店营业额",
+     0
+    ],
+    [
+     "metric:门店营业额",
+     0
+    ],
+    [
+     "metric:门店营业额",
+     0
+    ]
+   ],
+   "answer": "-14712.70",
+   "gold": "-14722.70",
+   "sql": ""
+  }
+ ]
+}

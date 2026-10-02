@@ -1,0 +1,1316 @@
+{
+ "numbers": {
+  "ScenModels": 1,
+  "ScenCells": 21,
+  "ScenCellsDropped": 3,
+  "ScenValidTasks": 2010,
+  "ScenQuotaTasks": 6,
+  "ScenAccNoShare": "32",
+  "ScenHoldoutNoShare": "49",
+  "ScenModeledNoShare": "19",
+  "ScenBenignNoShare": "44",
+  "ScenStaleNoShare": 0,
+  "ScenStaleModeledNoShare": 0,
+  "ScenStaleUnitNoShare": 0,
+  "ScenTokNoShare": "22.9",
+  "ScenMaintNoShare": "0.0",
+  "ScenAccTraj": "76",
+  "ScenHoldoutTraj": "100",
+  "ScenModeledTraj": "57",
+  "ScenBenignTraj": "100",
+  "ScenStaleTraj": 0,
+  "ScenStaleModeledTraj": 0,
+  "ScenStaleUnitTraj": 0,
+  "ScenTokTraj": "15.7",
+  "ScenMaintTraj": "0.0",
+  "ScenAccNoguard": "75",
+  "ScenHoldoutNoguard": "100",
+  "ScenModeledNoguard": "59",
+  "ScenBenignNoguard": "99",
+  "ScenStaleNoguard": 142,
+  "ScenStaleModeledNoguard": 98,
+  "ScenStaleUnitNoguard": 26,
+  "ScenTokNoguard": "15.8",
+  "ScenMaintNoguard": "0.0",
+  "ScenAccSchema": "75",
+  "ScenHoldoutSchema": "100",
+  "ScenModeledSchema": "58",
+  "ScenBenignSchema": "99",
+  "ScenStaleSchema": 143,
+  "ScenStaleModeledSchema": 99,
+  "ScenStaleUnitSchema": 26,
+  "ScenTokSchema": "17.3",
+  "ScenMaintSchema": "0.0",
+  "ScenAccRevoke": "67",
+  "ScenHoldoutRevoke": "96",
+  "ScenModeledRevoke": "61",
+  "ScenBenignRevoke": "78",
+  "ScenStaleRevoke": 0,
+  "ScenStaleModeledRevoke": 0,
+  "ScenStaleUnitRevoke": 0,
+  "ScenTokRevoke": "25.3",
+  "ScenMaintRevoke": "0.0",
+  "ScenAccDef": "69",
+  "ScenHoldoutDef": "91",
+  "ScenModeledDef": "64",
+  "ScenBenignDef": "78",
+  "ScenStaleDef": 24,
+  "ScenStaleModeledDef": 0,
+  "ScenStaleUnitDef": 24,
+  "ScenTokDef": "29.7",
+  "ScenMaintDef": "363.3",
+  "ScenAccCond": "81",
+  "ScenHoldoutCond": "100",
+  "ScenModeledCond": "73",
+  "ScenBenignCond": "99",
+  "ScenStaleCond": 27,
+  "ScenStaleModeledCond": 0,
+  "ScenStaleUnitCond": 27,
+  "ScenTokCond": "24.0",
+  "ScenMaintCond": "325.8",
+  "ScenMaintRatio": "90",
+  "ScenRelearnTok": "1.22",
+  "ScenAccCondDupload": "59",
+  "ScenAccNoShareDupload": "22",
+  "ScenAccSchemaDupload": "44",
+  "ScenAccDefDupload": "48",
+  "ScenAccTrajDupload": "37",
+  "ScenAccCondLatekey": "11",
+  "ScenAccNoShareLatekey": "11",
+  "ScenAccSchemaLatekey": "22",
+  "ScenAccDefLatekey": "11",
+  "ScenAccTrajLatekey": "22",
+  "ScenAccCondUnit": "44",
+  "ScenAccNoShareUnit": "22",
+  "ScenAccSchemaUnit": "50",
+  "ScenAccDefUnit": "37",
+  "ScenAccTrajUnit": "48",
+  "ScenAccCondStatus": "100",
+  "ScenAccNoShareStatus": "39",
+  "ScenAccSchemaStatus": "50",
+  "ScenAccDefStatus": "78",
+  "ScenAccTrajStatus": "50",
+  "ScenAccCondRevision": "96",
+  "ScenAccNoShareRevision": "22",
+  "ScenAccSchemaRevision": "74",
+  "ScenAccDefRevision": "85",
+  "ScenAccTrajRevision": "78",
+  "ScenAccCondDimhist": "100",
+  "ScenAccNoShareDimhist": "0",
+  "ScenAccSchemaDimhist": "100",
+  "ScenAccDefDimhist": "100",
+  "ScenAccTrajDimhist": "100",
+  "ScenAccCondMirror": "61",
+  "ScenAccNoShareMirror": "44",
+  "ScenAccSchemaMirror": "61",
+  "ScenAccDefMirror": "61",
+  "ScenAccTrajMirror": "72",
+  "ScenRepairFailedDupload": 12,
+  "ScenRepairSkippedLatekey": 12,
+  "ScenRevokedDupload": 12,
+  "ScenRevokedLatekey": 12,
+  "ScenUnitStaleTasks": 27,
+  "ScenUnitTasks": 27,
+  "ScenAccCondModelA": "81",
+  "ScenCommonPhasesModelA": 12,
+  "ScenAccNoShareModelA": "32",
+  "ScenAccDefModelA": "69",
+  "ScenAccTrajModelA": "76",
+  "ScenHoldTokSaveModelA": "36",
+  "ScenHoldTurnsNoShareModelA": "5.6",
+  "ScenHoldTurnsCondModelA": "3.7",
+  "MaintStagMin": "12.5",
+  "MaintStagMax": "37.8",
+  "MaintSimMin": "44.6",
+  "MaintSimMax": "75.5",
+  "ScenAgentTasks": "2,362",
+  "ScenLLMCalls": "12,285",
+  "ScenTokensM": "55",
+  "ScenAgentHours": "32"
+ },
+ "cells": [
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-a/metric-1790907305843653/cell-r1-middle-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "middle",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-a/metric-1790915082986481/cell-r1-metric-global-noguard-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-noguard",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-a/metric-1790915082986481/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-a/metric-1790915082986481/cell-r1-traj-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-b-rerun/metric-1790923166596116/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790907425882543/cell-r1-metric-global-noguard-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-noguard",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790907425882543/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790915117004809/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790915117004809/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-b-rerun/metric-1790918362008789/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-b/metric-1790907485902637/cell-r1-middle-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "middle",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-b/metric-1790916890330950/cell-r1-traj-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-a-rerun/metric-1790919022641243/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790917042411088/cell-r1-middle-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "middle",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-b/metric-1790907605929284/cell-r1-metric-global-noguard-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-noguard",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-b/metric-1790907605929284/cell-r1-traj-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-b/metric-1790915378185021/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  }
+ ],
+ "dropped": [
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-b/metric-1790907365861894/cell-r1-metric-global-revoke-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-b/metric-1790907485902637/cell-r1-metric-global-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790907545914633/cell-r1-metric-global-revoke-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  }
+ ],
+ "accuracy": {
+  "DeepSeek V4.1 Flash|middle|holdout": [
+   22,
+   45
+  ],
+  "DeepSeek V4.1 Flash|middle|append": [
+   10,
+   26
+  ],
+  "DeepSeek V4.1 Flash|middle|backfill": [
+   7,
+   17
+  ],
+  "DeepSeek V4.1 Flash|middle|correct": [
+   8,
+   27
+  ],
+  "DeepSeek V4.1 Flash|middle|addcol": [
+   12,
+   18
+  ],
+  "DeepSeek V4.1 Flash|middle|status": [
+   7,
+   18
+  ],
+  "DeepSeek V4.1 Flash|middle|revision": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|middle|dupload": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|middle|dimhist": [
+   0,
+   9
+  ],
+  "DeepSeek V4.1 Flash|middle|latekey": [
+   3,
+   27
+  ],
+  "DeepSeek V4.1 Flash|middle|unit": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|middle|mirror": [
+   8,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|holdout": [
+   44,
+   44
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|append": [
+   26,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|status": [
+   9,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|revision": [
+   21,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|dupload": [
+   12,
+   26
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|latekey": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|unit": [
+   11,
+   26
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|mirror": [
+   12,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|append": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|addcol": [
+   17,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|status": [
+   9,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|revision": [
+   20,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|dupload": [
+   12,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|latekey": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|unit": [
+   13,
+   26
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|mirror": [
+   11,
+   18
+  ],
+  "DeepSeek V4.1 Flash|traj-global|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|traj-global|append": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-global|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|traj-global|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-global|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|traj-global|status": [
+   9,
+   18
+  ],
+  "DeepSeek V4.1 Flash|traj-global|revision": [
+   21,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-global|dupload": [
+   10,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-global|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|traj-global|latekey": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-global|unit": [
+   13,
+   27
+  ],
+  "DeepSeek V4.1 Flash|traj-global|mirror": [
+   13,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|holdout": [
+   43,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|append": [
+   22,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|backfill": [
+   9,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|correct": [
+   25,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|addcol": [
+   16,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|status": [
+   14,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|revision": [
+   23,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|dupload": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|latekey": [
+   5,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|unit": [
+   12,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|mirror": [
+   8,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|holdout": [
+   41,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|append": [
+   22,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|backfill": [
+   12,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|correct": [
+   23,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|addcol": [
+   14,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|status": [
+   14,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|revision": [
+   23,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|dupload": [
+   13,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|latekey": [
+   3,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|unit": [
+   10,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|mirror": [
+   11,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global|append": [
+   26,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global|status": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global|revision": [
+   26,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global|dupload": [
+   16,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global|latekey": [
+   3,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global|unit": [
+   12,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global|mirror": [
+   11,
+   18
+  ]
+ },
+ "quota_failed_tasks": {
+  "DeepSeek V4.1 Flash|metric-global-schema": 1,
+  "DeepSeek V4.1 Flash|middle": 2,
+  "DeepSeek V4.1 Flash|metric-global-noguard": 3
+ },
+ "stale": {
+  "middle|holdout": [
+   0,
+   45
+  ],
+  "middle|append": [
+   0,
+   26
+  ],
+  "middle|backfill": [
+   0,
+   17
+  ],
+  "middle|correct": [
+   0,
+   27
+  ],
+  "middle|addcol": [
+   0,
+   18
+  ],
+  "middle|status": [
+   0,
+   18
+  ],
+  "middle|revision": [
+   0,
+   27
+  ],
+  "middle|dupload": [
+   0,
+   27
+  ],
+  "middle|dimhist": [
+   0,
+   9
+  ],
+  "middle|latekey": [
+   0,
+   27
+  ],
+  "middle|unit": [
+   0,
+   27
+  ],
+  "middle|mirror": [
+   0,
+   18
+  ],
+  "metric-global-noguard|holdout": [
+   0,
+   44
+  ],
+  "metric-global-noguard|append": [
+   0,
+   27
+  ],
+  "metric-global-noguard|backfill": [
+   0,
+   18
+  ],
+  "metric-global-noguard|correct": [
+   0,
+   27
+  ],
+  "metric-global-noguard|addcol": [
+   0,
+   18
+  ],
+  "metric-global-noguard|status": [
+   18,
+   18
+  ],
+  "metric-global-noguard|revision": [
+   27,
+   27
+  ],
+  "metric-global-noguard|dupload": [
+   18,
+   26
+  ],
+  "metric-global-noguard|dimhist": [
+   8,
+   9
+  ],
+  "metric-global-noguard|latekey": [
+   27,
+   27
+  ],
+  "metric-global-noguard|unit": [
+   26,
+   26
+  ],
+  "metric-global-noguard|mirror": [
+   18,
+   18
+  ],
+  "metric-global-schema|holdout": [
+   0,
+   45
+  ],
+  "metric-global-schema|append": [
+   0,
+   27
+  ],
+  "metric-global-schema|backfill": [
+   0,
+   18
+  ],
+  "metric-global-schema|correct": [
+   0,
+   27
+  ],
+  "metric-global-schema|addcol": [
+   0,
+   18
+  ],
+  "metric-global-schema|status": [
+   18,
+   18
+  ],
+  "metric-global-schema|revision": [
+   27,
+   27
+  ],
+  "metric-global-schema|dupload": [
+   18,
+   27
+  ],
+  "metric-global-schema|dimhist": [
+   9,
+   9
+  ],
+  "metric-global-schema|latekey": [
+   27,
+   27
+  ],
+  "metric-global-schema|unit": [
+   26,
+   26
+  ],
+  "metric-global-schema|mirror": [
+   18,
+   18
+  ],
+  "traj-global|holdout": [
+   0,
+   45
+  ],
+  "traj-global|append": [
+   0,
+   27
+  ],
+  "traj-global|backfill": [
+   0,
+   18
+  ],
+  "traj-global|correct": [
+   0,
+   27
+  ],
+  "traj-global|addcol": [
+   0,
+   18
+  ],
+  "traj-global|status": [
+   0,
+   18
+  ],
+  "traj-global|revision": [
+   0,
+   27
+  ],
+  "traj-global|dupload": [
+   0,
+   27
+  ],
+  "traj-global|dimhist": [
+   0,
+   9
+  ],
+  "traj-global|latekey": [
+   0,
+   27
+  ],
+  "traj-global|unit": [
+   0,
+   27
+  ],
+  "traj-global|mirror": [
+   0,
+   18
+  ],
+  "metric-global-revoke|holdout": [
+   0,
+   45
+  ],
+  "metric-global-revoke|append": [
+   0,
+   27
+  ],
+  "metric-global-revoke|backfill": [
+   0,
+   18
+  ],
+  "metric-global-revoke|correct": [
+   0,
+   27
+  ],
+  "metric-global-revoke|addcol": [
+   0,
+   18
+  ],
+  "metric-global-revoke|status": [
+   0,
+   18
+  ],
+  "metric-global-revoke|revision": [
+   0,
+   27
+  ],
+  "metric-global-revoke|dupload": [
+   0,
+   27
+  ],
+  "metric-global-revoke|dimhist": [
+   0,
+   9
+  ],
+  "metric-global-revoke|latekey": [
+   0,
+   27
+  ],
+  "metric-global-revoke|unit": [
+   0,
+   27
+  ],
+  "metric-global-revoke|mirror": [
+   0,
+   18
+  ],
+  "metric-global-def|holdout": [
+   0,
+   45
+  ],
+  "metric-global-def|append": [
+   0,
+   27
+  ],
+  "metric-global-def|backfill": [
+   0,
+   18
+  ],
+  "metric-global-def|correct": [
+   0,
+   27
+  ],
+  "metric-global-def|addcol": [
+   0,
+   18
+  ],
+  "metric-global-def|status": [
+   0,
+   18
+  ],
+  "metric-global-def|revision": [
+   0,
+   27
+  ],
+  "metric-global-def|dupload": [
+   0,
+   27
+  ],
+  "metric-global-def|dimhist": [
+   0,
+   9
+  ],
+  "metric-global-def|latekey": [
+   0,
+   27
+  ],
+  "metric-global-def|unit": [
+   24,
+   27
+  ],
+  "metric-global-def|mirror": [
+   0,
+   18
+  ],
+  "metric-global|holdout": [
+   0,
+   45
+  ],
+  "metric-global|append": [
+   0,
+   27
+  ],
+  "metric-global|backfill": [
+   0,
+   18
+  ],
+  "metric-global|correct": [
+   0,
+   27
+  ],
+  "metric-global|addcol": [
+   0,
+   18
+  ],
+  "metric-global|status": [
+   0,
+   18
+  ],
+  "metric-global|revision": [
+   0,
+   27
+  ],
+  "metric-global|dupload": [
+   0,
+   27
+  ],
+  "metric-global|dimhist": [
+   0,
+   9
+  ],
+  "metric-global|latekey": [
+   0,
+   27
+  ],
+  "metric-global|unit": [
+   27,
+   27
+  ],
+  "metric-global|mirror": [
+   0,
+   18
+  ]
+ },
+ "events": {
+  "metric-global-schema|append": {
+   "maintenance": 11
+  },
+  "metric-global-schema|backfill": {
+   "maintenance": 7
+  },
+  "metric-global-schema|correct": {
+   "maintenance": 11
+  },
+  "metric-global-schema|addcol": {
+   "maintenance": 7
+  },
+  "metric-global-schema|status": {
+   "maintenance": 7
+  },
+  "metric-global-schema|revision": {
+   "maintenance": 11
+  },
+  "metric-global-schema|dupload": {
+   "maintenance": 11
+  },
+  "metric-global-schema|dimhist": {
+   "maintenance": 3
+  },
+  "metric-global-schema|latekey": {
+   "maintenance": 11
+  },
+  "metric-global-schema|unit": {
+   "maintenance": 11
+  },
+  "metric-global-schema|mirror": {
+   "maintenance": 7
+  },
+  "metric-global-revoke|append": {
+   "revoked": 13,
+   "maintenance": 13,
+   "promoted": 12,
+   "candidate": 2,
+   "corroborated": 1,
+   "ref_rejected": 2
+  },
+  "metric-global-revoke|backfill": {
+   "revoked": 8,
+   "maintenance": 8,
+   "promoted": 4,
+   "candidate": 3,
+   "ref_rejected": 1,
+   "corroborated": 2
+  },
+  "metric-global-revoke|correct": {
+   "revoked": 13,
+   "maintenance": 13,
+   "promoted": 14,
+   "corroborated": 1,
+   "candidate": 1
+  },
+  "metric-global-revoke|addcol": {
+   "revoked": 8,
+   "maintenance": 8,
+   "promoted": 9,
+   "corroborated": 1,
+   "ref_rejected": 1
+  },
+  "metric-global-revoke|status": {
+   "revoked": 8,
+   "maintenance": 8,
+   "promoted": 4,
+   "corroborated": 1,
+   "candidate": 5,
+   "ref_rejected": 2
+  },
+  "metric-global-revoke|revision": {
+   "revoked": 13,
+   "maintenance": 13,
+   "promoted": 13,
+   "candidate": 1,
+   "corroborated": 2
+  },
+  "metric-global-revoke|dupload": {
+   "revoked": 13,
+   "maintenance": 13,
+   "candidate": 16,
+   "ref_rejected": 2
+  },
+  "metric-global-revoke|dimhist": {
+   "revoked": 5,
+   "maintenance": 5,
+   "promoted": 5,
+   "candidate": 1
+  },
+  "metric-global-revoke|latekey": {
+   "revoked": 13,
+   "maintenance": 13,
+   "promoted": 11,
+   "candidate": 2,
+   "corroborated": 3,
+   "ref_rejected": 1
+  },
+  "metric-global-revoke|unit": {
+   "revoked": 13,
+   "maintenance": 13,
+   "promoted": 14,
+   "corroborated": 2
+  },
+  "metric-global-revoke|mirror": {
+   "revoked": 8,
+   "maintenance": 8,
+   "candidate": 10,
+   "ref_rejected": 3
+  },
+  "metric-global-def|append": {
+   "maintenance": 10
+  },
+  "metric-global-def|backfill": {
+   "maintenance": 5
+  },
+  "metric-global-def|correct": {
+   "maintenance": 10
+  },
+  "metric-global-def|addcol": {
+   "maintenance": 5
+  },
+  "metric-global-def|status": {
+   "revoked": 5,
+   "repair_candidate": 5,
+   "repair_promoted": 5,
+   "maintenance": 5
+  },
+  "metric-global-def|revision": {
+   "revoked": 10,
+   "repair_candidate": 10,
+   "repair_promoted": 10,
+   "maintenance": 10
+  },
+  "metric-global-def|dupload": {
+   "revoked": 11,
+   "repair_failed": 11,
+   "maintenance": 11,
+   "ref_rejected": 14
+  },
+  "metric-global-def|dimhist": {
+   "revoked": 5,
+   "repair_candidate": 4,
+   "repair_promoted": 4,
+   "maintenance": 5,
+   "repair_skipped": 1
+  },
+  "metric-global-def|latekey": {
+   "revoked": 11,
+   "repair_skipped": 11,
+   "maintenance": 11,
+   "ref_rejected": 6
+  },
+  "metric-global-def|unit": {
+   "maintenance": 10
+  },
+  "metric-global-def|mirror": {
+   "revoked": 5,
+   "repair_failed": 4,
+   "maintenance": 5,
+   "ref_rejected": 1,
+   "repair_skipped": 1
+  },
+  "metric-global|append": {
+   "maintenance": 12
+  },
+  "metric-global|backfill": {
+   "maintenance": 9
+  },
+  "metric-global|correct": {
+   "maintenance": 12
+  },
+  "metric-global|addcol": {
+   "maintenance": 9
+  },
+  "metric-global|status": {
+   "revoked": 9,
+   "repair_candidate": 9,
+   "repair_promoted": 9,
+   "maintenance": 9
+  },
+  "metric-global|revision": {
+   "maintenance": 12,
+   "revoked": 10,
+   "repair_candidate": 10,
+   "repair_promoted": 10,
+   "repair_reused": 1
+  },
+  "metric-global|dupload": {
+   "revoked": 12,
+   "repair_failed": 12,
+   "maintenance": 12,
+   "ref_rejected": 8
+  },
+  "metric-global|dimhist": {
+   "revoked": 5,
+   "repair_candidate": 5,
+   "repair_promoted": 5,
+   "maintenance": 5
+  },
+  "metric-global|latekey": {
+   "revoked": 12,
+   "repair_skipped": 12,
+   "maintenance": 12,
+   "ref_rejected": 4
+  },
+  "metric-global|unit": {
+   "maintenance": 12
+  },
+  "metric-global|mirror": {
+   "revoked": 9,
+   "repair_failed": 5,
+   "maintenance": 9,
+   "repair_skipped": 4,
+   "ref_rejected": 3
+  },
+  "middle|append": {},
+  "middle|backfill": {},
+  "middle|correct": {},
+  "middle|addcol": {},
+  "middle|status": {},
+  "middle|revision": {},
+  "middle|dupload": {},
+  "middle|dimhist": {},
+  "middle|latekey": {},
+  "middle|unit": {},
+  "middle|mirror": {},
+  "traj-global|append": {},
+  "traj-global|backfill": {},
+  "traj-global|correct": {},
+  "traj-global|addcol": {},
+  "traj-global|status": {},
+  "traj-global|revision": {},
+  "traj-global|dupload": {},
+  "traj-global|dimhist": {},
+  "traj-global|latekey": {},
+  "traj-global|unit": {},
+  "traj-global|mirror": {},
+  "metric-global-noguard|append": {},
+  "metric-global-noguard|backfill": {},
+  "metric-global-noguard|correct": {},
+  "metric-global-noguard|addcol": {},
+  "metric-global-noguard|status": {},
+  "metric-global-noguard|revision": {},
+  "metric-global-noguard|dupload": {},
+  "metric-global-noguard|dimhist": {},
+  "metric-global-noguard|latekey": {},
+  "metric-global-noguard|unit": {},
+  "metric-global-noguard|mirror": {}
+ },
+ "maintenance_db_s_per_cell": {
+  "DeepSeek V4.1 Flash|middle": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|traj-global": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def": [
+   272.49976399999986,
+   524.6341779999997,
+   292.6625550000001
+  ],
+  "DeepSeek V4.1 Flash|metric-global": [
+   245.98104000000004,
+   346.0997900000001,
+   385.2292130000006
+  ]
+ },
+ "maint_ratios": {
+  "condition|staggered": [
+   [
+    4,
+    37.75191414779548
+   ],
+   [
+    8,
+    21.4073523882895
+   ],
+   [
+    15,
+    15.811991161832989
+   ],
+   [
+    19,
+    12.524210615501646
+   ]
+  ],
+  "condition-scope|staggered": [
+   [
+    4,
+    89.2670465929872
+   ],
+   [
+    8,
+    76.14580916004687
+   ],
+   [
+    15,
+    82.68654250288911
+   ],
+   [
+    19,
+    80.65188233546921
+   ]
+  ],
+  "condition|simultaneous": [
+   [
+    4,
+    68.4450001484138
+   ],
+   [
+    8,
+    75.50508655101093
+   ],
+   [
+    15,
+    59.1986581278021
+   ],
+   [
+    19,
+    44.5560501614129
+   ]
+  ],
+  "condition-scope|simultaneous": [
+   [
+    4,
+    84.0281213983887
+   ],
+   [
+    8,
+    78.21892189629726
+   ],
+   [
+    15,
+    87.28941286468567
+   ],
+   [
+    19,
+    90.25311503474104
+   ]
+  ]
+ }
+}

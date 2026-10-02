@@ -457,6 +457,8 @@ def main():
     ap.add_argument("--maint-rev", default="exp/2026-09-30-maint-share-rev/cells.txt")
     ap.add_argument("--out", default="overleaf/gen")
     ap.add_argument("--json", default=None)
+    ap.add_argument("--prefix", default="Scen", help="数值宏中 Scen 开头的名字改用这个前缀（如 PrevScen，保留旧一轮的数值）")
+    ap.add_argument("--numbers-only", default=None, help="只把数值宏写到这个文件（不写表格与图）")
     o = ap.parse_args()
     global METHODS, PHASES, MODEL_ORDER
     cells, dropped = [], []
@@ -478,6 +480,14 @@ def main():
     R = maint_ratios(load_maint(o.maint), load_maint(o.maint_rev))
     os.makedirs(o.out, exist_ok=True)
     gen = "% 由 tools/paper-results.py 生成，请勿手改。\n"
+    if o.numbers_only:
+        q = numbers(A, dropped, cells, R)
+        with open(o.numbers_only, "w", encoding="utf-8") as f:
+            f.write(gen + f"% --scen {' '.join(o.scen)}\n")
+            for k, v in q.items():
+                if k.startswith("Scen"):
+                    f.write(f"\\newcommand{{\\{o.prefix}{k[4:]}}}{{{v}}}\n")
+        return
     open(os.path.join(o.out, "scen-heat.tex"), "w", encoding="utf-8").write(gen + tex_heat_table(A))
     open(os.path.join(o.out, "scen-models.tex"), "w", encoding="utf-8").write(gen + tex_model_bars(A))
     open(os.path.join(o.out, "scen-cost.tex"), "w", encoding="utf-8").write(gen + tex_cost_table(A))

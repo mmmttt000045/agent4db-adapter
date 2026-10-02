@@ -226,7 +226,7 @@ def common_phases(acc, model):
 def per_model(acc, model, mode, reps=4000, seed=7):
     """该模型在共同场景上的正确率（场景等权平均），95% 区间为场景内按题有放回重抽样（固定种子）的百分位区间。"""
     ps = common_phases(acc, model)
-    if not ps:
+    if not ps or any(acc[(model, mode, p)][1] == 0 for p in ps):
         return None, None, None, 0
     kn = [acc[(model, mode, p)] for p in ps]
     point = mean([k / n for k, n in kn])
@@ -272,7 +272,8 @@ def tex_heat_table(A):
     lines.append(r"\midrule")
     cells = []
     for mode, *_ in METHODS:
-        cells.append(rf"\textbf{{{round(100 * phase_mean(A['acc'], mode, allp))}}}")
+        v = phase_mean(A["acc"], mode, allp)
+        cells.append(rf"\textbf{{{round(100 * v)}}}" if v is not None else "--")
     lines.append(rf"\multicolumn{{3}}{{@{{}}l}}{{\bt{{Mean over the {len(allp)} settings}}{{{len(allp)} 种情形平均}}}} & " + " & ".join(cells) + r"\\")
     lines.append(r"\bottomrule")
     lines.append(r"\end{tabularx}")
@@ -375,16 +376,16 @@ def numbers(A, dropped, cells, R):
     for mode, en, _ in METHODS:
         key = {"middle": "NoShare", "traj-global": "Traj", "metric-global-noguard": "Noguard", "metric-global-schema": "Schema",
                "metric-global-revoke": "Revoke", "metric-global-def": "Def", "metric-global": "Cond"}[mode]
-        q[f"ScenAcc{key}"] = f"{100 * phase_mean(A['acc'], mode, allp):.0f}"
-        vh, _ = macro(A["acc"], mode, ["holdout"])
-        q[f"ScenHoldout{key}"] = f"{100 * vh:.0f}"
-        q[f"ScenModeled{key}"] = f"{100 * phase_mean(A['acc'], mode, modeled):.0f}"
-        q[f"ScenBenign{key}"] = f"{100 * phase_mean(A['acc'], mode, ['append', 'backfill', 'correct', 'addcol']):.0f}"
+        pct = lambda v: f"{100 * v:.0f}" if v is not None else "--"
+        q[f"ScenAcc{key}"] = pct(phase_mean(A["acc"], mode, allp))
+        q[f"ScenHoldout{key}"] = pct(macro(A["acc"], mode, ["holdout"])[0])
+        q[f"ScenModeled{key}"] = pct(phase_mean(A["acc"], mode, modeled))
+        q[f"ScenBenign{key}"] = pct(phase_mean(A["acc"], mode, ["append", "backfill", "correct", "addcol"]))
         q[f"ScenStale{key}"] = sum(A["stale"][(mode, p)][0] for p in allp if p != "holdout")
         q[f"ScenStaleModeled{key}"] = sum(A["stale"][(mode, p)][0] for p in modeled)
         q[f"ScenStaleUnit{key}"] = A["stale"][(mode, "unit")][0]
         tk = mean([mean(xs) for (m, mo), xs in A["tokens"].items() if mo == mode and xs])
-        q[f"ScenTok{key}"] = f"{tk / 1000:.1f}"
+        q[f"ScenTok{key}"] = f"{tk / 1000:.1f}" if tk is not None else "--"
         ms = mean([x for (m, mo), xs in A["maint"].items() if mo == mode for x in xs])
         q[f"ScenMaint{key}"] = f"{ms:.1f}" if ms is not None else "--"
     cond = mean([x for (m, mo), xs in A["maint"].items() if mo == "metric-global" for x in xs])
@@ -407,6 +408,8 @@ def numbers(A, dropped, cells, R):
     q["ScenUnitTasks"] = A["stale"][("metric-global", "unit")][1]
     for m, tag in zip(MODEL_ORDER, "ABC"):
         for mode, key in (("metric-global", "Cond"), ("middle", "NoShare"), ("metric-global-def", "Def"), ("traj-global", "Traj")):
+            if mode not in {x for x, *_ in METHODS}:
+                continue
             v, _, _, nph = per_model(A["acc"], m, mode)
             q[f"ScenAcc{key}Model{tag}"] = f"{100 * v:.0f}" if v is not None else "--"
             q[f"ScenCommonPhasesModel{tag}"] = nph
@@ -463,7 +466,8 @@ def main():
     phases = {r["phase"] for c in cells for r in c["d"]["records"]}
     METHODS = [x for x in METHODS if x[0] in modes]
     PHASES = [x for x in PHASES if x[0] in phases]
-    MODEL_ORDER = [m for m in MODEL_ORDER if any(c["model"] == m for c in cells)]
+    MODEL_ORDER = [m for m in MODEL_ORDER if any(c["model"] == m for c in cells)] + \
+        sorted({c["model"] for c in cells} - set(MODEL_ORDER))
     A = analyze(cells)
     R = maint_ratios(load_maint(o.maint), load_maint(o.maint_rev))
     os.makedirs(o.out, exist_ok=True)

@@ -139,6 +139,7 @@
 - 命令：`agentdb-mid --pool 8 replay-bench --libs results/scen-20260930 --rows 200000`（默认策略已含 tabletest；与配对回放同一次运行，其余策略结果一并重新生成）。
 - 冒烟（2 万行、1 个库、5 种变化）：状态流水下 MAVRA 修复后 12 题全对，表级测试隔离 12 题；维表拉链 6 对 6 隔离；日期键改写两者都不可用；单位变化两者都答错 8 题。
 - 结果：见 `replay-stats.json` 的 `tabletest/judge` 组与正文第 7.2 节；宏 `\RpTable*` 由 `tools/review-results.py` 生成。
+- 复现：10-03 09:49 在空载的 noctis 上再跑一次（`results/replay-1790987566583945`），逐题结果与 `replay-stats.json` 完全相同，维护 DB 时间条件级 694.3 秒、通用缓存 701.0 秒、定义级 1,169.7 秒、表级测试 49.4 秒（与正文一致；比 10-02 的 583 秒高出的部分来自修复候选唯一性检查）。
 
 ## 真实 TPC-DS 数据上的配对回放（2026-10-03 新增，不调用 LLM）
 

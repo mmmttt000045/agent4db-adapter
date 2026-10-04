@@ -5,7 +5,7 @@
   xtick={0,1,2,3,4}, xticklabel style={font=\scriptsize, align=center},
   xticklabels={\bl{Held-out}{留出}, \bl{Benign}{正常}, \bl{Modeled\\breaking}{已建模破坏}, \bl{Backup\\copy}{备份副本}, \bl{Unit\\change}{金额单位}},
   ytick={0,25,50,75,100}, yticklabel={\pgfmathprintnumber{\tick}\%},
-  ylabel={\bt{Accuracy}{正确率}}, legend columns=\ifbilingual 3\else 4\fi, legend style={at={(0.5,1.02)}, anchor=south}]
+  ylabel={\bt{Accuracy}{正确率}}, legend columns=3, legend style={at={(0.5,1.02)}, anchor=south, font=\scriptsize}]
 \input{gen/scen-groups}
 \end{axis}
 \end{tikzpicture}

@@ -213,3 +213,23 @@
 | 半导/无同行评审 | AgentSM、MemGPT 只有 arXiv；Gupta & Mumick 1995 是 Data Eng. Bull. 邀稿；“fan trap / chasm trap” 找不到同行评审出处（可改引 Mazón09 §2.3 或 Hyde & Fremlin, SIGMOD-Companion'24） |
 
 作者顺序以论文 PDF 为准：Breck19（Breck, Polyzotis, Roy, Whang, Zinkevich）、DynFD（第五作者 Torben Meyer）、DataLab（按 IEEE/PDF）。
+
+## 12. 2026-10-04 全文引用核对
+
+按“观点混用、相关写成因果、少数写成共识、可能写成证明、引用对不上原文”五类逐句查了正文 38 处带引用的句子、4 句直接引语和全部 63 条被引条目（2025–2026 年的 10 条在 Crossref 或会议官网核过；Fürst25 的 DOI 10.48786/EDBT.2025.13 由 DataCite 注册，Crossref 查不到属正常）。
+
+新核实的原文依据：
+
+| 说法 | 依据 |
+|---|---|
+| 粒度是“binding contract” | Kimball & Ross 3rd ed. 第 1 章：“The grain declaration becomes a binding contract on the design” |
+| 一半集群 80% 查询完全重复 | van Renen et al. VLDB 2024（PDF 文件名 p3694-saxena.pdf）：“in 50% of database clusters 80% of queries are 1-to-1 repetitions of previously seen queries” |
+| 指纹高估重复 | Redset README：feature_fingerprint “A proxy for query-likeness, though not based on text. Will overestimate repetition” |
+| 只有领域专家懂的术语 | Floratou24 §2：“columns with abbreviated names and custom terminology that only domain experts can understand”；632 张表、4000 多列 |
+| 百万查询归并为千级模板 | Ma18 §4：“reduce the number of queries from millions to at most thousands of templates” |
+| BI 平台维护术语定义 | SiriusBI §3：知识库含 table、column、value、term、udf、alias 六类知识 |
+| 汇总约束类比完整性约束 | Horner04 摘要：“summary constraints could be integrated into data warehouses, just as integrity constraints are integrated into OLTP systems” |
+| 度量不随连接重复计数 | Hyde & Fremlin 2024：measure 锁定在定义表的粒度，连接不引入 bottom-up 计算常见的重复计数 |
+| BIRD-Interact | **没有**“有/无知识”的正确率对比，只是删除知识条目制造歧义；不能引作“业务语义提高正确率” |
+
+当天改掉的问题：Lenz97 被引作“每次更新都要重查”（应为 Mazón09 §4.1）；BIRD-Interact 被引作提高正确率；Breck19 的 “looks perfectly fine” 挂了两篇且写成普遍规律；引言里“becoming the norm”“every agent”“instances of”“defeat the safeguards”四处措辞收紧；状态流水混粒度的例子注明是我们的例子、Kimball 只禁止混粒度；Adapton 不是构建系统也不用哈希；参考文献里未被引用的 Cache-Craft 条目删除。

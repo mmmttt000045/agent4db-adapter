@@ -1,5 +1,10 @@
 \ifbilingual
-  \usepackage[UTF8,scheme=plain,fontset=fandol]{ctex}
+  % Noto CJK instead of Fandol: Fandol subsets embedded by xdvipdfmx render as blank pages in
+  % browser and macOS PDF viewers. The bilingual entry is the writing version only.
+  \usepackage[UTF8,scheme=plain,fontset=none]{ctex}
+  \setCJKmainfont{Noto Serif CJK SC}
+  \setCJKsansfont{Noto Sans CJK SC}
+  \setCJKmonofont{Noto Sans Mono CJK SC}
 \fi
 \usepackage{amsmath}
 \usepackage{algorithm}
@@ -57,6 +62,7 @@
 \input{gen/review}
 \input{gen/numbers-prev}
 \input{gen/scen-ds}
+\input{gen/session-latency}
 % Macros of runs still in progress: the generated files override these once the numbers exist.
 \providecommand{\RpTableCorrect}{--}\providecommand{\RpTableWrong}{--}\providecommand{\RpTableNeeded}{--}
 \providecommand{\RpTableUnneeded}{--}\providecommand{\RpTableDB}{--}
@@ -69,6 +75,11 @@
 \providecommand{\TrSameCondDef}{--}\providecommand{\TrCondUnneeded}{--}\providecommand{\TrCondNeeded}{--}\providecommand{\TrCondDuploadDB}{--}
 \setcopyright{none}
 \settopmatter{printacmref=false}
+\acmConference[SIGMOD '27]{ACM SIGMOD International Conference on Management of Data}{June 13--19, 2027}{Huntington Beach, CA, USA}
+\acmYear{2027}
+\copyrightyear{2027}
+% Submission version: suppress the copyright/permission block with its ISBN and DOI placeholders.
+\renewcommand\footnotetextcopyrightpermission[1]{}
 \citestyle{acmnumeric}
 \newcommand{\system}{MAVRA}
 \newcommand{\bi}[2]{#1\par\ifbilingual #2\par\fi}

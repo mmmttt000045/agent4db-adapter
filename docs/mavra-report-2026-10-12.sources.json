@@ -1,6 +1,6 @@
 {
   "reportDate": "2026-10-12",
-  "slides": 25,
+  "slides": 27,
   "mainSlides": 22,
   "sources": {
     "overleaf/gen/numbers.tex": "5be1196a1f6cc759ced155c58ed5ce784c7650ee7bf064fc215980aa5aa368c8",
@@ -26,7 +26,8 @@
     "overleaf/sections/evaluation/scenarios.tex": "f8b1bdc09c785c1496184c03f09ce7f3481fffe39d1a21be85b7a178d6d62f86",
     "overleaf/sections/09-limitations.tex": "5508b166ff82a0313dc5f712b85cfb1dc0202c80748d160e52f943fd57d9662a",
     "overleaf/sections/10-conclusion.tex": "a207d21dbb56d92e53fa3c0c300cfd232aafda3abdfae54b666cea1887dfd80e",
-    "overleaf/tables/workload.tex": "8e49ad8258fa1763da4179457b8a4b7419604864e9d70cf505b0cea381bec0a5"
+    "overleaf/tables/workload.tex": "8e49ad8258fa1763da4179457b8a4b7419604864e9d70cf505b0cea381bec0a5",
+    "overleaf/tables/scenarios.tex": "a2df67bcb64d7a084ef793e0ed4afd9e25bef64501a80f466306fbe7f021d17d"
   },
   "macros": {
     "CbStagCacheSix": "16.7",
@@ -36,6 +37,7 @@
     "CbStagScopeSix": "86.8",
     "CbZeroMax": "102",
     "CbZeroMin": "95",
+    "DsCmpModeledCondVerify": "11",
     "DsCmpModeledTraj": "16",
     "DsCmpModeledTrajHi": "18",
     "DsCmpModeledTrajLo": "14",
@@ -56,35 +58,28 @@
     "DuUndeclPct": "25.7",
     "EoneRatioFour": "13.0",
     "EoneRatioSixteen": "12.0",
-    "RpCacheCorrect": "973",
-    "RpCacheNeeded": "345",
-    "RpCacheUnneeded": "111",
-    "RpCacheWrong": "101",
     "RpChanges": "11",
     "RpCondCorrect": "973",
-    "RpCondNeeded": "345",
-    "RpCondUnneeded": "111",
+    "RpCondN": "1,530",
     "RpCondWrong": "101",
+    "RpCondWrongModeled": "0",
     "RpDefCorrect": "973",
-    "RpDefNeeded": "345",
-    "RpDefUnneeded": "111",
     "RpDefWrong": "101",
     "RpDefs": "97",
     "RpLibs": "15",
     "RpPairEx": "780",
     "RpPairJudge": "933",
     "RpPairN": "1,470",
-    "RpSameCondDef": "100.0",
     "RpSchemaCorrect": "784",
-    "RpSchemaNeeded": "0",
-    "RpSchemaUnneeded": "0",
     "RpSchemaWrong": "746",
     "RpSchemaWrongModeled": "645",
     "RpTableCorrect": "631",
-    "RpTableNeeded": "645",
     "RpTableOnlyCond": "342",
-    "RpTableUnneeded": "153",
     "RpTableWrong": "101",
+    "RpTableWrongModeled": "0",
+    "ScenHoldTokSaveModelA": "36",
+    "ScenHoldTurnsCondModelA": "3.7",
+    "ScenHoldTurnsNoShareModelA": "5.6",
     "ScenValidTasks": "2586",
     "SlCacheCorrect": "54",
     "SlCacheMean": "31.97",
@@ -119,188 +114,197 @@
     "TpDefs": "175",
     "TpPer": "8.6",
     "TpTemplates": "99",
-    "TrCondN": "981",
-    "TrCondRepairedTasks": "279",
-    "TrCondWrongModeled": "0",
-    "TrDefs": "93",
     "TrSchemaWrongModeled": "437",
-    "TrSeeded": "91",
     "WrCondOff": "63"
   },
   "outline": [
     {
       "page": 1,
-      "title": "MAVRA：共享指标定义的有效性维护",
-      "section": "开场",
+      "title": "MAVRA",
+      "section": "封面",
       "source": "论文标题 / 摘要",
       "appendix": false
     },
     {
       "page": 2,
-      "title": "数据库必须替智能体记住：学到的定义为什么成立",
-      "section": "核心观点",
-      "source": "论文 §1 / §7；gen/scen-ds.tex、review.tex、session-latency.tex",
+      "title": "一页看懂：问题、做法和效果",
+      "section": "概要",
+      "source": "论文摘要；gen/scen-ds.tex、review.tex、session-latency.tex",
       "appendix": false
     },
     {
       "page": 3,
-      "title": "SQL 照常执行，退货金额却被算了两次",
-      "section": "问题与动机",
-      "source": "论文 §1、§2.3；早期单期例子",
+      "title": "数据智能体：先摸清数据库，再写 SQL 回答业务问题",
+      "section": "背景",
+      "source": "论文 §2.1、§2.2；工作负载刻画 exp/2026-10-01-workload-characterization/",
       "appendix": false
     },
     {
       "page": 4,
-      "title": "使用者变成智能体后，三件事发生了变化",
-      "section": "问题与动机",
-      "source": "论文 §1（当前引言）",
+      "title": "“口径”是业务知识，表结构里没有",
+      "section": "背景",
+      "source": "论文 §1、§2.2；Spider 2.0、BIRD 的数字取自原论文",
       "appendix": false
     },
     {
       "page": 5,
-      "title": "智能体反复获取的是知识，探查 SQL 写法却不同",
-      "section": "问题与动机",
-      "source": "论文 §2.1、工作负载表；exp/2026-10-01-workload-characterization/",
+      "title": "趋势：把智能体学到的口径共享给后来的会话",
+      "section": "背景",
+      "source": "论文 §1、§2.2、§8；gen/numbers.tex（留出题的轮数与 token）",
       "appendix": false
     },
     {
       "page": 6,
-      "title": "保持共享口径正确，需要回答三个问题",
-      "section": "方法",
-      "source": "论文 §1、§4–6",
+      "title": "SQL 照常执行，退货金额却被算了两次",
+      "section": "问题",
+      "source": "论文 §1、§2.3（贯穿例子）",
       "appendix": false
     },
     {
       "page": 7,
-      "title": "中间层贯通准入、维护和执行",
-      "section": "系统",
-      "source": "论文 §3、§5–6",
+      "title": "为什么现有手段挡不住",
+      "section": "问题",
+      "source": "论文 §1、§2.4、§7.2、§7.6；gen/review.tex、scen-ds.tex",
       "appendix": false
     },
     {
       "page": 8,
-      "title": "四类条件把数据前提变成可执行的证据",
-      "section": "模型与保证",
-      "source": "论文 §4；命题 1",
+      "title": "我们的做法：数据库替智能体记住“定义为什么成立”",
+      "section": "做法",
+      "source": "论文 §1、§3–§6",
       "appendix": false
     },
     {
       "page": 9,
-      "title": "更新触及哪些条件，就维护哪些证据",
-      "section": "维护",
-      "source": "论文 §2.4、§4.3、§5.2；gen/review.tex",
+      "title": "记录：四类条件，用退货金额来看",
+      "section": "做法 · 记录",
+      "source": "论文 §4.2、§4.3；命题 1",
       "appendix": false
     },
     {
       "page": 10,
-      "title": "每次声明使用，绑定到查询自己的快照",
-      "section": "执行保证",
-      "source": "论文 §6.2；引理 1；snapshot_exec 为可选模式",
+      "title": "维护：更新触及哪些条件，就只重查哪些",
+      "section": "做法 · 维护",
+      "source": "论文 §4.4、§5.2；gen/review.tex",
       "appendix": false
     },
     {
       "page": 11,
-      "title": "失效后：唯一、不丢键、过回归才发布修复",
-      "section": "有界修复",
-      "source": "论文 §5.3；算法 1",
+      "title": "约束使用：检查和查询必须看同一份数据",
+      "section": "做法 · 约束使用",
+      "source": "论文 §6.2；引理 1；绑定快照为可选模式",
       "appendix": false
     },
     {
       "page": 12,
-      "title": "固定定义验证机制，完整会话验证任务收益",
-      "section": "实验设计",
-      "source": "论文 §7.1；exp/2026-10-02-scenarios-ds/、2026-10-03-session-latency/",
+      "title": "处理失效：三道关才发布修复，否则撤下",
+      "section": "做法 · 处理失效",
+      "source": "论文 §5.3；算法 1；§7.4",
       "appendix": false
     },
     {
       "page": 13,
-      "title": "Q1：维护后的定义在已建模变化下零错误答案",
-      "section": "实验 / 配对回放",
-      "source": "论文 §7.2；gen/review.tex；同一库、同一变化配对",
+      "title": "MAVRA：智能体与 PostgreSQL 之间的中间层",
+      "section": "系统",
+      "source": "论文 §3；约 6,600 行 Rust，40 个测试",
       "appendix": false
     },
     {
       "page": 14,
-      "title": "Q1：真实 TPC-DS SF1 上重复同一配对设计",
-      "section": "实验 / TPC-DS",
-      "source": "论文 §7.2；TPC-DS 模板导出的回放库；gen/review.tex",
+      "title": "两层实验：先固定口径验证机制，再让真实智能体跑完整任务",
+      "section": "实验",
+      "source": "论文 §7.1；表 2、表 3",
       "appendix": false
     },
     {
       "page": 15,
-      "title": "Q2：同快照执行消除了条件违规作答",
-      "section": "实验 / 并发写入",
-      "source": "论文 §7.3；gen/review.tex；四组随机并发设置",
+      "title": "数据变化后：维护后的口径零错误答案，只看结构 645 个",
+      "section": "实验 · 正确性",
+      "source": "论文 §7.2；gen/review.tex；表 4",
       "appendix": false
     },
     {
       "page": 16,
-      "title": "Q4：共享条件减少维护，通用缓存也得到节省",
-      "section": "实验 / 维护代价",
-      "source": "论文 §7.5；gen/review.tex；19 定义、错峰到达",
+      "title": "并发写入：执行前检查 4.6% 违规作答，绑定快照一次没有",
+      "section": "实验 · 使用时的保证",
+      "source": "论文 §7.3；gen/review.tex；表 5",
       "appendix": false
     },
     {
       "page": 17,
-      "title": "Q5：共享提高准确率，维护在破坏性变化下起作用",
-      "section": "实验 / 端到端",
-      "source": "论文 §7.6；9 方法 × 3 次；gen/scen-ds.tex",
+      "title": "维护代价：共享条件后，只需定义级重验的 14%",
+      "section": "实验 · 代价",
+      "source": "论文 §7.5；gen/review.tex；19 个口径、错峰到达",
       "appendix": false
     },
     {
       "page": 18,
-      "title": "新增会话证据：共享定义减少任务时间和 token",
-      "section": "实验 / 完整会话",
-      "source": "论文 §7.6；216 个固定库会话；gen/session-latency.tex",
+      "title": "端到端：共享把正确率从 32% 提到 75%，维护再拉开 16 个点",
+      "section": "实验 · 真实智能体",
+      "source": "论文 §7.6；gen/scen-ds.tex；9 种方法 × 3 次",
       "appendix": false
     },
     {
       "page": 19,
-      "title": "完整延迟结果：更新后首用更快，突发仍有模型长尾",
-      "section": "实验 / 完整会话",
-      "source": "exp/2026-10-03-session-latency/stats.json、report.md",
+      "title": "对使用者：任务更快、调用更少、token 更少",
+      "section": "实验 · 使用者的开销",
+      "source": "论文 §7.6；gen/session-latency.tex；exp/2026-10-03-shared-memory/analysis/summary.json",
       "appendix": false
     },
     {
       "page": 20,
-      "title": "业务定义相同、正确率相同时，共享仍减少探索",
-      "section": "实验 / 探索开销",
-      "source": "论文 §7.6；exp/2026-10-03-shared-memory/analysis/summary.json",
+      "title": "保证的范围，和现在还做不到的",
+      "section": "讨论",
+      "source": "论文 §6.3、§7.6、§9",
       "appendix": false
     },
     {
       "page": 21,
-      "title": "讨论：保证范围与下一步扩展",
-      "section": "讨论",
-      "source": "论文 §6.3、§7.6、§9；gen/review.tex",
+      "title": "论文贡献与当前进展",
+      "section": "进展",
+      "source": "当前 overleaf/；docs/research-status.md",
       "appendix": false
     },
     {
       "page": 22,
-      "title": "数据库持续维护共享定义成立的证据",
-      "section": "结论",
+      "title": "让共享知识在变化的数据上继续成立",
+      "section": "结束",
       "source": "论文 §10",
       "appendix": false
     },
     {
       "page": 23,
-      "title": "各类方法分别覆盖生命周期的哪些环节",
-      "section": "基线与定位",
-      "source": "论文 §2.4、基线表；概念对照",
+      "title": "形式化：定义、命题 1、引理 1 与算法 1",
+      "section": "形式化",
+      "source": "论文 §4、§6.2、§5.3",
       "appendix": true
     },
     {
       "page": 24,
-      "title": "修复参照决定自动化范围，唯一性挡住歧义",
+      "title": "修复参照决定自动化范围，唯一性规则挡住歧义",
       "section": "修复细节",
       "source": "论文 §7.4；gen/review.tex、scen-ds.tex",
       "appendix": true
     },
     {
       "page": 25,
-      "title": "本次更新对应论文的哪些变化",
-      "section": "论文与汇报同步",
-      "source": "当前 overleaf/；补充证据保留为论文相应段落的支持",
+      "title": "各类方法分别覆盖生命周期的哪些环节",
+      "section": "基线与定位",
+      "source": "论文 §2.4、表 3；概念对照",
+      "appendix": true
+    },
+    {
+      "page": 26,
+      "title": "完整会话延迟：更新后首用更快，突发到达仍有模型长尾",
+      "section": "完整会话",
+      "source": "exp/2026-10-03-session-latency/stats.json、report.md",
+      "appendix": true
+    },
+    {
+      "page": 27,
+      "title": "应用重复的是查询，智能体重复的是知识",
+      "section": "工作负载刻画",
+      "source": "论文 §2.1；exp/2026-10-01-workload-characterization/",
       "appendix": true
     }
   ]

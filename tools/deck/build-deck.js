@@ -1,5 +1,7 @@
-// MAVRA research presentation. Numerical results come from the paper's macros
-// and the archived session / matched-producer studies. No external skill required.
+// MAVRA research presentation (2026-10-12), written for an audience new to the
+// direction. Numbers come from the paper's result macros and the archived
+// session / matched-producer studies; the build fails if any of them is missing
+// or if the paper and the archive disagree.
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -83,20 +85,22 @@ for (const file of ['paper.tex', 'sections/abstract.tex', 'sections/01-introduct
   'sections/03-overview.tex', 'sections/04-model.tex', 'sections/05-maintenance.tex', 'sections/06-enforcement.tex',
   'sections/evaluation/setup.tex', 'sections/evaluation/validity.tex', 'sections/evaluation/concurrency.tex',
   'sections/evaluation/repair.tex', 'sections/evaluation/maintenance-cost.tex', 'sections/evaluation/scenarios.tex',
-  'sections/09-limitations.tex', 'sections/10-conclusion.tex', 'tables/workload.tex']) {
+  'sections/09-limitations.tex', 'sections/10-conclusion.tex', 'tables/workload.tex', 'tables/scenarios.tex']) {
   read(path.relative(repo, path.join(overleaf, file)));
 }
 
+// ---------------------------------------------------------------- styling ----
 const pres = new pptxgen();
 pres.layout = 'LAYOUT_WIDE';
 const W = 13.333333, H = 7.5;
 const FONT = 'Microsoft YaHei';
 const C = {
-  navy: '1B2A41', ink: '24364D', muted: '53657A', light: 'EEF2F7', line: 'D9E2EE',
-  blue: '2A78D6', orange: 'EB6834', green: '198861', gold: 'C48B0A', purple: '8250AD', white: 'FFFFFF',
+  navy: '1B2A41', ink: '24364D', muted: '53657A', light: 'EEF2F7', line: 'D9E2EE', white: 'FFFFFF',
+  blue: '2A78D6', orange: 'EB6834', green: '198861', purple: '8250AD', gold: 'C48B0A',
+  paleBlue: 'E6EFFB', paleOrange: 'FDEDE4', paleGreen: 'E3F2EB', palePurple: 'EFE8F7',
 };
 pres.theme = { headFontFace: FONT, bodyFontFace: FONT, lang: 'zh-CN' };
-pres.title = `MAVRA：共享指标定义的有效性维护 · ${reportDate}`;
+pres.title = `MAVRA：让数据智能体共享的指标定义在数据变化后依然正确 · ${reportDate}`;
 pres.subject = 'Keeping Shared Metric Definitions Valid for Data Agents';
 pres.author = 'MAVRA';
 pres.company = 'Research';
@@ -108,20 +112,25 @@ function boxCheck(x, y, w, h, label) {
     throw new Error(`Out of slide bounds: ${label}: ${[x, y, w, h].join(', ')}`);
   }
 }
-function tx(s, text, x, y, w, h, size = 18, opts = {}) {
+function tx(s, text, x, y, w, h, size = 17, opts = {}) {
   boxCheck(x, y, w, h, typeof text === 'string' ? text.slice(0, 40) : 'rich text');
   s.addText(text, { x, y, w, h, fontFace: FONT, fontSize: size, color: C.ink, margin: 0,
-    breakLine: false, valign: 'top', lineSpacingMultiple: 1.1, isTextBox: true,
+    breakLine: false, valign: 'top', lineSpacingMultiple: 1.12, isTextBox: true,
     objectName: `text-${++objects}`, ...opts });
 }
-function shape(s, x, y, w, h, fill = C.light, line = fill, type = 'roundRect') {
+function shape(s, x, y, w, h, fill = C.light, line = fill, type = 'roundRect', radius = 0.1) {
   boxCheck(x, y, w, h, type);
-  s.addShape(pres.ShapeType[type], { x, y, w, h, rectRadius: 0.08,
+  s.addShape(pres.ShapeType[type], { x, y, w, h, rectRadius: radius,
     fill: { color: fill }, line: { color: line, width: 0.8 }, objectName: `shape-${++objects}` });
 }
-function arrow(s, x1, y1, x2, y2, color = C.blue) {
+function circle(s, x, y, d, color, text, size = 15, textColor = C.white) {
+  boxCheck(x, y, d, d, 'circle');
+  s.addShape(pres.ShapeType.ellipse, { x, y, w: d, h: d, fill: { color }, line: { color, width: 0 }, objectName: `circle-${++objects}` });
+  if (text !== undefined) tx(s, String(text), x, y, d, d, size, { bold: true, color: textColor, align: 'center', valign: 'middle' });
+}
+function arrow(s, x1, y1, x2, y2, color = C.blue, width = 1.8) {
   s.addShape(pres.ShapeType.line, { x: x1, y: y1, w: x2 - x1, h: y2 - y1,
-    line: { color, width: 1.8, beginArrowType: 'none', endArrowType: 'triangle' }, objectName: `arrow-${++objects}` });
+    line: { color, width, beginArrowType: 'none', endArrowType: 'triangle' }, objectName: `arrow-${++objects}` });
 }
 function slide(title, section, source, notes, { dark = false, appendix = false } = {}) {
   const s = pres.addSlide();
@@ -129,33 +138,33 @@ function slide(title, section, source, notes, { dark = false, appendix = false }
   const page = slides.length + 1;
   slides.push({ page, title, section, source, appendix });
   if (!dark) {
-    tx(s, `${appendix ? '附录 / ' : ''}${section}`, 0.6, 0.25, 11.8, 0.24, 10.5, { bold: true, color: C.blue, charSpacing: 1 });
-    const titleSize = title.length > 34 ? 25 : title.length > 27 ? 27 : 29;
-    tx(s, title, 0.6, 0.64, 12.1, 0.65, titleSize, { bold: true });
-    shape(s, 0.6, 1.33, 12.1, 0.025, C.line, C.line, 'rect');
+    tx(s, `${appendix ? '附录 · ' : ''}${section}`, 0.6, 0.28, 11.8, 0.26, 11, { bold: true, color: C.blue, charSpacing: 1.5 });
+    const titleSize = title.length > 30 ? 25 : title.length > 24 ? 27 : 29;
+    tx(s, title, 0.6, 0.6, 12.1, 0.72, titleSize, { bold: true, color: C.navy });
   }
-  tx(s, `MAVRA · ${reportDate} 研究汇报`, 0.6, 7.1, 4.35, 0.22, 9.5, { color: dark ? 'C4D2E4' : C.muted });
+  tx(s, `MAVRA · ${reportDate} 组会汇报`, 0.6, 7.1, 4.35, 0.22, 9.5, { color: dark ? 'C4D2E4' : C.muted });
   tx(s, source, 5.0, 7.1, 7.1, 0.22, 8.5, { color: dark ? 'C4D2E4' : C.muted, align: 'right' });
   tx(s, String(page).padStart(2, '0'), 12.2, 7.08, 0.5, 0.24, 10.5, { align: 'right', color: dark ? C.white : C.muted });
-  s.addNotes(`${notes}\n\n依据：${source}\n报告日期：${reportDate}。内容对应当前 overleaf/ 正文；归档结果独立标注。`);
+  s.addNotes(`${notes}\n\n依据：${source}\n报告日期：${reportDate}。内容对应当前 overleaf/ 正文；归档结果单独标注。`);
   return s;
 }
-function card(s, x, y, w, h, head, body, color = C.blue, size = 16.5) {
-  shape(s, x, y, w, h);
-  shape(s, x + 0.18, y + 0.24, 0.055, 0.28, color, color, 'rect');
-  tx(s, head, x + 0.38, y + 0.18, w - 0.56, 0.52, 19, { bold: true, color });
-  tx(s, body, x + 0.23, y + 0.91, w - 0.46, h - 1.1, size);
+function card(s, x, y, w, h, head, body, color = C.blue, { size = 16, badge = null, fill = C.light, headSize = 18 } = {}) {
+  shape(s, x, y, w, h, fill, fill);
+  let hx = x + 0.24;
+  if (badge !== null) { circle(s, x + 0.22, y + 0.22, 0.44, color, badge, 15); hx = x + 0.8; }
+  tx(s, head, hx, y + 0.24, w - (hx - x) - 0.2, 0.46, headSize, { bold: true, color, valign: 'middle' });
+  tx(s, body, x + 0.24, y + 0.9, w - 0.48, h - 1.06, size);
 }
 function stat(s, x, y, w, value, label, color = C.blue, size = 38, labelH = 0.85) {
   tx(s, value, x, y, w, 0.85, size, { bold: true, color });
-  tx(s, label, x, y + 0.97, w, labelH, 15.5, { color: C.muted });
+  tx(s, label, x, y + 0.97, w, labelH, 15, { color: C.muted });
 }
-function bullets(s, items, x, y, w, h, size = 18, color = C.ink) {
+function bullets(s, items, x, y, w, h, size = 17, color = C.ink, space = 12) {
   tx(s, items.map((text, i) => ({ text, options: { bullet: { indent: size }, hanging: 4,
-    breakLine: i < items.length - 1, paraSpaceAfter: 12 } })), x, y, w, h, size, { color });
+    breakLine: i < items.length - 1, paraSpaceAfter: space } })), x, y, w, h, size, { color });
 }
-function takeaway(s, text, y = 6.28, color = C.blue) {
-  shape(s, 0.6, y, 12.1, 0.57, C.light);
+function takeaway(s, text, y = 6.3, color = C.blue, fill = C.light) {
+  shape(s, 0.6, y, 12.1, 0.57, fill, fill);
   tx(s, text, 0.82, y + 0.12, 11.66, 0.34, 16, { color, bold: true });
 }
 function table(s, rows, x, y, widths, rowH = 0.6, size = 15, highlight = null) {
@@ -185,324 +194,362 @@ function chart(s, data, x, y, w, h, colors, max = 100, options = {}) {
     plotArea: { fill: { color: C.white }, border: { color: C.white, pt: 0 } }, ...options,
   });
 }
+// A numbered process step: tinted box, number circle, heading, body.
+function step(s, x, y, w, h, number, head, body, color = C.blue, fill = C.light, size = 15) {
+  shape(s, x, y, w, h, fill, fill);
+  circle(s, x + 0.2, y + 0.2, 0.42, color, number, 15);
+  tx(s, head, x + 0.74, y + 0.2, w - 0.9, 0.44, 17, { bold: true, color, valign: 'middle' });
+  tx(s, body, x + 0.22, y + 0.8, w - 0.42, h - 0.95, size);
+}
 
+// ================================================================ slides ====
 // 01 Cover.
-let s = slide('MAVRA：共享指标定义的有效性维护', '开场', '论文标题 / 摘要',
-  '这次汇报沿着论文当前主线展开：数据库替智能体保存已学定义成立的证据，随更新维护，并在使用时约束读取的数据。方法讲清三个问题，实验区分机制层正确性和智能体完整任务收益。', { dark: true });
-tx(s, 'MAVRA', 0.8, 1.12, 11.6, 0.83, 52, { bold: true, color: C.white });
-tx(s, '面向数据智能体的\n共享指标定义有效性维护', 0.8, 2.35, 11.7, 1.55, 34, { bold: true, color: C.white });
-tx(s, 'Keeping Shared Metric Definitions Valid for Data Agents', 0.83, 4.36, 11.6, 0.44, 19, { color: 'D6E2F1' });
-tx(s, `${reportDate.replace(/-/g, ' / ')}  ·  论文进展汇报  ·  SIGMOD 2027`, 0.83, 5.32, 11.6, 0.45, 18, { color: 'D6E2F1' });
-tx(s, '问题与动机  →  有效性模型  →  维护与执行  →  实验与讨论', 0.83, 6.15, 11.6, 0.36, 15, { color: 'AFC4DE' });
+let s = slide('MAVRA', '封面', '论文标题 / 摘要',
+  '开场一句话：数据智能体会把“业务指标怎么算”自己摸索出来，并把结果共享给后面的会话；数据一变，这些共享的 SQL 可能悄悄算错。我们做的事是让数据库替智能体记住“这个定义为什么成立”，数据变了就重新核对，用的时候只在核对通过的数据上执行，坏了谨慎修或撤下。今天先讲背景和问题，再讲做法和实验，最后是进展和想讨论的问题。', { dark: true });
+tx(s, 'MAVRA', 0.8, 1.05, 11.6, 0.83, 52, { bold: true, color: C.white });
+tx(s, '让数据智能体共享的指标定义\n在数据变化后依然正确', 0.8, 2.25, 11.7, 1.6, 34, { bold: true, color: C.white });
+tx(s, 'Keeping Shared Metric Definitions Valid for Data Agents', 0.83, 4.3, 11.6, 0.44, 19, { color: 'D6E2F1' });
+tx(s, `${reportDate.replace(/-/g, ' / ')}  ·  组会汇报  ·  投稿目标 SIGMOD 2027`, 0.83, 5.25, 11.6, 0.45, 18, { color: 'D6E2F1' });
+tx(s, '背景  →  问题  →  做法  →  实验  →  进展与讨论', 0.83, 6.1, 11.6, 0.36, 15, { color: 'AFC4DE' });
 
-// 02 Central claim and separate evidence.
-s = slide('数据库必须替智能体记住：学到的定义为什么成立', '核心观点', '论文 §1 / §7；gen/scen-ds.tex、review.tex、session-latency.tex',
-  '共享定义的业务含义长期存在，但 SQL 正确性依赖当前数据。三组数字分别来自端到端场景、并发写入机制实验和固定库会话实验；它们不是同一分母，不互相替代。73% 是智能体最终答案正确率，零违规是声明使用时条件成立的保证。');
-card(s, 0.6, 1.66, 3.9, 2.4, '把前提变成条件', '从结构化定义推出粒度、连接多重性、时间角色与覆盖；证据随数据版本保存。', C.blue);
-card(s, 4.7, 1.66, 3.9, 2.4, '让证据约束使用', '声明的修订只在条件成立的快照上执行；依赖版本一致才复用结论。', C.green);
-card(s, 8.8, 1.66, 3.9, 2.4, '失效后有界修复', '修复必须不丢业务键、结构上唯一并通过回归；否则撤下定义。', C.orange);
-stat(s, 0.82, 4.46, 3.75, `${n('DsCondModeled')}% / ${n('DsTrajModeled')}%`, '已建模破坏下：MAVRA / 轨迹检索\n智能体最终答案正确率', C.blue);
-stat(s, 4.92, 4.46, 3.75, `0 / ${n('SnSnapAnswered')}`, '并发写入下：绑定快照执行\n在条件不成立的数据上作答的次数', C.green, 35);
-stat(s, 9.02, 4.46, 3.65, `${n('SlNoneMean')} → ${n('SlCondMean')}`, '固定库会话：不共享 → MAVRA\n平均完成秒数', C.orange, 27);
+// 02 One-page summary.
+s = slide('一页看懂：问题、做法和效果', '概要', '论文摘要；gen/scen-ds.tex、review.tex、session-latency.tex',
+  '这页是给第一次接触这个方向的听众的地图。四个框按“背景—问题—做法—效果”排列，后面每一节都对应其中一个框。三个数字分别来自三组不同实验，不是同一个分母：73% 对 57% 是真实智能体在破坏性数据变化下的最终答案正确率；0 违规是并发写入下的机制实验；64 秒到 38 秒是固定定义库的会话实验。');
+card(s, 0.6, 1.62, 2.85, 3.95, '背景', '大模型智能体靠探索数据库来回答业务问题。\n\n“退货金额怎么算”这类口径是业务知识，表结构里没有；学一次很贵，所以越来越多系统让智能体把学到的口径共享给后来的会话。', C.blue, { badge: '1', size: 15 });
+card(s, 3.68, 1.62, 2.85, 3.95, '问题', '共享的口径是在某一时刻的数据上学到的。\n\n日常的数据更新（比如多了一种状态行）不改表结构，却让共享的 SQL 照常执行、悄悄返回错误汇总值；用它的智能体看不出来。', C.orange, { badge: '2', size: 15 });
+card(s, 6.76, 1.62, 2.85, 3.95, '做法', '让数据库替智能体记住“定义为什么成立”：\n\n把成立条件记录为可执行检查，随数据版本维护，查询只在检查通过的数据上执行；坏了只做唯一且过回归的修复，否则撤下。', C.green, { badge: '3', size: 15 });
+card(s, 9.84, 1.62, 2.85, 3.95, '效果', `破坏性数据变化下，智能体正确率 ${n('DsCondModeled')}%，对照的轨迹检索 ${n('DsTrajModeled')}%。\n\n并发写入下零次在违规数据上作答。\n\n使用者的任务从 ${n('SlNoneMean')} 秒缩到 ${n('SlCondMean')} 秒，token 少 ${n('SlCondInputSaveNone')}%。`, C.purple, { badge: '4', size: 15 });
+takeaway(s, '一句话：共享让智能体少探索；维护让共享的知识在变化的数据上继续成立。', 5.95);
 
-// 03 Concrete producer / update / consumer story.
-s = slide('SQL 照常执行，退货金额却被算了两次', '问题与动机', '论文 §1、§2.3；早期单期例子',
-  '最初每个小票—商品键对应一条完成记录，SUM(sr_return_amt) 正确。ETL 追加申请状态行而不改表结构，新会话沿用共享 SQL 就会重复计数。这是论文引言中的实际单期例子。修复完成状态过滤还要检查是否丢键以及回归。');
-card(s, 0.6, 1.65, 3.6, 2.5, 'Agent A 学到定义', '一笔退货 = 一条完成记录\n小票—商品键唯一\nSQL：SUM(sr_return_amt)', C.blue, 16);
-card(s, 4.86, 1.65, 3.6, 2.5, 'ETL 追加状态流水', '同一退货又多一条申请行\n键不再唯一\n表名、列名、类型均不变', C.orange, 16);
-card(s, 9.12, 1.65, 3.6, 2.5, 'Agent B 复用共享 SQL', '学习者的会话已经结束\n新会话没有基准真值\n执行成功也看不出重复计数', C.purple, 16);
-arrow(s, 4.28, 2.8, 4.75, 2.8); arrow(s, 8.55, 2.8, 9.02, 2.8);
-stat(s, 0.85, 4.62, 5.7, '6,588,699.86', '共享 SQL 返回的单期金额', C.orange, 37);
-stat(s, 7.0, 4.62, 5.7, '3,294,349.93', '该期间实际的已完成退货金额', C.green, 37);
-takeaway(s, '共享保存了业务知识，也让一次过期观测传播给之后的每个智能体。');
-
-// 04 New introduction: what changes with agent consumers.
-s = slide('使用者变成智能体后，三件事发生了变化', '问题与动机', '论文 §1（当前引言）',
-  '这页对应新引言的三个变化。性质本身属于数据仓库的汇总正确性要求；变化在于这些前提由智能体观测、生产者与消费者脱钩、消费者不能靠执行成功识别破坏。已有共享记忆、数据测试和指标层构成背景；核心对象仍是指标定义的有效性生命周期。');
-card(s, 0.6, 1.75, 3.9, 3.65, '前提从设计变成观测', '智能体在当前快照查明粒度和连接。\n\n观测通常只留在轨迹中；之后的纯数据更新可能打破它。', C.blue, 18);
-card(s, 4.7, 1.75, 3.9, 3.65, '生产者与消费者脱钩', '定义在学习会话结束后继续存在，并服务全新的会话。\n\n一次过期的证据会影响所有复用者。', C.purple, 18);
-card(s, 8.8, 1.75, 3.9, 3.65, '消费者看不出破坏', '表结构未变，SQL 不报错，结果仍像一个合理数字。\n\n消费者既没见过原证据，也没有真值。', C.orange, 18);
-takeaway(s, '需要持续维护“定义—条件—证据”的联系，并让证据决定每次使用是否有效。');
-
-// 05 Workload characterization.
-s = slide('智能体反复获取的是知识，探查 SQL 写法却不同', '问题与动机', '论文 §2.1、工作负载表；exp/2026-10-01-workload-characterization/',
-  '应用侧来自 Redset，400 个集群、4.41 亿条查询；智能体侧是100个全新DeepSeek会话、521次工具调用。93%的结构与事实查找在此前会话出现过，SQL探查中38%重复事实而没有逐字相同的SQL。按文本缓存无法服务这些SQL探查；大量结构查找可由元数据缓存服务。不要把所有重复事实都说成指标定义的独有收益。');
-table(s, [
-  ['观察', '应用负载：Redset', '智能体：100 个全新会话'],
-  ['复用对象', '稳定的查询模板', '表结构、粒度、连接等事实'],
-  ['重复程度', '半数集群 80% 查询完全重复', '93% 的查找重复此前事实'],
-  ['SQL 探查', '34% 读查询由结果缓存回答', '38% 重复事实；逐字重复为 0'],
-  ['探索与验证', '知识预先写在应用代码里', '68% 调用用于探索；16% 会话查键唯一性'],
-  ['错误方式', '—', '32 个错误答案全部来自成功执行的 SQL'],
-], 0.6, 1.68, [2.0, 4.3, 5.8], 0.68, 15);
-takeaway(s, '共享能减少重复探索；支撑共享定义的事实仍需在更新后重验。');
-
-// 06 Three research questions.
-s = slide('保持共享口径正确，需要回答三个问题', '方法', '论文 §1、§4–6',
-  '三个问题对应模型、同快照执行、有界修复。缓存解决重复检查的代价，但不独立回答检查哪些条件、证据在哪个快照有效、失败后怎样恢复。充分性有业务前提，执行保证覆盖声明了修订的查询。');
-card(s, 0.6, 1.73, 3.9, 3.9, '该检查什么？', '定义依赖的数据性质不在 SQL 或表结构中明示。\n\n从结构化实现推导四类可执行条件。\n\n命题 1：业务前提下的充分性。', C.blue, 17);
-card(s, 4.7, 1.73, 3.9, 3.9, '何时可以使用？', '刚通过的检查只描述一个快照；随后可能有写入提交。\n\n查询与检查读取同一快照。\n\n引理 1：事务性版本相同才复用。', C.green, 17);
-card(s, 8.8, 1.73, 3.9, 3.9, '失效后怎么办？', '过滤可恢复每键一行，却选错业务总体。\n\n只发布唯一且经过回归的替代修订。\n\n算法 1：有界搜索与安全撤下。', C.orange, 17);
-takeaway(s, '有效性证据成为可维护的状态，并直接约束共享定义的使用。');
-
-// 07 System diagram: editable shapes.
-s = slide('中间层贯通准入、维护和执行', '系统', '论文 §3、§5–6',
-  '学习题给出显式业务定义，只有判题成功的计算链进入提炼与G1–G7准入。find_metric在依赖版本改变时维护，返回当前有效修订。run_sql声明定义键与修订；核对、SQL审查和可选的同快照执行约束它。默认DML统计不是事务性保证；绑定快照模式需启用事务性版本触发器。');
-shape(s, 3.25, 1.65, 6.78, 4.3, C.light);
-tx(s, 'MAVRA · 共享指标定义与有效性证据', 3.49, 1.9, 6.3, 0.45, 22, { bold: true, color: C.blue });
-card(s, 0.6, 2.35, 2.2, 2.32, '数据智能体', '学习 / 新会话\n查找定义\n声明修订并查询', C.purple, 15);
-card(s, 10.54, 2.35, 2.2, 2.32, 'PostgreSQL', '事实与维度表\nSQL 条件检查\n事务性版本', C.green, 15);
-arrow(s, 2.87, 3.45, 3.18, 3.45); arrow(s, 10.09, 3.45, 10.46, 3.45);
-for (const [i, head, body] of [
-  [0, '准入', '成功轨迹 → 结构化候选\nG1–G7 重放后发布'],
-  [1, '维护', '版本变化 → 条件重验\n复用 / 撤销 / 有界修复'],
-  [2, '执行', '核对声明修订 → SQL 审查\n同快照验证与执行'],
-]) {
-  shape(s, 3.53, 2.65 + i * 0.94, 6.2, 0.78, C.white);
-  tx(s, head, 3.75, 2.81 + i * 0.94, 1.12, 0.4, 19, { bold: true, color: C.blue });
-  tx(s, body, 5.06, 2.76 + i * 0.94, 4.42, 0.64, 16);
-}
-tx(s, '条件结论按身份与依赖版本索引，跨定义、跨智能体共享', 3.52, 5.57, 6.15, 0.3, 13.5, { color: C.muted });
-takeaway(s, 'find_metric 返回有效修订；run_sql 在使用时核对，并在绑定快照模式下保证条件成立。');
-
-// 08 Formal model, concise proof and explicit premises.
-s = slide('四类条件把数据前提变成可执行的证据', '模型与保证', '论文 §4；命题 1',
-  '修订m^r=(B,I,C,E,r)，规范SQL由I编译。B1是业务事件与过滤后键值一一对应；B2是度量表达式给出事件真实度量。四类条件在这两个前提下保证每个保留事件在其角色期间贡献一次，日期覆盖限制遗漏。单位变化、结构等价的业务总体、合法但错误的日期键不由结构条件证明。');
-tx(s, '修订 mʳ = (B, I, C, E, r)  =  业务含义 + 结构化实现 + 条件 + 证据 + 修订号', 0.63, 1.62, 12.02, 0.48, 18, { color: C.blue, bold: true });
-table(s, [
-  ['条件', '检查的性质'],
-  ['过滤后键唯一性', '每个业务键在持久过滤后最多一行'],
-  ['连接多重性', '允许的连接方向不会把事实行放大'],
-  ['时间角色', '事实按声明的日期关系归入期间'],
-  ['日期覆盖', '匹配不到日期维度的比例不超过准入时'],
-], 0.6, 2.35, [2.37, 4.53], 0.62, 16);
-card(s, 7.8, 2.35, 4.9, 3.1, '命题 1：充分性', '业务事件与过滤后的键一一对应，且度量表达式给出事件度量值时：\n\n四类条件成立 ⇒ 每个事件在其期间恰好贡献一次；遗漏受覆盖条件约束。', C.green, 16);
-takeaway(s, '保证依赖业务前提；取值单位变化、等价总体和合法但错误的日期键需要额外语义证据。', 6.28, C.orange);
-
-// 09 Selective maintenance and condition reuse.
-s = slide('更新触及哪些条件，就维护哪些证据', '维护', '论文 §2.4、§4.3、§5.2；gen/review.tex',
-  '这是受控定义库更新store_returns的例子：8个受影响定义要19次定义级检查，而依赖更新表的不同条件只有3个。结论键由语义条件身份和依赖表版本构成，相同键只执行一次检查。通用按SQL与版本索引的缓存能拿到大部分节省。TPC-DS自然共享的175定义是所有SELECT块提取结果，93定义是实际回放库，两者不能混淆。');
-card(s, 0.6, 1.72, 3.2, 2.8, '一次数据更新', 'store_returns 变化\n\n未触及表的条件保留\n受影响条件进入重验', C.orange, 18);
-arrow(s, 3.91, 3.06, 4.42, 3.06);
-card(s, 4.56, 1.72, 3.65, 2.8, '定义级重验证', '8 个受影响定义\n\n重查全部条件\n共 19 次检查', C.purple, 18);
-card(s, 8.99, 1.72, 3.7, 2.8, '按条件复用', '3 个不同的受影响条件\n\n每个版本只检查一次\n所有相关定义共享结论', C.blue, 18);
-tx(s, '结论索引 = (条件身份, 依赖表版本)\n并发遇到同一检查时共享正在执行的工作', 0.83, 4.95, 5.3, 0.94, 18, { bold: true, color: C.blue });
-tx(s, `TPC-DS 的 ${n('TpTemplates')} 个模板自然形成共享：\n${n('TpDefs')} 个定义 / ${n('TpConds')} 个不同条件 / 每条件 ${n('TpPer')} 个实例`, 6.7, 4.95, 5.8, 0.94, 17);
-takeaway(s, '重验工作的单位是不同条件；通用版本缓存也能利用这种共享。');
-
-// 10 Snapshot-bound execution.
-s = slide('每次声明使用，绑定到查询自己的快照', '执行保证', '论文 §6.2；引理 1；snapshot_exec 为可选模式',
-  '一条run_sql调用在可重复读只读事务中读取版本，收集条件，查缓存或同事务检查，失败即拒绝，成功再执行SQL。事务性表版本由写事务内部递增，读到相同依赖版本才允许复用。这个保证属于启用绑定快照模式后的显式声明使用，不属于所有未声明SQL，也不自动证明自写SQL等价于规范SQL。');
-const steps = ['开启可重复读\n只读事务', '读取事务性版本\n收集修订条件', '按身份与版本查结论\n缺失则在事务内检查', '条件不成立：拒绝\n交给常规维护', '条件全部成立\n同一事务执行业务 SQL'];
-for (let i = 0; i < steps.length; i++) {
-  const x = 0.61 + i * 2.47;
-  shape(s, x, 1.81, 2.22, 2.04, i === 3 ? 'FFF0E9' : C.light);
-  tx(s, String(i + 1), x + 0.17, 1.99, 1.8, 0.5, 25, { bold: true, color: i === 3 ? C.orange : C.blue });
-  tx(s, steps[i], x + 0.17, 2.72, 1.93, 0.95, 15);
-  if (i < 4) arrow(s, x + 2.25, 2.82, x + 2.41, 2.82);
-}
-card(s, 0.6, 4.25, 7.15, 1.68, '引理 1：结论复用', '条件读到的每张依赖表事务性版本都相同 ⇒ 条件结论可复用。\n写入与版本增量在同一事务中提交、在同一快照中可见。', C.green, 15.5);
-tx(s, '默认 DML 统计异步更新，\n相同统计值不能替代事务性版本。', 8.25, 4.63, 4.2, 1.05, 18, { color: C.orange, bold: true });
-takeaway(s, '保证作用于声明的修订及其条件；启用绑定快照模式后，检查和查询读取同一数据状态。');
-
-// 11 Bounded repair with three gates.
-s = slide('失效后：唯一、不丢键、过回归才发布修复', '有界修复', '论文 §5.3；算法 1',
-  '粒度失效后在低基数列枚举等值过滤。先保留恢复一键一行且不丢原业务键的候选，再要求候选恰好一个，之后G3–G5及G8回归。G8仅在更新触及学习期间且参照反映区分列时提供分辨力。重复装载无候选、备份副本多候选都撤下。修复进行中的其他请求等待已有维护结果。');
-const repairGates = [
-  ['恢复结构', '过滤后每键一行\n且保留全部业务键', C.blue],
-  ['候选唯一', '没有候选或多个候选\n都撤下定义', C.purple],
-  ['通过回归', 'G3–G5 重新准入\nG8 与学习参照比较', C.green],
-];
-repairGates.forEach(([head, body, color], i) => {
-  card(s, 0.6 + i * 4.2, 1.75, 3.7, 2.32, head, body, color, 18);
-  if (i < 2) arrow(s, 4.41 + i * 4.2, 2.9, 4.69 + i * 4.2, 2.9);
+// 03 Background: what a data agent does.
+s = slide('数据智能体：先摸清数据库，再写 SQL 回答业务问题', '背景', `论文 §2.1、§2.2；工作负载刻画 exp/2026-10-01-workload-characterization/`,
+  '先解释“数据智能体”：一个大模型，拿到业务问题后不能直接写 SQL，它要先用工具列出表、看列、试探几条 SQL，弄清楚数据长什么样，最后才给答案。这页右边列的四件事就是它每道题都要摸索的内容。强调一点：真正难的不是 SQL 语法，而是弄清“这个指标到底怎么算”。下面的两个数字说明摸索的代价：不共享任何知识时，每道题平均要 5.6 轮工具交互，正确率只有 32%。');
+const flow = [['业务问题', '“上个月门店\n退货金额是多少？”', C.purple], ['智能体', '大模型\n规划与推理', C.blue], ['工具调用', '列出表 · 查看列\n试探 SQL · 执行', C.blue], ['PostgreSQL', '事实表与维度表', C.green], ['答案', '金额 + 计算过程', C.purple]];
+flow.forEach(([head, body, color], i) => {
+  const x = 0.6 + i * 2.5;
+  shape(s, x, 1.7, 2.2, 1.55, C.light, C.light);
+  tx(s, head, x + 0.2, 1.84, 1.8, 0.4, 17, { bold: true, color });
+  tx(s, body, x + 0.2, 2.3, 1.85, 0.85, 14, { color: C.ink });
+  if (i < flow.length - 1) arrow(s, x + 2.22, 2.47, x + 2.48, 2.47);
 });
-card(s, 0.6, 4.39, 5.95, 1.57, '状态流水：一个完成状态过滤', '恢复粒度且不丢键，再用学习题检验修复后的数值。', C.blue, 15.5);
-card(s, 6.75, 4.39, 5.95, 1.57, '备份副本：两个总体都每键一行', '结构无法决定业务真相；候选不唯一时保持不可用。', C.orange, 15.5);
-takeaway(s, '发布新修订需要三道关；回归参照的分辨力决定自动修复能覆盖多少变化。');
+card(s, 0.6, 3.6, 6.4, 2.45, '每道题都要摸清的事', '① 哪张表装着退货，哪一列是金额\n② 一笔退货对应几行（粒度）\n③ 用哪个日期把退货归到“上个月”\n④ 哪些行不该算（取消、申请中……）', C.blue, { size: 15.5 });
+stat(s, 7.5, 3.75, 2.5, `${n('ScenHoldTurnsNoShareModelA')} 轮`, '不共享知识时\n每道题的工具交互轮数', C.orange, 36);
+stat(s, 10.3, 3.75, 2.4, `${n('DsNoShareAll')}%`, '不共享知识时\n端到端正确率', C.orange, 36);
+takeaway(s, '真正难的不是写 SQL，而是弄清“口径”：哪些行算一次、怎么归期、怎么过滤。');
 
-// 12 Experimental design.
-s = slide('固定定义验证机制，完整会话验证任务收益', '实验设计', '论文 §7.1；exp/2026-10-02-scenarios-ds/、2026-10-03-session-latency/',
-  'Q1–Q4固定定义和数据变化，只替换维护配置；Q5运行完整智能体，每种方法独立学习，所以跨方法正确率差异可能包含学习差异。9种端到端方法各3次，27次运行2586计分题。会话耗时实验固定3个已学库，4种方法每种54会话，总216；相同显式定义的积累实验也是216主分析会话，是另一个实验。');
+// 04 Background: what a metric definition is and why it is business knowledge.
+s = slide('“口径”是业务知识，表结构里没有', '背景', '论文 §1、§2.2；Spider 2.0、BIRD 的数字取自原论文',
+  '用退货金额把“口径”讲具体：事实表、度量、粒度、时间角色、过滤。这些东西 SQL 里不写、表结构也不保证，是业务上的约定。右边三个数字说明智能体离不开这类知识：Spider 2.0 的企业级任务上，o1-preview 智能体只完成 21.3%；BIRD 上给 GPT-4 专家标注的业务知识后正确率从 34.9% 升到 54.9%；我们自己的实验里，把学到的口径共享给新会话，正确率从 32% 升到 75%。所以口径要么有人告诉它，要么它自己摸索出来再记住。');
+card(s, 0.6, 1.62, 5.6, 4.45, '退货金额的口径', '事实表　store_returns\n度量　　SUM(sr_return_amt)\n粒度　　小票号 + 商品 = 一笔退货\n时间　　按退货日期归期\n过滤　　只算“已完成”的退货\n\n这五条 SQL 里不会写明，表结构也不强制。', C.blue, { size: 16 });
+const evid = [[`${'21.3'}%`, 'Spider 2.0 企业级任务上\no1-preview 智能体的完成率', C.orange], ['34.9% → 54.9%', 'BIRD：给 GPT-4 专家标注的\n业务知识前后的正确率', C.green], [`${n('DsNoShareAll')}% → ${n('DsNoguardAll')}%`, '我们的实验：新会话拿到\n共享口径前后的正确率', C.blue]];
+evid.forEach(([v, l, color], i) => {
+  shape(s, 6.6, 1.62 + i * 1.5, 6.1, 1.35, C.white, C.line);
+  tx(s, v, 6.85, 1.78 + i * 1.5, 2.9, 0.6, 26, { bold: true, color, valign: 'middle' });
+  tx(s, l, 9.75, 1.72 + i * 1.5, 2.85, 1.15, 13.5, { color: C.muted, valign: 'middle' });
+});
+takeaway(s, '口径必须有人告诉智能体，或者由它自己摸索出来再记住，否则每道题都从零开始。');
+
+// 05 Background: the trend toward shared learned definitions.
+s = slide('趋势：把智能体学到的口径共享给后来的会话', '背景', '论文 §1、§2.2、§8；gen/numbers.tex（留出题的轮数与 token）',
+  '业界和学术界都在往这个方向走：指标层让工程师手工声明口径；DataLab 这类系统从脚本历史和血缘里推导；AgentSM 这类工作直接复用智能体的成功轨迹。共享的收益很明确，下面三个数字是我们端到端实验里“不共享”对“共享”的差别。但共享之后，口径就变成了一个长期存在的东西，而它底下的数据库每天都在变。这就是下一节的问题。');
+card(s, 0.6, 1.62, 3.9, 2.55, '人工声明的指标层', 'Databricks metric views、dbt 语义层：\n工程师手工写出度量、键和关联。', C.purple, { badge: 'A', size: 15 });
+card(s, 4.7, 1.62, 3.9, 2.55, '从历史里推导', 'DataLab：用大模型从脚本历史和血缘\n生成派生列的计算逻辑。', C.purple, { badge: 'B', size: 15 });
+card(s, 8.8, 1.62, 3.9, 2.55, '复用智能体轨迹', 'AgentSM、智能体记忆系统：\n把成功轨迹存起来，按题面检索复用。', C.purple, { badge: 'C', size: 15 });
+stat(s, 0.85, 4.45, 3.6, `${n('DsNoShareAll')}% → ${n('DsNoguardAll')}%`, '共享口径后的端到端正确率', C.blue, 32);
+stat(s, 4.95, 4.45, 3.6, `${n('ScenHoldTurnsNoShareModelA')} → ${n('ScenHoldTurnsCondModelA')} 轮`, '每道留出题的工具交互轮数', C.blue, 32);
+stat(s, 9.05, 4.45, 3.6, `−${n('ScenHoldTokSaveModelA')}%`, '每道留出题的输入 token', C.blue, 32);
+takeaway(s, '共享的口径成了“长期状态”，可它底下的数据库每天都在变。', 6.3, C.orange, C.paleOrange);
+
+// 06 Problem: the concrete story.
+s = slide('SQL 照常执行，退货金额却被算了两次', '问题', '论文 §1、§2.3（贯穿例子）',
+  '这是论文引言里的例子，建议讲慢一点。第一步：Agent A 探索时发现每笔退货只有一条“完成”记录，小票号加商品就能唯一确定一笔退货，于是直接 SUM。第二步：ETL 改动后，每笔新退货还会多一条“申请中”的状态行；表名、列名、类型都没变。第三步：Agent B 复用共享的 SQL，照常执行，结果把很多退货算了两次：某个期间返回 659 万，正确值是 329 万。学的那个会话已经结束，用的会话没见过当初的证据，执行成功也看不出错。');
+card(s, 0.6, 1.65, 3.6, 2.55, 'Agent A 学到口径', '每笔退货 = 一条“完成”记录\n小票号 + 商品 唯一\nSQL：SUM(sr_return_amt)', C.blue, { badge: '1', size: 15 });
+card(s, 4.86, 1.65, 3.6, 2.55, 'ETL 追加状态流水', '每笔新退货多一条“申请中”行\n键不再唯一\n表名、列名、类型都没变', C.orange, { badge: '2', size: 15 });
+card(s, 9.12, 1.65, 3.6, 2.55, 'Agent B 复用 SQL', '学习者的会话早已结束\n新会话没有基准真值\n执行成功，看不出重复计数', C.purple, { badge: '3', size: 15 });
+arrow(s, 4.28, 2.9, 4.78, 2.9); arrow(s, 8.54, 2.9, 9.04, 2.9);
+stat(s, 0.85, 4.55, 5.7, '6,588,699.86', '共享 SQL 返回的单期退货金额', C.orange, 37);
+stat(s, 7.0, 4.55, 5.7, '3,294,349.93', '该期间真实的已完成退货金额', C.green, 37);
+takeaway(s, '共享保存了业务知识，也让一次过期的观测传播给之后的每个智能体。', 6.3, C.orange, C.paleOrange);
+
+// 07 Problem: why existing safeguards do not catch it.
+s = slide('为什么现有手段挡不住', '问题', `论文 §1、§2.4、§7.2、§7.6；gen/review.tex、scen-ds.tex`,
+  '听众可能会问：数据库和数据工程不是早有一套工具吗？四条路逐一说明。按表结构跟踪变化：表没变，什么也看不到，回放实验里只看结构的方法给出 645 个错误答案。dbt 式的数据测试：按表测，不知道哪个口径依赖哪条性质，测试一失败只能把整张表上的定义全部隔离，少答对 342 题。指标层：Databricks 的文档明确写了声明的连接性质“不在运行时验证”。让智能体自己查：轨迹里只有 16% 的会话会检查键唯一性；就算提示它去查，破坏性变化下也只从 57% 提到 63%，而由系统维护是 73%。');
+card(s, 0.6, 1.62, 2.85, 3.75, '按表结构跟踪', '表名、列名、类型都没变，\n所以什么也看不到。', C.orange, { badge: '1', size: 15, headSize: 16.5 });
+tx(s, `${n('RpSchemaWrongModeled')} 个错误答案`, 0.84, 4.5, 2.4, 0.4, 17, { bold: true, color: C.orange });
+tx(s, '回放实验，只看结构', 0.84, 4.9, 2.4, 0.3, 12.5, { color: C.muted });
+card(s, 3.68, 1.62, 2.85, 3.75, '数据质量测试', 'dbt 式按表测试：不知道哪个口径依赖哪条性质，失败只能整表隔离。', C.orange, { badge: '2', size: 15, headSize: 16.5 });
+tx(s, `少答对 ${n('RpTableOnlyCond')} 题`, 3.92, 4.5, 2.4, 0.4, 17, { bold: true, color: C.orange });
+tx(s, '都是能修复或本可保留的', 3.92, 4.9, 2.4, 0.3, 12.5, { color: C.muted });
+card(s, 6.76, 1.62, 2.85, 3.75, '指标层靠人声明', '连接性质靠人声明。Databricks 文档：该性质“不在运行时验证”。', C.orange, { badge: '3', size: 15, headSize: 16.5 });
+tx(s, '声明 ≠ 核对', 7.0, 4.5, 2.4, 0.4, 17, { bold: true, color: C.orange });
+tx(s, '放大行数时度量直接错', 7.0, 4.9, 2.4, 0.3, 12.5, { color: C.muted });
+card(s, 9.84, 1.62, 2.85, 3.75, '智能体自己检查', '只有 16% 的会话查键唯一性；提示它检查，也要每次重新找出区分列。', C.orange, { badge: '4', size: 15, headSize: 16.5 });
+tx(s, `${n('DsTrajModeled')}% → ${n('DsTrajVerifyModeled')}%`, 10.08, 4.5, 2.5, 0.4, 17, { bold: true, color: C.orange });
+tx(s, `系统维护时为 ${n('DsCondModeled')}%`, 10.08, 4.9, 2.4, 0.3, 12.5, { color: C.muted });
+takeaway(s, '缺的是一个专门记录、维护“口径成立条件”并在使用时核对的机制。', 5.85);
+
+// 08 The idea in four steps.
+s = slide('我们的做法：数据库替智能体记住“定义为什么成立”', '做法', '论文 §1、§3–§6',
+  '这是整个工作的主线，后面四页分别展开。第一步“记录”：从口径的结构化定义里推出四类可执行条件，就是上一页说的“成立条件”。第二步“维护”：条件的检查结论按数据版本保存；数据更新后只重查被触及的条件，结论在所有依赖它的口径和智能体之间共享。第三步“约束使用”：声明了口径的查询只在条件成立的那份数据快照上执行。第四步“处理失效”：条件不再成立时，只接受唯一且通过回归测试的修复，否则撤下口径，宁可不可用也不给错答案。');
+const idea = [
+  ['记录', '从口径推出四类\n可执行的成立条件', '该检查什么？', C.blue],
+  ['维护', '结论按数据版本保存\n更新后只重查受影响条件', '什么时候要重查？', C.green],
+  ['约束使用', '查询只在条件成立的\n快照上执行', '什么时候可以用？', C.purple],
+  ['处理失效', '唯一且过回归才修复\n否则撤下口径', '坏了怎么办？', C.orange],
+];
+idea.forEach(([head, body, q, color], i) => {
+  const x = 0.6 + i * 3.1;
+  step(s, x, 1.75, 2.8, 2.6, i + 1, head, body, color, C.light, 15.5);
+  shape(s, x, 4.55, 2.8, 0.72, C.white, C.line);
+  tx(s, q, x + 0.2, 4.55, 2.4, 0.72, 15.5, { color, bold: true, valign: 'middle', align: 'center' });
+  if (i < 3) arrow(s, x + 2.82, 3.05, x + 3.08, 3.05);
+});
+tx(s, '口径的有效性证据成为数据库里一等的、带版本的状态，而不是留在某次探索的轨迹里。', 0.85, 5.55, 11.6, 0.4, 16, { color: C.muted });
+takeaway(s, '对应论文的三项贡献：条件与充分性命题、绑定快照的执行与复用引理、有界修复算法。', 6.3);
+
+// 09 Step 1: the four conditions.
+s = slide('记录：四类条件，用退货金额来看', '做法 · 记录', '论文 §4.2、§4.3；命题 1',
+  '每一行先用白话说这个条件在保证什么，再说在退货金额里具体是什么，最后说数据库里怎么查。这四类条件都能写成 SQL 查询，返回“违反的证据”或空。命题 1 是论文的第一项形式化结果：在两条业务前提下（业务事件和过滤后的键一一对应；度量列就是事件的度量），四类条件成立就能保证规范 SQL 把每笔业务事件在它所属的期间恰好算一次，遗漏只限于覆盖条件约束的那部分。命题同时划清了边界：单位换算这类取值变化不违反任何条件，条件看不到。');
 table(s, [
-  ['问题', '比较方式', '规模 / 证据'],
-  ['Q1 更新后是否正确', '同一库配对回放', `${n('RpLibs')} 个库 / ${n('RpDefs')} 个定义 / ${n('RpChanges')} 种变化`],
-  ['Q2 并发写入时有效', '执行前检查 vs 绑定快照', '确定性交错 + 四组随机并发设置'],
-  ['Q3 何时修复或撤下', '回归参照 / 唯一性 / 等待', '配对题 + 备份副本反例'],
-  ['Q4 维护工作量', '定义级 / 通用缓存 / 条件级', '100 万–1600 万行；8–32 个脚本智能体'],
-  ['Q5 对智能体的作用', '完整学习与使用流程', `9 方法 × 3 次独立运行；${n('ScenValidTasks')} 道计分题`],
-  ['Q5 完整会话耗时', '3 个固定库 × 4 种方法', `${n('SlSessions')} 个全新会话；每种方法 54 个`],
-], 0.6, 1.65, [2.9, 4.0, 5.2], 0.6, 14.5);
-takeaway(s, '机制层覆盖合成数据与真实 TPC-DS SF1；端到端主实验使用 DeepSeek V4.1 Flash。');
+  ['条件', '白话', '退货金额里是', '怎么查'],
+  ['过滤后键唯一', '一笔业务事件只有一行', '“已完成”过滤后，小票号+商品唯一', '按键分组找重复'],
+  ['连接多重性', '关联维度表不会放大行数', '退货 → 商品表是多对一', '维表侧的键唯一'],
+  ['时间角色', '事实按正确的日期归期', '退货日期 → 日期维度多对一', '日期键多对一'],
+  ['日期覆盖', '事实不会悄悄掉出所有期间', '匹配不到日期的比例不高于准入时', '比例对比'],
+], 0.6, 1.65, [1.9, 3.1, 4.3, 2.8], 0.62, 14.5);
+card(s, 0.6, 4.95, 12.1, 1.25, '命题 1（充分性）', '在业务前提下，四类条件成立 ⇒ 规范 SQL 把每笔业务事件在其期间恰好计数一次，遗漏仅限覆盖条件约束的部分。', C.green, { size: 15, headSize: 17 });
+takeaway(s, '边界也由命题划定：单位换算、两份一样合法的总体、合法但错误的日期键，条件看不到。', 6.3, C.orange, C.paleOrange);
 
-// 13 Paired replay, distinguish modeled errors from unit control.
-s = slide('Q1：维护后的定义在已建模变化下零错误答案', '实验 / 配对回放', '论文 §7.2；gen/review.tex；同一库、同一变化配对',
-  '表中包含全部1530题，单位变化属于未建模取值对照，MAVRA仍有101个错误；已建模变化下错误是0。定义级、通用缓存、条件级逐题答案完全一致。表级测试也把已建模破坏隔离，但少答对的342题由修复或定义本身过滤保留下来，不能全部说成修复题。不必要的不可用是指标比率偶然不受重复影响但粒度条件确已被破坏，属于保守撤下。');
+// 10 Step 2: maintenance by versions and shared verdicts.
+s = slide('维护：更新触及哪些条件，就只重查哪些', '做法 · 维护', '论文 §4.4、§5.2；gen/review.tex',
+  '条件的检查结论按“条件身份 + 它读的那些表的版本”索引。表没变，结论继续有效；表变了，只有读到这张表的条件需要重查，而且一个条件的结论被所有依赖它的口径和智能体共享。右边是受控实验里的一个例子：更新 store_returns 后，有 8 个口径受影响；逐个口径重查要跑 19 次检查，但其实只涉及 3 个不同的条件。TPC-DS 的 99 个官方模板里共享更明显。要诚实地说：这种节省大部分用一个按版本索引的检查缓存也能拿到，所以论文不把它当主要贡献。');
+step(s, 0.6, 1.7, 3.6, 1.85, '1', '表的版本变了', '写事务里递增的事务性版本，\n或默认的 DML 统计', C.green, C.light, 14.5);
+step(s, 0.6, 3.75, 3.6, 1.85, '2', '找到读这张表的条件', '只有它们进入重查；\n其余条件的结论保留', C.green, C.light, 14.5);
+arrow(s, 2.4, 3.57, 2.4, 3.73, C.green);
+step(s, 4.45, 1.7, 3.6, 1.85, '3', '重查并保存结论', '索引 = (条件身份, 依赖表版本)\n同一检查并发到达时只跑一次', C.green, C.light, 14.5);
+step(s, 4.45, 3.75, 3.6, 1.85, '4', '所有口径共享结论', '一个结论服务所有需要\n同一条件的口径和智能体', C.green, C.light, 14.5);
+arrow(s, 4.22, 2.62, 4.43, 2.62, C.green); arrow(s, 6.25, 3.57, 6.25, 3.73, C.green);
+stat(s, 8.5, 1.85, 4.2, '19 次 → 3 次', '更新 store_returns：8 个口径受影响\n逐口径重查 19 次，不同条件只有 3 个', C.blue, 34, 0.95);
+stat(s, 8.5, 4.05, 4.2, `${n('TpDefs')} / ${n('TpConds')}`, `TPC-DS 的 ${n('TpTemplates')} 个模板：口径数 / 不同条件数\n平均每个条件被 ${n('TpPer')} 个口径共享`, C.blue, 34, 0.95);
+takeaway(s, '维护工作量按“不同条件”计，不按口径数计；这部分节省通用的版本缓存也能拿到。');
+
+// 11 Step 3: snapshot-bound execution.
+s = slide('约束使用：检查和查询必须看同一份数据', '做法 · 约束使用', '论文 §6.2；引理 1；绑定快照为可选模式',
+  '上面一行是常见做法：先检查，通过后再执行查询。问题是两步之间可能有写入提交，查询读到的已经是新数据，检查结论对它不成立——我们的并发实验里这种情况占 3.8% 到 4.6%。下面一行是我们的做法：把检查和查询放进同一个可重复读事务，读同一个快照；别处算好的结论只有在依赖表的事务性版本完全相同时才复用，这就是引理 1。要说明一点：默认的 DML 统计是异步更新的，统计值相同不代表数据相同，所以这个保证需要事务性版本（由写事务内的触发器维护）。');
+tx(s, '执行前检查（常见做法）', 0.6, 1.62, 5, 0.35, 15, { bold: true, color: C.orange });
+const pre = [['检查通过', C.green], ['写入提交', C.orange], ['查询执行', C.orange], ['在违规数据上作答', C.orange]];
+pre.forEach(([t, color], i) => {
+  const x = 0.6 + i * 3.08;
+  shape(s, x, 2.0, 2.75, 0.8, i === 0 ? C.paleGreen : C.paleOrange, i === 0 ? C.paleGreen : C.paleOrange);
+  tx(s, t, x + 0.15, 2.0, 2.45, 0.8, 15.5, { bold: true, color, align: 'center', valign: 'middle' });
+  if (i < 3) arrow(s, x + 2.77, 2.4, x + 3.06, 2.4, C.muted);
+});
+tx(s, '绑定快照执行（MAVRA）', 0.6, 3.1, 5, 0.35, 15, { bold: true, color: C.green });
+shape(s, 0.6, 3.48, 9.0, 0.8, C.paleGreen, C.paleGreen);
+tx(s, '同一个可重复读事务：读取版本 → 复用或执行检查 → 条件全部成立才执行业务 SQL', 0.8, 3.48, 8.7, 0.8, 15.5, { bold: true, color: C.green, valign: 'middle' });
+shape(s, 9.84, 3.48, 2.86, 0.8, C.paleOrange, C.paleOrange);
+tx(s, '任一条件不成立：拒绝', 9.99, 3.48, 2.6, 0.8, 15.5, { bold: true, color: C.orange, align: 'center', valign: 'middle' });
+card(s, 0.6, 4.6, 7.15, 1.55, '引理 1（结论复用）', '两个快照里，条件读到的每张表的事务性版本都相同 ⇒ 条件在两个快照上的结论相同。', C.green, { size: 15, headSize: 17 });
+card(s, 7.95, 4.6, 4.75, 1.55, '为什么要事务性版本', '默认 DML 统计异步更新；统计值相同不代表数据相同。', C.orange, { size: 15, headSize: 17 });
+takeaway(s, `并发写入下：执行前检查 ${n('SnPreUnannMin')}–${n('SnPreUnannMax')}% 的使用在违规数据上作答，绑定快照一次也没有。`);
+
+// 12 Step 4: bounded repair.
+s = slide('处理失效：三道关才发布修复，否则撤下', '做法 · 处理失效', '论文 §5.3；算法 1；§7.4',
+  '条件不成立时，有两种结局：修好，或撤下。修复只做一件事：在低基数列上找一个等值过滤。三道关：过滤后要恢复“一键一行”而且不丢任何业务键；候选过滤必须恰好一个；再通过准入门槛和用学习题做的回归测试。用两个例子说明为什么要“唯一”：状态流水的例子里，“状态=完成”是唯一能恢复粒度的过滤，修复成功；备份副本的例子里，“来源=主库”和“来源=备份”都能恢复粒度，结构上分不出哪个是真实业务数据，所以撤下。宁可不可用，也不发布可能错的修复。');
+const gates = [['恢复结构', '过滤后每个业务键一行，\n且不丢任何业务键', C.blue], ['候选唯一', '没有候选或多个候选，\n都撤下口径', C.purple], ['通过回归', '重新通过准入门槛，\n用学习题比对数值', C.green]];
+gates.forEach(([head, body, color], i) => {
+  step(s, 0.6 + i * 4.2, 1.7, 3.7, 2.15, i + 1, head, body, color, C.light, 15);
+  if (i < 2) arrow(s, 4.33 + i * 4.2, 2.77, 4.77 + i * 4.2, 2.77);
+});
+card(s, 0.6, 4.2, 5.95, 1.9, '状态流水：修复成功', '“状态 = 完成”是唯一能恢复一键一行的过滤；回归测试通过后发布新修订。', C.green, { size: 15, headSize: 17 });
+card(s, 6.75, 4.2, 5.95, 1.9, '备份副本：撤下口径', '“来源 = 主库”和“来源 = 备份”都能恢复粒度，结构上分不出真伪，所以撤下。', C.orange, { size: 15, headSize: 17 });
+takeaway(s, '宁可撤下口径，也不发布可能错的修复；修复进行中的请求等待结果，不重复算。');
+
+// 13 The system.
+s = slide('MAVRA：智能体与 PostgreSQL 之间的中间层', '系统', '论文 §3；约 6,600 行 Rust，40 个测试',
+  '系统是一个 HTTP 中间层，智能体通过它的工具接口访问数据库。三条路径：准入——判题成功的学习轨迹被提炼成结构化口径，通过七道门槛后发布；维护——依赖的表版本变了就按条件重查、复用结论、撤销或修复；执行——智能体在 run_sql 里声明用到的口径和修订号，中间层核对修订、审查 SQL，并在绑定快照模式下在同一事务里验证和执行。版本来源有两种：默认的表指纹加 DML 统计，和由语句级触发器维护的事务性版本。');
+shape(s, 3.25, 1.65, 6.78, 4.35, C.light, C.light);
+tx(s, 'MAVRA · 共享口径与有效性证据', 3.49, 1.88, 6.3, 0.45, 21, { bold: true, color: C.blue });
+card(s, 0.6, 2.35, 2.2, 2.4, '数据智能体', '学习会话 / 新会话\n查找口径\n声明修订并查询', C.purple, { size: 14.5, headSize: 17 });
+card(s, 10.54, 2.35, 2.2, 2.4, 'PostgreSQL', '事实与维度表\n条件检查 SQL\n事务性表版本', C.green, { size: 14.5, headSize: 17 });
+arrow(s, 2.87, 3.5, 3.18, 3.5); arrow(s, 10.09, 3.5, 10.46, 3.5);
+[['准入', '成功轨迹 → 结构化口径\n七道门槛重放后发布'], ['维护', '版本变化 → 按条件重查\n复用结论 / 撤销 / 有界修复'], ['执行', '核对声明的修订 → SQL 审查\n可选：同一快照验证并执行']].forEach(([head, body], i) => {
+  shape(s, 3.53, 2.6 + i * 0.98, 6.2, 0.82, C.white, C.white);
+  tx(s, head, 3.75, 2.6 + i * 0.98, 1.1, 0.82, 18, { bold: true, color: C.blue, valign: 'middle' });
+  tx(s, body, 5.0, 2.6 + i * 0.98, 4.55, 0.82, 14.5, { valign: 'middle' });
+});
+tx(s, '口径、连接路径、粒度条目、结论和证据都带版本，保存在中间层的知识库里', 3.52, 5.58, 6.3, 0.3, 12.5, { color: C.muted });
+takeaway(s, '对智能体来说只是多了两个工具：find_metric 返回当前有效的口径，run_sql 在使用时核对。');
+
+// 14 Experimental design.
+s = slide('两层实验：先固定口径验证机制，再让真实智能体跑完整任务', '实验', '论文 §7.1；表 2、表 3',
+  '实验分两层，这样能把“维护机制对不对”和“智能体学得好不好”分开。机制层固定口径和数据变化，只替换维护方式：配对回放（3 个大模型学到的 15 个口径库，加上从 TPC-DS 99 个官方模板导出的库，各经历 11 种数据变化）、并发写入、维护代价（100 万到 1600 万行）。端到端层用 DeepSeek V4.1 Flash 跑完整智能体：5 个指标，先学再用，11 种数据变化，9 种方法各独立跑 3 次，共 2586 道计分题；另有 216 个固定口径库的完整会话用来量任务时间和 token。右边列出 11 种数据变化是什么，其中单位换算是条件看不到的对照。');
+card(s, 0.6, 1.62, 5.85, 4.5, '机制层：口径固定，只换维护方式', `配对回放：${n('RpLibs')} 个学到的口径库（${n('RpDefs')} 个口径）+ TPC-DS 模板库，各 ${n('RpChanges')} 种数据变化\n\n并发写入：执行前检查 vs 绑定快照，确定性交错 + 随机并发\n\n维护代价：定义级 / 通用缓存 / MAVRA，100 万–1600 万行，8–32 个脚本智能体`, C.blue, { badge: '1', size: 14.5 });
+card(s, 6.65, 1.62, 6.05, 4.5, '端到端：真实智能体完整任务', `DeepSeek V4.1 Flash；5 个指标先学再用，只给指标名\n\n${n('RpChanges')} 种数据变化：状态流水、版本化更正、维表拉链、重复装载、日期键改写（条件能发现）；备份副本（修复有歧义）；4 种正常追加；单位换算（对照）\n\n9 种方法 × 3 次独立运行，${n('ScenValidTasks')} 道计分题；另有 ${n('SlSessions')} 个固定库会话量时间与 token`, C.purple, { badge: '2', size: 14.5 });
+takeaway(s, '机制层回答“维护对不对、贵不贵”，端到端回答“对使用者有没有用”。');
+
+// 15 Q1 results.
+s = slide('数据变化后：维护后的口径零错误答案，只看结构 645 个', '实验 · 正确性', '论文 §7.2；gen/review.tex；表 4',
+  '配对回放把同一个口径库放在不同维护方式下经历同样的变化，所以差异只来自维护。在条件能发现的变化下，MAVRA 没有给出任何错误答案，只看结构的维护给出 645 个；真实 TPC-DS 数据上是 0 对 437。dbt 式的表级测试也能把破坏隔离，但不会修，少答对 342 题。条件级、定义级和通用缓存三种重验方式逐题答案完全一样，说明端到端里它们的差异来自学到的库而不是维护。表里的 101 个错误全部来自单位换算这个对照，它不违反任何条件，论文明确把它划在边界之外。');
 table(s, [
-  ['方法', '答对', '答错', '必要不可用', '保守不可用'],
-  ['只看结构', n('RpSchemaCorrect'), n('RpSchemaWrong'), n('RpSchemaNeeded'), n('RpSchemaUnneeded')],
-  ['表级测试（dbt 式）', n('RpTableCorrect'), n('RpTableWrong'), n('RpTableNeeded'), n('RpTableUnneeded')],
-  ['定义级重验', n('RpDefCorrect'), n('RpDefWrong'), n('RpDefNeeded'), n('RpDefUnneeded')],
-  ['定义级 + 版本缓存', n('RpCacheCorrect'), n('RpCacheWrong'), n('RpCacheNeeded'), n('RpCacheUnneeded')],
-  ['MAVRA', n('RpCondCorrect'), n('RpCondWrong'), n('RpCondNeeded'), n('RpCondUnneeded')],
-], 0.6, 1.75, [2.6, 1.0, 1.0, 1.5, 1.5], 0.59, 15, 5);
-stat(s, 8.72, 1.95, 3.6, `0 vs ${n('RpSchemaWrongModeled')}`, '已建模变化下的错误答案\nMAVRA vs 只看结构', C.green, 35);
-stat(s, 8.72, 4.03, 3.6, n('RpSameCondDef') + '%', '条件级、定义级、通用缓存\n逐题结果一致', C.blue, 35);
-tx(s, `全表包含单位变化：各重验证方法的 ${n('RpCondWrong')} 个错误均来自这个取值语义对照。\n表级测试隔离破坏；MAVRA 多答对 ${n('RpTableOnlyCond')} 题，来自修复或定义自带过滤。`, 0.66, 5.48, 11.94, 0.79, 15.5);
-takeaway(s, '配对回放隔离了学习差异：维护方式改变工作量，不改变这些题的答案。');
+  ['维护方式', '答对', '答错', '其中：条件能发现的变化下答错'],
+  ['只看结构', n('RpSchemaCorrect'), n('RpSchemaWrong'), n('RpSchemaWrongModeled')],
+  ['表级测试（dbt 式）', n('RpTableCorrect'), n('RpTableWrong'), n('RpTableWrongModeled')],
+  ['定义级重验', n('RpDefCorrect'), n('RpDefWrong'), n('RpCondWrongModeled')],
+  ['MAVRA', n('RpCondCorrect'), n('RpCondWrong'), n('RpCondWrongModeled')],
+], 0.6, 1.7, [2.7, 1.1, 1.1, 3.3], 0.6, 15, 4);
+tx(s, `每种方法 ${n('RpCondN')} 道配对题；${n('RpCondWrong')} 个错误全部来自单位换算这个对照。`, 0.62, 4.85, 8.0, 0.35, 13.5, { color: C.muted });
+stat(s, 9.0, 1.75, 3.7, `0 vs ${n('RpSchemaWrongModeled')}`, '条件能发现的变化下的错误答案\nMAVRA vs 只看结构（学到的库）', C.green, 34);
+stat(s, 9.0, 3.65, 3.7, `0 vs ${n('TrSchemaWrongModeled')}`, '同样的对比，真实 TPC-DS 数据\n（99 个官方模板导出的口径库）', C.green, 34);
+takeaway(s, `表级测试也能隔离破坏，但不会修：MAVRA 多答对 ${n('RpTableOnlyCond')} 题，来自修复或口径自带的过滤。`, 5.6);
 
-// 14 TPC-DS external validity.
-s = slide('Q1：真实 TPC-DS SF1 上重复同一配对设计', '实验 / TPC-DS', '论文 §7.2；TPC-DS 模板导出的回放库；gen/review.tex',
-  '数据来自dsdgen SF1，约290万行门店销售和24张表。93个结构化实现可表达的模板定义中91个通过准入，两项学习期为空。该93是回放库，175是自然共享统计。为注入重复等变化，事实表主键改普通索引，decimal表示放宽。每方法981题；MAVRA已建模变化0错，单位变化72错，修复279题。维护耗时主要是重复装载无解的过滤搜索。');
+// 16 Q2 results.
+s = slide('并发写入：执行前检查 4.6% 违规作答，绑定快照一次没有', '实验 · 使用时的保证', '论文 §7.3；gen/review.tex；表 5',
+  '随机交错的并发实验：一边有写入者反复装载重复数据，一边有读者声明口径查询。执行前检查在没有通知的写入下有 3.8% 到 4.6% 的作答落在违反条件的数据上；绑定快照执行在 11,297 次作答里一次也没有。读者的中位延迟两种模式一样，因为快照模式复用了维护阶段的结论。代价在写入者这边：每条写语句多一次计数器更新，单写者吞吐是无触发器的 0.70 倍，32 个并发写者分片计数后 0.97 倍，不分片会掉到 0.36 倍。');
+stat(s, 0.86, 1.8, 5.7, `${n('SnPreUnannMin')}–${n('SnPreUnannMax')}%`, '执行前检查：未通知的写入下\n在违规数据上作答的使用', C.orange, 42);
+stat(s, 7.08, 1.8, 5.35, `0 / ${n('SnSnapAnswered')}`, '绑定快照：随机并发合计\n在违规数据上作答的使用', C.green, 42);
+table(s, [
+  ['代价', '观测结果'],
+  ['读者中位延迟', `${n('SnStressPFiftyLo')}–${n('SnStressPFiftyHi')} ms，两种模式相同`],
+  ['单写者吞吐（相对无触发器）', `${n('SnWriteSeq')}×`],
+  ['32 个并发写者：分片计数 / 不分片', `${n('SnWriteConcTT')}× / ${n('SnWriteHotTT')}×`],
+], 0.6, 4.15, [5.6, 6.5], 0.5, 15);
+takeaway(s, '保证来自事务性版本：写入和版本递增在同一事务里提交，读者看到其一就看到其二。');
+
+// 17 Q4 results.
+s = slide('维护代价：共享条件后，只需定义级重验的 14%', '实验 · 代价', '论文 §7.5；gen/review.tex；19 个口径、错峰到达',
+  '受控实验里，19 个口径共享条件，8 个脚本智能体错峰使用。把逐口径重查全部条件的“定义级”记为 100%：只缩小范围不复用结论是 86.8%，按 SQL 文本和版本缓存检查结果的通用缓存是 16.7%，MAVRA 是 14.0%。两点要如实讲：一是节省来自结论共享，通用缓存几乎拿到同样的节省，所以这不是论文的主要贡献；二是比例从 100 万行到 1600 万行都稳定在 12% 到 13%。');
+tx(s, '维护数据库时间，相对定义级（%）', 0.85, 1.62, 6.6, 0.24, 12, { color: C.muted });
+chart(s, [{ name: '相对定义级的维护 DB 时间（%）', labels: ['定义级', '仅缩小范围', '通用缓存', 'MAVRA'],
+  values: [100, num('CbStagScopeSix'), num('CbStagCacheSix'), num('CbStagCondSix')] }], 0.6, 1.85, 7.04, 4.1, [C.blue], 115, { dataLabelFormatCode: '0.0' });
 bullets(s, [
-  'dsdgen SF1：约 290 万行门店销售，24 张表。',
-  `99 个官方模板导出 ${n('TrDefs')} 个可表达定义；${n('TrSeeded')} 个通过准入。`,
-  '相同的 11 类注入变化；状态流水、版本化更正、维表拉链可修复。',
-  '重复装载、日期键改写、备份副本下撤下定义。',
-], 0.6, 1.84, 6.45, 3.95, 18);
-stat(s, 7.62, 1.83, 2.35, n('TrCondWrongModeled'), 'MAVRA 已建模变化下\n错误答案', C.green);
-stat(s, 10.22, 1.83, 2.4, n('TrSchemaWrongModeled'), '只看结构\n错误答案', C.orange);
-stat(s, 7.62, 4.02, 4.82, n('TrCondRepairedTasks'), `经修复答对的题次\n每种方法合计 ${n('TrCondN')} 道计分题`, C.blue);
-takeaway(s, '定义库来自官方模板；变化仍由实验注入，单位语义变化仍超出四类条件。');
+  `定义级随口径数增长：${n('CbStagDefOne')} → ${n('CbStagDefSix')} 秒。`,
+  `19 个口径：MAVRA 为定义级的 ${n('CbStagCondSix')}%，通用缓存 ${n('CbStagCacheSix')}%。`,
+  `100 万到 1600 万行：比例稳定在 ${n('EoneRatioSixteen')}–${n('EoneRatioFour')}%。`,
+  `口径之间没有共享条件时，所有方法都是定义级的 ${n('CbZeroMin')}–${n('CbZeroMax')}%。`,
+], 8.0, 1.85, 4.66, 4.2, 16);
+takeaway(s, '节省来自结论共享，通用版本缓存也能拿到；论文的贡献在条件、使用保证和修复规则。', 6.3, C.orange, C.paleOrange);
 
-// 15 Snapshot evidence and writer cost correctly labeled as throughput.
-s = slide('Q2：同快照执行消除了条件违规作答', '实验 / 并发写入', '论文 §7.3；gen/review.tex；四组随机并发设置',
-  '不通知写入下执行前检查3.8–4.6%的使用在条件违规数据上作答；绑定快照在11297次作答里0违规。这是满足条件的保证，不是所有业务答案100%正确。读者中位延迟26–29ms无明显改变，触发器代价需要明确写吞吐相对无触发器：单写者0.70倍，32写者16分片0.97倍，不分片0.36倍。较小比值意味着吞吐下降，不能写成延迟成本倍数。');
-stat(s, 0.86, 1.91, 5.7, `${n('SnPreUnannMin')}–${n('SnPreUnannMax')}%`, '执行前检查：未通知写入下\n在条件违规数据上作答的使用', C.orange, 43);
-stat(s, 7.08, 1.91, 5.35, `0 / ${n('SnSnapAnswered')}`, '绑定快照：随机并发合计\n在条件违规数据上作答的使用', C.green, 43);
-table(s, [
-  ['读者 / 写者代价', '观测结果'],
-  ['读者中位延迟', `${n('SnStressPFiftyLo')}–${n('SnStressPFiftyHi')} ms；两种模式相同`],
-  ['单写者：相对无触发器的吞吐', `${n('SnWriteSeq')}×`],
-  ['32 写者：16 分片 / 不分片吞吐', `${n('SnWriteConcTT')}× / ${n('SnWriteHotTT')}×`],
-], 0.6, 4.25, [5.6, 6.5], 0.47, 15.5);
-takeaway(s, '事务性版本把复用结论与快照绑定；写者吞吐代价取决于更新粒度和计数分片。');
-
-// 16 Maintenance cost, no hard-coded scope statistic.
-s = slide('Q4：共享条件减少维护，通用缓存也得到节省', '实验 / 维护代价', '论文 §7.5；gen/review.tex；19 定义、错峰到达',
-  '图中定义级归一为100%。仅范围86.8%，通用版本缓存16.7%，MAVRA14.0%，都来自当前review宏，替换旧PPT里写死的88。零共享对照95–102%，说明节省来自复用且跟踪条件开销不可见。规模扩展比例12.0–13.0%是另一个实验，不和14.0%的原受控矩阵混作同一数据点。同时到达下在途合并已减掉重复，差距缩小。');
-tx(s, '相对定义级的维护数据库时间（%）', 0.85, 1.65, 6.6, 0.24, 12, { color: C.muted });
-chart(s, [{ name: '相对定义级的维护 DB 时间（%）', labels: ['定义级', '仅范围', '通用缓存', 'MAVRA'],
-  values: [100, num('CbStagScopeSix'), num('CbStagCacheSix'), num('CbStagCondSix')] }], 0.6, 1.88, 7.04, 4.02, [C.blue], 115, { dataLabelFormatCode: '0.0' });
-bullets(s, [
-  `定义级随定义数增长：${n('CbStagDefOne')} → ${n('CbStagDefSix')} 秒。`,
-  `19 个定义：MAVRA 为定义级的 ${n('CbStagCondSix')}%；通用缓存 ${n('CbStagCacheSix')}%。`,
-  `零共享对照：所有方法为定义级的 ${n('CbZeroMin')}–${n('CbZeroMax')}%。`,
-  `100 万–1600 万行规模实验：比例保持在 ${n('EoneRatioSixteen')}–${n('EoneRatioFour')}%。`,
-], 8.0, 1.84, 4.66, 4.27, 17);
-takeaway(s, '核心贡献是条件、使用保证和修复规则；结论复用的节省可由通用版本缓存得到。');
-
-// 17 End-to-end accuracy, five readable baselines.
-s = slide('Q5：共享提高准确率，维护在破坏性变化下起作用', '实验 / 端到端', '论文 §7.6；9 方法 × 3 次；gen/scen-ds.tex',
-  '总体正确率不共享32%、无守护共享75%、MAVRA81%，不能将共享增益全归于维护。已建模破坏MAVRA73%，轨迹检索57%，自验证63%，智能体参照74%。预定比较73%-57%的未舍入差16，95%整群自助区间14–18。对自验证的差11来自未舍入统计，不能简单由显示舍入的73和63计算。固定库维护相同，跨端到端配置的差异还包含各自学习库差异。');
-const methods = [['不共享', 'DsNoShare'], ['轨迹检索', 'DsTraj'], ['检索+自验证', 'DsTrajVerify'], ['无守护共享', 'DsNoguard'], ['MAVRA', 'DsCond']];
-tx(s, '最终答案正确率（%）', 0.85, 1.57, 6.6, 0.24, 12, { color: C.muted });
+// 18 Q5 results.
+s = slide('端到端：共享把正确率从 32% 提到 75%，维护再拉开 16 个点', '实验 · 真实智能体', '论文 §7.6；gen/scen-ds.tex；9 种方法 × 3 次',
+  '蓝柱是全部情形，橙柱是条件能发现的破坏性变化。先看蓝柱：不共享 32%，共享但不维护 75%，MAVRA 81%，所以共享本身是最大的一步。再看橙柱：破坏性变化下，MAVRA 73%，模仿 AgentSM 的轨迹检索 57%，预先登记的比较差 16 个百分点，95% 区间 14 到 18；让检索的智能体自己检查这些性质，也只到 63%。右下角是一个诚实的反例：备份副本的变化下 MAVRA 撤下了口径，智能体要自己重找，这一组反而输给检索。');
+const methods = [['不共享', 'DsNoShare'], ['轨迹检索', 'DsTraj'], ['检索 + 自验证', 'DsTrajVerify'], ['共享不维护', 'DsNoguard'], ['MAVRA', 'DsCond']];
+tx(s, '智能体最终答案正确率（%）', 0.85, 1.6, 6.6, 0.24, 12, { color: C.muted });
 chart(s, [
   { name: '全部情形', labels: methods.map((m) => m[0]), values: methods.map((m) => num(m[1] + 'All')) },
-  { name: '已建模破坏', labels: methods.map((m) => m[0]), values: methods.map((m) => num(m[1] + 'Modeled')) },
-], 0.6, 1.79, 7.95, 4.5, [C.blue, C.orange], 110);
+  { name: '条件能发现的破坏性变化', labels: methods.map((m) => m[0]), values: methods.map((m) => num(m[1] + 'Modeled')) },
+], 0.6, 1.82, 7.95, 4.45, [C.blue, C.orange], 110);
 bullets(s, [
-  `共享本身：${n('DsNoShareAll')}% → ${n('DsNoguardAll')}%；维护后 ${n('DsCondAll')}%。`,
-  `已建模破坏：${n('DsCondModeled')}% vs ${n('DsTrajModeled')}%；预定差 +${n('DsCmpModeledTraj')} 个百分点（95% 区间 ${n('DsCmpModeledTrajLo')}–${n('DsCmpModeledTrajHi')}）。`,
-  `让检索者自行验证：${n('DsTrajVerifyModeled')}%；MAVRA 仍领先。`,
-  `改用智能体学习 SQL 作修复参照：${n('DsCondExrefModeled')}%。`,
-], 8.88, 1.83, 3.83, 4.33, 15.5);
-takeaway(s, `备份副本下检索 ${n('DsTrajMirror')}% vs MAVRA ${n('DsCondMirror')}%：安全撤下会放弃部分仍正确的知识。`, 6.35, C.orange);
+  `共享本身：${n('DsNoShareAll')}% → ${n('DsNoguardAll')}%；再加维护 ${n('DsCondAll')}%。`,
+  `破坏性变化：MAVRA ${n('DsCondModeled')}% vs 轨迹检索 ${n('DsTrajModeled')}%；预登记的差 +${n('DsCmpModeledTraj')}（95% 区间 ${n('DsCmpModeledTrajLo')}–${n('DsCmpModeledTrajHi')}）。`,
+  `让检索的智能体自己检查：${n('DsTrajVerifyModeled')}%，仍落后 ${n('DsCmpModeledCondVerify')} 个点。`,
+], 8.85, 1.85, 3.85, 3.3, 15);
+tx(s, `反例：备份副本下 MAVRA 撤下口径，这一组 ${n('DsCondMirror')}% 低于检索的 ${n('DsTrajMirror')}%。`, 8.85, 5.3, 3.85, 0.9, 14, { color: C.orange, bold: true });
+takeaway(s, '共享提高准确率；维护让共享的口径在数据变了之后仍然可靠。', 6.35);
 
-// 18 New fixed-library session study.
-s = slide('新增会话证据：共享定义减少任务时间和 token', '实验 / 完整会话', '论文 §7.6；216 个固定库会话；gen/session-latency.tex',
-  '三份固定已学库，每份4个有效定义，四种维护配置。每题全新会话、名称题，不共享组没有指标定义但基础中间层相同。完成时间包括LLM、工具和入场排队，学习与导入成本单列，答案缓存关闭。每方法54题，三种共享都54/54，不共享16/54。输入token每次尝试口径减少40.7%；每正确答案口径不同，不能混用。此处只支持相对不共享的任务收益。');
+// 19 Client-side cost.
+s = slide('对使用者：任务更快、调用更少、token 更少', '实验 · 使用者的开销', '论文 §7.6；gen/session-latency.tex；exp/2026-10-03-shared-memory/analysis/summary.json',
+  '两组实验。上面的表是固定口径库的会话实验：每道题一个全新会话，不共享的智能体 54 题只答对 16 题、平均 64 秒；有共享口径的三种方法都 54 题全对，MAVRA 平均 38 秒，输入 token 少 40.7%。要说清楚：这个节省来自共享，定义级和通用缓存也在 32、33 秒，维护方式之间没有延迟优势。下面一行是另一个实验：所有智能体都拿到相同的业务定义、正确率相同，只看探索开销——逐步积累的共享知识把每题的结构查找从 3.5 次减到 2.5 次，SQL 探查从 0.20 次减到 0.06 次。');
 table(s, [
-  ['方法', '正确 / 54', '平均完成 s', 'LLM 调用/题', '输入 token/尝试'],
-  ['不共享定义', `${n('SlNoneCorrect')}/${n('SlNoneN')}`, n('SlNoneMean'), n('SlNoneRounds'), integer(sessionPolicy('no-share').tokens.input_tokens / sessionPolicy('no-share').n)],
+  ['方法', '答对 / 54', '平均完成（秒）', 'LLM 调用 / 题', '输入 token / 次尝试'],
+  ['不共享口径', `${n('SlNoneCorrect')}/${n('SlNoneN')}`, n('SlNoneMean'), n('SlNoneRounds'), integer(sessionPolicy('no-share').tokens.input_tokens / sessionPolicy('no-share').n)],
   ['定义级重验', `${n('SlDefCorrect')}/${n('SlDefN')}`, n('SlDefMean'), n('SlDefRounds'), integer(sessionPolicy('definition').tokens.input_tokens / sessionPolicy('definition').n)],
   ['通用版本缓存', `${n('SlCacheCorrect')}/${n('SlCacheN')}`, n('SlCacheMean'), n('SlCacheRounds'), integer(sessionPolicy('definition-cache').tokens.input_tokens / sessionPolicy('definition-cache').n)],
   ['MAVRA', `${n('SlCondCorrect')}/${n('SlCondN')}`, n('SlCondMean'), n('SlCondRounds'), integer(sessionPolicy('condition').tokens.input_tokens / sessionPolicy('condition').n)],
-], 0.6, 1.78, [2.6, 1.75, 2.4, 2.5, 2.85], 0.68, 16, 4);
-stat(s, 0.84, 5.32, 3.45, `−${n('SlCondInputSaveNone')}%`, 'MAVRA 相对不共享\n每次尝试的输入 token', C.blue, 34, 0.6);
-tx(s, '3 个固定库 × 4 种方法 × 18 个会话 = 216\n覆盖首次、热复用、正常追加、破坏后首用和突发', 4.7, 5.48, 7.9, 0.86, 18, { color: C.muted });
-
-// 19 Include the complete latency result and model tail.
-s = slide('完整延迟结果：更新后首用更快，突发仍有模型长尾', '实验 / 完整会话', 'exp/2026-10-03-session-latency/stats.json、report.md',
-  '每个串行阶段每方法9个样本、突发18个。MAVRA追加后12.53秒、状态后28.41秒，低于通用缓存18.00/32.01；突发78.07高于58.05。一个356.23秒长尾中338.45秒来自LLM接口，全部保留。LLM接口时间包含网络、后端等待和重试，不能当成纯推理时间。全矩阵MAVRA均值37.68比通用缓存31.97更高，DB总工作量减少25.3%不推出整体加速。只有3库，描述性结果不宣称显著。');
-tx(s, '平均完整会话完成时间（秒）', 0.85, 1.65, 6.6, 0.24, 12, { color: C.muted });
-chart(s, [
-  { name: '通用版本缓存', labels: ['追加后首用', '状态破坏后首用', '破坏后突发'], values: ['after-append', 'after-status', 'burst-status'].map((p) => phaseMean('definition-cache', p)) },
-  { name: 'MAVRA', labels: ['追加后首用', '状态破坏后首用', '破坏后突发'], values: ['after-append', 'after-status', 'burst-status'].map((p) => phaseMean('condition', p)) },
-], 0.6, 1.9, 7.02, 4.13, [C.muted, C.blue], 95, { dataLabelFormatCode: '0.00' });
-card(s, 8.0, 1.89, 4.69, 1.85, '数据库工作量减少', `MAVRA 比通用缓存少 ${n('SlCondDBSaveCache')}% 的 DB 查询时间。`, C.blue, 16.5);
-card(s, 8.0, 4.0, 4.69, 1.97, '整体延迟优势尚未建立', `全矩阵平均 ${n('SlCondMean')} vs ${n('SlCacheMean')} s。\n一次 ${n('SlSlowTotal')} s 长尾中，LLM 接口占 ${n('SlSlowLLM')} s。`, C.orange, 16);
-takeaway(s, '测量包括 LLM、工具与排队；数据库工作量减少与完整会话加速需分别报告。', 6.35);
-
-// 20 Matched business knowledge experiment, all four policies.
-s = slide('业务定义相同、正确率相同时，共享仍减少探索', '实验 / 探索开销', '论文 §7.6；exp/2026-10-03-shared-memory/analysis/summary.json',
-  '这项补充实验给消费者相同显式业务定义，三个匹配生产者流，四种方法复用相同生产者前缀，关闭答案缓存、消费者跨题写回和策略适应。216主分析会话，四组均54/54，因此开销差别不由业务含义是否已知或正确率差别解释。积累共享包括画像、连接路径和定义；这里不是只归因于指标定义，且消费者时间不含生产者学习和提炼成本。百分比从未舍入计数算出。');
-const policies = [['隔离探索', 'isolated'], ['冻结共享', 'frozen'], ['逐步积累共享', 'accumulating'], ['轨迹检索', 'trajectory']];
-table(s, [
-  ['方法', '正确 / 54', '结构查找/题', 'SQL 探查/题', '平均完成 s'],
-  ...policies.map(([label, policy]) => [label, `${memory.primary[policy].correct}/${memory.primary[policy].n}`,
-    fixed(mem(policy, 'schema_calls')), fixed(mem(policy, 'sql_probes')), fixed(mem(policy, 'seconds'))]),
-], 0.6, 1.84, [2.7, 1.75, 2.6, 2.5, 2.55], 0.64, 16, 3);
+], 0.6, 1.65, [2.6, 1.75, 2.5, 2.4, 2.85], 0.56, 15, 4);
 const schemaSaving = (1 - mem('accumulating', 'schema_calls') / mem('isolated', 'schema_calls')) * 100;
 const probeSaving = (1 - mem('accumulating', 'sql_probes') / mem('isolated', 'sql_probes')) * 100;
-stat(s, 0.85, 5.23, 3.7, `−${fixed(schemaSaving, 1)}%`, '积累共享相对隔离\n每题结构查找次数', C.blue, 34, 0.6);
-stat(s, 5.0, 5.23, 3.6, `−${fixed(probeSaving, 1)}%`, '积累共享相对隔离\n每题 SQL 探查次数', C.green, 34, 0.6);
-tx(s, '画像、连接路径和定义共同复用\n消费者完成时间不含生产者学习成本', 9.08, 5.63, 3.65, 0.87, 15.5, { color: C.muted });
+stat(s, 0.85, 4.75, 3.0, `−${n('SlCondInputSaveNone')}%`, 'MAVRA 相对不共享\n每次尝试的输入 token', C.blue, 32, 0.6);
+stat(s, 4.05, 4.75, 3.0, `−${fixed(schemaSaving, 1)}%`, '业务定义相同时\n每题的结构查找次数', C.green, 32, 0.6);
+stat(s, 7.25, 4.75, 3.0, `−${fixed(probeSaving, 1)}%`, '业务定义相同时\n每题的 SQL 探查次数', C.green, 32, 0.6);
+tx(s, `节省来自共享：定义级 ${n('SlDefMean')} 秒、通用缓存 ${n('SlCacheMean')} 秒，维护方式之间没有延迟优势。`, 10.4, 4.8, 2.3, 1.4, 13, { color: C.muted });
+takeaway(s, `${n('SlSessions')} 个全新会话：不共享 ${n('SlNoneCorrect')}/54 答对、${n('SlNoneMean')} 秒；MAVRA 54/54、${n('SlCondMean')} 秒。`, 6.35);
 
-// 21 Discussion: scope and concrete next steps.
-s = slide('讨论：保证范围与下一步扩展', '讨论', '论文 §6.3、§7.6、§9；gen/review.tex',
-  '声明条件成立不等于任何自写SQL都正确，规范编译是推荐的计算表示。此前样本25.7%答案未声明定义，声明正确修订仍1.3%错误。下一步扩展取值语义条件，识别未声明使用，增加去重和重映射修复。真实TPC-DS数据已覆盖但变化注入，端到端主实验一个模型3重复，不能称为真实生产更新历史。');
-card(s, 0.6, 1.74, 3.9, 3.68, '使用保证', `声明修订 + 绑定快照模式：条件在所读数据上成立。\n\n未声明使用不受此契约约束；自写 SQL 仍可能偏离规范计算。`, C.blue, 17);
-card(s, 4.7, 1.74, 3.9, 3.68, '语义与修复', '业务证据提供含义。结构条件不能识别单位变化或等价总体。\n\n下一步：取值条件、去重、日期键重映射。', C.orange, 17);
-card(s, 8.8, 1.74, 3.9, 3.68, '评估与推广', '机制层：合成数据 + TPC-DS SF1。端到端：一个模型、3 次运行。\n\n下一步：真实更新历史、更多模型与业务库。', C.green, 17);
-takeaway(s, `此前答案中 ${n('DuUndeclPct')}% 未声明定义；声明正确修订后仍有 ${n('DuDevPct')}% 因 SQL 偏离而答错。`, 6.28, C.orange);
+// 20 Boundaries.
+s = slide('保证的范围，和现在还做不到的', '讨论', '论文 §6.3、§7.6、§9',
+  '主动把边界讲清楚，比被问到再解释好。第一，使用时的保证只覆盖声明了口径的查询：此前样本里 25.7% 的答案没有声明口径；声明了正确修订仍有 1.3% 因为自己写的 SQL 偏离规范计算而答错。第二，四类条件是结构条件，看不到取值语义（单位换算）和两份同样合法的总体（备份副本），这两类需要业务证据。第三，评估的局限：机制层的数据变化是我们注入的，不是真实的更新历史；端到端主实验只有一个模型、每种方法 3 次，更早一轮三个模型的趋势一致。');
+card(s, 0.6, 1.65, 3.9, 3.85, '保证只覆盖声明的使用', `声明口径 + 绑定快照：条件在所读数据上成立。\n\n未声明的 SQL 不在契约内；此前样本中 ${n('DuUndeclPct')}% 的答案未声明口径，声明正确修订后仍有 ${n('DuDevPct')}% 因 SQL 偏离而答错。`, C.blue, { badge: '1', size: 14.5 });
+card(s, 4.7, 1.65, 3.9, 3.85, '条件看不到取值语义', '单位换算不违反任何条件；备份副本里两份总体都合法。\n\n这两类要靠业务证据；修复也只会加过滤，还不会去重或重映射键。', C.orange, { badge: '2', size: 14.5 });
+card(s, 8.8, 1.65, 3.9, 3.85, '评估的局限', '数据变化由我们注入，不是真实更新历史。\n\n端到端主实验一个模型、每种方法 3 次；更早一轮三个模型趋势一致。', C.green, { badge: '3', size: 14.5 });
+takeaway(s, '下一步：取值层面的条件、识别未声明的使用、去重和重映射修复、真实更新历史。', 5.85);
 
-// 22 Closing, before optional appendix.
-s = slide('数据库持续维护共享定义成立的证据', '结论', '论文 §10',
-  '收束回主张：学到的定义成为长期状态；四类条件明确什么要检查，事务性版本和同快照执行明确何时可用，唯一且回归的修复明确失败时怎么办。端到端正确率不等于机制保证，相对不共享的任务收益也不等于相对通用缓存全面更快。附录供问答使用。', { dark: true });
-tx(s, '让共享知识在变化的数据上继续成立', 0.8, 1.16, 11.65, 0.9, 34, { bold: true, color: C.white });
-tx(s, '①  定义推出条件：粒度、连接、时间角色、覆盖\n②  证据约束使用：按版本复用，在查询自身快照验证\n③  失效有界修复：不丢键、唯一、过回归，否则撤下\n④  同时衡量：正确性、维护工作量和完整任务开销', 0.86, 2.69, 11.55, 2.36, 23, { color: 'D8E5F3', paraSpaceAfter: 13 });
-tx(s, '共享使智能体少探索；维护使已建模的数据破坏得到发现。', 0.86, 5.65, 11.55, 0.55, 21, { bold: true, color: '88B9F0' });
+// 21 Contributions and status.
+s = slide('论文贡献与当前进展', '进展', '当前 overleaf/；docs/research-status.md',
+  '左边是论文的四项贡献，和前面“记录—维护—约束使用—处理失效”一一对应。右边是进展：论文完整初稿已经写完并通过了一轮引用核对，目前 15 页，正文比 12 页上限多出约 0.6 页需要压缩；代码和全部实验数据都在仓库主线上，可复算；10 月 7 日模型配额重置后补跑其他模型的端到端实验。');
+card(s, 0.6, 1.62, 6.0, 4.5, '四项贡献', '① 把共享口径建模为依赖四类可执行条件的可维护知识，并证明条件的充分性（命题 1）\n\n② 把每次声明的使用绑定到查询自身快照上成立的证据，复用规则可靠（引理 1）\n\n③ 有界修复算法：唯一、不丢键、过回归，否则撤下（算法 1）\n\n④ 实现与两层评估：配对回放、TPC-DS、并发、代价、端到端', C.blue, { size: 14.5 });
+card(s, 6.8, 1.62, 5.9, 4.5, '进展与下一步', '✓ 论文完整初稿，投稿目标 SIGMOD 2027 研究track\n✓ 摘要、引言按“问题—做法—效果”重写，引用逐条核对\n✓ 代码、工具和实验数据在仓库主线上，可复算\n\n○ 正文约 12.6 页，需压缩 0.6 页\n○ 10 月 7 日配额重置后补跑其他模型\n○ 真实更新历史、取值条件、未声明使用', C.green, { size: 14.5 });
+takeaway(s, '方法、证明、系统和实验已经闭环；剩下的是压缩篇幅和补强评估。');
 
-// 23 Appendix: baseline coverage (conceptual, not extra experimental cells).
-s = slide('各类方法分别覆盖生命周期的哪些环节', '基线与定位', '论文 §2.4、基线表；概念对照',
-  '这张表是机制定位，不表示所有行都运行了同一端到端矩阵。表级测试在配对回放运行；定义级+缓存在代价及固定库会话运行。端到端场景是9种方法，不是把此表或所有实验的配置合成更多方法。MAVRA绑定快照能力仅在相应模式启用时成立。', { appendix: true });
+// 22 Closing.
+s = slide('让共享知识在变化的数据上继续成立', '结束', '论文 §10',
+  '收束回一句话：学到的口径成了长期状态；四类条件说明要查什么，事务性版本和绑定快照说明什么时候可以用，唯一且过回归的修复说明坏了怎么办。最后列出三个想请老师把关的问题：定位是否站得住、评估要补哪一项最有说服力、投稿目标与时间。', { dark: true });
+tx(s, '让共享知识在变化的数据上继续成立', 0.8, 1.0, 11.65, 0.85, 34, { bold: true, color: C.white });
+tx(s, '①  记录：从口径推出粒度、连接、时间角色、覆盖四类条件\n②  维护：结论按数据版本保存，更新后只重查受影响的条件\n③  约束使用：查询只在条件成立的快照上执行\n④  处理失效：唯一且过回归才修复，否则撤下', 0.86, 2.15, 11.55, 2.2, 20, { color: 'D8E5F3', paraSpaceAfter: 10 });
+shape(s, 0.8, 4.65, 11.7, 2.15, '24364D', '24364D');
+tx(s, '想请老师把关的三个问题', 1.05, 4.8, 11.2, 0.4, 18, { bold: true, color: '88B9F0' });
+tx(s, '1. 定位：聚焦“共享指标口径的有效性维护”，而不是更宽的“智能体共享记忆层”，这样切是否站得住？\n2. 评估：端到端一个模型 × 3 次、数据变化由我们注入；补哪一项最有说服力？\n3. 投稿：按 SIGMOD 2027 研究track，正文再压 0.6 页；目标与时间是否合适？', 1.05, 5.25, 11.2, 1.45, 15.5, { color: 'D8E5F3', paraSpaceAfter: 6 });
+
+// ---------------------------------------------------------- appendix ----
+// A1 Formal model.
+s = slide('形式化：定义、命题 1、引理 1 与算法 1', '形式化', '论文 §4、§6.2、§5.3',
+  '问答备用。修订 m^r=(B,I,C,E,r)：业务含义、结构化实现、条件集、证据、修订号；规范 SQL 由 I 编译。命题 1 的两条业务前提：B1 业务事件与过滤后的键值一一对应；B2 度量表达式在事件行上给出该事件的度量。引理 1 依赖 PostgreSQL 快照的嵌套性和“写入与版本递增同事务”。算法 1 的候选来自低基数列上的等值过滤。', { appendix: true });
+tx(s, '修订  mʳ = (B, I, C, E, r)   业务含义 · 结构化实现 · 条件集 · 证据 · 修订号；规范 SQL 由 I 编译', 0.63, 1.62, 12.0, 0.45, 16.5, { color: C.blue, bold: true });
+card(s, 0.6, 2.25, 5.95, 1.95, '命题 1（充分性）', 'B1、B2 与 C(mʳ) 在快照 Dₛ 上成立 ⇒ 对每个期间 p，规范 SQL 返回角色日期落在 p 内的事件度量的聚合，每个事件恰好贡献一次；遗漏仅为日期键匹配不到日期维度的事件，其比例受覆盖条件约束。', C.green, { size: 13.5, headSize: 16 });
+card(s, 6.75, 2.25, 5.95, 1.95, '引理 1（结论复用）', '两个快照 s₁、s₂ 中，条件 c 读到的每张表 T 的事务性版本相同 ⇒ c(D_{s₁}) = c(D_{s₂})。证明用快照嵌套与“写入和版本递增在同一事务提交”。', C.purple, { size: 13.5, headSize: 16 });
+card(s, 0.6, 4.4, 12.1, 1.7, '算法 1（有界修复）', '粒度条件失效 → 在低基数列上枚举等值过滤 → 保留恢复一键一行且不丢业务键的候选 → 候选恰好一个 → 通过准入门槛 G3–G5 与回归 G8 → 发布新修订；任一步失败则撤下口径。', C.orange, { size: 13.5, headSize: 16 });
+takeaway(s, '命题划定检测边界：取值变化、结构等价的总体、合法但错误的日期键不由结构条件证明。', 6.3, C.orange, C.paleOrange);
+
+// A2 Repair reference and the uniqueness counterexample.
+s = slide('修复参照决定自动化范围，唯一性规则挡住歧义', '修复细节', '论文 §7.4；gen/review.tex、scen-ds.tex',
+  '问答备用。同一批 1,470 道配对题，用智能体自己的学习 SQL 作回归参照比用判题参照少答对，但差别全部变成“不可用”，没有新增错误；端到端下两种参照 74% 对 73%。备份副本反例：不要求候选唯一时，一个预见来源列的参照会让错误修复发布，4 道新题错 2 道；要求唯一后两种参照都撤下。修复进行中到达的请求等待结果，同时到达的不可用从 63 降到 0。', { appendix: true });
 table(s, [
-  ['方法', '正常更新', '条件破坏后', '使用时保证', '维护单位'],
-  ['轨迹检索', '复用 SQL', '依赖智能体自行发现', '不绑定条件', '检索的成功轨迹'],
-  ['只看结构', '保留', '结构未变时漏检', '结构 / 修订核对', '结构指纹'],
-  ['表级测试（dbt 式）', '保留', '隔离相关表上的定义', '执行前的测试', '按表声明的测试'],
-  ['写入即撤销', '撤下并重学', '撤下并重学', '执行前核对', '每次写入'],
-  ['定义级 + 版本缓存', '保留', '同样的修复与回归', '执行前检查', '缓存检查 SQL'],
-  ['MAVRA', '保留', '有界修复或撤下', '可绑定同一快照', '变化触及的不同条件'],
-], 0.6, 1.73, [2.7, 1.63, 3.05, 2.46, 2.26], 0.64, 14, 6);
-takeaway(s, '共享、验证和缓存构成基础；本文研究指标定义的有效性生命周期。');
-
-// 24 Appendix: G8 reference and uniqueness evidence.
-s = slide('修复参照决定自动化范围，唯一性挡住歧义', '修复细节', '论文 §7.4；gen/review.tex、scen-ds.tex',
-  '配对1470题用智能体参照比判题参照少答对，但差别全部变成不可用，没有新增错误。端到端参照组74%对73%仅描述差异，不称相等；差1pp区间-1至3说明无明确准确率劣化证据。备份反例没有唯一性规则且参照预见来源列会错误发布，4题错2。有唯一性规则时两种参照都撤下。修复等待burst63降0说的是机制基准不可用，不是LLM正确题数。', { appendix: true });
-table(s, [
-  ['同一批配对题', '判题学习查询参照', '智能体学习 SQL 参照'],
+  ['同一批配对题', '判题学习查询作参照', '智能体学习 SQL 作参照'],
   [`${n('RpPairN')} 道题：答对`, n('RpPairJudge'), n('RpPairEx')],
   ['新增错误', '—', '0（差别全部转为不可用）'],
-  ['端到端：已建模破坏正确率', n('DsCondModeled') + '%', n('DsCondExrefModeled') + '%'],
-], 0.6, 1.79, [4.6, 3.6, 3.9], 0.65, 16);
-card(s, 0.6, 4.65, 5.95, 1.58, '反例：追加备份副本', '不要求候选唯一时可发布错误修复；要求唯一时两种参照均撤下。', C.orange, 16);
-card(s, 6.75, 4.65, 5.95, 1.58, '修复期间等待', `同时到达的不可用从 ${n('WrCondOff')} 降为 0；请求共享已有维护结果。`, C.blue, 16);
-takeaway(s, 'G8 只有在变化触及学习期间且参照反映区分列时，才提供额外分辨力。');
+  ['端到端：破坏性变化下正确率', n('DsCondModeled') + '%', n('DsCondExrefModeled') + '%'],
+], 0.6, 1.7, [4.6, 3.6, 3.9], 0.62, 15.5);
+card(s, 0.6, 4.45, 5.95, 1.7, '反例：追加备份副本', '不要求候选唯一时可发布错误修复；要求唯一时两种参照均撤下口径。', C.orange, { size: 15, headSize: 17 });
+card(s, 6.75, 4.45, 5.95, 1.7, '修复期间等待', `同时到达的不可用从 ${n('WrCondOff')} 降为 0；后到的请求共享已有的维护结果。`, C.blue, { size: 15, headSize: 17 });
+takeaway(s, '回归参照只有在变化触及学习期间、且参照反映区分列时，才提供额外分辨力。');
 
-// 25 Appendix: directly map this deck's revision to current paper.
-s = slide('本次更新对应论文的哪些变化', '论文与汇报同步', '当前 overleaf/；补充证据保留为论文相应段落的支持',
-  '当前主线仍是共享指标定义有效性维护。10月3日晚共享数据库知识层重构已于10月4日回退；本汇报根据当前正文。新增会话和积累实验按当前摘要、引言、代价段落使用，不把策略排序或元数据诊断升级成论文主贡献。为可复算，所有宏缺失会报错，session宏与原始统计对齐，源哈希另存。', { appendix: true });
+// A3 Baseline coverage.
+s = slide('各类方法分别覆盖生命周期的哪些环节', '基线与定位', '论文 §2.4、表 3；概念对照',
+  '问答备用。这张表是机制定位，不表示所有行都跑了同一个端到端矩阵：表级测试在配对回放里跑；定义级加缓存在代价实验和固定库会话里跑；端到端场景是 9 种方法。', { appendix: true });
 table(s, [
-  ['论文变化', '汇报处理', '对应页'],
-  ['摘要与引言强化中心主张', '新会话复用 + 三个变化 + 持续有效性证据', '2–6'],
-  ['固定库完整会话证据进入正文', '正确率、时间、调用和 token；并列报告缓存基线', '18–19'],
-  ['相同业务定义下的探索开销', '四组同为 54/54；结构查找、SQL 探查和时间', '20'],
-  ['模型、命题、引理与有界修复', '保留三项方法贡献，配套机制层证据', '8–16'],
-  ['讨论和研究边界', '声明使用、取值语义、修复歧义与真实更新历史', '21、24'],
-], 0.6, 1.8, [3.5, 6.9, 1.7], 0.68, 15.5);
-takeaway(s, '论文中的主张、证据口径与汇报一致；补充实验按其实际支持范围呈现。');
+  ['方法', '正常更新', '条件破坏后', '使用时保证', '维护单位'],
+  ['轨迹检索', '复用 SQL', '靠智能体自己发现', '不绑定条件', '检索到的成功轨迹'],
+  ['只看结构', '保留', '结构未变时漏检', '结构 / 修订核对', '结构指纹'],
+  ['表级测试（dbt 式）', '保留', '隔离相关表上的口径', '执行前的测试', '按表声明的测试'],
+  ['写入即撤销', '撤下并重学', '撤下并重学', '执行前核对', '每次写入'],
+  ['定义级 + 版本缓存', '保留', '同样的修复与回归', '执行前检查', '缓存的检查 SQL'],
+  ['MAVRA', '保留', '有界修复或撤下', '可绑定同一快照', '变化触及的不同条件'],
+], 0.6, 1.7, [2.7, 1.63, 3.05, 2.46, 2.26], 0.62, 14, 6);
+takeaway(s, '共享、验证和缓存是基础设施；本文研究的是口径的有效性生命周期。');
+
+// A4 Full session-latency result.
+s = slide('完整会话延迟：更新后首用更快，突发到达仍有模型长尾', '完整会话', 'exp/2026-10-03-session-latency/stats.json、report.md',
+  '问答备用，也是对“MAVRA 比通用缓存更快吗”的诚实回答：不是。更新后首次使用 MAVRA 更快（追加后 12.53 对 18.00 秒，破坏后 28.41 对 32.01），但突发到达时 78 对 58 秒，一次 356 秒的长尾里 338 秒是模型接口时间。全矩阵平均 37.68 对 31.97 秒；数据库工作量少 25.3% 推不出整体更快。只有 3 个库，描述性结果。', { appendix: true });
+tx(s, '平均完整会话完成时间（秒）', 0.85, 1.62, 6.6, 0.24, 12, { color: C.muted });
+chart(s, [
+  { name: '通用版本缓存', labels: ['追加后首用', '破坏后首用', '破坏后突发到达'], values: ['after-append', 'after-status', 'burst-status'].map((p) => phaseMean('definition-cache', p)) },
+  { name: 'MAVRA', labels: ['追加后首用', '破坏后首用', '破坏后突发到达'], values: ['after-append', 'after-status', 'burst-status'].map((p) => phaseMean('condition', p)) },
+], 0.6, 1.88, 7.02, 4.15, [C.muted, C.blue], 95, { dataLabelFormatCode: '0.00' });
+card(s, 8.0, 1.88, 4.69, 1.9, '数据库工作量减少', `MAVRA 比通用缓存少 ${n('SlCondDBSaveCache')}% 的数据库查询时间。`, C.blue, { size: 15, headSize: 17 });
+card(s, 8.0, 4.05, 4.69, 2.0, '整体延迟优势不成立', `全矩阵平均 ${n('SlCondMean')} 对 ${n('SlCacheMean')} 秒；一次 ${n('SlSlowTotal')} 秒的长尾中模型接口占 ${n('SlSlowLLM')} 秒。`, C.orange, { size: 15, headSize: 17 });
+takeaway(s, '测量包括模型、工具与排队；数据库工作量和完整会话时间要分开报告。', 6.35);
+
+// A5 Workload characterization.
+s = slide('应用重复的是查询，智能体重复的是知识', '工作负载刻画', '论文 §2.1；exp/2026-10-01-workload-characterization/',
+  '问答备用。应用侧是 Amazon Redset，400 个集群 4.41 亿条查询；智能体侧是 100 个互不共享的 DeepSeek 会话。应用反复发同样的查询模板，结果缓存就能服务；智能体反复获取的是表结构、粒度、连接这些事实，SQL 写法每次都不同，按文本的缓存一条也服务不了。另外两点：错误答案全部来自执行成功的 SQL；只有 16% 的会话会检查键唯一性。', { appendix: true });
+table(s, [
+  ['观察', '应用负载：Redset', '智能体：100 个全新会话'],
+  ['复用对象', '稳定的查询模板', '表结构、粒度、连接等事实'],
+  ['重复程度', '半数集群 80% 的查询完全重复', '93% 的查找重复此前会话获得的事实'],
+  ['SQL 探查', '34% 的读查询由结果缓存回答', '38% 重复事实；逐字相同的 SQL 为 0'],
+  ['探索与验证', '知识预先写在应用代码里', '68% 的调用用于探索；16% 的会话查键唯一性'],
+  ['错误方式', '—', '32 个错误答案全部来自成功执行的 SQL'],
+], 0.6, 1.7, [2.0, 4.3, 5.8], 0.66, 15);
+takeaway(s, '共享能减少重复探索；支撑共享口径的事实仍需在更新后重验。');
 
 (async () => {
   fs.mkdirSync(path.dirname(output), { recursive: true });

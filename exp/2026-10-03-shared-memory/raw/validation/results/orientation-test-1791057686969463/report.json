@@ -1,0 +1,4 @@
+{
+  "error": "SQL 执行失败：42P01 关系 \"etl_batch_log\" 不存在",
+  "status": "failed"
+}

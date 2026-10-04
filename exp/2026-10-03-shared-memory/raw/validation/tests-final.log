@@ -1,0 +1,50 @@
+   Compiling agentdb-mid v0.1.0 (/root/agentdb-shared-memory-20261003)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.17s
+     Running unittests src/main.rs (target/debug/deps/agentdb_mid-67ca4af01efeaad9)
+
+running 42 tests
+test db::tests::result_serialization_preserves_nulls_and_truncation ... ok
+test catalog::tests::join_input_must_reference_real_columns ... ok
+test feedback::tests::cached_checks_are_treated_as_free ... ok
+test integration_tests::postgres_change_scenarios ... ignored, requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission
+test integration_tests::postgres_http_mock_lifecycle ... ignored, requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission
+test integration_tests::postgres_repair_ambiguity ... ignored, experiment; requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission
+test integration_tests::postgres_snapshot_binding ... ignored, experiment; requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission
+test feedback::tests::future_reuse_cannot_rewrite_past_execution_costs ... ok
+test feedback::tests::passing_and_unaudited_candidates_are_not_replay_evidence ... ok
+test feedback::tests::replay_does_not_charge_an_already_executed_key_probe_twice ... ok
+test flight::tests::disabled_calls_do_not_merge ... ok
+test flight::tests::errors_do_not_poison_later_calls ... ok
+test feedback::tests::scorer_is_frozen_until_fresh_validation_completes ... ok
+test flight::tests::concurrent_calls_share_work_but_later_calls_retry ... ok
+test feedback::tests::replay_counts_cost_until_first_failure_plus_needed_key_probe ... ok
+test feedback::tests::adaptive_order_needs_replay_evidence_and_reverts_when_it_fades ... ok
+test metric::tests::answers_compare_at_answer_precision ... ok
+test llm::provider_tests::named_profiles_read_their_own_variables ... ok
+test metric::tests::compile_keeps_left_join_filters_in_on_clause ... ok
+test metric::tests::chain_must_match_answer_and_used ... ok
+test metric::tests::leading_expr_drops_trailing_notes ... ok
+test metric::tests::derivation_evaluates_chain_arithmetic ... ok
+test metric::tests::draft_parsing_resets_join_metadata ... ok
+test middle::metrics::tests::coverage_loss_reads_join_ratio ... ok
+test middle::metrics::tests::same_condition_ignores_column_order_and_filter_spacing ... ok
+test middle::metrics::tests::schema_dependency_only_covers_referenced_columns ... ok
+test middle::metrics::tests::unique_subset_key_implies_unique_superset_key ... ok
+test sqlscan::tests::cache_keys_preserve_sql_semantics ... ok
+test middle::traj_tests::containment_prefers_same_metric_questions ... ok
+test llm::provider_tests::request_without_tools_omits_tool_field ... ok
+test timing::tests::failure_keeps_elapsed_time_and_completed_usage ... ok
+test feedback::tests::repeated_candidates_do_not_inflate_evidence_and_training_groups_are_excluded ... ok
+test timing::tests::merged_requests_charge_sql_only_to_executor ... ok
+test llm::provider_tests::deepseek_max_and_tool_history_are_preserved ... ok
+test llm::provider_tests::zhipu_content_filter_fails_without_retry ... ok
+test tests::invalid_options_fail_before_database_access ... ok
+test tests::defaults_are_valid ... ok
+test metric::tests::referenced_columns_cover_keys_measure_and_filters ... ok
+test llm::provider_tests::required_model_handles_plain_and_wrapped_replies ... ok
+test llm::provider_tests::inference_cap_waits_for_reset ... ok
+test metric::tests::filters_reject_query_parameters ... ok
+test sqlscan::tests::per_key_queries_do_not_sum_across_duplicates ... ok
+
+test result: ok. 38 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

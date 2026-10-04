@@ -217,6 +217,7 @@ enum Lookup {
 type Versions = Arc<HashMap<String, TableVersion>>;
 
 /// 见 `Middle::checkpoint`。
+#[derive(Clone, Serialize)]
 pub struct Checkpoint {
     store: HashMap<String, Entry>,
     evidence: HashMap<String, MetricEvidence>,

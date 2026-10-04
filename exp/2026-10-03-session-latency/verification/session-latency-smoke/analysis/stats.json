@@ -1,0 +1,704 @@
+{
+  "sessions": 8,
+  "libraries": [
+    "dsv41flash-r1-b/r1-metric-global-named"
+  ],
+  "rows": [
+    {
+      "policy": "definition-cache",
+      "phase": "after-status",
+      "n": 2,
+      "correct": 2,
+      "accuracy_pct": 100.0,
+      "errors": 0,
+      "clarifications": 0,
+      "mean_completion_s": 14.747827461,
+      "median_completion_s": 13.002109768,
+      "p95_completion_s": 16.493545154,
+      "stage_ms_per_task": {
+        "llm": 14401.721417,
+        "exploration": 6.609909499998707,
+        "validation": 81.82172900000091,
+        "repair": 249.6136799999988,
+        "shared_wait": 0.0,
+        "execution": 2.3806999999987966,
+        "pool_wait": 0.08478700000034678,
+        "metadata": 4.0741725000018505,
+        "other": 1.521066000001099,
+        "queue": 0.0
+      },
+      "llm_share_pct": 97.65317267973698,
+      "tokens": {
+        "input_tokens": 21164,
+        "output_tokens": 1337,
+        "discarded_tokens": 0
+      },
+      "tokens_per_correct": {
+        "input_tokens": 10582.0,
+        "output_tokens": 668.5,
+        "discarded_tokens": 0.0
+      },
+      "db_ms": 675.0730000000001,
+      "db_queries": 38,
+      "mean_llm_replies": 4.0,
+      "window_s": 29.496671718,
+      "goodput": {
+        "30": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 4.068255603454114
+        },
+        "60": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 4.068255603454114
+        },
+        "120": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 4.068255603454114
+        }
+      }
+    },
+    {
+      "policy": "condition",
+      "phase": "after-status",
+      "n": 2,
+      "correct": 2,
+      "accuracy_pct": 100.0,
+      "errors": 0,
+      "clarifications": 0,
+      "mean_completion_s": 24.587947791,
+      "median_completion_s": 13.085907095,
+      "p95_completion_s": 36.089988487,
+      "stage_ms_per_task": {
+        "llm": 24405.507886,
+        "exploration": 13.31115000000159,
+        "validation": 46.79200899999887,
+        "repair": 115.4043755000016,
+        "shared_wait": 0.0,
+        "execution": 2.458787000000484,
+        "pool_wait": 0.05068549999759853,
+        "metadata": 2.8126940000001923,
+        "other": 1.6102040000042792,
+        "queue": 0.0
+      },
+      "llm_share_pct": 99.25801084925526,
+      "tokens": {
+        "input_tokens": 25490,
+        "output_tokens": 2587,
+        "discarded_tokens": 0
+      },
+      "tokens_per_correct": {
+        "input_tokens": 12745.0,
+        "output_tokens": 1293.5,
+        "discarded_tokens": 0.0
+      },
+      "db_ms": 353.97400000000005,
+      "db_queries": 34,
+      "mean_llm_replies": 4.5,
+      "window_s": 49.176742038,
+      "goodput": {
+        "30": {
+          "correct_within_slo": 1,
+          "tasks_per_minute": 1.2200889589968489
+        },
+        "60": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 2.4401779179936978
+        },
+        "120": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 2.4401779179936978
+        }
+      }
+    },
+    {
+      "policy": "definition-cache",
+      "phase": "burst-status",
+      "n": 2,
+      "correct": 2,
+      "accuracy_pct": 100.0,
+      "errors": 0,
+      "clarifications": 0,
+      "mean_completion_s": 14.130191595,
+      "median_completion_s": 13.353518396,
+      "p95_completion_s": 14.906864793999999,
+      "stage_ms_per_task": {
+        "llm": 13810.728307500001,
+        "exploration": 12.51555599999972,
+        "validation": 74.91198449999911,
+        "repair": 216.0940499999997,
+        "shared_wait": 0.0,
+        "execution": 4.658521000000292,
+        "pool_wait": 4.890703000001849,
+        "metadata": 4.311613999999281,
+        "other": 1.7730724999997949,
+        "queue": 0.3077865
+      },
+      "llm_share_pct": 97.73914397867725,
+      "tokens": {
+        "input_tokens": 29957,
+        "output_tokens": 1283,
+        "discarded_tokens": 0
+      },
+      "tokens_per_correct": {
+        "input_tokens": 14978.5,
+        "output_tokens": 641.5,
+        "discarded_tokens": 0.0
+      },
+      "db_ms": 612.7660000000001,
+      "db_queries": 41,
+      "mean_llm_replies": 5.0,
+      "window_s": 14.907210425,
+      "goodput": {
+        "30": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 8.049795808795661
+        },
+        "60": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 8.049795808795661
+        },
+        "120": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 8.049795808795661
+        }
+      }
+    },
+    {
+      "policy": "condition",
+      "phase": "burst-status",
+      "n": 2,
+      "correct": 2,
+      "accuracy_pct": 100.0,
+      "errors": 0,
+      "clarifications": 0,
+      "mean_completion_s": 15.476683238000001,
+      "median_completion_s": 10.06776058,
+      "p95_completion_s": 20.885605896,
+      "stage_ms_per_task": {
+        "llm": 15288.650710500002,
+        "exploration": 14.202230000000327,
+        "validation": 47.4985604999996,
+        "repair": 117.46102249999967,
+        "shared_wait": 0.0,
+        "execution": 2.2370654999999715,
+        "pool_wait": 0.06246550000219031,
+        "metadata": 4.133562499998675,
+        "other": 2.0977989999985622,
+        "queue": 0.33982199999999996
+      },
+      "llm_share_pct": 98.78505927524367,
+      "tokens": {
+        "input_tokens": 22101,
+        "output_tokens": 1631,
+        "discarded_tokens": 0
+      },
+      "tokens_per_correct": {
+        "input_tokens": 11050.5,
+        "output_tokens": 815.5,
+        "discarded_tokens": 0.0
+      },
+      "db_ms": 362.75300000000004,
+      "db_queries": 34,
+      "mean_llm_replies": 4.0,
+      "window_s": 20.885888137,
+      "goodput": {
+        "30": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 5.74550621035915
+        },
+        "60": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 5.74550621035915
+        },
+        "120": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 5.74550621035915
+        }
+      }
+    }
+  ],
+  "per_library": [
+    {
+      "library": "dsv41flash-r1-b/r1-metric-global-named",
+      "policy": "condition",
+      "phase": "after-status",
+      "n": 2,
+      "correct": 2,
+      "accuracy_pct": 100.0,
+      "errors": 0,
+      "clarifications": 0,
+      "mean_completion_s": 24.587947791,
+      "median_completion_s": 13.085907095,
+      "p95_completion_s": 36.089988487,
+      "stage_ms_per_task": {
+        "llm": 24405.507886,
+        "exploration": 13.31115000000159,
+        "validation": 46.79200899999887,
+        "repair": 115.4043755000016,
+        "shared_wait": 0.0,
+        "execution": 2.458787000000484,
+        "pool_wait": 0.05068549999759853,
+        "metadata": 2.8126940000001923,
+        "other": 1.6102040000042792,
+        "queue": 0.0
+      },
+      "llm_share_pct": 99.25801084925526,
+      "tokens": {
+        "input_tokens": 25490,
+        "output_tokens": 2587,
+        "discarded_tokens": 0
+      },
+      "tokens_per_correct": {
+        "input_tokens": 12745.0,
+        "output_tokens": 1293.5,
+        "discarded_tokens": 0.0
+      },
+      "db_ms": 353.97400000000005,
+      "db_queries": 34,
+      "mean_llm_replies": 4.5,
+      "window_s": 49.176742038,
+      "goodput": {
+        "30": {
+          "correct_within_slo": 1,
+          "tasks_per_minute": 1.2200889589968489
+        },
+        "60": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 2.4401779179936978
+        },
+        "120": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 2.4401779179936978
+        }
+      }
+    },
+    {
+      "library": "dsv41flash-r1-b/r1-metric-global-named",
+      "policy": "condition",
+      "phase": "burst-status",
+      "n": 2,
+      "correct": 2,
+      "accuracy_pct": 100.0,
+      "errors": 0,
+      "clarifications": 0,
+      "mean_completion_s": 15.476683238000001,
+      "median_completion_s": 10.06776058,
+      "p95_completion_s": 20.885605896,
+      "stage_ms_per_task": {
+        "llm": 15288.650710500002,
+        "exploration": 14.202230000000327,
+        "validation": 47.4985604999996,
+        "repair": 117.46102249999967,
+        "shared_wait": 0.0,
+        "execution": 2.2370654999999715,
+        "pool_wait": 0.06246550000219031,
+        "metadata": 4.133562499998675,
+        "other": 2.0977989999985622,
+        "queue": 0.33982199999999996
+      },
+      "llm_share_pct": 98.78505927524367,
+      "tokens": {
+        "input_tokens": 22101,
+        "output_tokens": 1631,
+        "discarded_tokens": 0
+      },
+      "tokens_per_correct": {
+        "input_tokens": 11050.5,
+        "output_tokens": 815.5,
+        "discarded_tokens": 0.0
+      },
+      "db_ms": 362.75300000000004,
+      "db_queries": 34,
+      "mean_llm_replies": 4.0,
+      "window_s": 20.885888137,
+      "goodput": {
+        "30": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 5.74550621035915
+        },
+        "60": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 5.74550621035915
+        },
+        "120": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 5.74550621035915
+        }
+      }
+    },
+    {
+      "library": "dsv41flash-r1-b/r1-metric-global-named",
+      "policy": "definition-cache",
+      "phase": "after-status",
+      "n": 2,
+      "correct": 2,
+      "accuracy_pct": 100.0,
+      "errors": 0,
+      "clarifications": 0,
+      "mean_completion_s": 14.747827461,
+      "median_completion_s": 13.002109768,
+      "p95_completion_s": 16.493545154,
+      "stage_ms_per_task": {
+        "llm": 14401.721417,
+        "exploration": 6.609909499998707,
+        "validation": 81.82172900000091,
+        "repair": 249.6136799999988,
+        "shared_wait": 0.0,
+        "execution": 2.3806999999987966,
+        "pool_wait": 0.08478700000034678,
+        "metadata": 4.0741725000018505,
+        "other": 1.521066000001099,
+        "queue": 0.0
+      },
+      "llm_share_pct": 97.65317267973698,
+      "tokens": {
+        "input_tokens": 21164,
+        "output_tokens": 1337,
+        "discarded_tokens": 0
+      },
+      "tokens_per_correct": {
+        "input_tokens": 10582.0,
+        "output_tokens": 668.5,
+        "discarded_tokens": 0.0
+      },
+      "db_ms": 675.0730000000001,
+      "db_queries": 38,
+      "mean_llm_replies": 4.0,
+      "window_s": 29.496671718,
+      "goodput": {
+        "30": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 4.068255603454114
+        },
+        "60": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 4.068255603454114
+        },
+        "120": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 4.068255603454114
+        }
+      }
+    },
+    {
+      "library": "dsv41flash-r1-b/r1-metric-global-named",
+      "policy": "definition-cache",
+      "phase": "burst-status",
+      "n": 2,
+      "correct": 2,
+      "accuracy_pct": 100.0,
+      "errors": 0,
+      "clarifications": 0,
+      "mean_completion_s": 14.130191595,
+      "median_completion_s": 13.353518396,
+      "p95_completion_s": 14.906864793999999,
+      "stage_ms_per_task": {
+        "llm": 13810.728307500001,
+        "exploration": 12.51555599999972,
+        "validation": 74.91198449999911,
+        "repair": 216.0940499999997,
+        "shared_wait": 0.0,
+        "execution": 4.658521000000292,
+        "pool_wait": 4.890703000001849,
+        "metadata": 4.311613999999281,
+        "other": 1.7730724999997949,
+        "queue": 0.3077865
+      },
+      "llm_share_pct": 97.73914397867725,
+      "tokens": {
+        "input_tokens": 29957,
+        "output_tokens": 1283,
+        "discarded_tokens": 0
+      },
+      "tokens_per_correct": {
+        "input_tokens": 14978.5,
+        "output_tokens": 641.5,
+        "discarded_tokens": 0.0
+      },
+      "db_ms": 612.7660000000001,
+      "db_queries": 41,
+      "mean_llm_replies": 5.0,
+      "window_s": 14.907210425,
+      "goodput": {
+        "30": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 8.049795808795661
+        },
+        "60": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 8.049795808795661
+        },
+        "120": {
+          "correct_within_slo": 2,
+          "tasks_per_minute": 8.049795808795661
+        }
+      }
+    }
+  ],
+  "startup": [
+    {
+      "library": "dsv41flash-r1-b/r1-metric-global-named",
+      "policy": "definition-cache",
+      "wall_ms": 238.775091,
+      "db_ms": 222.241,
+      "seeded": 3
+    },
+    {
+      "library": "dsv41flash-r1-b/r1-metric-global-named",
+      "policy": "condition",
+      "wall_ms": 122.451354,
+      "db_ms": 109.866,
+      "seeded": 3
+    }
+  ],
+  "manifests": [
+    {
+      "agent": "cline:cline-pass/deepseek-v4.1-flash",
+      "agent_config": {
+        "base_url": "https://api.cline.bot/api/v1",
+        "hedge": 1,
+        "model": "cline-pass/deepseek-v4.1-flash",
+        "provider": "cline",
+        "reasoning_effort": "high",
+        "require_model": null,
+        "thinking": null
+      },
+      "libraries": [
+        {
+          "entries": [
+            {
+              "def": "M3",
+              "metric": {
+                "aliases": [
+                  "门店退货率(%)",
+                  "store return rate"
+                ],
+                "basis": {
+                  "kind": "explicit_question",
+                  "task": "M3-L1"
+                },
+                "caveats": [
+                  "必须使用 store_sales LEFT JOIN store_returns，否则无退货的销售行会被丢掉，分母变小并导致退货率被高估；已验证该关联下约 60.41% 的 store_sales 行没有匹配退货。",
+                  "退货按小票号+商品与销售行对应，已验证该组合为 1:1，因此不需要额外去重即可保证每笔退货只计一次。",
+                  "期间按销售日期（store_sales.ss_sold_date_sk → date_dim）归属，不是按退货日期归属。",
+                  "口径未提及 sr_status 过滤，因此所有匹配到的退货记录均计入。"
+                ],
+                "definition": "期间内按销售日期归属的门店销售行，其对应退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；退货按小票号和商品与销售行对应，每笔退货只计一次。",
+                "empty": "unspecified",
+                "examples": [
+                  {
+                    "question": "2001 年 2 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+                    "sql": "WITH sales AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 2\n)\nSELECT\n  ROUND(SUM(sr.sr_return_amt) / SUM(s.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM sales s\nLEFT JOIN store_returns sr\n  ON s.ss_ticket_number = sr.sr_ticket_number\n AND s.ss_item_sk = sr.sr_item_sk"
+                  }
+                ],
+                "fact": "store_sales",
+                "filters": {},
+                "grain": [
+                  "ss_ticket_number",
+                  "ss_item_sk"
+                ],
+                "joins": [
+                  {
+                    "cardinality": "1:1",
+                    "filters": {},
+                    "key": "join:store_returns|store_sales",
+                    "kind": "left",
+                    "left": "store_sales",
+                    "loss_ratio": 0.604122,
+                    "on": [
+                      [
+                        "ss_ticket_number",
+                        "sr_ticket_number"
+                      ],
+                      [
+                        "ss_item_sk",
+                        "sr_item_sk"
+                      ]
+                    ],
+                    "revision": 0,
+                    "right": "store_returns"
+                  }
+                ],
+                "measure": "sum(sr_return_amt) / sum(ss_net_paid) * 100",
+                "name": "门店退货率",
+                "time": {
+                  "dim": "date_dim",
+                  "dim_col": "d_date_sk",
+                  "fact_col": "ss_sold_date_sk",
+                  "grain": "day",
+                  "loss_ratio": 0.010305000000000009,
+                  "role": "销售日"
+                }
+              },
+              "name": "门店退货率"
+            },
+            {
+              "def": "M3",
+              "metric": {
+                "aliases": [
+                  "门店退货率（%）"
+                ],
+                "basis": {
+                  "kind": "explicit_question",
+                  "task": "M3-L2"
+                },
+                "caveats": [
+                  "退货关联使用 LEFT JOIN，未退货的销售行保留用于分母；已验证关联中 store_sales 到 store_returns 为 1:1，匹配率约 39.59%（loss_ratio 0.604122），不会因一对多退货重复放大分母。",
+                  "期间过滤按 store_sales 的销售日期（经 date_dim）归属，不按退货日期归属。",
+                  "题面未要求按 sr_status 过滤退货状态；链中未过滤 sr_status。"
+                ],
+                "definition": "期间内售出的门店销售行所对应退货金额（sr_return_amt）之和，除以这些销售行的净支付额（ss_net_paid）之和，再乘以100。按销售日期归属期间；退货通过小票号和商品键关联到对应销售行，每笔退货只计一次。",
+                "empty": "unspecified",
+                "examples": [
+                  {
+                    "question": "2000 年 7 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+                    "sql": "WITH sales AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2000 AND d.d_moy = 7\n)\nSELECT\n  ROUND(SUM(sr.sr_return_amt) / SUM(s.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM sales s\nLEFT JOIN store_returns sr\n  ON s.ss_ticket_number = sr.sr_ticket_number\n AND s.ss_item_sk = sr.sr_item_sk"
+                  }
+                ],
+                "fact": "store_sales",
+                "filters": {},
+                "grain": [
+                  "ss_ticket_number",
+                  "ss_item_sk"
+                ],
+                "joins": [
+                  {
+                    "cardinality": "1:1",
+                    "filters": {},
+                    "key": "join:store_returns|store_sales",
+                    "kind": "left",
+                    "left": "store_sales",
+                    "loss_ratio": 0.604122,
+                    "on": [
+                      [
+                        "ss_ticket_number",
+                        "sr_ticket_number"
+                      ],
+                      [
+                        "ss_item_sk",
+                        "sr_item_sk"
+                      ]
+                    ],
+                    "revision": 0,
+                    "right": "store_returns"
+                  }
+                ],
+                "measure": "sum(store_returns.sr_return_amt) / sum(store_sales.ss_net_paid) * 100",
+                "name": "门店退货率#2",
+                "time": {
+                  "dim": "date_dim",
+                  "dim_col": "d_date_sk",
+                  "fact_col": "ss_sold_date_sk",
+                  "grain": "day",
+                  "loss_ratio": 0.010305000000000009,
+                  "role": "销售日"
+                }
+              },
+              "name": "门店退货率#2"
+            },
+            {
+              "def": "M2",
+              "metric": {
+                "aliases": [
+                  "门店退货总额",
+                  "商店退货金额"
+                ],
+                "basis": {
+                  "kind": "explicit_question",
+                  "task": "M2-L1"
+                },
+                "caveats": [
+                  "无被中间层拦下的写法。",
+                  "时间维度关联 store_returns.sr_returned_date_sk -> date_dim.d_date_sk，已验证为 N:1，丢行比例 0.0。"
+                ],
+                "definition": "门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+                "empty": "unspecified",
+                "examples": [
+                  {
+                    "question": "2001 年 4 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+                    "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4"
+                  }
+                ],
+                "fact": "store_returns",
+                "filters": {},
+                "grain": [
+                  "sr_item_sk",
+                  "sr_ticket_number"
+                ],
+                "joins": [],
+                "measure": "sum(sr_return_amt)",
+                "name": "门店退货金额",
+                "time": {
+                  "dim": "date_dim",
+                  "dim_col": "d_date_sk",
+                  "fact_col": "sr_returned_date_sk",
+                  "grain": "day",
+                  "loss_ratio": 0.0,
+                  "role": "退货日期"
+                }
+              },
+              "name": "门店退货金额"
+            }
+          ],
+          "id": "dsv41flash-r1-b/r1-metric-global-named",
+          "skipped": [],
+          "source": "/root/agentdb-mid/results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json"
+        }
+      ],
+      "methodology": "同一已学库与参数留出题配对；不重新学习；新 Agent 会话；关闭答案结果缓存；固定候选审计种子；阶段间写入完成后才发请求；cold 是固定库加载/准入后的首次 Agent 使用，库启动成本单列，非 OS/数据库冷缓存；warm 重用同一个中间层；append/status 各从内容核对过的 v1 恢复，首次使用触发维护；burst-status 同时提交全部请求，模型并发限制之外的排队计入完成时间；request-local SQL 只归属执行者，合并等待由 shared_wait 记录；嵌套 span 不直接相加；失败的耗时和已完成 token 仍保留",
+      "options": {
+        "agent": "cline",
+        "burst_copies": 1,
+        "concurrency": 2,
+        "libs": [
+          "/root/agentdb-mid/results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json"
+        ],
+        "max_steps": 20,
+        "metrics": [
+          "M2",
+          "M3"
+        ],
+        "oracle": "example",
+        "order_offset": 0,
+        "phases": [
+          "after-status",
+          "burst-status"
+        ],
+        "policies": [
+          "definition-cache",
+          "condition"
+        ],
+        "rows": 20000,
+        "seed": 20261003,
+        "sql_timeout_secs": 120
+      },
+      "pool": 16,
+      "tasks": [
+        {
+          "ask": {
+            "kind": "single",
+            "period": {
+              "m1": 5,
+              "m2": 5,
+              "year": 2002
+            }
+          },
+          "question": "2002 年 5 月的门店退货金额是多少？保留两位小数。",
+          "task": "M2-P1"
+        },
+        {
+          "ask": {
+            "kind": "single",
+            "period": {
+              "m1": 9,
+              "m2": 9,
+              "year": 2002
+            }
+          },
+          "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+          "task": "M3-P1"
+        }
+      ]
+    }
+  ]
+}

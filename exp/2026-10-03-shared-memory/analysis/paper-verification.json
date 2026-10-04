@@ -1,0 +1,46 @@
+{
+  "main-en": {
+    "pages": 13,
+    "references_begin_page": 12,
+    "sha256": "34e96eeb36825c0f4f3817e1bfd121f1ea046cea0ee8f3985d185f5ad7a45aad",
+    "overfull_hbox": 0,
+    "overfull_vbox": 0,
+    "undefined_citations_or_references": 0,
+    "missing_glyphs": 0,
+    "headline_percentages_present": true,
+    "visual_review": "English architecture, main results, conclusion/references; bilingual results and extended pages inspected separately."
+  },
+  "main": {
+    "pages": 20,
+    "references_begin_page": 19,
+    "sha256": "0f9b990d398830dc262fa592c837a5ced49ddf3a9bb7bdee315b99d618250f9c",
+    "overfull_hbox": 0,
+    "overfull_vbox": 0,
+    "undefined_citations_or_references": 0,
+    "missing_glyphs": 0,
+    "headline_percentages_present": true,
+    "visual_review": "English architecture, main results, conclusion/references; bilingual results and extended pages inspected separately."
+  },
+  "main-en-details": {
+    "pages": 15,
+    "references_begin_page": 12,
+    "sha256": "9e4712df752d7b43d7730c68c05ca6e0e94f5a5e6b55959428e4e91ac821ef64",
+    "overfull_hbox": 0,
+    "overfull_vbox": 0,
+    "undefined_citations_or_references": 0,
+    "missing_glyphs": 0,
+    "headline_percentages_present": true,
+    "visual_review": "English architecture, main results, conclusion/references; bilingual results and extended pages inspected separately."
+  },
+  "main-details": {
+    "pages": 24,
+    "references_begin_page": 19,
+    "sha256": "8b020cbaba94af4fd42595c31e3395a76713db7139d5d4e7ed38a65916fae75c",
+    "overfull_hbox": 0,
+    "overfull_vbox": 0,
+    "undefined_citations_or_references": 0,
+    "missing_glyphs": 0,
+    "headline_percentages_present": true,
+    "visual_review": "English architecture, main results, conclusion/references; bilingual results and extended pages inspected separately."
+  }
+}

@@ -9,13 +9,17 @@ mod integration_tests;
 mod knowledge;
 mod llm;
 mod maintbench;
+mod memorybench;
 mod metric;
 mod metricbench;
 mod middle;
 mod replaybench;
 mod scenario;
 mod server;
+mod sessionbench;
 mod sqlscan;
+mod strategybench;
+mod timing;
 mod tpcds;
 mod workloadbench;
 
@@ -26,7 +30,7 @@ use middle::{Middle, MiddleConfig};
 use std::sync::Arc;
 
 #[derive(Parser)]
-#[command(name = "agentdb-mid", about = "MAVRA：为数据智能体维护共享指标定义的中间层")]
+#[command(name = "agentdb-mid", about = "MAVRA：为数据智能体共享并维护数据库知识与经验证的经验")]
 struct Cli {
     /// PostgreSQL 连接串
     #[arg(long, env = "AGENTDB_URL", default_value = "postgres://postgres@127.0.0.1:55432/tpcds")]
@@ -51,6 +55,12 @@ enum Cmd {
     ReplayBench(replaybench::Options),
     /// 工作负载刻画：互不共享的 Agent 会话并发回答同一批分析题，逐次记录工具调用（真实模型，独立数据库）
     WorkloadBench(workloadbench::Options),
+    /// 固定已学定义库的会话耗时分解：首次使用、热复用、更新后首次使用与突发并发（真实模型，独立数据库）
+    SessionBench(sessionbench::Options),
+    /// 共享记忆的时序积累：同一生产者轨迹前缀下，比较隔离、冻结、持续积累和轨迹检索（真实模型，独立数据库）
+    MemoryBench(memorybench::Options),
+    /// 用数据库实测检查结果检验反馈排序：训练、采纳证据与未见候选测试分离（不调用 LLM）
+    StrategyBench(strategybench::Options),
     /// 初始化：状态列与 ETL 批次表（幂等）
     Setup,
     /// 模拟 ETL 改版：apply-v2 / reset / status
@@ -80,6 +90,9 @@ async fn main() -> Result<()> {
         Cmd::MaintBench(options) => maintbench::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::ReplayBench(options) => replaybench::run(&cli.db, cli.pool, &cli.out, options).await?,
         Cmd::WorkloadBench(options) => workloadbench::run(&cli.db, cli.pool, &cli.out, options).await?,
+        Cmd::SessionBench(options) => sessionbench::run(&cli.db, cli.pool, &cli.out, options).await?,
+        Cmd::MemoryBench(options) => memorybench::run(&cli.db, cli.pool, &cli.out, options).await?,
+        Cmd::StrategyBench(options) => strategybench::run(&cli.db, &cli.out, options).await?,
         Cmd::Setup => {
             etl::setup(&admin).await?;
             eprintln!("初始化完成");

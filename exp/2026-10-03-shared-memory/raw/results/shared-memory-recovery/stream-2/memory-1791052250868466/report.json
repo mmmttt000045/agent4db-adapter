@@ -1,0 +1,7603 @@
+{
+  "agent": {
+    "base_url": "https://api.cline.bot/api/v1",
+    "hedge": 1,
+    "model": "cline-pass/deepseek-v4.1-flash",
+    "provider": "cline",
+    "reasoning_effort": "high",
+    "require_model": "deepseek/deepseek-v4.1-flash",
+    "thinking": null
+  },
+  "database_cleaned_up": true,
+  "extractor": {
+    "base_url": "https://api.cline.bot/api/v1",
+    "hedge": 1,
+    "model": "cline-pass/deepseek-v4.1-flash",
+    "provider": "cline",
+    "reasoning_effort": "high",
+    "require_model": "deepseek/deepseek-v4.1-flash",
+    "thinking": null
+  },
+  "methodology": "Same real producer trajectories and exact knowledge prefix across policies; consumer task/agent/session fresh; primary questions fully defined; held-out results never published; consumer writeback reset between probes; no answer cache or strategy adaptation. Frozen gets only prefix one. Trajectory gets current structural knowledge and raw judged trajectories through its own retrieval tool. Isolated cannot read producer-scoped entries.",
+  "options": {
+    "agent": "cline",
+    "extract_attempts": 2,
+    "extractor": "cline",
+    "max_steps": 20,
+    "metrics": [
+      "M1",
+      "M2",
+      "M3",
+      "M5"
+    ],
+    "repeat": 2,
+    "rows": 100000,
+    "skip_named": false
+  },
+  "order": [
+    "M2",
+    "M3",
+    "M5",
+    "M1"
+  ],
+  "prefixes": [
+    {
+      "introduced_metric": "M2",
+      "memory": {
+        "condition": 4,
+        "join": 1,
+        "metric": 1,
+        "profile": 2
+      },
+      "training_tasks": 1,
+      "valid_metrics": 1,
+      "wave": 1
+    },
+    {
+      "introduced_metric": "M3",
+      "memory": {
+        "condition": 13,
+        "join": 3,
+        "metric": 2,
+        "profile": 3
+      },
+      "training_tasks": 2,
+      "valid_metrics": 2,
+      "wave": 2
+    },
+    {
+      "introduced_metric": "M5",
+      "memory": {
+        "condition": 16,
+        "join": 4,
+        "metric": 3,
+        "profile": 4
+      },
+      "training_tasks": 3,
+      "valid_metrics": 3,
+      "wave": 3
+    },
+    {
+      "introduced_metric": "M1",
+      "memory": {
+        "condition": 16,
+        "join": 4,
+        "metric": 4,
+        "profile": 4
+      },
+      "training_tasks": 4,
+      "valid_metrics": 4,
+      "wave": 4
+    }
+  ],
+  "records": [
+    {
+      "agent": "consumer-2-frozen-1-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.1199999999999974
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.534000000000006
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 7.653999999999996,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 5745,
+        "notices": 0,
+        "output_tokens": 349,
+        "rejections": 0,
+        "seconds": 4.391788676,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 3,
+        "tool_calls": 4,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 4.391819056,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 1
+    },
+    {
+      "agent": "consumer-2-accumulating-1-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.067
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.070000000000007
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 10.136999999999716,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12531,
+        "notices": 0,
+        "output_tokens": 635,
+        "rejections": 0,
+        "seconds": 8.933490983,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.933533853,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 1
+    },
+    {
+      "agent": "consumer-2-trajectory-1-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            159.846
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.13000000000001
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 167.97599999999966,
+        "queries": 5
+      },
+      "defined": true,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11131,
+        "notices": 0,
+        "output_tokens": 809,
+        "rejections": 0,
+        "seconds": 9.191191786,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": null,
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 9.191272984,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M2-P1",
+      "wave": 1
+    },
+    {
+      "agent": "consumer-2-isolated-1-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            13.536000000000001
+          ],
+          "exec": [
+            1,
+            5.768000000000001
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            12.775000000000006
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            13.545000000000002
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 45.62400000000025,
+        "queries": 13
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11483,
+        "notices": 0,
+        "output_tokens": 704,
+        "rejections": 0,
+        "seconds": 8.121466994,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT ROUND(SUM(sr_return_amt), 2) AS amt FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.121518415,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 1
+    },
+    {
+      "agent": "consumer-2-accumulating-2-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.240000000000009
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            9.477000000000004
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 11.717000000000098,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12292,
+        "notices": 0,
+        "output_tokens": 427,
+        "rejections": 0,
+        "seconds": 6.786158895,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": null,
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 6.786226306,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 2
+    },
+    {
+      "agent": "consumer-2-accumulating-2-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            13.736999999999995
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.759999999999991
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 22.4970000000003,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货率",
+          0
+        ]
+      ],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 13262,
+        "notices": 0,
+        "output_tokens": 774,
+        "rejections": 0,
+        "seconds": 7.484799552,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": null,
+        "steps": 4,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 7.484844521,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-P1",
+      "wave": 2
+    },
+    {
+      "agent": "consumer-2-trajectory-2-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.0889999999999986
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.636000000000024
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 7.725000000000364,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 9383,
+        "notices": 0,
+        "output_tokens": 547,
+        "rejections": 0,
+        "seconds": 23.257484834,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 4,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 23.257519564,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 2
+    },
+    {
+      "agent": "consumer-2-trajectory-2-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            49.43199999999999
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            11.238
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 60.67000000000007,
+        "queries": 6
+      },
+      "defined": true,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 20919,
+        "notices": 0,
+        "output_tokens": 2784,
+        "rejections": 0,
+        "seconds": 19.015344993,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": null,
+        "steps": 6,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 19.015412163,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M3-P1",
+      "wave": 2
+    },
+    {
+      "agent": "consumer-2-isolated-2-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            12.940999999999974
+          ],
+          "exec": [
+            2,
+            8.643000000000029
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            15.75399999999999
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            13.069000000000003
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 50.40700000000015,
+        "queries": 15
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 15538,
+        "notices": 0,
+        "output_tokens": 1002,
+        "rejections": 0,
+        "seconds": 10.269609481,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "steps": 6,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2"
+        ]
+      },
+      "seconds": 10.2696778,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M2-P1",
+      "wave": 2
+    },
+    {
+      "agent": "consumer-2-isolated-2-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            9,
+            219.644
+          ],
+          "exec": [
+            2,
+            13.745999999999981
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            7,
+            15.490000000000009
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            7,
+            49.55899999999998
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 298.4390000000003,
+        "queries": 25
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 20080,
+        "notices": 0,
+        "output_tokens": 1794,
+        "rejections": 0,
+        "seconds": 14.379689304,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) / SUM(ss.ss_net_paid) * 100 AS return_rate\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "steps": 6,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 14.379751703,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M3-P1",
+      "wave": 2
+    },
+    {
+      "agent": "consumer-2-frozen-2-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.105000000000018
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.724000000000018
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 10.829000000000178,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12506,
+        "notices": 0,
+        "output_tokens": 631,
+        "rejections": 0,
+        "seconds": 26.826668989,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 26.826735191,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 2
+    },
+    {
+      "agent": "consumer-2-frozen-2-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            8,
+            227.22400000000005
+          ],
+          "exec": [
+            1,
+            11.168000000000006
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            13.052999999999997
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            3,
+            35.762
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 287.20700000000033,
+        "queries": 17
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 18437,
+        "notices": 0,
+        "output_tokens": 1667,
+        "rejections": 0,
+        "seconds": 13.379744048,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt)/SUM(ss.ss_net_paid)*100 FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk=d.d_date_sk LEFT JOIN store_returns sr ON ss.ss_ticket_number=sr.sr_ticket_number AND ss.ss_item_sk=sr.sr_item_sk WHERE d.d_year=2002 AND d.d_moy=9;",
+        "steps": 6,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 13.379840659,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-P1",
+      "wave": 2
+    },
+    {
+      "agent": "consumer-2-trajectory-3-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.592999999999961
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            1,
+            3.225999999999999
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 5.81899999999996,
+        "queries": 2
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 5386,
+        "notices": 0,
+        "output_tokens": 290,
+        "rejections": 0,
+        "seconds": 4.816693555,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": null,
+        "steps": 3,
+        "tool_calls": 4,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 4.816731336,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-trajectory-3-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            21.550999999999988
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            12.359999999999957
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 33.9109999999996,
+        "queries": 6
+      },
+      "defined": true,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 19080,
+        "notices": 0,
+        "output_tokens": 1746,
+        "rejections": 0,
+        "seconds": 14.092682231,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt) / SUM(ss.ss_net_paid) * 100, 2) AS return_rate\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "steps": 6,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "seconds": 14.092763241,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M3-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-trajectory-3-prefix-param-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            4.0470000000000255
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            9.485000000000014
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 13.531999999999698,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12453,
+        "notices": 0,
+        "output_tokens": 690,
+        "rejections": 0,
+        "seconds": 8.122249406,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002 AND d.d_moy = 9;",
+        "steps": 5,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.122323756,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-isolated-3-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            13.048000000000002
+          ],
+          "exec": [
+            1,
+            2.052000000000021
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            11.711999999999989
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            14.113
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 40.92500000000018,
+        "queries": 13
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11820,
+        "notices": 0,
+        "output_tokens": 846,
+        "rejections": 0,
+        "seconds": 15.947845739,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 15.94789659,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-isolated-3-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            9,
+            230.8549999999999
+          ],
+          "exec": [
+            2,
+            21.70999999999998
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            8,
+            18.084000000000003
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            7,
+            48.920000000000016
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 319.56899999999996,
+        "queries": 26
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 23055,
+        "notices": 0,
+        "output_tokens": 2756,
+        "rejections": 0,
+        "seconds": 16.910854407,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT ROUND((SELECT SUM(sr.sr_return_amt) FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk JOIN store_returns sr ON ss.ss_ticket_number = sr.sr_ticket_number AND ss.ss_item_sk = sr.sr_item_sk WHERE d.d_year = 2002 AND d.d_moy = 9) / (SELECT SUM(ss.ss_net_paid) FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 9) * 100, 2) AS return_rate_pct",
+        "steps": 6,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2"
+        ]
+      },
+      "seconds": 16.910940137,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M3-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-isolated-3-prefix-param-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            6,
+            72.78700000000015
+          ],
+          "exec": [
+            1,
+            3.326999999999998
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            11.694000000000017
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            6,
+            35.58600000000001
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 123.39399999999978,
+        "queries": 19
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 13265,
+        "notices": 0,
+        "output_tokens": 758,
+        "rejections": 0,
+        "seconds": 8.124129747,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT round(sum(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002\n  AND d.d_moy = 9;",
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.124264898,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-frozen-3-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.0020000000000095
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            7.954000000000008
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 9.956000000000131,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 9460,
+        "notices": 0,
+        "output_tokens": 506,
+        "rejections": 0,
+        "seconds": 6.83262418,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 4,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 6.832673331,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-frozen-3-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            8,
+            233.702
+          ],
+          "exec": [
+            4,
+            152.09500000000003
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            7,
+            17.187999999999988
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            3,
+            34.80599999999998
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 437.79100000000017,
+        "queries": 22
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r3",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 26448,
+        "notices": 0,
+        "output_tokens": 2817,
+        "rejections": 0,
+        "seconds": 38.258689095,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 7
+        },
+        "sql": "SELECT ROUND(SUM(COALESCE(sr.sr_return_amt,0)) / SUM(ss.ss_net_paid) * 100, 2) AS return_rate\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr ON ss.ss_ticket_number = sr.sr_ticket_number AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "steps": 7,
+        "tool_calls": 11,
+        "tool_errors": 0,
+        "used": [
+          "r3"
+        ]
+      },
+      "seconds": 38.258768516,
+      "session": "fresh",
+      "sql_calls": 4,
+      "task": "M3-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-frozen-3-prefix-param-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            5,
+            70.55199999999991
+          ],
+          "exec": [
+            1,
+            3.13799999999992
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            10.322999999999979
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            34.01800000000003
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 118.03100000000086,
+        "queries": 15
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 13342,
+        "notices": 0,
+        "output_tokens": 728,
+        "rejections": 0,
+        "seconds": 8.321337586,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子';",
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.321408787,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-accumulating-3-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            1.9460000000000264
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            7.7479999999999905
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 9.693999999999505,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12106,
+        "notices": 0,
+        "output_tokens": 565,
+        "rejections": 0,
+        "seconds": 7.467165038,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": null,
+        "steps": 5,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 7.467219988,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-accumulating-3-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            15.747000000000071
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            10.283000000000015
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 26.029999999999745,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货率",
+          0
+        ]
+      ],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 16262,
+        "notices": 0,
+        "output_tokens": 1101,
+        "rejections": 0,
+        "seconds": 9.228176282,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "WITH sales_2002_09 AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_2002_09 s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (\n  SELECT sum(ss_net_paid) AS net_paid\n  FROM sales_2002_09\n)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale",
+        "steps": 5,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 9.228231142,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-accumulating-3-prefix-param-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            3.3209999999999127
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.447000000000003
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 11.768000000000029,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:电子品类门店营业额",
+          0
+        ]
+      ],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 14568,
+        "notices": 0,
+        "output_tokens": 766,
+        "rejections": 0,
+        "seconds": 26.164790422,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002\n  AND d.d_moy = 9",
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 26.164889823,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 3
+    },
+    {
+      "agent": "consumer-2-isolated-4-prefix-param-M1-P1",
+      "answer": "1301720.00",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            32.32099999999991
+          ],
+          "exec": [
+            1,
+            3.0130000000000337
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            10.515999999999963
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            34.41999999999996
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 80.27000000000044,
+        "queries": 13
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "1301720.00",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 9 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "1301720.00",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12113,
+        "notices": 0,
+        "output_tokens": 702,
+        "rejections": 0,
+        "seconds": 8.561348676,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT SUM(ss.ss_net_paid) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.561400126,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            15.817000000000007
+          ],
+          "exec": [
+            1,
+            2.673999999999978
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            12.74799999999999
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            13.211000000000013
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 44.44999999999891,
+        "queries": 13
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11941,
+        "notices": 0,
+        "output_tokens": 774,
+        "rejections": 0,
+        "seconds": 14.359535984,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 14.359598834,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            11,
+            233.06799999999998
+          ],
+          "exec": [
+            2,
+            19.119000000000028
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            8,
+            17.156999999999982
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            7,
+            49.428
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 318.77200000000084,
+        "queries": 28
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 24535,
+        "notices": 0,
+        "output_tokens": 3951,
+        "rejections": 0,
+        "seconds": 26.997885611,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt) / SUM(ss.ss_net_paid) * 100, 2) AS store_return_rate_pct\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n  AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "steps": 6,
+        "tool_calls": 11,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "seconds": 26.997962241,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M3-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-prefix-param-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            6,
+            73.62000000000012
+          ],
+          "exec": [
+            1,
+            3.463999999999942
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            11.422999999999945
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            6,
+            34.773000000000025
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 123.27999999999975,
+        "queries": 19
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "isolated",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 13357,
+        "notices": 0,
+        "output_tokens": 787,
+        "rejections": 0,
+        "seconds": 9.002499819,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9\n  AND i.i_category = '电子'\n  AND ss.ss_is_current = 1",
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 9.002624548,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-type-M1-T1",
+      "answer": "-5348.30",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            30.47699999999986
+          ],
+          "exec": [
+            2,
+            5.956000000000017
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            10.778999999999996
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            35.36499999999995
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 82.57699999999932,
+        "queries": 14
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "-5348.30",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "isolated",
+      "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-5348.30",
+        "clarification": null,
+        "derivation": "r1 - r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12380,
+        "notices": 0,
+        "output_tokens": 891,
+        "rejections": 0,
+        "seconds": 8.973574263,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT round(sum(ss.ss_net_paid), 2) AS store_net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;  -- 1301720.00\nSELECT round(sum(ss.ss_net_paid), 2) AS store_net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 6;  -- 1307068.30",
+        "steps": 5,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2"
+        ]
+      },
+      "seconds": 8.973636653,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M1-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-type-M1-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            31.31100000000015
+          ],
+          "exec": [
+            1,
+            23.13600000000008
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            11.41700000000003
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            34.192999999999984
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 100.05699999999888,
+        "queries": 13
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "3",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "isolated",
+      "question": "2002 年哪个月的门店营业额最高？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12284,
+        "notices": 0,
+        "output_tokens": 659,
+        "rejections": 0,
+        "seconds": 7.9233232099999995,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT d.d_moy AS month, SUM(s.ss_net_paid) AS net_paid\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC;",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 7.92339854,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-type-M2-T1",
+      "answer": "-26129.86",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            13.658999999999878
+          ],
+          "exec": [
+            1,
+            3.130999999999972
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            11.019000000000005
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            13.024000000000001
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 40.83299999999963,
+        "queries": 13
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "-26129.86",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "isolated",
+      "question": "2002 年 3 月的门店退货金额比2001 年 3 月高多少？（用前者减去后者，结果可以为负数）口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-26129.86",
+        "clarification": null,
+        "derivation": "r1[2002] - r1[2001]",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11911,
+        "notices": 0,
+        "output_tokens": 788,
+        "rejections": 0,
+        "seconds": 8.684356745,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT d_year, d_moy, SUM(sr_return_amt) AS amt FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE (d_year = 2001 AND d_moy = 3) OR (d_year = 2002 AND d_moy = 3) GROUP BY d_year, d_moy ORDER BY d_year;",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.684431635,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-type-M2-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            13.316000000000031
+          ],
+          "exec": [
+            1,
+            11.678999999999974
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            10.360000000000014
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            12.609000000000037
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 47.96399999999994,
+        "queries": 13
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "3",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "isolated",
+      "question": "2001 年哪个月的门店退货金额最高？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12010,
+        "notices": 0,
+        "output_tokens": 793,
+        "rejections": 0,
+        "seconds": 26.343769045,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT d.d_moy AS month, SUM(sr.sr_return_amt) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\nGROUP BY d.d_moy\nORDER BY total_return_amt DESC",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 26.343856587,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-type-M3-T1",
+      "answer": "-0.02",
+      "db": {
+        "by_kind": {
+          "check": [
+            9,
+            237.9050000000002
+          ],
+          "exec": [
+            2,
+            29.062999999999988
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            9,
+            20.726
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            7,
+            51.452
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 339.14600000000064,
+        "queries": 27
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "-0.0156207567663651",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "isolated",
+      "question": "2002 年 6 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-0.02",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 24865,
+        "notices": 0,
+        "output_tokens": 2406,
+        "rejections": 0,
+        "seconds": 15.666982567,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 7
+        },
+        "sql": "SELECT ROUND(\n  (SUM(CASE WHEN d.d_year=2002 THEN sr.sr_return_amt END)/SUM(CASE WHEN d.d_year=2002 THEN ss.ss_net_paid END)\n  - SUM(CASE WHEN d.d_year=2001 THEN sr.sr_return_amt END)/SUM(CASE WHEN d.d_year=2001 THEN ss.ss_net_paid END))*100, 2) AS diff\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 6)\n   OR (d.d_year = 2001 AND d.d_moy = 6);",
+        "steps": 7,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2"
+        ]
+      },
+      "seconds": 15.667072967,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M3-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-type-M3-T2",
+      "answer": "7",
+      "db": {
+        "by_kind": {
+          "check": [
+            9,
+            225.75
+          ],
+          "exec": [
+            2,
+            98.12099999999998
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            7,
+            15.30600000000004
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            7,
+            48.71100000000001
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 387.88800000000083,
+        "queries": 25
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "7",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "isolated",
+      "question": "2001 年哪个月的门店退货率最高？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "7",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 29179,
+        "notices": 0,
+        "output_tokens": 5864,
+        "rejections": 0,
+        "seconds": 29.810175115,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT d.d_moy AS best_month\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON sr.sr_ticket_number = ss.ss_ticket_number\n AND sr.sr_item_sk = ss.ss_item_sk\nWHERE d.d_year = 2001\nGROUP BY d.d_moy\nORDER BY SUM(sr.sr_return_amt)/SUM(ss.ss_net_paid) DESC\nLIMIT 1;",
+        "steps": 6,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "seconds": 29.810278235,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M3-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-type-M5-T1",
+      "answer": "-2511.30",
+      "db": {
+        "by_kind": {
+          "check": [
+            6,
+            73.59699999999975
+          ],
+          "exec": [
+            2,
+            12.388000000000034
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            7,
+            14.82400000000007
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            6,
+            36.19200000000001
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 137.0010000000002,
+        "queries": 21
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "-2511.30",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "isolated",
+      "question": "2002 年 9 月的电子品类门店营业额比2001 年 9 月高多少？（用前者减去后者，结果可以为负数）口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-2511.30",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 17687,
+        "notices": 0,
+        "output_tokens": 978,
+        "rejections": 0,
+        "seconds": 10.881528411,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "select sum(case when d.d_year=2002 then ss.ss_net_paid else -ss.ss_net_paid end) as diff\nfrom store_sales ss\njoin item i on ss.ss_item_sk = i.i_item_sk\njoin date_dim d on ss.ss_sold_date_sk = d.d_date_sk\nwhere i.i_category = '电子'\n  and d.d_moy = 9 and d.d_year in (2001, 2002);",
+        "steps": 6,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "seconds": 10.881693201000001,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M5-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-type-M5-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            6,
+            80.471
+          ],
+          "exec": [
+            1,
+            21.076000000000022
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            11.993000000000052
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            6,
+            35.11799999999994
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 148.65799999999945,
+        "queries": 19
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "3",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "isolated",
+      "question": "2002 年哪个月的电子品类门店营业额最高？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 13539,
+        "notices": 0,
+        "output_tokens": 721,
+        "rejections": 0,
+        "seconds": 9.07949601,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": null,
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 9.07963233,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-named-M1-P1",
+      "answer": "1407503.00",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            32.91300000000001
+          ],
+          "exec": [
+            1,
+            5.058999999999969
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            15.787000000000035
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            6,
+            47.596000000000004
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 101.35500000000138,
+        "queries": 16
+      },
+      "defined": false,
+      "error": null,
+      "finds": 15,
+      "found": [],
+      "gold": "1301720.00",
+      "metric": "M1",
+      "outcome": "wrong",
+      "phase": "final-named",
+      "policy": "isolated",
+      "question": "2002 年 9 月的门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "1407503.00",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 42995,
+        "notices": 0,
+        "output_tokens": 10516,
+        "rejections": 0,
+        "seconds": 55.672465844,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 9
+        },
+        "sql": "SELECT round(sum(ss.ss_ext_sales_price),2) AS store_turnover\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "steps": 9,
+        "tool_calls": 22,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 55.672662166,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-named-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            3,
+            14.592000000000098
+          ],
+          "exec": [
+            1,
+            2.1639999999999873
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            10.88900000000001
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            12.787000000000035
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 40.43199999999888,
+        "queries": 13
+      },
+      "defined": false,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "isolated",
+      "question": "2002 年 5 月的门店退货金额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11750,
+        "notices": 0,
+        "output_tokens": 815,
+        "rejections": 0,
+        "seconds": 8.161126061,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.161250582,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-named-M3-P1",
+      "answer": null,
+      "db": {
+        "by_kind": {
+          "check": [
+            11,
+            235.47299999999996
+          ],
+          "exec": [
+            1,
+            8.81000000000006
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            8,
+            16.617999999999938
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            7,
+            50.49300000000005
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 311.39400000000023,
+        "queries": 27
+      },
+      "defined": false,
+      "error": null,
+      "finds": 8,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "clarify",
+      "phase": "final-named",
+      "policy": "isolated",
+      "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": null,
+        "clarification": "\"门店退货率\"的业务口径不明确，且中间层没有已验证的指标定义。请确认口径：①分子/分母用哪种度量——退货金额÷销售金额、退货数量÷销售数量，还是退货单量÷销售单量？②金额口径用哪个字段——销售额（ss_ext_sales_price）还是净支付额（ss_net_paid）？③时间基准按退货发生日期（2002年9月发生的退货）还是按原销售日期（2002年9月售出商品的退货）？",
+        "derivation": null,
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 26585,
+        "notices": 0,
+        "output_tokens": 4394,
+        "rejections": 0,
+        "seconds": 25.142607557,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 7
+        },
+        "sql": null,
+        "steps": 7,
+        "tool_calls": 17,
+        "tool_errors": 0,
+        "used": []
+      },
+      "seconds": 25.142823978,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-isolated-4-final-named-M5-P1",
+      "answer": "288539.00",
+      "db": {
+        "by_kind": {
+          "check": [
+            6,
+            74.596
+          ],
+          "exec": [
+            1,
+            3.6219999999999573
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            12.20399999999995
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            6,
+            35.62199999999996
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 126.04399999999987,
+        "queries": 19
+      },
+      "defined": false,
+      "error": null,
+      "finds": 6,
+      "found": [],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "wrong",
+      "phase": "final-named",
+      "policy": "isolated",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "288539.00",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 15739,
+        "notices": 0,
+        "output_tokens": 2793,
+        "rejections": 0,
+        "seconds": 16.597593859,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT SUM(ss.ss_ext_sales_price) AS gross_sales\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子';",
+        "steps": 5,
+        "tool_calls": 14,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 16.597674688,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-prefix-param-M1-P1",
+      "answer": "1301720.00",
+      "db": {
+        "by_kind": {
+          "check": [
+            2,
+            30.47400000000016
+          ],
+          "exec": [
+            1,
+            3.1000000000000227
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            9.783999999999992
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            2,
+            34.63300000000004
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 77.99099999999999,
+        "queries": 9
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "1301720.00",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 9 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "1301720.00",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12530,
+        "notices": 0,
+        "output_tokens": 823,
+        "rejections": 0,
+        "seconds": 16.001326705,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 16.001390307,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.134999999999991
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.312000000000012
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 10.447000000000116,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12561,
+        "notices": 0,
+        "output_tokens": 639,
+        "rejections": 0,
+        "seconds": 7.935758506,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 7.935823086,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            8,
+            222.40200000000004
+          ],
+          "exec": [
+            4,
+            62.557000000000016
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            15.23599999999999
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            3,
+            35.70399999999995
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 335.89899999999943,
+        "queries": 21
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r4",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 26461,
+        "notices": 0,
+        "output_tokens": 2376,
+        "rejections": 0,
+        "seconds": 16.341364969,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 7
+        },
+        "sql": "WITH s AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n)\nSELECT ROUND(SUM(COALESCE(sr.sr_return_amt,0)) / SUM(s.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM s\nLEFT JOIN store_returns sr\n  ON sr.sr_ticket_number = s.ss_ticket_number\n AND sr.sr_item_sk = s.ss_item_sk;",
+        "steps": 7,
+        "tool_calls": 12,
+        "tool_errors": 1,
+        "used": [
+          "r4"
+        ]
+      },
+      "seconds": 16.34149094,
+      "session": "fresh",
+      "sql_calls": 4,
+      "task": "M3-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-prefix-param-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            5,
+            73.65499999999975
+          ],
+          "exec": [
+            1,
+            3.2749999999999773
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            10.817999999999984
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            34.35699999999997
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 122.10500000000138,
+        "queries": 15
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "frozen",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 13490,
+        "notices": 0,
+        "output_tokens": 881,
+        "rejections": 0,
+        "seconds": 8.028985722,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9\n  AND i.i_category = '电子';",
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.029065932,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-type-M1-T1",
+      "answer": "-5348.30",
+      "db": {
+        "by_kind": {
+          "check": [
+            2,
+            37.776000000000295
+          ],
+          "exec": [
+            2,
+            13.264999999999986
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            12.98599999999999
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            2,
+            35.613000000000056
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 99.63999999999942,
+        "queries": 11
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "-5348.30",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "frozen",
+      "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-5348.30",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 15841,
+        "notices": 0,
+        "output_tokens": 1035,
+        "rejections": 0,
+        "seconds": 27.31206965,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT\n  SUM(CASE WHEN d.d_year = 2002 AND d.d_moy = 9 THEN ss.ss_net_paid ELSE 0 END)\n  - SUM(CASE WHEN d.d_year = 2001 AND d.d_moy = 6 THEN ss.ss_net_paid ELSE 0 END) AS diff\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6);",
+        "steps": 6,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "seconds": 27.312150801,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M1-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-type-M1-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            2,
+            31.98999999999978
+          ],
+          "exec": [
+            1,
+            25.783000000000015
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            9.92100000000005
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            2,
+            33.952
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 101.64599999999882,
+        "queries": 9
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "3",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "frozen",
+      "question": "2002 年哪个月的门店营业额最高？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12198,
+        "notices": 0,
+        "output_tokens": 652,
+        "rejections": 0,
+        "seconds": 7.713911648,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT d.d_moy AS month, SUM(s.ss_net_paid) AS revenue FROM store_sales s JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2002 GROUP BY d.d_moy ORDER BY revenue DESC LIMIT 12",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 7.713990478,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-type-M2-T1",
+      "answer": "-26129.86",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            3,
+            7.115000000000009
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            10.224000000000046
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 17.338999999999942,
+        "queries": 7
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "-26129.86",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "frozen",
+      "question": "2002 年 3 月的门店退货金额比2001 年 3 月高多少？（用前者减去后者，结果可以为负数）口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-26129.86",
+        "clarification": null,
+        "derivation": "r2 - r3",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 16870,
+        "notices": 0,
+        "output_tokens": 1174,
+        "rejections": 0,
+        "seconds": 10.24928735,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 3",
+        "steps": 6,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r2",
+          "r3"
+        ]
+      },
+      "seconds": 10.249373091,
+      "session": "fresh",
+      "sql_calls": 3,
+      "task": "M2-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-type-M2-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            10.342999999999961
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.475999999999999
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 15.818999999999505,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "3",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "frozen",
+      "question": "2001 年哪个月的门店退货金额最高？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 5861,
+        "notices": 0,
+        "output_tokens": 369,
+        "rejections": 0,
+        "seconds": 4.027890611,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": "SELECT d.d_moy AS month, SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\nGROUP BY d.d_moy\nORDER BY total DESC",
+        "steps": 3,
+        "tool_calls": 4,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 4.027928512,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-type-M3-T1",
+      "answer": "-0.02",
+      "db": {
+        "by_kind": {
+          "check": [
+            8,
+            232.1959999999999
+          ],
+          "exec": [
+            2,
+            30.07000000000005
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            13.09699999999998
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            3,
+            36.88200000000006
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 312.2450000000008,
+        "queries": 18
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "-0.0156207567663651",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "frozen",
+      "question": "2002 年 6 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-0.02",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 22939,
+        "notices": 0,
+        "output_tokens": 3282,
+        "rejections": 0,
+        "seconds": 19.622889055999998,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "WITH rates AS (\n  SELECT d.d_year,\n         SUM(r.sr_return_amt) / SUM(s.ss_net_paid) * 100 AS rate\n  FROM store_sales s\n  JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\n  LEFT JOIN store_returns r\n    ON s.ss_ticket_number = r.sr_ticket_number\n   AND s.ss_item_sk = r.sr_item_sk\n  WHERE (d.d_year = 2001 AND d.d_moy = 6)\n     OR (d.d_year = 2002 AND d.d_moy = 6)\n  GROUP BY d.d_year\n)\nSELECT ROUND(\n  MAX(CASE WHEN d_year=2002 THEN rate END)\n  - MAX(CASE WHEN d_year=2001 THEN rate END), 2) AS diff\nFROM rates;",
+        "steps": 6,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "seconds": 19.622962667,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M3-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-type-M3-T2",
+      "answer": "7",
+      "db": {
+        "by_kind": {
+          "check": [
+            8,
+            250.73800000000028
+          ],
+          "exec": [
+            1,
+            65.00299999999993
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            14.91599999999994
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            3,
+            41.36999999999989
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 372.02700000000004,
+        "queries": 18
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "7",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "frozen",
+      "question": "2001 年哪个月的门店退货率最高？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "7",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 20039,
+        "notices": 0,
+        "output_tokens": 2107,
+        "rejections": 0,
+        "seconds": 21.113883788,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": null,
+        "steps": 6,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 21.113990138,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-type-M5-T1",
+      "answer": "-2511.30",
+      "db": {
+        "by_kind": {
+          "check": [
+            5,
+            71.36599999999999
+          ],
+          "exec": [
+            1,
+            5.148000000000138
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            10.408000000000015
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            34.18100000000004
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 121.10300000000097,
+        "queries": 15
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "-2511.30",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "frozen",
+      "question": "2002 年 9 月的电子品类门店营业额比2001 年 9 月高多少？（用前者减去后者，结果可以为负数）口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-2511.30",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 14003,
+        "notices": 0,
+        "output_tokens": 1438,
+        "rejections": 0,
+        "seconds": 17.909753021,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "WITH m AS (\n  SELECT d.d_year, SUM(ss.ss_net_paid) AS net\n  FROM store_sales ss\n  JOIN item i ON ss.ss_item_sk = i.i_item_sk\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE i.i_category = '电子' AND d.d_moy = 9 AND d.d_year IN (2001, 2002)\n  GROUP BY d.d_year\n)\nSELECT (SELECT net FROM m WHERE d_year = 2002) - (SELECT net FROM m WHERE d_year = 2001) AS diff,\n       (SELECT net FROM m WHERE d_year = 2002) AS net_2002_09,\n       (SELECT net FROM m WHERE d_year = 2001) AS net_2001_09",
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 17.909851053,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-type-M5-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            5,
+            73.28699999999981
+          ],
+          "exec": [
+            1,
+            22.269000000000005
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            11.017000000000053
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            34.2650000000001
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 140.83800000000156,
+        "queries": 15
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "3",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "frozen",
+      "question": "2002 年哪个月的电子品类门店营业额最高？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 13543,
+        "notices": 0,
+        "output_tokens": 659,
+        "rejections": 0,
+        "seconds": 7.584028057,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": null,
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 7.584105428,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-named-M1-P1",
+      "answer": null,
+      "db": {
+        "by_kind": {
+          "check": [
+            2,
+            31.10199999999986
+          ],
+          "exec": [
+            1,
+            3.1709999999998217
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            14.610000000000014
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            2,
+            33.86699999999996
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 82.75,
+        "queries": 11
+      },
+      "defined": false,
+      "error": null,
+      "finds": 18,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ],
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "1301720.00",
+      "metric": "M1",
+      "outcome": "clarify",
+      "phase": "final-named",
+      "policy": "frozen",
+      "question": "2002 年 9 月的门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": null,
+        "clarification": "“门店营业额”具体指哪个口径？可选：(1) ss_ext_sales_price 销售额（数量×单价，未扣折扣）；(2) ss_net_paid 净支付额（销售额−折扣，不含税）；(3) ss_net_paid_inc_tax 含税净支付额。另外是否需要从中扣减门店退货金额（store_returns.sr_return_amt）？请明确后我再计算 2002 年 9 月的数值。",
+        "derivation": null,
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 30781,
+        "notices": 0,
+        "output_tokens": 3110,
+        "rejections": 0,
+        "seconds": 30.153690935,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 8
+        },
+        "sql": null,
+        "steps": 8,
+        "tool_calls": 24,
+        "tool_errors": 0,
+        "used": []
+      },
+      "seconds": 30.153834625000002,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-named-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.0130000000001473
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.3559999999999945
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 7.368999999998778,
+        "queries": 3
+      },
+      "defined": false,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "frozen",
+      "question": "2002 年 5 月的门店退货金额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 6221,
+        "notices": 0,
+        "output_tokens": 390,
+        "rejections": 0,
+        "seconds": 5.59470958,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 3,
+        "tool_calls": 5,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 5.594759399,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-named-M3-P1",
+      "answer": null,
+      "db": {
+        "by_kind": {
+          "check": [
+            8,
+            219.1310000000003
+          ],
+          "exec": [
+            1,
+            6.429999999999836
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            6,
+            13.356999999999971
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            3,
+            35.210000000000036
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 274.1280000000006,
+        "queries": 18
+      },
+      "defined": false,
+      "error": null,
+      "finds": 11,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "clarify",
+      "phase": "final-named",
+      "policy": "frozen",
+      "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": null,
+        "clarification": "「门店退货率」的口径不明确，且中间层没有已验证的定义（只有「门店退货金额」）。请确认计算口径：是按金额（门店退货金额 ÷ 门店销售金额）还是按数量（退货数量 ÷ 销售数量）？另外，分子分母是否都按 2002 年 9 月的自然月（退货日期归属 / 销售日期归属）统计，还是退货需匹配到对应的原销售单？",
+        "derivation": null,
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 37616,
+        "notices": 0,
+        "output_tokens": 5673,
+        "rejections": 0,
+        "seconds": 34.489358098,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 8
+        },
+        "sql": null,
+        "steps": 8,
+        "tool_calls": 20,
+        "tool_errors": 0,
+        "used": []
+      },
+      "seconds": 34.489458328,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-frozen-4-final-named-M5-P1",
+      "answer": "288539.00",
+      "db": {
+        "by_kind": {
+          "check": [
+            5,
+            72.78999999999996
+          ],
+          "exec": [
+            1,
+            3.4760000000001128
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            11.975000000000023
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            4,
+            39.25
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 127.49099999999999,
+        "queries": 15
+      },
+      "defined": false,
+      "error": null,
+      "finds": 9,
+      "found": [],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "wrong",
+      "phase": "final-named",
+      "policy": "frozen",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "288539.00",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 19746,
+        "notices": 0,
+        "output_tokens": 2706,
+        "rejections": 0,
+        "seconds": 35.171156494,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_ext_sales_price), 2) AS ext_sales\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子';",
+        "steps": 6,
+        "tool_calls": 18,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 35.171266664,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-prefix-param-M1-P1",
+      "answer": "1301720.00",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            3.171000000000049
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.567000000000007
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 8.738000000001193,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:电子品类门店营业额",
+          0
+        ],
+        [
+          "metric:门店营业额",
+          0
+        ]
+      ],
+      "gold": "1301720.00",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "1301720.00",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 7267,
+        "notices": 0,
+        "output_tokens": 445,
+        "rejections": 0,
+        "seconds": 4.9542358459999996,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": null,
+        "steps": 3,
+        "tool_calls": 4,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 4.954271085,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.133000000000038
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.55499999999995
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 7.687999999998283,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 5953,
+        "notices": 0,
+        "output_tokens": 381,
+        "rejections": 0,
+        "seconds": 4.191631081,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": null,
+        "steps": 3,
+        "tool_calls": 5,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 4.191667761,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            13.230999999999995
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.317999999999984
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 21.54899999999907,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货率",
+          0
+        ]
+      ],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 16116,
+        "notices": 0,
+        "output_tokens": 828,
+        "rejections": 0,
+        "seconds": 8.876481859,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": null,
+        "steps": 5,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.876545579,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-prefix-param-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            3.563999999999851
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.444000000000074
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 12.00799999999981,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:电子品类门店营业额",
+          0
+        ],
+        [
+          "metric:门店营业额",
+          0
+        ]
+      ],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12895,
+        "notices": 0,
+        "output_tokens": 696,
+        "rejections": 0,
+        "seconds": 6.816461285,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002\n  AND d.d_moy = 9",
+        "steps": 4,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 6.816515645,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-type-M1-T1",
+      "answer": "-5348.30",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            7.080000000000155
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            6.018000000000029
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 13.097999999999956,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:电子品类门店营业额",
+          0
+        ],
+        [
+          "metric:门店营业额",
+          0
+        ]
+      ],
+      "gold": "-5348.30",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-5348.30",
+        "clarification": null,
+        "derivation": "r1 - r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 7596,
+        "notices": 0,
+        "output_tokens": 678,
+        "rejections": 0,
+        "seconds": 24.431728698,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": null,
+        "steps": 3,
+        "tool_calls": 5,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2"
+        ]
+      },
+      "seconds": 24.431782918,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M1-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-type-M1-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            23.417999999999893
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.6059999999999945
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 29.02400000000125,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:电子品类门店营业额",
+          0
+        ],
+        [
+          "metric:门店营业额",
+          0
+        ]
+      ],
+      "gold": "3",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "accumulating",
+      "question": "2002 年哪个月的门店营业额最高？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 7695,
+        "notices": 0,
+        "output_tokens": 513,
+        "rejections": 0,
+        "seconds": 4.8311827130000005,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": "SELECT d.d_moy AS month, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid_sum DESC",
+        "steps": 3,
+        "tool_calls": 5,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 4.831257724,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-type-M2-T1",
+      "answer": "-26129.86",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            3.0920000000000982
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.493000000000052
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 8.584999999999127,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "-26129.86",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "accumulating",
+      "question": "2002 年 3 月的门店退货金额比2001 年 3 月高多少？（用前者减去后者，结果可以为负数）口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-26129.86",
+        "clarification": null,
+        "derivation": "307246.52 - 333376.38",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 6034,
+        "notices": 0,
+        "output_tokens": 423,
+        "rejections": 0,
+        "seconds": 3.961252954,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": null,
+        "steps": 3,
+        "tool_calls": 5,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 3.961289974,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-type-M2-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            10.815999999999804
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.705000000000041
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 16.52099999999882,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "3",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "accumulating",
+      "question": "2001 年哪个月的门店退货金额最高？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 5879,
+        "notices": 0,
+        "output_tokens": 399,
+        "rejections": 0,
+        "seconds": 5.854527626,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": "SELECT d.d_moy AS month, SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\nGROUP BY d.d_moy\nORDER BY total DESC",
+        "steps": 3,
+        "tool_calls": 4,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 5.854578536,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-type-M3-T1",
+      "answer": "-0.02",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            3,
+            50.84700000000021
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            11.771999999999935
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 62.6190000000006,
+        "queries": 7
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货率",
+          0
+        ]
+      ],
+      "gold": "-0.0156207567663651",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "accumulating",
+      "question": "2002 年 6 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-0.02",
+        "clarification": null,
+        "derivation": "r1 - r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 22615,
+        "notices": 0,
+        "output_tokens": 1832,
+        "rejections": 0,
+        "seconds": 14.050500509999999,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "WITH sales_m AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 6\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_m s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (\n  SELECT sum(ss_net_paid) AS net_paid\n  FROM sales_m\n)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct_2002_06\nFROM ret, sale",
+        "steps": 6,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2"
+        ]
+      },
+      "seconds": 14.050603451,
+      "session": "fresh",
+      "sql_calls": 3,
+      "task": "M3-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-type-M3-T2",
+      "answer": "7",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            59.8599999999999
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            11.304000000000087
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 71.16399999999885,
+        "queries": 5
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货率",
+          0
+        ]
+      ],
+      "gold": "7",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "accumulating",
+      "question": "2001 年哪个月的门店退货率最高？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "7",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 21261,
+        "notices": 0,
+        "output_tokens": 1515,
+        "rejections": 0,
+        "seconds": 27.898705271,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "WITH sales AS (\n  SELECT d.d_moy, ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001\n),\nret AS (\n  SELECT s.d_moy, sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales s ON sr.sr_ticket_number = s.ss_ticket_number AND sr.sr_item_sk = s.ss_item_sk\n  GROUP BY s.d_moy\n),\nsale AS (\n  SELECT d_moy, sum(ss_net_paid) AS net_paid FROM sales GROUP BY d_moy\n)\nSELECT sale.d_moy, round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM sale JOIN ret ON sale.d_moy = ret.d_moy\nORDER BY return_rate_pct DESC",
+        "steps": 6,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 27.898807411,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-type-M5-T1",
+      "answer": "-2511.30",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            7.5150000000001
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.020999999999958
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 15.536000000000058,
+        "queries": 5
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店营业额",
+          0
+        ]
+      ],
+      "gold": "-2511.30",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的电子品类门店营业额比2001 年 9 月高多少？（用前者减去后者，结果可以为负数）口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-2511.30",
+        "clarification": null,
+        "derivation": "r1 - r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11130,
+        "notices": 0,
+        "output_tokens": 1114,
+        "rejections": 0,
+        "seconds": 7.753475227,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk JOIN item i ON ss.ss_item_sk = i.i_item_sk WHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子';",
+        "steps": 4,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2"
+        ]
+      },
+      "seconds": 7.753542707,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M5-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-type-M5-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            25.04399999999987
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.787000000000035
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 33.83099999999831,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店营业额",
+          0
+        ]
+      ],
+      "gold": "3",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "accumulating",
+      "question": "2002 年哪个月的电子品类门店营业额最高？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 14556,
+        "notices": 0,
+        "output_tokens": 956,
+        "rejections": 0,
+        "seconds": 8.154394575,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT d.d_moy, SUM(ss.ss_net_paid) AS net_paid_sum\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002\n  AND i.i_category = '电子'\nGROUP BY d.d_moy\nORDER BY net_paid_sum DESC",
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.154462096,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-named-M1-P1",
+      "answer": "1301720.00",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            3.117999999999938
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.6059999999999945
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 8.72400000000016,
+        "queries": 3
+      },
+      "defined": false,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:电子品类门店营业额",
+          0
+        ],
+        [
+          "metric:门店营业额",
+          0
+        ]
+      ],
+      "gold": "1301720.00",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "1301720.00",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 7317,
+        "notices": 0,
+        "output_tokens": 533,
+        "rejections": 0,
+        "seconds": 5.195381802,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\n  AND d.d_moy = 9",
+        "steps": 3,
+        "tool_calls": 5,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 5.195425711,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-named-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.07100000000014
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.718000000000075
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 7.789000000000669,
+        "queries": 3
+      },
+      "defined": false,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货金额",
+          0
+        ]
+      ],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "accumulating",
+      "question": "2002 年 5 月的门店退货金额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 5698,
+        "notices": 0,
+        "output_tokens": 426,
+        "rejections": 0,
+        "seconds": 4.443999031,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 3,
+        "tool_calls": 4,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 4.444043261,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-named-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            11.608999999999924
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.230000000000018
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 16.838999999999942,
+        "queries": 3
+      },
+      "defined": false,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:门店退货率",
+          0
+        ]
+      ],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11125,
+        "notices": 0,
+        "output_tokens": 921,
+        "rejections": 0,
+        "seconds": 6.978506012,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": "WITH sales_sep AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_sep s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (\n  SELECT sum(ss_net_paid) AS net_paid\n  FROM sales_sep\n)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale",
+        "steps": 4,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 6.978565371,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-accumulating-4-final-named-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            3.2789999999999964
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.278999999999996
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 8.557999999999083,
+        "queries": 3
+      },
+      "defined": false,
+      "error": null,
+      "finds": 1,
+      "found": [
+        [
+          "metric:电子品类门店营业额",
+          0
+        ],
+        [
+          "metric:门店营业额",
+          0
+        ]
+      ],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "accumulating",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 7338,
+        "notices": 0,
+        "output_tokens": 463,
+        "rejections": 0,
+        "seconds": 5.344474003,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 3
+        },
+        "sql": null,
+        "steps": 3,
+        "tool_calls": 5,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 5.344523733,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-prefix-param-M1-P1",
+      "answer": "1301720.00",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            3.270999999999958
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.492999999999938
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 8.763999999999214,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "1301720.00",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "1301720.00",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 10655,
+        "notices": 0,
+        "output_tokens": 630,
+        "rejections": 0,
+        "seconds": 12.963957,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\n  AND d.d_moy = 9",
+        "steps": 4,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 12.964029221,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-prefix-param-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.2760000000000673
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.2029999999999745
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 7.47899999999936,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 5 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 9919,
+        "notices": 0,
+        "output_tokens": 568,
+        "rejections": 0,
+        "seconds": 5.804387574,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "steps": 4,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 5.804447604,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-prefix-param-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            3,
+            21.971000000000004
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            5,
+            13.226999999999862
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 35.19800000000032,
+        "queries": 8
+      },
+      "defined": true,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r2 / r1 * 100",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 24788,
+        "notices": 0,
+        "output_tokens": 3435,
+        "rejections": 0,
+        "seconds": 21.254558992,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 7
+        },
+        "sql": "SELECT ROUND(\n  (SELECT SUM(sr.sr_return_amt)\n   FROM store_sales ss\n   JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n   JOIN store_returns sr ON ss.ss_ticket_number = sr.sr_ticket_number AND ss.ss_item_sk = sr.sr_item_sk\n   WHERE d.d_year = 2002 AND d.d_moy = 9)\n  /\n  (SELECT SUM(ss.ss_net_paid)\n   FROM store_sales ss\n   JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n   WHERE d.d_year = 2002 AND d.d_moy = 9)\n  * 100, 2) AS rate_pct;",
+        "steps": 7,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r1",
+          "r2"
+        ]
+      },
+      "seconds": 21.254677513,
+      "session": "fresh",
+      "sql_calls": 3,
+      "task": "M3-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-prefix-param-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            3.633000000000038
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.490000000000009
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 12.122999999999593,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "prefix-param",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12512,
+        "notices": 0,
+        "output_tokens": 749,
+        "rejections": 0,
+        "seconds": 8.380388227,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "select round(sum(ss.ss_net_paid), 2) as net_paid\nfrom store_sales ss\njoin item i on i.i_item_sk = ss.ss_item_sk\njoin date_dim d on d.d_date_sk = ss.ss_sold_date_sk\nwhere i.i_category = '电子' and d.d_year = 2002 and d.d_moy = 9",
+        "steps": 5,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.380474378,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-type-M1-T1",
+      "answer": "-5348.30",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            5.8279999999999745
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.44399999999996
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 14.271999999999025,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "-5348.30",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-5348.30",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11247,
+        "notices": 0,
+        "output_tokens": 678,
+        "rejections": 0,
+        "seconds": 7.2383460809999995,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT SUM(CASE WHEN d.d_year=2002 AND d.d_moy=9 THEN s.ss_net_paid END) - SUM(CASE WHEN d.d_year=2001 AND d.d_moy=6 THEN s.ss_net_paid END) AS diff FROM store_sales s JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk",
+        "steps": 5,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 7.238448322,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-type-M1-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            22.763999999999896
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.495999999999867
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 31.26000000000022,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "3",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "trajectory",
+      "question": "2002 年哪个月的门店营业额最高？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11188,
+        "notices": 0,
+        "output_tokens": 440,
+        "rejections": 0,
+        "seconds": 7.170360724,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": null,
+        "steps": 5,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 7.170445365,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-type-M2-T1",
+      "answer": "-26129.86",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            18.85200000000009
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            7.886999999999944
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 26.738999999999578,
+        "queries": 5
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "-26129.86",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "trajectory",
+      "question": "2002 年 3 月的门店退货金额比2001 年 3 月高多少？（用前者减去后者，结果可以为负数）口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-26129.86",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 12821,
+        "notices": 0,
+        "output_tokens": 666,
+        "rejections": 0,
+        "seconds": 7.754946615,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT SUM(CASE WHEN d.d_year=2002 AND d.d_moy=3 THEN sr.sr_return_amt ELSE 0 END) - SUM(CASE WHEN d.d_year=2001 AND d.d_moy=3 THEN sr.sr_return_amt ELSE 0 END) AS diff FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "seconds": 7.755015976,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M2-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-type-M2-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            10.319999999999936
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.22199999999998
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 15.54200000000128,
+        "queries": 3
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "3",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "trajectory",
+      "question": "2001 年哪个月的门店退货金额最高？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 9391,
+        "notices": 0,
+        "output_tokens": 389,
+        "rejections": 0,
+        "seconds": 6.313943314,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": null,
+        "steps": 4,
+        "tool_calls": 6,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 6.314009044,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-type-M3-T1",
+      "answer": "-0.02",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            3,
+            50.00700000000006
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            11.530999999999949
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 61.538000000000466,
+        "queries": 7
+      },
+      "defined": true,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "-0.0156207567663651",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "trajectory",
+      "question": "2002 年 6 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-0.02",
+        "clarification": null,
+        "derivation": "r3",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 21326,
+        "notices": 0,
+        "output_tokens": 2863,
+        "rejections": 0,
+        "seconds": 17.132561656,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": null,
+        "steps": 6,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r3"
+        ]
+      },
+      "seconds": 17.132834258,
+      "session": "fresh",
+      "sql_calls": 3,
+      "task": "M3-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-type-M3-T2",
+      "answer": "7",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            51.56099999999992
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            12.345000000000027
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 63.90599999999904,
+        "queries": 5
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "7",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "trajectory",
+      "question": "2001 年哪个月的门店退货率最高？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "7",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 17896,
+        "notices": 0,
+        "output_tokens": 1099,
+        "rejections": 0,
+        "seconds": 10.344851297,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT d.d_moy, SUM(sr.sr_return_amt)/SUM(ss.ss_net_paid)*100 AS rate FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk=d.d_date_sk JOIN store_returns sr ON ss.ss_ticket_number=sr.sr_ticket_number AND ss.ss_item_sk=sr.sr_item_sk WHERE d.d_year=2001 GROUP BY d.d_moy ORDER BY rate DESC;",
+        "steps": 6,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 10.344935088,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-type-M5-T1",
+      "answer": "-2511.30",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            10.167000000000144
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            10.544000000000096
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 20.71099999999933,
+        "queries": 6
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "-2511.30",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的电子品类门店营业额比2001 年 9 月高多少？（用前者减去后者，结果可以为负数）口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "-2511.30",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 19758,
+        "notices": 0,
+        "output_tokens": 976,
+        "rejections": 0,
+        "seconds": 10.601817962,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT ROUND(SUM(CASE WHEN d.d_year = 2002 THEN ss.ss_net_paid ELSE -ss.ss_net_paid END), 2) AS diff_2002_minus_2001\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_moy = 9 AND d.d_year IN (2001, 2002)",
+        "steps": 6,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "seconds": 10.601901593000001,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M5-T1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-type-M5-T2",
+      "answer": "3",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            23.12999999999988
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.619000000000142
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 31.748999999999796,
+        "queries": 4
+      },
+      "defined": true,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "3",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-type",
+      "policy": "trajectory",
+      "question": "2002 年哪个月的电子品类门店营业额最高？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。只回答月份数字（1–12）。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "3",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 14237,
+        "notices": 0,
+        "output_tokens": 825,
+        "rejections": 0,
+        "seconds": 8.410042654,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT d.d_moy AS month, SUM(ss.ss_net_paid) AS net_paid_sum\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid_sum DESC;",
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.410181925,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M5-T2",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-named-M1-P1",
+      "answer": "1301720.00",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            3.032000000000153
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            3,
+            8.008000000000038
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 11.040000000000873,
+        "queries": 4
+      },
+      "defined": false,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "1301720.00",
+      "metric": "M1",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "1301720.00",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11676,
+        "notices": 0,
+        "output_tokens": 557,
+        "rejections": 0,
+        "seconds": 8.637469823,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "steps": 5,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 8.637546954,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M1-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-named-M2-P1",
+      "answer": "322341.88",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            2.0269999999998163
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            5.31899999999996
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 7.345999999999549,
+        "queries": 3
+      },
+      "defined": false,
+      "error": null,
+      "finds": 0,
+      "found": [],
+      "gold": "322341.88",
+      "metric": "M2",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "trajectory",
+      "question": "2002 年 5 月的门店退货金额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "322341.88",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 7669,
+        "notices": 0,
+        "output_tokens": 368,
+        "rejections": 0,
+        "seconds": 5.952060099,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": "SELECT SUM(sr_return_amt) AS total_return_amt FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "steps": 4,
+        "tool_calls": 5,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 5.952122099,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M2-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-named-M3-P1",
+      "answer": "23.85",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            1,
+            12.003000000000156
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            2,
+            6.136000000000195
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 18.139000000001033,
+        "queries": 3
+      },
+      "defined": false,
+      "error": null,
+      "finds": 2,
+      "found": [],
+      "gold": "23.8511530897581661",
+      "metric": "M3",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "23.85",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 14413,
+        "notices": 0,
+        "output_tokens": 1061,
+        "rejections": 0,
+        "seconds": 10.459019661,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": "WITH sales_sep AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_sep s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (SELECT sum(ss_net_paid) AS net_paid FROM sales_sep)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale",
+        "steps": 5,
+        "tool_calls": 8,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "seconds": 10.45912461,
+      "session": "fresh",
+      "sql_calls": 1,
+      "task": "M3-P1",
+      "wave": 4
+    },
+    {
+      "agent": "consumer-2-trajectory-4-final-named-M5-P1",
+      "answer": "265264.40",
+      "db": {
+        "by_kind": {
+          "check": [
+            0,
+            0.0
+          ],
+          "exec": [
+            2,
+            6.5219999999999345
+          ],
+          "guard": [
+            0,
+            0.0
+          ],
+          "meta": [
+            4,
+            10.778999999999996
+          ],
+          "metric": [
+            0,
+            0.0
+          ],
+          "probe": [
+            0,
+            0.0
+          ],
+          "repair": [
+            0,
+            0.0
+          ]
+        },
+        "ms": 17.301000000001295,
+        "queries": 6
+      },
+      "defined": false,
+      "error": null,
+      "finds": 1,
+      "found": [],
+      "gold": "265264.40",
+      "metric": "M5",
+      "outcome": "correct",
+      "phase": "final-named",
+      "policy": "trajectory",
+      "question": "2002 年 9 月的电子品类门店营业额是多少？保留两位小数。",
+      "rejections": [],
+      "repeat": 2,
+      "run": {
+        "answer": "265264.40",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 16929,
+        "notices": 0,
+        "output_tokens": 1006,
+        "rejections": 0,
+        "seconds": 11.322295168,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002 AND d.d_moy = 9",
+        "steps": 6,
+        "tool_calls": 10,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "seconds": 11.322394459,
+      "session": "fresh",
+      "sql_calls": 2,
+      "task": "M5-P1",
+      "wave": 4
+    }
+  ],
+  "training": [
+    {
+      "agent_seconds": 11.505280087,
+      "chain_error": null,
+      "correct": true,
+      "db": {
+        "ms": 232.68099999999998,
+        "queries": 17
+      },
+      "error": null,
+      "extracted_draft": {
+        "example_sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4",
+        "metric": {
+          "aliases": [
+            "门店退货总额",
+            "退货金额"
+          ],
+          "basis": {
+            "kind": "none"
+          },
+          "caveats": [
+            "关联 store_returns 与 date_dim 无丢行（loss_ratio 0.0）",
+            "每笔退货只计一次，无需额外去重或状态过滤"
+          ],
+          "definition": "门店退货金额为门店退货明细中每笔退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间，每笔退货只计一次。",
+          "empty": "unspecified",
+          "examples": [],
+          "fact": "store_returns",
+          "filters": {},
+          "grain": [
+            "sr_ticket_number",
+            "sr_item_sk"
+          ],
+          "joins": [],
+          "measure": "sum(sr_return_amt)",
+          "name": "门店退货金额",
+          "time": {
+            "dim": "date_dim",
+            "dim_col": "d_date_sk",
+            "fact_col": "sr_returned_date_sk",
+            "grain": "day",
+            "loss_ratio": 0.0,
+            "role": "退货日期"
+          }
+        }
+      },
+      "extraction": {
+        "attempts": 1,
+        "errors": [],
+        "input_tokens": 1234,
+        "output_tokens": 2925,
+        "seconds": 12.65447033
+      },
+      "gold": "308496.23",
+      "memory": {
+        "condition": 4,
+        "join": 1,
+        "metric": 1,
+        "profile": 2
+      },
+      "metric": "M2",
+      "publication": {
+        "event": "promoted",
+        "failed_gate": null,
+        "gates": [
+          {
+            "gate": "G1",
+            "pass": true
+          },
+          {
+            "gate": "G2",
+            "pass": true
+          },
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": true
+          },
+          {
+            "gate": "G5",
+            "pass": true
+          },
+          {
+            "gate": "G6",
+            "pass": true
+          },
+          {
+            "gate": "G7",
+            "pass": true
+          }
+        ],
+        "key": "metric:门店退货金额",
+        "reason": null,
+        "revision": 0,
+        "task": "M2-L1"
+      },
+      "question": "2001 年 4 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "run": {
+        "answer": "308496.23",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 15309,
+        "notices": 0,
+        "output_tokens": 1011,
+        "rejections": 0,
+        "seconds": 11.505193166,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4;",
+        "steps": 6,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "task": "M2-L1",
+      "total_seconds": 24.337180103,
+      "wave": 1
+    },
+    {
+      "agent_seconds": 16.747331144,
+      "chain_error": null,
+      "correct": true,
+      "db": {
+        "ms": 798.075,
+        "queries": 24
+      },
+      "error": null,
+      "extracted_draft": {
+        "example_sql": "WITH sales_feb AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 2\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_feb s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (\n  SELECT sum(ss_net_paid) AS net_paid\n  FROM sales_feb\n)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale;",
+        "metric": {
+          "aliases": [
+            "退货率",
+            "门店退货比例",
+            "store return rate"
+          ],
+          "basis": {
+            "kind": "none"
+          },
+          "caveats": [
+            "退货按小票号+商品键关联 store_sales 与 store_returns；已验证该关联为 1:1，但 60.412% 的销售行没有对应退货，左连接后分子为 NULL，分母仍包含这些销售行。",
+            "直接对 store_sales 左连接 store_returns 后计算比率时，需确认每个销售行最多匹配一笔退货；若存在一对多，应像计算链一样先分别聚合退货金额和销售净支付额，避免分母被退货行放大。",
+            "时间过滤按销售日期（ss_sold_date_sk）归属期间，退货日期不参与期间限制；store_sales 到 date_dim 的关联约丢失 1.03% 的销售行。",
+            "题面未要求按 sr_status 过滤，示例未过滤退货状态。",
+            "题面未说明无数据时返回 0 还是 NULL，示例按 NULL 处理。"
+          ],
+          "definition": "按销售日期归属期间，期间内售出的门店销售行所对应退货金额之和除以这些销售行净支付额之和，再乘以100；退货按小票号和商品键与销售行对应，每笔退货只计一次。",
+          "empty": "unspecified",
+          "examples": [],
+          "fact": "store_sales",
+          "filters": {},
+          "grain": [
+            "ss_ticket_number",
+            "ss_item_sk"
+          ],
+          "joins": [
+            {
+              "cardinality": "",
+              "filters": {},
+              "key": "",
+              "kind": "left",
+              "left": "store_sales",
+              "loss_ratio": 0.0,
+              "on": [
+                [
+                  "ss_ticket_number",
+                  "sr_ticket_number"
+                ],
+                [
+                  "ss_item_sk",
+                  "sr_item_sk"
+                ]
+              ],
+              "revision": 0,
+              "right": "store_returns"
+            }
+          ],
+          "measure": "sum(store_returns.sr_return_amt) / sum(store_sales.ss_net_paid) * 100",
+          "name": "门店退货率",
+          "time": {
+            "dim": "date_dim",
+            "dim_col": "d_date_sk",
+            "fact_col": "ss_sold_date_sk",
+            "grain": "day",
+            "loss_ratio": 0.0,
+            "role": "销售日期"
+          }
+        }
+      },
+      "extraction": {
+        "attempts": 1,
+        "errors": [],
+        "input_tokens": 2010,
+        "output_tokens": 9958,
+        "seconds": 42.602569415
+      },
+      "gold": "23.5969324016021622",
+      "memory": {
+        "condition": 13,
+        "join": 3,
+        "metric": 2,
+        "profile": 3
+      },
+      "metric": "M3",
+      "publication": {
+        "event": "promoted",
+        "failed_gate": null,
+        "gates": [
+          {
+            "gate": "G1",
+            "pass": true
+          },
+          {
+            "gate": "G2",
+            "pass": true
+          },
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": true
+          },
+          {
+            "gate": "G5",
+            "pass": true
+          },
+          {
+            "gate": "G6",
+            "pass": true
+          },
+          {
+            "gate": "G7",
+            "pass": true
+          }
+        ],
+        "key": "metric:门店退货率",
+        "reason": null,
+        "revision": 0,
+        "task": "M3-L1"
+      },
+      "question": "2001 年 2 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "run": {
+        "answer": "23.60",
+        "clarification": null,
+        "derivation": "r2",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 20923,
+        "notices": 0,
+        "output_tokens": 2663,
+        "rejections": 0,
+        "seconds": 16.747223643,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 6
+        },
+        "sql": "WITH sales_feb AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 2\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_feb s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (SELECT sum(ss_net_paid) AS net_paid FROM sales_feb)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale;",
+        "steps": 6,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r2"
+        ]
+      },
+      "task": "M3-L1",
+      "total_seconds": 59.817984776,
+      "wave": 2
+    },
+    {
+      "agent_seconds": 9.089702157,
+      "chain_error": null,
+      "correct": true,
+      "db": {
+        "ms": 530.5419999999999,
+        "queries": 15
+      },
+      "error": null,
+      "extracted_draft": {
+        "example_sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2001\n  AND d.d_moy = 1;",
+        "metric": {
+          "aliases": [],
+          "basis": {
+            "kind": "none"
+          },
+          "caveats": [
+            "原计算链未额外过滤 item.i_is_current；若 item 维度包含历史版本，则“当前类别”可能需要按业务确认是否补加该条件。",
+            "与 date_dim 内连接的整体丢行比例约 1.03%（ss_sold_date_sk 无匹配日期维度），计算时沿用内连接。",
+            "题面要求保留两位小数，最终 SQL 使用 ROUND(SUM(...), 2)。",
+            "无数据时 SUM 返回 NULL，题面未说明按 0 处理。"
+          ],
+          "definition": "电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。",
+          "empty": "unspecified",
+          "examples": [],
+          "fact": "store_sales",
+          "filters": {
+            "item": "i_category = '电子'"
+          },
+          "grain": [
+            "ss_ticket_number",
+            "ss_item_sk"
+          ],
+          "joins": [
+            {
+              "cardinality": "",
+              "filters": {},
+              "key": "",
+              "kind": "inner",
+              "left": "store_sales",
+              "loss_ratio": 0.0,
+              "on": [
+                [
+                  "ss_item_sk",
+                  "i_item_sk"
+                ]
+              ],
+              "revision": 0,
+              "right": "item"
+            }
+          ],
+          "measure": "sum(ss_net_paid)",
+          "name": "电子品类门店营业额",
+          "time": {
+            "dim": "date_dim",
+            "dim_col": "d_date_sk",
+            "fact_col": "ss_sold_date_sk",
+            "grain": "day",
+            "loss_ratio": 0.0,
+            "role": "销售日"
+          }
+        }
+      },
+      "extraction": {
+        "attempts": 1,
+        "errors": [],
+        "input_tokens": 1614,
+        "output_tokens": 4469,
+        "seconds": 20.984243908
+      },
+      "gold": "273265.40",
+      "memory": {
+        "condition": 16,
+        "join": 4,
+        "metric": 3,
+        "profile": 4
+      },
+      "metric": "M5",
+      "publication": {
+        "event": "promoted",
+        "failed_gate": null,
+        "gates": [
+          {
+            "gate": "G1",
+            "pass": true
+          },
+          {
+            "gate": "G2",
+            "pass": true
+          },
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": true
+          },
+          {
+            "gate": "G5",
+            "pass": true
+          },
+          {
+            "gate": "G6",
+            "pass": true
+          },
+          {
+            "gate": "G7",
+            "pass": true
+          }
+        ],
+        "key": "metric:电子品类门店营业额",
+        "reason": null,
+        "revision": 0,
+        "task": "M5-L1"
+      },
+      "question": "2001 年 1 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+      "run": {
+        "answer": "273265.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 13627,
+        "notices": 0,
+        "output_tokens": 850,
+        "rejections": 0,
+        "seconds": 9.089578117,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 5
+        },
+        "sql": null,
+        "steps": 5,
+        "tool_calls": 9,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "task": "M5-L1",
+      "total_seconds": 30.55021696,
+      "wave": 3
+    },
+    {
+      "agent_seconds": 7.713021326,
+      "chain_error": null,
+      "correct": true,
+      "db": {
+        "ms": 474.9209999999998,
+        "queries": 9
+      },
+      "error": null,
+      "extracted_draft": {
+        "example_sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\n  AND d.d_moy = 3",
+        "metric": {
+          "aliases": [
+            "门店净支付额",
+            "门店销售净额"
+          ],
+          "basis": {
+            "kind": "none"
+          },
+          "caveats": [
+            "store_sales 到 date_dim 的关联为 INNER JOIN，会丢弃约 1.03% 的 store_sales 行（ss_sold_date_sk 为 NULL 或无匹配日期）；本口径按销售日期归属期间，这些行无法归入任何期间。",
+            "题面未说明无数据时的返回口径，按未指定处理。",
+            "计算时不应额外过滤 ss_is_current 等状态列，题面口径未要求。"
+          ],
+          "definition": "门店销售明细行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。",
+          "empty": "unspecified",
+          "examples": [],
+          "fact": "store_sales",
+          "filters": {},
+          "grain": [
+            "ss_ticket_number",
+            "ss_item_sk"
+          ],
+          "joins": [],
+          "measure": "sum(ss_net_paid)",
+          "name": "门店营业额",
+          "time": {
+            "dim": "date_dim",
+            "dim_col": "d_date_sk",
+            "fact_col": "ss_sold_date_sk",
+            "grain": "day",
+            "loss_ratio": 0.0,
+            "role": "销售日"
+          }
+        }
+      },
+      "extraction": {
+        "attempts": 1,
+        "errors": [],
+        "input_tokens": 1342,
+        "output_tokens": 1602,
+        "seconds": 7.603789171
+      },
+      "gold": "1354893.40",
+      "memory": {
+        "condition": 16,
+        "join": 4,
+        "metric": 4,
+        "profile": 4
+      },
+      "metric": "M1",
+      "publication": {
+        "event": "promoted",
+        "failed_gate": null,
+        "gates": [
+          {
+            "gate": "G1",
+            "pass": true
+          },
+          {
+            "gate": "G2",
+            "pass": true
+          },
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": true
+          },
+          {
+            "gate": "G5",
+            "pass": true
+          },
+          {
+            "gate": "G6",
+            "pass": true
+          },
+          {
+            "gate": "G7",
+            "pass": true
+          }
+        ],
+        "key": "metric:门店营业额",
+        "reason": null,
+        "revision": 0,
+        "task": "M1-L1"
+      },
+      "question": "2001 年 3 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+      "run": {
+        "answer": "1354893.40",
+        "clarification": null,
+        "derivation": "r1",
+        "discarded_replies": 0,
+        "discarded_tokens": 0,
+        "input_tokens": 11664,
+        "notices": 0,
+        "output_tokens": 900,
+        "rejections": 0,
+        "seconds": 7.7129230060000005,
+        "served_models": {
+          "deepseek/deepseek-v4.1-flash": 4
+        },
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\n  AND d.d_moy = 3",
+        "steps": 4,
+        "tool_calls": 7,
+        "tool_errors": 0,
+        "used": [
+          "r1"
+        ]
+      },
+      "task": "M1-L1",
+      "total_seconds": 15.78131056,
+      "wave": 4
+    }
+  ]
+}

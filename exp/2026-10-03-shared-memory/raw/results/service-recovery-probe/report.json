@@ -1,0 +1,47 @@
+[
+  {
+    "service": "kunyou",
+    "requested_model": "deepseek-v4.1-flash",
+    "host": "api.kunyou.asia",
+    "utc": "2026-10-03T18:26:06.075030+00:00",
+    "status": 401,
+    "error": "{\"code\":\"API_KEY_DISABLED\",\"message\":\"API key is disabled\"}"
+  },
+  {
+    "service": "official",
+    "requested_model": "deepseek-v4.1-flash",
+    "host": "api.deepseek.com",
+    "utc": "2026-10-03T18:26:06.077881+00:00",
+    "status": 400,
+    "error": "{\"error\":{\"message\":\"The supported API model names are deepseek-flash, deepseek-v4-pro, but you passed deepseek-v4.1-flash. (request_id: 7b031389-e6f6-4e16-a69b-860806e43504)\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
+  },
+  {
+    "service": "cline-pass",
+    "requested_model": "cline-pass/deepseek-v4.1-flash",
+    "host": "api.cline.bot",
+    "utc": "2026-10-03T18:26:06.078915+00:00",
+    "status": 200,
+    "served_model": "deepseek/deepseek-v4.1-flash",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "completion_tokens": 42,
+      "completion_tokens_details": {
+        "image_tokens": 0,
+        "reasoning_tokens": 39
+      },
+      "cost": 3.015e-05,
+      "cost_details": null,
+      "gateway_cost": 3.015e-05,
+      "is_byok": false,
+      "market_cost": 3.015e-05,
+      "prompt_tokens": 33,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "total_tokens": 75
+    },
+    "finish_reason": "stop"
+  }
+]

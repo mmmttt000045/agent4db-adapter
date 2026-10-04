@@ -1,0 +1,12 @@
+{
+  "shared-memory-main": {
+    "checked_returned_primary_answers": 197,
+    "failures": [],
+    "tolerance": "half of last declared decimal place, Decimal arithmetic, no relative float allowance"
+  },
+  "shared-memory-recovery": {
+    "checked_returned_primary_answers": 216,
+    "failures": [],
+    "tolerance": "half of last declared decimal place, Decimal arithmetic, no relative float allowance"
+  }
+}

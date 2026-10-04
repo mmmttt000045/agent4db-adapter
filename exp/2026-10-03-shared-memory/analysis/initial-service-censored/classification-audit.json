@@ -1,0 +1,4652 @@
+[
+  {
+    "repeat": 1,
+    "policy": "isolated",
+    "wave": 1,
+    "task": "M1-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_net_paid_2002_09\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_net_paid_2002_09\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "frozen",
+    "wave": 1,
+    "task": "M1-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "accumulating",
+    "wave": 1,
+    "task": "M1-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "trajectory",
+    "wave": 1,
+    "task": "M1-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT SUM(ss_net_paid) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT SUM(ss_net_paid) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 6",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS revenue FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy, SUM(ss.ss_net_paid) AS rev\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY rev DESC",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy, SUM(ss.ss_net_paid) AS rev\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY rev DESC",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS amt FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  ROUND(SUM(sr.sr_return_amt) / SUM(ss.ss_net_paid) * 100, 2) AS return_rate_pct,\n  SUM(sr.sr_return_amt) AS return_amt,\n  SUM(ss.ss_net_paid) AS net_paid,\n  COUNT(*) AS sales_rows,\n  COUNT(sr.sr_ticket_number) AS matched_return_rows\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT\n  ROUND(SUM(sr.sr_return_amt) / SUM(ss.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS elec_store_revenue\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS elec_store_revenue\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_year, d.d_moy, SUM(ss.ss_net_paid) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)\nGROUP BY d.d_year, d.d_moy\nORDER BY d.d_year, d.d_moy;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_year, d.d_moy, SUM(ss.ss_net_paid) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)\nGROUP BY d.d_year, d.d_moy\nORDER BY d.d_year, d.d_moy;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy AS month, SUM(s.ss_net_paid) AS net_paid\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy AS month, SUM(s.ss_net_paid) AS net_paid\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "wrong",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_year, d.d_moy,\n       ROUND(SUM(ss.ss_ext_sales_price), 2) AS gross_sales,\n       ROUND(SUM(ss.ss_net_paid), 2) AS net_paid,\n       ROUND(SUM(ss.ss_net_paid_inc_tax), 2) AS net_paid_inc_tax,\n       ROUND(SUM(ss.ss_net_profit), 2) AS net_profit,\n       COUNT(*) AS rows\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9\nGROUP BY d.d_year, d.d_moy;",
+        "ref": "r1",
+        "category": "attempt-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_ext_sales_price), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_ext_sales_price), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(sr_return_amt), 2) AS return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(sr_return_amt), 2) AS return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "clarify",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  SUM(sr.sr_return_quantity) AS ret_qty,\n  SUM(sr.sr_return_amt) AS ret_amt,\n  (SELECT SUM(ss.ss_quantity) FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE d.d_year=2002 AND d.d_moy=9) AS sold_qty,\n  (SELECT SUM(ss.ss_ext_sales_price) FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE d.d_year=2002 AND d.d_moy=9) AS sold_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year=2002 AND d.d_moy=9",
+        "ref": "r1",
+        "category": "attempt-sql"
+      },
+      {
+        "tool": "ask_clarification",
+        "sql": null,
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "wrong",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT sum(ss_ext_sales_price) AS ext_sales, sum(ss_net_paid) AS net_paid, sum(ss_net_paid_inc_tax) AS net_paid_inc_tax\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r1",
+        "category": "attempt-sql"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT sum(ss_ext_sales_price) AS v\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT sum(ss_net_paid) AS v\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r3",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT sum(ss_net_paid_inc_tax) AS v\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r4",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT sum(ss_ext_sales_price) AS v\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2006 AND d.d_moy = 6",
+        "ref": "r2",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 6",
+        "ref": "r3",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy AS month, SUM(ss.ss_net_paid) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY store_revenue DESC",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy AS month, SUM(ss.ss_net_paid) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY store_revenue DESC",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT SUM(sr_return_amt) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": null,
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "clarify",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "ask_clarification",
+        "sql": null,
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子'",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子'",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  ROUND(SUM(CASE WHEN d.d_year = 2002 AND d.d_moy = 9 THEN ss.ss_net_paid END), 2) AS sep2002,\n  ROUND(SUM(CASE WHEN d.d_year = 2001 AND d.d_moy = 6 THEN ss.ss_net_paid END), 2) AS jun2001,\n  ROUND(SUM(CASE WHEN d.d_year = 2002 AND d.d_moy = 9 THEN ss.ss_net_paid END)\n      - SUM(CASE WHEN d.d_year = 2001 AND d.d_moy = 6 THEN ss.ss_net_paid END), 2) AS diff\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT\n  ROUND(SUM(CASE WHEN d.d_year = 2002 AND d.d_moy = 9 THEN ss.ss_net_paid END), 2) AS sep2002,\n  ROUND(SUM(CASE WHEN d.d_year = 2001 AND d.d_moy = 6 THEN ss.ss_net_paid END), 2) AS jun2001,\n  ROUND(SUM(CASE WHEN d.d_year = 2002 AND d.d_moy = 9 THEN ss.ss_net_paid END)\n      - SUM(CASE WHEN d.d_year = 2001 AND d.d_moy = 6 THEN ss.ss_net_paid END), 2) AS diff\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy AS month, ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY store_revenue DESC;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy AS month, ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY store_revenue DESC;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS amt FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS amt FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  ROUND(SUM(sr.sr_return_amt) / SUM(ss.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT\n  ROUND(SUM(sr.sr_return_amt) / SUM(ss.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 1,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 2,
+    "policy": "frozen",
+    "wave": 1,
+    "task": "M2-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT count(*) AS total_rows,\n       count(DISTINCT (sr_returned_date_sk, sr_ticket_number, sr_item_sk)) AS distinct_grain\nFROM store_returns",
+        "ref": "r1",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "accumulating",
+    "wave": 1,
+    "task": "M2-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT count(*) AS rows_total,\n       count(DISTINCT (sr_returned_date_sk, sr_ticket_number, sr_item_sk)) AS distinct_grain\nFROM store_returns",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "trajectory",
+    "wave": 1,
+    "task": "M2-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT SUM(sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  (SELECT COUNT(*) FROM date_dim WHERE d_year=2002 AND d_moy=5) AS days,\n  (SELECT COUNT(DISTINCT d_date_sk) FROM date_dim) AS distinct_sk,\n  (SELECT COUNT(*) FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk=d.d_date_sk WHERE d.d_year=2002 AND d.d_moy=5) AS joined_rows,\n  (SELECT COUNT(*) FROM store_returns sr WHERE sr.sr_returned_date_sk IN (SELECT d_date_sk FROM date_dim WHERE d_year=2002 AND d_moy=5)) AS direct_rows;",
+        "ref": "r2",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT SUM(sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "isolated",
+    "wave": 1,
+    "task": "M2-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS return_amt, COUNT(*) AS cnt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_year, d.d_moy, SUM(s.ss_net_paid) AS revenue\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)\nGROUP BY d.d_year, d.d_moy\nORDER BY d.d_year, d.d_moy;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_year, d.d_moy, SUM(s.ss_net_paid) AS revenue FROM store_sales s JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk WHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6) GROUP BY d.d_year, d.d_moy ORDER BY d.d_year, d.d_moy;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT column_name, data_type FROM information_schema.columns WHERE table_name IN ('store_sales','date_dim') ORDER BY table_name, ordinal_position",
+        "ref": "r1",
+        "category": "schema-sql"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ss_is_current, count(*), count(ss_sold_date_sk) FROM store_sales GROUP BY 1 ORDER BY 1",
+        "ref": "r2",
+        "category": "explore-sql"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy, sum(s.ss_net_paid) AS net_paid\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC",
+        "ref": "r3",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy, sum(s.ss_net_paid) AS net_paid\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "wrong",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  SUM(ss_ext_sales_price) AS gross,\n  SUM(ss_net_paid) AS net_paid,\n  SUM(ss_net_paid_inc_tax) AS net_paid_tax\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT SUM(ss.ss_ext_sales_price) AS gross\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT SUM(sr.sr_return_amt) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "clarify",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "ask_clarification",
+        "sql": null,
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "wrong",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_ext_sales_price),2) AS gross_sales, ROUND(SUM(ss.ss_net_paid),2) AS net_paid FROM store_sales ss JOIN item i ON ss.ss_item_sk = i.i_item_sk JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_ext_sales_price),2) AS gross_sales FROM store_sales ss JOIN item i ON ss.ss_item_sk = i.i_item_sk JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "select sum(ss_net_paid) as total\nfrom store_sales ss join date_dim d on ss.ss_sold_date_sk = d.d_date_sk\nwhere d.d_year = 2002 and d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "select sum(ss_net_paid) as total\nfrom store_sales ss join date_dim d on ss.ss_sold_date_sk = d.d_date_sk\nwhere d.d_year = 2001 and d.d_moy = 6",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "select sum(ss_net_paid) as total from store_sales ss join date_dim d on ss.ss_sold_date_sk = d.d_date_sk where d.d_year = 2002 and d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy AS month, SUM(ss.ss_net_paid) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy AS month, SUM(ss.ss_net_paid) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "wrong",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  SUM(ss.ss_ext_sales_price) AS gross_sales,\n  SUM(ss.ss_net_paid) AS net_paid,\n  SUM(ss.ss_net_paid_inc_tax) AS net_paid_inc_tax,\n  COUNT(*) AS rows_cnt\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT SUM(ss.ss_ext_sales_price) FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT count(*) AS total_rows, count(DISTINCT (sr_returned_date_sk, sr_ticket_number, sr_item_sk)) AS grain_rows FROM store_returns",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT count(*) AS unmatched FROM store_returns sr LEFT JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_date_sk IS NULL",
+        "ref": "r3",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "wrong",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(ss.ss_ext_sales_price), 2) AS ext_sales,\n       round(sum(ss.ss_net_paid), 2) AS net_paid,\n       round(sum(ss.ss_net_paid_inc_tax), 2) AS net_paid_inc_tax\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "WITH ret AS (\n  SELECT sum(sr.sr_return_amt) AS amt\n  FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n), sal AS (\n  SELECT sum(ss.ss_ext_sales_price) AS ext, sum(ss.ss_net_paid) AS net, sum(ss.ss_net_paid_inc_tax) AS net_tax\n  FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n)\nSELECT round(100*ret.amt/sal.ext,2) AS rate_ext,\n       round(100*ret.amt/sal.net,2) AS rate_net,\n       round(100*ret.amt/sal.net_tax,2) AS rate_net_tax\nFROM ret, sal",
+        "ref": "r3",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "WITH ret AS (\n  SELECT sum(sr.sr_return_quantity) AS qty, sum(sr.sr_return_amt) AS amt\n  FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n), sal AS (\n  SELECT sum(ss.ss_quantity) AS qty, sum(ss.ss_ext_sales_price) AS ext, sum(ss.ss_net_paid) AS net\n  FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n)\nSELECT ret.qty AS ret_qty, sal.qty AS sal_qty,\n       round(100*ret.qty::numeric/sal.qty,2) AS qty_rate,\n       ret.amt AS ret_amt, sal.ext AS ext, sal.net AS net,\n       round(100*ret.amt/sal.ext,2) AS amt_rate_ext,\n       round(100*ret.amt/sal.net,2) AS amt_rate_net\nFROM ret, sal",
+        "ref": "r4",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "WITH ret AS (\n  SELECT sum(sr.sr_return_amt) AS amt\n  FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n), sal AS (\n  SELECT sum(ss.ss_ext_sales_price) AS ext\n  FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n)\nSELECT round(100 * ret.amt / sal.ext, 2) AS return_rate\nFROM ret, sal",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "wrong",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(ss.ss_ext_sales_price), 2) AS gross_sales,\n       round(sum(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "attempt-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "-- 门店营业额 = 门店销售明细销售额(ss_ext_sales_price)之和，按销售日期归属月份，限定品类=电子\nSELECT round(sum(ss.ss_ext_sales_price), 2) AS store_revenue\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002 AND d.d_moy = 9\n  AND ss.ss_is_current = 1\n  AND i.i_is_current = 'Y'",
+        "ref": null,
+        "category": "error"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(ss.ss_ext_sales_price), 2) AS store_revenue\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002 AND d.d_moy = 9\n  AND ss.ss_is_current = 1\n  AND i.i_is_current = 'Y'",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT round(sum(ss.ss_ext_sales_price), 2) AS store_revenue\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002 AND d.d_moy = 9\n  AND ss.ss_is_current = 1\n  AND i.i_is_current = 'Y'",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_year, d.d_moy, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)\nGROUP BY d.d_year, d.d_moy\nORDER BY d.d_year, d.d_moy",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_year, d.d_moy, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6) GROUP BY d.d_year, d.d_moy",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy AS month, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy AS month, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT count(*) AS total_rows, count(DISTINCT (sr_returned_date_sk, sr_ticket_number, sr_item_sk)) AS distinct_grain\nFROM store_returns",
+        "ref": "r2",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT round(sum(sr.sr_return_amt), 2) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "WITH sep_sales AS (\n  SELECT s.ss_ticket_number, s.ss_item_sk, s.ss_net_paid\n  FROM store_sales s\n  JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n),\nret AS (\n  SELECT sr_ticket_number, sr_item_sk, SUM(sr_return_amt) AS ret_amt\n  FROM store_returns\n  GROUP BY sr_ticket_number, sr_item_sk\n)\nSELECT ROUND(SUM(r.ret_amt) / SUM(j.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM sep_sales j\nLEFT JOIN ret r\n  ON j.ss_ticket_number = r.sr_ticket_number\n AND j.ss_item_sk = r.sr_item_sk",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "WITH sep_sales AS (\n  SELECT s.ss_ticket_number, s.ss_item_sk, s.ss_net_paid\n  FROM store_sales s\n  JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n),\nret AS (\n  SELECT sr_ticket_number, sr_item_sk, SUM(sr_return_amt) AS ret_amt\n  FROM store_returns\n  GROUP BY sr_ticket_number, sr_item_sk\n)\nSELECT ROUND(SUM(r.ret_amt) / SUM(j.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM sep_sales j\nLEFT JOIN ret r\n  ON j.ss_ticket_number = r.sr_ticket_number\n AND j.ss_item_sk = r.sr_item_sk",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002\n  AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2002\n  AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 2,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 2,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 2,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 2,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 2,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 2,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 3,
+    "policy": "accumulating",
+    "wave": 1,
+    "task": "M3-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  round(sum(sr.sr_return_amt) / sum(ss.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales ss\nJOIN date_dim d\n  ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": null,
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "trajectory",
+    "wave": 1,
+    "task": "M3-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "WITH s AS (\n  SELECT ss.ss_ticket_number AS tn, ss.ss_item_sk AS ik, ss.ss_net_paid AS net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n)\nSELECT\n  sum(s.net_paid) AS denom_net_paid,\n  sum(r.sr_return_amt) AS numer_return_amt,\n  round(sum(r.sr_return_amt) / sum(s.net_paid) * 100, 2) AS return_rate_pct\nFROM s\nLEFT JOIN store_returns r\n  ON s.tn = r.sr_ticket_number AND s.ik = r.sr_item_sk",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT count(*) AS total_rows, count(DISTINCT (sr_ticket_number, sr_item_sk)) AS distinct_pairs\nFROM store_returns",
+        "ref": "r2",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": null,
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "isolated",
+    "wave": 1,
+    "task": "M3-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  SUM(s.ss_net_paid) AS denom,\n  SUM(r.sr_return_amt) AS numer,\n  round(SUM(r.sr_return_amt) / SUM(s.ss_net_paid) * 100, 2) AS rate\nFROM (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n) s\nLEFT JOIN store_returns r\n  ON r.sr_ticket_number = s.ss_ticket_number AND r.sr_item_sk = s.ss_item_sk;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT SUM(ss.ss_net_paid) AS denom_all\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT SUM(s.ss_net_paid) AS denom, SUM(r.sr_return_amt) AS numer, round(SUM(r.sr_return_amt)/SUM(s.ss_net_paid)*100,2) AS rate\nFROM (SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n      FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk=d.d_date_sk\n      WHERE d.d_year=2002 AND d.d_moy=9) s\nLEFT JOIN store_returns r ON r.sr_ticket_number=s.ss_ticket_number AND r.sr_item_sk=s.ss_item_sk;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "frozen",
+    "wave": 1,
+    "task": "M3-P1",
+    "phase": "prefix-param",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  round(sum(sr.sr_return_amt) / sum(ss.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales ss\nJOIN date_dim d\n  ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": null,
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  SUM(CASE WHEN d.d_year=2002 AND d.d_moy=9 THEN ss.ss_net_paid END) AS sep2002,\n  SUM(CASE WHEN d.d_year=2001 AND d.d_moy=6 THEN ss.ss_net_paid END) AS jun2001,\n  SUM(CASE WHEN d.d_year=2002 AND d.d_moy=9 THEN ss.ss_net_paid END)\n  - SUM(CASE WHEN d.d_year=2001 AND d.d_moy=6 THEN ss.ss_net_paid END) AS diff\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year=2002 AND d.d_moy=9) OR (d.d_year=2001 AND d.d_moy=6);",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT SUM(CASE WHEN d.d_year=2002 AND d.d_moy=9 THEN ss.ss_net_paid END)\n     - SUM(CASE WHEN d.d_year=2001 AND d.d_moy=6 THEN ss.ss_net_paid END) AS diff\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year=2002 AND d.d_moy=9) OR (d.d_year=2001 AND d.d_moy=6);",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy AS month, SUM(s.ss_net_paid) AS store_revenue\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY store_revenue DESC\nLIMIT 1;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy AS month, SUM(s.ss_net_paid) AS store_revenue\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY d.d_moy;",
+        "ref": "r2",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy AS month, SUM(s.ss_net_paid) AS store_revenue\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY store_revenue DESC\nLIMIT 1;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "clarify",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  SUM(ss.ss_ext_sales_price) AS sum_ext_sales_price,\n  SUM(ss.ss_net_paid)        AS sum_net_paid,\n  SUM(ss.ss_net_paid_inc_tax) AS sum_net_paid_inc_tax,\n  SUM(ss.ss_net_profit)      AS sum_net_profit,\n  COUNT(*) AS n_rows\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+        "ref": "r1",
+        "category": "attempt-sql"
+      },
+      {
+        "tool": "ask_clarification",
+        "sql": null,
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT SUM(sr.sr_return_amt) AS return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT SUM(sr.sr_return_amt) AS return_amt FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  round(sum(sr.sr_return_amt) / sum(ss.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales ss\nJOIN date_dim d\n  ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT\n  round(sum(sr.sr_return_amt) / sum(ss.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales ss\nJOIN date_dim d\n  ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "frozen",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "wrong",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(ss.ss_ext_sales_price), 2) AS turnover\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子'",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT round(sum(ss.ss_net_paid), 2) AS turnover_net,\n       round(sum(ss.ss_ext_sales_price), 2) AS turnover_ext\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子'",
+        "ref": "r2",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_year, d.d_moy, i.i_category,\n       count(*) AS rows_cnt,\n       round(sum(ss.ss_ext_sales_price), 2) AS turnover\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子'\nGROUP BY d.d_year, d.d_moy, i.i_category",
+        "ref": "r3",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT round(sum(ss.ss_ext_sales_price), 2) AS turnover\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9 AND i.i_category = '电子'",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_year, d.d_moy, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)\nGROUP BY d.d_year, d.d_moy\nORDER BY d.d_year, d.d_moy",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_year, d.d_moy, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)\nGROUP BY d.d_year, d.d_moy",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy AS month, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy AS month, ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT SUM(r.sr_return_amt) AS total_return_amt, COUNT(*) AS cnt\nFROM store_returns r\nJOIN date_dim d ON r.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(r.sr_return_amt), 2) AS total_return_amt\nFROM store_returns r\nJOIN date_dim d ON r.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 5",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT\n  round(sum(sr.sr_return_amt) / sum(ss.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales ss\nJOIN date_dim d\n  ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN store_returns sr\n  ON ss.ss_ticket_number = sr.sr_ticket_number\n AND ss.ss_item_sk = sr.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "WITH ret AS (\n  SELECT sr_ticket_number, sr_item_sk, sum(sr_return_amt) AS ret_amt\n  FROM store_returns\n  GROUP BY sr_ticket_number, sr_item_sk\n)\nSELECT round(sum(r.ret_amt) / sum(ss.ss_net_paid) * 100, 2) AS return_rate_pct\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nLEFT JOIN ret r\n  ON ss.ss_ticket_number = r.sr_ticket_number\n AND ss.ss_item_sk = r.sr_item_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r2",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT round(sum(sr.sr_return_amt) / sum(ss.ss_net_paid) * 100, 2) AS return_rate_pct FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk LEFT JOIN store_returns sr ON ss.ss_ticket_number = sr.sr_ticket_number AND ss.ss_item_sk = sr.sr_item_sk WHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "accumulating",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "select sum(ss_net_paid) as net_paid_sep2002 from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where d.d_year = 2002 and d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "select sum(ss_net_paid) as net_paid_jun2001 from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where d.d_year = 2001 and d.d_moy = 6",
+        "ref": "r2",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "select sum(case when d.d_year=2002 and d.d_moy=9 then s.ss_net_paid else 0 end) - sum(case when d.d_year=2001 and d.d_moy=6 then s.ss_net_paid else 0 end) as diff from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where (d.d_year=2002 and d.d_moy=9) or (d.d_year=2001 and d.d_moy=6)",
+        "ref": "r3",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "select sum(case when d.d_year=2002 and d.d_moy=9 then s.ss_net_paid else 0 end) - sum(case when d.d_year=2001 and d.d_moy=6 then s.ss_net_paid else 0 end) from store_sales s join date_dim d on s.ss_sold_date_sk = d.d_date_sk where (d.d_year=2002 and d.d_moy=9) or (d.d_year=2001 and d.d_moy=6)",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_moy, SUM(ss.ss_net_paid) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT d.d_moy, SUM(ss.ss_net_paid) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(sr_return_amt),2) AS total_return_amt, COUNT(*) AS cnt FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(sr_return_amt),2) FROM store_returns sr JOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 5;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "WITH s AS (\n  SELECT ss.ss_ticket_number AS tn, ss.ss_item_sk AS ik, ss.ss_net_paid AS net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n)\nSELECT\n  sum(s.net_paid) AS denom_net_paid,\n  sum(r.sr_return_amt) AS numer_return_amt,\n  round(sum(r.sr_return_amt) / sum(s.net_paid) * 100, 2) AS return_rate_pct\nFROM s\nLEFT JOIN store_returns r\n  ON s.tn = r.sr_ticket_number AND s.ik = r.sr_item_sk",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "WITH s AS (\n  SELECT ss.ss_ticket_number AS tn, ss.ss_item_sk AS ik, ss.ss_net_paid AS net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n)\nSELECT\n  (SELECT count(*) FROM s) AS n_sales_rows,\n  (SELECT count(*) FROM (SELECT DISTINCT tn, ik FROM s) t) AS n_distinct_ticket_item,\n  (SELECT count(*) FROM s LEFT JOIN store_returns r ON s.tn=r.sr_ticket_number AND s.ik=r.sr_item_sk) AS n_joined,\n  (SELECT count(*) FROM s LEFT JOIN store_returns r ON s.tn=r.sr_ticket_number AND s.ik=r.sr_item_sk WHERE r.sr_return_amt IS NOT NULL) AS n_matched_return_rows",
+        "ref": "r2",
+        "category": "validate-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "WITH s AS (\n  SELECT ss.ss_ticket_number AS tn, ss.ss_item_sk AS ik, ss.ss_net_paid AS net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2002 AND d.d_moy = 9\n)\nSELECT\n  sum(s.net_paid) AS denom_net_paid,\n  sum(r.sr_return_amt) AS numer_return_amt,\n  round(sum(r.sr_return_amt) / sum(s.net_paid) * 100, 2) AS return_rate_pct\nFROM s\nLEFT JOIN store_returns r\n  ON s.tn = r.sr_ticket_number AND s.ik = r.sr_item_sk",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "trajectory",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "find_trajectory",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子' AND d.d_year = 2002 AND d.d_moy = 9",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M1-T1",
+    "phase": "final-type",
+    "outcome": "correct",
+    "calls": [
+      {
+        "tool": "list_tables",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "describe_table",
+        "sql": null,
+        "ref": null,
+        "category": "schema-tool"
+      },
+      {
+        "tool": "join_path",
+        "sql": null,
+        "ref": null,
+        "category": "relationship"
+      },
+      {
+        "tool": "find_metric",
+        "sql": null,
+        "ref": null,
+        "category": "retrieval"
+      },
+      {
+        "tool": "run_sql",
+        "sql": "SELECT d.d_year, d.d_moy, SUM(s.ss_net_paid) AS net_paid\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)\nGROUP BY d.d_year, d.d_moy\nORDER BY d.d_year, d.d_moy;",
+        "ref": "r1",
+        "category": "answer-sql"
+      },
+      {
+        "tool": "final_answer",
+        "sql": "SELECT SUM(s.ss_net_paid) FILTER (WHERE d.d_year=2002 AND d.d_moy=9) - SUM(s.ss_net_paid) FILTER (WHERE d.d_year=2001 AND d.d_moy=6) AS diff FROM store_sales s JOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk;",
+        "ref": null,
+        "category": "other"
+      }
+    ]
+  },
+  {
+    "repeat": 3,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M1-T2",
+    "phase": "final-type",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 3,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M1-P1",
+    "phase": "final-named",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 3,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M2-P1",
+    "phase": "final-named",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 3,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M3-P1",
+    "phase": "final-named",
+    "outcome": "error",
+    "calls": []
+  },
+  {
+    "repeat": 3,
+    "policy": "isolated",
+    "wave": 4,
+    "task": "M5-P1",
+    "phase": "final-named",
+    "outcome": "error",
+    "calls": []
+  }
+]

@@ -1,0 +1,1538 @@
+{
+  "checkpoint": {
+    "evidence": {
+      "G|metric:门店退货率": {
+        "ask": {
+          "kind": "single",
+          "period": {
+            "m1": 2,
+            "m2": 2,
+            "year": 2001
+          }
+        },
+        "corroborations": 0,
+        "decimals": 2,
+        "gates": [
+          {
+            "gate": "G1",
+            "pass": true
+          },
+          {
+            "gate": "G2",
+            "pass": true
+          },
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": true
+          },
+          {
+            "gate": "G5",
+            "pass": true
+          },
+          {
+            "gate": "G6",
+            "pass": true
+          },
+          {
+            "gate": "G7",
+            "pass": true
+          }
+        ],
+        "judge": "WITH sales_feb AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 2\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_feb s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (\n  SELECT sum(ss_net_paid) AS net_paid\n  FROM sales_feb\n)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale",
+        "repaired": false,
+        "task": "M3-L1",
+        "value": 23.6,
+        "versions": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          },
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        }
+      },
+      "G|metric:门店退货金额": {
+        "ask": {
+          "kind": "single",
+          "period": {
+            "m1": 4,
+            "m2": 4,
+            "year": 2001
+          }
+        },
+        "corroborations": 0,
+        "decimals": 2,
+        "gates": [
+          {
+            "gate": "G1",
+            "pass": true
+          },
+          {
+            "gate": "G2",
+            "pass": true
+          },
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": true
+          },
+          {
+            "gate": "G5",
+            "pass": true
+          },
+          {
+            "gate": "G6",
+            "pass": true
+          },
+          {
+            "gate": "G7",
+            "pass": true
+          }
+        ],
+        "judge": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4",
+        "repaired": false,
+        "task": "M2-L1",
+        "value": 308496.23,
+        "versions": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          }
+        }
+      }
+    },
+    "store": {
+      "G|check:{\"type\":\"KeyUnique\",\"table\":\"date_dim\",\"cols\":[\"d_date_sk\"],\"filter\":null}": {
+        "consumers": [
+          "producer-2-1",
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "cols": [
+                "d_date_sk"
+              ],
+              "filter": null,
+              "table": "date_dim",
+              "type": "KeyUnique"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 1.0,
+                "n_keys": 1096,
+                "n_rows": 1096
+              },
+              "ms": 1.896739,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-1",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          }
+        },
+        "guards": [],
+        "hits": 1,
+        "key": "check:{\"type\":\"KeyUnique\",\"table\":\"date_dim\",\"cols\":[\"d_date_sk\"],\"filter\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"KeyUnique\",\"table\":\"store_returns\",\"cols\":[\"sr_item_sk\",\"sr_ticket_number\"],\"filter\":null}": {
+        "consumers": [
+          "producer-2-1"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "cols": [
+                "sr_item_sk",
+                "sr_ticket_number"
+              ],
+              "filter": null,
+              "table": "store_returns",
+              "type": "KeyUnique"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 1.0,
+                "n_keys": 39588,
+                "n_rows": 39588
+              },
+              "ms": 167.17125199999998,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-1",
+        "deps": {
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"KeyUnique\",\"table\":\"store_returns\",\"cols\":[\"sr_item_sk\",\"sr_ticket_number\"],\"filter\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"KeyUnique\",\"table\":\"store_returns\",\"cols\":[\"sr_ticket_number\",\"sr_item_sk\"],\"filter\":null}": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "cols": [
+                "sr_ticket_number",
+                "sr_item_sk"
+              ],
+              "filter": null,
+              "table": "store_returns",
+              "type": "KeyUnique"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 1.0,
+                "n_keys": 39588,
+                "n_rows": 39588
+              },
+              "ms": 39.602231,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"KeyUnique\",\"table\":\"store_returns\",\"cols\":[\"sr_ticket_number\",\"sr_item_sk\"],\"filter\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"KeyUnique\",\"table\":\"store_returns\",\"cols\":[\"sr_ticket_number\"],\"filter\":null}": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "cols": [
+                "sr_ticket_number"
+              ],
+              "filter": null,
+              "table": "store_returns",
+              "type": "KeyUnique"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 2.0,
+                "n_keys": 19794,
+                "n_rows": 39588
+              },
+              "ms": 7.6081330000000005,
+              "pass": false
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"KeyUnique\",\"table\":\"store_returns\",\"cols\":[\"sr_ticket_number\"],\"filter\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"KeyUnique\",\"table\":\"store_sales\",\"cols\":[\"ss_item_sk\",\"ss_ticket_number\"],\"filter\":null}": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "cols": [
+                "ss_item_sk",
+                "ss_ticket_number"
+              ],
+              "filter": null,
+              "table": "store_sales",
+              "type": "KeyUnique"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 1.0,
+                "n_keys": 100000,
+                "n_rows": 100000
+              },
+              "ms": 438.568377,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"KeyUnique\",\"table\":\"store_sales\",\"cols\":[\"ss_item_sk\",\"ss_ticket_number\"],\"filter\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"KeyUnique\",\"table\":\"store_sales\",\"cols\":[\"ss_ticket_number\",\"ss_item_sk\"],\"filter\":null}": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "cols": [
+                "ss_ticket_number",
+                "ss_item_sk"
+              ],
+              "filter": null,
+              "table": "store_sales",
+              "type": "KeyUnique"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 1.0,
+                "n_keys": 100000,
+                "n_rows": 100000
+              },
+              "ms": 102.118042,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"KeyUnique\",\"table\":\"store_sales\",\"cols\":[\"ss_ticket_number\",\"ss_item_sk\"],\"filter\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"KeyUnique\",\"table\":\"store_sales\",\"cols\":[\"ss_ticket_number\"],\"filter\":null}": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "cols": [
+                "ss_ticket_number"
+              ],
+              "filter": null,
+              "table": "store_sales",
+              "type": "KeyUnique"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 5.0,
+                "n_keys": 20000,
+                "n_rows": 100000
+              },
+              "ms": 18.793870000000002,
+              "pass": false
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"KeyUnique\",\"table\":\"store_sales\",\"cols\":[\"ss_ticket_number\"],\"filter\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"RowConservation\",\"left\":\"store_returns\",\"right\":\"date_dim\",\"on\":[[\"sr_returned_date_sk\",\"d_date_sk\"]],\"lf\":null,\"rf\":null}": {
+        "consumers": [
+          "producer-2-1"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "left": "store_returns",
+              "lf": null,
+              "on": [
+                [
+                  "sr_returned_date_sk",
+                  "d_date_sk"
+                ]
+              ],
+              "rf": null,
+              "right": "date_dim",
+              "type": "RowConservation"
+            },
+            "outcome": {
+              "metrics": {
+                "join_ratio": 1.0,
+                "n_join": 39588,
+                "n_left": 39588,
+                "n_right": 1096
+              },
+              "ms": 16.778161,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-1",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"RowConservation\",\"left\":\"store_returns\",\"right\":\"date_dim\",\"on\":[[\"sr_returned_date_sk\",\"d_date_sk\"]],\"lf\":null,\"rf\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"RowConservation\",\"left\":\"store_sales\",\"right\":\"date_dim\",\"on\":[[\"ss_sold_date_sk\",\"d_date_sk\"]],\"lf\":null,\"rf\":null}": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "left": "store_sales",
+              "lf": null,
+              "on": [
+                [
+                  "ss_sold_date_sk",
+                  "d_date_sk"
+                ]
+              ],
+              "rf": null,
+              "right": "date_dim",
+              "type": "RowConservation"
+            },
+            "outcome": {
+              "metrics": {
+                "join_ratio": 0.9897,
+                "n_join": 98970,
+                "n_left": 100000,
+                "n_right": 1096
+              },
+              "ms": 27.861259999999998,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"RowConservation\",\"left\":\"store_sales\",\"right\":\"date_dim\",\"on\":[[\"ss_sold_date_sk\",\"d_date_sk\"]],\"lf\":null,\"rf\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"RowConservation\",\"left\":\"store_sales\",\"right\":\"store_returns\",\"on\":[[\"ss_ticket_number\",\"sr_ticket_number\"],[\"ss_item_sk\",\"sr_item_sk\"]],\"lf\":null,\"rf\":null}": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "left": "store_sales",
+              "lf": null,
+              "on": [
+                [
+                  "ss_ticket_number",
+                  "sr_ticket_number"
+                ],
+                [
+                  "ss_item_sk",
+                  "sr_item_sk"
+                ]
+              ],
+              "rf": null,
+              "right": "store_returns",
+              "type": "RowConservation"
+            },
+            "outcome": {
+              "metrics": {
+                "join_ratio": 0.39588,
+                "n_join": 39588,
+                "n_left": 100000,
+                "n_right": 39588
+              },
+              "ms": 41.930531,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          },
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"RowConservation\",\"left\":\"store_sales\",\"right\":\"store_returns\",\"on\":[[\"ss_ticket_number\",\"sr_ticket_number\"],[\"ss_item_sk\",\"sr_item_sk\"]],\"lf\":null,\"rf\":null}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"SampleFanout\",\"left\":\"store_returns\",\"right\":\"date_dim\",\"on\":[[\"sr_returned_date_sk\",\"d_date_sk\"]],\"lf\":null,\"rf\":null,\"n\":1000}": {
+        "consumers": [
+          "producer-2-1"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "left": "store_returns",
+              "lf": null,
+              "n": 1000,
+              "on": [
+                [
+                  "sr_returned_date_sk",
+                  "d_date_sk"
+                ]
+              ],
+              "rf": null,
+              "right": "date_dim",
+              "type": "SampleFanout"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 1.0,
+                "max_mult": 1,
+                "n_fanned": 0,
+                "n_sample": 1000
+              },
+              "ms": 3.102324,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-1",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"SampleFanout\",\"left\":\"store_returns\",\"right\":\"date_dim\",\"on\":[[\"sr_returned_date_sk\",\"d_date_sk\"]],\"lf\":null,\"rf\":null,\"n\":1000}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"SampleFanout\",\"left\":\"store_sales\",\"right\":\"date_dim\",\"on\":[[\"ss_sold_date_sk\",\"d_date_sk\"]],\"lf\":null,\"rf\":null,\"n\":1000}": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "left": "store_sales",
+              "lf": null,
+              "n": 1000,
+              "on": [
+                [
+                  "ss_sold_date_sk",
+                  "d_date_sk"
+                ]
+              ],
+              "rf": null,
+              "right": "date_dim",
+              "type": "SampleFanout"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 1.0,
+                "max_mult": 1,
+                "n_fanned": 0,
+                "n_sample": 1000
+              },
+              "ms": 2.8570219999999997,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"SampleFanout\",\"left\":\"store_sales\",\"right\":\"date_dim\",\"on\":[[\"ss_sold_date_sk\",\"d_date_sk\"]],\"lf\":null,\"rf\":null,\"n\":1000}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|check:{\"type\":\"SampleFanout\",\"left\":\"store_sales\",\"right\":\"store_returns\",\"on\":[[\"ss_ticket_number\",\"sr_ticket_number\"],[\"ss_item_sk\",\"sr_item_sk\"]],\"lf\":null,\"rf\":null,\"n\":1000}": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "CheckResult": {
+            "check": {
+              "left": "store_sales",
+              "lf": null,
+              "n": 1000,
+              "on": [
+                [
+                  "ss_ticket_number",
+                  "sr_ticket_number"
+                ],
+                [
+                  "ss_item_sk",
+                  "sr_item_sk"
+                ]
+              ],
+              "rf": null,
+              "right": "store_returns",
+              "type": "SampleFanout"
+            },
+            "outcome": {
+              "metrics": {
+                "avg_mult": 0.396,
+                "max_mult": 1,
+                "n_fanned": 0,
+                "n_sample": 1000
+              },
+              "ms": 3.098234,
+              "pass": true
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          },
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "check:{\"type\":\"SampleFanout\",\"left\":\"store_sales\",\"right\":\"store_returns\",\"on\":[[\"ss_ticket_number\",\"sr_ticket_number\"],[\"ss_item_sk\",\"sr_item_sk\"]],\"lf\":null,\"rf\":null,\"n\":1000}",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|join:date_dim|store_returns": {
+        "consumers": [
+          "producer-2-1"
+        ],
+        "content": {
+          "Join": {
+            "bad": [],
+            "paths": [
+              {
+                "evidence": [
+                  "store_returns 39588 行中 39588 行关联得上（0.0% 关联不上）"
+                ],
+                "filters": {},
+                "left": "store_returns",
+                "left_unique": false,
+                "loss_ratio": 0.0,
+                "n_join": 39588,
+                "n_left": 39588,
+                "on": [
+                  [
+                    "sr_returned_date_sk",
+                    "d_date_sk"
+                  ]
+                ],
+                "right": "date_dim",
+                "right_unique": true
+              }
+            ]
+          }
+        },
+        "created_by": "producer-2-1",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          }
+        },
+        "guards": [
+          {
+            "cols": [
+              "d_date_sk"
+            ],
+            "filter": null,
+            "table": "date_dim",
+            "type": "KeyUnique"
+          }
+        ],
+        "hits": 3,
+        "key": "join:date_dim|store_returns",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|join:date_dim|store_sales": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "Join": {
+            "bad": [],
+            "paths": [
+              {
+                "evidence": [
+                  "store_sales 100000 行中 98970 行关联得上（1.0% 关联不上）"
+                ],
+                "filters": {},
+                "left": "store_sales",
+                "left_unique": false,
+                "loss_ratio": 0.010299999999999976,
+                "n_join": 98970,
+                "n_left": 100000,
+                "on": [
+                  [
+                    "ss_sold_date_sk",
+                    "d_date_sk"
+                  ]
+                ],
+                "right": "date_dim",
+                "right_unique": true
+              }
+            ]
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [
+          {
+            "cols": [
+              "d_date_sk"
+            ],
+            "filter": null,
+            "table": "date_dim",
+            "type": "KeyUnique"
+          }
+        ],
+        "hits": 3,
+        "key": "join:date_dim|store_sales",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|join:store_returns|store_sales": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "Join": {
+            "bad": [
+              {
+                "fanout": 5.0,
+                "left": "store_returns",
+                "on": [
+                  [
+                    "sr_ticket_number",
+                    "ss_ticket_number"
+                  ]
+                ],
+                "reason": "两侧键都不唯一（多对多，会膨胀）。store_sales(ss_ticket_number) 是否唯一：100000 行只有 20000 个不同键（平均每键 5.00 行）",
+                "right": "store_sales"
+              }
+            ],
+            "paths": [
+              {
+                "evidence": [
+                  "store_sales 100000 行中 39588 行关联得上（60.4% 关联不上）"
+                ],
+                "filters": {},
+                "left": "store_sales",
+                "left_unique": true,
+                "loss_ratio": 0.60412,
+                "n_join": 39588,
+                "n_left": 100000,
+                "on": [
+                  [
+                    "ss_ticket_number",
+                    "sr_ticket_number"
+                  ],
+                  [
+                    "ss_item_sk",
+                    "sr_item_sk"
+                  ]
+                ],
+                "right": "store_returns",
+                "right_unique": true
+              }
+            ]
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          },
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [
+          {
+            "cols": [
+              "sr_ticket_number",
+              "sr_item_sk"
+            ],
+            "filter": null,
+            "table": "store_returns",
+            "type": "KeyUnique"
+          },
+          {
+            "cols": [
+              "ss_ticket_number",
+              "ss_item_sk"
+            ],
+            "filter": null,
+            "table": "store_sales",
+            "type": "KeyUnique"
+          }
+        ],
+        "hits": 4,
+        "key": "join:store_returns|store_sales",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|metric:门店退货率": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "Metric": {
+            "aliases": [
+              "退货率",
+              "门店退货比例",
+              "store return rate"
+            ],
+            "basis": {
+              "kind": "explicit_question",
+              "task": "M3-L1"
+            },
+            "caveats": [
+              "退货按小票号+商品键关联 store_sales 与 store_returns；已验证该关联为 1:1，但 60.412% 的销售行没有对应退货，左连接后分子为 NULL，分母仍包含这些销售行。",
+              "直接对 store_sales 左连接 store_returns 后计算比率时，需确认每个销售行最多匹配一笔退货；若存在一对多，应像计算链一样先分别聚合退货金额和销售净支付额，避免分母被退货行放大。",
+              "时间过滤按销售日期（ss_sold_date_sk）归属期间，退货日期不参与期间限制；store_sales 到 date_dim 的关联约丢失 1.03% 的销售行。",
+              "题面未要求按 sr_status 过滤，示例未过滤退货状态。",
+              "题面未说明无数据时返回 0 还是 NULL，示例按 NULL 处理。"
+            ],
+            "definition": "按销售日期归属期间，期间内售出的门店销售行所对应退货金额之和除以这些销售行净支付额之和，再乘以100；退货按小票号和商品键与销售行对应，每笔退货只计一次。",
+            "empty": "unspecified",
+            "examples": [
+              {
+                "question": "2001 年 2 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+                "sql": "WITH sales_feb AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 2\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_feb s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (\n  SELECT sum(ss_net_paid) AS net_paid\n  FROM sales_feb\n)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale"
+              }
+            ],
+            "fact": "store_sales",
+            "filters": {},
+            "grain": [
+              "ss_ticket_number",
+              "ss_item_sk"
+            ],
+            "joins": [
+              {
+                "cardinality": "1:1",
+                "filters": {},
+                "key": "join:store_returns|store_sales",
+                "kind": "left",
+                "left": "store_sales",
+                "loss_ratio": 0.60412,
+                "on": [
+                  [
+                    "ss_ticket_number",
+                    "sr_ticket_number"
+                  ],
+                  [
+                    "ss_item_sk",
+                    "sr_item_sk"
+                  ]
+                ],
+                "revision": 0,
+                "right": "store_returns"
+              }
+            ],
+            "measure": "sum(store_returns.sr_return_amt) / sum(store_sales.ss_net_paid) * 100",
+            "name": "门店退货率",
+            "time": {
+              "dim": "date_dim",
+              "dim_col": "d_date_sk",
+              "fact_col": "ss_sold_date_sk",
+              "grain": "day",
+              "loss_ratio": 0.010299999999999976,
+              "role": "销售日期"
+            }
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          },
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [
+          {
+            "cols": [
+              "ss_item_sk",
+              "ss_ticket_number"
+            ],
+            "filter": null,
+            "table": "store_sales",
+            "type": "KeyUnique"
+          }
+        ],
+        "hits": 0,
+        "key": "metric:门店退货率",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|metric:门店退货金额": {
+        "consumers": [
+          "producer-2-1"
+        ],
+        "content": {
+          "Metric": {
+            "aliases": [
+              "门店退货总额",
+              "退货金额"
+            ],
+            "basis": {
+              "kind": "explicit_question",
+              "task": "M2-L1"
+            },
+            "caveats": [
+              "关联 store_returns 与 date_dim 无丢行（loss_ratio 0.0）",
+              "每笔退货只计一次，无需额外去重或状态过滤"
+            ],
+            "definition": "门店退货金额为门店退货明细中每笔退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间，每笔退货只计一次。",
+            "empty": "unspecified",
+            "examples": [
+              {
+                "question": "2001 年 4 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+                "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4"
+              }
+            ],
+            "fact": "store_returns",
+            "filters": {},
+            "grain": [
+              "sr_ticket_number",
+              "sr_item_sk"
+            ],
+            "joins": [],
+            "measure": "sum(sr_return_amt)",
+            "name": "门店退货金额",
+            "time": {
+              "dim": "date_dim",
+              "dim_col": "d_date_sk",
+              "fact_col": "sr_returned_date_sk",
+              "grain": "day",
+              "loss_ratio": 0.0,
+              "role": "退货日期"
+            }
+          }
+        },
+        "created_by": "producer-2-1",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          },
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          }
+        },
+        "guards": [
+          {
+            "cols": [
+              "sr_item_sk",
+              "sr_ticket_number"
+            ],
+            "filter": null,
+            "table": "store_returns",
+            "type": "KeyUnique"
+          }
+        ],
+        "hits": 0,
+        "key": "metric:门店退货金额",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|profile:date_dim": {
+        "consumers": [
+          "producer-2-1",
+          "producer-2-2"
+        ],
+        "content": {
+          "Profile": {
+            "columns": [
+              {
+                "comment": "日期键",
+                "distinct_est": 1096,
+                "name": "d_date_sk",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "日期",
+                "distinct_est": 1096,
+                "name": "d_date",
+                "null_ratio": 0.0,
+                "type": "date"
+              },
+              {
+                "comment": "年份",
+                "common_values": "{2000,2001,2002}",
+                "distinct_est": 3,
+                "name": "d_year",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "月份（1–12）",
+                "common_values": "{1,3,5,7,8,10,12,4,6,9,11,2}",
+                "distinct_est": 12,
+                "name": "d_moy",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "日（1–31）",
+                "distinct_est": 31,
+                "name": "d_dom",
+                "null_ratio": 0.0,
+                "type": "integer"
+              }
+            ],
+            "comment": "日期维度：2000-01-01 至 2002-12-31",
+            "row_count": 1096,
+            "sample_rows": {
+              "columns": [
+                "d_date_sk",
+                "d_date",
+                "d_year",
+                "d_moy",
+                "d_dom"
+              ],
+              "row_count": 3,
+              "rows": [
+                [
+                  "1",
+                  "2000-01-01",
+                  "2000",
+                  "1",
+                  "1"
+                ],
+                [
+                  "2",
+                  "2000-01-02",
+                  "2000",
+                  "1",
+                  "2"
+                ],
+                [
+                  "3",
+                  "2000-01-03",
+                  "2000",
+                  "1",
+                  "3"
+                ]
+              ],
+              "truncated": false
+            },
+            "table": "date_dim"
+          }
+        },
+        "created_by": "producer-2-1",
+        "deps": {
+          "date_dim": {
+            "batch": 0,
+            "dml": 1096,
+            "schema": "1d5b539f418f89f103b10a9b345fc671"
+          }
+        },
+        "guards": [],
+        "hits": 1,
+        "key": "profile:date_dim",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|profile:store_returns": {
+        "consumers": [
+          "producer-2-1",
+          "producer-2-2"
+        ],
+        "content": {
+          "Profile": {
+            "columns": [
+              {
+                "comment": "退货日期键（关联 date_dim.d_date_sk）",
+                "distinct_est": 548,
+                "name": "sr_returned_date_sk",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "商品键",
+                "distinct_est": 400,
+                "name": "sr_item_sk",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "原小票号",
+                "distinct_est": 19781,
+                "name": "sr_ticket_number",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "退货数量",
+                "common_values": "{2,9,7,8,1,6,4,5,3}",
+                "distinct_est": 9,
+                "name": "sr_return_quantity",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "退货金额（不含税）",
+                "distinct_est": 2187,
+                "name": "sr_return_amt",
+                "null_ratio": 0.0,
+                "type": "numeric(12,2)"
+              },
+              {
+                "comment": "退货税额",
+                "distinct_est": 1940,
+                "name": "sr_return_tax",
+                "null_ratio": 0.0,
+                "type": "numeric(12,2)"
+              },
+              {
+                "comment": "退货手续费",
+                "common_values": "{4.00,6.00,2.00,5.00,3.00}",
+                "distinct_est": 5,
+                "name": "sr_fee",
+                "null_ratio": 0.0,
+                "type": "numeric(12,2)"
+              },
+              {
+                "comment": "退货净损失",
+                "distinct_est": 2448,
+                "name": "sr_net_loss",
+                "null_ratio": 0.0,
+                "type": "numeric(12,2)"
+              },
+              {
+                "comment": "退货状态：申请 / 完成",
+                "common_values": "{完成}",
+                "distinct_est": 1,
+                "name": "sr_status",
+                "null_ratio": 0.0,
+                "type": "character varying(8)"
+              }
+            ],
+            "comment": "门店退货明细",
+            "row_count": 39588,
+            "sample_rows": {
+              "columns": [
+                "sr_returned_date_sk",
+                "sr_item_sk",
+                "sr_ticket_number",
+                "sr_return_quantity",
+                "sr_return_amt",
+                "sr_return_tax",
+                "sr_fee",
+                "sr_net_loss",
+                "sr_status"
+              ],
+              "row_count": 3,
+              "rows": [
+                [
+                  "250",
+                  "4",
+                  "1",
+                  "5",
+                  "306.00",
+                  "24.48",
+                  "3.00",
+                  "156.00",
+                  "完成"
+                ],
+                [
+                  "250",
+                  "5",
+                  "1",
+                  "6",
+                  "433.20",
+                  "34.66",
+                  "3.00",
+                  "219.60",
+                  "完成"
+                ],
+                [
+                  "498",
+                  "8",
+                  "2",
+                  "9",
+                  "454.50",
+                  "36.36",
+                  "4.00",
+                  "231.25",
+                  "完成"
+                ]
+              ],
+              "truncated": false
+            },
+            "table": "store_returns"
+          }
+        },
+        "created_by": "producer-2-1",
+        "deps": {
+          "store_returns": {
+            "batch": 1,
+            "dml": 39588,
+            "schema": "ed077f6e3d3afcf1fbd2fae2181b3a98"
+          }
+        },
+        "guards": [],
+        "hits": 1,
+        "key": "profile:store_returns",
+        "revision": 0,
+        "status": "Valid"
+      },
+      "G|profile:store_sales": {
+        "consumers": [
+          "producer-2-2"
+        ],
+        "content": {
+          "Profile": {
+            "columns": [
+              {
+                "comment": "销售日期键（关联 date_dim.d_date_sk）",
+                "distinct_est": 1096,
+                "name": "ss_sold_date_sk",
+                "null_ratio": 0.010299999999999976,
+                "type": "integer"
+              },
+              {
+                "comment": "商品键",
+                "distinct_est": 1000,
+                "name": "ss_item_sk",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "小票号",
+                "distinct_est": 19831,
+                "name": "ss_ticket_number",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "数量",
+                "common_values": "{4,2,6,8,3,5,7,9,1}",
+                "distinct_est": 9,
+                "name": "ss_quantity",
+                "null_ratio": 0.0,
+                "type": "integer"
+              },
+              {
+                "comment": "单价",
+                "distinct_est": 200,
+                "name": "ss_sales_price",
+                "null_ratio": 0.0,
+                "type": "numeric(7,2)"
+              },
+              {
+                "comment": "销售额（数量 × 单价，未扣折扣）",
+                "distinct_est": 937,
+                "name": "ss_ext_sales_price",
+                "null_ratio": 0.0,
+                "type": "numeric(12,2)"
+              },
+              {
+                "comment": "折扣金额",
+                "distinct_est": 703,
+                "name": "ss_ext_discount_amt",
+                "null_ratio": 0.0,
+                "type": "numeric(12,2)"
+              },
+              {
+                "comment": "净支付额（销售额 − 折扣，不含税）",
+                "distinct_est": 1343,
+                "name": "ss_net_paid",
+                "null_ratio": 0.0,
+                "type": "numeric(12,2)"
+              },
+              {
+                "comment": "含税净支付额",
+                "distinct_est": 1343,
+                "name": "ss_net_paid_inc_tax",
+                "null_ratio": 0.0,
+                "type": "numeric(12,2)"
+              },
+              {
+                "comment": "净利润",
+                "distinct_est": 1148,
+                "name": "ss_net_profit",
+                "null_ratio": 0.0,
+                "type": "numeric(12,2)"
+              },
+              {
+                "comment": "是否当前版本（1 = 当前版本）",
+                "common_values": "{1}",
+                "distinct_est": 1,
+                "name": "ss_is_current",
+                "null_ratio": 0.0,
+                "type": "smallint"
+              }
+            ],
+            "comment": "门店销售明细：一行 = 一张小票中的一种商品",
+            "row_count": 100000,
+            "sample_rows": {
+              "columns": [
+                "ss_sold_date_sk",
+                "ss_item_sk",
+                "ss_ticket_number",
+                "ss_quantity",
+                "ss_sales_price",
+                "ss_ext_sales_price",
+                "ss_ext_discount_amt",
+                "ss_net_paid",
+                "ss_net_paid_inc_tax",
+                "ss_net_profit",
+                "ss_is_current"
+              ],
+              "row_count": 3,
+              "rows": [
+                [
+                  "248",
+                  "1",
+                  "1",
+                  "2",
+                  "42.00",
+                  "84.00",
+                  "4.20",
+                  "79.80",
+                  "86.18",
+                  "29.40",
+                  "1"
+                ],
+                [
+                  "248",
+                  "2",
+                  "1",
+                  "3",
+                  "79.00",
+                  "237.00",
+                  "23.70",
+                  "213.30",
+                  "230.36",
+                  "71.10",
+                  "1"
+                ],
+                [
+                  "248",
+                  "3",
+                  "1",
+                  "4",
+                  "116.00",
+                  "464.00",
+                  "69.60",
+                  "394.40",
+                  "425.95",
+                  "116.00",
+                  "1"
+                ]
+              ],
+              "truncated": false
+            },
+            "table": "store_sales"
+          }
+        },
+        "created_by": "producer-2-2",
+        "deps": {
+          "store_sales": {
+            "batch": 0,
+            "dml": 100000,
+            "schema": "5a1588adb632c624bce3ad86b27929a4"
+          }
+        },
+        "guards": [],
+        "hits": 0,
+        "key": "profile:store_sales",
+        "revision": 0,
+        "status": "Valid"
+      }
+    }
+  },
+  "summary": {
+    "introduced_metric": "M3",
+    "memory": {
+      "condition": 13,
+      "join": 3,
+      "metric": 2,
+      "profile": 3
+    },
+    "training_tasks": 2,
+    "valid_metrics": 2,
+    "wave": 2
+  },
+  "trajectories": [
+    {
+      "agent": "producer-2-1",
+      "answer": "308496.23",
+      "derivation": "r1",
+      "question": "2001 年 4 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+      "sqls": [
+        "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4"
+      ],
+      "task": "M2-L1"
+    },
+    {
+      "agent": "producer-2-2",
+      "answer": "23.60",
+      "derivation": "r2",
+      "question": "2001 年 2 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+      "sqls": [
+        "WITH sales_feb AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 2\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_feb s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (SELECT sum(ss_net_paid) AS net_paid FROM sales_feb)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale"
+      ],
+      "task": "M3-L1"
+    }
+  ]
+}

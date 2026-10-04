@@ -1,0 +1,14 @@
+{
+  "started_utc": "2026-10-03T19:30:55.783962+00:00",
+  "finished_utc": "2026-10-03T20:07:42.360628+00:00",
+  "exit_code": 101,
+  "thread_stack_bytes": 33554432,
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--",
+    "--ignored",
+    "--test-threads=1"
+  ]
+}

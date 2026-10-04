@@ -1,0 +1,959 @@
+[
+  {
+    "agent": "consumer-1-isolated-1-prefix-param-M1-P1",
+    "answer": "128005.70",
+    "db": {
+      "by_kind": {
+        "check": [
+          3,
+          5.497999999999999
+        ],
+        "exec": [
+          1,
+          1.183
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          5,
+          11.152999999999999
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          4,
+          4.827999999999999
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 22.661999999999978,
+      "queries": 13
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [],
+    "gold": "128005.70",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "prefix-param",
+    "policy": "isolated",
+    "question": "2002 年 9 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "128005.70",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 12133,
+      "notices": 0,
+      "output_tokens": 683,
+      "rejections": 0,
+      "seconds": 46.172705391,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 5
+      },
+      "sql": "SELECT SUM(ss.ss_net_paid) AS store_net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+      "steps": 5,
+      "tool_calls": 7,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "seconds": 46.172753191,
+    "session": "fresh",
+    "sql_calls": 1,
+    "task": "M1-P1",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-isolated-1-final-type-M1-T1",
+    "answer": "471.50",
+    "db": {
+      "by_kind": {
+        "check": [
+          3,
+          5.742000000000001
+        ],
+        "exec": [
+          1,
+          1.4689999999999999
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          5,
+          10.504000000000005
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          4,
+          4.984
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 22.69900000000004,
+      "queries": 13
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [],
+    "gold": "471.50",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "final-type",
+    "policy": "isolated",
+    "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "471.50",
+      "clarification": null,
+      "derivation": "r1(2002-09) - r1(2001-06) = 128005.70 - 127534.20",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 12289,
+      "notices": 0,
+      "output_tokens": 748,
+      "rejections": 0,
+      "seconds": 27.626865029,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 5
+      },
+      "sql": "SELECT d.d_year, d.d_moy, ROUND(SUM(s.ss_net_paid), 2) AS revenue\nFROM store_sales s\nJOIN date_dim d ON s.ss_sold_date_sk = d.d_date_sk\nWHERE (d.d_year = 2002 AND d.d_moy = 9) OR (d.d_year = 2001 AND d.d_moy = 6)\nGROUP BY d.d_year, d.d_moy\nORDER BY d.d_year, d.d_moy;",
+      "steps": 5,
+      "tool_calls": 7,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "seconds": 27.62691615,
+    "session": "fresh",
+    "sql_calls": 1,
+    "task": "M1-T1",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-isolated-1-final-type-M1-T2",
+    "answer": "5",
+    "db": {
+      "by_kind": {
+        "check": [
+          3,
+          5.687000000000001
+        ],
+        "exec": [
+          1,
+          3.6990000000000003
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          5,
+          11.286999999999992
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          4,
+          4.965
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 25.637999999999977,
+      "queries": 13
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [],
+    "gold": "5",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "final-type",
+    "policy": "isolated",
+    "question": "2002 年哪个月的门店营业额最高？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。只回答月份数字（1–12）。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "5",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 12115,
+      "notices": 0,
+      "output_tokens": 474,
+      "rejections": 0,
+      "seconds": 88.372153807,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 5
+      },
+      "sql": null,
+      "steps": 5,
+      "tool_calls": 7,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "seconds": 88.372203597,
+    "session": "fresh",
+    "sql_calls": 1,
+    "task": "M1-T2",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-frozen-1-prefix-param-M1-P1",
+    "answer": "128005.70",
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          1,
+          1.2029999999999994
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          2,
+          5.986000000000004
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 7.188999999999993,
+      "queries": 3
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [
+      [
+        "metric:门店营业额",
+        0
+      ]
+    ],
+    "gold": "128005.70",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "prefix-param",
+    "policy": "frozen",
+    "question": "2002 年 9 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "128005.70",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 6136,
+      "notices": 0,
+      "output_tokens": 705,
+      "rejections": 0,
+      "seconds": 45.160284999,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 3
+      },
+      "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+      "steps": 3,
+      "tool_calls": 4,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "seconds": 45.16032949,
+    "session": "fresh",
+    "sql_calls": 1,
+    "task": "M1-P1",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-frozen-1-final-type-M1-T1",
+    "answer": "471.50",
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          2,
+          2.258000000000001
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          3,
+          8.896999999999991
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 11.155000000000001,
+      "queries": 5
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [
+      [
+        "metric:门店营业额",
+        0
+      ]
+    ],
+    "gold": "471.50",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "final-type",
+    "policy": "frozen",
+    "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "471.50",
+      "clarification": null,
+      "derivation": "r1 - r2",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 10489,
+      "notices": 0,
+      "output_tokens": 991,
+      "rejections": 0,
+      "seconds": 52.36123599,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 4
+      },
+      "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 9;\n-- 128005.70\nSELECT ROUND(SUM(ss.ss_net_paid), 2) FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2001 AND d.d_moy = 6;\n-- 127534.20\n-- 128005.70 - 127534.20 = 471.50",
+      "steps": 4,
+      "tool_calls": 7,
+      "tool_errors": 0,
+      "used": [
+        "r1",
+        "r2"
+      ]
+    },
+    "seconds": 52.361277019,
+    "session": "fresh",
+    "sql_calls": 2,
+    "task": "M1-T1",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-frozen-1-final-type-M1-T2",
+    "answer": "5",
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          1,
+          3.6630000000000003
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          3,
+          8.974000000000004
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 12.637,
+      "queries": 4
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [
+      [
+        "metric:门店营业额",
+        0
+      ]
+    ],
+    "gold": "5",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "final-type",
+    "policy": "frozen",
+    "question": "2002 年哪个月的门店营业额最高？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。只回答月份数字（1–12）。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "5",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 10155,
+      "notices": 0,
+      "output_tokens": 636,
+      "rejections": 0,
+      "seconds": 21.277814979,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 4
+      },
+      "sql": "SELECT d.d_moy AS month, ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY store_revenue DESC, month",
+      "steps": 4,
+      "tool_calls": 6,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "seconds": 21.277849989,
+    "session": "fresh",
+    "sql_calls": 1,
+    "task": "M1-T2",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-accumulating-1-prefix-param-M1-P1",
+    "answer": "128005.70",
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          1,
+          1.5250000000000004
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          3,
+          7.946999999999974
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 9.471999999999952,
+      "queries": 4
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [
+      [
+        "metric:门店营业额",
+        0
+      ]
+    ],
+    "gold": "128005.70",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "prefix-param",
+    "policy": "accumulating",
+    "question": "2002 年 9 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "128005.70",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 8497,
+      "notices": 0,
+      "output_tokens": 433,
+      "rejections": 0,
+      "seconds": 43.926344965,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 4
+      },
+      "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9",
+      "steps": 4,
+      "tool_calls": 5,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "seconds": 43.926380267,
+    "session": "fresh",
+    "sql_calls": 1,
+    "task": "M1-P1",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-accumulating-1-final-type-M1-T1",
+    "answer": "471.50",
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          2,
+          1.7129999999999974
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          3,
+          7.9950000000000045
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 9.707999999999998,
+      "queries": 5
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [
+      [
+        "metric:门店营业额",
+        0
+      ]
+    ],
+    "gold": "471.50",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "final-type",
+    "policy": "accumulating",
+    "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "471.50",
+      "clarification": null,
+      "derivation": "r1 - r2",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 10976,
+      "notices": 0,
+      "output_tokens": 752,
+      "rejections": 0,
+      "seconds": 45.745238802,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 4
+      },
+      "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue_2002_09\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;\n-- 2001-06: same with d_year = 2001 AND d_moy = 6",
+      "steps": 4,
+      "tool_calls": 8,
+      "tool_errors": 0,
+      "used": [
+        "r1",
+        "r2"
+      ]
+    },
+    "seconds": 45.745283373,
+    "session": "fresh",
+    "sql_calls": 2,
+    "task": "M1-T1",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-accumulating-1-final-type-M1-T2",
+    "answer": "5",
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          1,
+          3.6350000000000016
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          2,
+          5.274000000000001
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 8.909000000000049,
+      "queries": 3
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [
+      [
+        "metric:门店营业额",
+        0
+      ]
+    ],
+    "gold": "5",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "final-type",
+    "policy": "accumulating",
+    "question": "2002 年哪个月的门店营业额最高？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。只回答月份数字（1–12）。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "5",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 6033,
+      "notices": 0,
+      "output_tokens": 305,
+      "rejections": 0,
+      "seconds": 24.840172271,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 3
+      },
+      "sql": null,
+      "steps": 3,
+      "tool_calls": 4,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "seconds": 24.840215423,
+    "session": "fresh",
+    "sql_calls": 1,
+    "task": "M1-T2",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-trajectory-1-prefix-param-M1-P1",
+    "answer": "128005.70",
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          1,
+          1.1409999999999982
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          3,
+          9.024000000000001
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 10.164999999999964,
+      "queries": 4
+    },
+    "defined": true,
+    "error": null,
+    "finds": 0,
+    "found": [],
+    "gold": "128005.70",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "prefix-param",
+    "policy": "trajectory",
+    "question": "2002 年 9 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "128005.70",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 11162,
+      "notices": 0,
+      "output_tokens": 555,
+      "rejections": 0,
+      "seconds": 50.568973928,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 5
+      },
+      "sql": "SELECT SUM(ss.ss_net_paid) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002 AND d.d_moy = 9;",
+      "steps": 5,
+      "tool_calls": 6,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "seconds": 50.569013729,
+    "session": "fresh",
+    "sql_calls": 1,
+    "task": "M1-P1",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-trajectory-1-final-type-M1-T1",
+    "answer": "471.50",
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          2,
+          2.1060000000000016
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          3,
+          10.363
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 12.468999999999994,
+      "queries": 5
+    },
+    "defined": true,
+    "error": null,
+    "finds": 1,
+    "found": [],
+    "gold": "471.50",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "final-type",
+    "policy": "trajectory",
+    "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "471.50",
+      "clarification": null,
+      "derivation": "r1 - r2",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 12156,
+      "notices": 0,
+      "output_tokens": 719,
+      "rejections": 0,
+      "seconds": 64.666183635,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 5
+      },
+      "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) FROM store_sales ss JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk WHERE d.d_year = 2002 AND d.d_moy = 9",
+      "steps": 5,
+      "tool_calls": 8,
+      "tool_errors": 0,
+      "used": [
+        "r1",
+        "r2"
+      ]
+    },
+    "seconds": 64.666238746,
+    "session": "fresh",
+    "sql_calls": 2,
+    "task": "M1-T1",
+    "wave": 1
+  },
+  {
+    "agent": "consumer-1-trajectory-1-final-type-M1-T2",
+    "answer": "5",
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          1,
+          3.4830000000000005
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          3,
+          8.908000000000015
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 12.39100000000002,
+      "queries": 4
+    },
+    "defined": true,
+    "error": null,
+    "finds": 0,
+    "found": [],
+    "gold": "5",
+    "metric": "M1",
+    "outcome": "correct",
+    "phase": "final-type",
+    "policy": "trajectory",
+    "question": "2002 年哪个月的门店营业额最高？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。只回答月份数字（1–12）。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": "5",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 11197,
+      "notices": 0,
+      "output_tokens": 506,
+      "rejections": 0,
+      "seconds": 55.948889333,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 5
+      },
+      "sql": "SELECT d.d_moy AS moy, SUM(ss.ss_net_paid) AS net_paid\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2002\nGROUP BY d.d_moy\nORDER BY net_paid DESC",
+      "steps": 5,
+      "tool_calls": 6,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "seconds": 55.948938864,
+    "session": "fresh",
+    "sql_calls": 1,
+    "task": "M1-T2",
+    "wave": 1
+  }
+]

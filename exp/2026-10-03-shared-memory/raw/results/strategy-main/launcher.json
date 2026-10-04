@@ -1,0 +1,47 @@
+{
+  "started_utc": "2026-10-03T16:34:34.234921+00:00",
+  "binary_sha256": "65afaf49f1ef7d4ff79bc2b270120123c5a7524b7c83fa100a0ae0719f8a25f1",
+  "commands": [
+    [
+      "/root/agentdb-shared-memory-20261003/results/shared-memory-main/inputs/agentdb-mid",
+      "--out",
+      "/root/agentdb-shared-memory-20261003/results/strategy-main/capture-1",
+      "strategy-bench",
+      "--rows",
+      "100000",
+      "--groups",
+      "64",
+      "--measurements",
+      "3"
+    ],
+    [
+      "/root/agentdb-shared-memory-20261003/results/shared-memory-main/inputs/agentdb-mid",
+      "--out",
+      "/root/agentdb-shared-memory-20261003/results/strategy-main/capture-2",
+      "strategy-bench",
+      "--rows",
+      "100000",
+      "--groups",
+      "64",
+      "--measurements",
+      "3"
+    ],
+    [
+      "/root/agentdb-shared-memory-20261003/results/shared-memory-main/inputs/agentdb-mid",
+      "--out",
+      "/root/agentdb-shared-memory-20261003/results/strategy-main/capture-3",
+      "strategy-bench",
+      "--rows",
+      "100000",
+      "--groups",
+      "64",
+      "--measurements",
+      "3"
+    ]
+  ],
+  "options": {
+    "binary": "results/shared-memory-main/inputs/agentdb-mid",
+    "out": "results/strategy-main"
+  },
+  "protocol": "Three sequential timing captures of one fixed workload, no outcome-based reruns. Each capture has disjoint 24/16/24 train/validation/test groups."
+}

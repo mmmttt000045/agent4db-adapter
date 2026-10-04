@@ -82,6 +82,35 @@ pub fn normalize(sql: &str) -> String {
     sql.trim().to_string()
 }
 
+/// 保守的表达式身份：忽略未引用标识符大小写及 token 间空白，保留字符串与引用标识符原文。
+/// 遇到转义字符串、美元引用或注释时退回精确文本，宁可少复用也不合并不同值。
+pub fn expression_key(expr: &str) -> String {
+    if expr.contains(['$', '\\']) || expr.contains("--") || expr.contains("/*") {
+        return format!("raw:{}", expr.trim());
+    }
+    static TOKENS: OnceLock<Regex> = OnceLock::new();
+    let tokens = TOKENS.get_or_init(|| {
+        Regex::new(
+            r#"'(?:[^']|'')*'|"(?:[^"]|"")*"|[a-zA-Z_][a-zA-Z_0-9]*|(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?|[~!@#%^&|+*/<>=:\-]+|[^\s]"#,
+        )
+        .unwrap()
+    });
+    let mut key: Vec<String> = vec![];
+    for m in tokens.find_iter(expr) {
+        let t = m.as_str();
+        let operator = t.chars().all(|c| "~!@#%^&|+*/<>=:-".contains(c));
+        if (operator && !["=", "<", ">", "<=", ">=", "<>", "!=", "+", "-", "*", "/", "%", "^", "||", "::"].contains(&t))
+            || t == "'"
+            || t == "\""
+            || (t.starts_with('\'') && key.last().is_some_and(|s| ["e", "b", "x", "u", "n"].contains(&s.as_str())))
+        {
+            return format!("raw:{}", expr.trim());
+        }
+        key.push(if t.starts_with(['\'', '"']) { t.to_string() } else { t.to_ascii_lowercase() });
+    }
+    format!("tokens:{}", key.join(" "))
+}
+
 /// 过滤条件是否出现在 SQL 中（忽略空白、大小写与表别名）。
 pub fn contains_filter(sql: &str, filter: &str) -> bool {
     let squash = |x: &str| -> String {
@@ -112,7 +141,23 @@ pub fn per_key(sql: &str, key: &[String]) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{normalize, per_key};
+    use super::{expression_key, normalize, per_key};
+
+    #[test]
+    fn expression_identity_preserves_literal_values_and_token_boundaries() {
+        assert_eq!(expression_key("S = '完成'"), expression_key("s='完成'"));
+        assert_ne!(expression_key("s='ABC'"), expression_key("s='abc'"));
+        assert_ne!(expression_key("s='A B'"), expression_key("s='AB'"));
+        assert_ne!(expression_key("s='A.B'"), expression_key("s='B'"));
+        assert_ne!(expression_key("s='O''Neil'"), expression_key("s='O''neil'"));
+        assert_ne!(expression_key("\"S\"=1"), expression_key("\"s\"=1"));
+        assert_ne!(expression_key("a b"), expression_key("ab"));
+        assert_ne!(expression_key("x>=1"), expression_key("x > = 1"));
+        assert_ne!(expression_key("a +- b"), expression_key("a + - b"));
+        assert_ne!(expression_key("x=B'0'"), expression_key("x=b '0'"));
+        assert_ne!(expression_key("x=E'\\\\ABC'"), expression_key("x=E'\\\\abc'"));
+        assert_ne!(expression_key("x=$tag$ABC$tag$"), expression_key("x=$tag$abc$tag$"));
+    }
 
     #[test]
     fn per_key_queries_do_not_sum_across_duplicates() {

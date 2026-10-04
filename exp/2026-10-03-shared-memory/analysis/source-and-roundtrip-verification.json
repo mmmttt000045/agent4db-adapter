@@ -1,0 +1,43 @@
+{
+  "source_archive_hashes": [
+    {
+      "route": "shared-memory-main",
+      "archive_sha256": "66ce1e21f710af649a1e33d0d05fbe73b9f0b37e7f7feb07538ebbe4fa7e8b22",
+      "matching_files": 29,
+      "absolute_manifest_path_mapping": {
+        "/root/agentdb-shared-memory-20261003/tools/run-memory-study.py": "tools/run-memory-study.py"
+      }
+    },
+    {
+      "route": "shared-memory-recovery",
+      "archive_sha256": "0ad89bfdd6e4b74adb1b1a28b8dd1770bdaa79232413a773f7c1b62ea4fa4669",
+      "matching_files": 29,
+      "absolute_manifest_path_mapping": {}
+    },
+    {
+      "route": "strategy-main",
+      "archive_sha256": "b855290303878cdfc3bad32396b34dd17f2b3e5ae951941ca36798381d025334",
+      "matching_files": 28
+    }
+  ],
+  "roundtrip_outputs_identical": [
+    "summary.json",
+    "results.md",
+    "classification-audit.json",
+    "initial-service-censored/summary.json",
+    "initial-service-censored/results.md",
+    "initial-service-censored/classification-audit.json",
+    "overleaf/gen/strategy.tex",
+    "overleaf/gen/shared-memory-prefix.tex",
+    "overleaf/gen/shared-memory-table.tex",
+    "overleaf/gen/strategy-table.tex",
+    "overleaf/gen/shared-memory.tex"
+  ],
+  "literal_identity_audit": {
+    "filter_occurrences": 12,
+    "quoted_literal_occurrences": 12,
+    "literals_with_internal_whitespace_or_ascii_uppercase": 0,
+    "scope": "All S1 checkpoint metric/join filters and KeyUnique checks. Final conservative comparison adds no differing treatment of literal values in these experiments."
+  },
+  "all_pass": true
+}

@@ -1,0 +1,299 @@
+{
+  "agent": "cline:cline-pass/deepseek-v4.1-flash",
+  "agent_config": {
+    "base_url": "https://api.cline.bot/api/v1",
+    "hedge": 1,
+    "model": "cline-pass/deepseek-v4.1-flash",
+    "provider": "cline",
+    "reasoning_effort": "high",
+    "require_model": null,
+    "thinking": null
+  },
+  "libraries": [
+    {
+      "entries": [
+        {
+          "def": "M1",
+          "metric": {
+            "aliases": [
+              "门店销售额",
+              "门店净营业额",
+              "store revenue"
+            ],
+            "basis": {
+              "kind": "explicit_question",
+              "task": "M1-L1"
+            },
+            "caveats": [
+              "date_dim 关联为 N:1，verified_joins.loss_ratio 约为 1.03%，即约 1.03% 的门店销售行因 ss_sold_date_sk 在 date_dim 中无匹配日期而在内关联后被排除。",
+              "题面未说明无数据时返回值；按 SQL 语义 SUM 无行时为 NULL。",
+              "年份和月份是题目参数，不在通用 filters 中固化；按销售日期归属期间时，使用 date_dim.d_year 和 d_moy 过滤。",
+              "无被中间层拦下的写法。"
+            ],
+            "definition": "门店营业额为门店销售明细行的净支付额之和，按销售日期归属期间；净支付额为不含税的销售额扣除折扣后的金额。查询结果保留两位小数。",
+            "empty": "unspecified",
+            "examples": [
+              {
+                "question": "2001 年 3 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+                "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 3"
+              }
+            ],
+            "fact": "store_sales",
+            "filters": {},
+            "grain": [
+              "ss_sold_date_sk",
+              "ss_ticket_number",
+              "ss_item_sk"
+            ],
+            "joins": [],
+            "measure": "sum(ss_net_paid)",
+            "name": "门店营业额",
+            "time": {
+              "dim": "date_dim",
+              "dim_col": "d_date_sk",
+              "fact_col": "ss_sold_date_sk",
+              "grain": "day",
+              "loss_ratio": 0.010305000000000009,
+              "role": "销售日"
+            }
+          },
+          "name": "门店营业额"
+        },
+        {
+          "def": "M3",
+          "metric": {
+            "aliases": [
+              "门店退货比例",
+              "退货率"
+            ],
+            "basis": {
+              "kind": "explicit_question",
+              "task": "M3-L1"
+            },
+            "caveats": [
+              "store_sales 与 store_returns 的已验证关联为 1:1；为保留无退货销售行以正确计算分母，应使用 LEFT JOIN。若用 INNER JOIN，会丢失约 60.41% 的销售行，导致分母偏小。",
+              "时间维度关联使用 ss_sold_date_sk；该内连接会排除约 1.03% 无有效日期键的销售行，计算链亦如此。",
+              "退货按销售日期归属期间，不应按 sr_returned_date_sk 关联 date_dim 筛选退货日期。",
+              "未按 sr_status 或 ss_is_current 过滤；题面未要求。"
+            ],
+            "definition": "期间内售出的门店销售行所对应退货金额之和 ÷ 这些销售行的净支付额之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。",
+            "empty": "unspecified",
+            "examples": [
+              {
+                "question": "2001 年 2 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+                "sql": "SELECT ROUND(\n  (SELECT SUM(sr.sr_return_amt)\n   FROM store_sales ss\n   JOIN date_dim d ON d.d_date_sk = ss.ss_sold_date_sk\n   JOIN store_returns sr ON sr.sr_ticket_number = ss.ss_ticket_number AND sr.sr_item_sk = ss.ss_item_sk\n   WHERE d.d_year = 2001 AND d.d_moy = 2)\n  /\n  (SELECT SUM(ss.ss_net_paid)\n   FROM store_sales ss\n   JOIN date_dim d ON d.d_date_sk = ss.ss_sold_date_sk\n   WHERE d.d_year = 2001 AND d.d_moy = 2)\n  * 100, 2) AS return_rate_pct"
+              }
+            ],
+            "fact": "store_sales",
+            "filters": {},
+            "grain": [
+              "ss_ticket_number",
+              "ss_item_sk"
+            ],
+            "joins": [
+              {
+                "cardinality": "1:1",
+                "filters": {},
+                "key": "join:store_returns|store_sales",
+                "kind": "left",
+                "left": "store_sales",
+                "loss_ratio": 0.604122,
+                "on": [
+                  [
+                    "ss_ticket_number",
+                    "sr_ticket_number"
+                  ],
+                  [
+                    "ss_item_sk",
+                    "sr_item_sk"
+                  ]
+                ],
+                "revision": 0,
+                "right": "store_returns"
+              }
+            ],
+            "measure": "ROUND(100.0 * SUM(store_returns.sr_return_amt) / NULLIF(SUM(store_sales.ss_net_paid), 0), 2)",
+            "name": "门店退货率",
+            "time": {
+              "dim": "date_dim",
+              "dim_col": "d_date_sk",
+              "fact_col": "ss_sold_date_sk",
+              "grain": "day",
+              "loss_ratio": 0.010305000000000009,
+              "role": "销售日"
+            }
+          },
+          "name": "门店退货率"
+        },
+        {
+          "def": "M2",
+          "metric": {
+            "aliases": [
+              "门店退货总额",
+              "门店退货金额合计"
+            ],
+            "basis": {
+              "kind": "explicit_question",
+              "task": "M2-L1"
+            },
+            "caveats": [
+              "已验证 store_returns 到 date_dim 的关联为 N:1，loss_ratio=0.0，不会因关联丢失退货记录。",
+              "题面未要求按 sr_status 过滤，故口径包含所有退货状态。",
+              "年份、月份过滤以及 ROUND 保留两位小数属于题目参数，不在指标口径中固定。"
+            ],
+            "definition": "门店退货金额 = 门店退货明细中每笔退货的退货金额（不含税）之和，按退货日期归属期间；每笔退货只计一次。",
+            "empty": "unspecified",
+            "examples": [
+              {
+                "question": "2001 年 4 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+                "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4"
+              }
+            ],
+            "fact": "store_returns",
+            "filters": {},
+            "grain": [
+              "sr_returned_date_sk",
+              "sr_item_sk",
+              "sr_ticket_number"
+            ],
+            "joins": [],
+            "measure": "sum(sr_return_amt)",
+            "name": "门店退货金额",
+            "time": {
+              "dim": "date_dim",
+              "dim_col": "d_date_sk",
+              "fact_col": "sr_returned_date_sk",
+              "grain": "day",
+              "loss_ratio": 0.0,
+              "role": "退货日期"
+            }
+          },
+          "name": "门店退货金额"
+        },
+        {
+          "def": "M2",
+          "metric": {
+            "aliases": [
+              "门店退货额"
+            ],
+            "basis": {
+              "kind": "explicit_question",
+              "task": "M2-L2"
+            },
+            "caveats": [
+              "未对 sr_status 做状态过滤；题面口径为每笔退货只计一次，未限定退货状态。",
+              "store_returns 与 date_dim 的已验证关联为 N:1，loss_ratio 为 0，不会因日期维度关联重复或丢行。",
+              "题面未说明空结果处理，示例 SQL 保留聚合自然返回 NULL。"
+            ],
+            "definition": "按退货日期归属期间，对门店退货明细中每笔退货的退货金额 sr_return_amt 求和，保留两位小数。",
+            "empty": "unspecified",
+            "examples": [
+              {
+                "question": "2000 年 8 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+                "sql": "SELECT ROUND(SUM(sr.sr_return_amt), 2) AS return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2000 AND d.d_moy = 8"
+              }
+            ],
+            "fact": "store_returns",
+            "filters": {},
+            "grain": [
+              "sr_item_sk",
+              "sr_ticket_number"
+            ],
+            "joins": [],
+            "measure": "sum(store_returns.sr_return_amt)",
+            "name": "门店退货金额#2",
+            "time": {
+              "dim": "date_dim",
+              "dim_col": "d_date_sk",
+              "fact_col": "sr_returned_date_sk",
+              "grain": "day",
+              "loss_ratio": 0.0,
+              "role": "退货日期"
+            }
+          },
+          "name": "门店退货金额#2"
+        }
+      ],
+      "id": "dsv41flash-r3-a/r1-metric-global-named",
+      "skipped": [
+        {
+          "key": "metric:门店退货率#2",
+          "reason": "状态 {\"Candidate\":\"G3：聚合表达式：sr 不是已知列或允许的函数\"}"
+        }
+      ],
+      "source": "/root/agentdb-session-latency-20261003/results/session-latency-20261003/inputs/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-named.json"
+    }
+  ],
+  "methodology": "同一已学库与参数留出题配对；不重新学习；新 Agent 会话；关闭答案结果缓存；固定候选审计种子；阶段间写入完成后才发请求；cold 是固定库加载/准入后的首次 Agent 使用，库启动成本单列，非 OS/数据库冷缓存；warm 重用同一个中间层；append/status 各从内容核对过的 v1 恢复，首次使用触发维护；burst-status 同时提交全部请求，模型并发限制之外的排队计入完成时间；request-local SQL 只归属执行者，合并等待由 shared_wait 记录；嵌套 span 不直接相加；失败的耗时和已完成 token 仍保留",
+  "options": {
+    "agent": "cline",
+    "burst_copies": 2,
+    "concurrency": 3,
+    "libs": [
+      "/root/agentdb-session-latency-20261003/results/session-latency-20261003/inputs/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-named.json"
+    ],
+    "max_steps": 20,
+    "metrics": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "oracle": "example",
+    "order_offset": 2,
+    "phases": [
+      "cold",
+      "warm",
+      "after-append",
+      "after-status",
+      "burst-status"
+    ],
+    "policies": [
+      "no-share",
+      "definition",
+      "definition-cache",
+      "condition"
+    ],
+    "rows": 1000000,
+    "seed": 20261003,
+    "sql_timeout_secs": 120
+  },
+  "pool": 16,
+  "tasks": [
+    {
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 9,
+          "m2": 9,
+          "year": 2002
+        }
+      },
+      "question": "2002 年 9 月的门店营业额是多少？保留两位小数。",
+      "task": "M1-P1"
+    },
+    {
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 5,
+          "m2": 5,
+          "year": 2002
+        }
+      },
+      "question": "2002 年 5 月的门店退货金额是多少？保留两位小数。",
+      "task": "M2-P1"
+    },
+    {
+      "ask": {
+        "kind": "single",
+        "period": {
+          "m1": 9,
+          "m2": 9,
+          "year": 2002
+        }
+      },
+      "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+      "task": "M3-P1"
+    }
+  ]
+}

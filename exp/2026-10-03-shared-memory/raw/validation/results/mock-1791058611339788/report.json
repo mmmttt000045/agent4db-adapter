@@ -1,0 +1,324 @@
+{
+  "correct_sum": {
+    "result": {
+      "columns": [
+        "sum"
+      ],
+      "row_count": 1,
+      "rows": [
+        [
+          "100.00"
+        ]
+      ],
+      "truncated": false
+    },
+    "source": "executed"
+  },
+  "etl_inserted": 2,
+  "many_to_one": {
+    "path": {
+      "evidence": [
+        "store_sales 10 行中 10 行关联得上（0.0% 关联不上）"
+      ],
+      "filters": {},
+      "left": "store_sales",
+      "left_unique": false,
+      "loss_ratio": 0.0,
+      "n_join": 10,
+      "n_left": 10,
+      "on": [
+        [
+          "ss_sold_date_sk",
+          "d_date_sk"
+        ]
+      ],
+      "right": "date_dim",
+      "right_unique": true
+    },
+    "source": "explored",
+    "valid": true
+  },
+  "repaired_join": {
+    "notices": [
+      "你用过的经验「join:store_returns|store_sales」已撤销（守卫失败：store_returns(sr_ticket_number, sr_item_sk) 是否唯一，12 行只有 10 个不同键（平均每键 1.20 行））。此前基于它得到的结果建议复核。"
+    ],
+    "path": {
+      "evidence": [
+        "store_returns 10 行中 10 行关联得上（0.0% 关联不上）",
+        "store_returns 需过滤 sr_status = '完成' 才能保持每键一行"
+      ],
+      "filters": {
+        "store_returns": "sr_status = '完成'"
+      },
+      "left": "store_returns",
+      "left_unique": true,
+      "loss_ratio": 0.0,
+      "n_join": 10,
+      "n_left": 10,
+      "on": [
+        [
+          "sr_ticket_number",
+          "ss_ticket_number"
+        ],
+        [
+          "sr_item_sk",
+          "ss_item_sk"
+        ]
+      ],
+      "right": "store_sales",
+      "right_unique": true
+    },
+    "source": "revalidated",
+    "valid": true
+  },
+  "stats": {
+    "db": {
+      "by_kind": {
+        "check": [
+          22,
+          17.051
+        ],
+        "exec": [
+          5,
+          105.273
+        ],
+        "guard": [
+          2,
+          1.236
+        ],
+        "meta": [
+          45,
+          140.78
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          4,
+          2.521
+        ]
+      },
+      "db_ms": 266.861,
+      "queries": 78
+    },
+    "entries": 33,
+    "feedback": {
+      "adaptive": {
+        "adopted": false,
+        "at": 0,
+        "evidence": {
+          "baseline_ms": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "episodes": 0,
+          "mean_delta_ms": 0.0,
+          "policy_ms": 0.0
+        }
+      },
+      "adaptive_uses": 0,
+      "contexts": {
+        "KeyUnique|customer(c_customer_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00001,
+          "ms": 0.915377,
+          "runs": 1
+        },
+        "KeyUnique|date_dim(d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 2e-6,
+          "ms": 0.8097249999999999,
+          "runs": 1
+        },
+        "KeyUnique|item(i_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00001,
+          "ms": 1.616332,
+          "runs": 1
+        },
+        "KeyUnique|store_returns(sr_ticket_number,sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00003,
+          "ms": 1.237761,
+          "runs": 2
+        },
+        "KeyUnique|store_sales(ss_customer_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00001,
+          "ms": 0.49752399999999997,
+          "runs": 1
+        },
+        "KeyUnique|store_sales(ss_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00001,
+          "ms": 0.513443,
+          "runs": 1
+        },
+        "KeyUnique|store_sales(ss_ticket_number,ss_item_sk)": {
+          "fails": 0,
+          "hits": 1,
+          "mrows": 0.000015,
+          "ms": 1.37457,
+          "runs": 1
+        },
+        "KeyUnique|store_sales(ss_warehouse_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00001,
+          "ms": 0.513253,
+          "runs": 1
+        },
+        "KeyUnique|warehouse(w_warehouse_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00001,
+          "ms": 0.829307,
+          "runs": 1
+        },
+        "RowConservation|store_returns>store_sales:(sr_ticket_number=ss_ticket_number, sr_item_sk=ss_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00006,
+          "ms": 2.310396,
+          "runs": 2
+        },
+        "RowConservation|store_sales>customer:(ss_customer_sk=c_customer_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00003,
+          "ms": 0.745565,
+          "runs": 1
+        },
+        "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.000022,
+          "ms": 0.725456,
+          "runs": 1
+        },
+        "RowConservation|store_sales>item:(ss_item_sk=i_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00003,
+          "ms": 0.9949469999999999,
+          "runs": 1
+        },
+        "RowConservation|store_sales>warehouse:(ss_warehouse_sk=w_warehouse_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00003,
+          "ms": 0.732985,
+          "runs": 1
+        },
+        "SampleFanout|store_returns>store_sales:(sr_ticket_number=ss_ticket_number, sr_item_sk=ss_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00002,
+          "ms": 1.527661,
+          "runs": 2
+        },
+        "SampleFanout|store_sales>customer:(ss_customer_sk=c_customer_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00001,
+          "ms": 0.663245,
+          "runs": 1
+        },
+        "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 2e-6,
+          "ms": 0.655955,
+          "runs": 1
+        },
+        "SampleFanout|store_sales>item:(ss_item_sk=i_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00001,
+          "ms": 1.001177,
+          "runs": 1
+        },
+        "SampleFanout|store_sales>warehouse:(ss_warehouse_sk=w_warehouse_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.00001,
+          "ms": 0.700934,
+          "runs": 1
+        }
+      },
+      "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+      "evidence": {
+        "audited_failures_in_window": 0,
+        "audited_failures_total": 0,
+        "min_evidence": 8,
+        "passed": 6,
+        "unaudited_failures": 0
+      },
+      "kinds": {
+        "KeyUnique": {
+          "fails": 0,
+          "hits": 1,
+          "mrows": 0.000107,
+          "ms": 8.307292,
+          "runs": 10
+        },
+        "RowConservation": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.000172,
+          "ms": 5.509348999999999,
+          "runs": 6
+        },
+        "SampleFanout": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.000052000000000000004,
+          "ms": 4.548972,
+          "runs": 6
+        }
+      },
+      "order_calls": 6,
+      "pending_validation": {
+        "baseline_ms": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "episodes": 0,
+        "mean_delta_ms": 0.0,
+        "policy_ms": 0.0
+      }
+    },
+    "guard_fails": 1,
+    "guard_runs": 2,
+    "inflight_merged": 7,
+    "knowledge_hits": 4,
+    "knowledge_misses": 39,
+    "notices": 1,
+    "repairs": 1,
+    "revocations": 1,
+    "snapshot_exec": {
+      "checks_reused": 0,
+      "checks_run": 0,
+      "rejections": 0
+    },
+    "sql_cache": {
+      "hits": 0,
+      "misses": 0
+    },
+    "sql_rejections": 1
+  },
+  "status": "passed"
+}

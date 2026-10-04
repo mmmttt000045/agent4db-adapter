@@ -320,17 +320,26 @@ async fn anthropic_chat(
 /// 设置了 require_model 时最多发出的轮数（每轮 hedge 个并发请求）
 const MODEL_ROUNDS: u32 = 15;
 
+/// Cline 等网关把完整 Chat Completions 放在 data 内；模型与用量校验必须读同一个已解包响应。
+fn completion_payload(mut v: Value) -> Value {
+    if v["data"]["choices"].is_array() {
+        v["data"].take()
+    } else {
+        v
+    }
+}
+
 /// 发出请求；设置了 require_model 时，回报模型不符的回复丢弃，每轮并发 hedge 份，取第一个相符的。
 /// 返回 (响应, 丢弃数, 丢弃回复的 token)。
 async fn post_model(req: &reqwest::RequestBuilder, body: &Value, options: &OpenAiOptions) -> Result<(Value, u32, u64)> {
     let clone = || req.try_clone().ok_or_else(|| anyhow!("请求无法重试"));
-    let Some(want) = &options.require_model else { return Ok((post_json(clone()?, body).await?, 0, 0)) };
+    let Some(want) = &options.require_model else { return Ok((completion_payload(post_json(clone()?, body).await?), 0, 0)) };
     let (mut discarded, mut wasted, mut last) = (0u32, 0u64, String::new());
     for _ in 0..MODEL_ROUNDS {
         let mut pending: futures::stream::FuturesUnordered<_> =
             (0..options.hedge.max(1)).map(|_| clone().map(|r| post_json(r, body))).collect::<Result<_>>()?;
         while let Some(r) = futures::StreamExt::next(&mut pending).await {
-            match r {
+            match r.map(completion_payload) {
                 Ok(v) if v["model"].as_str() == Some(want.as_str()) => return Ok((v, discarded, wasted)),
                 Ok(v) => {
                     discarded += 1;
@@ -528,7 +537,8 @@ pub async fn run_agent_with(
     let mut run = AgentRun::default();
     let t0 = Instant::now();
     for _ in 0..max_steps {
-        let r = p.chat(system, &turns, tools).await?;
+        let r = crate::timing::measure("llm", p.chat(system, &turns, tools)).await?;
+        crate::timing::reply(r.input_tokens, r.output_tokens, r.discarded_tokens, r.model.as_deref());
         run.steps += 1;
         run.input_tokens += r.input_tokens;
         run.output_tokens += r.output_tokens;
@@ -546,6 +556,7 @@ pub async fn run_agent_with(
         let mut done = false;
         for (seq, c) in r.calls.iter().enumerate() {
             run.tool_calls += 1;
+            let _span = crate::timing::Timer::start(&format!("tool:{}", c.name));
             let (t0, started) = (unix_ms(), Instant::now());
             // (状态, 中间层返回；出错时为错误信息)
             let (status, out) = if c.name == "final_answer" {
@@ -679,32 +690,39 @@ mod provider_tests {
     }
 
     #[tokio::test]
-    async fn required_model_discards_other_replies() {
+    async fn required_model_handles_plain_and_wrapped_replies() {
         use std::sync::atomic::{AtomicU32, Ordering};
-        static CALLS: AtomicU32 = AtomicU32::new(0);
-        let app = Router::new().route(
-            "/chat/completions",
-            post(|| async {
-                let n = CALLS.fetch_add(1, Ordering::SeqCst);
-                let model = if n < 2 { "old-model" } else { "want-model" };
-                Json(json!({"model": model, "usage": {"prompt_tokens": 5, "completion_tokens": 1, "total_tokens": 6},
-                            "choices": [{"message": {"role": "assistant", "content": model}}]}))
-            }),
-        );
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
-        let addr = listener.local_addr().unwrap();
-        let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
-        let provider = Provider::OpenAi {
-            vendor: "kunyou",
-            key: "test-key".into(),
-            base: format!("http://{addr}"),
-            model: "want-model".into(),
-            options: OpenAiOptions { require_model: Some("want-model".into()), hedge: 1, ..Default::default() },
-            http: reqwest::Client::builder().no_proxy().build().unwrap(),
-        };
-        let reply = provider.chat("test", &[Turn::User("test".into())], &[]).await.unwrap();
-        assert_eq!((reply.text.as_str(), reply.discarded, reply.discarded_tokens), ("want-model", 2, 12));
-        server.abort();
+        for wrapped in [false, true] {
+            let calls = std::sync::Arc::new(AtomicU32::new(0));
+            let app = Router::new().route(
+                "/chat/completions",
+                post(move || {
+                    let calls = calls.clone();
+                    async move {
+                        let n = calls.fetch_add(1, Ordering::SeqCst);
+                        let model = if n < 2 { "old-model" } else { "want-model" };
+                        let payload = json!({"model": model, "usage": {"prompt_tokens": 5, "completion_tokens": 1, "total_tokens": 6},
+                                            "choices": [{"message": {"role": "assistant", "content": model}}]});
+                        Json(if wrapped { json!({"data": payload}) } else { payload })
+                    }
+                }),
+            );
+            let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let addr = listener.local_addr().unwrap();
+            let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+            let provider = Provider::OpenAi {
+                vendor: if wrapped { "cline" } else { "kunyou" },
+                key: "test-key".into(),
+                base: format!("http://{addr}"),
+                model: "want-model".into(),
+                options: OpenAiOptions { require_model: Some("want-model".into()), hedge: 1, ..Default::default() },
+                http: reqwest::Client::builder().no_proxy().build().unwrap(),
+            };
+            let reply = provider.chat("test", &[Turn::User("test".into())], &[]).await.unwrap();
+            assert_eq!((reply.text.as_str(), reply.discarded, reply.discarded_tokens), ("want-model", 2, 12));
+            assert_eq!((reply.input_tokens, reply.output_tokens), (5, 1));
+            server.abort();
+        }
     }
 
     #[test]

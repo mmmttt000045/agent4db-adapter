@@ -1,0 +1,91 @@
+[
+  {
+    "agent_seconds": 67.978650245,
+    "chain_error": null,
+    "correct": true,
+    "db": {
+      "ms": 74.493,
+      "queries": 17
+    },
+    "error": null,
+    "extraction": {
+      "attempts": 1,
+      "errors": [],
+      "input_tokens": 1339,
+      "output_tokens": 3120,
+      "seconds": 35.682495999
+    },
+    "gold": "137408.00",
+    "memory": {
+      "condition": 4,
+      "join": 1,
+      "metric": 1,
+      "profile": 2
+    },
+    "metric": "M1",
+    "publication": {
+      "event": "promoted",
+      "failed_gate": null,
+      "gates": [
+        {
+          "gate": "G1",
+          "pass": true
+        },
+        {
+          "gate": "G2",
+          "pass": true
+        },
+        {
+          "gate": "G3",
+          "pass": true
+        },
+        {
+          "gate": "G4",
+          "pass": true
+        },
+        {
+          "gate": "G5",
+          "pass": true
+        },
+        {
+          "gate": "G6",
+          "pass": true
+        },
+        {
+          "gate": "G7",
+          "pass": true
+        }
+      ],
+      "key": "metric:门店营业额",
+      "reason": null,
+      "revision": 0,
+      "task": "M1-L1"
+    },
+    "question": "2001 年 3 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "run": {
+      "answer": "137408.00",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 12095,
+      "notices": 0,
+      "output_tokens": 605,
+      "rejections": 0,
+      "seconds": 67.978596635,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 5
+      },
+      "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS store_revenue\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 3",
+      "steps": 5,
+      "tool_calls": 7,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "task": "M1-L1",
+    "total_seconds": 103.707256837,
+    "wave": 1
+  }
+]

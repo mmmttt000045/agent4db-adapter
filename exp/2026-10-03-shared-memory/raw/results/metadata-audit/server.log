@@ -1,0 +1,8 @@
+中间层已启动：http://127.0.0.1:38089/v1/tools
+    · [producer] 执行探查表 store_returns
+    · [new-consumer] 复用表画像 store_returns
+    · [after-notified-dml] 执行探查表 store_returns
+    · [after-comment-only] 复用表画像 store_returns
+    · [after-additive-ddl] 执行探查表 store_returns
+中间层已启动：http://127.0.0.1:38089/v1/tools
+    · [after-explicit-restart] 执行探查表 store_returns

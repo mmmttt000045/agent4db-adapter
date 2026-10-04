@@ -1,0 +1,6 @@
+{
+  "started_utc": "2026-10-03T15:44:54.425468+00:00",
+  "base_commit": "60d07837fa7b8d2ea978018701c91e1fee19a672",
+  "initial_status": " M README.md\n M docs/research-status.md\n M exp/README.md\n M overleaf/README.md\n M overleaf/latex/preamble.tex\n M overleaf/mavra-sigmod-bilingual.zip\n M overleaf/sections/evaluation/scenarios.tex\n M overleaf/tables/experiments.tex\n M src/db.rs\n M src/flight.rs\n M src/llm.rs\n M src/main.rs\n M src/metricbench.rs\n M src/middle/metrics.rs\n M src/replaybench.rs\n M src/tpcds.rs\n?? exp/2026-10-03-session-latency/\n?? exp/2026-10-03-shared-memory/\n?? overleaf/gen/session-latency-table.tex\n?? overleaf/gen/session-latency.tex\n?? overleaf/sections/evaluation/session-latency.tex\n?? overleaf/tables/session-latency.tex\n?? src/sessionbench.rs\n?? src/timing.rs\n?? tools/run-session-latency.py\n?? tools/session-latency-stats.py\n",
+  "objective": "Refactor the bilingual paper around shared database knowledge and strategy memory for user-side agents; add evidence for exploration savings, accumulation, maintenance, and feedback-based strategy adaptation."
+}

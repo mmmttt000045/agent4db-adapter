@@ -1,0 +1,101 @@
+{
+  "main-en-before": {
+    "pages": 15,
+    "references_begin": [
+      13
+    ],
+    "session_section_pages": [],
+    "session_table_pages": [],
+    "unresolved_references": false,
+    "overfull_boxes": [
+      "Overfull \\hbox (23.271pt too wide) in paragraph at lines 21--22",
+      "Overfull \\hbox (39.7832pt too wide) in paragraph at lines 11--12"
+    ],
+    "session_overfull_boxes": []
+  },
+  "main-en": {
+    "pages": 15,
+    "references_begin": [
+      13
+    ],
+    "session_section_pages": [
+      11
+    ],
+    "session_table_pages": [
+      12
+    ],
+    "unresolved_references": false,
+    "overfull_boxes": [
+      "Overfull \\hbox (23.271pt too wide) in paragraph at lines 21--22",
+      "Overfull \\hbox (39.7832pt too wide) in paragraph at lines 11--12"
+    ],
+    "session_overfull_boxes": []
+  },
+  "main": {
+    "pages": 23,
+    "references_begin": [
+      21
+    ],
+    "session_section_pages": [
+      19
+    ],
+    "session_table_pages": [
+      19
+    ],
+    "unresolved_references": false,
+    "overfull_boxes": [
+      "Overfull \\hbox (4.62451pt too wide) in paragraph at lines 6--6",
+      "Overfull \\hbox (7.41374pt too wide) in paragraph at lines 4--4",
+      "Overfull \\hbox (19.75577pt too wide) in paragraph at lines 13--13",
+      "Overfull \\hbox (2.11053pt too wide) in paragraph at lines 22--22",
+      "Overfull \\hbox (13.66129pt too wide) in paragraph at lines 22--22",
+      "Overfull \\hbox (11.2585pt too wide) in paragraph at lines 22--22",
+      "Overfull \\hbox (3.97128pt too wide) in paragraph at lines 25--25",
+      "Overfull \\hbox (13.78955pt too wide) in paragraph at lines 25--25",
+      "Overfull \\hbox (7.41527pt too wide) in paragraph at lines 25--25",
+      "Overfull \\hbox (8.64603pt too wide) in paragraph at lines 25--25",
+      "Overfull \\hbox (10.8233pt too wide) in paragraph at lines 25--25",
+      "Overfull \\hbox (17.97151pt too wide) in paragraph at lines 25--25",
+      "Overfull \\hbox (19.89001pt too wide) in paragraph at lines 33--33",
+      "Overfull \\hbox (4.92226pt too wide) in paragraph at lines 37--37",
+      "Overfull \\hbox (4.7093pt too wide) in paragraph at lines 6--6",
+      "Overfull \\hbox (24.75226pt too wide) in paragraph at lines 22--22",
+      "Overfull \\hbox (6.81902pt too wide) in paragraph at lines 22--22",
+      "Overfull \\hbox (4.53pt too wide) in paragraph at lines 25--25",
+      "Overfull \\hbox (2.38277pt too wide) in paragraph at lines 30--30",
+      "Overfull \\hbox (9.71329pt too wide) in paragraph at lines 4--4",
+      "Overfull \\hbox (22.12799pt too wide) in paragraph at lines 13--13",
+      "Overfull \\hbox (11.87128pt too wide) in paragraph at lines 39--39",
+      "Overfull \\hbox (8.8185pt too wide) in paragraph at lines 43--43",
+      "Overfull \\hbox (2.26953pt too wide) in paragraph at lines 43--43",
+      "Overfull \\hbox (8.47505pt too wide) in paragraph at lines 58--60",
+      "Overfull \\hbox (2.60405pt too wide) in paragraph at lines 4--4",
+      "Overfull \\hbox (4.36899pt too wide) in paragraph at lines 9--9",
+      "Overfull \\hbox (3.1155pt too wide) in paragraph at lines 4--4",
+      "Overfull \\hbox (3.00952pt too wide) in paragraph at lines 13--13",
+      "Overfull \\hbox (9.51852pt too wide) in alignment at lines 13--13",
+      "Overfull \\hbox (3.12527pt too wide) in paragraph at lines 10--10",
+      "Overfull \\hbox (7.0856pt too wide) in paragraph at lines 21--22",
+      "Overfull \\hbox (7.73929pt too wide) in paragraph at lines 12--12",
+      "Overfull \\hbox (9.85985pt too wide) in paragraph at lines 12--12",
+      "Overfull \\hbox (1.07951pt too wide) in paragraph at lines 12--12",
+      "Overfull \\hbox (1.76027pt too wide) in paragraph at lines 4--4",
+      "Overfull \\hbox (21.9383pt too wide) in paragraph at lines 7--7",
+      "Overfull \\hbox (88.70193pt too wide) in paragraph at lines 11--12",
+      "Overfull \\hbox (1.85251pt too wide) in paragraph at lines 20--20",
+      "Overfull \\hbox (38.20853pt too wide) in paragraph at lines 2--7",
+      "Overfull \\hbox (1.06728pt too wide) in paragraph at lines 28--28",
+      "Overfull \\hbox (2.54251pt too wide) in paragraph at lines 28--28",
+      "Overfull \\hbox (1.12451pt too wide) in paragraph at lines 28--28",
+      "Overfull \\hbox (4.4168pt too wide) in paragraph at lines 5--5",
+      "Overfull \\hbox (4.60274pt too wide) in paragraph at lines 5--5",
+      "Overfull \\hbox (10.4355pt too wide) in paragraph at lines 13--13",
+      "Overfull \\hbox (6.76874pt too wide) in paragraph at lines 13--13",
+      "Overfull \\hbox (8.90999pt too wide) in paragraph at lines 17--17",
+      "Overfull \\hbox (6.88026pt too wide) in paragraph at lines 21--21",
+      "Overfull \\hbox (1.85251pt too wide) in paragraph at lines 21--21",
+      "Overfull \\vbox (1.2035pt too high) has occurred while \\output is active []"
+    ],
+    "session_overfull_boxes": []
+  }
+}

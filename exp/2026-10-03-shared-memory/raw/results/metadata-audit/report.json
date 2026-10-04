@@ -1,0 +1,478 @@
+{
+  "binary_sha256": "35a4c7b8a2ee9951a49948b19bd0fb13f1bda6d33b1bb9a957cdc9c93ac1568f",
+  "rows": 100000,
+  "methodology": "Exploratory diagnostic predicted by code inspection; no LLM. Fresh HTTP agents share one process. DML invalidation uses explicit ETL batch notification. Comment-only and additive DDL changes test startup-catalog boundaries. Restart is a separate intervention, not live refresh.",
+  "findings": {
+    "first_source": "explored",
+    "shared_source": "reused",
+    "shared_probe_queries": 0,
+    "notified_dml_row_count": 100001,
+    "comment_only_fresh": false,
+    "additive_ddl_column_visible": false,
+    "restart_comment_fresh": true,
+    "restart_column_visible": true
+  },
+  "database_cleaned_up": true,
+  "records": [
+    {
+      "stage": "producer",
+      "response": {
+        "profile": {
+          "columns": [
+            {
+              "distinct_est": 100000,
+              "name": "sr_ticket_number",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "common_values": "{1}",
+              "distinct_est": 1,
+              "name": "sr_item_sk",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "comment": "Amount excluding tax",
+              "distinct_est": 100000,
+              "name": "sr_return_amt",
+              "null_ratio": 0.0,
+              "type": "numeric"
+            },
+            {
+              "comment": "\u9000\u8d27\u72b6\u6001\uff1a\u7533\u8bf7 / \u5b8c\u6210",
+              "common_values": "{\u5b8c\u6210}",
+              "distinct_est": 1,
+              "name": "sr_status",
+              "null_ratio": 0.0,
+              "type": "character varying(8)"
+            }
+          ],
+          "comment": null,
+          "row_count": 100000,
+          "sample_rows": {
+            "columns": [
+              "sr_ticket_number",
+              "sr_item_sk",
+              "sr_return_amt",
+              "sr_status"
+            ],
+            "row_count": 3,
+            "rows": [
+              [
+                "1",
+                "1",
+                "1",
+                "\u5b8c\u6210"
+              ],
+              [
+                "2",
+                "1",
+                "2",
+                "\u5b8c\u6210"
+              ],
+              [
+                "3",
+                "1",
+                "3",
+                "\u5b8c\u6210"
+              ]
+            ],
+            "truncated": false
+          },
+          "table": "store_returns"
+        },
+        "source": "explored"
+      },
+      "queries": 4,
+      "probe_queries": 2,
+      "db_ms": 32.664
+    },
+    {
+      "stage": "new-consumer",
+      "response": {
+        "profile": {
+          "columns": [
+            {
+              "distinct_est": 100000,
+              "name": "sr_ticket_number",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "common_values": "{1}",
+              "distinct_est": 1,
+              "name": "sr_item_sk",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "comment": "Amount excluding tax",
+              "distinct_est": 100000,
+              "name": "sr_return_amt",
+              "null_ratio": 0.0,
+              "type": "numeric"
+            },
+            {
+              "comment": "\u9000\u8d27\u72b6\u6001\uff1a\u7533\u8bf7 / \u5b8c\u6210",
+              "common_values": "{\u5b8c\u6210}",
+              "distinct_est": 1,
+              "name": "sr_status",
+              "null_ratio": 0.0,
+              "type": "character varying(8)"
+            }
+          ],
+          "comment": null,
+          "row_count": 100000,
+          "sample_rows": {
+            "columns": [
+              "sr_ticket_number",
+              "sr_item_sk",
+              "sr_return_amt",
+              "sr_status"
+            ],
+            "row_count": 3,
+            "rows": [
+              [
+                "1",
+                "1",
+                "1",
+                "\u5b8c\u6210"
+              ],
+              [
+                "2",
+                "1",
+                "2",
+                "\u5b8c\u6210"
+              ],
+              [
+                "3",
+                "1",
+                "3",
+                "\u5b8c\u6210"
+              ]
+            ],
+            "truncated": false
+          },
+          "table": "store_returns"
+        },
+        "source": "reused"
+      },
+      "queries": 0,
+      "probe_queries": 0,
+      "db_ms": 0.0
+    },
+    {
+      "stage": "after-notified-dml",
+      "response": {
+        "profile": {
+          "columns": [
+            {
+              "distinct_est": 100001,
+              "name": "sr_ticket_number",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "common_values": "{1}",
+              "distinct_est": 1,
+              "name": "sr_item_sk",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "comment": "Amount excluding tax",
+              "distinct_est": 100001,
+              "name": "sr_return_amt",
+              "null_ratio": 0.0,
+              "type": "numeric"
+            },
+            {
+              "comment": "\u9000\u8d27\u72b6\u6001\uff1a\u7533\u8bf7 / \u5b8c\u6210",
+              "common_values": "{\u5b8c\u6210}",
+              "distinct_est": 1,
+              "name": "sr_status",
+              "null_ratio": 0.0,
+              "type": "character varying(8)"
+            }
+          ],
+          "comment": null,
+          "row_count": 100001,
+          "sample_rows": {
+            "columns": [
+              "sr_ticket_number",
+              "sr_item_sk",
+              "sr_return_amt",
+              "sr_status"
+            ],
+            "row_count": 3,
+            "rows": [
+              [
+                "1",
+                "1",
+                "1",
+                "\u5b8c\u6210"
+              ],
+              [
+                "2",
+                "1",
+                "2",
+                "\u5b8c\u6210"
+              ],
+              [
+                "3",
+                "1",
+                "3",
+                "\u5b8c\u6210"
+              ]
+            ],
+            "truncated": false
+          },
+          "table": "store_returns"
+        },
+        "source": "explored"
+      },
+      "queries": 4,
+      "probe_queries": 2,
+      "db_ms": 26.619
+    },
+    {
+      "stage": "after-comment-only",
+      "response": {
+        "profile": {
+          "columns": [
+            {
+              "distinct_est": 100001,
+              "name": "sr_ticket_number",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "common_values": "{1}",
+              "distinct_est": 1,
+              "name": "sr_item_sk",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "comment": "Amount excluding tax",
+              "distinct_est": 100001,
+              "name": "sr_return_amt",
+              "null_ratio": 0.0,
+              "type": "numeric"
+            },
+            {
+              "comment": "\u9000\u8d27\u72b6\u6001\uff1a\u7533\u8bf7 / \u5b8c\u6210",
+              "common_values": "{\u5b8c\u6210}",
+              "distinct_est": 1,
+              "name": "sr_status",
+              "null_ratio": 0.0,
+              "type": "character varying(8)"
+            }
+          ],
+          "comment": null,
+          "row_count": 100001,
+          "sample_rows": {
+            "columns": [
+              "sr_ticket_number",
+              "sr_item_sk",
+              "sr_return_amt",
+              "sr_status"
+            ],
+            "row_count": 3,
+            "rows": [
+              [
+                "1",
+                "1",
+                "1",
+                "\u5b8c\u6210"
+              ],
+              [
+                "2",
+                "1",
+                "2",
+                "\u5b8c\u6210"
+              ],
+              [
+                "3",
+                "1",
+                "3",
+                "\u5b8c\u6210"
+              ]
+            ],
+            "truncated": false
+          },
+          "table": "store_returns"
+        },
+        "source": "reused"
+      },
+      "queries": 1,
+      "probe_queries": 0,
+      "db_ms": 2.388999999999996
+    },
+    {
+      "stage": "after-additive-ddl",
+      "response": {
+        "profile": {
+          "columns": [
+            {
+              "distinct_est": 100001,
+              "name": "sr_ticket_number",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "common_values": "{1}",
+              "distinct_est": 1,
+              "name": "sr_item_sk",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "comment": "Amount excluding tax",
+              "distinct_est": 100001,
+              "name": "sr_return_amt",
+              "null_ratio": 0.0,
+              "type": "numeric"
+            },
+            {
+              "comment": "\u9000\u8d27\u72b6\u6001\uff1a\u7533\u8bf7 / \u5b8c\u6210",
+              "common_values": "{\u5b8c\u6210}",
+              "distinct_est": 1,
+              "name": "sr_status",
+              "null_ratio": 0.0,
+              "type": "character varying(8)"
+            }
+          ],
+          "comment": null,
+          "row_count": 100001,
+          "sample_rows": {
+            "columns": [
+              "sr_ticket_number",
+              "sr_item_sk",
+              "sr_return_amt",
+              "sr_status",
+              "sr_currency"
+            ],
+            "row_count": 3,
+            "rows": [
+              [
+                "1",
+                "1",
+                "1",
+                "\u5b8c\u6210",
+                "CNY"
+              ],
+              [
+                "2",
+                "1",
+                "2",
+                "\u5b8c\u6210",
+                "CNY"
+              ],
+              [
+                "3",
+                "1",
+                "3",
+                "\u5b8c\u6210",
+                "CNY"
+              ]
+            ],
+            "truncated": false
+          },
+          "table": "store_returns"
+        },
+        "source": "explored"
+      },
+      "queries": 4,
+      "probe_queries": 2,
+      "db_ms": 24.205000000000013
+    },
+    {
+      "stage": "after-explicit-restart",
+      "response": {
+        "profile": {
+          "columns": [
+            {
+              "distinct_est": 100001,
+              "name": "sr_ticket_number",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "common_values": "{1}",
+              "distinct_est": 1,
+              "name": "sr_item_sk",
+              "null_ratio": 0.0,
+              "type": "integer"
+            },
+            {
+              "comment": "Amount in cents excluding tax",
+              "distinct_est": 100001,
+              "name": "sr_return_amt",
+              "null_ratio": 0.0,
+              "type": "numeric"
+            },
+            {
+              "comment": "\u9000\u8d27\u72b6\u6001\uff1a\u7533\u8bf7 / \u5b8c\u6210",
+              "common_values": "{\u5b8c\u6210}",
+              "distinct_est": 1,
+              "name": "sr_status",
+              "null_ratio": 0.0,
+              "type": "character varying(8)"
+            },
+            {
+              "comment": "Currency code",
+              "common_values": "{CNY}",
+              "distinct_est": 1,
+              "name": "sr_currency",
+              "null_ratio": 0.0,
+              "type": "text"
+            }
+          ],
+          "comment": null,
+          "row_count": 100001,
+          "sample_rows": {
+            "columns": [
+              "sr_ticket_number",
+              "sr_item_sk",
+              "sr_return_amt",
+              "sr_status",
+              "sr_currency"
+            ],
+            "row_count": 3,
+            "rows": [
+              [
+                "1",
+                "1",
+                "1",
+                "\u5b8c\u6210",
+                "CNY"
+              ],
+              [
+                "2",
+                "1",
+                "2",
+                "\u5b8c\u6210",
+                "CNY"
+              ],
+              [
+                "3",
+                "1",
+                "3",
+                "\u5b8c\u6210",
+                "CNY"
+              ]
+            ],
+            "truncated": false
+          },
+          "table": "store_returns"
+        },
+        "source": "explored"
+      },
+      "queries": 4,
+      "probe_queries": 2,
+      "db_ms": 35.322
+    }
+  ]
+}

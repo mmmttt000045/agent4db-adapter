@@ -1,0 +1,10 @@
+{
+  "first_source": "explored",
+  "shared_source": "reused",
+  "shared_probe_queries": 0,
+  "notified_dml_row_count": 100001,
+  "comment_only_fresh": false,
+  "additive_ddl_column_visible": false,
+  "restart_comment_fresh": true,
+  "restart_column_visible": true
+}

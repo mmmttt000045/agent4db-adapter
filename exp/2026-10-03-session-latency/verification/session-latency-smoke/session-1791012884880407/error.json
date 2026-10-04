@@ -1,0 +1,4 @@
+{
+  "database_cleaned_up": true,
+  "error": "固定库条目 目录渠道营业额 准入失败：{\"failed_gate\":\"G7\",\"gates\":[{\"gate\":\"G3\",\"pass\":true},{\"gate\":\"G4\",\"pass\":true},{\"gate\":\"G5\",\"pass\":true},{\"gate\":\"G7\",\"pass\":false,\"reason\":\"结果 171605.45 与期望 Num(2001.0) 不一致\"}],\"key\":\"metric:目录渠道营业额\",\"promoted\":false,\"reason\":\"结果 171605.45 与期望 Num(2001.0) 不一致\",\"revision\":0}"
+}

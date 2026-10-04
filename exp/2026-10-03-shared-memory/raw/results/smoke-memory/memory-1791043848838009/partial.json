@@ -1,0 +1,74 @@
+[
+  {
+    "agent": "consumer-1-isolated-1-prefix-param-M1-P1",
+    "answer": null,
+    "db": {
+      "by_kind": {
+        "check": [
+          0,
+          0.0
+        ],
+        "exec": [
+          0,
+          0.0
+        ],
+        "guard": [
+          0,
+          0.0
+        ],
+        "meta": [
+          0,
+          0.0
+        ],
+        "metric": [
+          0,
+          0.0
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "ms": 0.0,
+      "queries": 0
+    },
+    "defined": true,
+    "finds": 0,
+    "found": [],
+    "gold": "128005.70",
+    "metric": "M1",
+    "outcome": "error",
+    "phase": "prefix-param",
+    "policy": "isolated",
+    "question": "2002 年 9 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "rejections": [],
+    "repeat": 1,
+    "run": {
+      "answer": null,
+      "clarification": null,
+      "derivation": null,
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 0,
+      "notices": 0,
+      "output_tokens": 0,
+      "rejections": 0,
+      "seconds": 0.0,
+      "served_models": {},
+      "sql": null,
+      "steps": 0,
+      "tool_calls": 0,
+      "tool_errors": 0,
+      "used": []
+    },
+    "seconds": 139.349755411,
+    "session": "fresh",
+    "sql_calls": 0,
+    "task": "M1-P1",
+    "wave": 1
+  }
+]

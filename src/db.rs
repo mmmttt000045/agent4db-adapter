@@ -72,6 +72,7 @@ impl Meter {
     fn record(&self, k: QKind, us: u64) {
         self.counts[k as usize].fetch_add(1, Ordering::Relaxed);
         self.micros[k as usize].fetch_add(us, Ordering::Relaxed);
+        crate::timing::query(k.name(), us);
     }
 
     pub fn snap(&self) -> MeterSnap {
@@ -145,13 +146,13 @@ impl Db {
     }
 
     pub async fn query(&self, kind: QKind, sql: &str) -> Result<Rows> {
-        let client = self.pool.get().await.context("获取数据库连接失败")?;
+        let client = crate::timing::measure("pool_wait", self.pool.get()).await.context("获取数据库连接失败")?;
         timed_query(&client, &self.meter, kind, sql).await
     }
 
     /// 开启一个可重复读、只读的事务：之后经 `Snapshot::query` 的查询都看到同一个快照（取自事务里的第一条查询）。
     pub async fn snapshot(&self) -> Result<Snapshot<'_>> {
-        let client = self.pool.get().await.context("获取数据库连接失败")?;
+        let client = crate::timing::measure("pool_wait", self.pool.get()).await.context("获取数据库连接失败")?;
         client
             .simple_query("begin isolation level repeatable read read only")
             .await
@@ -172,6 +173,7 @@ impl Db {
 
 async fn timed_query(client: &tokio_postgres::Client, meter: &Meter, kind: QKind, sql: &str) -> Result<Rows> {
     let t = Instant::now();
+    let _span = crate::timing::Timer::start(&format!("db:{}", kind.name()));
     let res = client.simple_query(sql).await;
     meter.record(kind, t.elapsed().as_micros() as u64);
     let msgs = res.map_err(|e| anyhow!("SQL 执行失败：{}", db_err(&e)))?;

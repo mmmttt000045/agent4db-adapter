@@ -1,0 +1,16 @@
+{
+  "at_utc": "2026-10-03T16:57:28.560741+00:00",
+  "aborted_processes": [
+    4039431,
+    4052578,
+    4052580,
+    4052581
+  ],
+  "databases_removed": [
+    "agentdb_memory_4039431_1791043848838009",
+    "agentdb_memory_4052578_1791045240119973",
+    "agentdb_memory_4052580_1791045240123085",
+    "agentdb_memory_4052581_1791045240123638"
+  ],
+  "scope": "Only explicitly terminated pilot memory runs; completed and active final databases untouched."
+}

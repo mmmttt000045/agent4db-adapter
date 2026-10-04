@@ -1,0 +1,75 @@
+{
+  "sessions": 216,
+  "outcomes": {
+    "correct": 178,
+    "wrong": 33,
+    "clarify": 5
+  },
+  "per_policy": {
+    "definition": 54,
+    "definition-cache": 54,
+    "condition": 54,
+    "no-share": 54
+  },
+  "source_snapshots_match_launcher": [
+    {
+      "library": "dsv41flash-r1-b",
+      "snapshot": "raw/inputs/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json",
+      "sha256": "9fb08e2113ef19eb16c543c3be82eb33f931c91d848005c967fc731be86f97f5"
+    },
+    {
+      "library": "dsv41flash-r2-b-rerun",
+      "snapshot": "raw/inputs/dsv41flash-r2-b-rerun/metric-1790918362008789/cell-r1-metric-global-named.json",
+      "sha256": "92e9b5803ffd80a9d5087a92fad22226ae81726c9e7f162d738aac9b5200f0c0"
+    },
+    {
+      "library": "dsv41flash-r3-a",
+      "snapshot": "raw/inputs/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-named.json",
+      "sha256": "bf1360081c042a58f2790aed3c4f1ced5015eb1f47b5f4e7bc15188cf3164572"
+    }
+  ],
+  "imported_libraries_identical_across_policies": [
+    {
+      "library": "dsv41flash-r2-b-rerun/r1-metric-global-named",
+      "definitions": 4,
+      "logical_sha256": "dff6598092f7f16e206facd758e5127d5885bffa9aa74b39e3198a38ac0963a3",
+      "matched_policies": [
+        "definition",
+        "definition-cache",
+        "condition"
+      ]
+    },
+    {
+      "library": "dsv41flash-r3-a/r1-metric-global-named",
+      "definitions": 4,
+      "logical_sha256": "1364d204ba7601ba0272fde6bf5215ccb05e5cb3ad8ce406214629fac02a6398",
+      "matched_policies": [
+        "definition-cache",
+        "condition",
+        "definition"
+      ]
+    },
+    {
+      "library": "dsv41flash-r1-b/r1-metric-global-named",
+      "definitions": 4,
+      "logical_sha256": "19bbd1367f2b387640ee450b332c0b4463e247a1b4252f03d48217f03c95960c",
+      "matched_policies": [
+        "definition",
+        "definition-cache",
+        "condition"
+      ]
+    }
+  ],
+  "served_models": {
+    "deepseek/deepseek-v4.1-flash": 905
+  },
+  "all_database_cleanup_confirmed": true,
+  "all_processes_exit_zero": true,
+  "completed_model_usage_matches_session_runs": true,
+  "binary_sha256": "a034a62e16a03ca7165533ba779581b64564984aa73d691b7d620bdebb2d9073",
+  "raw_archive_sha256": "4d3cd04803f29d65e8106a9b25d6867b65769fa888ca185ffb3448ff7cc60214",
+  "phase_sql_count_and_time_reconcile": true,
+  "exclusive_time_partition_reconciles": true,
+  "completion_equals_queue_plus_service": true,
+  "compiled_source_matches_workspace_files": 27
+}

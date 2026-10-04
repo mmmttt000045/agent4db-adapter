@@ -1,0 +1,138 @@
+{
+  "admission": {
+    "reason": "关联 details⋈facts 必须从事实表 facts 指向至多一行的另一侧；反向、多跳和自连接尚不支持",
+    "rejected": true,
+    "stage": "seed compilation"
+  },
+  "after": "200",
+  "before": "100",
+  "filter_identity": [
+    {
+      "expected_promoted": true,
+      "filter": "f_scope = 'A B'",
+      "result": {
+        "failed_gate": null,
+        "gates": [
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": true
+          },
+          {
+            "gate": "G5",
+            "pass": true
+          },
+          {
+            "gate": "G7",
+            "pass": true
+          }
+        ],
+        "key": "metric:literal_0",
+        "promoted": true,
+        "reason": null,
+        "revision": 0
+      }
+    },
+    {
+      "expected_promoted": false,
+      "filter": "f_scope = 'AB'",
+      "result": {
+        "failed_gate": "G4",
+        "gates": [
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": false,
+            "reason": "facts(f_id) 是否唯一 [过滤 f_scope = 'AB']：2 行只有 1 个不同键（平均每键 2.00 行）"
+          }
+        ],
+        "key": "metric:literal_1",
+        "promoted": false,
+        "reason": "facts(f_id) 是否唯一 [过滤 f_scope = 'AB']：2 行只有 1 个不同键（平均每键 2.00 行）",
+        "revision": 0
+      }
+    },
+    {
+      "expected_promoted": true,
+      "filter": "f_scope = 'ABC'",
+      "result": {
+        "failed_gate": null,
+        "gates": [
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": true
+          },
+          {
+            "gate": "G5",
+            "pass": true
+          },
+          {
+            "gate": "G7",
+            "pass": true
+          }
+        ],
+        "key": "metric:literal_2",
+        "promoted": true,
+        "reason": null,
+        "revision": 0
+      }
+    },
+    {
+      "expected_promoted": false,
+      "filter": "f_scope = 'abc'",
+      "result": {
+        "failed_gate": "G4",
+        "gates": [
+          {
+            "gate": "G3",
+            "pass": true
+          },
+          {
+            "gate": "G4",
+            "pass": false,
+            "reason": "facts(f_id) 是否唯一 [过滤 f_scope = 'abc']：2 行只有 1 个不同键（平均每键 2.00 行）"
+          }
+        ],
+        "key": "metric:literal_3",
+        "promoted": false,
+        "reason": "facts(f_id) 是否唯一 [过滤 f_scope = 'abc']：2 行只有 1 个不同键（平均每键 2.00 行）",
+        "revision": 0
+      }
+    }
+  ],
+  "gold": "100",
+  "reverse_path": {
+    "path": {
+      "evidence": [
+        "details 2 行中 2 行关联得上（0.0% 关联不上）"
+      ],
+      "filters": {},
+      "left": "details",
+      "left_unique": false,
+      "loss_ratio": 0.0,
+      "n_join": 2,
+      "n_left": 2,
+      "on": [
+        [
+          "de_fact",
+          "f_link"
+        ]
+      ],
+      "right": "facts",
+      "right_unique": true
+    },
+    "source": "explored",
+    "valid": true
+  },
+  "status": "passed"
+}

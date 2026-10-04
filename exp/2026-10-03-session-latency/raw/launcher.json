@@ -1,0 +1,83 @@
+{
+  "started_utc": "2026-10-03T07:42:01.355667+00:00",
+  "binary": "/root/agentdb-session-latency-20261003/target/release/agentdb-mid",
+  "binary_sha256": "a034a62e16a03ca7165533ba779581b64564984aa73d691b7d620bdebb2d9073",
+  "options": {
+    "binary": "target/release/agentdb-mid",
+    "sources_root": "/root/agentdb-mid/results/scen-20261002",
+    "out": "results/session-latency-20261003",
+    "jobs": 2,
+    "rows": 1000000
+  },
+  "jobs": [
+    {
+      "library": "dsv41flash-r1-b",
+      "source": "/root/agentdb-mid/results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json",
+      "snapshot": "/root/agentdb-session-latency-20261003/results/session-latency-20261003/inputs/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json",
+      "sha256": "9fb08e2113ef19eb16c543c3be82eb33f931c91d848005c967fc731be86f97f5",
+      "command": [
+        "/root/agentdb-session-latency-20261003/target/release/agentdb-mid",
+        "--pool",
+        "16",
+        "--out",
+        "/root/agentdb-session-latency-20261003/results/session-latency-20261003/dsv41flash-r1-b",
+        "session-bench",
+        "--libs",
+        "/root/agentdb-session-latency-20261003/results/session-latency-20261003/inputs/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json",
+        "--rows",
+        "1000000",
+        "--agent",
+        "cline",
+        "--order-offset",
+        "0"
+      ],
+      "log": "/root/agentdb-session-latency-20261003/results/session-latency-20261003/dsv41flash-r1-b.log"
+    },
+    {
+      "library": "dsv41flash-r2-b-rerun",
+      "source": "/root/agentdb-mid/results/scen-20261002/dsv41flash-r2-b-rerun/metric-1790918362008789/cell-r1-metric-global-named.json",
+      "snapshot": "/root/agentdb-session-latency-20261003/results/session-latency-20261003/inputs/dsv41flash-r2-b-rerun/metric-1790918362008789/cell-r1-metric-global-named.json",
+      "sha256": "92e9b5803ffd80a9d5087a92fad22226ae81726c9e7f162d738aac9b5200f0c0",
+      "command": [
+        "/root/agentdb-session-latency-20261003/target/release/agentdb-mid",
+        "--pool",
+        "16",
+        "--out",
+        "/root/agentdb-session-latency-20261003/results/session-latency-20261003/dsv41flash-r2-b-rerun",
+        "session-bench",
+        "--libs",
+        "/root/agentdb-session-latency-20261003/results/session-latency-20261003/inputs/dsv41flash-r2-b-rerun/metric-1790918362008789/cell-r1-metric-global-named.json",
+        "--rows",
+        "1000000",
+        "--agent",
+        "cline",
+        "--order-offset",
+        "1"
+      ],
+      "log": "/root/agentdb-session-latency-20261003/results/session-latency-20261003/dsv41flash-r2-b-rerun.log"
+    },
+    {
+      "library": "dsv41flash-r3-a",
+      "source": "/root/agentdb-mid/results/scen-20261002/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-named.json",
+      "snapshot": "/root/agentdb-session-latency-20261003/results/session-latency-20261003/inputs/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-named.json",
+      "sha256": "bf1360081c042a58f2790aed3c4f1ced5015eb1f47b5f4e7bc15188cf3164572",
+      "command": [
+        "/root/agentdb-session-latency-20261003/target/release/agentdb-mid",
+        "--pool",
+        "16",
+        "--out",
+        "/root/agentdb-session-latency-20261003/results/session-latency-20261003/dsv41flash-r3-a",
+        "session-bench",
+        "--libs",
+        "/root/agentdb-session-latency-20261003/results/session-latency-20261003/inputs/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-named.json",
+        "--rows",
+        "1000000",
+        "--agent",
+        "cline",
+        "--order-offset",
+        "2"
+      ],
+      "log": "/root/agentdb-session-latency-20261003/results/session-latency-20261003/dsv41flash-r3-a.log"
+    }
+  ]
+}

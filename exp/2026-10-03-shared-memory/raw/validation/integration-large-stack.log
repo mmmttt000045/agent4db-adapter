@@ -1,0 +1,11 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.24s
+     Running unittests src/main.rs (target/debug/deps/agentdb_mid-67ca4af01efeaad9)
+
+running 4 tests
+test integration_tests::postgres_change_scenarios ... ok
+test integration_tests::postgres_http_mock_lifecycle ... ok
+test integration_tests::postgres_repair_ambiguity ... ok
+test integration_tests::postgres_snapshot_binding ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 38 filtered out; finished in 2186.14s
+

@@ -1,0 +1,91 @@
+[
+  {
+    "agent_seconds": 64.446380314,
+    "chain_error": null,
+    "correct": true,
+    "db": {
+      "ms": 228.985,
+      "queries": 17
+    },
+    "error": null,
+    "extraction": {
+      "attempts": 1,
+      "errors": [],
+      "input_tokens": 1237,
+      "output_tokens": 2307,
+      "seconds": 26.445846883
+    },
+    "gold": "308496.23",
+    "memory": {
+      "condition": 4,
+      "join": 1,
+      "metric": 1,
+      "profile": 2
+    },
+    "metric": "M2",
+    "publication": {
+      "event": "promoted",
+      "failed_gate": null,
+      "gates": [
+        {
+          "gate": "G1",
+          "pass": true
+        },
+        {
+          "gate": "G2",
+          "pass": true
+        },
+        {
+          "gate": "G3",
+          "pass": true
+        },
+        {
+          "gate": "G4",
+          "pass": true
+        },
+        {
+          "gate": "G5",
+          "pass": true
+        },
+        {
+          "gate": "G6",
+          "pass": true
+        },
+        {
+          "gate": "G7",
+          "pass": true
+        }
+      ],
+      "key": "metric:门店退货金额",
+      "reason": null,
+      "revision": 0,
+      "task": "M2-L1"
+    },
+    "question": "2001 年 4 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+    "run": {
+      "answer": "308496.23",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 11658,
+      "notices": 0,
+      "output_tokens": 613,
+      "rejections": 0,
+      "seconds": 64.446305215,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 5
+      },
+      "sql": "SELECT SUM(sr.sr_return_amt) AS total_return_amt\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4;",
+      "steps": 5,
+      "tool_calls": 7,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "task": "M2-L1",
+    "total_seconds": 91.074121785,
+    "wave": 1
+  }
+]

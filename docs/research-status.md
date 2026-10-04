@@ -88,3 +88,24 @@ Only one synthetic schema is used. The scenario design has 54 cells; usage caps 
 2026-10-02 在 noctis（TeX Live 2026）用 `./build.sh all` 编译通过：英文稿 13 页（正文在第 12 页结束，其后为参考文献，未超过 12 页正文上限），双语稿 20 页。
 
 Compiled on noctis with TeX Live 2026: English 13 pages including references (body ends on page 12), bilingual 20 pages.
+
+2026-10-04（摘要与引言重写、引用核对后）在 noctis 用 `./build.sh all` 编译：英文稿 15 页，正文在第 13 页右栏约四分之一处结束，超出 12 页正文上限约 0.6 页；双语稿 23 页（CJK 字体改用 Noto，浏览器可正常显示）。
+
+Compiled on noctis on 2026-10-04 after the abstract/introduction rewrite and the citation audit: English 15 pages with the body ending about a quarter down the right column of page 13 (roughly 0.6 page over the 12-page body limit); bilingual 23 pages.
+
+## 10-03 补充实验与已回退的重构 / Supplementary experiments and the reverted restructure
+
+2026-10-03 晚曾把论文主线改写为“共享数据库知识与经验证的经验层”（标题 *Shared Database Knowledge and Verified Experience for Data Agents*）。2026-10-04 决定回退：该主线把贡献放宽到已有大量先例的共享记忆领域，而模型、命题、引理、算法和最强证据都只覆盖指标定义；新增主实验四组正确率相同，只在 token 与秒数上有差别。论文回到 `60d0783` 的主线（有效性模型、使用时的强制保证、有界修复）。重构稿 47 个源文件归档在 `exp/2026-10-03-shared-memory/overleaf-restructure-2026-10-03.tar.gz`，其验收记录见 [refactor-acceptance.md](refactor-acceptance.md)。
+
+On the evening of 2026-10-03 the paper was rewritten around a shared-memory layer; on 2026-10-04 this was reverted to the validity-maintenance main line of `60d0783`. The rewritten sources are archived, not deleted.
+
+10-03 运行的实验保留为补充证据，尚未进入正文；数值宏可用各自脚本的 `--tex-out overleaf/gen` 重新生成：
+
+| 实验 | 证据 | 结果 | 可能的用处 |
+| --- | --- | --- | --- |
+| 固定库会话耗时 | `exp/2026-10-03-session-latency/` | 三种维护方法 54/54、不共享 16/54；MAVRA 更新后首用更快，但全矩阵平均 37.68 s 对通用缓存 31.97 s，LLM 占共享方法服务时间约 99% | 已进入正文（10-04）：摘要、引言和 §7 的“代价与声明使用”段引用 `\Sl*` 宏（`gen/session-latency.tex` 从归档恢复），作为相对不共享的完成时间、轮数与 token 节省；对定义级与通用缓存的完成时间如实写出 |
+| 匹配生产者前缀的积累（S1） | `exp/2026-10-03-shared-memory/analysis/results.md` | 相同显式定义下四组均 54/54；积累比隔离输入 token 低 24.4%、结构调用低 27.7%；仅报指标名时隔离 3/12、冻结 6/12、积累与轨迹检索 12/12 | 已进入正文（10-04）：§7 “代价与声明使用”段以文字引用相同定义下的结构查找、SQL 探查和完成时间节省（3.5→2.5、0.20→0.06、13.4→9.5 s）；不能区分 MAVRA 与轨迹检索 |
+| 验证排序（S2） | 同上 `raw/results/strategy-main/` | 只排三项检查；采纳 0/3、3/3、3/3，回放代价低 0%、61.9%、37.9%，与回顾最优固定顺序相同 | 不进正文 |
+| 元数据诊断 | 同上 `raw/results/metadata-audit/` | 新智能体复用画像零探查；仅改注释与新增列在进程内不刷新，重启后更新 | 目录刷新的实现边界 |
+
+实验后代码修正（随 2026-10-04 的提交进入 main）：G3 与规范 SQL 编译要求每个非时间连接从事实表指向至多一行的另一侧，拒绝反向、自连接与多跳引用；条件身份与过滤去重改为保留字面量的保守 token 比较。两轮 S1 前缀的 25 个指标条目均满足新约束；实验时源码按原样归档。

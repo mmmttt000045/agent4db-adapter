@@ -1,0 +1,546 @@
+[
+  {
+    "agent_seconds": 11.505280087,
+    "chain_error": null,
+    "correct": true,
+    "db": {
+      "ms": 232.68099999999998,
+      "queries": 17
+    },
+    "error": null,
+    "extracted_draft": {
+      "example_sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4",
+      "metric": {
+        "aliases": [
+          "门店退货总额",
+          "退货金额"
+        ],
+        "basis": {
+          "kind": "none"
+        },
+        "caveats": [
+          "关联 store_returns 与 date_dim 无丢行（loss_ratio 0.0）",
+          "每笔退货只计一次，无需额外去重或状态过滤"
+        ],
+        "definition": "门店退货金额为门店退货明细中每笔退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间，每笔退货只计一次。",
+        "empty": "unspecified",
+        "examples": [],
+        "fact": "store_returns",
+        "filters": {},
+        "grain": [
+          "sr_ticket_number",
+          "sr_item_sk"
+        ],
+        "joins": [],
+        "measure": "sum(sr_return_amt)",
+        "name": "门店退货金额",
+        "time": {
+          "dim": "date_dim",
+          "dim_col": "d_date_sk",
+          "fact_col": "sr_returned_date_sk",
+          "grain": "day",
+          "loss_ratio": 0.0,
+          "role": "退货日期"
+        }
+      }
+    },
+    "extraction": {
+      "attempts": 1,
+      "errors": [],
+      "input_tokens": 1234,
+      "output_tokens": 2925,
+      "seconds": 12.65447033
+    },
+    "gold": "308496.23",
+    "memory": {
+      "condition": 4,
+      "join": 1,
+      "metric": 1,
+      "profile": 2
+    },
+    "metric": "M2",
+    "publication": {
+      "event": "promoted",
+      "failed_gate": null,
+      "gates": [
+        {
+          "gate": "G1",
+          "pass": true
+        },
+        {
+          "gate": "G2",
+          "pass": true
+        },
+        {
+          "gate": "G3",
+          "pass": true
+        },
+        {
+          "gate": "G4",
+          "pass": true
+        },
+        {
+          "gate": "G5",
+          "pass": true
+        },
+        {
+          "gate": "G6",
+          "pass": true
+        },
+        {
+          "gate": "G7",
+          "pass": true
+        }
+      ],
+      "key": "metric:门店退货金额",
+      "reason": null,
+      "revision": 0,
+      "task": "M2-L1"
+    },
+    "question": "2001 年 4 月的门店退货金额是多少？口径：门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次。保留两位小数。",
+    "run": {
+      "answer": "308496.23",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 15309,
+      "notices": 0,
+      "output_tokens": 1011,
+      "rejections": 0,
+      "seconds": 11.505193166,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 6
+      },
+      "sql": "SELECT SUM(sr.sr_return_amt) AS total\nFROM store_returns sr\nJOIN date_dim d ON sr.sr_returned_date_sk = d.d_date_sk\nWHERE d.d_year = 2001 AND d.d_moy = 4;",
+      "steps": 6,
+      "tool_calls": 7,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "task": "M2-L1",
+    "total_seconds": 24.337180103,
+    "wave": 1
+  },
+  {
+    "agent_seconds": 16.747331144,
+    "chain_error": null,
+    "correct": true,
+    "db": {
+      "ms": 798.075,
+      "queries": 24
+    },
+    "error": null,
+    "extracted_draft": {
+      "example_sql": "WITH sales_feb AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 2\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_feb s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (\n  SELECT sum(ss_net_paid) AS net_paid\n  FROM sales_feb\n)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale;",
+      "metric": {
+        "aliases": [
+          "退货率",
+          "门店退货比例",
+          "store return rate"
+        ],
+        "basis": {
+          "kind": "none"
+        },
+        "caveats": [
+          "退货按小票号+商品键关联 store_sales 与 store_returns；已验证该关联为 1:1，但 60.412% 的销售行没有对应退货，左连接后分子为 NULL，分母仍包含这些销售行。",
+          "直接对 store_sales 左连接 store_returns 后计算比率时，需确认每个销售行最多匹配一笔退货；若存在一对多，应像计算链一样先分别聚合退货金额和销售净支付额，避免分母被退货行放大。",
+          "时间过滤按销售日期（ss_sold_date_sk）归属期间，退货日期不参与期间限制；store_sales 到 date_dim 的关联约丢失 1.03% 的销售行。",
+          "题面未要求按 sr_status 过滤，示例未过滤退货状态。",
+          "题面未说明无数据时返回 0 还是 NULL，示例按 NULL 处理。"
+        ],
+        "definition": "按销售日期归属期间，期间内售出的门店销售行所对应退货金额之和除以这些销售行净支付额之和，再乘以100；退货按小票号和商品键与销售行对应，每笔退货只计一次。",
+        "empty": "unspecified",
+        "examples": [],
+        "fact": "store_sales",
+        "filters": {},
+        "grain": [
+          "ss_ticket_number",
+          "ss_item_sk"
+        ],
+        "joins": [
+          {
+            "cardinality": "",
+            "filters": {},
+            "key": "",
+            "kind": "left",
+            "left": "store_sales",
+            "loss_ratio": 0.0,
+            "on": [
+              [
+                "ss_ticket_number",
+                "sr_ticket_number"
+              ],
+              [
+                "ss_item_sk",
+                "sr_item_sk"
+              ]
+            ],
+            "revision": 0,
+            "right": "store_returns"
+          }
+        ],
+        "measure": "sum(store_returns.sr_return_amt) / sum(store_sales.ss_net_paid) * 100",
+        "name": "门店退货率",
+        "time": {
+          "dim": "date_dim",
+          "dim_col": "d_date_sk",
+          "fact_col": "ss_sold_date_sk",
+          "grain": "day",
+          "loss_ratio": 0.0,
+          "role": "销售日期"
+        }
+      }
+    },
+    "extraction": {
+      "attempts": 1,
+      "errors": [],
+      "input_tokens": 2010,
+      "output_tokens": 9958,
+      "seconds": 42.602569415
+    },
+    "gold": "23.5969324016021622",
+    "memory": {
+      "condition": 13,
+      "join": 3,
+      "metric": 2,
+      "profile": 3
+    },
+    "metric": "M3",
+    "publication": {
+      "event": "promoted",
+      "failed_gate": null,
+      "gates": [
+        {
+          "gate": "G1",
+          "pass": true
+        },
+        {
+          "gate": "G2",
+          "pass": true
+        },
+        {
+          "gate": "G3",
+          "pass": true
+        },
+        {
+          "gate": "G4",
+          "pass": true
+        },
+        {
+          "gate": "G5",
+          "pass": true
+        },
+        {
+          "gate": "G6",
+          "pass": true
+        },
+        {
+          "gate": "G7",
+          "pass": true
+        }
+      ],
+      "key": "metric:门店退货率",
+      "reason": null,
+      "revision": 0,
+      "task": "M3-L1"
+    },
+    "question": "2001 年 2 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+    "run": {
+      "answer": "23.60",
+      "clarification": null,
+      "derivation": "r2",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 20923,
+      "notices": 0,
+      "output_tokens": 2663,
+      "rejections": 0,
+      "seconds": 16.747223643,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 6
+      },
+      "sql": "WITH sales_feb AS (\n  SELECT ss.ss_ticket_number, ss.ss_item_sk, ss.ss_net_paid\n  FROM store_sales ss\n  JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\n  WHERE d.d_year = 2001 AND d.d_moy = 2\n),\nret AS (\n  SELECT sum(sr.sr_return_amt) AS return_amt\n  FROM store_returns sr\n  JOIN sales_feb s\n    ON sr.sr_ticket_number = s.ss_ticket_number\n   AND sr.sr_item_sk = s.ss_item_sk\n),\nsale AS (SELECT sum(ss_net_paid) AS net_paid FROM sales_feb)\nSELECT round(ret.return_amt / sale.net_paid * 100, 2) AS return_rate_pct\nFROM ret, sale;",
+      "steps": 6,
+      "tool_calls": 9,
+      "tool_errors": 0,
+      "used": [
+        "r2"
+      ]
+    },
+    "task": "M3-L1",
+    "total_seconds": 59.817984776,
+    "wave": 2
+  },
+  {
+    "agent_seconds": 9.089702157,
+    "chain_error": null,
+    "correct": true,
+    "db": {
+      "ms": 530.5419999999999,
+      "queries": 15
+    },
+    "error": null,
+    "extracted_draft": {
+      "example_sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN item i ON ss.ss_item_sk = i.i_item_sk\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE i.i_category = '电子'\n  AND d.d_year = 2001\n  AND d.d_moy = 1;",
+      "metric": {
+        "aliases": [],
+        "basis": {
+          "kind": "none"
+        },
+        "caveats": [
+          "原计算链未额外过滤 item.i_is_current；若 item 维度包含历史版本，则“当前类别”可能需要按业务确认是否补加该条件。",
+          "与 date_dim 内连接的整体丢行比例约 1.03%（ss_sold_date_sk 无匹配日期维度），计算时沿用内连接。",
+          "题面要求保留两位小数，最终 SQL 使用 ROUND(SUM(...), 2)。",
+          "无数据时 SUM 返回 NULL，题面未说明按 0 处理。"
+        ],
+        "definition": "电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。",
+        "empty": "unspecified",
+        "examples": [],
+        "fact": "store_sales",
+        "filters": {
+          "item": "i_category = '电子'"
+        },
+        "grain": [
+          "ss_ticket_number",
+          "ss_item_sk"
+        ],
+        "joins": [
+          {
+            "cardinality": "",
+            "filters": {},
+            "key": "",
+            "kind": "inner",
+            "left": "store_sales",
+            "loss_ratio": 0.0,
+            "on": [
+              [
+                "ss_item_sk",
+                "i_item_sk"
+              ]
+            ],
+            "revision": 0,
+            "right": "item"
+          }
+        ],
+        "measure": "sum(ss_net_paid)",
+        "name": "电子品类门店营业额",
+        "time": {
+          "dim": "date_dim",
+          "dim_col": "d_date_sk",
+          "fact_col": "ss_sold_date_sk",
+          "grain": "day",
+          "loss_ratio": 0.0,
+          "role": "销售日"
+        }
+      }
+    },
+    "extraction": {
+      "attempts": 1,
+      "errors": [],
+      "input_tokens": 1614,
+      "output_tokens": 4469,
+      "seconds": 20.984243908
+    },
+    "gold": "273265.40",
+    "memory": {
+      "condition": 16,
+      "join": 4,
+      "metric": 3,
+      "profile": 4
+    },
+    "metric": "M5",
+    "publication": {
+      "event": "promoted",
+      "failed_gate": null,
+      "gates": [
+        {
+          "gate": "G1",
+          "pass": true
+        },
+        {
+          "gate": "G2",
+          "pass": true
+        },
+        {
+          "gate": "G3",
+          "pass": true
+        },
+        {
+          "gate": "G4",
+          "pass": true
+        },
+        {
+          "gate": "G5",
+          "pass": true
+        },
+        {
+          "gate": "G6",
+          "pass": true
+        },
+        {
+          "gate": "G7",
+          "pass": true
+        }
+      ],
+      "key": "metric:电子品类门店营业额",
+      "reason": null,
+      "revision": 0,
+      "task": "M5-L1"
+    },
+    "question": "2001 年 1 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+    "run": {
+      "answer": "273265.40",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 13627,
+      "notices": 0,
+      "output_tokens": 850,
+      "rejections": 0,
+      "seconds": 9.089578117,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 5
+      },
+      "sql": null,
+      "steps": 5,
+      "tool_calls": 9,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "task": "M5-L1",
+    "total_seconds": 30.55021696,
+    "wave": 3
+  },
+  {
+    "agent_seconds": 7.713021326,
+    "chain_error": null,
+    "correct": true,
+    "db": {
+      "ms": 474.9209999999998,
+      "queries": 9
+    },
+    "error": null,
+    "extracted_draft": {
+      "example_sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\n  AND d.d_moy = 3",
+      "metric": {
+        "aliases": [
+          "门店净支付额",
+          "门店销售净额"
+        ],
+        "basis": {
+          "kind": "none"
+        },
+        "caveats": [
+          "store_sales 到 date_dim 的关联为 INNER JOIN，会丢弃约 1.03% 的 store_sales 行（ss_sold_date_sk 为 NULL 或无匹配日期）；本口径按销售日期归属期间，这些行无法归入任何期间。",
+          "题面未说明无数据时的返回口径，按未指定处理。",
+          "计算时不应额外过滤 ss_is_current 等状态列，题面口径未要求。"
+        ],
+        "definition": "门店销售明细行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。",
+        "empty": "unspecified",
+        "examples": [],
+        "fact": "store_sales",
+        "filters": {},
+        "grain": [
+          "ss_ticket_number",
+          "ss_item_sk"
+        ],
+        "joins": [],
+        "measure": "sum(ss_net_paid)",
+        "name": "门店营业额",
+        "time": {
+          "dim": "date_dim",
+          "dim_col": "d_date_sk",
+          "fact_col": "ss_sold_date_sk",
+          "grain": "day",
+          "loss_ratio": 0.0,
+          "role": "销售日"
+        }
+      }
+    },
+    "extraction": {
+      "attempts": 1,
+      "errors": [],
+      "input_tokens": 1342,
+      "output_tokens": 1602,
+      "seconds": 7.603789171
+    },
+    "gold": "1354893.40",
+    "memory": {
+      "condition": 16,
+      "join": 4,
+      "metric": 4,
+      "profile": 4
+    },
+    "metric": "M1",
+    "publication": {
+      "event": "promoted",
+      "failed_gate": null,
+      "gates": [
+        {
+          "gate": "G1",
+          "pass": true
+        },
+        {
+          "gate": "G2",
+          "pass": true
+        },
+        {
+          "gate": "G3",
+          "pass": true
+        },
+        {
+          "gate": "G4",
+          "pass": true
+        },
+        {
+          "gate": "G5",
+          "pass": true
+        },
+        {
+          "gate": "G6",
+          "pass": true
+        },
+        {
+          "gate": "G7",
+          "pass": true
+        }
+      ],
+      "key": "metric:门店营业额",
+      "reason": null,
+      "revision": 0,
+      "task": "M1-L1"
+    },
+    "question": "2001 年 3 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "run": {
+      "answer": "1354893.40",
+      "clarification": null,
+      "derivation": "r1",
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 11664,
+      "notices": 0,
+      "output_tokens": 900,
+      "rejections": 0,
+      "seconds": 7.7129230060000005,
+      "served_models": {
+        "deepseek/deepseek-v4.1-flash": 4
+      },
+      "sql": "SELECT ROUND(SUM(ss.ss_net_paid), 2) AS net_paid_sum\nFROM store_sales ss\nJOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk\nWHERE d.d_year = 2001\n  AND d.d_moy = 3",
+      "steps": 4,
+      "tool_calls": 7,
+      "tool_errors": 0,
+      "used": [
+        "r1"
+      ]
+    },
+    "task": "M1-L1",
+    "total_seconds": 15.78131056,
+    "wave": 4
+  }
+]

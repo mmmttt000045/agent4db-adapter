@@ -1,0 +1,76 @@
+[
+  {
+    "agent_seconds": 119.298008558,
+    "chain_error": null,
+    "correct": false,
+    "db": {
+      "ms": 0.0,
+      "queries": 0
+    },
+    "error": "15 轮内没有拿到 deepseek/deepseek-v4.1-flash 的回复（丢弃 15 个；最后：服务端回报模型 ?）",
+    "extraction": null,
+    "gold": "137408.00",
+    "memory": {},
+    "metric": "M1",
+    "publication": null,
+    "question": "2001 年 3 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "run": {
+      "answer": null,
+      "clarification": null,
+      "derivation": null,
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 0,
+      "notices": 0,
+      "output_tokens": 0,
+      "rejections": 0,
+      "seconds": 0.0,
+      "served_models": {},
+      "sql": null,
+      "steps": 0,
+      "tool_calls": 0,
+      "tool_errors": 0,
+      "used": []
+    },
+    "task": "M1-L1",
+    "total_seconds": 119.298023528,
+    "wave": 1
+  },
+  {
+    "agent_seconds": 94.807604775,
+    "chain_error": null,
+    "correct": false,
+    "db": {
+      "ms": 0.0,
+      "queries": 0
+    },
+    "error": "15 轮内没有拿到 deepseek/deepseek-v4.1-flash 的回复（丢弃 15 个；最后：服务端回报模型 ?）",
+    "extraction": null,
+    "gold": "129300.20",
+    "memory": {},
+    "metric": "M1",
+    "publication": null,
+    "question": "2000 年 11 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "run": {
+      "answer": null,
+      "clarification": null,
+      "derivation": null,
+      "discarded_replies": 0,
+      "discarded_tokens": 0,
+      "input_tokens": 0,
+      "notices": 0,
+      "output_tokens": 0,
+      "rejections": 0,
+      "seconds": 0.0,
+      "served_models": {},
+      "sql": null,
+      "steps": 0,
+      "tool_calls": 0,
+      "tool_errors": 0,
+      "used": []
+    },
+    "task": "M1-L2",
+    "total_seconds": 94.807620375,
+    "wave": 1
+  }
+]

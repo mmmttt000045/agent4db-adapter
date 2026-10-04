@@ -1,0 +1,966 @@
+{
+  "candidates": [
+    {
+      "filter": "sr_source = 'primary'",
+      "keys": "79176",
+      "metrics": [
+        {
+          "asks": [
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 9,
+                  "m2": 9,
+                  "year": 2002
+                }
+              },
+              "gold": "622531.03",
+              "ok": true,
+              "value": "622531.03"
+            },
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 5,
+                  "m2": 5,
+                  "year": 2002
+                }
+              },
+              "gold": "647266.55",
+              "ok": true,
+              "value": "647266.55"
+            },
+            {
+              "ask": {
+                "kind": "rank_month",
+                "year": 2002
+              },
+              "gold": "12",
+              "ok": true,
+              "value": "12"
+            },
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 6,
+                  "m2": 6,
+                  "year": 2001
+                }
+              },
+              "gold": "619063.02",
+              "ok": true,
+              "value": "619063.02"
+            }
+          ],
+          "g8": {
+            "judge": "1339728.60",
+            "pass": false,
+            "value": "669864.30"
+          },
+          "metric": "M2"
+        },
+        {
+          "asks": [
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 9,
+                  "m2": 9,
+                  "year": 2002
+                }
+              },
+              "gold": "23.6984821037088219",
+              "ok": true,
+              "value": "23.6984821037088219"
+            },
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 5,
+                  "m2": 5,
+                  "year": 2002
+                }
+              },
+              "gold": "23.8339793634025923",
+              "ok": true,
+              "value": "23.8339793634025923"
+            },
+            {
+              "ask": {
+                "kind": "rank_month",
+                "year": 2002
+              },
+              "gold": "1",
+              "ok": true,
+              "value": "1"
+            },
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 6,
+                  "m2": 6,
+                  "year": 2001
+                }
+              },
+              "gold": "23.7986468047999125",
+              "ok": true,
+              "value": "23.7986468047999125"
+            }
+          ],
+          "g8": {
+            "judge": "47.6071803115754029",
+            "pass": false,
+            "value": "23.8035901557877015"
+          },
+          "metric": "M3"
+        }
+      ],
+      "repair_test_passes": true,
+      "rows": "79176",
+      "total_keys": "79176"
+    },
+    {
+      "filter": "sr_source = 'backup'",
+      "keys": "79176",
+      "metrics": [
+        {
+          "asks": [
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 9,
+                  "m2": 9,
+                  "year": 2002
+                }
+              },
+              "gold": "622531.03",
+              "ok": false,
+              "value": "622749.03"
+            },
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 5,
+                  "m2": 5,
+                  "year": 2002
+                }
+              },
+              "gold": "647266.55",
+              "ok": false,
+              "value": "647494.55"
+            },
+            {
+              "ask": {
+                "kind": "rank_month",
+                "year": 2002
+              },
+              "gold": "12",
+              "ok": true,
+              "value": "12"
+            },
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 6,
+                  "m2": 6,
+                  "year": 2001
+                }
+              },
+              "gold": "619063.02",
+              "ok": true,
+              "value": "619063.02"
+            }
+          ],
+          "g8": {
+            "judge": "1339728.60",
+            "pass": false,
+            "value": "669864.30"
+          },
+          "metric": "M2"
+        },
+        {
+          "asks": [
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 9,
+                  "m2": 9,
+                  "year": 2002
+                }
+              },
+              "gold": "23.6984821037088219",
+              "ok": false,
+              "value": "23.7067643615213204"
+            },
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 5,
+                  "m2": 5,
+                  "year": 2002
+                }
+              },
+              "gold": "23.8339793634025923",
+              "ok": false,
+              "value": "23.8424110681657104"
+            },
+            {
+              "ask": {
+                "kind": "rank_month",
+                "year": 2002
+              },
+              "gold": "1",
+              "ok": true,
+              "value": "1"
+            },
+            {
+              "ask": {
+                "kind": "single",
+                "period": {
+                  "m1": 6,
+                  "m2": 6,
+                  "year": 2001
+                }
+              },
+              "gold": "23.7986468047999125",
+              "ok": true,
+              "value": "23.7986468047999125"
+            }
+          ],
+          "g8": {
+            "judge": "47.6071803115754029",
+            "pass": false,
+            "value": "23.8035901557877015"
+          },
+          "metric": "M3"
+        }
+      ],
+      "repair_test_passes": true,
+      "rows": "79176",
+      "total_keys": "79176"
+    }
+  ],
+  "change": "2002 年小票号尾数为 3 的退货金额更正减 1；另写入整份退货备份副本（sr_source = 'backup'），被更正的行在副本里仍是旧金额",
+  "learn": {
+    "m1": 3,
+    "m2": 3,
+    "year": 2001
+  },
+  "precolumn_variant": {
+    "candidates": [
+      {
+        "filter": "sr_source = 'primary'",
+        "metrics": [
+          {
+            "canonical": "669864.30",
+            "g8_anticipated": true,
+            "g8_stored_answer": true,
+            "g8_unanticipated": false,
+            "metric": "M2"
+          },
+          {
+            "canonical": "23.8035901557877015",
+            "g8_anticipated": true,
+            "g8_stored_answer": true,
+            "g8_unanticipated": false,
+            "metric": "M3"
+          }
+        ]
+      },
+      {
+        "filter": "sr_source = 'backup'",
+        "metrics": [
+          {
+            "canonical": "669864.30",
+            "g8_anticipated": true,
+            "g8_stored_answer": true,
+            "g8_unanticipated": false,
+            "metric": "M2"
+          },
+          {
+            "canonical": "23.8035901557877015",
+            "g8_anticipated": true,
+            "g8_stored_answer": true,
+            "g8_unanticipated": false,
+            "metric": "M3"
+          }
+        ]
+      }
+    ],
+    "runs": [
+      {
+        "events": [
+          {
+            "agent": "B",
+            "event": "revoked",
+            "key": "metric:门店退货金额",
+            "policy": "condition",
+            "reason": "粒度守卫失败：store_returns(sr_item_sk, sr_ticket_number) 是否唯一，158352 行只有 79176 个不同键（平均每键 2.00 行）",
+            "reextract": false,
+            "revision": 0
+          },
+          {
+            "change": "store_returns 增加粒度过滤 sr_source = 'backup'",
+            "event": "repair_candidate",
+            "key": "metric:门店退货金额",
+            "revision": 1
+          },
+          {
+            "event": "repair_rejected",
+            "failed_gate": "G8",
+            "gates": [
+              {
+                "gate": "G3",
+                "pass": true
+              },
+              {
+                "gate": "G4",
+                "pass": true
+              },
+              {
+                "gate": "G5",
+                "pass": true
+              },
+              {
+                "gate": "G8",
+                "pass": false,
+                "reason": "结果 669864.30 与期望 Num(1339728.6) 不一致"
+              }
+            ],
+            "key": "metric:门店退货金额",
+            "reason": "结果 669864.30 与期望 Num(1339728.6) 不一致",
+            "revision": 1
+          },
+          {
+            "agent": "B",
+            "event": "revoked",
+            "key": "metric:门店退货率",
+            "policy": "condition",
+            "reason": "关联 store_sales⋈store_returns 的已验证路径现在要求过滤 {\"store_returns\": \"sr_source = 'backup'\"}",
+            "reextract": false,
+            "revision": 0
+          },
+          {
+            "change": "关联 store_sales⋈store_returns 采用重验证路径的过滤 {\"store_returns\": \"sr_source = 'backup'\"}",
+            "event": "repair_candidate",
+            "key": "metric:门店退货率",
+            "revision": 1
+          },
+          {
+            "event": "repair_rejected",
+            "failed_gate": "G8",
+            "gates": [
+              {
+                "gate": "G3",
+                "pass": true
+              },
+              {
+                "gate": "G4",
+                "pass": true
+              },
+              {
+                "gate": "G5",
+                "pass": true
+              },
+              {
+                "gate": "G8",
+                "pass": false,
+                "reason": "结果 23.8035901557877015 与期望 Num(47.607180311575405) 不一致"
+              }
+            ],
+            "key": "metric:门店退货率",
+            "reason": "结果 23.8035901557877015 与期望 Num(47.607180311575405) 不一致",
+            "revision": 1
+          }
+        ],
+        "oracle": "unanticipated",
+        "repair_unique": false,
+        "served": [
+          {
+            "metric": "M2",
+            "status": "unavailable"
+          },
+          {
+            "metric": "M3",
+            "status": "unavailable"
+          }
+        ]
+      },
+      {
+        "events": [
+          {
+            "agent": "B",
+            "event": "revoked",
+            "key": "metric:门店退货金额",
+            "policy": "condition",
+            "reason": "粒度守卫失败：store_returns(sr_item_sk, sr_ticket_number) 是否唯一，158352 行只有 79176 个不同键（平均每键 2.00 行）",
+            "reextract": false,
+            "revision": 0
+          },
+          {
+            "event": "repair_failed",
+            "key": "metric:门店退货金额",
+            "reason": "多个过滤都能恢复唯一性，结构上分不出哪个对：sr_source = 'backup'；sr_source = 'primary'",
+            "revision": 0
+          },
+          {
+            "agent": "B",
+            "event": "revoked",
+            "key": "metric:门店退货率",
+            "policy": "condition",
+            "reason": "关联 store_sales⋈store_returns 不再成立：store_returns(sr_ticket_number, sr_item_sk) 是否唯一：158352 行只有 79176 个不同键（平均每键 2.00 行）",
+            "reextract": false,
+            "revision": 0
+          },
+          {
+            "event": "repair_skipped",
+            "key": "metric:门店退货率",
+            "reason": "不属于受限修复范围：关联 store_sales⋈store_returns 不再成立：store_returns(sr_ticket_number, sr_item_sk) 是否唯一：158352 行只有 79176 个不同键（平均每键 2.00 行）",
+            "revision": 0
+          }
+        ],
+        "oracle": "unanticipated",
+        "repair_unique": true,
+        "served": [
+          {
+            "metric": "M2",
+            "status": "unavailable"
+          },
+          {
+            "metric": "M3",
+            "status": "unavailable"
+          }
+        ]
+      },
+      {
+        "events": [
+          {
+            "agent": "B",
+            "event": "revoked",
+            "key": "metric:门店退货金额",
+            "policy": "condition",
+            "reason": "粒度守卫失败：store_returns(sr_item_sk, sr_ticket_number) 是否唯一，158352 行只有 79176 个不同键（平均每键 2.00 行）",
+            "reextract": false,
+            "revision": 0
+          },
+          {
+            "change": "store_returns 增加粒度过滤 sr_source = 'backup'",
+            "event": "repair_candidate",
+            "key": "metric:门店退货金额",
+            "revision": 1
+          },
+          {
+            "event": "repair_promoted",
+            "failed_gate": null,
+            "gates": [
+              {
+                "gate": "G3",
+                "pass": true
+              },
+              {
+                "gate": "G4",
+                "pass": true
+              },
+              {
+                "gate": "G5",
+                "pass": true
+              },
+              {
+                "gate": "G8",
+                "pass": true
+              }
+            ],
+            "key": "metric:门店退货金额",
+            "reason": null,
+            "revision": 1
+          },
+          {
+            "agent": "B",
+            "event": "revoked",
+            "key": "metric:门店退货率",
+            "policy": "condition",
+            "reason": "关联 store_sales⋈store_returns 的已验证路径现在要求过滤 {\"store_returns\": \"sr_source = 'backup'\"}",
+            "reextract": false,
+            "revision": 0
+          },
+          {
+            "change": "关联 store_sales⋈store_returns 采用重验证路径的过滤 {\"store_returns\": \"sr_source = 'backup'\"}",
+            "event": "repair_candidate",
+            "key": "metric:门店退货率",
+            "revision": 1
+          },
+          {
+            "event": "repair_promoted",
+            "failed_gate": null,
+            "gates": [
+              {
+                "gate": "G3",
+                "pass": true
+              },
+              {
+                "gate": "G4",
+                "pass": true
+              },
+              {
+                "gate": "G5",
+                "pass": true
+              },
+              {
+                "gate": "G8",
+                "pass": true
+              }
+            ],
+            "key": "metric:门店退货率",
+            "reason": null,
+            "revision": 1
+          }
+        ],
+        "oracle": "anticipated",
+        "repair_unique": false,
+        "served": [
+          {
+            "asks_ok": [
+              false,
+              false,
+              true,
+              true
+            ],
+            "filters": {
+              "store_returns": "sr_source = 'backup'"
+            },
+            "join_filters": [],
+            "metric": "M2",
+            "revision": 1,
+            "status": "valid"
+          },
+          {
+            "asks_ok": [
+              false,
+              false,
+              true,
+              true
+            ],
+            "filters": {},
+            "join_filters": [
+              {
+                "store_returns": "sr_source = 'backup'"
+              }
+            ],
+            "metric": "M3",
+            "revision": 1,
+            "status": "valid"
+          }
+        ]
+      },
+      {
+        "events": [
+          {
+            "agent": "B",
+            "event": "revoked",
+            "key": "metric:门店退货金额",
+            "policy": "condition",
+            "reason": "粒度守卫失败：store_returns(sr_item_sk, sr_ticket_number) 是否唯一，158352 行只有 79176 个不同键（平均每键 2.00 行）",
+            "reextract": false,
+            "revision": 0
+          },
+          {
+            "event": "repair_failed",
+            "key": "metric:门店退货金额",
+            "reason": "多个过滤都能恢复唯一性，结构上分不出哪个对：sr_source = 'backup'；sr_source = 'primary'",
+            "revision": 0
+          },
+          {
+            "agent": "B",
+            "event": "revoked",
+            "key": "metric:门店退货率",
+            "policy": "condition",
+            "reason": "关联 store_sales⋈store_returns 不再成立：store_returns(sr_ticket_number, sr_item_sk) 是否唯一：158352 行只有 79176 个不同键（平均每键 2.00 行）",
+            "reextract": false,
+            "revision": 0
+          },
+          {
+            "event": "repair_skipped",
+            "key": "metric:门店退货率",
+            "reason": "不属于受限修复范围：关联 store_sales⋈store_returns 不再成立：store_returns(sr_ticket_number, sr_item_sk) 是否唯一：158352 行只有 79176 个不同键（平均每键 2.00 行）",
+            "revision": 0
+          }
+        ],
+        "oracle": "anticipated",
+        "repair_unique": true,
+        "served": [
+          {
+            "metric": "M2",
+            "status": "unavailable"
+          },
+          {
+            "metric": "M3",
+            "status": "unavailable"
+          }
+        ]
+      }
+    ]
+  },
+  "rows": 200000,
+  "runs": [
+    {
+      "events": [
+        {
+          "agent": "B",
+          "event": "revoked",
+          "key": "metric:门店退货金额",
+          "policy": "condition",
+          "reason": "粒度守卫失败：store_returns(sr_item_sk, sr_ticket_number) 是否唯一，158352 行只有 79176 个不同键（平均每键 2.00 行）",
+          "reextract": false,
+          "revision": 0
+        },
+        {
+          "event": "repair_failed",
+          "key": "metric:门店退货金额",
+          "reason": "多个过滤都能恢复唯一性，结构上分不出哪个对：sr_source = 'backup'；sr_source = 'primary'",
+          "revision": 0
+        },
+        {
+          "agent": "B",
+          "changed": [
+            "store_returns"
+          ],
+          "conditions": [
+            {
+              "action": "skipped",
+              "cond": "时间关联 store_returns⋈date_dim",
+              "tables": [
+                "date_dim"
+              ]
+            },
+            {
+              "action": "executed",
+              "baseline": 0.0,
+              "cond": "覆盖 store_returns⋈date_dim",
+              "loss": 0.0,
+              "ms": 62.002348999999995,
+              "pass": true,
+              "tables": [
+                "store_returns",
+                "date_dim"
+              ]
+            },
+            {
+              "action": "executed",
+              "cond": "粒度 store_returns(sr_item_sk, sr_ticket_number) 是否唯一",
+              "ms": 707.597703,
+              "pass": false,
+              "tables": [
+                "store_returns"
+              ]
+            }
+          ],
+          "db": {
+            "by_kind": {
+              "check": [
+                0,
+                0.0
+              ],
+              "exec": [
+                0,
+                0.0
+              ],
+              "guard": [
+                0,
+                0.0
+              ],
+              "meta": [
+                5,
+                12.25
+              ],
+              "metric": [
+                2,
+                769.287
+              ],
+              "probe": [
+                0,
+                0.0
+              ],
+              "repair": [
+                5,
+                4465.384
+              ]
+            },
+            "ms": 5246.921,
+            "queries": 12
+          },
+          "event": "maintenance",
+          "key": "metric:门店退货金额",
+          "outcome": "revoked",
+          "policy": "condition",
+          "revision": 0,
+          "wall_ms": 5252.872593
+        },
+        {
+          "agent": "B",
+          "event": "revoked",
+          "key": "metric:门店退货率",
+          "policy": "condition",
+          "reason": "关联 store_sales⋈store_returns 不再成立：store_returns(sr_ticket_number, sr_item_sk) 是否唯一：158352 行只有 79176 个不同键（平均每键 2.00 行）",
+          "reextract": false,
+          "revision": 0
+        },
+        {
+          "event": "repair_skipped",
+          "key": "metric:门店退货率",
+          "reason": "不属于受限修复范围：关联 store_sales⋈store_returns 不再成立：store_returns(sr_ticket_number, sr_item_sk) 是否唯一：158352 行只有 79176 个不同键（平均每键 2.00 行）",
+          "revision": 0
+        },
+        {
+          "agent": "B",
+          "changed": [
+            "store_returns"
+          ],
+          "conditions": [
+            {
+              "action": "checked",
+              "cond": "关联 store_sales⋈store_returns",
+              "pass": false,
+              "source": "revalidated"
+            }
+          ],
+          "db": {
+            "by_kind": {
+              "check": [
+                3,
+                863.9130000000001
+              ],
+              "exec": [
+                0,
+                0.0
+              ],
+              "guard": [
+                0,
+                0.0
+              ],
+              "meta": [
+                10,
+                21.658
+              ],
+              "metric": [
+                0,
+                0.0
+              ],
+              "probe": [
+                0,
+                0.0
+              ],
+              "repair": [
+                5,
+                4346.894
+              ]
+            },
+            "ms": 5232.464999999998,
+            "queries": 18
+          },
+          "event": "maintenance",
+          "key": "metric:门店退货率",
+          "outcome": "revoked",
+          "policy": "condition",
+          "revision": 0,
+          "wall_ms": 5240.14517
+        }
+      ],
+      "maint": "condition",
+      "served": [
+        {
+          "metric": "M2",
+          "status": "unavailable"
+        },
+        {
+          "metric": "M3",
+          "status": "unavailable"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "agent": "B",
+          "event": "revoked",
+          "key": "metric:门店退货金额",
+          "policy": "definition",
+          "reason": "粒度守卫失败：store_returns(sr_item_sk, sr_ticket_number) 是否唯一，158352 行只有 79176 个不同键（平均每键 2.00 行）",
+          "reextract": false,
+          "revision": 0
+        },
+        {
+          "event": "repair_failed",
+          "key": "metric:门店退货金额",
+          "reason": "多个过滤都能恢复唯一性，结构上分不出哪个对：sr_source = 'backup'；sr_source = 'primary'",
+          "revision": 0
+        },
+        {
+          "agent": "B",
+          "changed": [
+            "store_returns"
+          ],
+          "conditions": [
+            {
+              "action": "forced",
+              "cond": "时间关联 store_returns⋈date_dim",
+              "pass": true,
+              "source": "reused"
+            },
+            {
+              "action": "executed",
+              "baseline": 0.0,
+              "cond": "覆盖 store_returns⋈date_dim",
+              "loss": 0.0,
+              "ms": 66.034647,
+              "pass": true,
+              "tables": [
+                "store_returns",
+                "date_dim"
+              ]
+            },
+            {
+              "action": "executed",
+              "cond": "粒度 store_returns(sr_item_sk, sr_ticket_number) 是否唯一",
+              "ms": 718.668804,
+              "pass": false,
+              "tables": [
+                "store_returns"
+              ]
+            }
+          ],
+          "db": {
+            "by_kind": {
+              "check": [
+                0,
+                0.0
+              ],
+              "exec": [
+                0,
+                0.0
+              ],
+              "guard": [
+                1,
+                0.746
+              ],
+              "meta": [
+                5,
+                11.36
+              ],
+              "metric": [
+                2,
+                784.4559999999999
+              ],
+              "probe": [
+                0,
+                0.0
+              ],
+              "repair": [
+                5,
+                4425.586
+              ]
+            },
+            "ms": 5222.148,
+            "queries": 13
+          },
+          "event": "maintenance",
+          "key": "metric:门店退货金额",
+          "outcome": "revoked",
+          "policy": "definition",
+          "revision": 0,
+          "wall_ms": 5228.088882999999
+        },
+        {
+          "agent": "B",
+          "event": "revoked",
+          "key": "metric:门店退货率",
+          "policy": "definition",
+          "reason": "关联 store_sales⋈store_returns 不再成立：store_returns(sr_ticket_number, sr_item_sk) 是否唯一：158352 行只有 79176 个不同键（平均每键 2.00 行）",
+          "reextract": false,
+          "revision": 0
+        },
+        {
+          "event": "repair_skipped",
+          "key": "metric:门店退货率",
+          "reason": "不属于受限修复范围：关联 store_sales⋈store_returns 不再成立：store_returns(sr_ticket_number, sr_item_sk) 是否唯一：158352 行只有 79176 个不同键（平均每键 2.00 行）",
+          "revision": 0
+        },
+        {
+          "agent": "B",
+          "changed": [
+            "store_returns"
+          ],
+          "conditions": [
+            {
+              "action": "forced",
+              "cond": "关联 store_sales⋈store_returns",
+              "pass": false,
+              "source": "revalidated"
+            }
+          ],
+          "db": {
+            "by_kind": {
+              "check": [
+                0,
+                0.0
+              ],
+              "exec": [
+                0,
+                0.0
+              ],
+              "guard": [
+                1,
+                694.323
+              ],
+              "meta": [
+                5,
+                11.652999999999992
+              ],
+              "metric": [
+                0,
+                0.0
+              ],
+              "probe": [
+                0,
+                0.0
+              ],
+              "repair": [
+                5,
+                4401.96
+              ]
+            },
+            "ms": 5107.936,
+            "queries": 11
+          },
+          "event": "maintenance",
+          "key": "metric:门店退货率",
+          "outcome": "revoked",
+          "policy": "definition",
+          "revision": 0,
+          "wall_ms": 5112.938365
+        }
+      ],
+      "maint": "definition",
+      "served": [
+        {
+          "metric": "M2",
+          "status": "unavailable"
+        },
+        {
+          "metric": "M3",
+          "status": "unavailable"
+        }
+      ]
+    }
+  ]
+}

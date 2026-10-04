@@ -1,0 +1,483 @@
+{
+  "checked_entries": 25,
+  "all_pass": true,
+  "scope": "All metric entries, including unpublished candidates, in six final S1 checkpoints. Experiments used the archived earlier binary; final guard was added afterward.",
+  "entries": [
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-1/memory-1791045812477151/prefix-4.json",
+      "key": "G|metric:电子品类门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "N:1",
+          "filters": {},
+          "key": "join:item|store_sales",
+          "kind": "inner",
+          "left": "store_sales",
+          "loss_ratio": 0.0,
+          "on": [
+            [
+              "ss_item_sk",
+              "i_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "item"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-1/memory-1791045812477151/prefix-4.json",
+      "key": "G|metric:门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-1/memory-1791045812477151/prefix-4.json",
+      "key": "G|metric:门店退货率",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "1:1",
+          "filters": {},
+          "key": "join:store_returns|store_sales",
+          "kind": "left",
+          "left": "store_sales",
+          "loss_ratio": 0.60412,
+          "on": [
+            [
+              "ss_ticket_number",
+              "sr_ticket_number"
+            ],
+            [
+              "ss_item_sk",
+              "sr_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "store_returns"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-1/memory-1791045812477151/prefix-4.json",
+      "key": "G|metric:门店退货金额",
+      "fact": "store_returns",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-2/memory-1791045812477875/prefix-4.json",
+      "key": "G|metric:电子品类门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "N:1",
+          "filters": {},
+          "key": "join:item|store_sales",
+          "kind": "inner",
+          "left": "store_sales",
+          "loss_ratio": 0.0,
+          "on": [
+            [
+              "ss_item_sk",
+              "i_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "item"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-2/memory-1791045812477875/prefix-4.json",
+      "key": "G|metric:门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-2/memory-1791045812477875/prefix-4.json",
+      "key": "G|metric:门店退货率",
+      "fact": "store_sales",
+      "status": {
+        "Candidate": "G3：聚合表达式：sr 不是已知列或允许的函数"
+      },
+      "joins": [
+        {
+          "cardinality": "1:1",
+          "filters": {},
+          "key": "join:store_returns|store_sales",
+          "kind": "left",
+          "left": "store_sales",
+          "loss_ratio": 0.60412,
+          "on": [
+            [
+              "ss_ticket_number",
+              "sr_ticket_number"
+            ],
+            [
+              "ss_item_sk",
+              "sr_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "store_returns"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-2/memory-1791045812477875/prefix-4.json",
+      "key": "G|metric:门店退货率#2",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "1:1",
+          "filters": {},
+          "key": "join:store_returns|store_sales",
+          "kind": "left",
+          "left": "store_sales",
+          "loss_ratio": 0.60412,
+          "on": [
+            [
+              "ss_ticket_number",
+              "sr_ticket_number"
+            ],
+            [
+              "ss_item_sk",
+              "sr_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "store_returns"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-2/memory-1791045812477875/prefix-4.json",
+      "key": "G|metric:门店退货金额",
+      "fact": "store_returns",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-3/memory-1791045812480450/prefix-4.json",
+      "key": "G|metric:电子品类门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "N:1",
+          "filters": {},
+          "key": "join:item|store_sales",
+          "kind": "inner",
+          "left": "store_sales",
+          "loss_ratio": 0.0,
+          "on": [
+            [
+              "ss_item_sk",
+              "i_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "item"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-3/memory-1791045812480450/prefix-4.json",
+      "key": "G|metric:门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-3/memory-1791045812480450/prefix-4.json",
+      "key": "G|metric:门店退货率",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "1:1",
+          "filters": {},
+          "key": "join:store_returns|store_sales",
+          "kind": "left",
+          "left": "store_sales",
+          "loss_ratio": 0.60412,
+          "on": [
+            [
+              "ss_ticket_number",
+              "sr_ticket_number"
+            ],
+            [
+              "ss_item_sk",
+              "sr_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "store_returns"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-main",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-main/stream-3/memory-1791045812480450/prefix-4.json",
+      "key": "G|metric:门店退货金额",
+      "fact": "store_returns",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-1/memory-1791052250868427/prefix-4.json",
+      "key": "G|metric:电子品类门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "N:1",
+          "filters": {},
+          "key": "join:item|store_sales",
+          "kind": "inner",
+          "left": "store_sales",
+          "loss_ratio": 0.0,
+          "on": [
+            [
+              "ss_item_sk",
+              "i_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "item"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-1/memory-1791052250868427/prefix-4.json",
+      "key": "G|metric:门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-1/memory-1791052250868427/prefix-4.json",
+      "key": "G|metric:门店退货率",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "1:1",
+          "filters": {},
+          "key": "join:store_returns|store_sales",
+          "kind": "left",
+          "left": "store_sales",
+          "loss_ratio": 0.60412,
+          "on": [
+            [
+              "ss_ticket_number",
+              "sr_ticket_number"
+            ],
+            [
+              "ss_item_sk",
+              "sr_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "store_returns"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-1/memory-1791052250868427/prefix-4.json",
+      "key": "G|metric:门店退货金额",
+      "fact": "store_returns",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-2/memory-1791052250868466/prefix-4.json",
+      "key": "G|metric:电子品类门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "N:1",
+          "filters": {},
+          "key": "join:item|store_sales",
+          "kind": "inner",
+          "left": "store_sales",
+          "loss_ratio": 0.0,
+          "on": [
+            [
+              "ss_item_sk",
+              "i_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "item"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-2/memory-1791052250868466/prefix-4.json",
+      "key": "G|metric:门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-2/memory-1791052250868466/prefix-4.json",
+      "key": "G|metric:门店退货率",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "1:1",
+          "filters": {},
+          "key": "join:store_returns|store_sales",
+          "kind": "left",
+          "left": "store_sales",
+          "loss_ratio": 0.60412,
+          "on": [
+            [
+              "ss_ticket_number",
+              "sr_ticket_number"
+            ],
+            [
+              "ss_item_sk",
+              "sr_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "store_returns"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-2/memory-1791052250868466/prefix-4.json",
+      "key": "G|metric:门店退货金额",
+      "fact": "store_returns",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-3/memory-1791052250870216/prefix-4.json",
+      "key": "G|metric:电子品类门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "N:1",
+          "filters": {},
+          "key": "join:item|store_sales",
+          "kind": "inner",
+          "left": "store_sales",
+          "loss_ratio": 0.0,
+          "on": [
+            [
+              "ss_item_sk",
+              "i_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "item"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-3/memory-1791052250870216/prefix-4.json",
+      "key": "G|metric:门店营业额",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-3/memory-1791052250870216/prefix-4.json",
+      "key": "G|metric:门店退货率",
+      "fact": "store_sales",
+      "status": "Valid",
+      "joins": [
+        {
+          "cardinality": "1:1",
+          "filters": {},
+          "key": "join:store_returns|store_sales",
+          "kind": "left",
+          "left": "store_sales",
+          "loss_ratio": 0.60412,
+          "on": [
+            [
+              "ss_ticket_number",
+              "sr_ticket_number"
+            ],
+            [
+              "ss_item_sk",
+              "sr_item_sk"
+            ]
+          ],
+          "revision": 0,
+          "right": "store_returns"
+        }
+      ],
+      "satisfies_final_orientation_guard": true
+    },
+    {
+      "route": "shared-memory-recovery",
+      "file": "exp/2026-10-03-shared-memory/raw/results/shared-memory-recovery/stream-3/memory-1791052250870216/prefix-4.json",
+      "key": "G|metric:门店退货金额",
+      "fact": "store_returns",
+      "status": "Valid",
+      "joins": [],
+      "satisfies_final_orientation_guard": true
+    }
+  ]
+}

@@ -2,6 +2,8 @@
 
 MAVRA（Maintaining Shared Metric Definitions for Data Agents）的系统原型：一个位于数据智能体与 PostgreSQL 之间的 Rust 中间层。多个 Agent 共享从成功轨迹中提炼的指标定义；每个定义的正确性落到可执行的有效性条件（过滤后的键唯一性、连接多重性、时间角色）上，数据变化后按条件选择性重验，跨定义复用条件结论，失效时撤销并做经过回归的受限修复，执行端核对声明的定义修订。
 
+10-03 的补充实验（固定库会话耗时、匹配生产者前缀的积累、验证排序、元数据诊断）作为补充证据保留，索引见 [exp/README.md](exp/README.md)；10-03 晚把主线改写为共享记忆层的稿件已于 10-04 回退，归档在 `exp/2026-10-03-shared-memory/overleaf-restructure-2026-10-03.tar.gz`。
+
 ## 论文
 
 论文源文件与实验依据在 [overleaf/](overleaf/README.md)：
@@ -10,12 +12,13 @@ MAVRA（Maintaining Shared Metric Definitions for Data Agents）的系统原型�
 - [英文入口](overleaf/main-en.tex)：pdfLaTeX 或 XeLaTeX；两种语言共用 [paper.tex](overleaf/paper.tex) 与 `sections/` 正文，无需导出。
 - `overleaf/build.sh [en|bi|all|pack]`：编译 PDF 或更新 Overleaf 上传包。
 - [研究状态](docs/research-status.md)：已有证据与尚未实现的机制。
+- [10-03 重构稿验收报告（重构已回退）](docs/refactor-acceptance.md)：补充实验、原始失败及验证入口。
 
 ## 目录
 
 | 路径 | 内容 |
 | --- | --- |
-| `src/` | 中间层与两个评测命令 |
+| `src/` | 中间层、真实模型实验与机制层评测 |
 | `exp/` | 论文所用实验的整理结果，索引见 [exp/README.md](exp/README.md) |
 | `docs/` | [设计与评测协议](docs/metric-experience-protocol.md)、[相关工作](docs/related-work.md)、[引用核对](docs/citation-audit-2026-10-01.md)、[模型网关](docs/cline-gateway.md)与[研究状态](docs/research-status.md) |
 | `overleaf/` | 论文 |
@@ -30,6 +33,8 @@ MAVRA（Maintaining Shared Metric Definitions for Data Agents）的系统原型�
 | `src/metric.rs` | 指标定义的纯逻辑：题型、规范 SQL 编译、计算链求值、静态检查、离线提炼 |
 | `src/metricbench.rs` | 端到端 LLM 评测（`metric-bench`） |
 | `src/maintbench.rs` | 维护方式对照，不调用 LLM（`maint-bench`） |
+| `src/sessionbench.rs` / `src/timing.rs` | 固定定义库的配对会话实验（`session-bench`）与请求局部计时 |
+| `src/memorybench.rs` / `src/strategybench.rs` | 匹配生产者前缀的积累实验 / 分离训练、采纳证据与测试的验证排序实验 |
 | `src/knowledge.rs` / `src/flight.rs` | 经验库 / 在途合并 |
 | `src/catalog.rs` / `src/checks.rs` | 数据目录、表版本与语义检查 |
 | `src/feedback.rs` | 检查顺序的执行反馈与回放采纳 |
@@ -41,10 +46,10 @@ MAVRA（Maintaining Shared Metric Definitions for Data Agents）的系统原型�
 ## 环境
 
 - Rust stable 与 Cargo。
-- PostgreSQL 15 或更高版本，连接账号需要 `CREATEDB`。两个评测命令都会新建独立实验库、生成合成零售数据，结束后删除，不修改连接串所指的数据库。
+- PostgreSQL 15 或更高版本，连接账号需要 `CREATEDB`。评测命令都会新建独立实验库、生成合成零售数据，结束后删除，不修改连接串所指的数据库。
 - 真实模型实验需要模型 API key，写在被 Git 忽略的 `.env`（从 `.env.example` 复制）。
 
-实验在 noctis 上运行：PostgreSQL 18.6，端口 55432，关闭 WAL 与 fsync，代码在 `/root/agentdb-mid`，原始输出写到被 Git 忽略的 `results/`。
+实验在 noctis 上运行：PostgreSQL 18.6，端口 55432，WAL 级别为 minimal，关闭 fsync、full-page writes 及同步提交。代码在 `/root/agentdb-mid`，原始输出写到被 Git 忽略的 `results/`；10-03 补充实验的原始输出所在的服务器目录见 [exp/README.md](exp/README.md)。
 
 ```bash
 cargo build --release --locked
@@ -104,6 +109,18 @@ python3 tools/workload-stats.py results/workload-*/
 
 输出目录里 `trace.jsonl` 逐次记录工具调用（参数、状态、耗时、返回摘要、调用前的思考末尾），`sessions.jsonl` 逐会话记录答案与判题，`app.json` 是应用把同样的题写成参数化 SQL 时的查询。
 
+### 固定定义库的会话耗时（`session-bench`）
+
+重用已完成场景实验的定义库，固定题目与更新序列，只改变共享和维护方式。每道题都由全新 Agent 会话回答；记录首次使用、热复用、正常追加后首用、状态流水破坏后首用和突发到达。定义库加载/准入单列，任务记录 LLM、工具、验证、修复、在途合并等待和突发入场排队。SQL 工作按实际执行请求归属，嵌套耗时由分析脚本切成互斥区间。
+
+```bash
+./target/release/agentdb-mid --pool 16 --out results/session-latency session-bench \
+  --libs results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json
+python3 tools/session-latency-stats.py results/session-latency/session-*/ --out results/session-latency/analysis --plot
+```
+
+三份固定库、四种方法的完整矩阵由 `tools/run-session-latency.py` 运行，设计与证据见 [实验协议](exp/2026-10-03-session-latency/README.md) 和 [216 会话的结果](exp/2026-10-03-session-latency/report.md)。默认沿用 `.env` 中的 Cline 模型，修复参照使用原 Agent 的示例 SQL；不重新学习定义。此处的首次使用不代表操作系统或数据库冷缓存。
+
 ### 模型服务
 
 内置三个 OpenAI 兼容配置，各读各的环境变量；切换模型只改 provider 名（`metric-bench --agent/--extractor`），不用改 `.env`：
@@ -154,6 +171,26 @@ python tools/check-llm.py zhipu
 
 工具有 `list_tables`、`describe_table`、`join_path`、`check_join`、`run_sql`，共享指标定义时另有 `find_metric`。`agent` 必填，`session` 默认 `default`；`tables` 是客户端自报的访问范围，不能替代服务端认证。语义审查拒绝的 SQL 返回 HTTP 200 与 `rejected: true`、理由及修复建议；经验撤销通知通过后续响应的 `notices` 返回。
 
+## 共享记忆补充实验
+
+所有主分析消费者题面包含相同业务定义。四组复用相同生产者轨迹前缀，关闭答案缓存、消费者跨题写回和策略适应；命名题另行分析。正式运行使用固定模型和三个独立生产者流，保留失败和未采纳结果。
+
+```bash
+CLINE_MODEL=cline-pass/deepseek-v4.1-flash \
+CLINE_REQUIRE_MODEL=deepseek/deepseek-v4.1-flash \
+CLINE_REASONING_EFFORT=high CLINE_HEDGE=1 \
+  python3 tools/run-memory-study.py --jobs 3 --out results/shared-memory-new
+python3 tools/run-strategy-study.py
+python3 tools/metadata-audit.py
+python3 tools/memory-study-stats.py \
+  --memory results/shared-memory-new \
+  --strategy results/strategy-main \
+  --metadata results/metadata-audit/report.json \
+  --out exp/2026-10-03-shared-memory/analysis
+```
+
+元数据诊断是探索性检查：它区分画像的跨智能体复用、带 ETL 通知的数据更新，以及目录刷新尚未实现的边界。生产者学习与完整策略审计成本单列，不能把回放节省写成包含建库成本的完整会话加速。
+
 ## 开发与测试
 
 在 noctis 上运行（本机只做编码）：
@@ -167,7 +204,9 @@ AGENTDB_TEST_URL=postgres://postgres:postgres@127.0.0.1:55432/postgres \
   cargo test --locked postgres_http_mock_lifecycle -- --ignored --nocapture
 ```
 
-集成测试覆盖只读连接、空结果列名、缓存隔离与命中、并发请求合并、多对一关联，以及 ETL 变更后的守护、粒度修复和未过滤 SQL 的拦截。GitHub Actions 执行同样的检查。
+运行全套数据库集成测试时，调试构建使用 `RUST_MIN_STACK=33554432`，并设置私有的 `AGENTDB_TEST_URL`；建议 `--test-threads=1`。
+
+集成测试覆盖只读连接、空结果列名、缓存隔离与命中、并发请求合并、多对一关联，以及 ETL 变更后的守护、粒度修复和未过滤 SQL 的拦截；新增连接方向反例验证事实金额不会因反向引用被重复累计。GitHub Actions 执行同样的检查。
 
 ## 已知边界
 

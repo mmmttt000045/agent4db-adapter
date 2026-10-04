@@ -123,6 +123,104 @@ async fn postgres_http_mock_lifecycle() -> Result<()> {
     Ok(())
 }
 
+async fn orientation_counterexample(url: &str) -> Result<Value> {
+    let admin = Arc::new(Db::connect(url, 2, false)?);
+    admin
+        .query(
+            QKind::Meta,
+            "create table facts (f_id bigint, f_link bigint, f_amount numeric, f_date bigint, f_scope text);\
+             create table details (de_id bigint, de_fact bigint);\
+             create table date_dim (d_date_sk bigint, d_year integer, d_moy integer);\
+             create table etl_batch_log (table_name text, batch_id integer, note text, applied_at timestamptz default now());\
+             insert into facts values (1, 10, 100, 1, 'A B');\
+             insert into details values (1, 10);\
+             insert into date_dim values (1, 2002, 9)",
+        )
+        .await?;
+    let raw = "select sum(f_amount) from facts join details on f_link = de_fact \
+               join date_dim on f_date = d_date_sk where d_year = 2002 and d_moy = 9";
+    let before = admin.query(QKind::Meta, raw).await?;
+    ensure!(before.cell(0, 0) == Some("100"), "反例初始值应为 100");
+    let db = Arc::new(Db::connect(url, 4, true)?);
+    let mid = Middle::new(db, MiddleConfig { version_ttl_ms: 0, cond_reuse: true, ..Default::default() }).await?;
+    let ctx = Ctx::new("A", "orientation", "seed");
+    let on = vec![("de_fact".into(), "f_link".into())];
+    let m: Metric = serde_json::from_value(json!({
+        "name": "fact_amount", "definition": "每条事实的金额恰好累计一次", "fact": "facts",
+        "measure": "sum(f_amount)", "grain": ["f_id"],
+        "time": {"role": "event date", "fact_col": "f_date", "dim": "date_dim", "dim_col": "d_date_sk", "grain": "day"},
+        "joins": [{"left": "details", "right": "facts", "on": on, "kind": "inner"}],
+        "examples": [{"question": "2002-09 amount", "sql": raw}]
+    }))?;
+    let ask = Ask::Single { period: Period::month(2002, 9) };
+    ensure!(metric::compile(&m, &ask).is_err(), "反向引用必须被规范编译拒绝");
+    // The seeding harness compiles before its gates; production extraction checks the same
+    // orientation in G3 before canonical compilation. Both paths must refuse publication.
+    let rejection = mid.seed_metric(&ctx, m, ask, 2, "select sum(f_amount) from facts").await.unwrap_err();
+    ensure!(rejection.to_string().contains("反向"), "反向引用必须被拒绝：{rejection}");
+    let admission = json!({"rejected": true, "stage": "seed compilation", "reason": rejection.to_string()});
+    admin.query(QKind::Meta, "insert into details values (2, 10)").await?;
+    mid.invalidate_versions();
+    let path = mid.check_join(&ctx, "details", "facts", &on).await?;
+    ensure!(path["valid"] == true, "details→facts 的右键仍唯一，关系检查本身应通过：{path}");
+    let after = admin.query(QKind::Meta, raw).await?;
+    let gold = admin.query(QKind::Meta, "select sum(f_amount) from facts").await?;
+    ensure!(after.cell(0, 0) == Some("200") && gold.cell(0, 0) == Some("100"), "反向关系导致事实金额翻倍");
+    admin
+        .query(
+            QKind::Meta,
+            "insert into facts values (2,20,100,1,'AB'),(2,21,100,1,'AB'),\
+             (3,30,100,1,'ABC'),(4,40,100,1,'abc'),(4,41,100,1,'abc')",
+        )
+        .await?;
+    mid.invalidate_versions();
+    let mut filter_identity = vec![];
+    for (i, filter, should_promote) in
+        [(0, "f_scope = 'A B'", true), (1, "f_scope = 'AB'", false), (2, "f_scope = 'ABC'", true), (3, "f_scope = 'abc'", false)]
+    {
+        let candidate: Metric = serde_json::from_value(json!({
+            "name": format!("literal_{i}"), "definition": "过滤后的事实金额", "fact": "facts",
+            "measure": "sum(f_amount)", "grain": ["f_id"], "filters": {"facts": filter},
+            "time": {"role": "event date", "fact_col": "f_date", "dim": "date_dim", "dim_col": "d_date_sk", "grain": "day"}
+        }))?;
+        let v = mid.seed_metric(&ctx, candidate, ask, 2, &format!("select sum(f_amount) from facts where {filter}")).await?;
+        ensure!(v["promoted"] == should_promote, "不同字面量不能复用另一总体的唯一性结论：{v}");
+        if !should_promote {
+            ensure!(v["failed_gate"] == "G4", "重复键必须由 G4 拒绝：{v}");
+        }
+        filter_identity.push(json!({"filter": filter, "expected_promoted": should_promote, "result": v}));
+    }
+    Ok(json!({"status": "passed", "before": before.cell(0, 0), "after": after.cell(0, 0),
+              "gold": gold.cell(0, 0), "reverse_path": path, "admission": admission, "filter_identity": filter_identity}))
+}
+
+#[tokio::test]
+#[ignore = "requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission"]
+async fn postgres_metric_join_orientation() -> Result<()> {
+    let _ = dotenvy::dotenv();
+    let url = std::env::var("AGENTDB_TEST_URL").context("设置 AGENTDB_TEST_URL 为测试服务器连接串")?;
+    let admin = Db::connect(&url, 1, false)?;
+    let unique = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
+    let name = format!("agentdb_orientation_{}_{unique}", std::process::id());
+    let mut test_url = reqwest::Url::parse(&url)?;
+    test_url.set_path(&format!("/{name}"));
+    admin.query(QKind::Meta, &format!("create database {name}")).await?;
+    let result = tokio::time::timeout(Duration::from_secs(90), orientation_counterexample(test_url.as_str())).await;
+    let cleanup = admin.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
+    let report = match &result {
+        Ok(Ok(v)) => v.clone(),
+        Ok(Err(e)) => json!({"status": "failed", "error": format!("{e:#}")}),
+        Err(_) => json!({"status": "failed", "error": "连接方向测试超时"}),
+    };
+    let out = format!("results/orientation-test-{unique}");
+    std::fs::create_dir_all(&out)?;
+    std::fs::write(format!("{out}/report.json"), serde_json::to_string_pretty(&report)?)?;
+    println!("连接方向测试报告：{out}/report.json；测试库清理：{}", cleanup.is_ok());
+    cleanup.context("测试库清理失败")?;
+    result.context("连接方向测试超时")??;
+    Ok(())
+}
+
 // ───────────────────────── 数据变化场景：不调用 LLM 的维护预期 ─────────────────────────
 
 fn seeded_metrics() -> Vec<(&'static str, Metric)> {

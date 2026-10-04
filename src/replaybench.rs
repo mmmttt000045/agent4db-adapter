@@ -53,15 +53,15 @@ pub struct Options {
     sql_timeout_secs: u64,
 }
 
-struct LibEntry {
+pub(crate) struct LibEntry {
     /// 库内唯一的名称（同名的第二条带 #2 后缀，与原组一致）
-    name: String,
-    def: String,
-    metric: Metric,
-    ask: Ask,
-    decimals: u32,
-    judge: String,
-    example: String,
+    pub(crate) name: String,
+    pub(crate) def: String,
+    pub(crate) metric: Metric,
+    pub(crate) ask: Ask,
+    pub(crate) decimals: u32,
+    pub(crate) judge: String,
+    pub(crate) example: String,
     /// 计分的留出题（编号, 参数）：合成基准取 `metricbench::tasks`，TPC-DS 库随库给出
     held: Vec<(String, Ask)>,
     /// 标准答案由原定义的规范 SQL 在“业务事实已变、表示未变”的状态上算出（TPC-DS 库）；合成基准用手写判题 SQL
@@ -123,11 +123,11 @@ fn judge_metric(m: &Metric) -> Metric {
     j
 }
 
-struct Library {
-    id: String,
-    source: String,
-    entries: Vec<LibEntry>,
-    skipped: Vec<Value>,
+pub(crate) struct Library {
+    pub(crate) id: String,
+    pub(crate) source: String,
+    pub(crate) entries: Vec<LibEntry>,
+    pub(crate) skipped: Vec<Value>,
 }
 
 struct Run {
@@ -161,7 +161,7 @@ fn find_cells(path: &Path, out: &mut Vec<String>) -> Result<()> {
     Ok(())
 }
 
-fn load(path: &str) -> Result<Library> {
+pub(crate) fn load(path: &str) -> Result<Library> {
     let v: Value = serde_json::from_str(&std::fs::read_to_string(path)?).with_context(|| format!("读取 {path}"))?;
     let p = Path::new(path);
     let run = p.parent().and_then(Path::parent).and_then(Path::file_name).and_then(|n| n.to_str()).unwrap_or("run");
@@ -188,7 +188,7 @@ fn load(path: &str) -> Result<Library> {
             let held = if own_gold {
                 holdout
             } else {
-                metricbench::tasks(&[def.clone()]).into_iter().filter(|t| t.set != Set::Learn).map(|t| (t.id, t.ask)).collect()
+                metricbench::tasks(std::slice::from_ref(&def)).into_iter().filter(|t| t.set != Set::Learn).map(|t| (t.id, t.ask)).collect()
             };
             let example = match metric.examples.first() {
                 Some(x) => x.sql.clone(),
@@ -223,7 +223,7 @@ fn config(policy: &str) -> MiddleConfig {
 
 /// 条目是否读到了变化的表：合成基准按基准定义的表，TPC-DS 库按结构化实现涉及的表。
 fn affected(e: &LibEntry, ch: Ch) -> bool {
-    let tables: Vec<String> = match metricbench::tasks(&[e.def.clone()]).first() {
+    let tables: Vec<String> = match metricbench::tasks(std::slice::from_ref(&e.def)).first() {
         Some(t) if !e.own_gold => t.def.tables.iter().map(|s| s.to_string()).collect(),
         _ => e.metric.tables(),
     };
@@ -304,11 +304,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     let root = Db::connect(url, 1, false)?;
     let mut isolated = reqwest::Url::parse(url)?;
     isolated.set_path(&format!("/{name}"));
-    let create = if o.schema == "tpcds" {
-        format!("create database {name} template {}", o.template_db)
-    } else {
-        format!("create database {name}")
-    };
+    let create =
+        if o.schema == "tpcds" { format!("create database {name} template {}", o.template_db) } else { format!("create database {name}") };
     root.query(QKind::Meta, &create).await.context("创建隔离实验库失败（需要 CREATEDB；tpcds 还需要模板库存在且无人连接）")?;
     let result: Result<Value> = async {
         let admin = Db::connect(isolated.as_str(), 2, false)?;

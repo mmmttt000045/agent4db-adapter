@@ -37,6 +37,7 @@ impl<T: Clone> Flight<T> {
         };
         let ran = AtomicBool::new(false);
         let ran_ref = &ran;
+        let mut wait = crate::timing::Timer::start("shared_wait");
         let res = cell
             .get_or_init(move || async move {
                 ran_ref.store(true, Ordering::Relaxed);
@@ -45,6 +46,7 @@ impl<T: Clone> Flight<T> {
             .await
             .clone();
         if ran.load(Ordering::Relaxed) {
+            wait.cancel();
             let mut m = self.map.lock();
             if m.get(key).is_some_and(|c| Arc::ptr_eq(c, &cell)) {
                 m.remove(key);

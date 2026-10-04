@@ -106,7 +106,7 @@ fn schema_breach(
 }
 
 fn squash(s: &str) -> String {
-    s.to_lowercase().chars().filter(|c| !c.is_whitespace()).collect()
+    sqlscan::expression_key(s)
 }
 
 /// 已通过的 `known` 蕴含 `c` 通过：同表、同过滤的键唯一性，`known` 的键列是 `c` 的子集。
@@ -121,7 +121,7 @@ fn implies(known: &Check, c: &Check) -> bool {
     }
 }
 
-/// 同一条件：键唯一性按表、列集合与过滤（忽略大小写与空白）比较，其他检查要求完全相同。
+/// 同一条件：键唯一性按表、列集合与过滤 token 比较，保留字符串值，其他检查要求完全相同。
 fn same_cond(a: &Check, b: &Check) -> bool {
     match (a, b) {
         (Check::KeyUnique { table: t1, cols: c1, filter: f1 }, Check::KeyUnique { table: t2, cols: c2, filter: f2 }) => {
@@ -531,7 +531,8 @@ impl Middle {
     }
 
     /// G3：表列存在；关联属于已验证路径且方向一致、包含路径要求的过滤；聚合表达式与过滤只引用口径内的表；
-    /// 过滤不含题目参数；必需的粒度过滤都在。顺带按已验证路径填写关联的键、基数、丢行比例与修订号。
+    /// 非时间连接必须从事实表指向一侧；过滤不含题目参数；必需的粒度过滤都在。
+    /// 顺带按已验证路径填写关联的键、基数、丢行比例与修订号。
     async fn static_gate(&self, ctx: &Ctx, m: &mut Metric, ask: &Ask) -> Result<Gate> {
         macro_rules! bad {
             ($($t:tt)*) => { return Ok(Err(format!($($t)*))) };
@@ -582,11 +583,11 @@ impl Middle {
                 !(tables && (j.on == on || j.on == flip))
             });
         }
+        if let Err(e) = metric::check_join_orientation(m) {
+            bad!("{e}");
+        }
         let mut allowed: BTreeSet<String> = [m.fact.clone()].into_iter().collect();
         for j in m.joins.iter_mut() {
-            if j.left != m.fact && j.right != m.fact {
-                bad!("关联 {}⋈{} 不经过事实表 {}", j.left, j.right, m.fact);
-            }
             if self.cat.validate_join(&j.left, &j.right, &j.on).is_err() {
                 bad!("关联 {}⋈{} 的列不存在或重复", j.left, j.right);
             }
@@ -794,7 +795,10 @@ impl Middle {
         }
         let key = format!("maint:{fk}@{}", ver_sig(&e.deps));
         self.maint_inflight.lock().insert(fk.to_string(), key.clone());
-        let r = self.flight_v.run(self.cfg.singleflight, &key, || self.maintain(ctx, fk, &e, &cur)).await;
+        let r = self
+            .flight_v
+            .run(self.cfg.singleflight, &key, || crate::timing::measure("maintenance", self.maintain(ctx, fk, &e, &cur)))
+            .await;
         {
             let mut m = self.maint_inflight.lock();
             if m.get(fk) == Some(&key) {
@@ -854,7 +858,7 @@ impl Middle {
                 if reextract {
                     "revoked_on_write"
                 } else {
-                    self.restricted_repair(ctx, fk, e, &m, b).await?;
+                    crate::timing::measure("repair", self.restricted_repair(ctx, fk, e, &m, b)).await?;
                     if self.store.get(fk).is_some_and(|x| x.status == Status::Valid) {
                         "repaired"
                     } else {
@@ -1272,6 +1276,8 @@ mod tests {
         assert!(!same_cond(&ku("t", &["a", "b"], None), &ku("t", &["a"], None)));
         assert!(!same_cond(&ku("t", &["a"], None), &ku("u", &["a"], None)));
         assert!(!same_cond(&ku("t", &["a"], None), &ku("t", &["a"], Some("s = '完成'"))));
+        assert!(!same_cond(&ku("t", &["a"], Some("s = 'ABC'")), &ku("t", &["a"], Some("s = 'abc'"))));
+        assert!(!same_cond(&ku("t", &["a"], Some("s = 'A B'")), &ku("t", &["a"], Some("s = 'AB'"))));
     }
 
     #[test]
@@ -1280,6 +1286,8 @@ mod tests {
         assert!(!implies(&ku("t", &["a", "b", "c"], None), &ku("t", &["a", "b"], None)));
         assert!(!implies(&ku("t", &["a"], Some("x = 1")), &ku("t", &["a", "b"], None)));
         assert!(!implies(&ku("t", &["a"], None), &ku("u", &["a", "b"], None)));
+        assert!(!implies(&ku("t", &["a"], Some("s = 'ABC'")), &ku("t", &["a", "b"], Some("s = 'abc'"))));
+        assert!(!implies(&ku("t", &["a"], Some("s = 'A B'")), &ku("t", &["a", "b"], Some("s = 'AB'"))));
     }
 
     #[test]

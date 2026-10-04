@@ -1,0 +1,4 @@
+{
+  "error": "关联 details⋈facts 必须从事实表 facts 指向至多一行的另一侧；反向、多跳和自连接尚不支持",
+  "status": "failed"
+}

@@ -1,0 +1,7621 @@
+{
+  "collection_seconds": 23.251533658,
+  "database_cleaned_up": true,
+  "full_observation_ms": 12480.43334000001,
+  "methodology": "PostgreSQL measured outcomes; median of three rotated measurements per check; chronological disjoint training/validation/test table pairs; scoring frozen before validation; no test feedback; all permutations replay identical actual costs; required key-diagnostic cost included; full observation acquisition overhead separate. Narrow verifier-strategy evidence, not an agent-planning or live latency experiment.",
+  "options": {
+    "groups": 64,
+    "measurements": 3,
+    "rows": 100000
+  },
+  "results": [
+    {
+      "adoption": {
+        "adaptive": {
+          "adopted": false,
+          "at": 30,
+          "evidence": {
+            "baseline_ms": 44.14306066666668,
+            "ci95": [
+              4.622589466991857,
+              5.309876366341453
+            ],
+            "episodes": 12,
+            "mean_delta_ms": 4.966232916666655,
+            "policy_ms": 49.10929358333333
+          }
+        },
+        "adaptive_uses": 0,
+        "contexts": {
+          "KeyUnique|dimension_0(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 30.201216,
+            "runs": 1
+          },
+          "KeyUnique|dimension_1(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.096953,
+            "runs": 1
+          },
+          "KeyUnique|dimension_10(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.972435999999995,
+            "runs": 1
+          },
+          "KeyUnique|dimension_11(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.056325,
+            "runs": 1
+          },
+          "KeyUnique|dimension_12(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 26.445531000000003,
+            "runs": 1
+          },
+          "KeyUnique|dimension_13(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.72432,
+            "runs": 1
+          },
+          "KeyUnique|dimension_14(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.86817,
+            "runs": 1
+          },
+          "KeyUnique|dimension_15(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.799761000000004,
+            "runs": 1
+          },
+          "KeyUnique|dimension_16(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.642512,
+            "runs": 1
+          },
+          "KeyUnique|dimension_17(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.528875000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_18(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.748449,
+            "runs": 1
+          },
+          "KeyUnique|dimension_19(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.524415,
+            "runs": 1
+          },
+          "KeyUnique|dimension_2(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.638878,
+            "runs": 1
+          },
+          "KeyUnique|dimension_20(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.922773,
+            "runs": 1
+          },
+          "KeyUnique|dimension_21(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.267293,
+            "runs": 1
+          },
+          "KeyUnique|dimension_22(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.377274,
+            "runs": 1
+          },
+          "KeyUnique|dimension_23(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.896747000000005,
+            "runs": 1
+          },
+          "KeyUnique|dimension_24(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 27.532228999999997,
+            "runs": 1
+          },
+          "KeyUnique|dimension_25(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.403607,
+            "runs": 1
+          },
+          "KeyUnique|dimension_26(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.893521,
+            "runs": 1
+          },
+          "KeyUnique|dimension_27(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.82384,
+            "runs": 1
+          },
+          "KeyUnique|dimension_28(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 30.015474,
+            "runs": 1
+          },
+          "KeyUnique|dimension_29(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.680279000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_3(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.303633000000005,
+            "runs": 1
+          },
+          "KeyUnique|dimension_30(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.104541,
+            "runs": 1
+          },
+          "KeyUnique|dimension_31(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.721019,
+            "runs": 1
+          },
+          "KeyUnique|dimension_32(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.515000999999998,
+            "runs": 1
+          },
+          "KeyUnique|dimension_33(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.077876,
+            "runs": 1
+          },
+          "KeyUnique|dimension_34(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.686922,
+            "runs": 1
+          },
+          "KeyUnique|dimension_35(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.862795000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_36(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 30.039294,
+            "runs": 1
+          },
+          "KeyUnique|dimension_37(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.168666,
+            "runs": 1
+          },
+          "KeyUnique|dimension_38(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 40.452982,
+            "runs": 1
+          },
+          "KeyUnique|dimension_39(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.84068,
+            "runs": 1
+          },
+          "KeyUnique|dimension_4(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.903724,
+            "runs": 1
+          },
+          "KeyUnique|dimension_5(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.751024,
+            "runs": 1
+          },
+          "KeyUnique|dimension_6(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.420975000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_7(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.134175,
+            "runs": 1
+          },
+          "KeyUnique|dimension_8(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.689832,
+            "runs": 1
+          },
+          "KeyUnique|dimension_9(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.487208,
+            "runs": 1
+          },
+          "RowConservation|facts_0>dimension_0:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.431217,
+            "runs": 1
+          },
+          "RowConservation|facts_10>dimension_10:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.965266,
+            "runs": 1
+          },
+          "RowConservation|facts_11>dimension_11:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.940086,
+            "runs": 1
+          },
+          "RowConservation|facts_12>dimension_12:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.337902,
+            "runs": 1
+          },
+          "RowConservation|facts_13>dimension_13:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.189417,
+            "runs": 1
+          },
+          "RowConservation|facts_14>dimension_14:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.274819,
+            "runs": 1
+          },
+          "RowConservation|facts_15>dimension_15:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.219978,
+            "runs": 1
+          },
+          "RowConservation|facts_16>dimension_16:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.544367,
+            "runs": 1
+          },
+          "RowConservation|facts_17>dimension_17:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.209038,
+            "runs": 1
+          },
+          "RowConservation|facts_18>dimension_18:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.929812000000002,
+            "runs": 1
+          },
+          "RowConservation|facts_19>dimension_19:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.384988,
+            "runs": 1
+          },
+          "RowConservation|facts_1>dimension_1:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.476949,
+            "runs": 1
+          },
+          "RowConservation|facts_20>dimension_20:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.235252,
+            "runs": 1
+          },
+          "RowConservation|facts_21>dimension_21:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.51479,
+            "runs": 1
+          },
+          "RowConservation|facts_22>dimension_22:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.167394,
+            "runs": 1
+          },
+          "RowConservation|facts_23>dimension_23:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.798012999999997,
+            "runs": 1
+          },
+          "RowConservation|facts_24>dimension_24:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.478334,
+            "runs": 1
+          },
+          "RowConservation|facts_25>dimension_25:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.062942999999997,
+            "runs": 1
+          },
+          "RowConservation|facts_26>dimension_26:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.076997000000002,
+            "runs": 1
+          },
+          "RowConservation|facts_27>dimension_27:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.048942999999998,
+            "runs": 1
+          },
+          "RowConservation|facts_28>dimension_28:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.941393,
+            "runs": 1
+          },
+          "RowConservation|facts_29>dimension_29:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.961036,
+            "runs": 1
+          },
+          "RowConservation|facts_2>dimension_2:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.738825,
+            "runs": 1
+          },
+          "RowConservation|facts_30>dimension_30:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.979696,
+            "runs": 1
+          },
+          "RowConservation|facts_31>dimension_31:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.534394,
+            "runs": 1
+          },
+          "RowConservation|facts_32>dimension_32:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.456955999999998,
+            "runs": 1
+          },
+          "RowConservation|facts_33>dimension_33:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.653665,
+            "runs": 1
+          },
+          "RowConservation|facts_34>dimension_34:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.907677,
+            "runs": 1
+          },
+          "RowConservation|facts_35>dimension_35:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.735635,
+            "runs": 1
+          },
+          "RowConservation|facts_36>dimension_36:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.124675,
+            "runs": 1
+          },
+          "RowConservation|facts_37>dimension_37:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.018165,
+            "runs": 1
+          },
+          "RowConservation|facts_38>dimension_38:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.568004,
+            "runs": 1
+          },
+          "RowConservation|facts_39>dimension_39:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.213102,
+            "runs": 1
+          },
+          "RowConservation|facts_3>dimension_3:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.158444,
+            "runs": 1
+          },
+          "RowConservation|facts_4>dimension_4:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.490553,
+            "runs": 1
+          },
+          "RowConservation|facts_5>dimension_5:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.766695,
+            "runs": 1
+          },
+          "RowConservation|facts_6>dimension_6:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.011697,
+            "runs": 1
+          },
+          "RowConservation|facts_7>dimension_7:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.203318,
+            "runs": 1
+          },
+          "RowConservation|facts_8>dimension_8:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 13.98493,
+            "runs": 1
+          },
+          "RowConservation|facts_9>dimension_9:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.057707,
+            "runs": 1
+          },
+          "SampleFanout|facts_0>dimension_0:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.47678,
+            "runs": 1
+          },
+          "SampleFanout|facts_10>dimension_10:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.842991,
+            "runs": 1
+          },
+          "SampleFanout|facts_11>dimension_11:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.8612020000000005,
+            "runs": 1
+          },
+          "SampleFanout|facts_12>dimension_12:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.851176,
+            "runs": 1
+          },
+          "SampleFanout|facts_13>dimension_13:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.608715999999999,
+            "runs": 1
+          },
+          "SampleFanout|facts_14>dimension_14:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.122293,
+            "runs": 1
+          },
+          "SampleFanout|facts_15>dimension_15:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.77018,
+            "runs": 1
+          },
+          "SampleFanout|facts_16>dimension_16:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.306047,
+            "runs": 1
+          },
+          "SampleFanout|facts_17>dimension_17:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.083202999999999,
+            "runs": 1
+          },
+          "SampleFanout|facts_18>dimension_18:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.285933,
+            "runs": 1
+          },
+          "SampleFanout|facts_19>dimension_19:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.748686,
+            "runs": 1
+          },
+          "SampleFanout|facts_1>dimension_1:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.251174,
+            "runs": 1
+          },
+          "SampleFanout|facts_20>dimension_20:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.565639,
+            "runs": 1
+          },
+          "SampleFanout|facts_21>dimension_21:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.677217,
+            "runs": 1
+          },
+          "SampleFanout|facts_22>dimension_22:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.913138,
+            "runs": 1
+          },
+          "SampleFanout|facts_23>dimension_23:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.179174,
+            "runs": 1
+          },
+          "SampleFanout|facts_24>dimension_24:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.9515569999999998,
+            "runs": 1
+          },
+          "SampleFanout|facts_25>dimension_25:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 6.388952,
+            "runs": 1
+          },
+          "SampleFanout|facts_26>dimension_26:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.5445199999999994,
+            "runs": 1
+          },
+          "SampleFanout|facts_27>dimension_27:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.088332,
+            "runs": 1
+          },
+          "SampleFanout|facts_28>dimension_28:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.295404,
+            "runs": 1
+          },
+          "SampleFanout|facts_29>dimension_29:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.185124,
+            "runs": 1
+          },
+          "SampleFanout|facts_2>dimension_2:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.657451,
+            "runs": 1
+          },
+          "SampleFanout|facts_30>dimension_30:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.839771,
+            "runs": 1
+          },
+          "SampleFanout|facts_31>dimension_31:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.919342,
+            "runs": 1
+          },
+          "SampleFanout|facts_32>dimension_32:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.040267,
+            "runs": 1
+          },
+          "SampleFanout|facts_33>dimension_33:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.300673,
+            "runs": 1
+          },
+          "SampleFanout|facts_34>dimension_34:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.619949,
+            "runs": 1
+          },
+          "SampleFanout|facts_35>dimension_35:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.964292,
+            "runs": 1
+          },
+          "SampleFanout|facts_36>dimension_36:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.921366,
+            "runs": 1
+          },
+          "SampleFanout|facts_37>dimension_37:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.742411000000001,
+            "runs": 1
+          },
+          "SampleFanout|facts_38>dimension_38:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.234298,
+            "runs": 1
+          },
+          "SampleFanout|facts_39>dimension_39:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.767131,
+            "runs": 1
+          },
+          "SampleFanout|facts_3>dimension_3:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.717697,
+            "runs": 1
+          },
+          "SampleFanout|facts_4>dimension_4:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.630129,
+            "runs": 1
+          },
+          "SampleFanout|facts_5>dimension_5:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.114593,
+            "runs": 1
+          },
+          "SampleFanout|facts_6>dimension_6:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.176343,
+            "runs": 1
+          },
+          "SampleFanout|facts_7>dimension_7:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.050463,
+            "runs": 1
+          },
+          "SampleFanout|facts_8>dimension_8:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.938746,
+            "runs": 1
+          },
+          "SampleFanout|facts_9>dimension_9:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.036233,
+            "runs": 1
+          }
+        },
+        "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+        "evidence": {
+          "audited_failures_in_window": 30,
+          "audited_failures_total": 30,
+          "min_evidence": 8,
+          "passed": 10,
+          "unaudited_failures": 0
+        },
+        "kinds": {
+          "KeyUnique": {
+            "fails": 30,
+            "hits": 0,
+            "mrows": 4.000000000000002,
+            "ms": 1630.2212250000002,
+            "runs": 40
+          },
+          "RowConservation": {
+            "fails": 30,
+            "hits": 0,
+            "mrows": 4.160000000000003,
+            "ms": 701.7930720000002,
+            "runs": 40
+          },
+          "SampleFanout": {
+            "fails": 30,
+            "hits": 0,
+            "mrows": 4.000000000000002,
+            "ms": 196.66859300000002,
+            "runs": 40
+          }
+        },
+        "order_calls": 2,
+        "pending_validation": null
+      },
+      "setting": "key-required",
+      "tests": [
+        {
+          "default_ms": 49.545981,
+          "group": 40,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 49.545981,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 49.545981,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 44.466508000000005,
+          "group": 41,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.466508000000005,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.466508000000005,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.16177300000001,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.16177300000001,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.482041,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.482041,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 44.466508000000005,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 44.65591,
+          "group": 42,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.65591,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.65591,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.705436999999996,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.705436999999996,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.686683,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.686683,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 44.65591,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 43.428241,
+          "group": 43,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 43.428241,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 43.428241,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 61.67044,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 61.67044,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 48.504984,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 48.504984,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 43.428241,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 49.940943,
+          "group": 44,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 49.940943,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 49.940943,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 44.333057000000004,
+          "group": 45,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.333057000000004,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.333057000000004,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 63.098579,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 63.098579,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.274985,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.274985,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 44.333057000000004,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 44.412458,
+          "group": 46,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.412458,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.412458,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 63.561932,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 63.561932,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.082694000000004,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.082694000000004,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 44.412458,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 44.187097,
+          "group": 47,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.187097,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.187097,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.383995,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.383995,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.138119,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.138119,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 44.187097,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 51.38633399999999,
+          "group": 48,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.386334,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.386334,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 51.38633399999999,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 45.051942,
+          "group": 49,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 45.051942,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.051942,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 65.021481,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 65.021481,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.830769999999994,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.830769999999994,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 45.051942,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 46.119407,
+          "group": 50,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 46.119407,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 46.119407,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.802959,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.802959,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 51.502522,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 51.502522,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 46.119407,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 44.553728,
+          "group": 51,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.553728,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.553728,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.597204,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.597204,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.968433,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.968433,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 44.553728,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 52.029359,
+          "group": 52,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 52.029359,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 52.029359,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 44.240927,
+          "group": 53,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.240927,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.240927,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.475105,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.475105,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.102539,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.102539,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 44.240927,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 44.302118,
+          "group": 54,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.302118,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.302118,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.756637999999995,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.756637999999995,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.587692000000004,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.587692000000004,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 44.302118,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 46.013028,
+          "group": 55,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 46.013028,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 46.013028,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 66.315919,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 66.315919,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 51.904976,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 51.904976,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 46.013028,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 59.54940599999999,
+          "group": 56,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 59.54940599999999,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 45.369544,
+          "group": 57,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 45.369544,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.369544,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.92948,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.92948,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 51.220290999999996,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 51.220290999999996,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 45.369544,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 48.422844,
+          "group": 58,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 48.422844,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 48.422844,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 70.481637,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 70.481637,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 55.135588,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 55.135588,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 48.422844,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 49.554801000000005,
+          "group": 59,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 49.554801000000005,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.554801000000005,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 70.748079,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 70.748079,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 56.994798,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 56.994798,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 49.554801000000005,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 57.99129599999999,
+          "group": 60,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 57.99129599999999,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 50.499007,
+          "group": 61,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 50.499007,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.499007,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 73.500906,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 73.500906,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 57.931995,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 57.931995,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 50.499007,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 45.854137,
+          "group": 62,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 45.854137,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.854137,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.838559,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.838559,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 52.823092,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 52.823092,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 45.854137,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        },
+        {
+          "default_ms": 41.411457,
+          "group": 63,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 41.411457,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 41.411457,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 56.431174,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 56.431174,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.936026999999996,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.936026999999996,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 41.411457,
+          "selected_order": [
+            "KeyUnique",
+            "RowConservation",
+            "SampleFanout"
+          ]
+        }
+      ]
+    },
+    {
+      "adoption": {
+        "adaptive": {
+          "adopted": true,
+          "at": 30,
+          "evidence": {
+            "baseline_ms": 44.14306066666668,
+            "ci95": [
+              -39.91725417188175,
+              -38.43640132811828
+            ],
+            "episodes": 12,
+            "mean_delta_ms": -39.176827750000015,
+            "policy_ms": 4.966232916666666
+          }
+        },
+        "adaptive_uses": 1,
+        "contexts": {
+          "KeyUnique|dimension_0(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 30.201216,
+            "runs": 1
+          },
+          "KeyUnique|dimension_1(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.096953,
+            "runs": 1
+          },
+          "KeyUnique|dimension_10(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.972435999999995,
+            "runs": 1
+          },
+          "KeyUnique|dimension_11(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.056325,
+            "runs": 1
+          },
+          "KeyUnique|dimension_12(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 26.445531000000003,
+            "runs": 1
+          },
+          "KeyUnique|dimension_13(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.72432,
+            "runs": 1
+          },
+          "KeyUnique|dimension_14(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.86817,
+            "runs": 1
+          },
+          "KeyUnique|dimension_15(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.799761000000004,
+            "runs": 1
+          },
+          "KeyUnique|dimension_16(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.642512,
+            "runs": 1
+          },
+          "KeyUnique|dimension_17(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.528875000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_18(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.748449,
+            "runs": 1
+          },
+          "KeyUnique|dimension_19(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.524415,
+            "runs": 1
+          },
+          "KeyUnique|dimension_2(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.638878,
+            "runs": 1
+          },
+          "KeyUnique|dimension_20(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.922773,
+            "runs": 1
+          },
+          "KeyUnique|dimension_21(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.267293,
+            "runs": 1
+          },
+          "KeyUnique|dimension_22(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.377274,
+            "runs": 1
+          },
+          "KeyUnique|dimension_23(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.896747000000005,
+            "runs": 1
+          },
+          "KeyUnique|dimension_24(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 27.532228999999997,
+            "runs": 1
+          },
+          "KeyUnique|dimension_25(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.403607,
+            "runs": 1
+          },
+          "KeyUnique|dimension_26(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.893521,
+            "runs": 1
+          },
+          "KeyUnique|dimension_27(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.82384,
+            "runs": 1
+          },
+          "KeyUnique|dimension_28(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 30.015474,
+            "runs": 1
+          },
+          "KeyUnique|dimension_29(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.680279000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_3(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.303633000000005,
+            "runs": 1
+          },
+          "KeyUnique|dimension_30(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.104541,
+            "runs": 1
+          },
+          "KeyUnique|dimension_31(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.721019,
+            "runs": 1
+          },
+          "KeyUnique|dimension_32(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.515000999999998,
+            "runs": 1
+          },
+          "KeyUnique|dimension_33(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.077876,
+            "runs": 1
+          },
+          "KeyUnique|dimension_34(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.686922,
+            "runs": 1
+          },
+          "KeyUnique|dimension_35(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.862795000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_36(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 30.039294,
+            "runs": 1
+          },
+          "KeyUnique|dimension_37(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.168666,
+            "runs": 1
+          },
+          "KeyUnique|dimension_38(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 40.452982,
+            "runs": 1
+          },
+          "KeyUnique|dimension_39(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.84068,
+            "runs": 1
+          },
+          "KeyUnique|dimension_4(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.903724,
+            "runs": 1
+          },
+          "KeyUnique|dimension_5(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.751024,
+            "runs": 1
+          },
+          "KeyUnique|dimension_6(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.420975000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_7(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.134175,
+            "runs": 1
+          },
+          "KeyUnique|dimension_8(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.689832,
+            "runs": 1
+          },
+          "KeyUnique|dimension_9(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.487208,
+            "runs": 1
+          },
+          "RowConservation|facts_0>dimension_0:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.431217,
+            "runs": 1
+          },
+          "RowConservation|facts_10>dimension_10:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.965266,
+            "runs": 1
+          },
+          "RowConservation|facts_11>dimension_11:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.940086,
+            "runs": 1
+          },
+          "RowConservation|facts_12>dimension_12:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.337902,
+            "runs": 1
+          },
+          "RowConservation|facts_13>dimension_13:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.189417,
+            "runs": 1
+          },
+          "RowConservation|facts_14>dimension_14:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.274819,
+            "runs": 1
+          },
+          "RowConservation|facts_15>dimension_15:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.219978,
+            "runs": 1
+          },
+          "RowConservation|facts_16>dimension_16:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.544367,
+            "runs": 1
+          },
+          "RowConservation|facts_17>dimension_17:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.209038,
+            "runs": 1
+          },
+          "RowConservation|facts_18>dimension_18:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.929812000000002,
+            "runs": 1
+          },
+          "RowConservation|facts_19>dimension_19:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.384988,
+            "runs": 1
+          },
+          "RowConservation|facts_1>dimension_1:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.476949,
+            "runs": 1
+          },
+          "RowConservation|facts_20>dimension_20:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.235252,
+            "runs": 1
+          },
+          "RowConservation|facts_21>dimension_21:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.51479,
+            "runs": 1
+          },
+          "RowConservation|facts_22>dimension_22:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.167394,
+            "runs": 1
+          },
+          "RowConservation|facts_23>dimension_23:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.798012999999997,
+            "runs": 1
+          },
+          "RowConservation|facts_24>dimension_24:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.478334,
+            "runs": 1
+          },
+          "RowConservation|facts_25>dimension_25:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.062942999999997,
+            "runs": 1
+          },
+          "RowConservation|facts_26>dimension_26:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.076997000000002,
+            "runs": 1
+          },
+          "RowConservation|facts_27>dimension_27:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.048942999999998,
+            "runs": 1
+          },
+          "RowConservation|facts_28>dimension_28:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.941393,
+            "runs": 1
+          },
+          "RowConservation|facts_29>dimension_29:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.961036,
+            "runs": 1
+          },
+          "RowConservation|facts_2>dimension_2:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.738825,
+            "runs": 1
+          },
+          "RowConservation|facts_30>dimension_30:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.979696,
+            "runs": 1
+          },
+          "RowConservation|facts_31>dimension_31:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.534394,
+            "runs": 1
+          },
+          "RowConservation|facts_32>dimension_32:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.456955999999998,
+            "runs": 1
+          },
+          "RowConservation|facts_33>dimension_33:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.653665,
+            "runs": 1
+          },
+          "RowConservation|facts_34>dimension_34:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.907677,
+            "runs": 1
+          },
+          "RowConservation|facts_35>dimension_35:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.735635,
+            "runs": 1
+          },
+          "RowConservation|facts_36>dimension_36:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.124675,
+            "runs": 1
+          },
+          "RowConservation|facts_37>dimension_37:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.018165,
+            "runs": 1
+          },
+          "RowConservation|facts_38>dimension_38:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.568004,
+            "runs": 1
+          },
+          "RowConservation|facts_39>dimension_39:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.213102,
+            "runs": 1
+          },
+          "RowConservation|facts_3>dimension_3:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.158444,
+            "runs": 1
+          },
+          "RowConservation|facts_4>dimension_4:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.490553,
+            "runs": 1
+          },
+          "RowConservation|facts_5>dimension_5:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.766695,
+            "runs": 1
+          },
+          "RowConservation|facts_6>dimension_6:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.011697,
+            "runs": 1
+          },
+          "RowConservation|facts_7>dimension_7:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.203318,
+            "runs": 1
+          },
+          "RowConservation|facts_8>dimension_8:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 13.98493,
+            "runs": 1
+          },
+          "RowConservation|facts_9>dimension_9:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.057707,
+            "runs": 1
+          },
+          "SampleFanout|facts_0>dimension_0:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.47678,
+            "runs": 1
+          },
+          "SampleFanout|facts_10>dimension_10:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.842991,
+            "runs": 1
+          },
+          "SampleFanout|facts_11>dimension_11:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.8612020000000005,
+            "runs": 1
+          },
+          "SampleFanout|facts_12>dimension_12:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.851176,
+            "runs": 1
+          },
+          "SampleFanout|facts_13>dimension_13:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.608715999999999,
+            "runs": 1
+          },
+          "SampleFanout|facts_14>dimension_14:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.122293,
+            "runs": 1
+          },
+          "SampleFanout|facts_15>dimension_15:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.77018,
+            "runs": 1
+          },
+          "SampleFanout|facts_16>dimension_16:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.306047,
+            "runs": 1
+          },
+          "SampleFanout|facts_17>dimension_17:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.083202999999999,
+            "runs": 1
+          },
+          "SampleFanout|facts_18>dimension_18:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.285933,
+            "runs": 1
+          },
+          "SampleFanout|facts_19>dimension_19:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.748686,
+            "runs": 1
+          },
+          "SampleFanout|facts_1>dimension_1:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.251174,
+            "runs": 1
+          },
+          "SampleFanout|facts_20>dimension_20:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.565639,
+            "runs": 1
+          },
+          "SampleFanout|facts_21>dimension_21:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.677217,
+            "runs": 1
+          },
+          "SampleFanout|facts_22>dimension_22:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.913138,
+            "runs": 1
+          },
+          "SampleFanout|facts_23>dimension_23:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.179174,
+            "runs": 1
+          },
+          "SampleFanout|facts_24>dimension_24:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.9515569999999998,
+            "runs": 1
+          },
+          "SampleFanout|facts_25>dimension_25:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 6.388952,
+            "runs": 1
+          },
+          "SampleFanout|facts_26>dimension_26:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.5445199999999994,
+            "runs": 1
+          },
+          "SampleFanout|facts_27>dimension_27:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.088332,
+            "runs": 1
+          },
+          "SampleFanout|facts_28>dimension_28:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.295404,
+            "runs": 1
+          },
+          "SampleFanout|facts_29>dimension_29:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.185124,
+            "runs": 1
+          },
+          "SampleFanout|facts_2>dimension_2:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.657451,
+            "runs": 1
+          },
+          "SampleFanout|facts_30>dimension_30:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.839771,
+            "runs": 1
+          },
+          "SampleFanout|facts_31>dimension_31:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.919342,
+            "runs": 1
+          },
+          "SampleFanout|facts_32>dimension_32:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.040267,
+            "runs": 1
+          },
+          "SampleFanout|facts_33>dimension_33:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.300673,
+            "runs": 1
+          },
+          "SampleFanout|facts_34>dimension_34:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.619949,
+            "runs": 1
+          },
+          "SampleFanout|facts_35>dimension_35:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.964292,
+            "runs": 1
+          },
+          "SampleFanout|facts_36>dimension_36:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.921366,
+            "runs": 1
+          },
+          "SampleFanout|facts_37>dimension_37:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.742411000000001,
+            "runs": 1
+          },
+          "SampleFanout|facts_38>dimension_38:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.234298,
+            "runs": 1
+          },
+          "SampleFanout|facts_39>dimension_39:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.767131,
+            "runs": 1
+          },
+          "SampleFanout|facts_3>dimension_3:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.717697,
+            "runs": 1
+          },
+          "SampleFanout|facts_4>dimension_4:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.630129,
+            "runs": 1
+          },
+          "SampleFanout|facts_5>dimension_5:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.114593,
+            "runs": 1
+          },
+          "SampleFanout|facts_6>dimension_6:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.176343,
+            "runs": 1
+          },
+          "SampleFanout|facts_7>dimension_7:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.050463,
+            "runs": 1
+          },
+          "SampleFanout|facts_8>dimension_8:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.938746,
+            "runs": 1
+          },
+          "SampleFanout|facts_9>dimension_9:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.036233,
+            "runs": 1
+          }
+        },
+        "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+        "evidence": {
+          "audited_failures_in_window": 30,
+          "audited_failures_total": 30,
+          "min_evidence": 8,
+          "passed": 10,
+          "unaudited_failures": 0
+        },
+        "kinds": {
+          "KeyUnique": {
+            "fails": 30,
+            "hits": 0,
+            "mrows": 4.000000000000002,
+            "ms": 1630.2212250000002,
+            "runs": 40
+          },
+          "RowConservation": {
+            "fails": 30,
+            "hits": 0,
+            "mrows": 4.160000000000003,
+            "ms": 701.7930720000002,
+            "runs": 40
+          },
+          "SampleFanout": {
+            "fails": 30,
+            "hits": 0,
+            "mrows": 4.000000000000002,
+            "ms": 196.66859300000002,
+            "runs": 40
+          }
+        },
+        "order_calls": 2,
+        "pending_validation": {
+          "baseline_ms": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "episodes": 0,
+          "mean_delta_ms": 0.0,
+          "policy_ms": 0.0
+        }
+      },
+      "setting": "repair-exhausted",
+      "tests": [
+        {
+          "default_ms": 49.545981,
+          "group": 40,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 49.545981,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 49.545981,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.466508000000005,
+          "group": 41,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.466508000000005,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.466508000000005,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 17.695265000000003,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 17.695265000000003,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.015533,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.015533,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.015533,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.65591,
+          "group": 42,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.65591,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.65591,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.049526999999998,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.049526999999998,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.030773,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.030773,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.030773,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 43.428241,
+          "group": 43,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 43.428241,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 43.428241,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.242199,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.242199,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.076743,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.076743,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.076743,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 49.940943,
+          "group": 44,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 49.940943,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 49.940943,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.333057000000004,
+          "group": 45,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.333057000000004,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.333057000000004,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.765522,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.765522,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.941928,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.941928,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.941928,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.412458,
+          "group": 46,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.412458,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.412458,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.149473999999998,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.149473999999998,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.670236,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.670236,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.670236,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.187097,
+          "group": 47,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.187097,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.187097,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.196898,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.196898,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.951022,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.951022,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 4.951022,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 51.38633399999999,
+          "group": 48,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.386334,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.386334,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 51.386334,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 45.051942,
+          "group": 49,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 45.051942,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.051942,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.969539,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.969539,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.778828,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.778828,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.778828,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 46.119407,
+          "group": 50,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 46.119407,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 46.119407,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.683552,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.683552,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.383115,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.383115,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.383115,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.553728,
+          "group": 51,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.553728,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.553728,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.043476,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.043476,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.414705,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.414705,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.414705,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 52.029359,
+          "group": 52,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 52.029359,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 52.029359,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.240927,
+          "group": 53,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.240927,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.240927,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.234178,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.234178,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.861612,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.861612,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 4.861612,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.302118,
+          "group": 54,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.302118,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.302118,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.45452,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.45452,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.285574,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.285574,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.285574,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 46.013028,
+          "group": 55,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 46.013028,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 46.013028,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 20.302891,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 20.302891,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.891948,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.891948,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.891948,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 59.54940599999999,
+          "group": 56,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 59.54940599999999,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 45.369544,
+          "group": 57,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 45.369544,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.369544,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.559936,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.559936,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.850747,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.850747,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.850747,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 48.422844,
+          "group": 58,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 48.422844,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 48.422844,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 22.058793,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 22.058793,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 6.712744,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 6.712744,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 6.712744,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 49.554801000000005,
+          "group": 59,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 49.554801000000005,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.554801000000005,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 21.193278,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 21.193278,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 7.439997,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 7.439997,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 7.439997,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 57.99129599999999,
+          "group": 60,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 57.99129599999999,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 50.499007,
+          "group": 61,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 50.499007,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.499007,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 23.001898999999998,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 23.001898999999998,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 7.432988,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 7.432988,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 7.432988,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 45.854137,
+          "group": 62,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 45.854137,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.854137,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.984422000000002,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.984422000000002,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 6.968954999999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 6.968954999999999,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 6.968954999999999,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 41.411457,
+          "group": 63,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 41.411457,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 41.411457,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 15.019717,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 15.019717,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.524570000000001,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.524570000000001,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 4.524570000000001,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        }
+      ]
+    },
+    {
+      "adoption": {
+        "adaptive": {
+          "adopted": true,
+          "at": 30,
+          "evidence": {
+            "baseline_ms": 44.14306066666668,
+            "ci95": [
+              -38.552072733019834,
+              -10.778588433646862
+            ],
+            "episodes": 12,
+            "mean_delta_ms": -24.665330583333347,
+            "policy_ms": 19.47773008333333
+          }
+        },
+        "adaptive_uses": 1,
+        "contexts": {
+          "KeyUnique|dimension_0(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 30.201216,
+            "runs": 1
+          },
+          "KeyUnique|dimension_1(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.096953,
+            "runs": 1
+          },
+          "KeyUnique|dimension_10(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.972435999999995,
+            "runs": 1
+          },
+          "KeyUnique|dimension_11(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.056325,
+            "runs": 1
+          },
+          "KeyUnique|dimension_12(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 26.445531000000003,
+            "runs": 1
+          },
+          "KeyUnique|dimension_13(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.72432,
+            "runs": 1
+          },
+          "KeyUnique|dimension_14(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.86817,
+            "runs": 1
+          },
+          "KeyUnique|dimension_15(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.799761000000004,
+            "runs": 1
+          },
+          "KeyUnique|dimension_16(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.642512,
+            "runs": 1
+          },
+          "KeyUnique|dimension_17(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.528875000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_18(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.748449,
+            "runs": 1
+          },
+          "KeyUnique|dimension_19(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.524415,
+            "runs": 1
+          },
+          "KeyUnique|dimension_2(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.638878,
+            "runs": 1
+          },
+          "KeyUnique|dimension_20(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.922773,
+            "runs": 1
+          },
+          "KeyUnique|dimension_21(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.267293,
+            "runs": 1
+          },
+          "KeyUnique|dimension_22(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.377274,
+            "runs": 1
+          },
+          "KeyUnique|dimension_23(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.896747000000005,
+            "runs": 1
+          },
+          "KeyUnique|dimension_24(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 27.532228999999997,
+            "runs": 1
+          },
+          "KeyUnique|dimension_25(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.403607,
+            "runs": 1
+          },
+          "KeyUnique|dimension_26(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.893521,
+            "runs": 1
+          },
+          "KeyUnique|dimension_27(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.82384,
+            "runs": 1
+          },
+          "KeyUnique|dimension_28(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 30.015474,
+            "runs": 1
+          },
+          "KeyUnique|dimension_29(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.680279000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_3(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.303633000000005,
+            "runs": 1
+          },
+          "KeyUnique|dimension_30(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.104541,
+            "runs": 1
+          },
+          "KeyUnique|dimension_31(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.721019,
+            "runs": 1
+          },
+          "KeyUnique|dimension_32(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.515000999999998,
+            "runs": 1
+          },
+          "KeyUnique|dimension_33(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.077876,
+            "runs": 1
+          },
+          "KeyUnique|dimension_34(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.686922,
+            "runs": 1
+          },
+          "KeyUnique|dimension_35(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.862795000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_36(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 30.039294,
+            "runs": 1
+          },
+          "KeyUnique|dimension_37(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.168666,
+            "runs": 1
+          },
+          "KeyUnique|dimension_38(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 40.452982,
+            "runs": 1
+          },
+          "KeyUnique|dimension_39(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.84068,
+            "runs": 1
+          },
+          "KeyUnique|dimension_4(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.903724,
+            "runs": 1
+          },
+          "KeyUnique|dimension_5(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 43.751024,
+            "runs": 1
+          },
+          "KeyUnique|dimension_6(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 45.420975000000006,
+            "runs": 1
+          },
+          "KeyUnique|dimension_7(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.134175,
+            "runs": 1
+          },
+          "KeyUnique|dimension_8(r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 29.689832,
+            "runs": 1
+          },
+          "KeyUnique|dimension_9(r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 44.487208,
+            "runs": 1
+          },
+          "RowConservation|facts_0>dimension_0:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.431217,
+            "runs": 1
+          },
+          "RowConservation|facts_10>dimension_10:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.965266,
+            "runs": 1
+          },
+          "RowConservation|facts_11>dimension_11:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.940086,
+            "runs": 1
+          },
+          "RowConservation|facts_12>dimension_12:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.337902,
+            "runs": 1
+          },
+          "RowConservation|facts_13>dimension_13:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.189417,
+            "runs": 1
+          },
+          "RowConservation|facts_14>dimension_14:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.274819,
+            "runs": 1
+          },
+          "RowConservation|facts_15>dimension_15:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.219978,
+            "runs": 1
+          },
+          "RowConservation|facts_16>dimension_16:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.544367,
+            "runs": 1
+          },
+          "RowConservation|facts_17>dimension_17:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.209038,
+            "runs": 1
+          },
+          "RowConservation|facts_18>dimension_18:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.929812000000002,
+            "runs": 1
+          },
+          "RowConservation|facts_19>dimension_19:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.384988,
+            "runs": 1
+          },
+          "RowConservation|facts_1>dimension_1:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.476949,
+            "runs": 1
+          },
+          "RowConservation|facts_20>dimension_20:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.235252,
+            "runs": 1
+          },
+          "RowConservation|facts_21>dimension_21:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.51479,
+            "runs": 1
+          },
+          "RowConservation|facts_22>dimension_22:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.167394,
+            "runs": 1
+          },
+          "RowConservation|facts_23>dimension_23:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.798012999999997,
+            "runs": 1
+          },
+          "RowConservation|facts_24>dimension_24:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.478334,
+            "runs": 1
+          },
+          "RowConservation|facts_25>dimension_25:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.062942999999997,
+            "runs": 1
+          },
+          "RowConservation|facts_26>dimension_26:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.076997000000002,
+            "runs": 1
+          },
+          "RowConservation|facts_27>dimension_27:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.048942999999998,
+            "runs": 1
+          },
+          "RowConservation|facts_28>dimension_28:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.941393,
+            "runs": 1
+          },
+          "RowConservation|facts_29>dimension_29:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.961036,
+            "runs": 1
+          },
+          "RowConservation|facts_2>dimension_2:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.738825,
+            "runs": 1
+          },
+          "RowConservation|facts_30>dimension_30:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.979696,
+            "runs": 1
+          },
+          "RowConservation|facts_31>dimension_31:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.534394,
+            "runs": 1
+          },
+          "RowConservation|facts_32>dimension_32:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.456955999999998,
+            "runs": 1
+          },
+          "RowConservation|facts_33>dimension_33:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.653665,
+            "runs": 1
+          },
+          "RowConservation|facts_34>dimension_34:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.907677,
+            "runs": 1
+          },
+          "RowConservation|facts_35>dimension_35:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.735635,
+            "runs": 1
+          },
+          "RowConservation|facts_36>dimension_36:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 16.124675,
+            "runs": 1
+          },
+          "RowConservation|facts_37>dimension_37:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.018165,
+            "runs": 1
+          },
+          "RowConservation|facts_38>dimension_38:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 14.568004,
+            "runs": 1
+          },
+          "RowConservation|facts_39>dimension_39:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.213102,
+            "runs": 1
+          },
+          "RowConservation|facts_3>dimension_3:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 19.158444,
+            "runs": 1
+          },
+          "RowConservation|facts_4>dimension_4:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.490553,
+            "runs": 1
+          },
+          "RowConservation|facts_5>dimension_5:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 17.766695,
+            "runs": 1
+          },
+          "RowConservation|facts_6>dimension_6:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.011697,
+            "runs": 1
+          },
+          "RowConservation|facts_7>dimension_7:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.203318,
+            "runs": 1
+          },
+          "RowConservation|facts_8>dimension_8:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 13.98493,
+            "runs": 1
+          },
+          "RowConservation|facts_9>dimension_9:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.104,
+            "ms": 18.057707,
+            "runs": 1
+          },
+          "SampleFanout|facts_0>dimension_0:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.47678,
+            "runs": 1
+          },
+          "SampleFanout|facts_10>dimension_10:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.842991,
+            "runs": 1
+          },
+          "SampleFanout|facts_11>dimension_11:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.8612020000000005,
+            "runs": 1
+          },
+          "SampleFanout|facts_12>dimension_12:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.851176,
+            "runs": 1
+          },
+          "SampleFanout|facts_13>dimension_13:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.608715999999999,
+            "runs": 1
+          },
+          "SampleFanout|facts_14>dimension_14:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.122293,
+            "runs": 1
+          },
+          "SampleFanout|facts_15>dimension_15:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.77018,
+            "runs": 1
+          },
+          "SampleFanout|facts_16>dimension_16:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.306047,
+            "runs": 1
+          },
+          "SampleFanout|facts_17>dimension_17:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.083202999999999,
+            "runs": 1
+          },
+          "SampleFanout|facts_18>dimension_18:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.285933,
+            "runs": 1
+          },
+          "SampleFanout|facts_19>dimension_19:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.748686,
+            "runs": 1
+          },
+          "SampleFanout|facts_1>dimension_1:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.251174,
+            "runs": 1
+          },
+          "SampleFanout|facts_20>dimension_20:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.565639,
+            "runs": 1
+          },
+          "SampleFanout|facts_21>dimension_21:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.677217,
+            "runs": 1
+          },
+          "SampleFanout|facts_22>dimension_22:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.913138,
+            "runs": 1
+          },
+          "SampleFanout|facts_23>dimension_23:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.179174,
+            "runs": 1
+          },
+          "SampleFanout|facts_24>dimension_24:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.9515569999999998,
+            "runs": 1
+          },
+          "SampleFanout|facts_25>dimension_25:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 6.388952,
+            "runs": 1
+          },
+          "SampleFanout|facts_26>dimension_26:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.5445199999999994,
+            "runs": 1
+          },
+          "SampleFanout|facts_27>dimension_27:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.088332,
+            "runs": 1
+          },
+          "SampleFanout|facts_28>dimension_28:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.295404,
+            "runs": 1
+          },
+          "SampleFanout|facts_29>dimension_29:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.185124,
+            "runs": 1
+          },
+          "SampleFanout|facts_2>dimension_2:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.657451,
+            "runs": 1
+          },
+          "SampleFanout|facts_30>dimension_30:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.839771,
+            "runs": 1
+          },
+          "SampleFanout|facts_31>dimension_31:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.919342,
+            "runs": 1
+          },
+          "SampleFanout|facts_32>dimension_32:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.040267,
+            "runs": 1
+          },
+          "SampleFanout|facts_33>dimension_33:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.300673,
+            "runs": 1
+          },
+          "SampleFanout|facts_34>dimension_34:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.619949,
+            "runs": 1
+          },
+          "SampleFanout|facts_35>dimension_35:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.964292,
+            "runs": 1
+          },
+          "SampleFanout|facts_36>dimension_36:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.921366,
+            "runs": 1
+          },
+          "SampleFanout|facts_37>dimension_37:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.742411000000001,
+            "runs": 1
+          },
+          "SampleFanout|facts_38>dimension_38:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.234298,
+            "runs": 1
+          },
+          "SampleFanout|facts_39>dimension_39:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.767131,
+            "runs": 1
+          },
+          "SampleFanout|facts_3>dimension_3:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.717697,
+            "runs": 1
+          },
+          "SampleFanout|facts_4>dimension_4:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 4.630129,
+            "runs": 1
+          },
+          "SampleFanout|facts_5>dimension_5:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.114593,
+            "runs": 1
+          },
+          "SampleFanout|facts_6>dimension_6:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.176343,
+            "runs": 1
+          },
+          "SampleFanout|facts_7>dimension_7:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.050463,
+            "runs": 1
+          },
+          "SampleFanout|facts_8>dimension_8:(l_key=r_key)": {
+            "fails": 0,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 3.938746,
+            "runs": 1
+          },
+          "SampleFanout|facts_9>dimension_9:(l_key=r_key)": {
+            "fails": 1,
+            "hits": 0,
+            "mrows": 0.1,
+            "ms": 5.036233,
+            "runs": 1
+          }
+        },
+        "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+        "evidence": {
+          "audited_failures_in_window": 30,
+          "audited_failures_total": 30,
+          "min_evidence": 8,
+          "passed": 10,
+          "unaudited_failures": 0
+        },
+        "kinds": {
+          "KeyUnique": {
+            "fails": 30,
+            "hits": 0,
+            "mrows": 4.000000000000002,
+            "ms": 1630.2212250000002,
+            "runs": 40
+          },
+          "RowConservation": {
+            "fails": 30,
+            "hits": 0,
+            "mrows": 4.160000000000003,
+            "ms": 701.7930720000002,
+            "runs": 40
+          },
+          "SampleFanout": {
+            "fails": 30,
+            "hits": 0,
+            "mrows": 4.000000000000002,
+            "ms": 196.66859300000002,
+            "runs": 40
+          }
+        },
+        "order_calls": 2,
+        "pending_validation": {
+          "baseline_ms": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "episodes": 0,
+          "mean_delta_ms": 0.0,
+          "policy_ms": 0.0
+        }
+      },
+      "setting": "mixed",
+      "tests": [
+        {
+          "default_ms": 49.545981,
+          "group": 40,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 49.545981,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.545981,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 49.545981,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.466508000000005,
+          "group": 41,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.466508000000005,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.466508000000005,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 17.695265000000003,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 17.695265000000003,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.015533,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.015533,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.015533,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.65591,
+          "group": 42,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.65591,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.65591,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.705436999999996,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.705436999999996,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.686683,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.686683,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 49.686683,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 43.428241,
+          "group": 43,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 43.428241,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 43.428241,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.242199,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.242199,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.076743,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.076743,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.076743,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 49.940943,
+          "group": 44,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 49.940943,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 49.940943,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 49.940943,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.333057000000004,
+          "group": 45,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.333057000000004,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.333057000000004,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.765522,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.765522,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.941928,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.941928,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.941928,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.412458,
+          "group": 46,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.412458,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.412458,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 63.561932,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 63.561932,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.082694000000004,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.082694000000004,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 50.082694000000004,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.187097,
+          "group": 47,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.187097,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.187097,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.196898,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.196898,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.951022,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.951022,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 4.951022,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 51.38633399999999,
+          "group": 48,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.386334,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.38633399999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 51.386334,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 51.386334,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 45.051942,
+          "group": 49,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 45.051942,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.051942,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.969539,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.969539,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.778828,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.778828,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.778828,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 46.119407,
+          "group": 50,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 46.119407,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 46.119407,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.802959,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.802959,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 51.502522,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 51.502522,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 51.502522,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.553728,
+          "group": 51,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.553728,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.553728,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.043476,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.043476,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.414705,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.414705,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.414705,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 52.029359,
+          "group": 52,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 52.029359,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 52.029359,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 52.029359,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.240927,
+          "group": 53,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.240927,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.240927,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.234178,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 18.234178,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.861612,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.861612,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 4.861612,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 44.302118,
+          "group": 54,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 44.302118,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 44.302118,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.756637999999995,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 62.756637999999995,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.587692000000004,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.587692000000004,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 49.587692000000004,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 46.013028,
+          "group": 55,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 46.013028,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 46.013028,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 20.302891,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 20.302891,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.891948,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.891948,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.891948,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 59.54940599999999,
+          "group": 56,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 59.54940599999999,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 59.54940599999999,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 45.369544,
+          "group": 57,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 45.369544,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.369544,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.559936,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 19.559936,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.850747,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 5.850747,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 5.850747,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 48.422844,
+          "group": 58,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 48.422844,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 48.422844,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 70.481637,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 70.481637,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 55.135588,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 55.135588,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 55.135588,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 49.554801000000005,
+          "group": 59,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 49.554801000000005,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 49.554801000000005,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 21.193278,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 21.193278,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 7.439997,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 7.439997,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 7.439997,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 57.99129599999999,
+          "group": 60,
+          "pass": true,
+          "permutations": [
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": true
+            },
+            {
+              "ms": 57.99129599999999,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": true
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 57.99129599999999,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 50.499007,
+          "group": 61,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 50.499007,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 50.499007,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 23.001898999999998,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 23.001898999999998,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 7.432988,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 7.432988,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 7.432988,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 45.854137,
+          "group": 62,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 45.854137,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 45.854137,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.838559,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 64.838559,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 52.823092,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 52.823092,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": true,
+          "selected_ms": 52.823092,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        },
+        {
+          "default_ms": 41.411457,
+          "group": 63,
+          "pass": false,
+          "permutations": [
+            {
+              "ms": 41.411457,
+              "order": [
+                0,
+                1,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 41.411457,
+              "order": [
+                0,
+                2,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 15.019717,
+              "order": [
+                1,
+                0,
+                2
+              ],
+              "pass": false
+            },
+            {
+              "ms": 15.019717,
+              "order": [
+                1,
+                2,
+                0
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.524570000000001,
+              "order": [
+                2,
+                0,
+                1
+              ],
+              "pass": false
+            },
+            {
+              "ms": 4.524570000000001,
+              "order": [
+                2,
+                1,
+                0
+              ],
+              "pass": false
+            }
+          ],
+          "probe_key": false,
+          "selected_ms": 4.524570000000001,
+          "selected_order": [
+            "SampleFanout",
+            "RowConservation",
+            "KeyUnique"
+          ]
+        }
+      ]
+    }
+  ],
+  "test_groups": 24,
+  "training_groups": 24,
+  "validation_groups": 16
+}

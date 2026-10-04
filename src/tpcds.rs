@@ -392,10 +392,7 @@ async fn cols(db: &Db, table: &str, exclude: &[&str]) -> Result<Vec<String>> {
             ),
         )
         .await?;
-    Ok((0..r.rows.len())
-        .filter_map(|i| r.cell(i, 0).map(str::to_string))
-        .filter(|c| !exclude.contains(&c.as_str()))
-        .collect())
+    Ok((0..r.rows.len()).filter_map(|i| r.cell(i, 0).map(str::to_string)).filter(|c| !exclude.contains(&c.as_str())).collect())
 }
 
 /// 门店销售的全部金额列（numeric）。
@@ -438,7 +435,6 @@ pub async fn setup(db: &Db) -> Result<()> {
     ensure!(pk == 0, "TPC-DS 事实表仍有主键，请用 tools/tpcds-load.sh 装载模板库");
     etl::setup(db).await?;
     scenario::setup(db).await?;
-    db.query(QKind::Meta, "create schema if not exists aux; create table if not exists aux.backfill_keys (item int, ticket int)")
-        .await?;
+    db.query(QKind::Meta, "create schema if not exists aux; create table if not exists aux.backfill_keys (item int, ticket int)").await?;
     Ok(())
 }

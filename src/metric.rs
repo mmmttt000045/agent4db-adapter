@@ -271,7 +271,7 @@ pub fn verify_chain(traj: &Trajectory, results: &BTreeMap<usize, Value>) -> std:
 // ───────────────────────── 规范 SQL ─────────────────────────
 
 fn squash(s: &str) -> String {
-    s.to_lowercase().chars().filter(|c| !c.is_whitespace()).collect()
+    sqlscan::expression_key(s)
 }
 
 fn push_unique(v: &mut Vec<String>, seen: &mut BTreeSet<String>, f: &str) {
@@ -288,22 +288,32 @@ fn period_pred(p: &Period) -> String {
     }
 }
 
+/// 当前编译器以事实表为根；每个非时间连接必须从事实表指向被验证为至多一行的右侧。
+/// 反向引用只证明事实表键唯一，不能阻止另一侧把事实行放大。多跳与自连接也不在当前契约内。
+pub fn check_join_orientation(m: &Metric) -> Result<()> {
+    for j in &m.joins {
+        ensure!(
+            j.left == m.fact && j.right != m.fact,
+            "关联 {}⋈{} 必须从事实表 {} 指向至多一行的另一侧；反向、多跳和自连接尚不支持",
+            j.left,
+            j.right,
+            m.fact
+        );
+    }
+    Ok(())
+}
+
 /// 由口径字段编译规范 SQL（G7、G8 与修复后的示例使用）。列名不加表别名（本数据集列名全局唯一）；
 /// 期间谓词按 date_dim 的 d_year / d_moy 约定生成。左关联的过滤放在 ON 中，避免把左关联变成内关联。
 pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
+    check_join_orientation(m)?;
     let time = m.time.as_ref().ok_or_else(|| anyhow!("口径没有时间定义，无法按期间编译"))?;
     ensure!(time.dim == "date_dim", "规范编译只支持 date_dim 日历（d_year、d_moy）");
     let mut from = m.fact.clone();
     let mut wheres = vec![];
     let mut seen = BTreeSet::new();
     for j in &m.joins {
-        let other = if j.left == m.fact {
-            &j.right
-        } else if j.right == m.fact {
-            &j.left
-        } else {
-            bail!("关联 {}⋈{} 不经过事实表 {}", j.left, j.right, m.fact);
-        };
+        let other = &j.right;
         let mut conds: Vec<String> = j.on.iter().map(|(l, r)| format!("{l} = {r}")).collect();
         let mut seen_on = BTreeSet::new();
         for f in j.filters.get(other).into_iter().chain(m.filters.get(other)) {
@@ -743,9 +753,36 @@ mod tests {
         inner.joins[0].kind = JoinKind::Inner;
         let s = compile(&inner, &Ask::Single { period: p(2002, 9) }).unwrap();
         assert!(s.contains("where (sr_status = '完成') and d_year = 2002"));
+        let mut literal_filters = m.clone();
+        literal_filters.joins[0].filters.insert("store_returns".into(), "sr_status = 'A B'".into());
+        literal_filters.filters.insert("store_returns".into(), "sr_status = 'AB'".into());
+        let s = compile(&literal_filters, &Ask::Single { period: p(2002, 9) }).unwrap();
+        assert!(s.contains("(sr_status = 'A B') and (sr_status = 'AB')"));
+        let mut different_values = literal_filters.clone();
+        different_values.filters.insert("store_returns".into(), "sr_status = 'A B'".into());
+        assert!(!same_structure(&literal_filters, &different_values));
         let mut untimed = m;
         untimed.time = None;
         assert!(compile(&untimed, &Ask::RankMonth { year: 2001 }).is_err());
+    }
+
+    #[test]
+    fn compile_rejects_reverse_fact_join_to_prevent_fanout() {
+        let ask = Ask::Single { period: Period::month(2002, 9) };
+        let mut m = rate();
+        let j = &mut m.joins[0];
+        std::mem::swap(&mut j.left, &mut j.right);
+        for (l, r) in &mut j.on {
+            std::mem::swap(l, r);
+        }
+        // Right-side uniqueness now proves the fact key, not the number of matching returns.
+        assert!(compile(&m, &ask).unwrap_err().to_string().contains("反向"));
+        m.joins[0].left = "item".into();
+        m.joins[0].right = "store_returns".into();
+        assert!(compile(&m, &ask).is_err());
+        m.joins[0].left = m.fact.clone();
+        m.joins[0].right = m.fact.clone();
+        assert!(compile(&m, &ask).is_err());
     }
 
     #[test]

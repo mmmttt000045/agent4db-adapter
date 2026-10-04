@@ -3,3 +3,4 @@ build.log
 .env
 .env.deepseek
 /results/
+/tools/deck/node_modules/

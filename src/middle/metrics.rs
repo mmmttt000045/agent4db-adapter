@@ -704,7 +704,7 @@ impl Middle {
     /// 规范 SQL 只有一列）；执行失败算不通过。
     /// G8 的学习时快照版本：参照查询与替代修订在同一个只读事务里执行，数据是学习时快照——单独的快照库
     /// （`schema` 为空），或同一库里保存学习时数据的模式（以它为 search_path）。
-    async fn learned_snapshot_gate(&self, db: &Db, schema: Option<&str>, reference: &str, sql: &str, decimals: u32) -> Gate {
+    async fn learned_snapshot_gate(&self, db: &crate::db::Db, schema: Option<&str>, reference: &str, sql: &str, decimals: u32) -> Gate {
         let run = async {
             let snap = db.snapshot().await?;
             if let Some(schema) = schema {

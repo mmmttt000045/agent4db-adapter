@@ -22,13 +22,14 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from vecfig import PT  # noqa: E402
+from vecfig import PT, measure  # noqa: E402
 import style  # noqa: E402
 from style import (ACC, ACC_DK, ACC_PALE, AMBER, AMBER_PALE, EDGE, FACE, FIELD, INK, MUTED,  # noqa: E402
                    RED, RULE, SIDE, SLATE, TOP, WHITE)
 
 NAME = 'architecture'
-W, H = style.TEXTWIDTH, 68.6
+W, H = style.TEXTWIDTH, 71.3
+LOW = 2.7                                # how far the lower half moved for the taller store
 
 TITLE, BODY, NOTE, STEP = 7.0, 6.4, 6.0, 5.6    # font sizes, pt (acmart \scriptsize is 6, \footnotesize 7)
 LEARN, USE, EXEC_C = '#7A68B0', ACC, '#C97A1E'  # path colours: learning, use, execution
@@ -42,7 +43,11 @@ LABELS = {
         'middleware': 'MAVRA middleware',
         'admission': 'Admission', 'candidate': 'candidate',
         'defs': 'Definitions', 'valid': 'valid', 'pending': 'pending', 'revoked': 'invalid',
-        'results': 'Check results', 'results_key': 'one per',
+        'results': 'Check results', 'results_key': 'key',
+        'no_result': '? no result at current $V$', 'qc_result': '$Q_c$ result',
+        'valid_mr': 'valid $m^r$', 'q_decl': '$q$ + declared $m^r$',
+        'available': '$m^r$ available · SQL review', 'prov': 'provenance',
+        'shared': 'shared by all user agents', 'from_a': 'from A',
         'maint': 'Condition maintenance', 'maint_note': 'reuse result, else run $Q_c$',
         'repair': 'Bounded repair', 'repair_note': 'unique filter',
         'lookup': 'Lookup', 'lookup_note': 'compare versions $V(T)$',
@@ -54,7 +59,7 @@ LABELS = {
         'db_snapshot': 'snapshot',
         'etl': 'ETL and writers', 'updates': 'updates', 'publish': 'publish',
         'reuse': 'reuse', 'to_maint': 'pending', 'failed': 'failed $c$',
-        'chain': 'provenance / candidate', 'versions': '$V(T)$',
+        'versions': '$V(T)$',
         'tracker_read': '$V(T)$', 'snapshot': 'snapshot $s$',
         'paths': ('learning path', 'use path', 'execution path'),
         'lines': ('call / response', 'shared-store write', 'read of database state'),
@@ -66,7 +71,11 @@ LABELS = {
         'middleware': 'MAVRA 中间件',
         'admission': '准入', 'candidate': '候选',
         'defs': '定义', 'valid': '有效', 'pending': '待验证', 'revoked': '已失效',
-        'results': '检查结果', 'results_key': '每个键一条',
+        'results': '检查结果', 'results_key': '键',
+        'no_result': '? 当前版本尚无结果', 'qc_result': '$Q_c$ 结果',
+        'valid_mr': '有效 $m^r$', 'q_decl': '$q$ + 声明的 $m^r$',
+        'available': '$m^r$ 可用 · SQL 审查', 'prov': '答案溯源',
+        'shared': '所有用户端智能体共享', 'from_a': '来自 A',
         'maint': '条件维护', 'maint_note': '复用结果，否则执行 $Q_c$',
         'repair': '有界修复', 'repair_note': '唯一过滤',
         'lookup': '查找', 'lookup_note': '比较版本 $V(T)$',
@@ -78,7 +87,7 @@ LABELS = {
         'db_snapshot': '快照',
         'etl': 'ETL 与写入方', 'updates': '更新', 'publish': '发布',
         'reuse': '复用', 'to_maint': '待验证', 'failed': '条件失败',
-        'chain': '答案溯源／候选', 'versions': '$V(T)$',
+        'versions': '$V(T)$',
         'tracker_read': '$V(T)$', 'snapshot': '快照 $s$',
         'paths': ('学习路径', '使用路径', '执行路径'),
         'lines': ('调用／返回', '写入共享库', '读取数据库状态'),
@@ -86,20 +95,24 @@ LABELS = {
 }
 
 # Boxes (x, y, w, h).
-ADM = (4, 24, 21, 24.5)
-STORE = (33, 24, 68, 13.3)
-SPLIT = 71                               # definitions | check results inside the store
-REPAIR = (33, 40.5, 28, 8)
-MAINT = (70.4, 40.5, 30.6, 8)
+ADM = (4, 24, 21, 27.2)
+STORE = (33, 24, 68, 16.0)
+SPLIT = 69                               # definitions | check results inside the store
+REPAIR = (33, 43.2, 28, 8)
+MAINT = (70.4, 43.2, 30.6, 8)
 LOOKUP = (109, 24, 27, 9.5)
-TRACK = (109, 40.5, 27, 8)
-EXEC = (144, 24, 31, 24.5)
-FIELD_BOX = (1.5, 20, 175.5, 31.5)
+TRACK = (109, 43.2, 27, 8)
+EXEC = (144, 24, 31, 27.2)
+FIELD_BOX = (1.5, 20, 175.5, 34.2)
 NODE_Y, NODE_H = 6, 8.4                  # front faces of the user agents
 INNER_Y = 7.6                            # front faces of MAVRA's own agent and extractor
 INNER = (1.5, .2, 47.0, 20.8)            # MAVRA's field reaches up around them
-PG = (31, 57.0, 144, 11.0)               # the database slab
+PG = (31, 59.7, 144, 11.0)               # the database slab
 DB_TABLES, DB_STATS, DB_SNAP = (76, 32), (110.5, 27), (143.5, 30)   # (x, w) of its three regions
+# One worked example, kept consistent across the figure: each condition reads one
+# table; only T2 is written, so c3 has no check result at the current version
+# and m_2^1, which needs c3, is pending. (condition, table, result)
+CONDS = ((1, 1, 'ok'), (2, 3, 'ok'), (3, 2, 'wait'), (4, 4, 'fail'))
 
 
 def mid(box):
@@ -119,8 +132,8 @@ def draw(s, lang):
     def node(x, w, y=NODE_Y, d=1.5, own=False):
         """Front face with a top and a right face behind it; MAVRA's own parts are blue."""
         h = NODE_H
-        top, side, edge, face = ('#DCE8F7', '#C3D6EF', '#7FA6D8', '#F7FAFE') if own else \
-            (TOP, SIDE, EDGE, WHITE)
+        top, side, edge, face = ('#E6EFFA', '#D3E2F4', '#9DBBE2', '#F7FAFE') if own else \
+            ('#F2F0EC', '#E7E4DF', '#BDB9B2', WHITE)
         s.poly([(x, y), (x + d, y - d), (x + w + d, y - d), (x + w, y)], top, edge, .12)
         s.poly([(x + w, y), (x + w + d, y - d), (x + w + d, y + h - d), (x + w, y + h)],
                side, edge, .12)
@@ -136,16 +149,20 @@ def draw(s, lang):
         s.line(x + 4.2, base + .2, x + w - .9, base + .2, '#7FA6D8', .2)
 
     def agent(x, letter, w=9.5):
-        """A user-side agent: asks questions in natural language."""
+        """A user-side agent: asks in natural language and holds the shared m_1^3."""
         node(x, w)
         y = NODE_Y
-        text(x + 1.5, y + 4.9, letter, TITLE + .6, INK, 'bold')
+        text(x + 1.5, y + 4.6, letter, TITLE + .6, INK, 'bold')
         bx, bw = x + 4.3, w - 5.6               # speech bubble with two lines
-        rect(bx, y + 1.4, bw, 4.0, ACC_PALE, ACC, .12, r=.7)
+        rect(bx, y + 1.0, bw, 3.4, ACC_PALE, ACC, .12, r=.7)
         for k, length in enumerate((bw - 1.4, bw - 2.3)):
-            s.line(bx + .7, y + 2.75 + 1.3 * k, bx + .7 + length, y + 2.75 + 1.3 * k, ACC, .22)
-        s.circle(x + 2.3, y + 6.9, .45, ACC)
-        s.line(x + 3.6, y + 6.9, x + w - 1.4, y + 6.9, RULE, .3)
+            s.line(bx + .7, y + 2.15 + 1.15 * k, bx + .7 + length, y + 2.15 + 1.15 * k, ACC, .22)
+        shared_def(x + 1.2, y + 5.3, w - 2.4)
+
+    def shared_def(x, y, w):
+        """The definition m_1^3, the same one every user agent receives."""
+        rect(x, y, w, 2.5, ACC_PALE, ACC, .16, r=.5)
+        text(x + w / 2, y + 1.85, '$m_1^3$', 5.6, ACC_DK, align='center')
 
     def gate(cx, cy, r=2.0):
         """Admission check: candidates pass only between its two bars."""
@@ -162,7 +179,7 @@ def draw(s, lang):
             s.line(x - .5, y - .5, x + .5, y + .5, RED, .24)
             s.line(x - .5, y + .5, x + .5, y - .5, RED, .24)
         else:
-            s.circle(x, y, .42, AMBER)
+            text(x, y + .8, '?', NOTE + .6, '#9A6500', 'bold', 'center')
 
     def chip(x, y, cond, kind):
         rect(x, y, 4.4, 2.3, FACE, EDGE, .1, r=.45)
@@ -242,9 +259,11 @@ def draw(s, lang):
     a1, a2 = a_x + 4.75, x_x + x_w / 2
     route([(a1, INNER_Y + NODE_H), (a1, ay)], LEARN, THIN)
     step(a1 - 2.8, 21.8, 1, LEARN)
-    route([(a2, ay), (a2, INNER_Y + NODE_H)], LEARN, THIN, heads='both')
-    text(a2 + 2, 19.0, L['chain'], NOTE, MUTED, width=INNER[0] + INNER[2] - a2 - 2.6)
-    step(a2 + 2.8, 21.8, 2, LEARN)
+    route([(a2 - .9, ay), (a2 - .9, INNER_Y + NODE_H)], LEARN, THIN, length=1.0)
+    route([(a2 + .9, INNER_Y + NODE_H), (a2 + .9, ay)], LEARN, THIN, length=1.0)
+    text(a2 - 2.3, 19.3, L['prov'], NOTE, MUTED, align='right', width=a2 - 2.3 - a1 - 1.0)
+    text(a2 + 2.3, 19.3, L['candidate'], NOTE, MUTED, width=INNER[0] + INNER[2] - a2 - 3.0)
+    step(a2 + 3.1, 21.9, 2, LEARN)
     # Candidate (answer provenance: queries and arithmetic) through the checks.
     cx, cy = ax + 2.0, ay + 2.2
     rect(cx + .9, cy - .9, 8.6, 9.2, FACE, EDGE, .12, r=.4)
@@ -273,6 +292,9 @@ def draw(s, lang):
     rect(x, y + 2.2, w, 2.2, ACC_PALE, None)
     s.line(x, y + 4.4, x + w, y + 4.4, RULE, .14)
     s.line(SPLIT, y, SPLIT, y + h, RULE, .14)
+    pw_ = measure(L['shared'], NOTE, 'bold') + 3.0
+    rect(x + w - pw_, 20.95, pw_, 2.5, ACC, None, r=1.25)
+    text(x + w - pw_ / 2, 22.75, L['shared'], NOTE, WHITE, 'bold', 'center')
     tw = text(x + 1.8, y + 3.2, L['defs'], TITLE, INK, 'bold')
     text(SPLIT - 1.6, y + 3.2, '$m^r=(B,I,C,E,r)$', BODY, INK, align='right',
          width=SPLIT - x - 5 - tw)
@@ -280,18 +302,32 @@ def draw(s, lang):
             ('$m_2^{1}$', L['pending'], AMBER, ((2, 'ok'), (3, 'wait'))),
             ('$m_3^{2}$', L['revoked'], RED, ((4, 'fail'),))]
     for k, (name, state, col, conds) in enumerate(rows):
-        yy = y + 5.0 + 2.65 * k
+        yy = y + 5.4 + 3.2 * k
+        if k == 0:                       # the shared definition, as held by every user agent
+            rect(x + .9, yy - .25, SPLIT - x - 1.8, 2.6, ACC_PALE, None, r=.4)
+        elif k == 1:                     # pending because c3 has no result at V(T2)
+            rect(x + .9, yy - .25, SPLIT - x - 1.8, 2.6, AMBER_PALE, None, r=.4)
         rect(x + 1.8, yy + .1, .6, 2.1, col)
         text(x + 3.2, yy + 1.75, name, BODY, INK)
         text(x + 9.0, yy + 1.75, state, NOTE, col)
+        if k == 0:
+            text(x + 17.0, yy + 1.75, L['from_a'], NOTE, LEARN, 'bold', width=8.5)
         for j, (cond, kind) in enumerate(conds):
             chip(SPLIT - 1.6 - 4.4 * (len(conds) - j) - .6 * (len(conds) - 1 - j), yy, cond, kind)
     text(SPLIT + 1.6, y + 3.2, L['results'], TITLE, INK, 'bold', width=x + w - SPLIT - 3.2)
-    for j, (cond, kind) in enumerate(((1, 'ok'), (2, 'ok'), (3, 'wait'), (4, 'fail'))):
-        chip(SPLIT + 1.6 + 5.0 * j, y + 5.2, cond, kind)
-    kw = text(SPLIT + 1.6, y + h - 1.6, L['results_key'], NOTE, MUTED)
-    text(x + w - 1.6, y + h - 1.6, r'$(\mathrm{id}(c),\,V(\mathrm{dep}(c)))$', NOTE, INK,
-         align='right', width=x + w - SPLIT - 4.4 - kw)
+    kw = text(SPLIT + 1.6, y + 7.3, L['results_key'], NOTE, MUTED)
+    text(SPLIT + 2.6 + kw, y + 7.3, r'$(\mathrm{id}(c),\,V(\mathrm{dep}(c)))$', NOTE, INK,
+         width=x + w - SPLIT - 4.2 - kw)
+    cw_ = (x + w - SPLIT - 3.2 - 1.0) / 2
+    for j, (cond, table, kind) in enumerate(CONDS):
+        cx_, cy_ = SPLIT + 1.6 + (j % 2) * (cw_ + 1.0), y + 8.1 + (j // 2) * 2.55
+        missing = kind == 'wait'
+        rect(cx_, cy_, cw_, 2.2, AMBER_PALE if missing else FACE, AMBER if missing else EDGE,
+             .14 if missing else .1, r=.45)
+        text(cx_ + .6, cy_ + 1.65, f'$c_{cond}$', NOTE, INK)
+        text(cx_ + 4.4, cy_ + 1.65, f'$T_{table}$', NOTE, MUTED)
+        mark(cx_ + cw_ - 1.3, cy_ + 1.1, kind)
+    text(SPLIT + 1.6, y + h - 1.0, L['no_result'], NOTE, '#9A6500', width=x + w - SPLIT - 3.2)
 
     # Use path: lookup, maintenance, repair --------------------------------
     titled(MAINT, L['maint'], L['maint_note'])
@@ -310,9 +346,11 @@ def draw(s, lang):
     bus_y = 17.2
     for xc in (bx + 4.75 for bx in b_xs):
         route([(xc, NODE_Y + NODE_H), (xc, bus_y)], INK, .2, heads=None)
-    route([(b4, bus_y), (b8, bus_y)], INK, .2, heads=None)
-    route([(b4, bus_y), (b4, ly)], USE, THIN)
-    step(b4 - 2.8, 21.6, 4, USE)
+    route([(b4 - .9, bus_y), (b8, bus_y)], INK, .2, heads=None)
+    route([(b4 - .9, bus_y), (b4 - .9, ly)], USE, THIN, length=1.0)        # call
+    route([(b4 + .9, ly), (b4 + .9, bus_y)], USE, THIN, length=1.0)        # response
+    text(b4 + 2.3, 21.6, L['valid_mr'], NOTE, USE)
+    step(b4 - 3.7, 21.6, 4, USE)
 
     store_right = STORE[0] + STORE[2]
     route([(store_right, ly + 3.5), (lx_, ly + 3.5)], USE, THIN)
@@ -344,9 +382,8 @@ def draw(s, lang):
     ex, ey, ew, eh = EXEC
     box(EXEC)
     route([(b8, bus_y), (b8, ey)], EXEC_C, THIN)
-    step(b8 - 2.8, 21.6, 8, EXEC_C)
-    route([(lx_ + lw, ly + 3.5), (ex, ly + 3.5)], EXEC_C, THIN)
-    gap_label(lx_ + lw, ex, ly + 2.4, '$m^r$')
+    step(b8 + 2.8, 21.6, 8, EXEC_C)
+    text(b8 - 1.4, 21.6, L['q_decl'], NOTE, EXEC_C, align='right', width=b8 - 1.4 - b4 - 16)
     first, second = L['exec']
     text(ex + 1.8, ey + 3.9, first, TITLE, INK, 'bold', width=ew - 3.6)
     top = ey + 3.9
@@ -354,7 +391,9 @@ def draw(s, lang):
         top += 3.0
         text(ex + 1.8, top, second, TITLE, INK, 'bold', width=ew - 3.6)
     text(ex + 1.8, top + 3.3, L['declares'], BODY, INK, width=ew - 3.6)
-    fx, fy, fw, fh = ex + 1.8, ey + 12.4, ew - 3.6, 7.0
+    mark(ex + 3.2, top + 5.75, 'ok')
+    text(ex + 4.6, top + 6.3, L['available'], NOTE, INK, width=ew - 6.4)
+    fx, fy, fw, fh = ex + 1.8, top + 8.6, ew - 3.6, 7.0
     rect(fx, fy, fw, fh, None, EXEC_C, .18, r=.6, dash=(.8, .5))
     dw = 4.4
     rect(fx + fw - dw - 1.2, fy - 1.1, dw, 2.2, WHITE, None)
@@ -365,25 +404,27 @@ def draw(s, lang):
         text(fx + 2.8, yy, label, NOTE, INK, width=fw - 3.4)
     px, py, pw, ph = PG
     route([(b8, ey + eh), (b8, py - 1.3)], EXEC_C, THIN)
-    step(b8 - 2.8, 52.2, 9, EXEC_C)
-    text(b8 - 4.8, baseline(52.2, NOTE), L['snapshot'], NOTE, MUTED, align='right')
+    step(b8 - 2.8, 52.2 + LOW, 9, EXEC_C)
+    text(b8 - 4.8, baseline(52.2 + LOW, NOTE), L['snapshot'], NOTE, MUTED, align='right')
 
     # Database reads -------------------------------------------------------
-    qx = mx + mw - 7
+    t_cw = (DB_TABLES[1] - 3 * .9) / 4
+    qx = DB_TABLES[0] + (t_cw + .9) + t_cw / 2       # over T2, the table c3 reads
     route([(qx, py - 1.3), (qx, my + mh)], SLATE, THIN, dash=(.9, .6), length=1.0)
-    text(qx + 1.3, 53.6, '$Q_c$', BODY, SLATE)
+    text(qx + 1.3, 53.6 + LOW, L['qc_result'], NOTE, SLATE)
     vr = tx + 5
     route([(vr, py - 1.3), (vr, ty + th)], SLATE, THIN, dash=(.9, .6), length=1.0)
-    text(vr + 1.3, 53.6, L['tracker_read'], NOTE, SLATE, width=b8 - 4.8 - 18 - vr)
+    text(vr + 1.3, 53.6 + LOW, L['tracker_read'], NOTE, SLATE, width=b8 - 4.8 - 18 - vr)
 
     # Database: one storage slab. Its three regions sit under the arrows that
     # reach them: check queries read tables, the tracker reads statistics and
     # versions, same-snapshot validation runs on a snapshot.
     d = 1.4
-    s.poly([(px, py), (px + d, py - d), (px + pw + d, py - d), (px + pw, py)], TOP, EDGE, .14)
+    soft = '#BDB9B2'
+    s.poly([(px, py), (px + d, py - d), (px + pw + d, py - d), (px + pw, py)], '#F2F0EC', soft, .12)
     s.poly([(px + pw, py), (px + pw + d, py - d), (px + pw + d, py + ph - d), (px + pw, py + ph)],
-           SIDE, EDGE, .14)
-    rect(px, py, pw, ph, FACE, EDGE, .18, r=.5)
+           '#E7E4DF', soft, .12)
+    rect(px, py, pw, ph, FACE, soft, .16, r=.5)
     room = DB_TABLES[0] - px - 4.0
     text(px + 2.4, py + 4.4, L['db'], TITLE, INK, 'bold', width=room)
     text(px + 2.4, py + 7.8, L['db_note'], NOTE, MUTED, width=room)
@@ -404,15 +445,18 @@ def draw(s, lang):
     # Tables: rows changed by the writers are amber.
     tx, tw_all = DB_TABLES
     cw = (tw_all - 3 * .9) / 4
-    for k, changed in enumerate(((3,), (1, 2), (), (0,))):
-        table_card(tx + k * (cw + .9), cw, top, inner, f'$T_{k + 1}$', changed)
+    for k, changed in enumerate(((), (1, 2), (), ())):
+        table_card(tx + k * (cw + .9), cw, top, inner, f'$T_{k + 1}$', changed,
+                   outline=AMBER if changed else EDGE)
 
     # Version of each table.
     sx_, sw_ = DB_STATS
     rect(sx_, top, sw_, inner, WHITE, EDGE, .14, r=.35)
-    # Writes to T1 and T2 (amber rows) move their versions; T3 keeps its own.
-    for k, (old, new) in enumerate(((7, 8), (13, 14), (4, None))):
+    # The write to T2 (amber rows) moves its version; T1 and T3 keep theirs.
+    for k, (old, new) in enumerate(((7, None), (13, 14), (4, None))):
         yy = top + 1.9 + 2.35 * k
+        if new:
+            rect(sx_ + .6, yy - 1.0, sw_ - 1.2, 2.3, AMBER_PALE, AMBER, .14, r=.45)
         text(sx_ + 1.4, yy + .75, f'$V(T_{k + 1})$', NOTE, INK)
         value = f'${old}\\to{new}$' if new else f'${old}$'
         text(sx_ + sw_ - 1.4, yy + .75, value, NOTE, '#9A6500' if new else INK, align='right')
@@ -429,13 +473,13 @@ def draw(s, lang):
         table_card(m0 + k * (mini + .6), mini, top + .8, inner - 1.6, f'$T_{k + 1}$')
 
     # Writers --------------------------------------------------------------
-    dx0, dy0 = 4, 60.0
+    dx0, dy0 = 4, 60.0 + LOW
     for off in (1.6, .8, 0):
         rect(dx0 + off, dy0 - off, 11.5, 7.0, WHITE, EDGE, .13, r=.4)
     for k in range(3):
         s.circle(dx0 + 1.8, dy0 + 1.7 + 1.8 * k, .4, AMBER)
         s.line(dx0 + 3.0, dy0 + 1.7 + 1.8 * k, dx0 + 9.6, dy0 + 1.7 + 1.8 * k, RULE, .3)
-    text(dx0, 55.6, L['etl'], TITLE - .4, INK, 'bold')
+    text(dx0, 55.6 + LOW, L['etl'], TITLE - .4, INK, 'bold')
     yy = dy0 + 3.2
     route([(dx0 + 13.6, yy), (px, yy)], INK, THIN)
     gap_label(dx0 + 13.6, px, yy - 1.1, L['updates'])

@@ -6,7 +6,7 @@
 \else
 \includegraphics[width=\linewidth]{figures/maintenance-cost}
 \fi
-\caption{\bt{Maintenance database time relative to definition-level revalidation (100\%), 1\,M sales rows, eight agents. The generic cache keys check results by SQL text and table versions; \system\ keys verdicts by condition identity and versions.}{相对定义级重验证（100\%）的维护数据库时间，100 万行销售，8 个智能体。通用缓存按 SQL 文本与表版本索引检查结果；\system\ 按条件身份与版本索引结论。}}
+\caption{\bt{Maintenance database time relative to definition-level revalidation (100\%), 1\,M sales rows, eight agents. The check-result cache keys check results by SQL text and table versions; \system\ keys them by the condition's canonical form and table versions.}{相对定义级重验证（100\%）的维护数据库时间，100 万行销售，8 个智能体。检查结果缓存按 SQL 文本与表版本索引检查结果；\system\ 按条件的规范形式与表版本索引。}}
 \label{fig:cost}
-\Description{Two line charts of database time relative to definition-level revalidation over 4 to 19 definitions, with series labelled on the lines. Staggered: MAVRA and the generic cache fall from about 43--57\% to 14--17\%; scope-only stays at 83--94\%. Simultaneous: MAVRA and the cache lie between 50\% and 84\%; scope-only between 86\% and 119\%.}
+\Description{Two line charts of database time relative to definition-level revalidation over 4 to 19 definitions, with series labelled on the lines. Staggered: MAVRA and the check-result cache fall from about 43--57\% to 14--17\%; affected-only revalidation stays at 83--94\%. Simultaneous: MAVRA and the cache lie between 50\% and 84\%; affected-only revalidation between 86\% and 119\%.}
 \end{figure}

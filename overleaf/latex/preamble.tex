@@ -18,7 +18,7 @@
 % definitions, so a method has the same color in a figure and in a table swatch. Six slots in the
 % CVD-validated order (blue, orange, aqua, yellow, magenta, green), assigned in reverse along the
 % method order so neighbouring methods are validated pairs; scope-only (controlled benchmark only)
-% uses violet. Blue is reserved for MAVRA; accuracy shading uses a neutral ramp. The generic
+% uses violet. Blue is reserved for MAVRA (its gold-SQL variant takes a tint); accuracy shading uses a neutral ramp. The generic
 % version-keyed cache (cost figure and replay only) uses a neutral gray with its own marker and dash.
 \definecolor{mCond}{HTML}{2A78D6}
 \definecolor{mDef}{HTML}{EB6834}
@@ -29,9 +29,9 @@
 \definecolor{mScope}{HTML}{4A3AA7}
 \definecolor{mCache}{HTML}{6B6A66}
 \definecolor{mTraj}{HTML}{8E44AD} % trajectory-retrieval baseline; CVD-validated between no-sharing green and unguarded pink
-\definecolor{mTrajVerify}{HTML}{C39BD3} % trajectory retrieval plus a self-verification instruction: tint of the trajectory violet
-\definecolor{mCondExref}{HTML}{7FB2EA} % MAVRA with the agent's own learning query as the G8 reference: tint of the MAVRA blue
-\definecolor{mTable}{HTML}{A0522D} % dbt-style table-test baseline (paired replay only)
+\definecolor{mTrajVerify}{HTML}{C39BD3} % trajectory retrieval plus a self-check instruction: tint of the trajectory violet
+\definecolor{mCondGold}{HTML}{7FB2EA} % MAVRA (gold SQL): the benchmark's gold SQL as the G8 reference; tint of the MAVRA blue
+\definecolor{mTable}{HTML}{A0522D} % dbt-style table-test baseline (library replay only)
 \definecolor{inkmuted}{HTML}{52514E}
 \definecolor{gridline}{HTML}{DDDCD8}
 \newcommand{\swatch}[1]{\textcolor{#1}{\rule[-0.1ex]{0.8em}{0.8em}}}

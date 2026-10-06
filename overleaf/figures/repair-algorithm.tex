@@ -3,7 +3,7 @@
 \label{alg:repair}
 \footnotesize
 \begin{algorithmic}[1]
-\Require \bt{revision $m^r$ whose $\operatorname{KeyUnique}(F,K,\varphi)$ failed; learning question $x$; reference query $R$; low-cardinality columns $A$ of $F$}{$\operatorname{KeyUnique}(F,K,\varphi)$ 失效的修订 $m^r$；学习题 $x$；参照查询 $R$；$F$ 的低基数列 $A$}
+\Require \bt{revision $m^r$ whose $\operatorname{KeyUnique}(F,K,\varphi)$ failed; learning question $x$; reference query $R$, by default the agent's learning SQL; low-cardinality columns $A$ of $F$}{$\operatorname{KeyUnique}(F,K,\varphi)$ 失效的修订 $m^r$；学习题 $x$；参照查询 $R$（默认为智能体的学习 SQL）；$F$ 的低基数列 $A$}
 \State $P\gets\emptyset$
 \ForAll{$a\in A$ \textbf{and} $v\in\pi_a(F)$}
   \State $\psi\gets\varphi\wedge(a=v)$
@@ -12,11 +12,11 @@
   \EndIf
 \EndFor
 \If{$|P|\neq 1$}\label{alg:repair:unique}
-  \State \Return \textsc{withdraw} \Comment{\bt{no fix, or several equivalent fixes}{没有修复，或多个等价修复}}
+  \State \Return \textsc{invalidate} \Comment{\bt{no fix, or several equivalent fixes}{没有修复，或多个等价修复}}
 \EndIf
 \State $m'\gets m^r$ \bt{with}{，令} $\varphi:=\psi$ \bt{for the single $\psi\in P$; re-derive $C(m')$}{（$\psi$ 为 $P$ 的唯一元素），重新推导 $C(m')$}
 \If{$m'$ \bt{fails G3--G5}{未通过 G3--G5} \textbf{or} $\operatorname{compile}(m',x)(D)\neq R(D)$}\label{alg:repair:g8}
-  \State \Return \textsc{withdraw} \Comment{G8}
+  \State \Return \textsc{invalidate} \Comment{G8}
 \EndIf
 \State \bt{publish}{发布} $m^{r+1}=m'$
 \end{algorithmic}

@@ -4,11 +4,10 @@
   "condition/example",
   "condition/judge",
   "definition/example",
-  "definition/judge",
-  "definition-cache/judge",
-  "revoke/judge",
-  "schema/judge",
-  "tabletest/judge"
+  "definition-cache/example",
+  "revoke/example",
+  "schema/example",
+  "tabletest/example"
  ],
  "task_level": {
   "condition/example": {
@@ -44,60 +43,128 @@
    "unavailable_needed_pct": 31.9,
    "unavailable_unneeded_pct": 8.3
   },
-  "definition/judge": {
-   "n": 1530,
-   "correct": 973,
-   "served_wrong": 101,
-   "unavailable_needed": 345,
-   "unavailable_unneeded": 111,
-   "correct_pct": 63.6,
-   "served_wrong_pct": 6.6,
-   "unavailable_needed_pct": 22.5,
-   "unavailable_unneeded_pct": 7.3
+  "definition-cache/example": {
+   "n": 1470,
+   "correct": 780,
+   "served_wrong": 99,
+   "unavailable_needed": 469,
+   "unavailable_unneeded": 122,
+   "correct_pct": 53.1,
+   "served_wrong_pct": 6.7,
+   "unavailable_needed_pct": 31.9,
+   "unavailable_unneeded_pct": 8.3
   },
-  "definition-cache/judge": {
-   "n": 1530,
-   "correct": 973,
-   "served_wrong": 101,
-   "unavailable_needed": 345,
-   "unavailable_unneeded": 111,
-   "correct_pct": 63.6,
-   "served_wrong_pct": 6.6,
-   "unavailable_needed_pct": 22.5,
-   "unavailable_unneeded_pct": 7.3
-  },
-  "revoke/judge": {
-   "n": 1530,
+  "revoke/example": {
+   "n": 1470,
    "correct": 0,
    "served_wrong": 0,
-   "unavailable_needed": 746,
-   "unavailable_unneeded": 784,
+   "unavailable_needed": 728,
+   "unavailable_unneeded": 742,
    "correct_pct": 0.0,
    "served_wrong_pct": 0.0,
-   "unavailable_needed_pct": 48.8,
-   "unavailable_unneeded_pct": 51.2
+   "unavailable_needed_pct": 49.5,
+   "unavailable_unneeded_pct": 50.5
   },
-  "schema/judge": {
-   "n": 1530,
-   "correct": 784,
-   "served_wrong": 746,
+  "schema/example": {
+   "n": 1470,
+   "correct": 742,
+   "served_wrong": 728,
    "unavailable_needed": 0,
    "unavailable_unneeded": 0,
-   "correct_pct": 51.2,
-   "served_wrong_pct": 48.8,
+   "correct_pct": 50.5,
+   "served_wrong_pct": 49.5,
    "unavailable_needed_pct": 0.0,
    "unavailable_unneeded_pct": 0.0
   },
-  "tabletest/judge": {
-   "n": 1530,
-   "correct": 631,
-   "served_wrong": 101,
-   "unavailable_needed": 645,
-   "unavailable_unneeded": 153,
-   "correct_pct": 41.2,
-   "served_wrong_pct": 6.6,
-   "unavailable_needed_pct": 42.2,
-   "unavailable_unneeded_pct": 10.0
+  "tabletest/example": {
+   "n": 1470,
+   "correct": 603,
+   "served_wrong": 99,
+   "unavailable_needed": 629,
+   "unavailable_unneeded": 139,
+   "correct_pct": 41.0,
+   "served_wrong_pct": 6.7,
+   "unavailable_needed_pct": 42.8,
+   "unavailable_unneeded_pct": 9.5
+  }
+ },
+ "task_level_common": {
+  "condition/example": {
+   "n": 1470,
+   "correct": 780,
+   "served_wrong": 99,
+   "unavailable_needed": 469,
+   "unavailable_unneeded": 122,
+   "correct_pct": 53.1,
+   "served_wrong_pct": 6.7,
+   "unavailable_needed_pct": 31.9,
+   "unavailable_unneeded_pct": 8.3
+  },
+  "condition/judge": {
+   "n": 1470,
+   "correct": 933,
+   "served_wrong": 99,
+   "unavailable_needed": 339,
+   "unavailable_unneeded": 99,
+   "correct_pct": 63.5,
+   "served_wrong_pct": 6.7,
+   "unavailable_needed_pct": 23.1,
+   "unavailable_unneeded_pct": 6.7
+  },
+  "definition/example": {
+   "n": 1470,
+   "correct": 780,
+   "served_wrong": 99,
+   "unavailable_needed": 469,
+   "unavailable_unneeded": 122,
+   "correct_pct": 53.1,
+   "served_wrong_pct": 6.7,
+   "unavailable_needed_pct": 31.9,
+   "unavailable_unneeded_pct": 8.3
+  },
+  "definition-cache/example": {
+   "n": 1470,
+   "correct": 780,
+   "served_wrong": 99,
+   "unavailable_needed": 469,
+   "unavailable_unneeded": 122,
+   "correct_pct": 53.1,
+   "served_wrong_pct": 6.7,
+   "unavailable_needed_pct": 31.9,
+   "unavailable_unneeded_pct": 8.3
+  },
+  "revoke/example": {
+   "n": 1470,
+   "correct": 0,
+   "served_wrong": 0,
+   "unavailable_needed": 728,
+   "unavailable_unneeded": 742,
+   "correct_pct": 0.0,
+   "served_wrong_pct": 0.0,
+   "unavailable_needed_pct": 49.5,
+   "unavailable_unneeded_pct": 50.5
+  },
+  "schema/example": {
+   "n": 1470,
+   "correct": 742,
+   "served_wrong": 728,
+   "unavailable_needed": 0,
+   "unavailable_unneeded": 0,
+   "correct_pct": 50.5,
+   "served_wrong_pct": 49.5,
+   "unavailable_needed_pct": 0.0,
+   "unavailable_unneeded_pct": 0.0
+  },
+  "tabletest/example": {
+   "n": 1470,
+   "correct": 603,
+   "served_wrong": 99,
+   "unavailable_needed": 629,
+   "unavailable_unneeded": 139,
+   "correct_pct": 41.0,
+   "served_wrong_pct": 6.7,
+   "unavailable_needed_pct": 42.8,
+   "unavailable_unneeded_pct": 9.5
   }
  },
  "definition_level": {
@@ -122,33 +189,26 @@
    "not_needed:served_ok": 181,
    "not_needed:unavailable": 13
   },
-  "definition/judge": {
-   "needed:served_ok": 111,
-   "needed:served_wrong": 58,
-   "needed:unavailable": 137,
-   "not_needed:served_ok": 189,
-   "not_needed:unavailable": 15
+  "definition-cache/example": {
+   "needed:served_ok": 56,
+   "needed:served_wrong": 56,
+   "needed:unavailable": 184,
+   "not_needed:served_ok": 181,
+   "not_needed:unavailable": 13
   },
-  "definition-cache/judge": {
-   "needed:served_ok": 111,
-   "needed:served_wrong": 58,
-   "needed:unavailable": 137,
-   "not_needed:served_ok": 189,
-   "not_needed:unavailable": 15
+  "revoke/example": {
+   "needed:unavailable": 296,
+   "not_needed:unavailable": 194
   },
-  "revoke/judge": {
-   "needed:unavailable": 306,
-   "not_needed:unavailable": 204
+  "schema/example": {
+   "needed:served_wrong": 296,
+   "not_needed:served_ok": 194
   },
-  "schema/judge": {
-   "needed:served_wrong": 306,
-   "not_needed:served_ok": 204
-  },
-  "tabletest/judge": {
-   "needed:served_wrong": 58,
-   "needed:unavailable": 248,
-   "not_needed:served_ok": 186,
-   "not_needed:unavailable": 18
+  "tabletest/example": {
+   "needed:served_wrong": 56,
+   "needed:unavailable": 240,
+   "not_needed:served_ok": 178,
+   "not_needed:unavailable": 16
   }
  },
  "by_change": {
@@ -165,25 +225,21 @@
     "correct_pct": 100.0,
     "n": 99
    },
-   "definition/judge": {
+   "definition-cache/example": {
     "correct_pct": 100.0,
-    "n": 105
+    "n": 99
    },
-   "definition-cache/judge": {
-    "correct_pct": 100.0,
-    "n": 105
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 105
+    "n": 99
    },
-   "schema/judge": {
+   "schema/example": {
     "correct_pct": 100.0,
-    "n": 105
+    "n": 99
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 100.0,
-    "n": 105
+    "n": 99
    }
   },
   "append": {
@@ -199,25 +255,21 @@
     "correct_pct": 100.0,
     "n": 168
    },
-   "definition/judge": {
+   "definition-cache/example": {
     "correct_pct": 100.0,
-    "n": 174
+    "n": 168
    },
-   "definition-cache/judge": {
-    "correct_pct": 100.0,
-    "n": 174
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    },
-   "schema/judge": {
+   "schema/example": {
     "correct_pct": 100.0,
-    "n": 174
+    "n": 168
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 100.0,
-    "n": 174
+    "n": 168
    }
   },
   "backfill": {
@@ -233,25 +285,21 @@
     "correct_pct": 100.0,
     "n": 99
    },
-   "definition/judge": {
+   "definition-cache/example": {
     "correct_pct": 100.0,
-    "n": 105
+    "n": 99
    },
-   "definition-cache/judge": {
-    "correct_pct": 100.0,
-    "n": 105
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 105
+    "n": 99
    },
-   "schema/judge": {
+   "schema/example": {
     "correct_pct": 100.0,
-    "n": 105
+    "n": 99
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 100.0,
-    "n": 105
+    "n": 99
    }
   },
   "correct": {
@@ -267,25 +315,21 @@
     "correct_pct": 100.0,
     "n": 168
    },
-   "definition/judge": {
+   "definition-cache/example": {
     "correct_pct": 100.0,
-    "n": 174
+    "n": 168
    },
-   "definition-cache/judge": {
-    "correct_pct": 100.0,
-    "n": 174
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    },
-   "schema/judge": {
+   "schema/example": {
     "correct_pct": 100.0,
-    "n": 174
+    "n": 168
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 100.0,
-    "n": 174
+    "n": 168
    }
   },
   "dimhist": {
@@ -301,23 +345,19 @@
     "correct_pct": 13.6,
     "n": 66
    },
-   "definition/judge": {
-    "correct_pct": 95.5,
+   "definition-cache/example": {
+    "correct_pct": 13.6,
     "n": 66
    },
-   "definition-cache/judge": {
-    "correct_pct": 95.5,
-    "n": 66
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
     "n": 66
    },
-   "schema/judge": {
+   "schema/example": {
     "correct_pct": 42.4,
     "n": 66
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 0.0,
     "n": 66
    }
@@ -335,25 +375,21 @@
     "correct_pct": 0.0,
     "n": 168
    },
-   "definition/judge": {
+   "definition-cache/example": {
     "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    },
-   "definition-cache/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    },
-   "revoke/judge": {
+   "schema/example": {
+    "correct_pct": 23.2,
+    "n": 168
+   },
+   "tabletest/example": {
     "correct_pct": 0.0,
-    "n": 174
-   },
-   "schema/judge": {
-    "correct_pct": 25.9,
-    "n": 174
-   },
-   "tabletest/judge": {
-    "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    }
   },
   "latekey": {
@@ -369,25 +405,21 @@
     "correct_pct": 0.0,
     "n": 168
    },
-   "definition/judge": {
+   "definition-cache/example": {
     "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    },
-   "definition-cache/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    },
-   "revoke/judge": {
+   "schema/example": {
+    "correct_pct": 15.5,
+    "n": 168
+   },
+   "tabletest/example": {
     "correct_pct": 0.0,
-    "n": 174
-   },
-   "schema/judge": {
-    "correct_pct": 17.2,
-    "n": 174
-   },
-   "tabletest/judge": {
-    "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    }
   },
   "mirror": {
@@ -403,25 +435,21 @@
     "correct_pct": 0.0,
     "n": 99
    },
-   "definition/judge": {
+   "definition-cache/example": {
     "correct_pct": 0.0,
-    "n": 105
+    "n": 99
    },
-   "definition-cache/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 105
+    "n": 99
    },
-   "revoke/judge": {
-    "correct_pct": 0.0,
-    "n": 105
-   },
-   "schema/judge": {
+   "schema/example": {
     "correct_pct": 33.3,
-    "n": 105
+    "n": 99
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 0.0,
-    "n": 105
+    "n": 99
    }
   },
   "revision": {
@@ -437,25 +465,21 @@
     "correct_pct": 41.1,
     "n": 168
    },
-   "definition/judge": {
-    "correct_pct": 100.0,
-    "n": 174
+   "definition-cache/example": {
+    "correct_pct": 41.1,
+    "n": 168
    },
-   "definition-cache/judge": {
-    "correct_pct": 100.0,
-    "n": 174
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    },
-   "schema/judge": {
-    "correct_pct": 8.6,
-    "n": 174
+   "schema/example": {
+    "correct_pct": 7.7,
+    "n": 168
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    }
   },
   "status": {
@@ -471,25 +495,21 @@
     "correct_pct": 100.0,
     "n": 99
    },
-   "definition/judge": {
+   "definition-cache/example": {
     "correct_pct": 100.0,
-    "n": 105
+    "n": 99
    },
-   "definition-cache/judge": {
-    "correct_pct": 100.0,
-    "n": 105
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 105
+    "n": 99
    },
-   "schema/judge": {
+   "schema/example": {
     "correct_pct": 0.0,
-    "n": 105
+    "n": 99
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 0.0,
-    "n": 105
+    "n": 99
    }
   },
   "unit": {
@@ -505,25 +525,21 @@
     "correct_pct": 41.1,
     "n": 168
    },
-   "definition/judge": {
-    "correct_pct": 42.0,
-    "n": 174
+   "definition-cache/example": {
+    "correct_pct": 41.1,
+    "n": 168
    },
-   "definition-cache/judge": {
-    "correct_pct": 42.0,
-    "n": 174
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 174
+    "n": 168
    },
-   "schema/judge": {
-    "correct_pct": 42.0,
-    "n": 174
+   "schema/example": {
+    "correct_pct": 41.1,
+    "n": 168
    },
-   "tabletest/judge": {
-    "correct_pct": 42.0,
-    "n": 174
+   "tabletest/example": {
+    "correct_pct": 41.1,
+    "n": 168
    }
   }
  },
@@ -541,25 +557,21 @@
     "correct_pct": 52.9,
     "n": 597
    },
-   "definition/judge": {
-    "correct_pct": 63.8,
-    "n": 657
+   "definition-cache/example": {
+    "correct_pct": 52.9,
+    "n": 597
    },
-   "definition-cache/judge": {
-    "correct_pct": 63.8,
-    "n": 657
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
-    "n": 657
+    "n": 597
    },
-   "schema/judge": {
-    "correct_pct": 51.4,
-    "n": 657
+   "schema/example": {
+    "correct_pct": 49.6,
+    "n": 597
    },
-   "tabletest/judge": {
-    "correct_pct": 41.4,
-    "n": 657
+   "tabletest/example": {
+    "correct_pct": 40.9,
+    "n": 597
    }
   },
   "glm53": {
@@ -575,23 +587,19 @@
     "correct_pct": 54.8,
     "n": 564
    },
-   "definition/judge": {
-    "correct_pct": 64.4,
+   "definition-cache/example": {
+    "correct_pct": 54.8,
     "n": 564
    },
-   "definition-cache/judge": {
-    "correct_pct": 64.4,
-    "n": 564
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
     "n": 564
    },
-   "schema/judge": {
+   "schema/example": {
     "correct_pct": 53.5,
     "n": 564
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 42.0,
     "n": 564
    }
@@ -609,42 +617,26 @@
     "correct_pct": 50.2,
     "n": 309
    },
-   "definition/judge": {
-    "correct_pct": 61.8,
+   "definition-cache/example": {
+    "correct_pct": 50.2,
     "n": 309
    },
-   "definition-cache/judge": {
-    "correct_pct": 61.8,
-    "n": 309
-   },
-   "revoke/judge": {
+   "revoke/example": {
     "correct_pct": 0.0,
     "n": 309
    },
-   "schema/judge": {
+   "schema/example": {
     "correct_pct": 46.6,
     "n": 309
    },
-   "tabletest/judge": {
+   "tabletest/example": {
     "correct_pct": 39.5,
     "n": 309
    }
   }
  },
  "paired": {
-  "condition/example vs definition/example": {
-   "n": 1470,
-   "same_class_pct": 100.0,
-   "cond_only_correct": 0,
-   "other_only_correct": 0,
-   "correct_diff_pp": 0.0,
-   "ci95_pp": [
-    0.0,
-    0.0
-   ],
-   "discordant": {}
-  },
-  "condition/example vs definition-cache/judge": {
+  "condition/example vs condition/judge": {
    "n": 1470,
    "same_class_pct": 89.6,
    "cond_only_correct": 0,
@@ -659,7 +651,31 @@
     "unavailable_unneeded->correct": 23
    }
   },
-  "condition/example vs revoke/judge": {
+  "condition/example vs definition/example": {
+   "n": 1470,
+   "same_class_pct": 100.0,
+   "cond_only_correct": 0,
+   "other_only_correct": 0,
+   "correct_diff_pp": 0.0,
+   "ci95_pp": [
+    0.0,
+    0.0
+   ],
+   "discordant": {}
+  },
+  "condition/example vs definition-cache/example": {
+   "n": 1470,
+   "same_class_pct": 100.0,
+   "cond_only_correct": 0,
+   "other_only_correct": 0,
+   "correct_diff_pp": 0.0,
+   "ci95_pp": [
+    0.0,
+    0.0
+   ],
+   "discordant": {}
+  },
+  "condition/example vs revoke/example": {
    "n": 1470,
    "same_class_pct": 40.2,
    "cond_only_correct": 780,
@@ -675,7 +691,7 @@
     "served_wrong->unavailable_needed": 99
    }
   },
-  "condition/example vs schema/judge": {
+  "condition/example vs schema/example": {
    "n": 1470,
    "same_class_pct": 48.9,
    "cond_only_correct": 160,
@@ -691,7 +707,7 @@
     "unavailable_unneeded->correct": 122
    }
   },
-  "condition/example vs tabletest/judge": {
+  "condition/example vs tabletest/example": {
    "n": 1470,
    "same_class_pct": 88.0,
    "cond_only_correct": 177,
@@ -706,207 +722,213 @@
     "correct->unavailable_unneeded": 17
    }
   },
-  "condition/judge vs definition/judge": {
-   "n": 1530,
-   "same_class_pct": 100.0,
-   "cond_only_correct": 0,
+  "condition/judge vs condition/example": {
+   "n": 1470,
+   "same_class_pct": 89.6,
+   "cond_only_correct": 153,
    "other_only_correct": 0,
-   "correct_diff_pp": 0.0,
+   "correct_diff_pp": 10.4,
    "ci95_pp": [
-    0.0,
-    0.0
+    9.4,
+    11.8
    ],
-   "discordant": {}
+   "discordant": {
+    "correct->unavailable_needed": 130,
+    "correct->unavailable_unneeded": 23
+   }
   },
-  "condition/judge vs definition-cache/judge": {
-   "n": 1530,
-   "same_class_pct": 100.0,
-   "cond_only_correct": 0,
+  "condition/judge vs definition/example": {
+   "n": 1470,
+   "same_class_pct": 89.6,
+   "cond_only_correct": 153,
    "other_only_correct": 0,
-   "correct_diff_pp": 0.0,
+   "correct_diff_pp": 10.4,
    "ci95_pp": [
-    0.0,
-    0.0
+    9.4,
+    11.8
    ],
-   "discordant": {}
+   "discordant": {
+    "correct->unavailable_needed": 130,
+    "correct->unavailable_unneeded": 23
+   }
   },
-  "condition/judge vs revoke/judge": {
-   "n": 1530,
+  "condition/judge vs definition-cache/example": {
+   "n": 1470,
+   "same_class_pct": 89.6,
+   "cond_only_correct": 153,
+   "other_only_correct": 0,
+   "correct_diff_pp": 10.4,
+   "ci95_pp": [
+    9.4,
+    11.8
+   ],
+   "discordant": {
+    "correct->unavailable_needed": 130,
+    "correct->unavailable_unneeded": 23
+   }
+  },
+  "condition/judge vs revoke/example": {
+   "n": 1470,
    "same_class_pct": 29.8,
-   "cond_only_correct": 973,
+   "cond_only_correct": 933,
    "other_only_correct": 0,
-   "correct_diff_pp": 63.6,
+   "correct_diff_pp": 63.5,
    "ci95_pp": [
-    62.8,
-    64.2
+    62.6,
+    64.1
    ],
    "discordant": {
-    "correct->unavailable_unneeded": 673,
-    "correct->unavailable_needed": 300,
-    "served_wrong->unavailable_needed": 101
+    "correct->unavailable_unneeded": 643,
+    "correct->unavailable_needed": 290,
+    "served_wrong->unavailable_needed": 99
    }
   },
-  "condition/judge vs schema/judge": {
-   "n": 1530,
-   "same_class_pct": 50.6,
-   "cond_only_correct": 300,
-   "other_only_correct": 111,
-   "correct_diff_pp": 12.4,
+  "condition/judge vs schema/example": {
+   "n": 1470,
+   "same_class_pct": 50.5,
+   "cond_only_correct": 290,
+   "other_only_correct": 99,
+   "correct_diff_pp": 13.0,
    "ci95_pp": [
-    10.8,
-    14.1
+    11.4,
+    14.8
    ],
    "discordant": {
-    "correct->served_wrong": 300,
-    "unavailable_needed->served_wrong": 345,
-    "unavailable_unneeded->correct": 111
+    "correct->served_wrong": 290,
+    "unavailable_needed->served_wrong": 339,
+    "unavailable_unneeded->correct": 99
    }
   },
-  "condition/judge vs tabletest/judge": {
-   "n": 1530,
+  "condition/judge vs tabletest/example": {
+   "n": 1470,
    "same_class_pct": 77.6,
-   "cond_only_correct": 342,
+   "cond_only_correct": 330,
    "other_only_correct": 0,
    "correct_diff_pp": 22.4,
    "ci95_pp": [
-    21.8,
-    22.8
+    21.9,
+    22.9
    ],
    "discordant": {
-    "correct->unavailable_needed": 300,
-    "correct->unavailable_unneeded": 42
+    "correct->unavailable_needed": 290,
+    "correct->unavailable_unneeded": 40
    }
   }
  },
  "maintenance_db_s": {
-  "condition/judge": {
-   "total": 693.4,
-   "addcol": 4.19,
-   "append": 19.11,
-   "backfill": 5.77,
-   "correct": 18.79,
-   "dimhist": 1.32,
-   "dupload": 254.92,
-   "latekey": 10.63,
-   "mirror": 127.97,
-   "revision": 178.23,
-   "status": 53.23,
-   "unit": 19.21,
-   "vs_condition_judge": 1.0
-  },
   "condition/example": {
-   "total": 679.0,
-   "addcol": 4.22,
-   "append": 19.16,
-   "backfill": 5.81,
-   "correct": 18.78,
-   "dimhist": 1.32,
-   "dupload": 244.93,
-   "latekey": 9.76,
-   "mirror": 124.7,
-   "revision": 178.13,
-   "status": 53.0,
-   "unit": 19.16,
-   "vs_condition_judge": 0.98
+   "total": 674.1,
+   "addcol": 4.24,
+   "append": 19.12,
+   "backfill": 5.85,
+   "correct": 18.64,
+   "dimhist": 1.43,
+   "dupload": 243.96,
+   "latekey": 9.62,
+   "mirror": 124.89,
+   "revision": 173.05,
+   "status": 54.24,
+   "unit": 19.01,
+   "vs_condition": 1.0
   },
-  "definition/judge": {
-   "total": 1176.0,
-   "addcol": 41.16,
-   "append": 60.14,
-   "backfill": 32.79,
-   "correct": 75.66,
-   "dimhist": 21.0,
-   "dupload": 304.15,
-   "latekey": 21.24,
-   "mirror": 137.2,
-   "revision": 304.14,
-   "status": 104.93,
-   "unit": 73.6,
-   "vs_condition_judge": 1.7
+  "condition/judge": {
+   "total": 690.1,
+   "addcol": 4.18,
+   "append": 19.12,
+   "backfill": 5.91,
+   "correct": 18.75,
+   "dimhist": 1.4,
+   "dupload": 253.9,
+   "latekey": 10.53,
+   "mirror": 127.93,
+   "revision": 175.8,
+   "status": 53.39,
+   "unit": 19.14,
+   "vs_condition": 1.02
   },
   "definition/example": {
-   "total": 1118.4,
-   "addcol": 36.89,
-   "append": 57.99,
-   "backfill": 29.6,
-   "correct": 70.9,
-   "dimhist": 20.9,
-   "dupload": 289.69,
-   "latekey": 18.78,
-   "mirror": 133.74,
-   "revision": 290.55,
-   "status": 99.95,
-   "unit": 69.38,
-   "vs_condition_judge": 1.61
+   "total": 1113.8,
+   "addcol": 36.87,
+   "append": 58.23,
+   "backfill": 29.88,
+   "correct": 70.91,
+   "dimhist": 20.54,
+   "dupload": 289.33,
+   "latekey": 18.68,
+   "mirror": 133.69,
+   "revision": 285.97,
+   "status": 100.35,
+   "unit": 69.37,
+   "vs_condition": 1.65
   },
-  "definition-cache/judge": {
-   "total": 699.9,
-   "addcol": 33.2,
-   "append": 28.0,
-   "backfill": 27.31,
-   "correct": 39.71,
-   "dimhist": 20.1,
-   "dupload": 138.81,
-   "latekey": 10.64,
-   "mirror": 121.96,
-   "revision": 167.9,
-   "status": 77.06,
-   "unit": 35.17,
-   "vs_condition_judge": 1.01
+  "definition-cache/example": {
+   "total": 683.8,
+   "addcol": 30.81,
+   "append": 27.61,
+   "backfill": 25.51,
+   "correct": 38.21,
+   "dimhist": 19.62,
+   "dupload": 137.24,
+   "latekey": 9.62,
+   "mirror": 120.12,
+   "revision": 164.13,
+   "status": 77.01,
+   "unit": 33.91,
+   "vs_condition": 1.01
   },
-  "schema/judge": {
-   "total": 0.6,
-   "addcol": 0.04,
-   "append": 0.06,
-   "backfill": 0.04,
-   "correct": 0.06,
-   "dimhist": 0.04,
-   "dupload": 0.06,
-   "latekey": 0.06,
-   "mirror": 0.06,
-   "revision": 0.07,
-   "status": 0.05,
-   "unit": 0.06,
-   "vs_condition_judge": 0.0
-  },
-  "revoke/judge": {
+  "schema/example": {
    "total": 0.4,
-   "addcol": 0.03,
+   "addcol": 0.04,
+   "append": 0.04,
+   "backfill": 0.04,
+   "correct": 0.04,
+   "dimhist": 0.04,
+   "dupload": 0.04,
+   "latekey": 0.04,
+   "mirror": 0.04,
+   "revision": 0.04,
+   "status": 0.04,
+   "unit": 0.04,
+   "vs_condition": 0.0
+  },
+  "revoke/example": {
+   "total": 0.4,
+   "addcol": 0.04,
    "append": 0.04,
    "backfill": 0.03,
    "correct": 0.04,
    "dimhist": 0.04,
    "dupload": 0.04,
    "latekey": 0.04,
-   "mirror": 0.03,
+   "mirror": 0.04,
    "revision": 0.04,
    "status": 0.03,
    "unit": 0.04,
-   "vs_condition_judge": 0.0
+   "vs_condition": 0.0
   },
-  "tabletest/judge": {
-   "total": 49.9,
-   "addcol": 4.78,
-   "append": 4.04,
-   "backfill": 4.32,
-   "correct": 4.86,
-   "dimhist": 4.15,
-   "dupload": 4.43,
-   "latekey": 5.4,
-   "mirror": 3.94,
-   "revision": 3.86,
-   "status": 4.56,
-   "unit": 5.58,
-   "vs_condition_judge": 0.07
+  "tabletest/example": {
+   "total": 49.8,
+   "addcol": 4.94,
+   "append": 3.87,
+   "backfill": 4.15,
+   "correct": 4.79,
+   "dimhist": 3.86,
+   "dupload": 4.29,
+   "latekey": 5.44,
+   "mirror": 3.9,
+   "revision": 4.17,
+   "status": 4.64,
+   "unit": 5.73,
+   "vs_condition": 0.07
   }
  },
+ "maintenance_db_s_base": "condition/example",
  "seed_failures": {
-  "condition/judge": 0,
   "condition/example": 2,
-  "definition/judge": 0,
+  "condition/judge": 0,
   "definition/example": 2,
-  "definition-cache/judge": 0,
-  "schema/judge": 0,
-  "revoke/judge": 0
+  "definition-cache/example": 2,
+  "schema/example": 2,
+  "revoke/example": 2
  }
 }

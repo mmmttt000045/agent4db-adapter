@@ -131,7 +131,7 @@
    "input_tokens_per_task": 15749.225694444445
   },
   "traj-verify": {
-   "name": "Trajectory retrieval + self-verification",
+   "name": "Trajectory + self-check",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -190,7 +190,7 @@
    "input_tokens_per_task": 21686.32986111111
   },
   "metric-global-noguard": {
-   "name": "Unguarded",
+   "name": "No validation",
    "cells": 3,
    "provider_errors": 3,
    "all": {
@@ -249,7 +249,7 @@
    "input_tokens_per_task": 15844.245614035088
   },
   "metric-global-schema": {
-   "name": "Schema-only",
+   "name": "Schema-change invalidation",
    "cells": 3,
    "provider_errors": 1,
    "all": {
@@ -308,7 +308,7 @@
    "input_tokens_per_task": 17339.965156794424
   },
   "metric-global-revoke": {
-   "name": "Revoke-on-write",
+   "name": "Invalidate-on-write",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -426,7 +426,7 @@
    "input_tokens_per_task": 29659.722222222223
   },
   "metric-global": {
-   "name": "MAVRA (condition-level)",
+   "name": "MAVRA (gold SQL)",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -485,7 +485,7 @@
    "input_tokens_per_task": 23961.9375
   },
   "metric-global-exref": {
-   "name": "MAVRA, agent reference for G8",
+   "name": "MAVRA",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -545,67 +545,102 @@
   }
  },
  "comparisons": {
-  "a1 modeled: MAVRA - trajectory": {
+  "a1 modeled: MAVRA (gold SQL) - trajectory": {
    "diff": 0.1592592592592592,
    "ci95": [
     0.13703703703703707,
     0.18148148148148147
    ]
   },
-  "a2 modeled: MAVRA - definition-level": {
+  "a2 modeled: MAVRA (gold SQL) - definition-level": {
    "diff": 0.0888888888888888,
    "ci95": [
     0.007407407407407418,
     0.14814814814814814
    ]
   },
-  "b all: MAVRA - no sharing": {
+  "b all: MAVRA (gold SQL) - no sharing": {
    "diff": 0.48548684431037376,
    "ci95": [
     0.45740740740740743,
     0.5289351851851851
    ]
   },
-  "c holdout: MAVRA - trajectory": {
+  "c holdout: MAVRA (gold SQL) - trajectory": {
    "diff": 0.0,
    "ci95": [
     0.0,
     0.0
    ]
   },
-  "d1 modeled: MAVRA agent-ref - trajectory": {
+  "d1 modeled: MAVRA - trajectory": {
    "diff": 0.16666666666666663,
    "ci95": [
     0.1518518518518518,
     0.18148148148148158
    ]
   },
-  "d2 modeled: MAVRA agent-ref - MAVRA": {
+  "d2 modeled: MAVRA - MAVRA (gold SQL)": {
    "diff": 0.007407407407407418,
    "ci95": [
     -0.014814814814814836,
     0.029629629629629672
    ]
   },
-  "e1 modeled: trajectory+verify - trajectory": {
+  "e1 modeled: trajectory+self-check - trajectory": {
    "diff": 0.05185185185185193,
    "ci95": [
     0.014814814814814836,
     0.10370370370370374
    ]
   },
-  "e2 modeled: MAVRA - trajectory+verify": {
+  "e2 modeled: MAVRA (gold SQL) - trajectory+self-check": {
    "diff": 0.10740740740740728,
    "ci95": [
     0.05555555555555558,
     0.1518518518518518
    ]
   },
-  "e3 all: MAVRA - trajectory+verify": {
+  "e3 all: MAVRA (gold SQL) - trajectory+self-check": {
    "diff": 0.03395061728395077,
    "ci95": [
     0.007716049382716195,
     0.06635802469135799
+   ]
+  },
+  "f1 modeled: MAVRA - definition-level": {
+   "diff": 0.09629629629629621,
+   "ci95": [
+    0.007407407407407418,
+    0.14814814814814825
+   ]
+  },
+  "f2 all: MAVRA - no sharing": {
+   "diff": 0.4916596838165464,
+   "ci95": [
+    0.46049382716049375,
+    0.5320216049382716
+   ]
+  },
+  "f3 holdout: MAVRA - trajectory": {
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ]
+  },
+  "f4 modeled: MAVRA - trajectory+self-check": {
+   "diff": 0.1148148148148147,
+   "ci95": [
+    0.06296296296296289,
+    0.1518518518518519
+   ]
+  },
+  "f5 all: MAVRA - trajectory+self-check": {
+   "diff": 0.04012345679012341,
+   "ci95": [
+    0.012345679012345734,
+    0.07253086419753063
    ]
   }
  },

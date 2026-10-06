@@ -36,7 +36,7 @@ FAMILIES = [('returns', 5, (0, 1)), ('ratios', 3, (2, 3, 4)), ('sales', 6, (3, 4
 
 TEXT = {
     'en': {'defs': 'Definitions', 'conds': 'Conditions', 'update': 'update `store_returns`',
-           'kinds': {'grain': 'Grain', 'time': 'Time', 'join': 'Join'},
+           'kinds': {'grain': 'Grain', 'time': 'Date role', 'join': 'Join'},
            'families': {'returns': ('Store returns', 'amount, tax, fee, …'),
                         'ratios': ('Return ratios', 'return rate, …'),
                         'sales': ('Store sales', 'revenue, profit, …'),
@@ -44,7 +44,7 @@ TEXT = {
            'def_level': 'Definition-level reruns', 'mavra': 'MAVRA runs',
            'checks': '{} checks'},
     'zh': {'defs': '定义', 'conds': '条件', 'update': '更新 `store_returns`',
-           'kinds': {'grain': '粒度', 'time': '时间', 'join': '连接'},
+           'kinds': {'grain': '粒度', 'time': '日期角色', 'join': '连接'},
            'families': {'returns': ('门店退货', '金额、税额、手续费等'),
                         'ratios': ('退货比率', '退货率等'),
                         'sales': ('门店销售', '营业额、利润等'),

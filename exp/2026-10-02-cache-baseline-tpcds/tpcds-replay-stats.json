@@ -64,6 +64,63 @@
    "unavailable_unneeded_pct": 14.2
   }
  },
+ "task_level_common": {
+  "condition/example": {
+   "n": 981,
+   "correct": 360,
+   "served_wrong": 72,
+   "unavailable_needed": 431,
+   "unavailable_unneeded": 118,
+   "correct_pct": 36.7,
+   "served_wrong_pct": 7.3,
+   "unavailable_needed_pct": 43.9,
+   "unavailable_unneeded_pct": 12.0
+  },
+  "condition/judge": {
+   "n": 981,
+   "correct": 630,
+   "served_wrong": 72,
+   "unavailable_needed": 250,
+   "unavailable_unneeded": 29,
+   "correct_pct": 64.2,
+   "served_wrong_pct": 7.3,
+   "unavailable_needed_pct": 25.5,
+   "unavailable_unneeded_pct": 3.0
+  },
+  "revoke/judge": {
+   "n": 981,
+   "correct": 0,
+   "served_wrong": 0,
+   "unavailable_needed": 509,
+   "unavailable_unneeded": 472,
+   "correct_pct": 0.0,
+   "served_wrong_pct": 0.0,
+   "unavailable_needed_pct": 51.9,
+   "unavailable_unneeded_pct": 48.1
+  },
+  "schema/judge": {
+   "n": 981,
+   "correct": 472,
+   "served_wrong": 509,
+   "unavailable_needed": 0,
+   "unavailable_unneeded": 0,
+   "correct_pct": 48.1,
+   "served_wrong_pct": 51.9,
+   "unavailable_needed_pct": 0.0,
+   "unavailable_unneeded_pct": 0.0
+  },
+  "tabletest/judge": {
+   "n": 981,
+   "correct": 351,
+   "served_wrong": 72,
+   "unavailable_needed": 437,
+   "unavailable_unneeded": 121,
+   "correct_pct": 35.8,
+   "served_wrong_pct": 7.3,
+   "unavailable_needed_pct": 44.5,
+   "unavailable_unneeded_pct": 12.3
+  }
+ },
  "definition_level": {
   "condition/example": {
    "needed:served_ok": 3,
@@ -363,6 +420,21 @@
   }
  },
  "paired": {
+  "condition/example vs condition/judge": {
+   "n": 981,
+   "same_class_pct": 72.5,
+   "cond_only_correct": 0,
+   "other_only_correct": 270,
+   "correct_diff_pp": -27.5,
+   "ci95_pp": [
+    -27.5,
+    -27.5
+   ],
+   "discordant": {
+    "unavailable_needed->correct": 181,
+    "unavailable_unneeded->correct": 89
+   }
+  },
   "condition/example vs revoke/judge": {
    "n": 981,
    "same_class_pct": 56.0,
@@ -408,6 +480,21 @@
    "discordant": {
     "correct->unavailable_needed": 6,
     "correct->unavailable_unneeded": 3
+   }
+  },
+  "condition/judge vs condition/example": {
+   "n": 981,
+   "same_class_pct": 72.5,
+   "cond_only_correct": 270,
+   "other_only_correct": 0,
+   "correct_diff_pp": 27.5,
+   "ci95_pp": [
+    27.5,
+    27.5
+   ],
+   "discordant": {
+    "correct->unavailable_needed": 181,
+    "correct->unavailable_unneeded": 89
    }
   },
   "condition/judge vs revoke/judge": {
@@ -472,7 +559,7 @@
    "revision": 91.79,
    "status": 11.18,
    "unit": 39.93,
-   "vs_condition_judge": 1.0
+   "vs_condition": 1.0
   },
   "condition/example": {
    "total": 2591.7,
@@ -487,7 +574,7 @@
    "revision": 91.82,
    "status": 10.97,
    "unit": 39.55,
-   "vs_condition_judge": 1.0
+   "vs_condition": 1.0
   },
   "schema/judge": {
    "total": 0.0,
@@ -502,7 +589,7 @@
    "revision": 0.0,
    "status": 0.0,
    "unit": 0.0,
-   "vs_condition_judge": 0.0
+   "vs_condition": 0.0
   },
   "revoke/judge": {
    "total": 0.0,
@@ -517,7 +604,7 @@
    "revision": 0.0,
    "status": 0.0,
    "unit": 0.0,
-   "vs_condition_judge": 0.0
+   "vs_condition": 0.0
   },
   "tabletest/judge": {
    "total": 98.2,
@@ -532,9 +619,10 @@
    "revision": 7.74,
    "status": 8.56,
    "unit": 16.64,
-   "vs_condition_judge": 0.04
+   "vs_condition": 0.04
   }
  },
+ "maintenance_db_s_base": "condition/example",
  "seed_failures": {
   "condition/judge": 2,
   "condition/example": 2,

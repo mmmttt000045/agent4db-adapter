@@ -7,11 +7,11 @@
 \toprule
 \bt{Strategy}{方式} & \bt{Benign append}{正常追加} & \bt{Data-only break}{纯数据破坏} & \bt{Write during use}{使用期间写入} & \bt{Work per update}{每次更新的工作}\\
 \midrule
-\swatch{mSchema}\ \bt{Schema-only}{只看结构} & \bt{keep}{保留} & \bt{stale use}{过期使用} & \bt{unchecked}{不检查} & \bt{none}{无}\\
-\swatch{mTable}\ \bt{Table tests}{表级测试} & \bt{keep}{保留} & \bt{quarantine}{隔离} & \bt{pre-check}{执行前检查} & \bt{declared tests per table}{按表声明的测试}\\
-\swatch{mRevoke}\ \bt{Revoke-on-write}{写入即撤销} & \bt{relearn}{重学} & \bt{relearn}{重学} & \bt{pre-check}{执行前检查} & \bt{LLM relearning}{大模型重学}\\
-\swatch{mDef}\ \bt{Definition-level}{定义级} & \bt{keep}{保留} & \bt{repair}{修复} & \bt{pre-check}{执行前检查} & \bt{conditions of affected definitions}{受影响定义的条件}\\
-\swatch{mCache}\ \bt{+ version cache}{+ 版本缓存} & \bt{keep}{保留} & \bt{repair}{修复} & \bt{pre-check}{执行前检查} & \bt{distinct changed checks}{变化的不同检查}\\
+\swatch{mSchema}\ \ifbilingual\bhl{Schema-change\\invalidation}{按模式变更失效}\else Schema-change invalidation\fi & \bt{keep}{保留} & \bt{stale use}{过期使用} & \bt{unchecked}{不检查} & \bt{none}{无}\\
+\swatch{mTable}\ \bhl{Table tests}{表级测试} & \bt{keep}{保留} & \bt{invalidate}{失效} & \bt{check, then execute}{先检查后执行} & \bt{declared tests per table}{按表声明的测试}\\
+\swatch{mRevoke}\ \ifbilingual\bhl{Invalidate-\\on-write}{写入即失效}\else Invalidate-on-write\fi & \bt{relearn}{重学} & \bt{relearn}{重学} & \bt{check, then execute}{先检查后执行} & \bt{LLM relearning}{大模型重学}\\
+\swatch{mDef}\ \bhl{Definition-level}{定义级} & \bt{keep}{保留} & \bt{repair}{修复} & \bt{check, then execute}{先检查后执行} & \bt{conditions of affected definitions}{受影响定义的条件}\\
+\swatch{mCache}\ \ifbilingual\bhl{Check-result\\cache}{检查结果缓存}\else Check-result cache\fi & \bt{keep}{保留} & \bt{repair}{修复} & \bt{check, then execute}{先检查后执行} & \bt{distinct changed checks}{变化的不同检查}\\
 \swatch{mCond}\ \system & \bt{keep}{保留} & \bt{bounded repair}{有界修复} & \bt{same snapshot}{同一快照} & \bt{distinct changed conditions}{变化的不同条件}\\
 \bottomrule
 \end{tabularx}

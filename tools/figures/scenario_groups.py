@@ -20,19 +20,19 @@ W, H = style.COLUMN, 43.5
 DATA = style.ROOT / 'exp/2026-10-02-scenarios-ds/scen-stats.json'
 
 ROWS = ['middle', 'traj-global', 'traj-verify', 'metric-global-noguard', 'metric-global-schema',
-        'metric-global-revoke', 'metric-global-def', 'metric-global', 'metric-global-exref']
+        'metric-global-revoke', 'metric-global-def', 'metric-global-exref', 'metric-global']
 GROUPS = ['holdout', 'benign', 'modeled', 'mirror', 'unit']
 TITLES = {
-    'en': [('', 'Held-out'), ('', 'Benign'), ('Modeled', 'breaking'), ('Backup', 'copy'),
+    'en': [('', 'Held-out'), ('', 'Benign'), ('Covered', 'breaking'), ('Backup', 'copy'),
            ('Unit', 'change')],
-    'zh': [('', '留出'), ('', '正常'), ('已建模', '破坏'), ('备份', '副本'), ('金额', '单位')],
+    'zh': [('', '留出'), ('', '正常'), ('条件覆盖', '的破坏'), ('备份', '副本'), ('金额', '单位')],
 }
 AXIS = {'en': 'Accuracy (%)', 'zh': '正确率（%）'}
 # Macro keys of tools/scen-stats.py: \Ds<method><group>.
 KEY = {'middle': 'NoShare', 'traj-global': 'Traj', 'traj-verify': 'TrajVerify',
        'metric-global-noguard': 'Noguard', 'metric-global-schema': 'Schema',
-       'metric-global-revoke': 'Revoke', 'metric-global-def': 'Def', 'metric-global': 'Cond',
-       'metric-global-exref': 'CondExref'}
+       'metric-global-revoke': 'Revoke', 'metric-global-def': 'Def', 'metric-global-exref': 'Cond',
+       'metric-global': 'CondGold'}
 
 LABEL, TICK, TITLE = 6.5, 6.0, 7.0     # font sizes, pt (acmart \scriptsize is 6, \footnotesize 7)
 
@@ -63,10 +63,10 @@ def draw(s, lang):
     top, pitch = 8.0, 3.05
     bottom = top + pitch * len(ROWS)
 
-    # Rows: MAVRA's two rows on a tint, labels in the method's ink.
+    # Rows: MAVRA's row on a tint, labels in the method's ink.
     for i, m in enumerate(ROWS):
         y = top + pitch * (i + .5)
-        if m in ('metric-global', 'metric-global-exref'):
+        if m == 'metric-global-exref':
             s.rect(0, y - pitch / 2, W, pitch, ACC_PALE, None)
         label, color = labels[i]
         s.rect(0, y - .8, 1.6, 1.6, color, None, r=.2)

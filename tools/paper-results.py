@@ -37,14 +37,19 @@ MODEL_ORDER = ["DeepSeek V4.1 Flash", "GLM-5.3", "GLM-5.3 Flash"]
 METHODS = [  # (mode, 英文, 中文)；全文统一的方法名
     ("middle", "No sharing", "不共享"),
     ("traj-global", "Trajectory retrieval", "轨迹检索"),
-    ("traj-verify", "Trajectory retrieval + verify", "轨迹检索 + 自验证"),
-    ("metric-global-noguard", "Unguarded", "无守护"),
-    ("metric-global-schema", "Schema-only", "只看结构"),
-    ("metric-global-revoke", "Revoke-on-write", "写入即撤销"),
+    ("traj-verify", "Trajectory + self-check", "轨迹检索 + 自检"),
+    ("metric-global-noguard", "No validation", "共享不验证"),
+    ("metric-global-schema", "Schema-change invalidation", "按模式变更失效"),
+    ("metric-global-revoke", "Invalidate-on-write", "写入即失效"),
     ("metric-global-def", "Definition-level", "定义级"),
-    ("metric-global", r"\system", "条件级"),
-    ("metric-global-exref", r"\system, agent ref.", "条件级，智能体参照"),
+    ("metric-global-exref", r"\system", r"\system"),
+    ("metric-global", r"\system\ (gold SQL)", r"\system（标准答案 SQL）"),
 ]
+# 论文中的 MAVRA 是部署中可得的配置：G8 以智能体自己的 SQL 为参照（metric-global-exref）；以标准答案 SQL 为参照的
+# metric-global 是 MAVRA (gold SQL)。只有 metric-global 的旧一轮数据（如三模型运行）里，metric-global 就是 MAVRA。
+MAVRA, GOLD = "metric-global-exref", "metric-global"
+KEYS = {"middle": "NoShare", "traj-global": "Traj", "traj-verify": "TrajVerify", "metric-global-noguard": "Noguard",
+        "metric-global-schema": "Schema", "metric-global-revoke": "Revoke", "metric-global-def": "Def", MAVRA: "Cond", GOLD: "CondGold"}
 COLOR = {  # 与正文导言的方法颜色一致
     "middle": "mNoShare",
     "traj-global": "mTraj",
@@ -53,29 +58,41 @@ COLOR = {  # 与正文导言的方法颜色一致
     "metric-global-schema": "mSchema",
     "metric-global-revoke": "mRevoke",
     "metric-global-def": "mDef",
-    "metric-global": "mCond",
-    "metric-global-exref": "mCondExref",
+    MAVRA: "mCond",
+    GOLD: "mCondGold",
 }
+
+
+TABLE_EN = {}  # 窄栏表格里需要断行的方法名（目前没有）
+
+
+def main_mode():
+    """数据中的 MAVRA：有 metric-global-exref 时取它，否则取 metric-global。"""
+    return MAVRA if any(m == MAVRA for m, *_ in METHODS) else GOLD
+
+
+def key_of(mode):
+    return "Cond" if mode == main_mode() else KEYS[mode]
 CLASSES = {  # 类别：英文、中文
     "none": ("None", "无变化"),
     "benign": ("Benign", "正常"),
     "grain": ("Grain", "粒度"),
-    "fanout": ("Fan-out", "连接放大"),
-    "coverage": ("Coverage", "覆盖"),
-    "unmodeled": ("Not modeled", "未建模"),
+    "fanout": ("Join fan-out", "连接放大"),
+    "coverage": ("Completeness", "完整性"),
+    "unmodeled": ("Not covered", "条件未覆盖"),
     "ambiguous": ("Ambiguous fix", "修复有歧义"),
 }
 PHASES = [  # (phase, 类别, 英文, 中文, 英文说明, 中文说明)
     ("holdout", "none", "Held-out", "留出", "No update; new parameters and question types", "无更新；新参数与新题型"),
     ("append", "benign", "Append", "正常追加", "Copy one month of sales under new tickets", "复制一个月销售并换新小票号"),
-    ("backfill", "benign", "Late backfill", "迟到回填", "Add returns with new keys", "补写新键的退货"),
+    ("backfill", "benign", "Late-arriving", "迟到事实", "Add returns with new keys", "补写新键的退货"),
     ("correct", "benign", "In-place fix", "原地更正", "Update net paid of some sales", "原地修改部分销售的净支付额"),
     ("addcol", "benign", "New column", "新增无关列", "Add an empty column to returns", "退货表新增空列"),
-    ("status", "grain", "Status history", "状态流水", "Add an application-state row per return", "每笔退货追加申请状态行"),
-    ("revision", "grain", "Versioning", "版本化更正", "Keep old sales versions as non-current rows", "旧版本销售保留为非当前行"),
-    ("dupload", "grain", "Duplicate load", "重复装载", "Reload four months of identical sales rows", "四个月销售整批重复装载"),
-    ("dimhist", "fanout", "Dim.\\ history", "维表拉链", "Add old-version rows to the item dimension", "商品维表增加旧版本行"),
-    ("latekey", "coverage", "Key format", "日期键格式", "Append sales whose date keys use yyyymmdd", "追加日期键为 yyyymmdd 的销售"),
+    ("status", "grain", "Status-change rows", "状态变更行", "Add an application-state row per return", "每笔退货追加申请状态行"),
+    ("revision", "grain", "Restatement", "多版本更正", "Keep old sales versions as non-current rows", "旧版本销售保留为非当前行"),
+    ("dupload", "grain", "Duplicate load", "重复加载", "Reload four months of identical sales rows", "四个月销售整批重复加载"),
+    ("dimhist", "fanout", "SCD Type 2", "缓慢变化维", "Add old-version rows to the item dimension", "商品维表增加旧版本行"),
+    ("latekey", "coverage", "Date-key format", "日期键格式", "Append sales whose date keys use yyyymmdd", "追加日期键为 yyyymmdd 的销售"),
     ("unit", "unmodeled", "Unit change", "金额单位", "Multiply sales amounts by 100 from 2002-07", "2002-07 起销售金额乘以 100"),
     ("mirror", "ambiguous", "Backup copy", "备份副本", "Append a full backup copy that keeps old amounts", "追加保留旧金额的整份备份副本"),
 ]
@@ -244,7 +261,7 @@ def tex_cost_table(A):
     changed = [p for p, *_ in PHASES[1:]]
     lines = [r"\begin{tabular}{@{}lrrrrr@{}}", r"\toprule"]
     lines.append(
-        r"\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale\\(tasks)}{过期使用} & \bh{Revoked /\\repaired}{撤销／修复}"
+        r"\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale\\(tasks)}{过期使用} & \bh{Invalidated /\\repaired}{失效／修复}"
         r" & \bh{Maint.\\DB (s)}{维护 DB 秒} & \bh{Input tok.\\(k)}{输入千 token}\\"
     )
     lines.append(r"\midrule")
@@ -258,6 +275,7 @@ def tex_cost_table(A):
         tk = mean([mean(xs) for (m, mo), xs in A["hold_tokens"].items() if mo == mode and xs])
         ms_s = "--" if mode in ("middle", "traj-global", "traj-verify") or ms is None else f"{ms:.0f}"
         rr = "--" if mode in ("middle", "traj-global", "traj-verify", "metric-global-noguard", "metric-global-schema") else f"{rev:.1f} / {rep:.1f}"
+        en = TABLE_EN.get(mode, en)  # 窄栏表格里把长方法名断成两行
         lines.append(rf"\swatch{{{COLOR[mode]}}}\ \bhl{{{en}}}{{{zh}}} & {100 * v:.0f} & {st} & {rr} & {ms_s} & {tk / 1000:.1f}\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines) + "\n"
@@ -301,10 +319,9 @@ def numbers(A, dropped, cells, R):
     q["ScenCellsDropped"] = len(dropped)
     q["ScenValidTasks"] = sum(n for (_, _, _), (_, n) in A["acc"].items())
     q["ScenQuotaTasks"] = sum(A["err"].values())
+    main = main_mode()
     for mode, en, _ in METHODS:
-        key = {"middle": "NoShare", "traj-global": "Traj", "traj-verify": "TrajVerify", "metric-global-noguard": "Noguard",
-               "metric-global-schema": "Schema", "metric-global-revoke": "Revoke", "metric-global-def": "Def", "metric-global": "Cond",
-               "metric-global-exref": "CondExref"}[mode]
+        key = key_of(mode)
         pct = lambda v: f"{100 * v:.0f}" if v is not None else "--"
         q[f"ScenAcc{key}"] = pct(phase_mean(A["acc"], mode, allp))
         q[f"ScenHoldout{key}"] = pct(macro(A["acc"], mode, ["holdout"])[0])
@@ -317,34 +334,34 @@ def numbers(A, dropped, cells, R):
         q[f"ScenTok{key}"] = f"{tk / 1000:.1f}" if tk is not None else "--"
         ms = mean([x for (m, mo), xs in A["maint"].items() if mo == mode for x in xs])
         q[f"ScenMaint{key}"] = f"{ms:.1f}" if ms is not None else "--"
-    cond = mean([x for (m, mo), xs in A["maint"].items() if mo == "metric-global" for x in xs])
+    cond = mean([x for (m, mo), xs in A["maint"].items() if mo == main for x in xs])
     dfn = mean([x for (m, mo), xs in A["maint"].items() if mo == "metric-global-def" for x in xs])
     q["ScenMaintRatio"] = f"{100 * cond / dfn:.0f}" if cond is not None and dfn else "--"
     rl = [t for ts in A["relearn"].values() for t in ts]
     q["ScenRelearnTok"] = f"{mean(rl) / 1e6:.2f}" if rl else "--"
     for p in ("dupload", "latekey", "unit", "status", "revision", "dimhist", "mirror"):
-        for mode, key in (("metric-global", "Cond"), ("middle", "NoShare"), ("metric-global-schema", "Schema"), ("metric-global-def", "Def"),
+        for mode, key in ((main, "Cond"), ("middle", "NoShare"), ("metric-global-schema", "Schema"), ("metric-global-def", "Def"),
                           ("traj-global", "Traj")):
             v, _ = macro(A["acc"], mode, [p])
             if v is not None:
                 q[f"ScenAcc{key}{p.capitalize()}"] = f"{100 * v:.0f}"
     ev = A["events"]
-    q["ScenRepairFailedDupload"] = ev[("metric-global", "dupload")]["repair_failed"]
-    q["ScenRepairSkippedLatekey"] = ev[("metric-global", "latekey")]["repair_skipped"]
-    q["ScenRevokedDupload"] = ev[("metric-global", "dupload")]["revoked"]
-    q["ScenRevokedLatekey"] = ev[("metric-global", "latekey")]["revoked"]
-    q["ScenUnitStaleTasks"] = A["stale"][("metric-global", "unit")][0]
-    q["ScenUnitTasks"] = A["stale"][("metric-global", "unit")][1]
+    q["ScenRepairFailedDupload"] = ev[(main, "dupload")]["repair_failed"]
+    q["ScenRepairSkippedLatekey"] = ev[(main, "latekey")]["repair_skipped"]
+    q["ScenRevokedDupload"] = ev[(main, "dupload")]["revoked"]
+    q["ScenRevokedLatekey"] = ev[(main, "latekey")]["revoked"]
+    q["ScenUnitStaleTasks"] = A["stale"][(main, "unit")][0]
+    q["ScenUnitTasks"] = A["stale"][(main, "unit")][1]
     for m, tag in zip(MODEL_ORDER, "ABC"):
-        for mode, key in (("metric-global", "Cond"), ("middle", "NoShare"), ("metric-global-def", "Def"), ("traj-global", "Traj")):
+        for mode, key in ((main, "Cond"), ("middle", "NoShare"), ("metric-global-def", "Def"), ("traj-global", "Traj")):
             if mode not in {x for x, *_ in METHODS}:
                 continue
             v, _, _, nph = per_model(A["acc"], m, mode)
             q[f"ScenAcc{key}Model{tag}"] = f"{100 * v:.0f}" if v is not None else "--"
             q[f"ScenCommonPhasesModel{tag}"] = nph
-        a, b = mean(A["hold_tokens"][(m, "middle")]), mean(A["hold_tokens"][(m, "metric-global")])
+        a, b = mean(A["hold_tokens"][(m, "middle")]), mean(A["hold_tokens"][(m, main)])
         q[f"ScenHoldTokSaveModel{tag}"] = f"{100 * (1 - b / a):.0f}" if a and b else "--"
-        a, b = mean(A["hold_turns"][(m, "middle")]), mean(A["hold_turns"][(m, "metric-global")])
+        a, b = mean(A["hold_turns"][(m, "middle")]), mean(A["hold_turns"][(m, main)])
         q[f"ScenHoldTurnsNoShareModel{tag}"] = f"{a:.1f}" if a else "--"
         q[f"ScenHoldTurnsCondModel{tag}"] = f"{b:.1f}" if b else "--"
     q["MaintStagMin"] = f"{min(y for _, y in R[('condition', 'staggered')]):.1f}"

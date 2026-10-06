@@ -10,7 +10,11 @@
   与留出、正常变化、备份副本、单位变化各自的正确率。
 - 95% 区间：按组（方法 × 重复）整群自助法：同一方法的组有放回重抽，组内题目整体带入。
 - 预先声明的比较：(a) 已建模破坏性变化下 条件级 − 轨迹检索、条件级 − 定义级；(b) 全部情形 条件级 − 不共享；
-  (c) 留出题 条件级 − 轨迹检索。差值的区间对两种方法各自独立整群重抽。
+  (c) 留出题 条件级 − 轨迹检索。差值的区间对两种方法各自独立整群重抽。(a)–(c) 与 e2、e3 中的“条件级”是当时的主配置
+  metric-global（G8 参照为标准答案 SQL）；d1、d2 是 2026-10-03 增补的 metric-global-exref（G8 参照为智能体自己的 SQL）。
+- 2026-10-06 起论文以部署中可得的 metric-global-exref 为 MAVRA，metric-global 改称 MAVRA (gold SQL)：宏 \DsCond* 指
+  metric-global-exref，\DsCondGold* 指 metric-global。f1–f5 是这时补算的、MAVRA 与其余方法的同口径比较（同一批自助样本，
+  不在预先写定的分析方案内）。
 """
 
 import argparse
@@ -22,10 +26,10 @@ import random
 
 METHODS = ["middle", "traj-global", "traj-verify", "metric-global-noguard", "metric-global-schema", "metric-global-revoke",
            "metric-global-def", "metric-global", "metric-global-exref"]
-NAMES = {"middle": "No sharing", "traj-global": "Trajectory retrieval", "traj-verify": "Trajectory retrieval + self-verification",
-         "metric-global-noguard": "Unguarded", "metric-global-schema": "Schema-only", "metric-global-revoke": "Revoke-on-write",
-         "metric-global-def": "Definition-level", "metric-global": "MAVRA (condition-level)",
-         "metric-global-exref": "MAVRA, agent reference for G8"}
+NAMES = {"middle": "No sharing", "traj-global": "Trajectory retrieval", "traj-verify": "Trajectory + self-check",
+         "metric-global-noguard": "No validation", "metric-global-schema": "Schema-change invalidation",
+         "metric-global-revoke": "Invalidate-on-write", "metric-global-def": "Definition-level",
+         "metric-global": "MAVRA (gold SQL)", "metric-global-exref": "MAVRA"}
 PHASES = ["holdout", "append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"]
 GROUPS = {
     "all": PHASES,
@@ -111,8 +115,8 @@ def ci(xs):
 
 
 KEY = {"middle": "NoShare", "traj-global": "Traj", "traj-verify": "TrajVerify", "metric-global-noguard": "Noguard",
-       "metric-global-schema": "Schema", "metric-global-revoke": "Revoke", "metric-global-def": "Def", "metric-global": "Cond",
-       "metric-global-exref": "CondExref"}
+       "metric-global-schema": "Schema", "metric-global-revoke": "Revoke", "metric-global-def": "Def", "metric-global": "CondGold",
+       "metric-global-exref": "Cond"}
 
 
 def tex(res, out):
@@ -134,13 +138,20 @@ def tex(res, out):
         q[f"Ds{k}Turns"] = f"{r['turns_per_task']:.1f}" if r["turns_per_task"] else "--"
         q[f"Ds{k}TokK"] = f"{r['input_tokens_per_task'] / 1000:.1f}" if r["input_tokens_per_task"] else "--"
         q[f"Ds{k}MaintS"] = f"{r['maint_db_s_per_cell']:.0f}"
-    names = {"a1 modeled: MAVRA - trajectory": "DsCmpModeledTraj", "a2 modeled: MAVRA - definition-level": "DsCmpModeledDef",
-             "b all: MAVRA - no sharing": "DsCmpAllNoShare", "c holdout: MAVRA - trajectory": "DsCmpHoldoutTraj",
-             "d1 modeled: MAVRA agent-ref - trajectory": "DsCmpModeledExrefTraj",
-             "d2 modeled: MAVRA agent-ref - MAVRA": "DsCmpModeledExrefCond",
-             "e1 modeled: trajectory+verify - trajectory": "DsCmpModeledVerifyTraj",
-             "e2 modeled: MAVRA - trajectory+verify": "DsCmpModeledCondVerify",
-             "e3 all: MAVRA - trajectory+verify": "DsCmpAllCondVerify"}
+    names = {"a1 modeled: MAVRA (gold SQL) - trajectory": "DsCmpModeledGoldTraj",
+             "a2 modeled: MAVRA (gold SQL) - definition-level": "DsCmpModeledGoldDef",
+             "b all: MAVRA (gold SQL) - no sharing": "DsCmpAllGoldNoShare",
+             "c holdout: MAVRA (gold SQL) - trajectory": "DsCmpHoldoutGoldTraj",
+             "d1 modeled: MAVRA - trajectory": "DsCmpModeledTraj",
+             "d2 modeled: MAVRA - MAVRA (gold SQL)": "DsCmpModeledGold",
+             "e1 modeled: trajectory+self-check - trajectory": "DsCmpModeledVerifyTraj",
+             "e2 modeled: MAVRA (gold SQL) - trajectory+self-check": "DsCmpModeledGoldVerify",
+             "e3 all: MAVRA (gold SQL) - trajectory+self-check": "DsCmpAllGoldVerify",
+             "f1 modeled: MAVRA - definition-level": "DsCmpModeledDef",
+             "f2 all: MAVRA - no sharing": "DsCmpAllNoShare",
+             "f3 holdout: MAVRA - trajectory": "DsCmpHoldoutTraj",
+             "f4 modeled: MAVRA - trajectory+self-check": "DsCmpModeledCondVerify",
+             "f5 all: MAVRA - trajectory+self-check": "DsCmpAllCondVerify"}
     for label, name in names.items():
         c = res["comparisons"].get(label)
         if c:
@@ -199,16 +210,22 @@ def main():
         return {"diff": point, "ci95": ci(ds)}
 
     res["comparisons"] = {
-        "a1 modeled: MAVRA - trajectory": diff("metric-global", "traj-global", "modeled"),
-        "a2 modeled: MAVRA - definition-level": diff("metric-global", "metric-global-def", "modeled"),
-        "b all: MAVRA - no sharing": diff("metric-global", "middle", "all"),
-        "c holdout: MAVRA - trajectory": diff("metric-global", "traj-global", "holdout"),
-        # 2026-10-03 增补（见 exp/2026-10-02-scenarios-ds/README.md 的分析方案增补）
-        "d1 modeled: MAVRA agent-ref - trajectory": diff("metric-global-exref", "traj-global", "modeled"),
-        "d2 modeled: MAVRA agent-ref - MAVRA": diff("metric-global-exref", "metric-global", "modeled"),
-        "e1 modeled: trajectory+verify - trajectory": diff("traj-verify", "traj-global", "modeled"),
-        "e2 modeled: MAVRA - trajectory+verify": diff("metric-global", "traj-verify", "modeled"),
-        "e3 all: MAVRA - trajectory+verify": diff("metric-global", "traj-verify", "all"),
+        # 预先写定的分析方案（a–c 为主实验，d、e 为 2026-10-03 增补；见 exp/2026-10-02-scenarios-ds/README.md）
+        "a1 modeled: MAVRA (gold SQL) - trajectory": diff("metric-global", "traj-global", "modeled"),
+        "a2 modeled: MAVRA (gold SQL) - definition-level": diff("metric-global", "metric-global-def", "modeled"),
+        "b all: MAVRA (gold SQL) - no sharing": diff("metric-global", "middle", "all"),
+        "c holdout: MAVRA (gold SQL) - trajectory": diff("metric-global", "traj-global", "holdout"),
+        "d1 modeled: MAVRA - trajectory": diff("metric-global-exref", "traj-global", "modeled"),
+        "d2 modeled: MAVRA - MAVRA (gold SQL)": diff("metric-global-exref", "metric-global", "modeled"),
+        "e1 modeled: trajectory+self-check - trajectory": diff("traj-verify", "traj-global", "modeled"),
+        "e2 modeled: MAVRA (gold SQL) - trajectory+self-check": diff("metric-global", "traj-verify", "modeled"),
+        "e3 all: MAVRA (gold SQL) - trajectory+self-check": diff("metric-global", "traj-verify", "all"),
+        # 2026-10-06 补算：MAVRA（智能体自己的 SQL 作参照）与其余方法的同口径比较，不在预先写定的方案内
+        "f1 modeled: MAVRA - definition-level": diff("metric-global-exref", "metric-global-def", "modeled"),
+        "f2 all: MAVRA - no sharing": diff("metric-global-exref", "middle", "all"),
+        "f3 holdout: MAVRA - trajectory": diff("metric-global-exref", "traj-global", "holdout"),
+        "f4 modeled: MAVRA - trajectory+self-check": diff("metric-global-exref", "traj-verify", "modeled"),
+        "f5 all: MAVRA - trajectory+self-check": diff("metric-global-exref", "traj-verify", "all"),
     }
     res["comparisons"] = {k: v for k, v in res["comparisons"].items() if v is not None}
     if o.json:

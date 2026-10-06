@@ -1,6 +1,6 @@
 # 研究状态与证据 / Research status and evidence
 
-更新日期 / Updated: **2026-10-03**（10-03：补充命题 1、引理 1、算法 1；新增 dbt 式表级测试基线、真实 TPC-DS 数据上的配对回放、两种增补方法（智能体参照的 G8、轨迹检索 + 自验证）。10-02：按外部评审改写主线：有效性模型、使用时的强制保证（含绑定快照执行）与有界修复；效率作为实现结论。新增机制层证据：配对回放、并发写入、通用缓存基线、TPC-DS 自然共享、规模扩展。数值由 `tools/paper-results.py` 与 `tools/review-results.py` 生成）。
+更新日期 / Updated: **2026-10-06**（10-06：论文以部署可得的配置为 MAVRA——G8 以智能体自己的学习 SQL 为对照（`metric-global-exref`、回放参照 `example`）；原判题参照配置改称 MAVRA (gold SQL)；定义库回放在各方法共用的智能体 SQL 参照下重跑；全文术语改为数据库通用词汇（失效、检查结果、同快照验证、先检查后执行、请求合并、连接基数、缓慢变化维等，一个概念一个名字）。下文 10-03 及更早的条目保留当时的方法名与数值。10-03：补充命题 1、引理 1、算法 1；新增 dbt 式表级测试基线、真实 TPC-DS 数据上的配对回放、两种增补方法（智能体参照的 G8、轨迹检索 + 自验证）。10-02：按外部评审改写主线：有效性模型、使用时的强制保证（含绑定快照执行）与有界修复；效率作为实现结论。新增机制层证据：配对回放、并发写入、通用缓存基线、TPC-DS 自然共享、规模扩展。数值由 `tools/paper-results.py` 与 `tools/review-results.py` 生成）。
 
 系统仓库 / System repository: `agent4db-adapter`，场景实验代码 `26c2b48` 起，统计脚本见 `tools/`。
 论文仓库原始版本 / Original paper commit: `f33e2b8`。
@@ -46,6 +46,8 @@ python3 tools/figures/build.py   # 六幅图：overleaf/figures/<名称>.pdf 与
 Section 2.1 values are written in the text from the two workload reports. Section 7's scenario cost table and the in-text number macros are generated into `gen/` from raw outputs; the six figures are vector PDFs drawn by `tools/figures/build.py`, which reads the archived results and checks them against `gen/`.
 
 ## 已支撑的结果 / Supported results
+
+- **2026-10-06 现行数值**（论文正文、`overleaf/gen/`）：端到端已建模破坏 MAVRA **74%**（73–76），轨迹检索 57%，定义级 64%，自检 63%；MAVRA − 轨迹检索 **+17**（15–18，预先写定的 d1），MAVRA (gold SQL) 73%（−1–3）；每次运行发布修复 4.7（gold SQL 8.0）。定义库回放（1,470 道共同题，各方法同一参照）：MAVRA 答对 780、条件覆盖的变化下零错误，按模式变更失效 629 个错误，表级测试 603，gold SQL 933（差 10.4 个百分点，全部在版本化更正与维表拉链）；TPC-DS 981 道：MAVRA 360，gold SQL 630，按模式变更失效 437 个错误。详见 `exp/2026-10-02-cache-baseline-tpcds/README.md` 与 `exp/2026-10-02-scenarios-ds/README.md` 的 10-06 小节。
 
 - 工作负载：智能体 SQL 只有 24% 复用已出现模板（Redset 读查询 93.4%）；68% 的调用用于探索；93% 的查找重复此前会话获得的事实，其中大部分是表结构事实，SQL 查找中 38% 重复事实且没有一条 SQL 文本重复；32 个错误答案全部来自执行成功的 SQL。
 - 配对回放（固定学到的定义库，只换维护方式）：在已建模的变化下各重验证方法零错误答案，只看结构 **645** 个；各重验证方法只在单位变化下答错（101）。条件级、定义级、通用缓存逐题结果 **100%** 相同——场景中的正确率差来自学到的库。维护 DB 时间：条件级 583 s，通用缓存 613 s（1.05×），定义级 1,058 s（1.82×）。

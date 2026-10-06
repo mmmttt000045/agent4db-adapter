@@ -1,8 +1,10 @@
-"""Figure: paired replay, outcome of every scored question per method.
+"""Figure: library replay, outcome of every scored question per method.
 
-One 100% bar per method splits its questions into correct, served wrong,
-and unavailable (needed or not); maintenance database time sits at the
-right. Data: exp/2026-10-02-cache-baseline-tpcds/replay-stats.json, the
+One 100% bar per method splits its questions into correct, wrong, and
+invalidated (correctly or falsely); maintenance database time sits at the
+right. All methods use the agent's own SQL as the G8 reference; the last row
+repeats MAVRA with the gold SQL. Counts are over the questions every row
+answers (task_level_common). Data: exp/2026-10-02-cache-baseline-tpcds/replay-stats.json, the
 archive tools/review-results.py turns into the \\Rp* macros; every count and
 time is checked against those macros.
 """
@@ -20,22 +22,22 @@ W, H = style.COLUMN, 35.4
 DATA = style.ROOT / 'exp/2026-10-02-cache-baseline-tpcds/replay-stats.json'
 
 # (replay group, method key in style.METHODS, macro key, footnote mark)
-ROWS = [('schema/judge', 'metric-global-schema', 'Schema', ''),
-        ('tabletest/judge', 'tabletest', 'Table', ''),
-        ('revoke/judge', 'metric-global-revoke', 'Revoke', 'a'),
-        ('definition/judge', 'definition', 'Def', ''),
-        ('definition-cache/judge', 'definition-cache', 'Cache', ''),
-        ('condition/judge', 'condition', 'Cond', ''),
-        ('condition/example', 'metric-global-exref', 'Ex', 'b')]
+ROWS = [('schema/example', 'metric-global-schema', 'Schema', ''),
+        ('tabletest/example', 'tabletest', 'Table', ''),
+        ('revoke/example', 'metric-global-revoke', 'Revoke', 'a'),
+        ('definition/example', 'definition', 'Def', ''),
+        ('definition-cache/example', 'definition-cache', 'Cache', ''),
+        ('condition/example', 'condition', 'Cond', ''),
+        ('condition/judge', 'metric-global', 'Gold', 'b')]
 # (field, macro suffix, fill, text color)
 OUTCOMES = [('correct', 'Correct', '#5B5853', WHITE),
             ('served_wrong', 'Wrong', RED, WHITE),
             ('unavailable_needed', 'Needed', '#B4B0A9', INK),
             ('unavailable_unneeded', 'Unneeded', '#E2DFD9', INK)]
 TEXT = {
-    'en': {'outcomes': ('Correct', 'Served wrong', 'Unavailable, needed', 'Unavailable, not needed'),
+    'en': {'outcomes': ('Correct', 'Wrong', 'Correct invalidation', 'False invalidation'),
            'db': 'Maint. DB s'},
-    'zh': {'outcomes': ('答对', '提供但答错', '不可用（必要）', '不可用（不必要）'),
+    'zh': {'outcomes': ('答对', '答错', '正确失效', '误失效'),
            'db': '维护 DB 秒'},
 }
 LABEL, NUM, TICK = 6.5, 6.0, 6.0       # font sizes, pt (acmart \scriptsize is 6)
@@ -50,7 +52,7 @@ def load():
     printed = style.macros('review')
     rows = []
     for group, key, macro, mark in ROWS:
-        cell = stats['task_level'][group]
+        cell = stats['task_level_common'][group]
         counts = [cell[field] for field, *_ in OUTCOMES]
         if sum(counts) != cell['n']:
             raise SystemExit(f'{group}: outcomes add up to {sum(counts)}, not {cell["n"]}')
@@ -93,7 +95,7 @@ def draw(s, lang):
 
     for i, ((key, mark, counts, db), (label, color)) in enumerate(zip(rows, labels)):
         yc = top + pitch * (i + .5)
-        if key in ('condition', 'metric-global-exref'):
+        if key == 'condition':
             s.rect(0, yc - pitch / 2, W, pitch, ACC_PALE, None)
         s.rect(0, yc - .8, 1.6, 1.6, color, None, r=.2)
         text(2.4, yc + .8, label, LABEL, INK)

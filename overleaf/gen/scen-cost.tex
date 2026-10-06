@@ -1,16 +1,16 @@
 % 由 tools/paper-results.py 生成，请勿手改。
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
-\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale\\(tasks)}{过期使用} & \bh{Revoked /\\repaired}{撤销／修复} & \bh{Maint.\\DB (s)}{维护 DB 秒} & \bh{Input tok.\\(k)}{输入千 token}\\
+\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale\\(tasks)}{过期使用} & \bh{Invalidated /\\repaired}{失效／修复} & \bh{Maint.\\DB (s)}{维护 DB 秒} & \bh{Input tok.\\(k)}{输入千 token}\\
 \midrule
 \swatch{mNoShare}\ \bhl{No sharing}{不共享} & 32 & 0 & -- & -- & 15.6\\
 \swatch{mTraj}\ \bhl{Trajectory retrieval}{轨迹检索} & 76 & 0 & -- & -- & 11.0\\
-\swatch{mTrajVerify}\ \bhl{Trajectory retrieval + verify}{轨迹检索 + 自验证} & 77 & 0 & -- & -- & 13.5\\
-\swatch{mUnguarded}\ \bhl{Unguarded}{无守护} & 75 & 142 & -- & 0 & 10.7\\
-\swatch{mSchema}\ \bhl{Schema-only}{只看结构} & 75 & 143 & -- & 0 & 10.7\\
-\swatch{mRevoke}\ \bhl{Revoke-on-write}{写入即撤销} & 67 & 0 & 38.3 / 0.0 & 0 & 12.8\\
+\swatch{mTrajVerify}\ \bhl{Trajectory + self-check}{轨迹检索 + 自检} & 77 & 0 & -- & -- & 13.5\\
+\swatch{mUnguarded}\ \bhl{No validation}{共享不验证} & 75 & 142 & -- & 0 & 10.7\\
+\swatch{mSchema}\ \bhl{Schema-change invalidation}{按模式变更失效} & 75 & 143 & -- & 0 & 10.7\\
+\swatch{mRevoke}\ \bhl{Invalidate-on-write}{写入即失效} & 67 & 0 & 38.3 / 0.0 & 0 & 12.8\\
 \swatch{mDef}\ \bhl{Definition-level}{定义级} & 69 & 24 & 15.7 / 6.3 & 363 & 13.2\\
-\swatch{mCond}\ \bhl{\system}{条件级} & 81 & 27 & 19.0 / 8.0 & 326 & 10.0\\
-\swatch{mCondExref}\ \bhl{\system, agent ref.}{条件级，智能体参照} & 81 & 27 & 18.7 / 4.7 & 342 & 10.7\\
+\swatch{mCond}\ \bhl{\system}{\system} & 81 & 27 & 18.7 / 4.7 & 342 & 10.7\\
+\swatch{mCondGold}\ \bhl{\system\ (gold SQL)}{\system（标准答案 SQL）} & 81 & 27 & 19.0 / 8.0 & 326 & 10.0\\
 \bottomrule
 \end{tabular}

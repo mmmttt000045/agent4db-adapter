@@ -4,11 +4,10 @@
 
 | 维护方式 | G8 参照 | 题次 | 答对 | 提供但答错 | 不可用（必要） | 不可用（不必要） | 维护 DB 秒 |
 |---|---|---|---|---|---|---|---|
-| condition | example | 1470 | 780 | 99 | 469 | 122 | 679.0 |
-| condition | judge | 1530 | 973 | 101 | 345 | 111 | 693.4 |
-| definition | example | 1470 | 780 | 99 | 469 | 122 | 1118.4 |
-| definition | judge | 1530 | 973 | 101 | 345 | 111 | 1176.0 |
-| definition-cache | judge | 1530 | 973 | 101 | 345 | 111 | 699.9 |
-| revoke | judge | 1530 | 0 | 0 | 746 | 784 | 0.4 |
-| schema | judge | 1530 | 784 | 746 | 0 | 0 | 0.6 |
-| tabletest | judge | 1530 | 631 | 101 | 645 | 153 | 49.9 |
+| condition | example | 1470 | 780 | 99 | 469 | 122 | 674.1 |
+| condition | judge | 1530 | 973 | 101 | 345 | 111 | 690.1 |
+| definition | example | 1470 | 780 | 99 | 469 | 122 | 1113.8 |
+| definition-cache | example | 1470 | 780 | 99 | 469 | 122 | 683.8 |
+| revoke | example | 1470 | 0 | 0 | 728 | 742 | 0.4 |
+| schema | example | 1470 | 742 | 728 | 0 | 0 | 0.4 |
+| tabletest | example | 1470 | 603 | 99 | 629 | 139 | 49.8 |

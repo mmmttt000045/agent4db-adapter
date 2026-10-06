@@ -7,7 +7,9 @@
 - 题次级：correct / served_wrong / unavailable_needed / unavailable_unneeded（见 replay-bench 报告的 methodology）。
 - 定义级（库 × 变化 × 条目）：原定义在变化后至少答错一题 = 需要处理；处理结果按条目的全部受影响题目归为
   全部答对（served_ok）/ 提供且有题答错（served_wrong）/ 不可用（unavailable）。
-- 配对差异：条件级与其他方式在同一 (库, 变化, 条目, 题) 上逐题比较；答对率之差的 95% 区间按库做整群自助法。
+- 配对差异：条件级（每种 G8 参照）与其余每一组在同一 (库, 变化, 条目, 题) 上逐题比较；答对率之差的 95% 区间按库做
+  整群自助法。
+- 维护 DB 时间的比值以条件级在主参照下的组为分母（有 condition/example 时取它，否则 condition/judge）。
 """
 
 import argparse
@@ -57,6 +59,16 @@ def main():
         n = sum(c.values())
         task[f"{g[0]}/{g[1]}"] = {"n": n, **{k: c[k] for k in CLASSES}, **{k + "_pct": pct(c[k], n) for k in CLASSES}}
     res["task_level"] = task
+    # 共同题次：每一组都有结果的 (库, 变化, 条目, 题)；只在部分参照下准入的条目不计，各组在同一批题上比较
+    keys = {g: {(x["lib"], x["change"], x["entry"], x["task"]) for x in outs if (x["policy"], x["oracle"]) == g} for g in groups}
+    common = set.intersection(*keys.values()) if keys else set()
+    task_c = {}
+    for g in groups:
+        c = collections.Counter(x["class"] for x in outs
+                                if (x["policy"], x["oracle"]) == g and (x["lib"], x["change"], x["entry"], x["task"]) in common)
+        n = sum(c.values())
+        task_c[f"{g[0]}/{g[1]}"] = {"n": n, **{k: c[k] for k in CLASSES}, **{k + "_pct": pct(c[k], n) for k in CLASSES}}
+    res["task_level_common"] = task_c
 
     # 定义级
     by_def = collections.defaultdict(list)
@@ -93,13 +105,12 @@ def main():
                 t[k][f"{g[0]}/{g[1]}"] = {"correct_pct": pct(a, n), "n": n}
         res[name] = dict(sorted(t.items()))
 
-    # 配对：条件级 vs 其他方式（同一 G8 参照；不区分参照的方式与 judge 比）
+    # 配对：条件级（每种参照）vs 其余每一组
     idx = {(x["policy"], x["oracle"], x["lib"], x["change"], x["entry"], x["task"]): x for x in outs}
     paired = {}
     for oracle in sorted({q for p, q in groups if p == "condition"}):
-        for other in sorted({p for p, _ in groups if p != "condition"}):
-            q2 = oracle if (other, oracle) in groups else "judge"
-            if (other, q2) not in groups:
+        for other, q2 in groups:
+            if (other, q2) == ("condition", oracle):
                 continue
             pairs = collections.defaultdict(list)
             agree = collections.Counter()
@@ -127,9 +138,11 @@ def main():
     for m in r["maintenance"]:
         ms[f"{m['policy']}/{m['oracle']}"][m["change"]] += m["db_ms"] / 1000.0
     res["maintenance_db_s"] = {g: {"total": round(sum(v.values()), 1), **{k: round(s, 2) for k, s in sorted(v.items())}} for g, v in ms.items()}
-    cond = res["maintenance_db_s"].get("condition/judge", {}).get("total")
+    base = "condition/example" if "condition/example" in res["maintenance_db_s"] else "condition/judge"
+    cond = res["maintenance_db_s"].get(base, {}).get("total")
+    res["maintenance_db_s_base"] = base
     for g, v in res["maintenance_db_s"].items():
-        v["vs_condition_judge"] = round(v["total"] / cond, 2) if cond else None
+        v["vs_condition"] = round(v["total"] / cond, 2) if cond else None
 
     # 准入
     fails = collections.Counter()

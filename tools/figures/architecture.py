@@ -1,10 +1,12 @@
 """Figure 2: the MAVRA architecture as a vector drawing.
 
-The layout reads left to right: the learning side (agent A, admission) writes
+The layout reads left to right: the learning side (agent A, MAVRA's built-in
+analysis optimizer, drawn inside MAVRA's area; admission) writes
 into the shared store in the centre; condition maintenance and bounded repair
 sit under the store, so their write-backs go up into it; the use side
 (lookup) and the execution side (same-snapshot validation) read from it on
-the right, and the revision m^r a lookup returns is the one a query declares.
+the right for user agents B, C, ... (grey, outside MAVRA), and the revision
+m^r a lookup returns is the one a query declares.
 The SQL database is one storage slab at the bottom: tables, their versions
 V(T), and the snapshot D_s a query runs on. No engine-specific names appear;
 the figure explains the model, not the implementation.
@@ -34,8 +36,9 @@ THIN, THICK = .22, .5                            # call or response; write to th
 
 LABELS = {
     'en': {
-        'agent_a': 'Agent A', 'extractor': 'LLM extractor',
-        'agents': 'Agents B, C, …', 'agents_note': 'questions with metric names only',
+        'agent_a': 'Agent A', 'agent_a_note': 'built-in analysis optimizer',
+        'extractor': 'LLM extractor',
+        'agents': 'User agents B, C, …', 'agents_note': 'questions with metric names only',
         'middleware': 'MAVRA middleware',
         'admission': 'Admission', 'candidate': 'candidate',
         'defs': 'Definitions', 'valid': 'valid', 'pending': 'pending', 'revoked': 'invalid',
@@ -57,8 +60,9 @@ LABELS = {
         'lines': ('call / response', 'shared-store write', 'read of database state'),
     },
     'zh': {
-        'agent_a': '智能体 A', 'extractor': '大模型提取器',
-        'agents': '智能体 B、C 等', 'agents_note': '只给指标名的问题',
+        'agent_a': '智能体 A', 'agent_a_note': '内置分析优化器',
+        'extractor': '大模型提取器',
+        'agents': '用户端智能体 B、C 等', 'agents_note': '只给指标名的问题',
         'middleware': 'MAVRA 中间件',
         'admission': '准入', 'candidate': '候选',
         'defs': '定义', 'valid': '有效', 'pending': '待验证', 'revoked': '已失效',
@@ -91,7 +95,9 @@ LOOKUP = (109, 24, 27, 9.5)
 TRACK = (109, 40.5, 27, 8)
 EXEC = (144, 24, 31, 24.5)
 FIELD_BOX = (1.5, 20, 175.5, 31.5)
-NODE_Y, NODE_H = 6, 8.4                  # agent front faces
+NODE_Y, NODE_H = 6, 8.4                  # front faces of the user agents
+INNER_Y = 7.6                            # front faces of MAVRA's own agent and extractor
+INNER = (1.5, .2, 47.0, 20.8)            # MAVRA's field reaches up around them
 PG = (31, 57.0, 144, 11.0)               # the database slab
 DB_TABLES, DB_STATS, DB_SNAP = (76, 32), (110.5, 27), (143.5, 30)   # (x, w) of its three regions
 
@@ -110,15 +116,27 @@ def draw(s, lang):
     L = LABELS[lang]
     text, rect, route = s.text, s.rect, s.route
 
-    def node(x, w, d=1.5):
-        """Front face with a top and a right face behind it."""
-        y, h = NODE_Y, NODE_H
-        s.poly([(x, y), (x + d, y - d), (x + w + d, y - d), (x + w, y)], TOP, EDGE, .12)
+    def node(x, w, y=NODE_Y, d=1.5, own=False):
+        """Front face with a top and a right face behind it; MAVRA's own parts are blue."""
+        h = NODE_H
+        top, side, edge, face = ('#DCE8F7', '#C3D6EF', '#7FA6D8', '#F7FAFE') if own else \
+            (TOP, SIDE, EDGE, WHITE)
+        s.poly([(x, y), (x + d, y - d), (x + w + d, y - d), (x + w, y)], top, edge, .12)
         s.poly([(x + w, y), (x + w + d, y - d), (x + w + d, y + h - d), (x + w, y + h)],
-               SIDE, EDGE, .12)
-        rect(x, y, w, h, WHITE, EDGE, .16, r=.35)
+               side, edge, .12)
+        rect(x, y, w, h, face, edge, .16, r=.35)
+
+    def analyzer(x, y, w=9.5):
+        """MAVRA's built-in analysis optimizer: an analysis chart instead of a chat bubble."""
+        node(x, w, y, own=True)
+        text(x + 1.5, y + 4.9, 'A', TITLE + .6, ACC_DK, 'bold')
+        base = y + 6.6
+        for k, height in enumerate((2.0, 3.4, 4.8)):
+            rect(x + 4.6 + 1.35 * k, base - height, .95, height, ACC, None, r=.15)
+        s.line(x + 4.2, base + .2, x + w - .9, base + .2, '#7FA6D8', .2)
 
     def agent(x, letter, w=9.5):
+        """A user-side agent: asks questions in natural language."""
         node(x, w)
         y = NODE_Y
         text(x + 1.5, y + 4.9, letter, TITLE + .6, INK, 'bold')
@@ -170,18 +188,22 @@ def draw(s, lang):
         """Label centred over an arrow that crosses the gap from x0 to x1."""
         text((x0 + x1) / 2, y, label, NOTE, color, 'sans', 'center', width=x1 - x0 - .6)
 
-    # Field ----------------------------------------------------------------
+    # Field: MAVRA's area reaches up around its built-in agent and extractor ---
+    rect(*INNER, FIELD, None, r=1.4)
     rect(*FIELD_BOX, FIELD, None, r=1.4)
     rect(STORE[0], 20.9, .55, 2.6, ACC)
     text(STORE[0] + 1.5, 23.0, L['middleware'], TITLE - .4, ACC_DK, 'bold')
 
     # Agents and extractor -------------------------------------------------
     a_x, x_x, x_w = 4, 17, 14
-    agent(a_x, 'A')
-    text(a_x + 4.75, 3.2, L['agent_a'], TITLE, INK, 'bold', 'center')
-    node(x_x, x_w)
-    text(x_x + x_w / 2, 3.2, L['extractor'], TITLE, INK, 'bold', 'center')
-    cols = [(x_x + 2.6, (8.2, 12.2)), (x_x + 7, (7.6, 10.2, 12.8)), (x_x + 11.4, (8.9, 11.5))]
+    analyzer(a_x, INNER_Y)
+    text(a_x + 4.75, 3.0, L['agent_a'], TITLE, ACC_DK, 'bold', 'center')
+    text(a_x, 5.35, L['agent_a_note'], NOTE, ACC_DK, width=INNER[0] + INNER[2] - a_x - 1)
+    node(x_x, x_w, INNER_Y, own=True)
+    text(x_x + x_w / 2, 3.0, L['extractor'], TITLE, ACC_DK, 'bold', 'center')
+    dy = INNER_Y - NODE_Y
+    cols = [(x_x + 2.6, (8.2 + dy, 12.2 + dy)), (x_x + 7, (7.6 + dy, 10.2 + dy, 12.8 + dy)),
+            (x_x + 11.4, (8.9 + dy, 11.5 + dy))]
     for (xa, ya), (xb, yb) in zip(cols, cols[1:]):
         for y1 in ya:
             for y2 in yb:
@@ -218,10 +240,10 @@ def draw(s, lang):
     ax, ay, aw, ah = ADM
     box(ADM)
     a1, a2 = a_x + 4.75, x_x + x_w / 2
-    route([(a1, NODE_Y + NODE_H), (a1, ay)], LEARN, THIN)
+    route([(a1, INNER_Y + NODE_H), (a1, ay)], LEARN, THIN)
     step(a1 - 2.8, 21.8, 1, LEARN)
-    route([(a2, ay), (a2, NODE_Y + NODE_H)], LEARN, THIN, heads='both')
-    text(a2 + 2, 18.7, L['chain'], NOTE, MUTED)
+    route([(a2, ay), (a2, INNER_Y + NODE_H)], LEARN, THIN, heads='both')
+    text(a2 + 2, 19.0, L['chain'], NOTE, MUTED, width=INNER[0] + INNER[2] - a2 - 2.6)
     step(a2 + 2.8, 21.8, 2, LEARN)
     # Candidate (answer provenance: queries and arithmetic) through the checks.
     cx, cy = ax + 2.0, ay + 2.2

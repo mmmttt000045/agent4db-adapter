@@ -1,8 +1,8 @@
 """Figure 2: the MAVRA architecture as a vector drawing.
 
 The layout reads left to right: the learning side (MAVRA's built-in analysis
-optimizer and LLM extractor, drawn as components inside MAVRA's area, then
-admission) writes
+optimizer, an LLM agent drawn in MAVRA's blue inside MAVRA's area, the LLM
+extractor, then admission) writes
 into the shared store in the centre; condition maintenance and bounded repair
 sit under the store, so their write-backs go up into it; the use side
 (lookup) and the execution side (same-snapshot validation) read from it on
@@ -19,6 +19,7 @@ shared store, dashed = read of database state.
 Coordinates are millimetres from the top-left at printed size: the figure
 spans \\textwidth (178 mm). Every label is checked against the room it has.
 """
+import math
 import sys
 from pathlib import Path
 
@@ -38,7 +39,7 @@ THIN, THICK = .22, .5                            # call or response; write to th
 
 LABELS = {
     'en': {
-        'opt': ('Analysis', 'optimizer'), 'ext': ('LLM', 'extractor'),
+        'opt': ('Analysis', 'optimizer'), 'opt_kind': 'LLM agent', 'ext': ('LLM', 'extractor'),
         'agents': 'User agents', 'agents_note': 'questions with metric names only',
         'middleware': 'MAVRA middleware',
         'admission': 'Admission', 'candidate': 'candidate',
@@ -65,7 +66,7 @@ LABELS = {
         'lines': ('call / response', 'shared-store write', 'read of database state'),
     },
     'zh': {
-        'opt': ('分析', '优化器'), 'ext': ('大模型', '提取器'),
+        'opt': ('分析', '优化器'), 'opt_kind': 'LLM 智能体', 'ext': ('大模型', '提取器'),
         'agents': '用户端智能体', 'agents_note': '只给指标名的问题',
         'middleware': 'MAVRA 中间件',
         'admission': '准入', 'candidate': '候选',
@@ -104,7 +105,7 @@ TRACK = (109, 43.2, 27, 8)
 EXEC = (144, 24, 31, 27.2)
 FIELD_BOX = (1.5, 20, 175.5, 34.2)
 NODE_Y, NODE_H = 6, 8.4                  # front faces of the user agents
-OPT = (2.8, 6.0, 18.4, 10.4)             # MAVRA's built-in analysis optimizer
+OPT = (2.6, 6.0, 18.2, 10.4)             # MAVRA's built-in analysis optimizer (an LLM agent)
 EXT = (22.2, 6.0, 24.8, 10.4)            # LLM extractor
 INNER = (1.5, .2, 47.0, 20.8)            # MAVRA's field reaches up around both
 PG = (31, 59.7, 144, 11.0)               # the database slab
@@ -151,14 +152,32 @@ def draw(s, lang):
             text(x_text, y + h / 2 + 1.2, first, TITLE, INK, 'bold', width=room)
 
     def optimizer(b):
-        """MAVRA's built-in analysis optimizer: a component, drawn like the others."""
+        """MAVRA's built-in analysis optimizer: an LLM agent, so it has an agent's 3D
+        form like the user agents, but in MAVRA's blue, inside MAVRA, with an LLM mark."""
         x, y, w, h = b
-        box(b)
-        base = y + h / 2 + 2.6
-        for k, height in enumerate((2.0, 3.4, 4.8)):
-            rect(x + 1.4 + 1.35 * k, base - height, .95, height, ACC, None, r=.15)
-        s.line(x + 1.0, base + .25, x + 5.6, base + .25, '#7FA6D8', .2)
-        two_lines(b, L['opt'], x + 6.2)
+        d = 1.2
+        s.poly([(x, y), (x + d, y - d), (x + w + d, y - d), (x + w, y)], '#E6EFFA', '#9DBBE2', .12)
+        s.poly([(x + w, y), (x + w + d, y - d), (x + w + d, y + h - d), (x + w, y + h)],
+               '#D3E2F4', '#9DBBE2', .12)
+        rect(x, y, w, h, '#F7FAFE', ACC, .2, r=.5)
+        cx, cy, r = x + 3.0, y + h / 2, 1.8
+        rect(cx - r, cy - r, 2 * r, 2 * r, ACC, None, r=.9)
+        sparkle(cx, cy, 1.25)
+        sparkle(cx + 1.05, cy - 1.0, .45)
+        tx, room = x + 5.8, w - 5.8 - .8
+        first, second = L['opt']
+        text(tx, y + 3.5, first, TITLE, INK, 'bold', width=room)
+        text(tx, y + 6.3, second, TITLE, INK, 'bold', width=room)
+        text(tx, y + 9.0, L['opt_kind'], NOTE, ACC_DK, 'bold', width=room)
+
+    def sparkle(cx, cy, r):
+        """Four-pointed star, the usual mark for an LLM."""
+        pts = []
+        for k in range(8):
+            a = math.pi / 4 * k - math.pi / 2
+            rr = r if k % 2 == 0 else .28 * r
+            pts.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
+        s.poly(pts, WHITE, None)
 
     def extractor(b):
         x, y, w, h = b

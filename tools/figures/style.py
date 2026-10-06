@@ -51,6 +51,7 @@ METHODS = {
     'definition-cache': ('Check-result cache', '检查结果缓存', 'mCache'),
     'condition-scope': ('Affected-only', '只查受影响条件', 'mScope'),
     'condition': ('MAVRA', 'MAVRA', 'mCond'),
+    'condition-current': ('MAVRA, G8 on current data', 'MAVRA，G8 用当前数据', 'mCondCur'),
 }
 
 

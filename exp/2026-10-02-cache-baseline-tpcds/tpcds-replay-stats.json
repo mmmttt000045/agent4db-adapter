@@ -3,9 +3,10 @@
  "groups": [
   "condition/example",
   "condition/judge",
-  "revoke/judge",
-  "schema/judge",
-  "tabletest/judge"
+  "condition/snapshot",
+  "revoke/snapshot",
+  "schema/snapshot",
+  "tabletest/snapshot"
  ],
  "task_level": {
   "condition/example": {
@@ -30,7 +31,18 @@
    "unavailable_needed_pct": 25.5,
    "unavailable_unneeded_pct": 3.0
   },
-  "revoke/judge": {
+  "condition/snapshot": {
+   "n": 981,
+   "correct": 630,
+   "served_wrong": 72,
+   "unavailable_needed": 250,
+   "unavailable_unneeded": 29,
+   "correct_pct": 64.2,
+   "served_wrong_pct": 7.3,
+   "unavailable_needed_pct": 25.5,
+   "unavailable_unneeded_pct": 3.0
+  },
+  "revoke/snapshot": {
    "n": 981,
    "correct": 0,
    "served_wrong": 0,
@@ -41,7 +53,7 @@
    "unavailable_needed_pct": 51.9,
    "unavailable_unneeded_pct": 48.1
   },
-  "schema/judge": {
+  "schema/snapshot": {
    "n": 981,
    "correct": 472,
    "served_wrong": 509,
@@ -52,16 +64,16 @@
    "unavailable_needed_pct": 0.0,
    "unavailable_unneeded_pct": 0.0
   },
-  "tabletest/judge": {
-   "n": 1023,
-   "correct": 369,
+  "tabletest/snapshot": {
+   "n": 981,
+   "correct": 351,
    "served_wrong": 72,
    "unavailable_needed": 437,
-   "unavailable_unneeded": 145,
-   "correct_pct": 36.1,
-   "served_wrong_pct": 7.0,
-   "unavailable_needed_pct": 42.7,
-   "unavailable_unneeded_pct": 14.2
+   "unavailable_unneeded": 121,
+   "correct_pct": 35.8,
+   "served_wrong_pct": 7.3,
+   "unavailable_needed_pct": 44.5,
+   "unavailable_unneeded_pct": 12.3
   }
  },
  "task_level_common": {
@@ -87,7 +99,18 @@
    "unavailable_needed_pct": 25.5,
    "unavailable_unneeded_pct": 3.0
   },
-  "revoke/judge": {
+  "condition/snapshot": {
+   "n": 981,
+   "correct": 630,
+   "served_wrong": 72,
+   "unavailable_needed": 250,
+   "unavailable_unneeded": 29,
+   "correct_pct": 64.2,
+   "served_wrong_pct": 7.3,
+   "unavailable_needed_pct": 25.5,
+   "unavailable_unneeded_pct": 3.0
+  },
+  "revoke/snapshot": {
    "n": 981,
    "correct": 0,
    "served_wrong": 0,
@@ -98,7 +121,7 @@
    "unavailable_needed_pct": 51.9,
    "unavailable_unneeded_pct": 48.1
   },
-  "schema/judge": {
+  "schema/snapshot": {
    "n": 981,
    "correct": 472,
    "served_wrong": 509,
@@ -109,7 +132,7 @@
    "unavailable_needed_pct": 0.0,
    "unavailable_unneeded_pct": 0.0
   },
-  "tabletest/judge": {
+  "tabletest/snapshot": {
    "n": 981,
    "correct": 351,
    "served_wrong": 72,
@@ -136,19 +159,26 @@
    "not_needed:served_ok": 105,
    "not_needed:unavailable": 6
   },
-  "revoke/judge": {
+  "condition/snapshot": {
+   "needed:served_ok": 93,
+   "needed:served_wrong": 36,
+   "needed:unavailable": 87,
+   "not_needed:served_ok": 105,
+   "not_needed:unavailable": 6
+  },
+  "revoke/snapshot": {
    "needed:unavailable": 216,
    "not_needed:unavailable": 111
   },
-  "schema/judge": {
+  "schema/snapshot": {
    "needed:served_wrong": 216,
    "not_needed:served_ok": 111
   },
-  "tabletest/judge": {
+  "tabletest/snapshot": {
    "needed:served_wrong": 36,
    "needed:unavailable": 180,
-   "not_needed:served_ok": 111,
-   "not_needed:unavailable": 14
+   "not_needed:served_ok": 105,
+   "not_needed:unavailable": 6
   }
  },
  "by_change": {
@@ -161,15 +191,19 @@
     "correct_pct": 100.0,
     "n": 9
    },
-   "revoke/judge": {
-    "correct_pct": 0.0,
-    "n": 9
-   },
-   "schema/judge": {
+   "condition/snapshot": {
     "correct_pct": 100.0,
     "n": 9
    },
-   "tabletest/judge": {
+   "revoke/snapshot": {
+    "correct_pct": 0.0,
+    "n": 9
+   },
+   "schema/snapshot": {
+    "correct_pct": 100.0,
+    "n": 9
+   },
+   "tabletest/snapshot": {
     "correct_pct": 100.0,
     "n": 9
    }
@@ -183,17 +217,21 @@
     "correct_pct": 100.0,
     "n": 135
    },
-   "revoke/judge": {
+   "condition/snapshot": {
+    "correct_pct": 100.0,
+    "n": 135
+   },
+   "revoke/snapshot": {
     "correct_pct": 0.0,
     "n": 135
    },
-   "schema/judge": {
+   "schema/snapshot": {
     "correct_pct": 100.0,
     "n": 135
    },
-   "tabletest/judge": {
+   "tabletest/snapshot": {
     "correct_pct": 100.0,
-    "n": 141
+    "n": 135
    }
   },
   "backfill": {
@@ -205,15 +243,19 @@
     "correct_pct": 100.0,
     "n": 9
    },
-   "revoke/judge": {
-    "correct_pct": 0.0,
-    "n": 9
-   },
-   "schema/judge": {
+   "condition/snapshot": {
     "correct_pct": 100.0,
     "n": 9
    },
-   "tabletest/judge": {
+   "revoke/snapshot": {
+    "correct_pct": 0.0,
+    "n": 9
+   },
+   "schema/snapshot": {
+    "correct_pct": 100.0,
+    "n": 9
+   },
+   "tabletest/snapshot": {
     "correct_pct": 100.0,
     "n": 9
    }
@@ -227,17 +269,21 @@
     "correct_pct": 100.0,
     "n": 135
    },
-   "revoke/judge": {
+   "condition/snapshot": {
+    "correct_pct": 100.0,
+    "n": 135
+   },
+   "revoke/snapshot": {
     "correct_pct": 0.0,
     "n": 135
    },
-   "schema/judge": {
+   "schema/snapshot": {
     "correct_pct": 100.0,
     "n": 135
    },
-   "tabletest/judge": {
+   "tabletest/snapshot": {
     "correct_pct": 100.0,
-    "n": 141
+    "n": 135
    }
   },
   "dimhist": {
@@ -249,17 +295,21 @@
     "correct_pct": 100.0,
     "n": 135
    },
-   "revoke/judge": {
+   "condition/snapshot": {
+    "correct_pct": 100.0,
+    "n": 135
+   },
+   "revoke/snapshot": {
     "correct_pct": 0.0,
     "n": 135
    },
-   "schema/judge": {
+   "schema/snapshot": {
     "correct_pct": 32.6,
     "n": 135
    },
-   "tabletest/judge": {
+   "tabletest/snapshot": {
     "correct_pct": 0.0,
-    "n": 141
+    "n": 135
    }
   },
   "dupload": {
@@ -271,17 +321,21 @@
     "correct_pct": 0.0,
     "n": 135
    },
-   "revoke/judge": {
+   "condition/snapshot": {
     "correct_pct": 0.0,
     "n": 135
    },
-   "schema/judge": {
+   "revoke/snapshot": {
+    "correct_pct": 0.0,
+    "n": 135
+   },
+   "schema/snapshot": {
     "correct_pct": 9.6,
     "n": 135
    },
-   "tabletest/judge": {
+   "tabletest/snapshot": {
     "correct_pct": 0.0,
-    "n": 141
+    "n": 135
    }
   },
   "latekey": {
@@ -293,17 +347,21 @@
     "correct_pct": 0.0,
     "n": 135
    },
-   "revoke/judge": {
+   "condition/snapshot": {
     "correct_pct": 0.0,
     "n": 135
    },
-   "schema/judge": {
+   "revoke/snapshot": {
+    "correct_pct": 0.0,
+    "n": 135
+   },
+   "schema/snapshot": {
     "correct_pct": 9.6,
     "n": 135
    },
-   "tabletest/judge": {
+   "tabletest/snapshot": {
     "correct_pct": 0.0,
-    "n": 141
+    "n": 135
    }
   },
   "mirror": {
@@ -315,15 +373,19 @@
     "correct_pct": 0.0,
     "n": 9
    },
-   "revoke/judge": {
+   "condition/snapshot": {
     "correct_pct": 0.0,
     "n": 9
    },
-   "schema/judge": {
+   "revoke/snapshot": {
+    "correct_pct": 0.0,
+    "n": 9
+   },
+   "schema/snapshot": {
     "correct_pct": 33.3,
     "n": 9
    },
-   "tabletest/judge": {
+   "tabletest/snapshot": {
     "correct_pct": 0.0,
     "n": 9
    }
@@ -337,17 +399,21 @@
     "correct_pct": 100.0,
     "n": 135
    },
-   "revoke/judge": {
+   "condition/snapshot": {
+    "correct_pct": 100.0,
+    "n": 135
+   },
+   "revoke/snapshot": {
     "correct_pct": 0.0,
     "n": 135
    },
-   "schema/judge": {
+   "schema/snapshot": {
     "correct_pct": 33.3,
     "n": 135
    },
-   "tabletest/judge": {
+   "tabletest/snapshot": {
     "correct_pct": 0.0,
-    "n": 141
+    "n": 135
    }
   },
   "status": {
@@ -359,15 +425,19 @@
     "correct_pct": 100.0,
     "n": 9
    },
-   "revoke/judge": {
+   "condition/snapshot": {
+    "correct_pct": 100.0,
+    "n": 9
+   },
+   "revoke/snapshot": {
     "correct_pct": 0.0,
     "n": 9
    },
-   "schema/judge": {
+   "schema/snapshot": {
     "correct_pct": 33.3,
     "n": 9
    },
-   "tabletest/judge": {
+   "tabletest/snapshot": {
     "correct_pct": 0.0,
     "n": 9
    }
@@ -381,17 +451,21 @@
     "correct_pct": 46.7,
     "n": 135
    },
-   "revoke/judge": {
-    "correct_pct": 0.0,
-    "n": 135
-   },
-   "schema/judge": {
+   "condition/snapshot": {
     "correct_pct": 46.7,
     "n": 135
    },
-   "tabletest/judge": {
-    "correct_pct": 48.9,
-    "n": 141
+   "revoke/snapshot": {
+    "correct_pct": 0.0,
+    "n": 135
+   },
+   "schema/snapshot": {
+    "correct_pct": 46.7,
+    "n": 135
+   },
+   "tabletest/snapshot": {
+    "correct_pct": 46.7,
+    "n": 135
    }
   }
  },
@@ -405,17 +479,21 @@
     "correct_pct": 64.2,
     "n": 981
    },
-   "revoke/judge": {
+   "condition/snapshot": {
+    "correct_pct": 64.2,
+    "n": 981
+   },
+   "revoke/snapshot": {
     "correct_pct": 0.0,
     "n": 981
    },
-   "schema/judge": {
+   "schema/snapshot": {
     "correct_pct": 48.1,
     "n": 981
    },
-   "tabletest/judge": {
-    "correct_pct": 36.1,
-    "n": 1023
+   "tabletest/snapshot": {
+    "correct_pct": 35.8,
+    "n": 981
    }
   }
  },
@@ -435,7 +513,22 @@
     "unavailable_unneeded->correct": 89
    }
   },
-  "condition/example vs revoke/judge": {
+  "condition/example vs condition/snapshot": {
+   "n": 981,
+   "same_class_pct": 72.5,
+   "cond_only_correct": 0,
+   "other_only_correct": 270,
+   "correct_diff_pp": -27.5,
+   "ci95_pp": [
+    -27.5,
+    -27.5
+   ],
+   "discordant": {
+    "unavailable_needed->correct": 181,
+    "unavailable_unneeded->correct": 89
+   }
+  },
+  "condition/example vs revoke/snapshot": {
    "n": 981,
    "same_class_pct": 56.0,
    "cond_only_correct": 360,
@@ -451,7 +544,7 @@
     "served_wrong->unavailable_needed": 72
    }
   },
-  "condition/example vs schema/judge": {
+  "condition/example vs schema/snapshot": {
    "n": 981,
    "same_class_pct": 43.4,
    "cond_only_correct": 6,
@@ -467,7 +560,7 @@
     "unavailable_unneeded->correct": 118
    }
   },
-  "condition/example vs tabletest/judge": {
+  "condition/example vs tabletest/snapshot": {
    "n": 981,
    "same_class_pct": 99.1,
    "cond_only_correct": 9,
@@ -497,7 +590,19 @@
     "correct->unavailable_unneeded": 89
    }
   },
-  "condition/judge vs revoke/judge": {
+  "condition/judge vs condition/snapshot": {
+   "n": 981,
+   "same_class_pct": 100.0,
+   "cond_only_correct": 0,
+   "other_only_correct": 0,
+   "correct_diff_pp": 0.0,
+   "ci95_pp": [
+    0.0,
+    0.0
+   ],
+   "discordant": {}
+  },
+  "condition/judge vs revoke/snapshot": {
    "n": 981,
    "same_class_pct": 28.4,
    "cond_only_correct": 630,
@@ -513,7 +618,7 @@
     "served_wrong->unavailable_needed": 72
    }
   },
-  "condition/judge vs schema/judge": {
+  "condition/judge vs schema/snapshot": {
    "n": 981,
    "same_class_pct": 52.5,
    "cond_only_correct": 187,
@@ -529,7 +634,81 @@
     "unavailable_unneeded->correct": 29
    }
   },
-  "condition/judge vs tabletest/judge": {
+  "condition/judge vs tabletest/snapshot": {
+   "n": 981,
+   "same_class_pct": 71.6,
+   "cond_only_correct": 279,
+   "other_only_correct": 0,
+   "correct_diff_pp": 28.4,
+   "ci95_pp": [
+    28.4,
+    28.4
+   ],
+   "discordant": {
+    "correct->unavailable_needed": 187,
+    "correct->unavailable_unneeded": 92
+   }
+  },
+  "condition/snapshot vs condition/example": {
+   "n": 981,
+   "same_class_pct": 72.5,
+   "cond_only_correct": 270,
+   "other_only_correct": 0,
+   "correct_diff_pp": 27.5,
+   "ci95_pp": [
+    27.5,
+    27.5
+   ],
+   "discordant": {
+    "correct->unavailable_needed": 181,
+    "correct->unavailable_unneeded": 89
+   }
+  },
+  "condition/snapshot vs condition/judge": {
+   "n": 981,
+   "same_class_pct": 100.0,
+   "cond_only_correct": 0,
+   "other_only_correct": 0,
+   "correct_diff_pp": 0.0,
+   "ci95_pp": [
+    0.0,
+    0.0
+   ],
+   "discordant": {}
+  },
+  "condition/snapshot vs revoke/snapshot": {
+   "n": 981,
+   "same_class_pct": 28.4,
+   "cond_only_correct": 630,
+   "other_only_correct": 0,
+   "correct_diff_pp": 64.2,
+   "ci95_pp": [
+    64.2,
+    64.2
+   ],
+   "discordant": {
+    "correct->unavailable_unneeded": 443,
+    "correct->unavailable_needed": 187,
+    "served_wrong->unavailable_needed": 72
+   }
+  },
+  "condition/snapshot vs schema/snapshot": {
+   "n": 981,
+   "same_class_pct": 52.5,
+   "cond_only_correct": 187,
+   "other_only_correct": 29,
+   "correct_diff_pp": 16.1,
+   "ci95_pp": [
+    16.1,
+    16.1
+   ],
+   "discordant": {
+    "correct->served_wrong": 187,
+    "unavailable_needed->served_wrong": 250,
+    "unavailable_unneeded->correct": 29
+   }
+  },
+  "condition/snapshot vs tabletest/snapshot": {
    "n": 981,
    "same_class_pct": 71.6,
    "cond_only_correct": 279,
@@ -546,6 +725,66 @@
   }
  },
  "maintenance_db_s": {
+  "condition/snapshot": {
+   "total": 2630.4,
+   "addcol": 1.66,
+   "append": 7.94,
+   "backfill": 1.77,
+   "correct": 8.9,
+   "dimhist": 26.53,
+   "dupload": 2374.13,
+   "latekey": 0.56,
+   "mirror": 42.14,
+   "revision": 117.25,
+   "status": 10.97,
+   "unit": 38.58,
+   "vs_condition": 1.01
+  },
+  "schema/snapshot": {
+   "total": 0.0,
+   "addcol": 0.0,
+   "append": 0.0,
+   "backfill": 0.0,
+   "correct": 0.0,
+   "dimhist": 0.01,
+   "dupload": 0.0,
+   "latekey": 0.0,
+   "mirror": 0.0,
+   "revision": 0.0,
+   "status": 0.0,
+   "unit": 0.0,
+   "vs_condition": 0.0
+  },
+  "revoke/snapshot": {
+   "total": 0.0,
+   "addcol": 0.0,
+   "append": 0.0,
+   "backfill": 0.0,
+   "correct": 0.0,
+   "dimhist": 0.0,
+   "dupload": 0.01,
+   "latekey": 0.0,
+   "mirror": 0.0,
+   "revision": 0.0,
+   "status": 0.0,
+   "unit": 0.0,
+   "vs_condition": 0.0
+  },
+  "tabletest/snapshot": {
+   "total": 98.4,
+   "addcol": 8.99,
+   "append": 8.48,
+   "backfill": 8.2,
+   "correct": 8.85,
+   "dimhist": 8.13,
+   "dupload": 8.11,
+   "latekey": 6.54,
+   "mirror": 8.67,
+   "revision": 7.68,
+   "status": 8.66,
+   "unit": 16.11,
+   "vs_condition": 0.04
+  },
   "condition/judge": {
    "total": 2602.1,
    "addcol": 1.73,
@@ -575,58 +814,14 @@
    "status": 10.97,
    "unit": 39.55,
    "vs_condition": 1.0
-  },
-  "schema/judge": {
-   "total": 0.0,
-   "addcol": 0.0,
-   "append": 0.0,
-   "backfill": 0.0,
-   "correct": 0.0,
-   "dimhist": 0.0,
-   "dupload": 0.0,
-   "latekey": 0.0,
-   "mirror": 0.0,
-   "revision": 0.0,
-   "status": 0.0,
-   "unit": 0.0,
-   "vs_condition": 0.0
-  },
-  "revoke/judge": {
-   "total": 0.0,
-   "addcol": 0.0,
-   "append": 0.0,
-   "backfill": 0.0,
-   "correct": 0.0,
-   "dimhist": 0.0,
-   "dupload": 0.0,
-   "latekey": 0.0,
-   "mirror": 0.0,
-   "revision": 0.0,
-   "status": 0.0,
-   "unit": 0.0,
-   "vs_condition": 0.0
-  },
-  "tabletest/judge": {
-   "total": 98.2,
-   "addcol": 8.78,
-   "append": 8.24,
-   "backfill": 8.12,
-   "correct": 8.89,
-   "dimhist": 7.88,
-   "dupload": 8.34,
-   "latekey": 6.51,
-   "mirror": 8.55,
-   "revision": 7.74,
-   "status": 8.56,
-   "unit": 16.64,
-   "vs_condition": 0.04
   }
  },
  "maintenance_db_s_base": "condition/example",
  "seed_failures": {
+  "condition/snapshot": 2,
+  "schema/snapshot": 2,
+  "revoke/snapshot": 2,
   "condition/judge": 2,
-  "condition/example": 2,
-  "schema/judge": 2,
-  "revoke/judge": 2
+  "condition/example": 2
  }
 }

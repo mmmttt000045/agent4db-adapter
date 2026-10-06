@@ -185,3 +185,18 @@
   - 两种参照：标准答案 SQL 多答对 153 题（+10.4 个百分点，按库整群自助 9.4–11.8），全部在版本化更正（168 对 69，共 168）与维表拉链（63 对 9，共 66）；状态流水两者都是 99/99；答错不增加。
   - MAVRA 的 122 道误失效中 83 道是退货率（重复装载 39、日期键格式 26、备份副本 13、版本化更正 5），其余为备份副本下的退货金额 20 与维表拉链下的电子品类营业额 19。
 - TPC-DS 不重跑：两种参照下准入的定义相同（91 个），不修复的方法与参照无关；用新的 `replay-stats.py` 从存档的 `tpcds-replay-outcomes.json.gz` 重算 `tpcds-replay-stats.json`（981 道共同题）：MAVRA 360（状态流水 9 题经修复作答，版本化更正与维表拉链各 135 题失效），MAVRA（标准答案 SQL）630，答错都是 72（单位变化）；按模式变更失效 472 / 509；表级测试 351 / 72 / 437 / 121。
+
+## 2026-10-06（晚）：G8 在学习时快照上比较，重跑定义库回放
+
+- 动机：智能体的学习 SQL 只在学习时的快照上被判过对；在当前数据上它本身可能过期（多版本更正后把旧版本算进去，缓慢变化维下连接放大），拿它在当前数据上做回归会拒绝正确的修复。上一节的回放里，这使 MAVRA 在合成数据上只答对 780（标准答案 SQL 933），TPC-DS 上 360（630），几乎与表级测试持平。
+- 代码（提交 `c49bbc4`）：`MiddleConfig::g8_snapshot`：G8 在同一个只读事务里、以保存学习时数据的模式为 search_path，执行参照 SQL 与替代修订并比较；`replay-bench` 新增参照 `snapshot`（准入前把 public 的全部基表复制到 `mavra_learn`，代替数仓的 time travel），默认 `--oracles snapshot,example,judge`。`etl::apply_v2` 查列名时限定 public 模式（否则复制的表会让列重复）。
+- 运行（noctis，两个回放并行，维护 DB 时间因此偏高）：
+  - 合成数据：`agentdb-mid --pool 8 --out results replay-bench --libs results/scen-20260930 --rows 200000 --oracles snapshot,example,judge` → `results/replay-1791286552102025/report.json`。
+  - TPC-DS：`agentdb-mid --pool 16 --out results replay-bench --schema tpcds --libs results/tpcds-library.json --policies condition,schema,revoke,tabletest --oracles snapshot --sql-timeout-secs 1800` → `results/replay-1791286552032549/report.json`；`condition/example` 与 `condition/judge` 两组用 `python3 tools/merge-replay.py <新报告> tpcds-replay-outcomes.json.gz（10-03 存档） --groups condition/example,condition/judge` 并入（同一定义库、同一组变化与留出题，脚本核对一致）。
+  - 本目录的 `replay-*`、`tpcds-replay-*` 文件已替换为这两次运行（TPC-DS 为合并后的报告）；旧文件见 git 历史。
+- 结果（共同题；答对 / 答错 / 正确失效 / 误失效）：
+  - 合成数据 1,470 题：MAVRA（G8 在学习时快照上）**933** / 99 / 339 / 99；定义级、检查结果缓存逐题相同；G8 在当前数据上 780 / 99 / 469 / 122；标准答案 SQL 933 / 99 / 339 / 99；表级测试 603 / 99 / 629 / 139；按模式变更失效 742 / 728（条件覆盖的变化下 629）。
+  - 分变化（学习时快照 / 当前数据 / 标准答案）：状态流水 99 / 99 / 99（共 99）；版本化更正 168 / 69 / 168（共 168）；维表拉链 63 / 9 / 63（共 66，余下 3 题为电子品类营业额，标准答案下同样失效）。学习时快照 − 当前数据 +10.4 个百分点（整群自助 9.4–11.8），答错不变。
+  - TPC-DS 981 题：MAVRA **630** / 72 / 250 / 29（状态流水 9、版本化更正 135、维表拉链 135 题全部经修复答对；重复装载、日期键格式、备份副本下失效）；当前数据 360；标准答案 630；表级测试 351 / 72 / 437 / 121；按模式变更失效 472 / 509。
+  - 表级测试少答对的 330 题：MAVRA 修复的版本化更正 168、状态流水 99、维表拉链 57，以及因定义自带过滤而保留的 6。误失效 99 题中 78 题是退货率（重复装载 39、日期键格式 26、备份副本 13）。
+- 端到端实验未重跑：其中 MAVRA 的 G8 在当前数据上比较（`metric-global-exref`），论文已注明；定义失效后智能体自行推出过滤，正确率 74%。

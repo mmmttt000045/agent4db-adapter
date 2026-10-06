@@ -16,7 +16,8 @@
 \swatch{mDef}\ \bt{Definition-level}{定义级} & R, C, E & \bt{Recheck all conditions of a definition on use; G8 uses the gold SQL in E.}{使用时重查定义的全部条件；E 中 G8 用标准答案 SQL。}\\
 \swatch{mCache}\ \bt{Check-result cache}{检查结果缓存} & R, C & \bt{Definition-level; cache keyed by SQL text and versions.}{定义级；按 SQL 文本与版本缓存。}\\
 \swatch{mScope}\ \bt{Affected-only revalidation}{只重查受影响条件} & C & \bt{Recheck conditions on changed tables; no reuse.}{只重查表有变化的条件，不复用。}\\
-\swatch{mCond}\ \bt{\system\ (condition-level)}{\system（条件级）} & R, C, E & \bt{Affected-only plus reuse of check results and repairs.}{只重查受影响条件，并复用检查结果与修复。}\\
+\swatch{mCond}\ \bt{\system\ (condition-level)}{\system（条件级）} & R, C, E & \bt{Affected-only plus reuse; G8 on the learning snapshot (current data in E).}{只重查受影响条件并复用；G8 在学习时快照上（E 中为当前数据）。}\\
+\swatch{mCondCur}\ \bt{\system, G8 on current data}{\system，G8 用当前数据} & R & \bt{Ablation.}{消融。}\\
 \swatch{mCondGold}\ \bt{\system\ (gold SQL)}{\system（标准答案 SQL）} & R, E & \bt{G8 uses the benchmark's gold SQL, which filters on the distinguishing columns.}{G8 改用基准的标准答案 SQL，它带有区分列过滤。}\\
 \bottomrule
 \end{tabularx}

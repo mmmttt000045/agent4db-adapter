@@ -2,8 +2,8 @@
 
 One 100% bar per method splits its questions into correct, wrong, and
 invalidated (correctly or falsely); maintenance database time sits at the
-right. All methods use the agent's own SQL as the G8 reference; the last row
-repeats MAVRA with the gold SQL. Counts are over the questions every row
+right. All methods use the agent's own SQL as the G8 reference on the
+learning snapshot; the last row repeats MAVRA with G8 on current data. Counts are over the questions every row
 answers (task_level_common). Data: exp/2026-10-02-cache-baseline-tpcds/replay-stats.json, the
 archive tools/review-results.py turns into the \\Rp* macros; every count and
 time is checked against those macros.
@@ -22,13 +22,13 @@ W, H = style.COLUMN, 35.4
 DATA = style.ROOT / 'exp/2026-10-02-cache-baseline-tpcds/replay-stats.json'
 
 # (replay group, method key in style.METHODS, macro key, footnote mark)
-ROWS = [('schema/example', 'metric-global-schema', 'Schema', ''),
-        ('tabletest/example', 'tabletest', 'Table', ''),
-        ('revoke/example', 'metric-global-revoke', 'Revoke', 'a'),
-        ('definition/example', 'definition', 'Def', ''),
-        ('definition-cache/example', 'definition-cache', 'Cache', ''),
-        ('condition/example', 'condition', 'Cond', ''),
-        ('condition/judge', 'metric-global', 'Gold', 'b')]
+ROWS = [('schema/snapshot', 'metric-global-schema', 'Schema', ''),
+        ('tabletest/snapshot', 'tabletest', 'Table', ''),
+        ('revoke/snapshot', 'metric-global-revoke', 'Revoke', 'a'),
+        ('definition/snapshot', 'definition', 'Def', ''),
+        ('definition-cache/snapshot', 'definition-cache', 'Cache', ''),
+        ('condition/snapshot', 'condition', 'Cond', ''),
+        ('condition/example', 'condition-current', 'Cur', 'b')]
 # (field, macro suffix, fill, text color)
 OUTCOMES = [('correct', 'Correct', '#5B5853', WHITE),
             ('served_wrong', 'Wrong', RED, WHITE),

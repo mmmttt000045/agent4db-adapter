@@ -28,19 +28,26 @@ def fmt(x, nd=1):
     return f"{x:.{nd}f}"
 
 
-# 定义库回放的方法与宏名：MAVRA 与基线共用主参照 example（智能体自己的 SQL）；Gold 为 MAVRA (gold SQL)
-REPLAY_GROUPS = [("Cond", "condition/example"), ("Gold", "condition/judge"), ("Def", "definition/example"),
-                 ("Cache", "definition-cache/example"), ("Schema", "schema/example"), ("Revoke", "revoke/example"),
-                 ("Table", "tabletest/example")]
+# 定义库回放的方法与宏名。MAVRA 与各基线共用主参照 snapshot：智能体自己的 SQL，G8 在学习时快照上比较。
+# Cur = MAVRA 的 G8 在当前数据上比较（example）；Gold = MAVRA (gold SQL)（judge）。没有 snapshot 的存档以 example 为主参照。
+def replay_groups(tl):
+    primary = "snapshot" if "condition/snapshot" in tl else "example"
+    groups = [("Cond", f"condition/{primary}"), ("Gold", "condition/judge"), ("Def", f"definition/{primary}"),
+              ("Cache", f"definition-cache/{primary}"), ("Schema", f"schema/{primary}"), ("Revoke", f"revoke/{primary}"),
+              ("Table", f"tabletest/{primary}")]
+    if primary != "example":
+        groups.insert(1, ("Cur", "condition/example"))
+    return primary, groups
 
 
 def group(tl, g):
-    """不修复的方法与参照无关：较早的存档里它们记在 judge 下。MAVRA 的两种参照不互相替代。"""
+    """不修复的方法与参照无关：较早的存档里它们记在 judge 或 example 下。MAVRA 的各参照不互相替代。"""
     if g in tl:
         return g
     policy, _ = g.split("/")
-    if policy != "condition" and f"{policy}/judge" in tl:
-        return f"{policy}/judge"
+    for alt in ("judge", "example"):
+        if policy != "condition" and f"{policy}/{alt}" in tl:
+            return f"{policy}/{alt}"
     return None
 
 
@@ -55,22 +62,61 @@ def common_keys(outs):
     return set.intersection(*groups.values()) if groups else set()
 
 
-def reference_pair(m, prefix, outs, paired):
-    """同一批题上两种参照的 MAVRA：答对数、多出的答错数，以及标准答案 SQL 多答对的百分点（按库整群自助区间）。"""
+def reference_pair(m, prefix, tag, outs, paired, primary, other):
+    """同一批题上 MAVRA 的主参照与另一种参照：各自答对数、主参照多出的答错数、答对率之差（主参照 − 另一种，
+    百分点，按库整群自助区间），以及三种会修复的变化上的分项。宏名 {prefix}{tag}…，Cond 为主参照，Other 为另一种。"""
     idx = {(x["oracle"],) + key_of(x): x for x in outs if x["policy"] == "condition"}
-    both = [(idx[("example",) + k[1:]], x) for k, x in idx.items() if k[0] == "judge" and ("example",) + k[1:] in idx]
-    m[f"{prefix}PairN"] = len(both)
-    m[f"{prefix}PairCond"] = sum(a["class"] == "correct" for a, _ in both)
-    m[f"{prefix}PairGold"] = sum(b["class"] == "correct" for _, b in both)
-    m[f"{prefix}PairExtraWrong"] = sum(a["class"] == "served_wrong" for a, _ in both) - sum(b["class"] == "served_wrong" for _, b in both)
-    m[f"{prefix}RefDiff"] = -paired["correct_diff_pp"]
-    m[f"{prefix}RefLo"] = -paired["ci95_pp"][1]
-    m[f"{prefix}RefHi"] = -paired["ci95_pp"][0]
+    both = [(x, idx[(other,) + k[1:]]) for k, x in idx.items() if k[0] == primary and (other,) + k[1:] in idx]
+    m[f"{prefix}{tag}PairN"] = len(both)
+    m[f"{prefix}{tag}PairCond"] = sum(a["class"] == "correct" for a, _ in both)
+    m[f"{prefix}{tag}PairOther"] = sum(b["class"] == "correct" for _, b in both)
+    m[f"{prefix}{tag}PairExtraWrong"] = sum(a["class"] == "served_wrong" for a, _ in both) - sum(b["class"] == "served_wrong" for _, b in both)
+    m[f"{prefix}{tag}Diff"] = paired["correct_diff_pp"]
+    m[f"{prefix}{tag}DiffLo"] = paired["ci95_pp"][0]
+    m[f"{prefix}{tag}DiffHi"] = paired["ci95_pp"][1]
     for ch, name in [("revision", "Revision"), ("dimhist", "Dimhist"), ("status", "Status")]:
         sel = [(a, b) for a, b in both if a["change"] == ch]
-        m[f"{prefix}{name}N"] = len(sel)
-        m[f"{prefix}{name}Cond"] = sum(a["class"] == "correct" for a, _ in sel)
-        m[f"{prefix}{name}Gold"] = sum(b["class"] == "correct" for _, b in sel)
+        m[f"{prefix}{tag}{name}N"] = len(sel)
+        m[f"{prefix}{tag}{name}Cond"] = sum(a["class"] == "correct" for a, _ in sel)
+        m[f"{prefix}{tag}{name}Other"] = sum(b["class"] == "correct" for _, b in sel)
+
+
+def replay_macros(m, prefix, stats, outs):
+    """一次定义库回放（合成数据或 TPC-DS）的题次级宏：各组在共同题上的结果、条件覆盖的变化下的答错数、维护 DB 时间。"""
+    tl = stats["task_level_common"]
+    primary, groups = replay_groups(tl)
+    common = common_keys(outs)
+    wrong_mod = collections.Counter((x["policy"], x["oracle"]) for x in outs
+                                    if x["class"] == "served_wrong" and x["change"] != "unit" and key_of(x) in common)
+    for key, g in groups:
+        g = group(tl, g)
+        if g is None:
+            continue
+        t = tl[g]
+        m[f"{prefix}{key}N"] = t["n"]
+        m[f"{prefix}{key}Correct"] = t["correct"]
+        m[f"{prefix}{key}Wrong"] = t["served_wrong"]
+        m[f"{prefix}{key}Needed"] = t["unavailable_needed"]
+        m[f"{prefix}{key}Unneeded"] = t["unavailable_unneeded"]
+        m[f"{prefix}{key}CorrectPct"] = t["correct_pct"]
+        m[f"{prefix}{key}DB"] = stats["maintenance_db_s"][g]["total"]
+        m[f"{prefix}{key}WrongModeled"] = wrong_mod[tuple(g.split("/"))]
+        policy, oracle = g.split("/")
+        if policy == "condition":
+            m[f"{prefix}{key}RepairedTasks"] = sum(1 for x in outs if x["policy"] == "condition" and x["oracle"] == oracle
+                                                   and x["repaired"] and key_of(x) in common)
+    pair = stats["paired"].get(f"condition/{primary} vs " + (group(tl, f"tabletest/{primary}") or ""))
+    if pair:
+        m[f"{prefix}TableVsCondDiff"] = pair["correct_diff_pp"]
+        m[f"{prefix}TableVsCondLo"] = pair["ci95_pp"][0]
+        m[f"{prefix}TableVsCondHi"] = pair["ci95_pp"][1]
+        m[f"{prefix}TableOnlyCond"] = pair["cond_only_correct"]
+        m[f"{prefix}TableOnlyTable"] = pair["other_only_correct"]
+    for tag, other in (("Cur", "example"), ("Gold", "judge")):
+        key = f"condition/{primary} vs condition/{other}"
+        if other != primary and key in stats["paired"]:
+            reference_pair(m, prefix, tag, outs, stats["paired"][key], primary, other)
+    return primary
 
 
 def main():
@@ -80,48 +126,18 @@ def main():
     o = ap.parse_args()
     m = {}
 
-    # ── 定义库回放 ──
-    # MAVRA = 条件级、G8 以智能体自己的 SQL 为参照（condition/example），各方法共用这一参照；
-    # MAVRA (gold SQL) = 条件级、G8 以标准答案 SQL 为参照（condition/judge）。题次一律取各组共同的题（task_level_common）。
+    # ── 定义库回放 ──（题次一律取各组共同的题）
     rs = load(o.exp, "replay-stats.json")
     ro = load(o.exp, "replay-outcomes.json.gz")
-    tl = rs["task_level_common"]
     m["RpLibs"] = len(ro["libraries"])
     m["RpDefs"] = sum(len(l["entries"]) for l in ro["libraries"])
     m["RpChanges"] = len(ro["changes"])
-    for key, g in REPLAY_GROUPS:
-        g = group(tl, g)
-        if g is None:
-            continue
-        t = tl[g]
-        m[f"Rp{key}N"] = t["n"]
-        m[f"Rp{key}Correct"] = t["correct"]
-        m[f"Rp{key}Wrong"] = t["served_wrong"]
-        m[f"Rp{key}Needed"] = t["unavailable_needed"]
-        m[f"Rp{key}Unneeded"] = t["unavailable_unneeded"]
-        m[f"Rp{key}CorrectPct"] = t["correct_pct"]
-        m[f"Rp{key}DB"] = rs["maintenance_db_s"][g]["total"]
-    outs = ro["outcomes"]
-    common = common_keys(outs)
-    wrong_mod = collections.Counter((x["policy"], x["oracle"]) for x in outs
-                                    if x["class"] == "served_wrong" and x["change"] != "unit" and key_of(x) in common)
-    for key, g in REPLAY_GROUPS:
-        g = group(tl, g)
-        if g is not None:
-            m[f"Rp{key}WrongModeled"] = wrong_mod[tuple(g.split("/"))]
-    pair = rs["paired"].get("condition/example vs " + group(tl, "tabletest/example"))
-    if pair:
-        m["RpTableVsCondDiff"] = pair["correct_diff_pp"]
-        m["RpTableVsCondLo"] = pair["ci95_pp"][0]
-        m["RpTableVsCondHi"] = pair["ci95_pp"][1]
-        m["RpTableOnlyCond"] = pair["cond_only_correct"]
-        m["RpTableOnlyTable"] = pair["other_only_correct"]
+    primary = replay_macros(m, "Rp", rs, ro["outcomes"])
     db = rs["maintenance_db_s"]
-    m["RpCacheVsCond"] = db["definition-cache/example"]["total"] / db["condition/example"]["total"]
-    m["RpDefVsCond"] = db["definition/example"]["total"] / db["condition/example"]["total"]
-    m["RpSameCondDef"] = rs["paired"]["condition/example vs definition/example"]["same_class_pct"]
-    m["RpSameCondCache"] = rs["paired"]["condition/example vs definition-cache/example"]["same_class_pct"]
-    reference_pair(m, "Rp", outs, rs["paired"]["condition/example vs condition/judge"])
+    m["RpCacheVsCond"] = db[f"definition-cache/{primary}"]["total"] / db[f"condition/{primary}"]["total"]
+    m["RpDefVsCond"] = db[f"definition/{primary}"]["total"] / db[f"condition/{primary}"]["total"]
+    m["RpSameCondDef"] = rs["paired"][f"condition/{primary} vs definition/{primary}"]["same_class_pct"]
+    m["RpSameCondCache"] = rs["paired"][f"condition/{primary} vs definition-cache/{primary}"]["same_class_pct"]
 
     # ── 快照绑定 ──
     sn = load(o.exp, "snapshot-binding-stats.json")
@@ -251,7 +267,6 @@ def main():
     m["DuUndeclPct"] = 100.0 * c["undeclared"] / du["records"]
 
     # ── TPC-DS 上的定义库回放（第二个负载；文件不存在时跳过）──
-    # 不修复的方法与参照无关（两种参照下准入的定义相同），存档里记为 judge；MAVRA 取 condition/example。
     if os.path.exists(os.path.join(o.exp, "tpcds-replay-stats.json")):
         ts = load(o.exp, "tpcds-replay-stats.json")
         to = load(o.exp, "tpcds-replay-outcomes.json.gz")
@@ -262,40 +277,12 @@ def main():
         m["TrJoinDefs"] = sum(1 for e in lib if e["metric"]["joins"])
         m["TrFilterDefs"] = sum(1 for e in lib if e["metric"]["filters"])
         m["TrChanges"] = len(to["changes"])
-        seed = next(s_ for s_ in to["seeds"] if s_["policy"] == "condition" and s_["oracle"] == "example")
+        primary = replay_macros(m, "Tr", ts, to["outcomes"])
+        seed = next(s_ for s_ in to["seeds"] if s_["policy"] == "condition" and s_["oracle"] == primary)
         m["TrSeeded"] = seed["seeded"]
         m["TrSeedFailed"] = len(seed["failed"])
-        tl = ts["task_level_common"]
-        for key, g in REPLAY_GROUPS:
-            g = group(tl, g)
-            if g is None:
-                continue
-            t = tl[g]
-            m[f"Tr{key}N"] = t["n"]
-            m[f"Tr{key}Correct"] = t["correct"]
-            m[f"Tr{key}Wrong"] = t["served_wrong"]
-            m[f"Tr{key}Needed"] = t["unavailable_needed"]
-            m[f"Tr{key}Unneeded"] = t["unavailable_unneeded"]
-            m[f"Tr{key}CorrectPct"] = t["correct_pct"]
-            m[f"Tr{key}DB"] = ts["maintenance_db_s"][g]["total"]
-        common = common_keys(to["outcomes"])
-        wrong_mod = collections.Counter((x["policy"], x["oracle"]) for x in to["outcomes"]
-                                        if x["class"] == "served_wrong" and x["change"] != "unit" and key_of(x) in common)
-        for key, g in REPLAY_GROUPS:
-            g = group(tl, g)
-            if g is not None:
-                m[f"Tr{key}WrongModeled"] = wrong_mod[tuple(g.split("/"))]
-        for key, oracle in (("Cond", "example"), ("Gold", "judge")):
-            m[f"Tr{key}RepairedTasks"] = sum(1 for x in to["outcomes"] if x["policy"] == "condition" and x["oracle"] == oracle
-                                             and x["repaired"] and key_of(x) in common)
-        pair = ts["paired"].get("condition/example vs " + group(tl, "tabletest/example"))
-        if pair:
-            m["TrTableVsCondDiff"] = pair["correct_diff_pp"]
-            m["TrTableOnlyCond"] = pair["cond_only_correct"]
-            m["TrTableOnlyTable"] = pair["other_only_correct"]
-        reference_pair(m, "Tr", to["outcomes"], ts["paired"]["condition/example vs condition/judge"])
-        if "dupload" in ts["maintenance_db_s"].get("condition/example", {}):
-            m["TrCondDuploadDB"] = ts["maintenance_db_s"]["condition/example"]["dupload"]
+        if "dupload" in ts["maintenance_db_s"].get(f"condition/{primary}", {}):
+            m["TrCondDuploadDB"] = ts["maintenance_db_s"][f"condition/{primary}"]["dupload"]
 
     lines = ["% generated by tools/review-results.py from " + o.exp + "; do not edit"]
     for k in sorted(m):

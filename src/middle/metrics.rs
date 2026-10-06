@@ -702,6 +702,31 @@ impl Middle {
 
     /// 执行 SQL，第一行须有一个单元格在答案精度上等于 `expect`（示例 SQL 常把中间量与结果放在同一行；
     /// 规范 SQL 只有一列）；执行失败算不通过。
+    /// G8 的学习时快照版本：参照查询与替代修订在同一个只读事务里、以保存学习时数据的模式为 search_path 执行。
+    async fn learned_snapshot_gate(&self, schema: &str, reference: &str, sql: &str, decimals: u32) -> Gate {
+        let run = async {
+            let snap = self.db.snapshot().await?;
+            snap.query(QKind::Metric, &format!("set local search_path to \"{schema}\"")).await?;
+            let r = snap.query(QKind::Metric, reference).await;
+            let c = snap.query(QKind::Metric, sql).await;
+            snap.commit().await?;
+            Ok::<_, anyhow::Error>((r, c))
+        };
+        match run.await {
+            Err(e) => Err(format!("学习时快照不可用：{e:#}")),
+            Ok((Err(e), _)) => Err(format!("参照查询在学习时快照上失败：{e:#}")),
+            Ok((_, Err(e))) => Err(format!("替代修订在学习时快照上执行失败：{e:#}")),
+            Ok((Ok(r), Ok(c))) => {
+                let expect = metric::parse_answer(r.cell(0, 0).unwrap_or("NULL"));
+                match c.rows.first() {
+                    None => Err("学习时快照上结果为空".into()),
+                    Some(row) if row.iter().flatten().any(|v| metric::same_value(&metric::parse_answer(v), &expect, decimals)) => Ok(()),
+                    Some(_) => Err(format!("学习时快照上结果 {} 与参照 {expect:?} 不一致", c.cell(0, 0).unwrap_or("NULL"))),
+                }
+            }
+        }
+    }
+
     async fn value_gate(&self, sql: &str, expect: &Answer, decimals: u32) -> Gate {
         match self.vquery(QKind::Metric, sql).await {
             Err(e) => Err(format!("执行失败：{e:#}")),
@@ -1245,16 +1270,20 @@ impl Middle {
         gate!(gates, "G4", self.grain_gate(ctx, m, self.cfg.cond_reuse).await);
         let example = m.examples.first().map(|x| x.sql.clone()).unwrap_or_default();
         gate!(gates, "G5", self.review_gate(ctx, &example).await?);
-        // G8：规范 SQL 按学习题参数在当前快照上执行，与学习题判题查询在同一快照上的结果比较
+        // G8：规范 SQL 按学习题参数执行，与参照查询在同一份数据上的结果比较；数据默认是当前快照，
+        // 配置了学习时快照时两者都在学习时快照上执行
         let g8 = match (&ev.judge, metric::compile(m, &ev.ask)) {
             (None, _) => Err("没有学习题判题查询，需业务方确认".into()),
             (_, Err(e)) => Err(format!("{e:#}")),
-            (Some(judge), Ok(sql)) => match self.vquery(QKind::Metric, judge).await {
-                Ok(r) => {
-                    let expect = metric::parse_answer(r.cell(0, 0).unwrap_or("NULL"));
-                    self.value_gate(&sql, &expect, ev.decimals).await
-                }
-                Err(e) => Err(format!("判题查询失败：{e:#}")),
+            (Some(judge), Ok(sql)) => match &self.cfg.g8_snapshot {
+                Some(schema) => self.learned_snapshot_gate(schema, judge, &sql, ev.decimals).await,
+                None => match self.vquery(QKind::Metric, judge).await {
+                    Ok(r) => {
+                        let expect = metric::parse_answer(r.cell(0, 0).unwrap_or("NULL"));
+                        self.value_gate(&sql, &expect, ev.decimals).await
+                    }
+                    Err(e) => Err(format!("判题查询失败：{e:#}")),
+                },
             },
         };
         gate!(gates, "G8", g8);

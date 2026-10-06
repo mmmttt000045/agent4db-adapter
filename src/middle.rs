@@ -122,6 +122,9 @@ pub struct MiddleConfig {
     /// 修复回归（G8）的参照用提炼出的示例 SQL（由 G6 核实能复现智能体自己的答案），而不是基准的判题 SQL：
     /// 部署中真正可得的参照。只影响修复，准入门槛不变
     pub g8_example: bool,
+    /// 修复回归（G8）在学习时的快照上比较：参照查询与替代修订都在保存学习时数据的模式里执行。智能体的 SQL 只在
+    /// 学习时的快照上被判对过，在当前数据上它本身可能已经过期。部署中对应数仓的 time travel；原型用准入前复制的模式
+    pub g8_snapshot: Option<String>,
 }
 
 impl Default for MiddleConfig {
@@ -149,6 +152,7 @@ impl Default for MiddleConfig {
             repair_unique: true,
             wait_repair: true,
             g8_example: false,
+            g8_snapshot: None,
         }
     }
 }

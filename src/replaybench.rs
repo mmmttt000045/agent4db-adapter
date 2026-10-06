@@ -3,9 +3,10 @@
 //! 答案一律用当时提供的修订的规范 SQL（`metric::compile`）在当前数据上计算并与标准答案比较，即“智能体完全按定义作答”
 //! 时维护方式本身带来的正确、过期使用与不可用，排除了学习与作答的随机性。
 //!
-//! G8 参照有两种：example = 智能体学习时自己写的 SQL（部署中真正可得的参照）；judge = 学习题的标准答案 SQL
-//! （本文基准的做法，预先写入了状态与版本过滤）。`--oracles` 的第一个是各方法共用的主参照（准入与修复回归都用它），
-//! 其后的参照只对条件级（MAVRA）再跑一遍。
+//! G8 参照有三种：snapshot = 智能体学习时自己写的 SQL，在学习时的快照上与替代修订比较（准入前把基表复制到
+//! `LEARN_SCHEMA`，代替数仓的 time travel）；example = 同一条 SQL，在当前数据上比较；judge = 学习题的标准答案 SQL
+//! （本文基准的做法，预先写入了状态与版本过滤），在当前数据上比较。`--oracles` 的第一个是各方法共用的主参照
+//! （准入与修复回归都用它），其后的参照只对条件级（MAVRA）再跑一遍。
 
 use crate::db::{Db, QKind};
 use crate::etl;
@@ -36,7 +37,7 @@ pub struct Options {
           value_parser = ["condition", "definition", "definition-cache", "schema", "revoke", "tabletest"])]
     policies: Vec<String>,
     /// G8 参照：第一个为各方法共用的主参照（准入与修复回归都用它）；其后的参照只对条件级再跑一遍
-    #[arg(long, value_delimiter = ',', default_value = "example,judge", value_parser = ["judge", "example"])]
+    #[arg(long, value_delimiter = ',', default_value = "snapshot,example,judge", value_parser = ["snapshot", "example", "judge"])]
     oracles: Vec<String>,
     /// 负载：synthetic = 合成零售数据（按 --rows 生成）；tpcds = 从模板库复制真实 TPC-DS 数据（tools/tpcds-load.sh 装入），
     /// 变化为 `tpcds::Change`，库为 tools/tpcds-library.py 导出的模板定义库（留出题与标准答案随库给出）
@@ -211,8 +212,29 @@ pub(crate) fn load(path: &str) -> Result<Library> {
     Ok(Library { id: format!("{run}/{cell}"), source: path.to_string(), entries, skipped })
 }
 
-fn config(policy: &str) -> MiddleConfig {
-    let base = MiddleConfig { name: policy.into(), ..Default::default() };
+/// 学习时快照所在的模式（time travel 的原型替代）。
+const LEARN_SCHEMA: &str = "mavra_learn";
+
+/// 准入前把 public 模式的全部基表原样复制到 `LEARN_SCHEMA`，返回复制的表数。
+async fn copy_learning_snapshot(db: &Db) -> Result<usize> {
+    let tables = db
+        .query(QKind::Meta, "select table_name from information_schema.tables where table_schema = 'public' and table_type = 'BASE TABLE' order by 1")
+        .await?;
+    db.execute(&format!("drop schema if exists {LEARN_SCHEMA} cascade; create schema {LEARN_SCHEMA}")).await?;
+    let mut n = 0;
+    for t in tables.rows.iter().filter_map(|r| r.first().cloned().flatten()) {
+        db.execute(&format!("create table {LEARN_SCHEMA}.\"{t}\" as table public.\"{t}\"")).await?;
+        n += 1;
+    }
+    Ok(n)
+}
+
+fn config(policy: &str, oracle: &str) -> MiddleConfig {
+    let base = MiddleConfig {
+        name: policy.into(),
+        g8_snapshot: (oracle == "snapshot").then(|| LEARN_SCHEMA.to_string()),
+        ..Default::default()
+    };
     match policy {
         "condition" => MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, ..base },
         "definition" => MiddleConfig { metric_maint: Maint::Definition, ..base },
@@ -321,6 +343,10 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             etl::setup(&admin).await?;
             scenario::setup(&admin).await?;
         }
+        if o.oracles.iter().any(|x| x == "snapshot") {
+            let n = copy_learning_snapshot(&admin).await?;
+            eprintln!("学习时快照：{n} 张表复制到模式 {LEARN_SCHEMA}");
+        }
         let v1 = scenario::fingerprint(&admin).await?;
         let table_test = o.policies.iter().any(|p| p == "tabletest");
         if table_test {
@@ -353,7 +379,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             let lib = &libs[*li];
             let db = db.clone();
             async move {
-                let mid = Middle::new(db, config(policy)).await?;
+                let mid = Middle::new(db, config(policy, oracle)).await?;
                 let ctx = Ctx::new("A", &lib.id, "seed");
                 let (mut seeded, mut seed_failed) = (vec![], vec![]);
                 for (ei, e) in lib.entries.iter().enumerate() {
@@ -539,7 +565,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 "pairing": "每个库在各维护方式下各有一个中间层实例，准入、变化、留出题完全相同；每个变化从 v1 施加，结束后回滚并恢复各实例的准入快照",
                 "answer": "答案 = 当时提供的修订的规范 SQL 在当前数据上的结果；不提供（撤销或候选）记为不可用",
                 "classes": "correct / served_wrong（提供了但答错：过期使用或错误修复）/ unavailable_needed（原定义已答错）/ unavailable_unneeded（原定义仍答对）",
-                "oracle": "example = 智能体学习时自己写的 SQL；judge = 学习题的标准答案 SQL；第一个为各方法共用的主参照（准入与修复回归），其后的只对条件级再跑",
+                "oracle": "snapshot = 智能体学习时自己写的 SQL，G8 在学习时快照上比较；example = 同一条 SQL，G8 在当前数据上比较；judge = 学习题的标准答案 SQL；第一个为各方法共用的主参照（准入与修复回归），其后的只对条件级再跑",
                 "tabletest": "dbt 式表级测试基线：按初始快照校准的 unique / not_null / relationships 测试，变化后全部重跑，失败的表上的定义全部隔离，不修复；只计主参照下准入的条目",
                 "db_time": "各实例按顺序评估，数据库耗时为评估前后中间层连接池计量的差值（答案查询走独立连接，不计入）",
             },

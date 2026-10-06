@@ -51,7 +51,7 @@ pub async fn apply_v2(db: &Db) -> Result<i64> {
         .query(
             QKind::Meta,
             "select string_agg(column_name, ', ' order by ordinal_position) from information_schema.columns \
-             where table_name = 'store_returns' and column_name <> 'sr_status'",
+             where table_schema = 'public' and table_name = 'store_returns' and column_name <> 'sr_status'",
         )
         .await?;
     let cols = cols.cell(0, 0).unwrap_or_default().to_string();

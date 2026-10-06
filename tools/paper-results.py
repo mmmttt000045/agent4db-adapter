@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""论文结果：从实验原始输出生成 overleaf/gen/ 下的表格与正文数值宏，并写出汇总 JSON。
+"""论文结果：从实验原始输出生成 overleaf/gen/ 下的代价表与正文数值宏，并写出汇总 JSON。
+逐情形正确率热力图由 tools/figures/scenario_changes.py 读取 --json 的输出绘制。
 
 用法（在 noctis 的仓库根目录）：
   python3 tools/paper-results.py --scen results/scen-20260930 --out overleaf/gen \
@@ -44,17 +45,6 @@ METHODS = [  # (mode, 英文, 中文)；全文统一的方法名
     ("metric-global", r"\system", "条件级"),
     ("metric-global-exref", r"\system, agent ref.", "条件级，智能体参照"),
 ]
-HEAD = {  # 表头用的两行英文（与方法名一致）
-    "middle": r"No\\sharing",
-    "traj-global": r"Trajectory\\retrieval",
-    "traj-verify": r"Trajectory\\+ verify",
-    "metric-global-noguard": r"Un-\\guarded",
-    "metric-global-schema": r"Schema-\\only",
-    "metric-global-revoke": r"Revoke-\\on-write",
-    "metric-global-def": r"Definition-\\level",
-    "metric-global": r"\system\\(condition)",
-    "metric-global-exref": r"\system\\agent ref.",
-}
 COLOR = {  # 与正文导言的方法颜色一致
     "middle": "mNoShare",
     "traj-global": "mTraj",
@@ -249,48 +239,6 @@ def per_model(acc, model, mode, reps=4000, seed=7):
 # ───────────────────────── LaTeX 输出 ─────────────────────────
 
 
-def heat(v):
-    """正确率 → 中性灰阶底纹（\\cellcolor{heat!x}），越深越高；文字保持黑色。蓝色只留给 MAVRA。"""
-    return f"\\cellcolor{{heat!{round(6 + 50 * v)}}}"
-
-
-def tex_heat_table(A):
-    allp = [p for p, *_ in PHASES]
-    lines = []
-    lines.append(r"\begin{tabularx}{\textwidth}{@{}llL" + "r" * len(METHODS) + r"@{}}")
-    lines.append(r"\toprule")
-    head = " & ".join(rf"\bh{{\swatch{{{COLOR[mode]}}}\\{HEAD[mode]}}}{{{zh}}}" for mode, en, zh in METHODS)
-    lines.append(rf"\bt{{Class}}{{类别}} & \bt{{Change}}{{数据变化}} & \bt{{What the update does}}{{更新内容}} & {head}\\")
-    lines.append(r"\midrule")
-    prev = None
-    for p, cls, en, zh, den, dzh in PHASES:
-        cen, czh = CLASSES[cls]
-        first = cls != prev
-        if first and prev is not None:
-            lines.append(r"\addlinespace[2pt]")
-        prev = cls
-        label = rf"\bt{{{cen}}}{{{czh}}}" if first else ""
-        cells = []
-        for mode, *_ in METHODS:
-            v, _ = macro(A["acc"], mode, [p])
-            if v is None:
-                cells.append("--")
-                continue
-            s = A["stale"][(mode, p)]
-            mark = r"$^\dagger$" if s[1] and s[0] / s[1] >= 0.25 else ""
-            cells.append(f"{heat(v)}{round(100 * v)}{mark}")
-        lines.append(rf"{label} & \bt{{{en}}}{{{zh}}} & \bt{{{den}}}{{{dzh}}} & " + " & ".join(cells) + r"\\")
-    lines.append(r"\midrule")
-    cells = []
-    for mode, *_ in METHODS:
-        v = phase_mean(A["acc"], mode, allp)
-        cells.append(rf"\textbf{{{round(100 * v)}}}" if v is not None else "--")
-    lines.append(rf"\multicolumn{{3}}{{@{{}}l}}{{\bt{{Mean over the {len(allp)} settings}}{{{len(allp)} 种情形平均}}}} & " + " & ".join(cells) + r"\\")
-    lines.append(r"\bottomrule")
-    lines.append(r"\end{tabularx}")
-    return "\n".join(lines) + "\n"
-
-
 def tex_cost_table(A):
     allp = [p for p, *_ in PHASES]
     changed = [p for p, *_ in PHASES[1:]]
@@ -463,7 +411,6 @@ def main():
                 if k.startswith("Scen"):
                     f.write(f"\\newcommand{{\\{o.prefix}{k[4:]}}}{{{v}}}\n")
         return
-    open(os.path.join(o.out, "scen-heat.tex"), "w", encoding="utf-8").write(gen + tex_heat_table(A))
     open(os.path.join(o.out, "scen-cost.tex"), "w", encoding="utf-8").write(gen + tex_cost_table(A))
     q = numbers(A, dropped, cells, R)
     with open(os.path.join(o.out, "numbers.tex"), "w", encoding="utf-8") as f:

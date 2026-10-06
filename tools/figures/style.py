@@ -46,6 +46,7 @@ METHODS = {
     'metric-global-def': ('Definition-level', '定义级', 'mDef'),
     'metric-global': ('MAVRA', 'MAVRA', 'mCond'),
     'metric-global-exref': ('MAVRA, agent ref.', 'MAVRA，智能体参照', 'mCondExref'),
+    'tabletest': ('Table tests', '表级测试', 'mTable'),
     'definition': ('Definition-level', '定义级', 'mDef'),
     'definition-cache': ('Definition + cache', '定义级 + 缓存', 'mCache'),
     'condition-scope': ('Scope-only', '仅范围', 'mScope'),
@@ -61,7 +62,7 @@ def method(key, lang):
 def macros(name):
     """\\newcommand values of overleaf/gen/<name>.tex as strings."""
     text = (PAPER / 'gen' / f'{name}.tex').read_text(encoding='utf-8')
-    return dict(re.findall(r'\\newcommand\{\\(\w+)\}\{([^}]*)\}', text))
+    return dict(re.findall(r'\\newcommand\{\\(\w+)\}\{((?:[^{}]|\{[^{}]*\})*)\}', text))
 
 
 def agree(what, shown, printed):

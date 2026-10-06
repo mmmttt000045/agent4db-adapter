@@ -24,7 +24,7 @@ MAVRA（Maintaining Shared Metric Definitions for Data Agents）的系统原型�
 | `docs/` | [设计与评测协议](docs/metric-experience-protocol.md)、[相关工作](docs/related-work.md)、[引用核对](docs/citation-audit-2026-10-01.md)、[模型网关](docs/cline-gateway.md)与[研究状态](docs/research-status.md) |
 | `overleaf/` | 论文 |
 | `tools/check-llm.py` | 模型 API 的极小连通性测试 |
-| `tools/figures/` | 论文四幅图的矢量绘图脚本，[说明](tools/figures/README.md) |
+| `tools/figures/` | 论文六幅图的矢量绘图脚本，[说明](tools/figures/README.md) |
 | `data/mock_fixture.sql` | PostgreSQL 集成测试的最小数据 |
 
 | 文件 | 职责 |

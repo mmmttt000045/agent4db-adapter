@@ -5,7 +5,9 @@ into the shared store in the centre; condition maintenance and bounded repair
 sit under the store, so their write-backs go up into it; the use side
 (lookup) and the execution side (same-snapshot validation) read from it on
 the right, and the revision m^r a lookup returns is the one a query declares.
-PostgreSQL is one storage slab at the bottom.
+The SQL database is one storage slab at the bottom: tables, their versions
+V(T), and the snapshot D_s a query runs on. No engine-specific names appear;
+the figure explains the model, not the implementation.
 
 Step numbers and arrows are coloured by path (learning 1-3, use 4-7,
 execution 8-9, as in the caption of overleaf/figures/architecture.tex); line
@@ -24,7 +26,7 @@ from style import (ACC, ACC_DK, ACC_PALE, AMBER, AMBER_PALE, EDGE, FACE, FIELD, 
                    RED, RULE, SIDE, SLATE, TOP, WHITE)
 
 NAME = 'architecture'
-W, H = style.TEXTWIDTH, 67
+W, H = style.TEXTWIDTH, 68.6
 
 TITLE, BODY, NOTE, STEP = 7.0, 6.4, 6.0, 5.6    # font sizes, pt (acmart \scriptsize is 6, \footnotesize 7)
 LEARN, USE, EXEC_C = '#7A68B0', ACC, '#C97A1E'  # path colours: learning, use, execution
@@ -38,17 +40,19 @@ LABELS = {
         'admission': 'Admission', 'candidate': 'candidate',
         'defs': 'Definitions', 'valid': 'valid', 'pending': 'pending', 'revoked': 'invalid',
         'results': 'Check results', 'results_key': 'one per',
-        'maint': 'Condition maintenance', 'maint_note': 'reuse · coalesce · wait',
+        'maint': 'Condition maintenance', 'maint_note': 'reuse result, else run $Q_c$',
         'repair': 'Bounded repair', 'repair_note': 'unique filter',
-        'lookup': 'Lookup', 'lookup_note': 'version check',
-        'tracker': 'Version tracker', 'tracker_note': 'statistics, triggers',
-        'exec': ('Same-snapshot', 'validation'), 'check': 'check $C(m^r)$',
-        'run': 'run SQL', 'pg': 'PostgreSQL',
-        'pg_note': 'tables · DML statistics · version triggers',
+        'lookup': 'Lookup', 'lookup_note': 'compare versions $V(T)$',
+        'tracker': 'Version tracker', 'tracker_note': 'per-table versions',
+        'exec': ('Same-snapshot', 'validation'), 'declares': '$q$ declares $m^r$',
+        'run': 'run $q$ on $D_s$', 'db': 'SQL database',
+        'db_note': 'tables $T$ · versions $V(T)$ · snapshots $D_s$',
+
+        'db_snapshot': 'snapshot',
         'etl': 'ETL and writers', 'updates': 'updates', 'publish': 'publish',
         'reuse': 'reuse', 'to_maint': 'pending', 'failed': 'failed $c$',
-        'chain': 'provenance / candidate', 'versions': 'versions',
-        'tracker_read': 'DML stats, tx versions', 'snapshot': 'one snapshot',
+        'chain': 'provenance / candidate', 'versions': '$V(T)$',
+        'tracker_read': '$V(T)$', 'snapshot': 'snapshot $s$',
         'paths': ('learning path', 'use path', 'execution path'),
         'lines': ('call / response', 'shared-store write', 'read of database state'),
     },
@@ -59,17 +63,19 @@ LABELS = {
         'admission': '准入', 'candidate': '候选',
         'defs': '定义', 'valid': '有效', 'pending': '待验证', 'revoked': '已失效',
         'results': '检查结果', 'results_key': '每个键一条',
-        'maint': '条件维护', 'maint_note': '复用 · 合并 · 等待',
+        'maint': '条件维护', 'maint_note': '复用结果，否则执行 $Q_c$',
         'repair': '有界修复', 'repair_note': '唯一过滤',
-        'lookup': '查找', 'lookup_note': '版本比较',
-        'tracker': '版本跟踪', 'tracker_note': '统计、触发器',
-        'exec': ('同快照验证', None), 'check': '核对 $C(m^r)$',
-        'run': '执行 SQL', 'pg': 'PostgreSQL',
-        'pg_note': '表 · DML 统计 · 版本触发器',
+        'lookup': '查找', 'lookup_note': '比较版本 $V(T)$',
+        'tracker': '版本跟踪', 'tracker_note': '每张表的版本',
+        'exec': ('同快照验证', None), 'declares': '$q$ 声明 $m^r$',
+        'run': '在 $D_s$ 上执行 $q$', 'db': 'SQL 数据库',
+        'db_note': '表 $T$ · 版本 $V(T)$ · 快照 $D_s$',
+
+        'db_snapshot': '快照',
         'etl': 'ETL 与写入方', 'updates': '更新', 'publish': '发布',
         'reuse': '复用', 'to_maint': '待验证', 'failed': '条件失败',
-        'chain': '答案溯源／候选', 'versions': '版本',
-        'tracker_read': 'DML 统计、事务版本', 'snapshot': '同一快照',
+        'chain': '答案溯源／候选', 'versions': '$V(T)$',
+        'tracker_read': '$V(T)$', 'snapshot': '快照 $s$',
         'paths': ('学习路径', '使用路径', '执行路径'),
         'lines': ('调用／返回', '写入共享库', '读取数据库状态'),
     },
@@ -86,7 +92,8 @@ TRACK = (109, 40.5, 27, 8)
 EXEC = (144, 24, 31, 24.5)
 FIELD_BOX = (1.5, 20, 175.5, 31.5)
 NODE_Y, NODE_H = 6, 8.4                  # agent front faces
-PG = (31, 57.0, 144, 9.4)
+PG = (31, 57.0, 144, 11.0)               # the database slab
+DB_TABLES, DB_STATS, DB_SNAP = (76, 32), (110.5, 27), (143.5, 30)   # (x, w) of its three regions
 
 
 def mid(box):
@@ -273,8 +280,7 @@ def draw(s, lang):
 
     lx_, ly, lw, lh = LOOKUP
     box(LOOKUP)
-    tw = text(lx_ + 1.8, ly + 3.9, L['lookup'], TITLE, INK, 'bold')
-    text(lx_ + 3.0 + tw, ly + 3.9, '`find_metric`', BODY, INK, width=lw - 4.8 - tw)
+    text(lx_ + 1.8, ly + 3.9, L['lookup'], TITLE, INK, 'bold')
     text(lx_ + 1.8, ly + 7.3, L['lookup_note'], NOTE, MUTED, width=lw - 3.6)
     titled(TRACK, L['tracker'], L['tracker_note'])
 
@@ -325,13 +331,13 @@ def draw(s, lang):
     if second:
         top += 3.0
         text(ex + 1.8, top, second, TITLE, INK, 'bold', width=ew - 3.6)
-    text(ex + 1.8, top + 3.3, '`run_sql`', BODY, INK)
+    text(ex + 1.8, top + 3.3, L['declares'], BODY, INK, width=ew - 3.6)
     fx, fy, fw, fh = ex + 1.8, ey + 12.4, ew - 3.6, 7.0
     rect(fx, fy, fw, fh, None, EXEC_C, .18, r=.6, dash=(.8, .5))
     dw = 4.4
     rect(fx + fw - dw - 1.2, fy - 1.1, dw, 2.2, WHITE, None)
     text(fx + fw - 1.2 - dw / 2, fy + .8, '$D_s$', BODY, EXEC_C, align='center')
-    for k, label in enumerate((L['check'], L['run'])):
+    for k, label in enumerate((r'$\forall c \in C(m^r){:}\ c(D_s)$', L['run'])):
         yy = fy + 2.9 + 2.7 * k
         mark(fx + 1.4, yy - .55, 'ok')
         text(fx + 2.8, yy, label, NOTE, INK, width=fw - 3.4)
@@ -348,28 +354,60 @@ def draw(s, lang):
     route([(vr, py - 1.3), (vr, ty + th)], SLATE, THIN, dash=(.9, .6), length=1.0)
     text(vr + 1.3, 53.6, L['tracker_read'], NOTE, SLATE, width=b8 - 4.8 - 18 - vr)
 
-    # PostgreSQL: one storage slab with table pages ------------------------
+    # Database: one storage slab. Its three regions sit under the arrows that
+    # reach them: check queries read tables, the tracker reads statistics and
+    # versions, same-snapshot validation runs on a snapshot.
     d = 1.4
     s.poly([(px, py), (px + d, py - d), (px + pw + d, py - d), (px + pw, py)], TOP, EDGE, .14)
     s.poly([(px + pw, py), (px + pw + d, py - d), (px + pw + d, py + ph - d), (px + pw, py + ph)],
            SIDE, EDGE, .14)
     rect(px, py, pw, ph, FACE, EDGE, .18, r=.5)
-    text(px + 2.4, py + 3.9, L['pg'], TITLE, INK, 'bold')
-    text(px + 2.4, py + 7.3, L['pg_note'], NOTE, MUTED, width=44)
-    changed = {(0, 4), (3, 1), (3, 5), (5, 2)}
-    for k in range(6):
-        x0 = px + 48 + 14.4 * k
-        rect(x0 + .7, py + 1.0, 12.4, 7.2, SIDE, None, r=.35)
-        rect(x0, py + 1.6, 12.4, 7.2, WHITE, EDGE, .12, r=.35)
-        for c in range(6):
-            cxx, cyy = x0 + 1.0 + (c % 3) * 3.6, py + 2.7 + (c // 3) * 2.9
-            rect(cxx, cyy, 3.0, 2.2, AMBER_PALE if (k, c) in changed else FACE,
-                 AMBER if (k, c) in changed else None, .1, r=.3)
+    room = DB_TABLES[0] - px - 4.0
+    text(px + 2.4, py + 4.4, L['db'], TITLE, INK, 'bold', width=room)
+    text(px + 2.4, py + 7.8, L['db_note'], NOTE, MUTED, width=room)
+    top, inner = py + 1.2, ph - 2.4
+    row_fill = '#E4E1DB'
+
+    def table_card(x0, w, y0, h, label, changed=(), outline=EDGE, dash=None):
+        rect(x0, y0, w, h, WHITE, outline, .14, r=.35, dash=dash)
+        rect(x0 + .15, y0 + .15, w - .3, 2.0, TOP, None, r=.25)
+        text(x0 + w / 2, y0 + 1.75, label, NOTE, INK, align='center', width=w - .6)
+        rows = int((h - 2.9) // 1.35)
+        for r_ in range(rows):
+            yy = y0 + 2.75 + 1.35 * r_
+            hot = r_ in changed
+            rect(x0 + .8, yy, w - 1.6, .78, AMBER_PALE if hot else row_fill,
+                 AMBER if hot else None, .1, r=.2)
+
+    # Tables: rows changed by the writers are amber.
+    tx, tw_all = DB_TABLES
+    cw = (tw_all - 3 * .9) / 4
+    for k, changed in enumerate(((3,), (1, 2), (), (0,))):
+        table_card(tx + k * (cw + .9), cw, top, inner, f'$T_{k + 1}$', changed)
+
+    # Version of each table.
+    sx_, sw_ = DB_STATS
+    rect(sx_, top, sw_, inner, WHITE, EDGE, .14, r=.35)
+    # Writes to T1 and T2 (amber rows) move their versions; T3 keeps its own.
+    for k, (old, new) in enumerate(((7, 8), (13, 14), (4, None))):
+        yy = top + 1.9 + 2.35 * k
+        text(sx_ + 1.4, yy + .75, f'$V(T_{k + 1})$', NOTE, INK)
+        value = f'${old}\\to{new}$' if new else f'${old}$'
+        text(sx_ + sw_ - 1.4, yy + .75, value, NOTE, '#9A6500' if new else INK, align='right')
+
+    # Snapshot D_s: a frozen copy of the tables, framed like D_s above.
+    nx, nw = DB_SNAP
+    rect(nx + 1.0, top - .6, nw - 1.0, inner, '#EFEDE8', None, r=.35)
+    rect(nx, top, nw - 1.0, inner, WHITE, EXEC_C, .18, r=.35, dash=(.8, .5))
+    lw_ = text(nx + 1.2, top + 3.4, L['db_snapshot'], NOTE, MUTED, 'bold')
+    text(nx + 1.2, top + 6.6, '$D_s$', BODY, EXEC_C)
+    m0 = nx + 1.2 + lw_ + 1.2
+    mini = (nx + nw - 1.0 - 1.0 - m0 - 2 * .6) / 3
     for k in range(3):
-        s.circle(px + pw - 2.2 - 1.5 * k, py + ph - 1.2, .38, ACC)
+        table_card(m0 + k * (mini + .6), mini, top + .8, inner - 1.6, f'$T_{k + 1}$')
 
     # Writers --------------------------------------------------------------
-    dx0, dy0 = 4, 59.2
+    dx0, dy0 = 4, 60.0
     for off in (1.6, .8, 0):
         rect(dx0 + off, dy0 - off, 11.5, 7.0, WHITE, EDGE, .13, r=.4)
     for k in range(3):

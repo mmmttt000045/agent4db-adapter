@@ -501,7 +501,7 @@ takeaway(s, '命题划定检测边界：取值变化、结构等价的总体、�
 
 // A2 Repair reference and the uniqueness counterexample.
 s = slide('回归测试放在学习时快照上做：不需要标准答案也能修好', '修复细节', '论文 §5.3、§7.4；gen/review.tex',
-  `问答备用。智能体的学习 SQL 只在学习时的那份数据上被判过对。MAVRA 把它和修复后的定义放在学习时快照上比较（数仓用 time travel，原型在准入时复制相关表）：同一批 ${n('RpCurPairN')} 道题答对 ${n('RpCurPairCond')} 道，多版本更正 ${n('RpCurRevisionCond')}/${n('RpCurRevisionN')}、缓慢变化维 ${n('RpCurDimhistCond')}/${n('RpCurDimhistN')} 全部修好。同样的测试放在当前数据上只答对 ${n('RpCurPairOther')} 道：多版本更正之后智能体的 SQL 会把旧版本也算进去，正确的修复也被拒绝。预先写入区分列的标准答案 SQL 答对 ${n('RpGoldPairOther')} 道。TPC-DS 上是 ${n('TrCurPairCond')} 对 ${n('TrCurPairOther')}（共 ${n('TrCurPairN')} 道）。端到端实验早于这个改动，G8 在当前数据上比较，口径失效后智能体自己推出过滤，正确率 ${n('DsCondModeled')}%。备份副本反例：不要求候选唯一时，一个预见来源列的参照会让错误修复发布；要求唯一后都让口径失效。`, { appendix: true });
+  `问答备用。智能体的学习 SQL 只在学习时的那份数据上被判过对。MAVRA 把它和修复后的定义放在学习时快照上比较（数仓用 time travel，原型在准入时复制相关表）：同一批 ${n('RpCurPairN')} 道题答对 ${n('RpCurPairCond')} 道，多版本更正 ${n('RpCurRevisionCond')}/${n('RpCurRevisionN')}、缓慢变化维 ${n('RpCurDimhistCond')}/${n('RpCurDimhistN')} 全部修好。同样的测试放在当前数据上只答对 ${n('RpCurPairOther')} 道：多版本更正之后智能体的 SQL 会把旧版本也算进去，正确的修复也被拒绝。预先写入区分列的标准答案 SQL 答对 ${n('RpGoldPairOther')} 道。TPC-DS 上是 ${n('TrCurPairCond')} 对 ${n('TrCurPairOther')}（共 ${n('TrCurPairN')} 道）。端到端：每次运行自动修好 ${n('DsCondRepaired')} 个，G8 用当前数据时只有 ${n('DsCondCurRepaired')} 个；正确率 ${n('DsCondModeled')}% 对 ${n('DsCondCurModeled')}%，因为口径失效后智能体会自己推出过滤。备份副本反例：不要求候选唯一时，一个预见来源列的参照会让错误修复发布；要求唯一后都让口径失效。`, { appendix: true });
 table(s, [
   ['同一批题：答对', 'G8 在学习时快照上（MAVRA）', 'G8 在当前数据上'],
   [`定义库回放（${n('RpCurPairN')} 道）`, n('RpCurPairCond'), n('RpCurPairOther')],

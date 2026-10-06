@@ -20,7 +20,7 @@ W, H = style.COLUMN, 43.5
 DATA = style.ROOT / 'exp/2026-10-02-scenarios-ds/scen-stats.json'
 
 ROWS = ['middle', 'traj-global', 'traj-verify', 'metric-global-noguard', 'metric-global-schema',
-        'metric-global-revoke', 'metric-global-def', 'metric-global-exref', 'metric-global']
+        'metric-global-revoke', 'metric-global-def', 'metric-global-snap', 'metric-global-exref']
 GROUPS = ['holdout', 'benign', 'modeled', 'mirror', 'unit']
 TITLES = {
     'en': [('', 'Held-out'), ('', 'Benign'), ('Covered', 'breaking'), ('Backup', 'copy'),
@@ -31,8 +31,8 @@ AXIS = {'en': 'Accuracy (%)', 'zh': '正确率（%）'}
 # Macro keys of tools/scen-stats.py: \Ds<method><group>.
 KEY = {'middle': 'NoShare', 'traj-global': 'Traj', 'traj-verify': 'TrajVerify',
        'metric-global-noguard': 'Noguard', 'metric-global-schema': 'Schema',
-       'metric-global-revoke': 'Revoke', 'metric-global-def': 'Def', 'metric-global-exref': 'Cond',
-       'metric-global': 'CondGold'}
+       'metric-global-revoke': 'Revoke', 'metric-global-def': 'Def', 'metric-global-snap': 'Cond',
+       'metric-global-exref': 'CondCur', 'metric-global': 'CondGold'}
 
 LABEL, TICK, TITLE = 6.5, 6.0, 7.0     # font sizes, pt (acmart \scriptsize is 6, \footnotesize 7)
 
@@ -66,7 +66,7 @@ def draw(s, lang):
     # Rows: MAVRA's row on a tint, labels in the method's ink.
     for i, m in enumerate(ROWS):
         y = top + pitch * (i + .5)
-        if m == 'metric-global-exref':
+        if m == 'metric-global-snap':
             s.rect(0, y - pitch / 2, W, pitch, ACC_PALE, None)
         label, color = labels[i]
         s.rect(0, y - .8, 1.6, 1.6, color, None, r=.2)

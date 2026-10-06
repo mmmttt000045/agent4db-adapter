@@ -42,14 +42,16 @@ METHODS = [  # (mode, 英文, 中文)；全文统一的方法名
     ("metric-global-schema", "Schema-change invalidation", "按模式变更失效"),
     ("metric-global-revoke", "Invalidate-on-write", "写入即失效"),
     ("metric-global-def", "Definition-level", "定义级"),
-    ("metric-global-exref", r"\system", r"\system"),
+    ("metric-global-snap", r"\system", r"\system"),
+    ("metric-global-exref", r"\system, G8 on current data", r"\system，G8 用当前数据"),
     ("metric-global", r"\system\ (gold SQL)", r"\system（标准答案 SQL）"),
 ]
-# 论文中的 MAVRA 是部署中可得的配置：G8 以智能体自己的 SQL 为参照（metric-global-exref）；以标准答案 SQL 为参照的
-# metric-global 是 MAVRA (gold SQL)。只有 metric-global 的旧一轮数据（如三模型运行）里，metric-global 就是 MAVRA。
-MAVRA, GOLD = "metric-global-exref", "metric-global"
+# 论文中的 MAVRA：G8 以智能体自己的 SQL 为参照、在学习时快照上比较（metric-global-snap）；metric-global-exref 是同一参照
+# 在当前数据上比较（消融）；metric-global 是 MAVRA (gold SQL)。较早的数据里没有前者时依次退回 exref、metric-global。
+MAVRA, CUR, GOLD = "metric-global-snap", "metric-global-exref", "metric-global"
 KEYS = {"middle": "NoShare", "traj-global": "Traj", "traj-verify": "TrajVerify", "metric-global-noguard": "Noguard",
-        "metric-global-schema": "Schema", "metric-global-revoke": "Revoke", "metric-global-def": "Def", MAVRA: "Cond", GOLD: "CondGold"}
+        "metric-global-schema": "Schema", "metric-global-revoke": "Revoke", "metric-global-def": "Def", MAVRA: "Cond",
+        CUR: "CondCur", GOLD: "CondGold"}
 COLOR = {  # 与正文导言的方法颜色一致
     "middle": "mNoShare",
     "traj-global": "mTraj",
@@ -59,6 +61,7 @@ COLOR = {  # 与正文导言的方法颜色一致
     "metric-global-revoke": "mRevoke",
     "metric-global-def": "mDef",
     MAVRA: "mCond",
+    CUR: "mCondCur",
     GOLD: "mCondGold",
 }
 
@@ -67,8 +70,15 @@ TABLE_EN = {}  # 窄栏表格里需要断行的方法名（目前没有）
 
 
 def main_mode():
-    """数据中的 MAVRA：有 metric-global-exref 时取它，否则取 metric-global。"""
-    return MAVRA if any(m == MAVRA for m, *_ in METHODS) else GOLD
+    """数据中的 MAVRA：依次取 metric-global-snap、metric-global-exref、metric-global 中第一个出现的。"""
+    present = {m for m, *_ in METHODS}
+    return next((m for m in (MAVRA, CUR, GOLD) if m in present), GOLD)
+
+
+def shown_modes():
+    """代价表与逐情形热力图列出的方法：有 metric-global-snap 时不列 MAVRA (gold SQL)，它只在正文里出现。"""
+    present = {m for m, *_ in METHODS}
+    return [m for m, *_ in METHODS if not (m == GOLD and MAVRA in present)]
 
 
 def key_of(mode):
@@ -265,7 +275,10 @@ def tex_cost_table(A):
         r" & \bh{Maint.\\DB (s)}{维护 DB 秒} & \bh{Input tok.\\(k)}{输入千 token}\\"
     )
     lines.append(r"\midrule")
+    shown = shown_modes()
     for mode, en, zh in METHODS:
+        if mode not in shown:
+            continue
         v = phase_mean(A["acc"], mode, allp)
         st = sum(A["stale"][(mode, p)][0] for p in changed)
         nc = sum(n for (m, mo), n in A["ncells"].items() if mo == mode)

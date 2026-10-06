@@ -8,9 +8,10 @@
   "metric-global-revoke": 3,
   "metric-global-def": 3,
   "metric-global": 3,
-  "metric-global-exref": 3
+  "metric-global-exref": 3,
+  "metric-global-snap": 3
  },
- "replaced_cells_excluded": 3,
+ "replaced_cells_excluded": 24,
  "methods": {
   "middle": {
    "name": "No sharing",
@@ -192,71 +193,12 @@
   "metric-global-noguard": {
    "name": "No validation",
    "cells": 3,
-   "provider_errors": 3,
-   "all": {
-    "acc": 0.7511870845204177,
-    "ci95": [
-     0.7430555555555555,
-     0.7638888888888888
-    ]
-   },
-   "holdout": {
-    "acc": 1.0,
-    "ci95": [
-     1.0,
-     1.0
-    ]
-   },
-   "benign": {
-    "acc": 0.9907407407407407,
-    "ci95": [
-     0.9722222222222222,
-     1.0
-    ]
-   },
-   "modeled": {
-    "acc": 0.5923076923076923,
-    "ci95": [
-     0.575,
-     0.611111111111111
-    ]
-   },
-   "mirror": {
-    "acc": 0.6666666666666666,
-    "ci95": [
-     0.6666666666666666,
-     0.6666666666666666
-    ]
-   },
-   "unit": {
-    "acc": 0.4230769230769231,
-    "ci95": [
-     0.375,
-     0.4444444444444444
-    ]
-   },
-   "stale_tasks": {
-    "holdout": 0,
-    "benign": 0,
-    "modeled": 98,
-    "mirror": 18,
-    "unit": 26
-   },
-   "revoked_per_cell": 0.0,
-   "repaired_per_cell": 0.0,
-   "maint_db_s_per_cell": 0.0,
-   "turns_per_task": 4.442105263157894,
-   "input_tokens_per_task": 15844.245614035088
-  },
-  "metric-global-schema": {
-   "name": "Schema-change invalidation",
-   "cells": 3,
-   "provider_errors": 1,
+   "provider_errors": 0,
    "all": {
     "acc": 0.7469135802469135,
     "ci95": [
-     0.7256944444444445,
-     0.7592592592592592
+     0.726851851851852,
+     0.7685185185185186
     ]
    },
    "holdout": {
@@ -267,9 +209,9 @@
     ]
    },
    "benign": {
-    "acc": 0.9861111111111112,
+    "acc": 1.0,
     "ci95": [
-     0.9583333333333334,
+     1.0,
      1.0
     ]
    },
@@ -283,185 +225,8 @@
    "mirror": {
     "acc": 0.6111111111111112,
     "ci95": [
-     0.5,
-     0.6666666666666666
-    ]
-   },
-   "unit": {
-    "acc": 0.5,
-    "ci95": [
-     0.375,
-     0.6666666666666666
-    ]
-   },
-   "stale_tasks": {
-    "holdout": 0,
-    "benign": 0,
-    "modeled": 99,
-    "mirror": 18,
-    "unit": 26
-   },
-   "revoked_per_cell": 0.0,
-   "repaired_per_cell": 0.0,
-   "maint_db_s_per_cell": 0.0,
-   "turns_per_task": 4.470383275261324,
-   "input_tokens_per_task": 17339.965156794424
-  },
-  "metric-global-revoke": {
-   "name": "Invalidate-on-write",
-   "cells": 3,
-   "provider_errors": 0,
-   "all": {
-    "acc": 0.6675925925925926,
-    "ci95": [
-     0.5629629629629629,
-     0.7361111111111112
-    ]
-   },
-   "holdout": {
-    "acc": 0.9555555555555556,
-    "ci95": [
-     0.8666666666666667,
-     1.0
-    ]
-   },
-   "benign": {
-    "acc": 0.7824074074074074,
-    "ci95": [
-     0.6805555555555555,
-     0.875
-    ]
-   },
-   "modeled": {
-    "acc": 0.6074074074074074,
-    "ci95": [
-     0.4666666666666667,
-     0.6888888888888889
-    ]
-   },
-   "mirror": {
-    "acc": 0.4444444444444444,
-    "ci95": [
      0.3333333333333333,
-     0.5
-    ]
-   },
-   "unit": {
-    "acc": 0.4444444444444444,
-    "ci95": [
-     0.3333333333333333,
-     0.5555555555555556
-    ]
-   },
-   "stale_tasks": {
-    "holdout": 0,
-    "benign": 0,
-    "modeled": 0,
-    "mirror": 0,
-    "unit": 0
-   },
-   "revoked_per_cell": 38.333333333333336,
-   "repaired_per_cell": 0.0,
-   "maint_db_s_per_cell": 0.0,
-   "turns_per_task": 5.385416666666667,
-   "input_tokens_per_task": 25296.472222222223
-  },
-  "metric-global-def": {
-   "name": "Definition-level",
-   "cells": 3,
-   "provider_errors": 0,
-   "all": {
-    "acc": 0.6854938271604939,
-    "ci95": [
-     0.6092592592592592,
-     0.8148148148148148
-    ]
-   },
-   "holdout": {
-    "acc": 0.9111111111111111,
-    "ci95": [
-     0.8666666666666667,
-     1.0
-    ]
-   },
-   "benign": {
-    "acc": 0.7777777777777777,
-    "ci95": [
-     0.6527777777777777,
-     1.0
-    ]
-   },
-   "modeled": {
-    "acc": 0.6444444444444445,
-    "ci95": [
-     0.6,
-     0.7333333333333333
-    ]
-   },
-   "mirror": {
-    "acc": 0.6111111111111112,
-    "ci95": [
-     0.5,
-     0.6666666666666666
-    ]
-   },
-   "unit": {
-    "acc": 0.37037037037037035,
-    "ci95": [
-     0.3333333333333333,
-     0.4444444444444444
-    ]
-   },
-   "stale_tasks": {
-    "holdout": 0,
-    "benign": 0,
-    "modeled": 0,
-    "mirror": 0,
-    "unit": 24
-   },
-   "revoked_per_cell": 15.666666666666666,
-   "repaired_per_cell": 6.333333333333333,
-   "maint_db_s_per_cell": 363.26549899999986,
-   "turns_per_task": 5.861111111111111,
-   "input_tokens_per_task": 29659.722222222223
-  },
-  "metric-global": {
-   "name": "MAVRA (gold SQL)",
-   "cells": 3,
-   "provider_errors": 0,
-   "all": {
-    "acc": 0.8070987654320988,
-    "ci95": [
-     0.800925925925926,
-     0.8148148148148149
-    ]
-   },
-   "holdout": {
-    "acc": 1.0,
-    "ci95": [
-     1.0,
-     1.0
-    ]
-   },
-   "benign": {
-    "acc": 0.9907407407407407,
-    "ci95": [
-     0.9722222222222222,
-     1.0
-    ]
-   },
-   "modeled": {
-    "acc": 0.7333333333333333,
-    "ci95": [
-     0.7111111111111111,
-     0.7555555555555555
-    ]
-   },
-   "mirror": {
-    "acc": 0.6111111111111112,
-    "ci95": [
-     0.5,
-     0.6666666666666666
+     0.8333333333333334
     ]
    },
    "unit": {
@@ -474,25 +239,143 @@
    "stale_tasks": {
     "holdout": 0,
     "benign": 0,
-    "modeled": 0,
-    "mirror": 0,
+    "modeled": 99,
+    "mirror": 18,
     "unit": 27
    },
-   "revoked_per_cell": 19.0,
-   "repaired_per_cell": 8.0,
-   "maint_db_s_per_cell": 325.77001433333356,
-   "turns_per_task": 5.215277777777778,
-   "input_tokens_per_task": 23961.9375
+   "revoked_per_cell": 0.0,
+   "repaired_per_cell": 0.0,
+   "maint_db_s_per_cell": 0.0,
+   "turns_per_task": 4.663194444444445,
+   "input_tokens_per_task": 18038.128472222223
   },
-  "metric-global-exref": {
-   "name": "MAVRA",
+  "metric-global-schema": {
+   "name": "Schema-change invalidation",
    "cells": 3,
    "provider_errors": 0,
    "all": {
-    "acc": 0.8132716049382714,
+    "acc": 0.7530864197530863,
     "ci95": [
-     0.8009259259259259,
-     0.8240740740740741
+     0.75,
+     0.7546296296296297
+    ]
+   },
+   "holdout": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "benign": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "modeled": {
+    "acc": 0.5888888888888889,
+    "ci95": [
+     0.5888888888888889,
+     0.5888888888888889
+    ]
+   },
+   "mirror": {
+    "acc": 0.6111111111111112,
+    "ci95": [
+     0.5,
+     0.6666666666666666
+    ]
+   },
+   "unit": {
+    "acc": 0.48148148148148145,
+    "ci95": [
+     0.4444444444444444,
+     0.5555555555555556
+    ]
+   },
+   "stale_tasks": {
+    "holdout": 0,
+    "benign": 0,
+    "modeled": 100,
+    "mirror": 18,
+    "unit": 27
+   },
+   "revoked_per_cell": 0.0,
+   "repaired_per_cell": 0.0,
+   "maint_db_s_per_cell": 0.0,
+   "turns_per_task": 4.600694444444445,
+   "input_tokens_per_task": 19545.8125
+  },
+  "metric-global-revoke": {
+   "name": "Invalidate-on-write",
+   "cells": 3,
+   "provider_errors": 0,
+   "all": {
+    "acc": 0.7885802469135802,
+    "ci95": [
+     0.7777777777777777,
+     0.8055555555555554
+    ]
+   },
+   "holdout": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "benign": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "modeled": {
+    "acc": 0.6888888888888889,
+    "ci95": [
+     0.6888888888888889,
+     0.6888888888888889
+    ]
+   },
+   "mirror": {
+    "acc": 0.5,
+    "ci95": [
+     0.3333333333333333,
+     0.6666666666666666
+    ]
+   },
+   "unit": {
+    "acc": 0.5185185185185185,
+    "ci95": [
+     0.4444444444444444,
+     0.5555555555555556
+    ]
+   },
+   "stale_tasks": {
+    "holdout": 0,
+    "benign": 0,
+    "modeled": 0,
+    "mirror": 0,
+    "unit": 0
+   },
+   "revoked_per_cell": 40.0,
+   "repaired_per_cell": 0.0,
+   "maint_db_s_per_cell": 0.0,
+   "turns_per_task": 5.131944444444445,
+   "input_tokens_per_task": 24052.375
+  },
+  "metric-global-def": {
+   "name": "Definition-level",
+   "cells": 3,
+   "provider_errors": 0,
+   "all": {
+    "acc": 0.8163580246913579,
+    "ci95": [
+     0.7962962962962962,
+     0.8333333333333334
     ]
    },
    "holdout": {
@@ -512,14 +395,73 @@
    "modeled": {
     "acc": 0.7407407407407407,
     "ci95": [
-     0.7333333333333333,
-     0.7555555555555555
+     0.6888888888888889,
+     0.7777777777777778
     ]
    },
    "mirror": {
     "acc": 0.6111111111111112,
     "ci95": [
      0.5,
+     0.6666666666666666
+    ]
+   },
+   "unit": {
+    "acc": 0.48148148148148145,
+    "ci95": [
+     0.4444444444444444,
+     0.5555555555555556
+    ]
+   },
+   "stale_tasks": {
+    "holdout": 0,
+    "benign": 0,
+    "modeled": 0,
+    "mirror": 0,
+    "unit": 27
+   },
+   "revoked_per_cell": 21.333333333333332,
+   "repaired_per_cell": 8.666666666666666,
+   "maint_db_s_per_cell": 533.7801323333337,
+   "turns_per_task": 5.652777777777778,
+   "input_tokens_per_task": 30057.98611111111
+  },
+  "metric-global": {
+   "name": "MAVRA (gold SQL)",
+   "cells": 3,
+   "provider_errors": 0,
+   "all": {
+    "acc": 0.8148148148148148,
+    "ci95": [
+     0.7962962962962963,
+     0.8333333333333334
+    ]
+   },
+   "holdout": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "benign": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "modeled": {
+    "acc": 0.7333333333333333,
+    "ci95": [
+     0.6888888888888889,
+     0.7777777777777778
+    ]
+   },
+   "mirror": {
+    "acc": 0.6666666666666666,
+    "ci95": [
+     0.6666666666666666,
      0.6666666666666666
     ]
    },
@@ -537,33 +479,151 @@
     "mirror": 0,
     "unit": 27
    },
-   "revoked_per_cell": 18.666666666666668,
+   "revoked_per_cell": 20.666666666666668,
+   "repaired_per_cell": 9.0,
+   "maint_db_s_per_cell": 361.2755166666666,
+   "turns_per_task": 5.486111111111111,
+   "input_tokens_per_task": 28216.493055555555
+  },
+  "metric-global-exref": {
+   "name": "MAVRA, G8 on current data",
+   "cells": 3,
+   "provider_errors": 0,
+   "all": {
+    "acc": 0.8040123456790124,
+    "ci95": [
+     0.7777777777777777,
+     0.8333333333333334
+    ]
+   },
+   "holdout": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "benign": {
+    "acc": 0.9814814814814814,
+    "ci95": [
+     0.9444444444444444,
+     1.0
+    ]
+   },
+   "modeled": {
+    "acc": 0.7185185185185186,
+    "ci95": [
+     0.6888888888888889,
+     0.7555555555555555
+    ]
+   },
+   "mirror": {
+    "acc": 0.6111111111111112,
+    "ci95": [
+     0.5,
+     0.6666666666666666
+    ]
+   },
+   "unit": {
+    "acc": 0.5185185185185185,
+    "ci95": [
+     0.4444444444444444,
+     0.5555555555555556
+    ]
+   },
+   "stale_tasks": {
+    "holdout": 0,
+    "benign": 0,
+    "modeled": 0,
+    "mirror": 0,
+    "unit": 27
+   },
+   "revoked_per_cell": 21.0,
    "repaired_per_cell": 4.666666666666667,
-   "maint_db_s_per_cell": 342.2503536666666,
-   "turns_per_task": 5.232638888888889,
-   "input_tokens_per_task": 23103.38888888889
+   "maint_db_s_per_cell": 298.6045899999999,
+   "turns_per_task": 5.836805555555555,
+   "input_tokens_per_task": 31212.350694444445
+  },
+  "metric-global-snap": {
+   "name": "MAVRA",
+   "cells": 3,
+   "provider_errors": 0,
+   "all": {
+    "acc": 0.808641975308642,
+    "ci95": [
+     0.7824074074074074,
+     0.8333333333333334
+    ]
+   },
+   "holdout": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "benign": {
+    "acc": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ]
+   },
+   "modeled": {
+    "acc": 0.7333333333333334,
+    "ci95": [
+     0.6888888888888889,
+     0.7555555555555555
+    ]
+   },
+   "mirror": {
+    "acc": 0.5555555555555556,
+    "ci95": [
+     0.5,
+     0.6666666666666666
+    ]
+   },
+   "unit": {
+    "acc": 0.48148148148148145,
+    "ci95": [
+     0.4444444444444444,
+     0.5555555555555556
+    ]
+   },
+   "stale_tasks": {
+    "holdout": 0,
+    "benign": 0,
+    "modeled": 0,
+    "mirror": 0,
+    "unit": 27
+   },
+   "revoked_per_cell": 25.666666666666668,
+   "repaired_per_cell": 10.333333333333334,
+   "maint_db_s_per_cell": 347.24931566666675,
+   "turns_per_task": 5.680555555555555,
+   "input_tokens_per_task": 32324.333333333332
   }
  },
  "comparisons": {
   "a1 modeled: MAVRA (gold SQL) - trajectory": {
    "diff": 0.1592592592592592,
    "ci95": [
-    0.13703703703703707,
-    0.18148148148148147
+    0.11481481481481481,
+    0.20370370370370372
    ]
   },
   "a2 modeled: MAVRA (gold SQL) - definition-level": {
-   "diff": 0.0888888888888888,
+   "diff": -0.007407407407407418,
    "ci95": [
-    0.007407407407407418,
-    0.14814814814814814
+    -0.06666666666666665,
+    0.051851851851851816
    ]
   },
   "b all: MAVRA (gold SQL) - no sharing": {
-   "diff": 0.48548684431037376,
+   "diff": 0.49320289369308973,
    "ci95": [
-    0.45740740740740743,
-    0.5289351851851851
+    0.4574074074074073,
+    0.5320216049382716
    ]
   },
   "c holdout: MAVRA (gold SQL) - trajectory": {
@@ -573,18 +633,18 @@
     0.0
    ]
   },
-  "d1 modeled: MAVRA - trajectory": {
-   "diff": 0.16666666666666663,
+  "d1 modeled: MAVRA, G8 on current data - trajectory": {
+   "diff": 0.1444444444444445,
    "ci95": [
-    0.1518518518518518,
-    0.18148148148148158
+    0.11481481481481481,
+    0.18148148148148147
    ]
   },
-  "d2 modeled: MAVRA - MAVRA (gold SQL)": {
-   "diff": 0.007407407407407418,
+  "d2 modeled: MAVRA, G8 on current data - MAVRA (gold SQL)": {
+   "diff": -0.014814814814814725,
    "ci95": [
-    -0.014814814814814836,
-    0.029629629629629672
+    -0.06666666666666665,
+    0.03703703703703698
    ]
   },
   "e1 modeled: trajectory+self-check - trajectory": {
@@ -597,50 +657,106 @@
   "e2 modeled: MAVRA (gold SQL) - trajectory+self-check": {
    "diff": 0.10740740740740728,
    "ci95": [
-    0.05555555555555558,
-    0.1518518518518518
+    0.04814814814814816,
+    0.16666666666666663
    ]
   },
   "e3 all: MAVRA (gold SQL) - trajectory+self-check": {
-   "diff": 0.03395061728395077,
+   "diff": 0.04166666666666674,
    "ci95": [
-    0.007716049382716195,
-    0.06635802469135799
+    0.0092592592592593,
+    0.07407407407407418
    ]
   },
-  "f1 modeled: MAVRA - definition-level": {
-   "diff": 0.09629629629629621,
+  "f1 modeled: MAVRA, G8 on current data - definition-level": {
+   "diff": -0.022222222222222143,
    "ci95": [
-    0.007407407407407418,
-    0.14814814814814825
+    -0.07407407407407407,
+    0.029629629629629672
    ]
   },
-  "f2 all: MAVRA - no sharing": {
-   "diff": 0.4916596838165464,
+  "f2 all: MAVRA, G8 on current data - no sharing": {
+   "diff": 0.4824004245572873,
    "ci95": [
-    0.46049382716049375,
-    0.5320216049382716
+    0.4425925925925925,
+    0.527391975308642
    ]
   },
-  "f3 holdout: MAVRA - trajectory": {
+  "f3 holdout: MAVRA, G8 on current data - trajectory": {
    "diff": 0.0,
    "ci95": [
     0.0,
     0.0
    ]
   },
-  "f4 modeled: MAVRA - trajectory+self-check": {
-   "diff": 0.1148148148148147,
+  "f4 modeled: MAVRA, G8 on current data - trajectory+self-check": {
+   "diff": 0.09259259259259256,
    "ci95": [
-    0.06296296296296289,
-    0.1518518518518519
+    0.040740740740740744,
+    0.14444444444444438
    ]
   },
-  "f5 all: MAVRA - trajectory+self-check": {
-   "diff": 0.04012345679012341,
+  "f5 all: MAVRA, G8 on current data - trajectory+self-check": {
+   "diff": 0.030864197530864335,
    "ci95": [
-    0.012345679012345734,
-    0.07253086419753063
+    -0.007716049382716084,
+    0.07098765432098753
+   ]
+  },
+  "g1 modeled: MAVRA - trajectory": {
+   "diff": 0.15925925925925932,
+   "ci95": [
+    0.11481481481481481,
+    0.18888888888888888
+   ]
+  },
+  "g2 modeled: MAVRA - MAVRA, G8 on current data": {
+   "diff": 0.014814814814814836,
+   "ci95": [
+    -0.029629629629629672,
+    0.059259259259259234
+   ]
+  },
+  "h1 modeled: MAVRA - definition-level": {
+   "diff": -0.007407407407407307,
+   "ci95": [
+    -0.059259259259259345,
+    0.0444444444444444
+   ]
+  },
+  "h2 all: MAVRA - no sharing": {
+   "diff": 0.48703005418691697,
+   "ci95": [
+    0.45154320987654334,
+    0.531304012345679
+   ]
+  },
+  "h3 holdout: MAVRA - trajectory": {
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ]
+  },
+  "h4 modeled: MAVRA - trajectory+self-check": {
+   "diff": 0.1074074074074074,
+   "ci95": [
+    0.05555555555555547,
+    0.1592592592592592
+   ]
+  },
+  "h5 all: MAVRA - trajectory+self-check": {
+   "diff": 0.035493827160493985,
+   "ci95": [
+    -0.0015432098765428837,
+    0.07253086419753108
+   ]
+  },
+  "h6 modeled: MAVRA - MAVRA (gold SQL)": {
+   "diff": 1.1102230246251565e-16,
+   "ci95": [
+    -0.059259259259259234,
+    0.051851851851851816
    ]
   }
  },
@@ -689,75 +805,47 @@
   },
   "metric-global-noguard": {
    "holdout": 1.0,
-   "append": 0.9629629629629629,
+   "append": 1.0,
    "backfill": 1.0,
    "correct": 1.0,
    "addcol": 1.0,
    "status": 0.5,
-   "revision": 0.7777777777777778,
-   "dupload": 0.46153846153846156,
+   "revision": 0.7407407407407407,
+   "dupload": 0.4444444444444444,
    "dimhist": 1.0,
    "latekey": 0.2222222222222222,
-   "unit": 0.4230769230769231,
-   "mirror": 0.6666666666666666
+   "unit": 0.4444444444444444,
+   "mirror": 0.6111111111111112
   },
   "metric-global-schema": {
    "holdout": 1.0,
    "append": 1.0,
    "backfill": 1.0,
    "correct": 1.0,
-   "addcol": 0.9444444444444444,
+   "addcol": 1.0,
    "status": 0.5,
-   "revision": 0.7407407407407407,
+   "revision": 0.7777777777777778,
    "dupload": 0.4444444444444444,
    "dimhist": 1.0,
    "latekey": 0.2222222222222222,
-   "unit": 0.5,
+   "unit": 0.48148148148148145,
    "mirror": 0.6111111111111112
   },
   "metric-global-revoke": {
-   "holdout": 0.9555555555555556,
-   "append": 0.8148148148148148,
-   "backfill": 0.5,
-   "correct": 0.9259259259259259,
-   "addcol": 0.8888888888888888,
-   "status": 0.7777777777777778,
-   "revision": 0.8518518518518519,
-   "dupload": 0.2222222222222222,
-   "dimhist": 1.0,
-   "latekey": 0.18518518518518517,
-   "unit": 0.4444444444444444,
-   "mirror": 0.4444444444444444
-  },
-  "metric-global-def": {
-   "holdout": 0.9111111111111111,
-   "append": 0.8148148148148148,
-   "backfill": 0.6666666666666666,
-   "correct": 0.8518518518518519,
-   "addcol": 0.7777777777777778,
-   "status": 0.7777777777777778,
-   "revision": 0.8518518518518519,
-   "dupload": 0.48148148148148145,
-   "dimhist": 1.0,
-   "latekey": 0.1111111111111111,
-   "unit": 0.37037037037037035,
-   "mirror": 0.6111111111111112
-  },
-  "metric-global": {
    "holdout": 1.0,
-   "append": 0.9629629629629629,
+   "append": 1.0,
    "backfill": 1.0,
    "correct": 1.0,
    "addcol": 1.0,
    "status": 1.0,
-   "revision": 0.9629629629629629,
-   "dupload": 0.5925925925925926,
+   "revision": 0.8888888888888888,
+   "dupload": 0.3333333333333333,
    "dimhist": 1.0,
-   "latekey": 0.1111111111111111,
-   "unit": 0.4444444444444444,
-   "mirror": 0.6111111111111112
+   "latekey": 0.2222222222222222,
+   "unit": 0.5185185185185185,
+   "mirror": 0.5
   },
-  "metric-global-exref": {
+  "metric-global-def": {
    "holdout": 1.0,
    "append": 1.0,
    "backfill": 1.0,
@@ -768,8 +856,50 @@
    "dupload": 0.5925925925925926,
    "dimhist": 1.0,
    "latekey": 0.1111111111111111,
-   "unit": 0.4444444444444444,
+   "unit": 0.48148148148148145,
    "mirror": 0.6111111111111112
+  },
+  "metric-global": {
+   "holdout": 1.0,
+   "append": 1.0,
+   "backfill": 1.0,
+   "correct": 1.0,
+   "addcol": 1.0,
+   "status": 1.0,
+   "revision": 1.0,
+   "dupload": 0.5925925925925926,
+   "dimhist": 1.0,
+   "latekey": 0.07407407407407407,
+   "unit": 0.4444444444444444,
+   "mirror": 0.6666666666666666
+  },
+  "metric-global-exref": {
+   "holdout": 1.0,
+   "append": 0.9629629629629629,
+   "backfill": 1.0,
+   "correct": 0.9629629629629629,
+   "addcol": 1.0,
+   "status": 1.0,
+   "revision": 0.8888888888888888,
+   "dupload": 0.5925925925925926,
+   "dimhist": 1.0,
+   "latekey": 0.1111111111111111,
+   "unit": 0.5185185185185185,
+   "mirror": 0.6111111111111112
+  },
+  "metric-global-snap": {
+   "holdout": 1.0,
+   "append": 1.0,
+   "backfill": 1.0,
+   "correct": 1.0,
+   "addcol": 1.0,
+   "status": 1.0,
+   "revision": 0.9259259259259259,
+   "dupload": 0.5925925925925926,
+   "dimhist": 1.0,
+   "latekey": 0.14814814814814814,
+   "unit": 0.48148148148148145,
+   "mirror": 0.5555555555555556
   }
  }
 }

@@ -28,19 +28,19 @@ _spec = importlib.util.spec_from_file_location('paper_results', style.ROOT / 'to
 paper_results = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(paper_results)
 PHASES, CLASSES = paper_results.PHASES, paper_results.CLASSES
-MODES = [mode for mode, *_ in paper_results.METHODS]
+MODES = paper_results.shown_modes()
 
 HEAD = {  # column heads, two lines; abbreviations of the method names in Table 3
     'en': {'middle': ('No', 'sharing'), 'traj-global': ('Trajectory', 'retrieval'),
            'traj-verify': ('Traj. +', 'self-check'), 'metric-global-noguard': ('No', 'validation'),
            'metric-global-schema': ('Schema', 'change'), 'metric-global-revoke': ('Invalidate-', 'on-write'),
-           'metric-global-def': ('Definition-', 'level'), 'metric-global-exref': ('', 'MAVRA'),
-           'metric-global': ('MAVRA', '(gold SQL)')},
+           'metric-global-def': ('Definition-', 'level'), 'metric-global-snap': ('', 'MAVRA'),
+           'metric-global-exref': ('MAVRA,', 'G8 current'), 'metric-global': ('MAVRA', '(gold SQL)')},
     'zh': {'middle': ('', '不共享'), 'traj-global': ('', '轨迹检索'),
            'traj-verify': ('轨迹检索', '+ 自检'), 'metric-global-noguard': ('共享', '不验证'),
            'metric-global-schema': ('按模式', '变更失效'), 'metric-global-revoke': ('写入即', '失效'),
-           'metric-global-def': ('', '定义级'), 'metric-global-exref': ('', 'MAVRA'),
-           'metric-global': ('MAVRA', '标准答案')},
+           'metric-global-def': ('', '定义级'), 'metric-global-snap': ('', 'MAVRA'),
+           'metric-global-exref': ('MAVRA', '当前数据'), 'metric-global': ('MAVRA', '标准答案')},
 }
 TEXT = {
     'en': {'class': 'Class', 'change': 'Change', 'what': 'What the update does',
@@ -108,7 +108,7 @@ def draw(s, lang):
         _, color = style.method(mode, lang)
         s.rect(cx - .8, .6, 1.6, 1.6, color, None, r=.2)
         first, second = HEAD[lang][mode]
-        mavra = mode == 'metric-global-exref'
+        mavra = mode == 'metric-global-snap'
         for line, y in ((first, 5.4), (second, 8.3)):
             if line:
                 text(cx, y, line, HEADPT, ACC_DK if mavra else INK, 'bold' if mavra else 'sans',
@@ -145,14 +145,14 @@ def draw(s, lang):
     base = y + .45 + pitch / 2 + .9
     text(0, base, T['mean'].format(len(PHASES)), LABEL, INK, 'bold')
     for j, mode in enumerate(MODES):
-        mavra = mode == 'metric-global-exref'
+        mavra = mode == 'metric-global-snap'
         text(x_cells + cw * (j + .5), base, f'{100 * means[mode]:.0f}', CELL,
              ACC_DK if mavra else INK, 'bold', 'center')
     table_bottom = y + .45 + pitch + .3
     s.line(0, table_bottom, W, table_bottom, MUTED, .2)
 
     # MAVRA's column framed in its color.
-    j = MODES.index('metric-global-exref')
+    j = MODES.index('metric-global-snap')
     s.rect(x_cells + cw * j + .05, .2, cw - .1, table_bottom - .2, None, ACC, .3, r=.6)
 
     # Legend: the shade ramp and the stale mark.

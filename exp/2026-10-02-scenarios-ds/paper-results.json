@@ -1,10 +1,10 @@
 {
  "numbers": {
   "ScenModels": 1,
-  "ScenCells": 27,
-  "ScenCellsDropped": 3,
-  "ScenValidTasks": 2586,
-  "ScenQuotaTasks": 6,
+  "ScenCells": 30,
+  "ScenCellsDropped": 24,
+  "ScenValidTasks": 2878,
+  "ScenQuotaTasks": 2,
   "ScenAccNoShare": "32",
   "ScenHoldoutNoShare": "49",
   "ScenModeledNoShare": "19",
@@ -34,117 +34,126 @@
   "ScenMaintTrajVerify": "0.0",
   "ScenAccNoguard": "75",
   "ScenHoldoutNoguard": "100",
-  "ScenModeledNoguard": "59",
-  "ScenBenignNoguard": "99",
-  "ScenStaleNoguard": 142,
-  "ScenStaleModeledNoguard": 98,
-  "ScenStaleUnitNoguard": 26,
-  "ScenTokNoguard": "15.8",
+  "ScenModeledNoguard": "58",
+  "ScenBenignNoguard": "100",
+  "ScenStaleNoguard": 144,
+  "ScenStaleModeledNoguard": 99,
+  "ScenStaleUnitNoguard": 27,
+  "ScenTokNoguard": "18.0",
   "ScenMaintNoguard": "0.0",
   "ScenAccSchema": "75",
   "ScenHoldoutSchema": "100",
-  "ScenModeledSchema": "58",
-  "ScenBenignSchema": "99",
-  "ScenStaleSchema": 143,
-  "ScenStaleModeledSchema": 99,
-  "ScenStaleUnitSchema": 26,
-  "ScenTokSchema": "17.3",
+  "ScenModeledSchema": "59",
+  "ScenBenignSchema": "100",
+  "ScenStaleSchema": 145,
+  "ScenStaleModeledSchema": 100,
+  "ScenStaleUnitSchema": 27,
+  "ScenTokSchema": "19.5",
   "ScenMaintSchema": "0.0",
-  "ScenAccRevoke": "67",
-  "ScenHoldoutRevoke": "96",
-  "ScenModeledRevoke": "61",
-  "ScenBenignRevoke": "78",
+  "ScenAccRevoke": "79",
+  "ScenHoldoutRevoke": "100",
+  "ScenModeledRevoke": "69",
+  "ScenBenignRevoke": "100",
   "ScenStaleRevoke": 0,
   "ScenStaleModeledRevoke": 0,
   "ScenStaleUnitRevoke": 0,
-  "ScenTokRevoke": "25.3",
+  "ScenTokRevoke": "24.1",
   "ScenMaintRevoke": "0.0",
-  "ScenAccDef": "69",
-  "ScenHoldoutDef": "91",
-  "ScenModeledDef": "64",
-  "ScenBenignDef": "78",
-  "ScenStaleDef": 24,
+  "ScenAccDef": "82",
+  "ScenHoldoutDef": "100",
+  "ScenModeledDef": "74",
+  "ScenBenignDef": "100",
+  "ScenStaleDef": 27,
   "ScenStaleModeledDef": 0,
-  "ScenStaleUnitDef": 24,
-  "ScenTokDef": "29.7",
-  "ScenMaintDef": "363.3",
+  "ScenStaleUnitDef": 27,
+  "ScenTokDef": "30.1",
+  "ScenMaintDef": "533.8",
   "ScenAccCond": "81",
   "ScenHoldoutCond": "100",
-  "ScenModeledCond": "74",
+  "ScenModeledCond": "73",
   "ScenBenignCond": "100",
   "ScenStaleCond": 27,
   "ScenStaleModeledCond": 0,
   "ScenStaleUnitCond": 27,
-  "ScenTokCond": "23.1",
-  "ScenMaintCond": "342.3",
+  "ScenTokCond": "32.3",
+  "ScenMaintCond": "347.2",
+  "ScenAccCondCur": "80",
+  "ScenHoldoutCondCur": "100",
+  "ScenModeledCondCur": "72",
+  "ScenBenignCondCur": "98",
+  "ScenStaleCondCur": 27,
+  "ScenStaleModeledCondCur": 0,
+  "ScenStaleUnitCondCur": 27,
+  "ScenTokCondCur": "31.2",
+  "ScenMaintCondCur": "298.6",
   "ScenAccCondGold": "81",
   "ScenHoldoutCondGold": "100",
   "ScenModeledCondGold": "73",
-  "ScenBenignCondGold": "99",
+  "ScenBenignCondGold": "100",
   "ScenStaleCondGold": 27,
   "ScenStaleModeledCondGold": 0,
   "ScenStaleUnitCondGold": 27,
-  "ScenTokCondGold": "24.0",
-  "ScenMaintCondGold": "325.8",
-  "ScenMaintRatio": "94",
-  "ScenRelearnTok": "1.22",
+  "ScenTokCondGold": "28.2",
+  "ScenMaintCondGold": "361.3",
+  "ScenMaintRatio": "65",
+  "ScenRelearnTok": "1.70",
   "ScenAccCondDupload": "59",
   "ScenAccNoShareDupload": "22",
   "ScenAccSchemaDupload": "44",
-  "ScenAccDefDupload": "48",
+  "ScenAccDefDupload": "59",
   "ScenAccTrajDupload": "37",
-  "ScenAccCondLatekey": "11",
+  "ScenAccCondLatekey": "15",
   "ScenAccNoShareLatekey": "11",
   "ScenAccSchemaLatekey": "22",
   "ScenAccDefLatekey": "11",
   "ScenAccTrajLatekey": "22",
-  "ScenAccCondUnit": "44",
+  "ScenAccCondUnit": "48",
   "ScenAccNoShareUnit": "22",
-  "ScenAccSchemaUnit": "50",
-  "ScenAccDefUnit": "37",
+  "ScenAccSchemaUnit": "48",
+  "ScenAccDefUnit": "48",
   "ScenAccTrajUnit": "48",
   "ScenAccCondStatus": "100",
   "ScenAccNoShareStatus": "39",
   "ScenAccSchemaStatus": "50",
-  "ScenAccDefStatus": "78",
+  "ScenAccDefStatus": "100",
   "ScenAccTrajStatus": "50",
-  "ScenAccCondRevision": "100",
+  "ScenAccCondRevision": "93",
   "ScenAccNoShareRevision": "22",
-  "ScenAccSchemaRevision": "74",
-  "ScenAccDefRevision": "85",
+  "ScenAccSchemaRevision": "78",
+  "ScenAccDefRevision": "100",
   "ScenAccTrajRevision": "78",
   "ScenAccCondDimhist": "100",
   "ScenAccNoShareDimhist": "0",
   "ScenAccSchemaDimhist": "100",
   "ScenAccDefDimhist": "100",
   "ScenAccTrajDimhist": "100",
-  "ScenAccCondMirror": "61",
+  "ScenAccCondMirror": "56",
   "ScenAccNoShareMirror": "44",
   "ScenAccSchemaMirror": "61",
   "ScenAccDefMirror": "61",
   "ScenAccTrajMirror": "72",
-  "ScenRepairFailedDupload": 12,
-  "ScenRepairSkippedLatekey": 12,
-  "ScenRevokedDupload": 12,
-  "ScenRevokedLatekey": 12,
+  "ScenRepairFailedDupload": 17,
+  "ScenRepairSkippedLatekey": 17,
+  "ScenRevokedDupload": 17,
+  "ScenRevokedLatekey": 17,
   "ScenUnitStaleTasks": 27,
   "ScenUnitTasks": 27,
   "ScenAccCondModelA": "81",
   "ScenCommonPhasesModelA": 12,
   "ScenAccNoShareModelA": "32",
-  "ScenAccDefModelA": "69",
+  "ScenAccDefModelA": "82",
   "ScenAccTrajModelA": "76",
-  "ScenHoldTokSaveModelA": "32",
+  "ScenHoldTokSaveModelA": "34",
   "ScenHoldTurnsNoShareModelA": "5.6",
-  "ScenHoldTurnsCondModelA": "3.8",
+  "ScenHoldTurnsCondModelA": "3.6",
   "MaintStagMin": "12.5",
   "MaintStagMax": "37.8",
   "MaintSimMin": "44.6",
   "MaintSimMax": "75.5",
-  "ScenAgentTasks": "2,998",
-  "ScenLLMCalls": "15,764",
-  "ScenTokensM": "70",
-  "ScenAgentHours": "45"
+  "ScenAgentTasks": "3,340",
+  "ScenLLMCalls": "17,914",
+  "ScenTokensM": "88",
+  "ScenAgentHours": "31"
  },
  "cells": [
   {
@@ -154,81 +163,57 @@
    "excluded_phases": []
   },
   {
-   "file": "results/scen-20261002/dsv41flash-r1-a/metric-1790915082986481/cell-r1-metric-global-noguard-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-noguard",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r1-a/metric-1790915082986481/cell-r1-metric-global-schema-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-schema",
-   "excluded_phases": []
-  },
-  {
    "file": "results/scen-20261002/dsv41flash-r1-a/metric-1790915082986481/cell-r1-traj-global-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "traj-global",
    "excluded_phases": []
   },
   {
-   "file": "results/scen-20261002/dsv41flash-r1-b-rerun/metric-1790923166596116/cell-r1-metric-global-revoke-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-revoke",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-def-named.json",
+   "file": "results/scen-20261002/dsv41flash-r1-g3fix--def/metric-1791301545727558/cell-r1-metric-global-def-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "metric-global-def",
    "excluded_phases": []
   },
   {
-   "file": "results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json",
+   "file": "results/scen-20261002/dsv41flash-r1-g3fix--exref/metric-1791301425690493/cell-r1-metric-global-exref-named.json",
    "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global",
+   "mode": "metric-global-exref",
    "excluded_phases": []
   },
   {
-   "file": "results/scen-20261002/dsv41flash-r1-exref/metric-1790956275696455/cell-r1-metric-global-exref-named.json",
+   "file": "results/scen-20261002/dsv41flash-r1-g3fix--noguard/metric-1791301605743236/cell-r1-metric-global-noguard-named.json",
    "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-exref",
+   "mode": "metric-global-noguard",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-g3fix--revoke/metric-1791304246715121/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-g3fix--schema/metric-1791301665762222/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-g3fix--snap/metric-1791301365673302/cell-r1-metric-global-snap-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-snap",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-g3fix/metric-1791301485709346/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
    "excluded_phases": []
   },
   {
    "file": "results/scen-20261002/dsv41flash-r1-trajv/metric-1790956335712338/cell-r1-traj-verify-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "traj-verify",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790907425882543/cell-r1-metric-global-noguard-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-noguard",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790907425882543/cell-r1-metric-global-schema-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-schema",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790915117004809/cell-r1-metric-global-def-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-def",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790915117004809/cell-r1-metric-global-revoke-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-revoke",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r2-b-rerun/metric-1790918362008789/cell-r1-metric-global-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global",
    "excluded_phases": []
   },
   {
@@ -244,9 +229,45 @@
    "excluded_phases": []
   },
   {
-   "file": "results/scen-20261002/dsv41flash-r2-exref/metric-1790956395729880/cell-r1-metric-global-exref-named.json",
+   "file": "results/scen-20261002/dsv41flash-r2-g3fix--def/metric-1791305087039951/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-g3fix--exref/metric-1791304636862414/cell-r1-metric-global-exref-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-g3fix--noguard/metric-1791305177073940/cell-r1-metric-global-noguard-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-noguard",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-g3fix--revoke/metric-1791307728166081/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-g3fix--schema/metric-1791307277984545/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-g3fix--snap/metric-1791304306737109/cell-r1-metric-global-snap-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-snap",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-g3fix/metric-1791304696881160/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
    "excluded_phases": []
   },
   {
@@ -256,33 +277,9 @@
    "excluded_phases": []
   },
   {
-   "file": "results/scen-20261002/dsv41flash-r3-a-rerun/metric-1790919022641243/cell-r1-metric-global-revoke-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-revoke",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-def-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-def",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global",
-   "excluded_phases": []
-  },
-  {
    "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790917042411088/cell-r1-middle-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "middle",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r3-b/metric-1790907605929284/cell-r1-metric-global-noguard-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-noguard",
    "excluded_phases": []
   },
   {
@@ -292,15 +289,45 @@
    "excluded_phases": []
   },
   {
-   "file": "results/scen-20261002/dsv41flash-r3-b/metric-1790915378185021/cell-r1-metric-global-schema-named.json",
+   "file": "results/scen-20261002/dsv41flash-r3-g3fix--def/metric-1791309348844599/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-g3fix--exref/metric-1791308418459823/cell-r1-metric-global-exref-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-g3fix--noguard/metric-1791309498901785/cell-r1-metric-global-noguard-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-noguard",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-g3fix--revoke/metric-1791311449726061/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-g3fix--schema/metric-1791311389707097/cell-r1-metric-global-schema-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "metric-global-schema",
    "excluded_phases": []
   },
   {
-   "file": "results/scen-20261002/dsv41flash-r3-exref/metric-1790956515766498/cell-r1-metric-global-exref-named.json",
+   "file": "results/scen-20261002/dsv41flash-r3-g3fix--snap/metric-1791307998281156/cell-r1-metric-global-snap-named.json",
    "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-exref",
+   "mode": "metric-global-snap",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-g3fix/metric-1791308508491882/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
    "excluded_phases": []
   },
   {
@@ -312,7 +339,55 @@
  ],
  "dropped": [
   {
+   "file": "results/scen-20261002/dsv41flash-r1-a/metric-1790915082986481/cell-r1-metric-global-noguard-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-a/metric-1790915082986481/cell-r1-metric-global-schema-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-b-rerun/metric-1790923166596116/cell-r1-metric-global-revoke-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
    "file": "results/scen-20261002/dsv41flash-r1-b/metric-1790907365861894/cell-r1-metric-global-revoke-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-def-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-b/metric-1790916886275999/cell-r1-metric-global-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-exref/metric-1790956275696455/cell-r1-metric-global-exref-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r1-snap/metric-1791292360518723/cell-r1-metric-global-snap-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790907425882543/cell-r1-metric-global-noguard-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790907425882543/cell-r1-metric-global-schema-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790915117004809/cell-r1-metric-global-def-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-a/metric-1790915117004809/cell-r1-metric-global-revoke-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-b-rerun/metric-1790918362008789/cell-r1-metric-global-named.json",
    "reason": "replaced by a rerun (provider failure during learning or relearning)"
   },
   {
@@ -320,7 +395,43 @@
    "reason": "replaced by a rerun (provider failure during learning or relearning)"
   },
   {
+   "file": "results/scen-20261002/dsv41flash-r2-exref/metric-1790956395729880/cell-r1-metric-global-exref-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r2-snap/metric-1791292420528689/cell-r1-metric-global-snap-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-a-rerun/metric-1790919022641243/cell-r1-metric-global-revoke-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
    "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790907545914633/cell-r1-metric-global-revoke-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-def-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-a/metric-1790917042411088/cell-r1-metric-global-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-b/metric-1790907605929284/cell-r1-metric-global-noguard-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-b/metric-1790915378185021/cell-r1-metric-global-schema-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-exref/metric-1790956515766498/cell-r1-metric-global-exref-named.json",
+   "reason": "replaced by a rerun (provider failure during learning or relearning)"
+  },
+  {
+   "file": "results/scen-20261002/dsv41flash-r3-snap/metric-1791292480536105/cell-r1-metric-global-snap-named.json",
    "reason": "replaced by a rerun (provider failure during learning or relearning)"
   }
  ],
@@ -373,102 +484,6 @@
    8,
    18
   ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|holdout": [
-   44,
-   44
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|append": [
-   26,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|backfill": [
-   18,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|correct": [
-   27,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|addcol": [
-   18,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|status": [
-   9,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|revision": [
-   21,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|dupload": [
-   12,
-   26
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|dimhist": [
-   9,
-   9
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|latekey": [
-   6,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|unit": [
-   11,
-   26
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|mirror": [
-   12,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|holdout": [
-   45,
-   45
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|append": [
-   27,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|backfill": [
-   18,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|correct": [
-   27,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|addcol": [
-   17,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|status": [
-   9,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|revision": [
-   20,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|dupload": [
-   12,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|dimhist": [
-   9,
-   9
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|latekey": [
-   6,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|unit": [
-   13,
-   26
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema|mirror": [
-   11,
-   18
-  ],
   "DeepSeek V4.1 Flash|traj-global|holdout": [
    45,
    45
@@ -517,84 +532,36 @@
    13,
    18
   ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|holdout": [
-   43,
-   45
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|append": [
-   22,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|backfill": [
-   9,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|correct": [
-   25,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|addcol": [
-   16,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|status": [
-   14,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|revision": [
-   23,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|dupload": [
-   6,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|dimhist": [
-   9,
-   9
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|latekey": [
-   5,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|unit": [
-   12,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-revoke|mirror": [
-   8,
-   18
-  ],
   "DeepSeek V4.1 Flash|metric-global-def|holdout": [
-   41,
+   45,
    45
   ],
   "DeepSeek V4.1 Flash|metric-global-def|append": [
-   22,
+   27,
    27
   ],
   "DeepSeek V4.1 Flash|metric-global-def|backfill": [
-   12,
+   18,
    18
   ],
   "DeepSeek V4.1 Flash|metric-global-def|correct": [
-   23,
+   27,
    27
   ],
   "DeepSeek V4.1 Flash|metric-global-def|addcol": [
-   14,
+   18,
    18
   ],
   "DeepSeek V4.1 Flash|metric-global-def|status": [
-   14,
+   18,
    18
   ],
   "DeepSeek V4.1 Flash|metric-global-def|revision": [
-   23,
+   27,
    27
   ],
   "DeepSeek V4.1 Flash|metric-global-def|dupload": [
-   13,
+   16,
    27
   ],
   "DeepSeek V4.1 Flash|metric-global-def|dimhist": [
@@ -606,11 +573,251 @@
    27
   ],
   "DeepSeek V4.1 Flash|metric-global-def|unit": [
-   10,
+   13,
    27
   ],
   "DeepSeek V4.1 Flash|metric-global-def|mirror": [
    11,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|append": [
+   26,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|correct": [
+   26,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|status": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|revision": [
+   24,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|dupload": [
+   16,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|latekey": [
+   3,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|unit": [
+   14,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|mirror": [
+   11,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|append": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|status": [
+   9,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|revision": [
+   20,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|dupload": [
+   12,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|latekey": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|unit": [
+   12,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard|mirror": [
+   11,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|append": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|status": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|revision": [
+   24,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|dupload": [
+   9,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|latekey": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|unit": [
+   14,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|mirror": [
+   9,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|append": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|status": [
+   9,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|revision": [
+   21,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|dupload": [
+   12,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|latekey": [
+   6,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|unit": [
+   13,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|mirror": [
+   11,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|holdout": [
+   45,
+   45
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|append": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|backfill": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|correct": [
+   27,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|addcol": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|status": [
+   18,
+   18
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|revision": [
+   25,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|dupload": [
+   16,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|dimhist": [
+   9,
+   9
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|latekey": [
+   4,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|unit": [
+   13,
+   27
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|mirror": [
+   10,
    18
   ],
   "DeepSeek V4.1 Flash|metric-global|holdout": [
@@ -618,7 +825,7 @@
    45
   ],
   "DeepSeek V4.1 Flash|metric-global|append": [
-   26,
+   27,
    27
   ],
   "DeepSeek V4.1 Flash|metric-global|backfill": [
@@ -638,7 +845,7 @@
    18
   ],
   "DeepSeek V4.1 Flash|metric-global|revision": [
-   26,
+   27,
    27
   ],
   "DeepSeek V4.1 Flash|metric-global|dupload": [
@@ -650,7 +857,7 @@
    9
   ],
   "DeepSeek V4.1 Flash|metric-global|latekey": [
-   3,
+   2,
    27
   ],
   "DeepSeek V4.1 Flash|metric-global|unit": [
@@ -658,55 +865,7 @@
    27
   ],
   "DeepSeek V4.1 Flash|metric-global|mirror": [
-   11,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|holdout": [
-   45,
-   45
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|append": [
-   27,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|backfill": [
-   18,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|correct": [
-   27,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|addcol": [
-   18,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|status": [
-   18,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|revision": [
-   27,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|dupload": [
-   16,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|dimhist": [
-   9,
-   9
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|latekey": [
-   3,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|unit": [
    12,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref|mirror": [
-   11,
    18
   ],
   "DeepSeek V4.1 Flash|traj-verify|holdout": [
@@ -759,9 +918,7 @@
   ]
  },
  "quota_failed_tasks": {
-  "DeepSeek V4.1 Flash|metric-global-schema": 1,
-  "DeepSeek V4.1 Flash|middle": 2,
-  "DeepSeek V4.1 Flash|metric-global-noguard": 3
+  "DeepSeek V4.1 Flash|middle": 2
  },
  "stale": {
   "middle|holdout": [
@@ -812,102 +969,6 @@
    0,
    18
   ],
-  "metric-global-noguard|holdout": [
-   0,
-   44
-  ],
-  "metric-global-noguard|append": [
-   0,
-   27
-  ],
-  "metric-global-noguard|backfill": [
-   0,
-   18
-  ],
-  "metric-global-noguard|correct": [
-   0,
-   27
-  ],
-  "metric-global-noguard|addcol": [
-   0,
-   18
-  ],
-  "metric-global-noguard|status": [
-   18,
-   18
-  ],
-  "metric-global-noguard|revision": [
-   27,
-   27
-  ],
-  "metric-global-noguard|dupload": [
-   18,
-   26
-  ],
-  "metric-global-noguard|dimhist": [
-   8,
-   9
-  ],
-  "metric-global-noguard|latekey": [
-   27,
-   27
-  ],
-  "metric-global-noguard|unit": [
-   26,
-   26
-  ],
-  "metric-global-noguard|mirror": [
-   18,
-   18
-  ],
-  "metric-global-schema|holdout": [
-   0,
-   45
-  ],
-  "metric-global-schema|append": [
-   0,
-   27
-  ],
-  "metric-global-schema|backfill": [
-   0,
-   18
-  ],
-  "metric-global-schema|correct": [
-   0,
-   27
-  ],
-  "metric-global-schema|addcol": [
-   0,
-   18
-  ],
-  "metric-global-schema|status": [
-   18,
-   18
-  ],
-  "metric-global-schema|revision": [
-   27,
-   27
-  ],
-  "metric-global-schema|dupload": [
-   18,
-   27
-  ],
-  "metric-global-schema|dimhist": [
-   9,
-   9
-  ],
-  "metric-global-schema|latekey": [
-   27,
-   27
-  ],
-  "metric-global-schema|unit": [
-   26,
-   26
-  ],
-  "metric-global-schema|mirror": [
-   18,
-   18
-  ],
   "traj-global|holdout": [
    0,
    45
@@ -954,6 +1015,150 @@
   ],
   "traj-global|mirror": [
    0,
+   18
+  ],
+  "metric-global-def|holdout": [
+   0,
+   45
+  ],
+  "metric-global-def|append": [
+   0,
+   27
+  ],
+  "metric-global-def|backfill": [
+   0,
+   18
+  ],
+  "metric-global-def|correct": [
+   0,
+   27
+  ],
+  "metric-global-def|addcol": [
+   0,
+   18
+  ],
+  "metric-global-def|status": [
+   0,
+   18
+  ],
+  "metric-global-def|revision": [
+   0,
+   27
+  ],
+  "metric-global-def|dupload": [
+   0,
+   27
+  ],
+  "metric-global-def|dimhist": [
+   0,
+   9
+  ],
+  "metric-global-def|latekey": [
+   0,
+   27
+  ],
+  "metric-global-def|unit": [
+   27,
+   27
+  ],
+  "metric-global-def|mirror": [
+   0,
+   18
+  ],
+  "metric-global-exref|holdout": [
+   0,
+   45
+  ],
+  "metric-global-exref|append": [
+   0,
+   27
+  ],
+  "metric-global-exref|backfill": [
+   0,
+   18
+  ],
+  "metric-global-exref|correct": [
+   0,
+   27
+  ],
+  "metric-global-exref|addcol": [
+   0,
+   18
+  ],
+  "metric-global-exref|status": [
+   0,
+   18
+  ],
+  "metric-global-exref|revision": [
+   0,
+   27
+  ],
+  "metric-global-exref|dupload": [
+   0,
+   27
+  ],
+  "metric-global-exref|dimhist": [
+   0,
+   9
+  ],
+  "metric-global-exref|latekey": [
+   0,
+   27
+  ],
+  "metric-global-exref|unit": [
+   27,
+   27
+  ],
+  "metric-global-exref|mirror": [
+   0,
+   18
+  ],
+  "metric-global-noguard|holdout": [
+   0,
+   45
+  ],
+  "metric-global-noguard|append": [
+   0,
+   27
+  ],
+  "metric-global-noguard|backfill": [
+   0,
+   18
+  ],
+  "metric-global-noguard|correct": [
+   0,
+   27
+  ],
+  "metric-global-noguard|addcol": [
+   0,
+   18
+  ],
+  "metric-global-noguard|status": [
+   18,
+   18
+  ],
+  "metric-global-noguard|revision": [
+   27,
+   27
+  ],
+  "metric-global-noguard|dupload": [
+   18,
+   27
+  ],
+  "metric-global-noguard|dimhist": [
+   9,
+   9
+  ],
+  "metric-global-noguard|latekey": [
+   27,
+   27
+  ],
+  "metric-global-noguard|unit": [
+   27,
+   27
+  ],
+  "metric-global-noguard|mirror": [
+   18,
    18
   ],
   "metric-global-revoke|holdout": [
@@ -1004,51 +1209,99 @@
    0,
    18
   ],
-  "metric-global-def|holdout": [
+  "metric-global-schema|holdout": [
    0,
    45
   ],
-  "metric-global-def|append": [
+  "metric-global-schema|append": [
    0,
    27
   ],
-  "metric-global-def|backfill": [
+  "metric-global-schema|backfill": [
    0,
    18
   ],
-  "metric-global-def|correct": [
+  "metric-global-schema|correct": [
    0,
    27
   ],
-  "metric-global-def|addcol": [
+  "metric-global-schema|addcol": [
    0,
    18
   ],
-  "metric-global-def|status": [
+  "metric-global-schema|status": [
+   18,
+   18
+  ],
+  "metric-global-schema|revision": [
+   27,
+   27
+  ],
+  "metric-global-schema|dupload": [
+   19,
+   27
+  ],
+  "metric-global-schema|dimhist": [
+   9,
+   9
+  ],
+  "metric-global-schema|latekey": [
+   27,
+   27
+  ],
+  "metric-global-schema|unit": [
+   27,
+   27
+  ],
+  "metric-global-schema|mirror": [
+   18,
+   18
+  ],
+  "metric-global-snap|holdout": [
+   0,
+   45
+  ],
+  "metric-global-snap|append": [
+   0,
+   27
+  ],
+  "metric-global-snap|backfill": [
    0,
    18
   ],
-  "metric-global-def|revision": [
+  "metric-global-snap|correct": [
    0,
    27
   ],
-  "metric-global-def|dupload": [
+  "metric-global-snap|addcol": [
+   0,
+   18
+  ],
+  "metric-global-snap|status": [
+   0,
+   18
+  ],
+  "metric-global-snap|revision": [
    0,
    27
   ],
-  "metric-global-def|dimhist": [
+  "metric-global-snap|dupload": [
+   0,
+   27
+  ],
+  "metric-global-snap|dimhist": [
    0,
    9
   ],
-  "metric-global-def|latekey": [
+  "metric-global-snap|latekey": [
    0,
    27
   ],
-  "metric-global-def|unit": [
-   24,
+  "metric-global-snap|unit": [
+   27,
    27
   ],
-  "metric-global-def|mirror": [
+  "metric-global-snap|mirror": [
    0,
    18
   ],
@@ -1097,54 +1350,6 @@
    27
   ],
   "metric-global|mirror": [
-   0,
-   18
-  ],
-  "metric-global-exref|holdout": [
-   0,
-   45
-  ],
-  "metric-global-exref|append": [
-   0,
-   27
-  ],
-  "metric-global-exref|backfill": [
-   0,
-   18
-  ],
-  "metric-global-exref|correct": [
-   0,
-   27
-  ],
-  "metric-global-exref|addcol": [
-   0,
-   18
-  ],
-  "metric-global-exref|status": [
-   0,
-   18
-  ],
-  "metric-global-exref|revision": [
-   0,
-   27
-  ],
-  "metric-global-exref|dupload": [
-   0,
-   27
-  ],
-  "metric-global-exref|dimhist": [
-   0,
-   9
-  ],
-  "metric-global-exref|latekey": [
-   0,
-   27
-  ],
-  "metric-global-exref|unit": [
-   27,
-   27
-  ],
-  "metric-global-exref|mirror": [
    0,
    18
   ],
@@ -1198,145 +1403,35 @@
   ]
  },
  "events": {
-  "metric-global-schema|append": {
-   "maintenance": 11
-  },
-  "metric-global-schema|backfill": {
-   "maintenance": 7
-  },
-  "metric-global-schema|correct": {
-   "maintenance": 11
-  },
-  "metric-global-schema|addcol": {
-   "maintenance": 7
-  },
-  "metric-global-schema|status": {
-   "maintenance": 7
-  },
-  "metric-global-schema|revision": {
-   "maintenance": 11
-  },
-  "metric-global-schema|dupload": {
-   "maintenance": 11
-  },
-  "metric-global-schema|dimhist": {
-   "maintenance": 3
-  },
-  "metric-global-schema|latekey": {
-   "maintenance": 11
-  },
-  "metric-global-schema|unit": {
-   "maintenance": 11
-  },
-  "metric-global-schema|mirror": {
-   "maintenance": 7
-  },
-  "metric-global-revoke|append": {
-   "revoked": 13,
-   "maintenance": 13,
-   "promoted": 12,
-   "candidate": 2,
-   "corroborated": 1,
-   "ref_rejected": 2
-  },
-  "metric-global-revoke|backfill": {
-   "revoked": 8,
-   "maintenance": 8,
-   "promoted": 4,
-   "candidate": 3,
-   "ref_rejected": 1,
-   "corroborated": 2
-  },
-  "metric-global-revoke|correct": {
-   "revoked": 13,
-   "maintenance": 13,
-   "promoted": 14,
-   "corroborated": 1,
-   "candidate": 1
-  },
-  "metric-global-revoke|addcol": {
-   "revoked": 8,
-   "maintenance": 8,
-   "promoted": 9,
-   "corroborated": 1,
-   "ref_rejected": 1
-  },
-  "metric-global-revoke|status": {
-   "revoked": 8,
-   "maintenance": 8,
-   "promoted": 4,
-   "corroborated": 1,
-   "candidate": 5,
-   "ref_rejected": 2
-  },
-  "metric-global-revoke|revision": {
-   "revoked": 13,
-   "maintenance": 13,
-   "promoted": 13,
-   "candidate": 1,
-   "corroborated": 2
-  },
-  "metric-global-revoke|dupload": {
-   "revoked": 13,
-   "maintenance": 13,
-   "candidate": 16,
-   "ref_rejected": 2
-  },
-  "metric-global-revoke|dimhist": {
-   "revoked": 5,
-   "maintenance": 5,
-   "promoted": 5,
-   "candidate": 1
-  },
-  "metric-global-revoke|latekey": {
-   "revoked": 13,
-   "maintenance": 13,
-   "promoted": 11,
-   "candidate": 2,
-   "corroborated": 3,
-   "ref_rejected": 1
-  },
-  "metric-global-revoke|unit": {
-   "revoked": 13,
-   "maintenance": 13,
-   "promoted": 14,
-   "corroborated": 2
-  },
-  "metric-global-revoke|mirror": {
-   "revoked": 8,
-   "maintenance": 8,
-   "candidate": 10,
-   "ref_rejected": 3
-  },
   "metric-global-def|append": {
-   "maintenance": 10
+   "maintenance": 13
   },
   "metric-global-def|backfill": {
-   "maintenance": 5
+   "maintenance": 9
   },
   "metric-global-def|correct": {
-   "maintenance": 10
+   "maintenance": 14
   },
   "metric-global-def|addcol": {
-   "maintenance": 5
+   "maintenance": 9
   },
   "metric-global-def|status": {
-   "revoked": 5,
-   "repair_candidate": 5,
-   "repair_promoted": 5,
-   "maintenance": 5
+   "revoked": 9,
+   "repair_candidate": 9,
+   "repair_promoted": 9,
+   "maintenance": 9
   },
   "metric-global-def|revision": {
-   "revoked": 10,
-   "repair_candidate": 10,
-   "repair_promoted": 10,
-   "maintenance": 10
+   "revoked": 13,
+   "repair_candidate": 13,
+   "repair_promoted": 13,
+   "maintenance": 13
   },
   "metric-global-def|dupload": {
-   "revoked": 11,
-   "repair_failed": 11,
-   "maintenance": 11,
-   "ref_rejected": 14
+   "revoked": 14,
+   "repair_failed": 14,
+   "maintenance": 14,
+   "ref_rejected": 5
   },
   "metric-global-def|dimhist": {
    "revoked": 5,
@@ -1346,106 +1441,52 @@
    "repair_skipped": 1
   },
   "metric-global-def|latekey": {
-   "revoked": 11,
-   "repair_skipped": 11,
-   "maintenance": 11,
+   "revoked": 14,
+   "repair_skipped": 14,
+   "maintenance": 14,
    "ref_rejected": 6
   },
   "metric-global-def|unit": {
-   "maintenance": 10
+   "maintenance": 13
   },
   "metric-global-def|mirror": {
-   "revoked": 5,
-   "repair_failed": 4,
-   "maintenance": 5,
-   "ref_rejected": 1,
-   "repair_skipped": 1
+   "revoked": 9,
+   "repair_failed": 5,
+   "maintenance": 9,
+   "repair_skipped": 4,
+   "ref_rejected": 4
   },
-  "metric-global|append": {
-   "maintenance": 12
+  "metric-global-exref|append": {
+   "maintenance": 13
   },
-  "metric-global|backfill": {
+  "metric-global-exref|backfill": {
    "maintenance": 9
   },
-  "metric-global|correct": {
-   "maintenance": 12
+  "metric-global-exref|correct": {
+   "maintenance": 13
   },
-  "metric-global|addcol": {
+  "metric-global-exref|addcol": {
    "maintenance": 9
   },
-  "metric-global|status": {
+  "metric-global-exref|status": {
    "revoked": 9,
    "repair_candidate": 9,
    "repair_promoted": 9,
    "maintenance": 9
   },
-  "metric-global|revision": {
-   "maintenance": 12,
-   "revoked": 10,
-   "repair_candidate": 10,
-   "repair_promoted": 10,
-   "repair_reused": 1
-  },
-  "metric-global|dupload": {
-   "revoked": 12,
-   "repair_failed": 12,
-   "maintenance": 12,
-   "ref_rejected": 8
-  },
-  "metric-global|dimhist": {
-   "revoked": 5,
-   "repair_candidate": 5,
-   "repair_promoted": 5,
-   "maintenance": 5
-  },
-  "metric-global|latekey": {
-   "revoked": 12,
-   "repair_skipped": 12,
-   "maintenance": 12,
-   "ref_rejected": 4
-  },
-  "metric-global|unit": {
-   "maintenance": 12
-  },
-  "metric-global|mirror": {
-   "revoked": 9,
-   "repair_failed": 5,
-   "maintenance": 9,
-   "repair_skipped": 4,
-   "ref_rejected": 3
-  },
-  "metric-global-exref|append": {
-   "maintenance": 12
-  },
-  "metric-global-exref|backfill": {
-   "maintenance": 8
-  },
-  "metric-global-exref|correct": {
-   "maintenance": 12
-  },
-  "metric-global-exref|addcol": {
-   "maintenance": 8
-  },
-  "metric-global-exref|status": {
-   "revoked": 8,
-   "repair_candidate": 8,
-   "repair_promoted": 8,
-   "maintenance": 8,
-   "repair_reused": 1
-  },
   "metric-global-exref|revision": {
-   "revoked": 12,
-   "repair_candidate": 12,
-   "repair_rejected": 6,
-   "maintenance": 12,
-   "repair_promoted": 6,
-   "repair_reused": 1
+   "revoked": 14,
+   "repair_candidate": 14,
+   "repair_rejected": 9,
+   "maintenance": 14,
+   "repair_reused": 4,
+   "repair_promoted": 5
   },
   "metric-global-exref|dupload": {
-   "revoked": 12,
-   "repair_failed": 12,
-   "maintenance": 12,
-   "ref_rejected": 6
+   "revoked": 13,
+   "repair_failed": 13,
+   "maintenance": 13,
+   "ref_rejected": 2
   },
   "metric-global-exref|dimhist": {
    "revoked": 4,
@@ -1454,20 +1495,233 @@
    "maintenance": 4
   },
   "metric-global-exref|latekey": {
-   "revoked": 12,
-   "repair_skipped": 12,
-   "maintenance": 12,
-   "ref_rejected": 3
+   "revoked": 14,
+   "repair_skipped": 14,
+   "maintenance": 14,
+   "ref_rejected": 4
   },
   "metric-global-exref|unit": {
-   "maintenance": 12
+   "maintenance": 14,
+   "ref_rejected": 1
   },
   "metric-global-exref|mirror": {
+   "revoked": 9,
+   "repair_failed": 4,
+   "maintenance": 9,
+   "repair_skipped": 5,
+   "ref_rejected": 3
+  },
+  "metric-global-revoke|append": {
+   "revoked": 14,
+   "maintenance": 14,
+   "promoted": 16,
+   "corroborated": 2
+  },
+  "metric-global-revoke|backfill": {
+   "revoked": 8,
+   "maintenance": 8,
+   "promoted": 7,
+   "corroborated": 4
+  },
+  "metric-global-revoke|correct": {
+   "revoked": 14,
+   "maintenance": 14,
+   "promoted": 16,
+   "corroborated": 2
+  },
+  "metric-global-revoke|addcol": {
+   "revoked": 8,
+   "maintenance": 8,
+   "promoted": 9,
+   "corroborated": 2
+  },
+  "metric-global-revoke|status": {
+   "revoked": 8,
+   "maintenance": 8,
+   "promoted": 6,
+   "corroborated": 2,
+   "candidate": 3
+  },
+  "metric-global-revoke|revision": {
+   "revoked": 14,
+   "maintenance": 14,
+   "promoted": 9,
+   "candidate": 5,
+   "corroborated": 3,
+   "ref_rejected": 1
+  },
+  "metric-global-revoke|dupload": {
+   "revoked": 14,
+   "maintenance": 14,
+   "candidate": 17,
+   "ref_rejected": 5
+  },
+  "metric-global-revoke|dimhist": {
+   "revoked": 4,
+   "maintenance": 4,
+   "promoted": 5,
+   "candidate": 1
+  },
+  "metric-global-revoke|latekey": {
+   "revoked": 14,
+   "maintenance": 14,
+   "promoted": 15,
+   "corroborated": 2,
+   "candidate": 1
+  },
+  "metric-global-revoke|unit": {
+   "revoked": 14,
+   "maintenance": 14,
+   "promoted": 17,
+   "corroborated": 1,
+   "ref_rejected": 1
+  },
+  "metric-global-revoke|mirror": {
+   "revoked": 8,
+   "maintenance": 8,
+   "candidate": 10,
+   "ref_rejected": 5
+  },
+  "metric-global-schema|append": {
+   "maintenance": 15
+  },
+  "metric-global-schema|backfill": {
+   "maintenance": 9
+  },
+  "metric-global-schema|correct": {
+   "maintenance": 14
+  },
+  "metric-global-schema|addcol": {
+   "maintenance": 9
+  },
+  "metric-global-schema|status": {
+   "maintenance": 9
+  },
+  "metric-global-schema|revision": {
+   "maintenance": 14
+  },
+  "metric-global-schema|dupload": {
+   "maintenance": 14
+  },
+  "metric-global-schema|dimhist": {
+   "maintenance": 6
+  },
+  "metric-global-schema|latekey": {
+   "maintenance": 14
+  },
+  "metric-global-schema|unit": {
+   "maintenance": 14
+  },
+  "metric-global-schema|mirror": {
+   "maintenance": 9
+  },
+  "metric-global-snap|append": {
+   "maintenance": 16
+  },
+  "metric-global-snap|backfill": {
+   "maintenance": 11
+  },
+  "metric-global-snap|correct": {
+   "maintenance": 16
+  },
+  "metric-global-snap|addcol": {
+   "maintenance": 11
+  },
+  "metric-global-snap|status": {
+   "revoked": 11,
+   "repair_candidate": 11,
+   "repair_promoted": 11,
+   "maintenance": 11,
+   "repair_reused": 1
+  },
+  "metric-global-snap|revision": {
+   "revoked": 15,
+   "repair_candidate": 15,
+   "repair_promoted": 15,
+   "maintenance": 15,
+   "repair_reused": 3
+  },
+  "metric-global-snap|dupload": {
+   "revoked": 17,
+   "repair_failed": 17,
+   "maintenance": 17,
+   "ref_rejected": 10
+  },
+  "metric-global-snap|dimhist": {
+   "revoked": 6,
+   "repair_candidate": 5,
+   "repair_promoted": 5,
+   "maintenance": 6,
+   "repair_skipped": 1
+  },
+  "metric-global-snap|latekey": {
+   "revoked": 17,
+   "repair_skipped": 17,
+   "maintenance": 17,
+   "ref_rejected": 5
+  },
+  "metric-global-snap|unit": {
+   "maintenance": 16
+  },
+  "metric-global-snap|mirror": {
+   "revoked": 11,
+   "repair_failed": 5,
+   "maintenance": 11,
+   "repair_skipped": 6,
+   "ref_rejected": 7
+  },
+  "metric-global|append": {
+   "maintenance": 12
+  },
+  "metric-global|backfill": {
+   "maintenance": 8
+  },
+  "metric-global|correct": {
+   "maintenance": 12
+  },
+  "metric-global|addcol": {
+   "maintenance": 8
+  },
+  "metric-global|status": {
+   "revoked": 8,
+   "repair_candidate": 8,
+   "repair_promoted": 8,
+   "maintenance": 8
+  },
+  "metric-global|revision": {
+   "revoked": 13,
+   "repair_candidate": 13,
+   "repair_promoted": 13,
+   "maintenance": 13,
+   "repair_reused": 2
+  },
+  "metric-global|dupload": {
+   "revoked": 13,
+   "repair_failed": 13,
+   "maintenance": 13,
+   "ref_rejected": 2
+  },
+  "metric-global|dimhist": {
+   "revoked": 6,
+   "repair_candidate": 6,
+   "repair_promoted": 6,
+   "maintenance": 6
+  },
+  "metric-global|latekey": {
+   "revoked": 14,
+   "repair_skipped": 14,
+   "maintenance": 14,
+   "ref_rejected": 7
+  },
+  "metric-global|unit": {
+   "maintenance": 12
+  },
+  "metric-global|mirror": {
    "revoked": 8,
    "repair_failed": 5,
    "maintenance": 8,
    "repair_skipped": 3,
-   "ref_rejected": 3
+   "ref_rejected": 7
   },
   "middle|append": {},
   "middle|backfill": {},
@@ -1520,17 +1774,22 @@
    0.0,
    0.0
   ],
-  "DeepSeek V4.1 Flash|metric-global-noguard": [
-   0.0,
-   0.0,
-   0.0
-  ],
-  "DeepSeek V4.1 Flash|metric-global-schema": [
-   0.0,
-   0.0,
-   0.0
-  ],
   "DeepSeek V4.1 Flash|traj-global": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def": [
+   507.3278250000003,
+   482.16233800000015,
+   611.8502340000002
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref": [
+   286.40974999999986,
+   333.0402869999999,
+   276.36373299999997
+  ],
+  "DeepSeek V4.1 Flash|metric-global-noguard": [
    0.0,
    0.0,
    0.0
@@ -1540,20 +1799,20 @@
    0.0,
    0.0
   ],
-  "DeepSeek V4.1 Flash|metric-global-def": [
-   272.49976399999986,
-   524.6341779999997,
-   292.6625550000001
+  "DeepSeek V4.1 Flash|metric-global-schema": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap": [
+   347.17576899999995,
+   279.63585600000005,
+   414.93632200000036
   ],
   "DeepSeek V4.1 Flash|metric-global": [
-   245.98104000000004,
-   346.0997900000001,
-   385.2292130000006
-  ],
-  "DeepSeek V4.1 Flash|metric-global-exref": [
-   385.54504400000013,
-   288.2610699999999,
-   352.944947
+   324.51028399999996,
+   345.6256589999999,
+   413.690607
   ],
   "DeepSeek V4.1 Flash|traj-verify": [
    0.0,

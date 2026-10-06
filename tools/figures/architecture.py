@@ -1,11 +1,12 @@
 """Figure 2: the MAVRA architecture as a vector drawing.
 
-The layout reads left to right: the learning side (agent A, MAVRA's built-in
-analysis optimizer, drawn inside MAVRA's area; admission) writes
+The layout reads left to right: the learning side (MAVRA's built-in analysis
+optimizer and LLM extractor, drawn as components inside MAVRA's area, then
+admission) writes
 into the shared store in the centre; condition maintenance and bounded repair
 sit under the store, so their write-backs go up into it; the use side
 (lookup) and the execution side (same-snapshot validation) read from it on
-the right for user agents B, C, ... (grey, outside MAVRA), and the revision
+the right for the user agents (3D, outside MAVRA), and the revision
 m^r a lookup returns is the one a query declares.
 The SQL database is one storage slab at the bottom: tables, their versions
 V(T), and the snapshot D_s a query runs on. No engine-specific names appear;
@@ -37,9 +38,8 @@ THIN, THICK = .22, .5                            # call or response; write to th
 
 LABELS = {
     'en': {
-        'agent_a': 'Agent A', 'agent_a_note': 'built-in analysis optimizer',
-        'extractor': 'LLM extractor',
-        'agents': 'User agents B, C, …', 'agents_note': 'questions with metric names only',
+        'opt': ('Analysis', 'optimizer'), 'ext': ('LLM', 'extractor'),
+        'agents': 'User agents', 'agents_note': 'questions with metric names only',
         'middleware': 'MAVRA middleware',
         'admission': 'Admission', 'candidate': 'candidate',
         'defs': 'Definitions', 'valid': 'valid', 'pending': 'pending', 'revoked': 'invalid',
@@ -47,7 +47,7 @@ LABELS = {
         'no_result': '? no result at current $V$', 'qc_result': '$Q_c$ result',
         'valid_mr': 'valid $m^r$', 'q_decl': '$q$ + declared $m^r$',
         'available': '$m^r$ available · SQL review', 'prov': 'provenance',
-        'shared': 'shared by all user agents', 'from_a': 'from A',
+        'shared': 'shared by all user agents', 'from_a': 'learned',
         'maint': 'Condition maintenance', 'maint_note': 'reuse result, else run $Q_c$',
         'repair': 'Bounded repair', 'repair_note': 'unique filter',
         'lookup': 'Lookup', 'lookup_note': 'compare versions $V(T)$',
@@ -65,9 +65,8 @@ LABELS = {
         'lines': ('call / response', 'shared-store write', 'read of database state'),
     },
     'zh': {
-        'agent_a': '智能体 A', 'agent_a_note': '内置分析优化器',
-        'extractor': '大模型提取器',
-        'agents': '用户端智能体 B、C 等', 'agents_note': '只给指标名的问题',
+        'opt': ('分析', '优化器'), 'ext': ('大模型', '提取器'),
+        'agents': '用户端智能体', 'agents_note': '只给指标名的问题',
         'middleware': 'MAVRA 中间件',
         'admission': '准入', 'candidate': '候选',
         'defs': '定义', 'valid': '有效', 'pending': '待验证', 'revoked': '已失效',
@@ -75,7 +74,7 @@ LABELS = {
         'no_result': '? 当前版本尚无结果', 'qc_result': '$Q_c$ 结果',
         'valid_mr': '有效 $m^r$', 'q_decl': '$q$ + 声明的 $m^r$',
         'available': '$m^r$ 可用 · SQL 审查', 'prov': '答案溯源',
-        'shared': '所有用户端智能体共享', 'from_a': '来自 A',
+        'shared': '所有用户端智能体共享', 'from_a': '学到',
         'maint': '条件维护', 'maint_note': '复用结果，否则执行 $Q_c$',
         'repair': '有界修复', 'repair_note': '唯一过滤',
         'lookup': '查找', 'lookup_note': '比较版本 $V(T)$',
@@ -105,8 +104,9 @@ TRACK = (109, 43.2, 27, 8)
 EXEC = (144, 24, 31, 27.2)
 FIELD_BOX = (1.5, 20, 175.5, 34.2)
 NODE_Y, NODE_H = 6, 8.4                  # front faces of the user agents
-INNER_Y = 7.6                            # front faces of MAVRA's own agent and extractor
-INNER = (1.5, .2, 47.0, 20.8)            # MAVRA's field reaches up around them
+OPT = (2.8, 6.0, 18.4, 10.4)             # MAVRA's built-in analysis optimizer
+EXT = (22.2, 6.0, 24.8, 10.4)            # LLM extractor
+INNER = (1.5, .2, 47.0, 20.8)            # MAVRA's field reaches up around both
 PG = (31, 59.7, 144, 11.0)               # the database slab
 DB_TABLES, DB_STATS, DB_SNAP = (76, 32), (110.5, 27), (143.5, 30)   # (x, w) of its three regions
 # One worked example, kept consistent across the figure: each condition reads one
@@ -139,20 +139,47 @@ def draw(s, lang):
                side, edge, .12)
         rect(x, y, w, h, face, edge, .16, r=.35)
 
-    def analyzer(x, y, w=9.5):
-        """MAVRA's built-in analysis optimizer: an analysis chart instead of a chat bubble."""
-        node(x, w, y, own=True)
-        text(x + 1.5, y + 4.9, 'A', TITLE + .6, ACC_DK, 'bold')
-        base = y + 6.6
-        for k, height in enumerate((2.0, 3.4, 4.8)):
-            rect(x + 4.6 + 1.35 * k, base - height, .95, height, ACC, None, r=.15)
-        s.line(x + 4.2, base + .2, x + w - .9, base + .2, '#7FA6D8', .2)
+    def two_lines(b, lines, x_text):
+        """Bold one- or two-line title of a component box, centred vertically."""
+        x, y, w, h = b
+        first, second = lines
+        room = x + w - x_text - .8
+        if second:
+            text(x_text, y + h / 2 - .35, first, TITLE, INK, 'bold', width=room)
+            text(x_text, y + h / 2 + 2.65, second, TITLE, INK, 'bold', width=room)
+        else:
+            text(x_text, y + h / 2 + 1.2, first, TITLE, INK, 'bold', width=room)
 
-    def agent(x, letter, w=9.5):
-        """A user-side agent: asks in natural language and holds the shared m_1^3."""
+    def optimizer(b):
+        """MAVRA's built-in analysis optimizer: a component, drawn like the others."""
+        x, y, w, h = b
+        box(b)
+        base = y + h / 2 + 2.6
+        for k, height in enumerate((2.0, 3.4, 4.8)):
+            rect(x + 1.4 + 1.35 * k, base - height, .95, height, ACC, None, r=.15)
+        s.line(x + 1.0, base + .25, x + 5.6, base + .25, '#7FA6D8', .2)
+        two_lines(b, L['opt'], x + 6.2)
+
+    def extractor(b):
+        x, y, w, h = b
+        box(b)
+        two_lines(b, L['ext'], x + 1.8)
+        gx, gy = x + w - 12.4, y + h / 2
+        cols = [(gx + 1.6, (-2.0, 2.0)), (gx + 6.0, (-2.6, 0, 2.6)), (gx + 10.4, (-1.3, 1.3))]
+        for (xa, ya), (xb, yb) in zip(cols, cols[1:]):
+            for y1 in ya:
+                for y2 in yb:
+                    s.line(xa, gy + y1, xb, gy + y2, RULE, .14)
+        for xc, ys in cols:
+            for yc in ys:
+                s.circle(xc, gy + yc, .62, WHITE, ACC, .2)
+
+    def agent(x, w=9.5):
+        """A user agent: a person asking in natural language, holding the shared m_1^3."""
         node(x, w)
         y = NODE_Y
-        text(x + 1.5, y + 4.6, letter, TITLE + .6, INK, 'bold')
+        s.circle(x + 2.25, y + 2.1, .85, '#8E8B85')
+        rect(x + 1.0, y + 3.15, 2.5, 1.5, '#8E8B85', None, r=.75)
         bx, bw = x + 4.3, w - 5.6               # speech bubble with two lines
         rect(bx, y + 1.0, bw, 3.4, ACC_PALE, ACC, .12, r=.7)
         for k, length in enumerate((bw - 1.4, bw - 2.3)):
@@ -205,34 +232,20 @@ def draw(s, lang):
         """Label centred over an arrow that crosses the gap from x0 to x1."""
         text((x0 + x1) / 2, y, label, NOTE, color, 'sans', 'center', width=x1 - x0 - .6)
 
-    # Field: MAVRA's area reaches up around its built-in agent and extractor ---
+    # Field: MAVRA's area reaches up around its built-in optimizer and extractor
     rect(*INNER, FIELD, None, r=1.4)
     rect(*FIELD_BOX, FIELD, None, r=1.4)
-    rect(STORE[0], 20.9, .55, 2.6, ACC)
-    text(STORE[0] + 1.5, 23.0, L['middleware'], TITLE - .4, ACC_DK, 'bold')
+    rect(3.0, 1.2, .55, 2.6, ACC)
+    text(4.5, 3.3, L['middleware'], TITLE - .4, ACC_DK, 'bold')
 
-    # Agents and extractor -------------------------------------------------
-    a_x, x_x, x_w = 4, 17, 14
-    analyzer(a_x, INNER_Y)
-    text(a_x + 4.75, 3.0, L['agent_a'], TITLE, ACC_DK, 'bold', 'center')
-    text(a_x, 5.35, L['agent_a_note'], NOTE, ACC_DK, width=INNER[0] + INNER[2] - a_x - 1)
-    node(x_x, x_w, INNER_Y, own=True)
-    text(x_x + x_w / 2, 3.0, L['extractor'], TITLE, ACC_DK, 'bold', 'center')
-    dy = INNER_Y - NODE_Y
-    cols = [(x_x + 2.6, (8.2 + dy, 12.2 + dy)), (x_x + 7, (7.6 + dy, 10.2 + dy, 12.8 + dy)),
-            (x_x + 11.4, (8.9 + dy, 11.5 + dy))]
-    for (xa, ya), (xb, yb) in zip(cols, cols[1:]):
-        for y1 in ya:
-            for y2 in yb:
-                s.line(xa, y1, xb, y2, RULE, .14)
-    for xc, ys in cols:
-        for yc in ys:
-            s.circle(xc, yc, .62, WHITE, ACC, .2)
+    # Built-in optimizer and extractor; user agents outside MAVRA ---------
+    optimizer(OPT)
+    extractor(EXT)
 
     b4, b8 = mid(LOOKUP)[0], mid(EXEC)[0]
     b_xs = (b4 - 4.75, b4 + 9.25, b4 + 23.25)
-    for x, letter in zip(b_xs, 'BCD'):
-        agent(x, letter)
+    for x in b_xs:
+        agent(x)
     for k in range(3):
         s.circle(b_xs[-1] + 13.2 + 1.6 * k, NODE_Y + NODE_H / 2, .32, EDGE)
     w = text(b_xs[0], 3.2, L['agents'], TITLE, INK, 'bold')
@@ -253,14 +266,15 @@ def draw(s, lang):
         route([(kx, y), (kx + 6.5, y)], color, sw, dash=dash, length=1.1)
         text(kx + 8.0, baseline(y, NOTE), label, NOTE, MUTED, width=b_xs[0] - kx - 10)
 
-    # Learning path: agent A -> admission -> store -------------------------
+    # Learning path: optimizer -> extractor -> admission -> store -------------------------
     ax, ay, aw, ah = ADM
     box(ADM)
-    a1, a2 = a_x + 4.75, x_x + x_w / 2
-    route([(a1, INNER_Y + NODE_H), (a1, ay)], LEARN, THIN)
+    a1, a2 = 7.5, EXT[0] + 1.6                 # optimizer and extractor arrows
+    ob, eb = OPT[1] + OPT[3], EXT[1] + EXT[3]
+    route([(a1, ob), (a1, ay)], LEARN, THIN)
     step(a1 - 2.8, 21.8, 1, LEARN)
-    route([(a2 - .9, ay), (a2 - .9, INNER_Y + NODE_H)], LEARN, THIN, length=1.0)
-    route([(a2 + .9, INNER_Y + NODE_H), (a2 + .9, ay)], LEARN, THIN, length=1.0)
+    route([(a2 - .9, ay), (a2 - .9, eb)], LEARN, THIN, length=1.0)
+    route([(a2 + .9, eb), (a2 + .9, ay)], LEARN, THIN, length=1.0)
     text(a2 - 2.3, 19.3, L['prov'], NOTE, MUTED, align='right', width=a2 - 2.3 - a1 - 1.0)
     text(a2 + 2.3, 19.3, L['candidate'], NOTE, MUTED, width=INNER[0] + INNER[2] - a2 - 3.0)
     step(a2 + 3.1, 21.9, 2, LEARN)

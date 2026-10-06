@@ -702,11 +702,14 @@ impl Middle {
 
     /// 执行 SQL，第一行须有一个单元格在答案精度上等于 `expect`（示例 SQL 常把中间量与结果放在同一行；
     /// 规范 SQL 只有一列）；执行失败算不通过。
-    /// G8 的学习时快照版本：参照查询与替代修订在同一个只读事务里、以保存学习时数据的模式为 search_path 执行。
-    async fn learned_snapshot_gate(&self, schema: &str, reference: &str, sql: &str, decimals: u32) -> Gate {
+    /// G8 的学习时快照版本：参照查询与替代修订在同一个只读事务里执行，数据是学习时快照——单独的快照库
+    /// （`schema` 为空），或同一库里保存学习时数据的模式（以它为 search_path）。
+    async fn learned_snapshot_gate(&self, db: &Db, schema: Option<&str>, reference: &str, sql: &str, decimals: u32) -> Gate {
         let run = async {
-            let snap = self.db.snapshot().await?;
-            snap.query(QKind::Metric, &format!("set local search_path to \"{schema}\"")).await?;
+            let snap = db.snapshot().await?;
+            if let Some(schema) = schema {
+                snap.query(QKind::Metric, &format!("set local search_path to \"{schema}\"")).await?;
+            }
             let r = snap.query(QKind::Metric, reference).await;
             let c = snap.query(QKind::Metric, sql).await;
             snap.commit().await?;
@@ -1275,9 +1278,11 @@ impl Middle {
         let g8 = match (&ev.judge, metric::compile(m, &ev.ask)) {
             (None, _) => Err("没有学习题判题查询，需业务方确认".into()),
             (_, Err(e)) => Err(format!("{e:#}")),
-            (Some(judge), Ok(sql)) => match &self.cfg.g8_snapshot {
-                Some(schema) => self.learned_snapshot_gate(schema, judge, &sql, ev.decimals).await,
-                None => match self.vquery(QKind::Metric, judge).await {
+            (Some(judge), Ok(sql)) => match (&self.learn_db, &self.cfg.g8_snapshot) {
+                (Some(ldb), _) => self.learned_snapshot_gate(ldb, None, judge, &sql, ev.decimals).await,
+                (None, Some(schema)) => self.learned_snapshot_gate(&self.db, Some(schema), judge, &sql, ev.decimals).await,
+                _ if self.cfg.g8_snapshot_db => Err("配置了学习时快照库，但没有连接".into()),
+                (None, None) => match self.vquery(QKind::Metric, judge).await {
                     Ok(r) => {
                         let expect = metric::parse_answer(r.cell(0, 0).unwrap_or("NULL"));
                         self.value_gate(&sql, &expect, ev.decimals).await

@@ -30,11 +30,11 @@ pub struct Options {
     #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "anthropic", "claude"])]
     extractor: String,
     /// metric-global 为条件级维护；-schema / -revoke / -def 只改变维护方式（只看结构、逐写入撤销后重新提炼、定义级重验）；
-    /// -exref 的修复回归以提炼出的示例 SQL 为参照；traj-verify 在轨迹检索基线上加一句“复用前先核对前提”的提示
+    /// -exref 的修复回归以提炼出的示例 SQL 为参照，-snap 同样的参照但在学习时快照库上比较；traj-verify 在轨迹检索基线上加一句“复用前先核对前提”的提示
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",
           value_parser = ["direct", "middle", "metric-local", "metric-global", "metric-global-noguard",
                           "metric-global-schema", "metric-global-revoke", "metric-global-def", "metric-global-exref",
-                          "traj-global", "traj-verify"])]
+                          "metric-global-snap", "traj-global", "traj-verify"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
     phrasings: Vec<String>,
@@ -462,6 +462,12 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         "metric-global-def" => (MiddleConfig { metric_maint: Maint::Definition, ..base }, true, true),
         // 条件级维护，但修复回归以提炼出的示例 SQL 为参照（部署中真正可得的参照），而不是基准的判题 SQL
         "metric-global-exref" => (MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, ..base }, true, true),
+        // 同上，但 G8 在学习时快照上比较：快照是单独建的、与 v1 内容相同的库，智能体的连接看不到它
+        "metric-global-snap" => (
+            MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, g8_snapshot_db: true, ..base },
+            true,
+            true,
+        ),
         // 匹配的轨迹检索基线：同样的中间层工具与学习题，学习成功的轨迹原样保存、按题面检索，不提炼、不维护；
         // traj-verify 只多一句提示：复用前先在当前数据上核对 SQL 依赖的前提
         "traj-global" | "traj-verify" => (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false),
@@ -510,6 +516,8 @@ struct Env<'a> {
     changes: &'a [Change],
     /// v1 的逐表内容指纹；每个场景回滚后核对
     v1: &'a BTreeMap<String, String>,
+    /// 学习时快照库的只读连接（有 `g8_snapshot_db` 的组时才建）
+    learn: Option<Arc<Db>>,
 }
 
 struct Cell<'a> {
@@ -777,7 +785,11 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     let cell = Cell { id: format!("r{repeat}-{mode}-{phrasing}"), mode, phrasing, repeat, system: system_text, tools };
     eprintln!("== {}", cell.id);
     scenario::ensure_v1(env.admin, env.v1, "上一组").await?;
-    let mid = Middle::new(db, cfg).await?;
+    let snapshot_db = cfg.g8_snapshot_db;
+    let mut mid = Middle::new(db, cfg).await?;
+    if snapshot_db {
+        mid.learn_db = Some(env.learn.clone().context("没有建学习时快照库")?);
+    }
     let defined = phrasing == "defined";
     let mut records = vec![];
     let mut learning = vec![];
@@ -889,6 +901,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     let root = Db::connect(url, 1, false)?;
     let mut isolated = reqwest::Url::parse(url)?;
     isolated.set_path(&format!("/{name}"));
+    let mut learn_url = isolated.clone();
     root.query(QKind::Meta, &format!("create database {name}")).await.context("创建隔离实验库失败（需要 CREATEDB）")?;
     let result: Result<Value> = async {
         let admin = Db::connect(isolated.as_str(), 2, false)?;
@@ -902,10 +915,25 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             let n = admin.query(QKind::Meta, &format!("select count(*) from {t}")).await?.i64(0, 0).unwrap_or(0);
             dataset.insert(t.into(), json!(n));
         }
+        // 学习时快照库：另建一个库、跑同一套确定性的数据生成，与 v1 的指纹核对一致后只读连接给 G8 用
+        let learn = if o.modes.iter().any(|m| config(m).0.g8_snapshot_db) {
+            root.query(QKind::Meta, &format!("create database {name}_learn")).await.context("创建学习时快照库失败")?;
+            learn_url.set_path(&format!("/{name}_learn"));
+            let la = Db::connect(learn_url.as_str(), 2, false)?;
+            la.query(QKind::Meta, &fixture(o.rows)).await?;
+            etl::setup(&la).await?;
+            scenario::setup(&la).await?;
+            ensure!(scenario::fingerprint(&la).await? == v1, "学习时快照库与 v1 内容不一致");
+            eprintln!("学习时快照库 {name}_learn 已建，内容与 v1 一致");
+            Some(Arc::new(Db::connect_timeout(learn_url.as_str(), 4, true, o.sql_timeout_secs)?))
+        } else {
+            None
+        };
         let probe = Db::connect(isolated.as_str(), 2, true)?;
         let db = Arc::new(Db::connect_timeout(isolated.as_str(), pool, true, o.sql_timeout_secs)?);
         let tasks = tasks(&o.metrics);
-        let env = Env { o: &o, admin: &admin, probe: &probe, agent: &agent, extractor: &extractor, tasks: &tasks, changes: &changes, v1: &v1 };
+        let env =
+            Env { o: &o, admin: &admin, probe: &probe, agent: &agent, extractor: &extractor, tasks: &tasks, changes: &changes, v1: &v1, learn };
         let mut cells = vec![];
         for r in 1..=o.repeats {
             // 每轮轮换组的执行顺序
@@ -946,6 +974,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     }
     .await;
     let cleanup = root.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
+    let _ = root.query(QKind::Meta, &format!("drop database if exists {name}_learn with (force)")).await;
     match result {
         Ok(mut report) => {
             report["database_cleaned_up"] = json!(cleanup.is_ok());

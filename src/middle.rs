@@ -125,6 +125,9 @@ pub struct MiddleConfig {
     /// 修复回归（G8）在学习时的快照上比较：参照查询与替代修订都在保存学习时数据的模式里执行。智能体的 SQL 只在
     /// 学习时的快照上被判对过，在当前数据上它本身可能已经过期。部署中对应数仓的 time travel；原型用准入前复制的模式
     pub g8_snapshot: Option<String>,
+    /// 修复回归（G8）在单独保存的学习时快照库上比较（库由调用方建好并设到 `Middle::learn_db`）。
+    /// 与 `g8_snapshot` 的区别：快照在另一个库里，智能体的连接看不到它
+    pub g8_snapshot_db: bool,
 }
 
 impl Default for MiddleConfig {
@@ -153,6 +156,7 @@ impl Default for MiddleConfig {
             wait_repair: true,
             g8_example: false,
             g8_snapshot: None,
+            g8_snapshot_db: false,
         }
     }
 }
@@ -335,6 +339,8 @@ pub struct Middle {
     maint_inflight: Mutex<HashMap<String, String>>,
     /// 设置后，LLM Agent 循环逐次记录工具调用（工作负载刻画用）
     pub trace: Option<crate::llm::Trace>,
+    /// 学习时快照库的只读连接（`MiddleConfig::g8_snapshot_db`）；G8 在其中比较
+    pub learn_db: Option<Arc<Db>>,
 }
 
 fn join_key(a: &str, b: &str) -> String {
@@ -425,6 +431,7 @@ impl Middle {
             ambiguous: Mutex::new(HashMap::new()),
             maint_inflight: Mutex::new(HashMap::new()),
             trace: None,
+            learn_db: None,
         })
     }
 

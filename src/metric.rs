@@ -395,6 +395,25 @@ const SQL_WORDS: &[&str] = &[
     "varchar",
 ];
 
+/// 把列前的表别名换成表名：`sr.sr_return_amt` → `store_returns.sr_return_amt`（规范 SQL 不给表起别名，提炼器却常照抄
+/// 智能体 SQL 里的别名）。只改写“前缀.列”中列属于 `allowed` 里某张表、前缀本身不是这些表名的情形；其余原样保留，
+/// 仍由 `check_expr` 判断。
+pub fn qualify_aliases(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog) -> String {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    let re = RE.get_or_init(|| Regex::new(r"\b([A-Za-z_][A-Za-z0-9_]*)\.([A-Za-z_][A-Za-z0-9_]*)\b").unwrap());
+    re.replace_all(expr, |c: &regex::Captures| {
+        let (prefix, col) = (c[1].to_lowercase(), &c[2]);
+        if allowed.contains(&prefix) {
+            return c[0].to_string();
+        }
+        match cat.table_of(&col.to_lowercase()) {
+            Some(t) if allowed.contains(t) => format!("{t}.{col}"),
+            _ => c[0].to_string(),
+        }
+    })
+    .into_owned()
+}
+
 /// 表达式只能引用 `allowed` 中表的列与少量函数、关键字；不允许子查询与多语句。
 pub fn check_expr(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog) -> std::result::Result<(), String> {
     if expr.contains(';') || expr.contains("/*") || expr.contains("--") {
@@ -807,6 +826,13 @@ mod tests {
         assert!(check_expr("sum(store_returns.sr_return_amt)", &allowed, &c).is_err());
         let both: BTreeSet<String> = ["store_sales".to_string(), "store_returns".to_string()].into_iter().collect();
         assert!(check_expr("100.0 * sum(store_returns.sr_return_amt) / sum(store_sales.ss_net_paid)", &both, &c).is_ok());
+        // 提炼器照抄的表别名改写成表名后可以通过；口径外的表、未知列与数字照旧
+        let e = qualify_aliases("ROUND(SUM(sr.sr_return_amt) / NULLIF(SUM(ss.ss_net_paid), 0) * 100.0, 2)", &both, &c);
+        assert_eq!(e, "ROUND(SUM(store_returns.sr_return_amt) / NULLIF(SUM(store_sales.ss_net_paid), 0) * 100.0, 2)");
+        assert!(check_expr(&e, &both, &c).is_ok());
+        assert_eq!(qualify_aliases("sum(sr.sr_return_amt)", &allowed, &c), "sum(sr.sr_return_amt)");
+        assert_eq!(qualify_aliases("sum(x.unknown_col)", &both, &c), "sum(x.unknown_col)");
+        assert_eq!(qualify_aliases("sum(store_sales.ss_net_paid)", &both, &c), "sum(store_sales.ss_net_paid)");
     }
 
     #[test]

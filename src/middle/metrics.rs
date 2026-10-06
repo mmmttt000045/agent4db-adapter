@@ -617,6 +617,11 @@ impl Middle {
             allowed.insert(j.left.clone());
             allowed.insert(j.right.clone());
         }
+        // 提炼器常照抄智能体 SQL 里的表别名，规范 SQL 不起别名：先把别名改写成表名再检查
+        m.measure = metric::qualify_aliases(&m.measure, &allowed, &self.cat);
+        for (t, f) in m.filters.iter_mut() {
+            *f = metric::qualify_aliases(f, &[t.clone()].into_iter().collect(), &self.cat);
+        }
         if let Err(e) = metric::check_expr(&m.measure, &allowed, &self.cat) {
             bad!("聚合表达式：{e}");
         }

@@ -99,3 +99,10 @@
   - (g1) `metric-global-snap` − `traj-global`：MAVRA 相对轨迹检索的优势；预期为正，与 d1（+17）相近。
   - (g2) `metric-global-snap` − `metric-global-exref`：比较位置的影响；预期正确率差别很小（定义失效后智能体会自行推出过滤），差别体现在每次运行发布的修复数（预期接近 `metric-global` 的 8.0，而不是 4.7）。
 - 报告规则同主方案第 6 条：全部报告，区间重叠时写“无可分辨差别”。其余比较只作描述，标明不在预先写定的方案内。
+
+## 准入修正后重跑（2026-10-06，写于启动运行之前）
+
+- 问题：提炼器常照抄智能体 SQL 里的表别名（如 `ROUND(SUM(sr.sr_return_amt) / SUM(ss.ss_net_paid) * 100, 2)`），而规范 SQL 不给表起别名，G3 以“sr 不是已知列”拒绝。本目录的每一批运行都有 1–4 个定义因此未准入（各方法都有），`metric-global-snap` 的第 2 次运行两个退货率候选都被拒，智能体 B 只能自己算退货率，留出与正常变化下也答错——与 G8 无关。
+- 修正（`metric::qualify_aliases`）：G3 检查前把“前缀.列”中列属于口径涉及的表、前缀不是表名的别名改写成表名；单元测试覆盖。
+- 重跑：所有依赖准入的方法——`metric-global-noguard`、`-schema`、`-revoke`、`-def`、`metric-global`、`-exref`、`-snap`——各 3 次独立重复，模型、数据、题目、变化、并发与之前相同，输出到 `results/scen-20261002/dsv41flash-r{1,2,3}-g3fix-*`。完成后把这些方法此前的 21 组写入 `replaced.txt`（不计分，文件保留）。不依赖准入的 `middle`、`traj-global`、`traj-verify` 不重跑。
+- 比较不变：预先写定的 a–e、g 各项按方法名在新的运行上重算；f、h 两组照旧标为补算。

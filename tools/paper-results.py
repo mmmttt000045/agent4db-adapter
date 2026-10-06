@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""论文结果：从实验原始输出生成 overleaf/gen/ 下的表格、pgfplots 坐标与正文数值宏，并写出汇总 JSON。
+"""论文结果：从实验原始输出生成 overleaf/gen/ 下的表格与正文数值宏，并写出汇总 JSON。
 
 用法（在 noctis 的仓库根目录）：
   python3 tools/paper-results.py --scen results/scen-20260930 --out overleaf/gen \
@@ -13,7 +13,7 @@
 - 学习阶段（学习题或提炼）出现服务失败的组整组剔除：没有学到定义的组不能代表该方法。
   撤销重学组某场景的重新学习失败时，剔除该组这一场景的计分题。
 - 方法之间按模型宏平均：先在每个模型内求正确率，再对有数据的模型取平均；汇总行再对场景等权平均。
-- 分模型的图只用该模型下六种方法都有有效题的场景，区间为场景内按题重抽样的 95% 百分位区间。
+- 分模型的数值只用该模型下六种方法都有有效题的场景，区间为场景内按题重抽样的 95% 百分位区间。
 - 过期使用：计分题中 find_metric 返回、或 SQL 声明了在该场景开始时审计为答错的修订（metric_use.bad_found / bad_executed）。
 - 维护数据库时间：maintenance 事件内计量的数据库时间（与 metric-bench 报告相同），按组求和后对组取平均。
 受控维护实验（maint-bench）的比值取正反两轮各自比值的算术平均，与论文表述一致。
@@ -66,7 +66,6 @@ COLOR = {  # 与正文导言的方法颜色一致
     "metric-global": "mCond",
     "metric-global-exref": "mCondExref",
 }
-STYLE = {mode: "bar" + c[1:] for mode, c in COLOR.items()}
 CLASSES = {  # 类别：英文、中文
     "none": ("None", "无变化"),
     "benign": ("Benign", "正常"),
@@ -292,21 +291,6 @@ def tex_heat_table(A):
     return "\n".join(lines) + "\n"
 
 
-def tex_model_bars(A):
-    """pgfplots：每种方法一条 \\addplot（x 为模型序号，y 为正确率，误差线为 95% 自助法区间），颜色与全文方法颜色一致。"""
-    out = []
-    for mode, en, zh in METHODS:
-        pts = []
-        for i, m in enumerate(MODEL_ORDER):
-            p, lo, hi, _ = per_model(A["acc"], m, mode)
-            if p is None:
-                continue
-            pts.append(f"({i},{100 * p:.1f}) += (0,{100 * max(0.0, hi - p):.1f}) -= (0,{100 * max(0.0, p - lo):.1f})")
-        out.append(rf"\addplot[{STYLE[mode]}] coordinates {{" + " ".join(pts) + "};")
-        out.append(rf"\addlegendentry{{\bt{{{en}}}{{{zh}}}}}")
-    return "\n".join(out) + "\n"
-
-
 def tex_cost_table(A):
     allp = [p for p, *_ in PHASES]
     changed = [p for p, *_ in PHASES[1:]]
@@ -358,22 +342,6 @@ def maint_ratios(fwd, rev):
                 pts.append((ndef, 100 * sum(rs) / len(rs)))
             out[(pol, tag)] = pts
     return out
-
-
-def tex_maint_plot(R):
-    """pgfplots：条件级与仅范围两种方法 × 错峰与同时到达，样式在正文导言定义（颜色区分方法，线型区分到达方式）。"""
-    out = []
-    legend = {("condition", "staggered"): (r"\system, staggered", r"\system，错峰"),
-              ("condition-scope", "staggered"): ("Scope-only, staggered", "仅范围，错峰"),
-              ("condition", "simultaneous"): (r"\system, simultaneous", r"\system，同时"),
-              ("condition-scope", "simultaneous"): ("Scope-only, simultaneous", "仅范围，同时")}
-    for key in [("condition", "staggered"), ("condition-scope", "staggered"), ("condition", "simultaneous"), ("condition-scope", "simultaneous")]:
-        pol, arr = key
-        style = ("maintCond" if pol == "condition" else "maintScope") + ("Stag" if arr == "staggered" else "Sim")
-        out.append(rf"\addplot[{style}] coordinates {{" + " ".join(f"({x},{y:.1f})" for x, y in R[key]) + "};")
-        en, zh = legend[key]
-        out.append(rf"\addlegendentry{{\bt{{{en}}}{{{zh}}}}}")
-    return "\n".join(out) + "\n"
 
 
 def numbers(A, dropped, cells, R):
@@ -496,9 +464,7 @@ def main():
                     f.write(f"\\newcommand{{\\{o.prefix}{k[4:]}}}{{{v}}}\n")
         return
     open(os.path.join(o.out, "scen-heat.tex"), "w", encoding="utf-8").write(gen + tex_heat_table(A))
-    open(os.path.join(o.out, "scen-models.tex"), "w", encoding="utf-8").write(gen + tex_model_bars(A))
     open(os.path.join(o.out, "scen-cost.tex"), "w", encoding="utf-8").write(gen + tex_cost_table(A))
-    open(os.path.join(o.out, "maint-ratio.tex"), "w", encoding="utf-8").write(gen + tex_maint_plot(R))
     q = numbers(A, dropped, cells, R)
     with open(os.path.join(o.out, "numbers.tex"), "w", encoding="utf-8") as f:
         f.write(gen)

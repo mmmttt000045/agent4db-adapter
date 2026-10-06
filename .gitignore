@@ -4,3 +4,4 @@ build.log
 .env.deepseek
 /results/
 /tools/deck/node_modules/
+__pycache__/

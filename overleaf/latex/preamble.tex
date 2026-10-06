@@ -11,17 +11,15 @@
 \usepackage{algpseudocode}
 \usepackage{booktabs}
 \usepackage{tabularx}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,fit}
+\usepackage{xcolor}
 \usepackage{colortbl}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{groupplots}
-% Method colors, fixed across every figure and table. Six slots in the CVD-validated order
-% (blue, orange, aqua, yellow, magenta, green), assigned in reverse along the bar order so
-% adjacent bars are validated pairs; scope-only (controlled benchmark only) uses violet.
-% Blue is reserved for MAVRA; accuracy shading uses a neutral ramp. The generic version-keyed cache
-% (cost figure and replay only) uses a neutral gray with its own marker and dash.
+\usepackage{graphicx}
+% Method colors, fixed across every figure and table; the figures (tools/figures/) read these
+% definitions, so a method has the same color in a figure and in a table swatch. Six slots in the
+% CVD-validated order (blue, orange, aqua, yellow, magenta, green), assigned in reverse along the
+% method order so neighbouring methods are validated pairs; scope-only (controlled benchmark only)
+% uses violet. Blue is reserved for MAVRA; accuracy shading uses a neutral ramp. The generic
+% version-keyed cache (cost figure and replay only) uses a neutral gray with its own marker and dash.
 \definecolor{mCond}{HTML}{2A78D6}
 \definecolor{mDef}{HTML}{EB6834}
 \definecolor{mRevoke}{HTML}{1BAF7A}
@@ -38,26 +36,6 @@
 \definecolor{inkmuted}{HTML}{52514E}
 \definecolor{gridline}{HTML}{DDDCD8}
 \newcommand{\swatch}[1]{\textcolor{#1}{\rule[-0.1ex]{0.8em}{0.8em}}}
-\pgfplotsset{
-  mavra/.style={font=\footnotesize, axis line style={inkmuted}, tick style={inkmuted}, tick label style={font=\scriptsize},
-    label style={font=\footnotesize}, legend style={font=\scriptsize, draw=none, fill=none}, legend cell align=left,
-    ymajorgrids, grid style={gridline, line width=0.3pt}, axis x line*=bottom, axis y line*=left},
-  bars/.style={area legend, line width=0.3pt, error bars/y dir=both, error bars/y explicit,
-    error bars/error bar style={black!75, line width=0.4pt}, error bars/error mark options={rotate=90, mark size=0.8pt, black!75}},
-  barNoShare/.style={bars, fill=mNoShare, draw=mNoShare!70!black},
-  barTraj/.style={bars, fill=mTraj, draw=mTraj!70!black},
-  barTrajVerify/.style={bars, fill=mTrajVerify, draw=mTrajVerify!70!black},
-  barCondExref/.style={bars, fill=mCondExref, draw=mCondExref!70!black},
-  barUnguarded/.style={bars, fill=mUnguarded, draw=mUnguarded!70!black},
-  barSchema/.style={bars, fill=mSchema, draw=mSchema!70!black},
-  barRevoke/.style={bars, fill=mRevoke, draw=mRevoke!70!black},
-  barDef/.style={bars, fill=mDef, draw=mDef!70!black},
-  barCond/.style={bars, fill=mCond, draw=mCond!70!black},
-  costCond/.style={mCond, line width=1pt, mark=*, mark size=1.6pt},
-  costCache/.style={mCache, line width=1pt, densely dashed, mark=triangle*, mark size=2pt, mark options={solid}},
-  costScope/.style={mScope, line width=1pt, densely dotted, mark=square*, mark size=1.5pt, mark options={solid}},
-}
-\usetikzlibrary{patterns,shapes.geometric,calc,backgrounds}
 \input{gen/numbers}
 \input{gen/review}
 \input{gen/numbers-prev}
@@ -84,7 +62,6 @@
 \newcommand{\system}{MAVRA}
 \newcommand{\bi}[2]{#1\par\ifbilingual #2\par\fi}
 \newcommand{\bt}[2]{#1\ifbilingual\space / #2\fi}
-\newcommand{\bl}[2]{#1\ifbilingual\\#2\fi}
 \newcommand{\bh}[2]{\begin{tabular}[b]{@{}c@{}}#1\ifbilingual\\#2\fi\end{tabular}}
 \newcommand{\bhl}[2]{\begin{tabular}[b]{@{}l@{}}#1\ifbilingual\\#2\fi\end{tabular}}
 \newcommand{\code}[1]{\texttt{#1}}

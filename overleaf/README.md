@@ -17,7 +17,7 @@
 | `sections/abstract.tex` | 中英文摘要、关键词与 `\maketitle` |
 | `sections/01-*.tex` 至 `10-*.tex` | 原论文的十个章节，编号和顺序不变 |
 | `sections/evaluation/` | 实验设置、有效性、并发、修复、维护代价与场景六个小节 |
-| `figures/` | 四幅 TikZ / pgfplots 图，包括标题与描述 |
+| `figures/` | 四幅图：`*.tex` 写标题、标签与描述，图本身是 [`tools/figures/build.py`](../tools/figures/README.md) 生成的矢量 PDF（`<名称>.pdf` 用于英文稿，`<名称>-zh.pdf` 用于双语稿），不要手改；另有算法 1 |
 | `tables/` | 八张表，包括标题和原有生成数据的加载位置 |
 | `references.tex` | 原样保留的 `thebibliography`，引用键与条目顺序不变 |
 | `gen/` | 实验统计脚本生成的数值宏、表格数据和绘图坐标；不要手改 |
@@ -49,7 +49,7 @@ Overleaf 的编译器需要在项目设置中选择；源码顶部的 `% !TeX pr
 ./build.sh pack  # 更新 mavra-sigmod-bilingual.zip，不需要 LaTeX 环境
 ```
 
-编译优先使用 `latexmk`：英文调用 pdfLaTeX，双语调用 XeLaTeX；也支持已有的 Tectonic 环境。ACM 文档类已随包提供；环境仍需提供其标准宏包依赖、TikZ、pgfplots、colortbl，以及双语模式下的 `ctex` / Fandol 字体。打包只需要 Python 3，包含官方文档类及其源码，并按 `\input` 依赖收集论文文件，不包含实验附件、编译缓存或无关生成文件。构建不会改写论文源文件。
+编译优先使用 `latexmk`：英文调用 pdfLaTeX，双语调用 XeLaTeX；也支持已有的 Tectonic 环境。ACM 文档类已随包提供；环境仍需提供其标准宏包依赖与 colortbl，以及双语模式下的 `ctex` / Fandol 字体。打包只需要 Python 3，包含官方文档类及其源码，并按 `\input` 与 `\includegraphics` 依赖收集论文文件，不包含实验附件、编译缓存或无关生成文件。构建不会改写论文源文件。
 
 ### 缺少标准宏包时
 
@@ -72,16 +72,23 @@ tlmgr path add
 
 | 生成文件 | 来源与生成脚本 |
 | --- | --- |
-| `gen/numbers.tex`、`gen/scen-*.tex` | `tools/paper-results.py`；原始场景结果在 noctis 的 `results/scen-20260930/`，汇总存档在 `exp/2026-10-01-scenarios/paper-results.json` |
-| `gen/review.tex`、`gen/cache-ratio-*.tex`、`gen/snapshot-stress.tex` | `tools/review-results.py`；本地存档在 `exp/2026-10-02-cache-baseline-tpcds/` |
+| `gen/numbers.tex`、`gen/scen-heat.tex`、`gen/scen-cost.tex` | `tools/paper-results.py`；原始场景结果在 noctis 的 `results/scen-20261002/`，汇总存档在 `exp/2026-10-02-scenarios-ds/paper-results.json` |
+| `gen/numbers-prev.tex` | `tools/paper-results.py --numbers-only`；此前一轮三模型实验，原始结果在 noctis 的 `results/scen-20260930/` |
+| `gen/scen-ds.tex` | `tools/scen-stats.py`；汇总存档在 `exp/2026-10-02-scenarios-ds/scen-stats.json` |
+| `gen/review.tex`、`gen/snapshot-stress.tex` | `tools/review-results.py`；本地存档在 `exp/2026-10-02-cache-baseline-tpcds/` |
+| `gen/session-latency.tex` | `tools/session-latency-stats.py --tex-out`；存档在 `exp/2026-10-03-session-latency/` |
+| `figures/*.pdf` | `tools/figures/build.py`；图 3、图 4 直接读取上面的 `cb-1m-share-stats.json` 与 `scen-stats.json` 存档，并与 `gen/` 中正文引用的数值逐一核对 |
 | 工作负载表中的数值 | `exp/2026-10-01-workload-characterization/` |
 
-从仓库根目录重新生成实验输出：
+在 noctis 的仓库根目录重新生成（2026-10-06 核对：前四条命令逐字节复现 `gen/` 中对应文件）：
 
 ```bash
-python3 tools/paper-results.py --scen results/scen-20260930 --out overleaf/gen \
-  --json exp/2026-10-01-scenarios/paper-results.json
+python3 tools/paper-results.py --scen results/scen-20260930 --prefix PrevScen --numbers-only overleaf/gen/numbers-prev.tex
+python3 tools/paper-results.py --scen results/scen-20261002 --models "DeepSeek V4.1 Flash" --out overleaf/gen \
+  --json exp/2026-10-02-scenarios-ds/paper-results.json
+python3 tools/scen-stats.py --scen results/scen-20261002 --json exp/2026-10-02-scenarios-ds/scen-stats.json --tex-out overleaf/gen
 python3 tools/review-results.py --exp exp/2026-10-02-cache-baseline-tpcds --out overleaf/gen
+python3 tools/figures/build.py
 ```
 
 场景生成命令需要服务器上完整的原始结果；正常编辑与编译不需要重新运行实验。研究状态与实现边界见 [docs/research-status.md](../docs/research-status.md)，实验索引见 [exp/README.md](../exp/README.md)，参考文献核对记录见 [docs/citation-audit-2026-10-01.md](../docs/citation-audit-2026-10-01.md)。

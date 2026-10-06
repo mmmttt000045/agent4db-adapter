@@ -30,11 +30,19 @@ def collect(path, stack=()):
     if path in files:
         return
     files.add(path)
-    for name in re.findall(r'\\input\{([^}]+)\}', (root / path).read_text(encoding='utf-8')):
+    source = (root / path).read_text(encoding='utf-8')
+    for name in re.findall(r'\\input\{([^}]+)\}', source):
         child = Path(name if name.endswith('.tex') else name + '.tex')
         if child.is_absolute() or '..' in child.parts:
             raise SystemExit(f'Input outside the paper directory: {child}')
         collect(child, (*stack, path))
+    for name in re.findall(r'\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}', source):
+        graphic = Path(name if Path(name).suffix else name + '.pdf')
+        if graphic.is_absolute() or '..' in graphic.parts:
+            raise SystemExit(f'Graphic outside the paper directory: {graphic}')
+        if not (root / graphic).is_file():
+            raise SystemExit(f'Missing graphic: {graphic}')
+        files.add(graphic)
 
 for entry in ('main.tex', 'main-en.tex'):
     collect(Path(entry))
@@ -69,8 +77,8 @@ check_dependencies() {
     hyperref.sty hyperxmp.sty graphicx.sty xcolor.sty geometry.sty
     manyfoot.sty cmap.sty libertine.sty zi4.sty newtxmath.sty
     amssymb.sty pifont.sty caption.sty float.sty comment.sty
-    fancyhdr.sty balance.sty amsmath.sty tabularx.sty tikz.sty
-    colortbl.sty pgfplots.sty algorithm.sty algpseudocode.sty
+    fancyhdr.sty balance.sty amsmath.sty tabularx.sty
+    colortbl.sty algorithm.sty algpseudocode.sty
   )
   local -a missing_files=()
   if [ "$target" != en ]; then

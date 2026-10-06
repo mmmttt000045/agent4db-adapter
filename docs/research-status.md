@@ -32,17 +32,18 @@ The manuscript uses the SIGMOD 2027 research submission layout with anonymous re
 | 增补方法 / Added end-to-end methods | DeepSeek V4.1 Flash × {MAVRA 智能体参照, 轨迹检索 + 自验证} × 3 次 / two added methods, three runs each | `results/scen-20261002/dsv41flash-r{1,2,3}-{exref,trajv}`（noctis），分析方案增补见 `exp/2026-10-02-scenarios-ds/README.md` |
 | 早期单模型端到端 / Earlier single-model run | 6 组，21 道计分题；论文只引用其准入拒绝与引言中的单期例子 / cited only for admission rejections and the introduction example | `exp/2026-09-30-metric-maint-named/report.md`、同目录的 `summary.txt`、`verified-results.json` |
 
-论文中第 2.1 节表格的数值直接写在正文里（来自上面两份工作负载证据）；第 7.6 节的场景表格、模型图和场景数值宏由 `tools/paper-results.py` 从原始输出生成到 `gen/`；机制层（第 7.2–7.5 节）的数值宏 `\Rp* \Sn* \Cb* \Eone* \Tp* \Wr* \Du*`、代价图坐标与随机并发表由 `tools/review-results.py` 从 `exp/2026-10-02-cache-baseline-tpcds` 的存档生成（实验数据统一保留在 `exp/`，Overleaf 工程只加载 `gen/` 的生成文件）：
+论文中第 2.1 节表格的数值直接写在正文里（来自上面两份工作负载证据）；第 7.6 节的场景表格和场景数值宏由 `tools/paper-results.py` 从原始输出生成到 `gen/`；机制层（第 7.2–7.5 节）的数值宏 `\Rp* \Sn* \Cb* \Eone* \Tp* \Wr* \Du*`与随机并发表由 `tools/review-results.py` 从 `exp/2026-10-02-cache-baseline-tpcds` 的存档生成（实验数据统一保留在 `exp/`，Overleaf 工程只加载 `gen/` 的生成文件）；论文的四幅图是 `tools/figures/build.py` 生成的矢量 PDF，图 3、图 4 直接读取 `exp/` 中的存档并与 `gen/` 的数值核对：
 
 ```bash
 # noctis，仓库根目录
 python3 tools/paper-results.py --scen results/scen-20260930 --prefix PrevScen --numbers-only overleaf/gen/numbers-prev.tex   # 此前一轮三模型（\PrevScen*）
 python3 tools/paper-results.py --scen results/scen-20261002 --models "DeepSeek V4.1 Flash" --out overleaf/gen --json exp/2026-10-02-scenarios-ds/paper-results.json
-python3 tools/scen-stats.py --scen results/scen-20261002 --json exp/2026-10-02-scenarios-ds/scen-stats.json --tex-out overleaf/gen   # 预定分析方案：整群自助法区间与预先声明的比较（\Ds*、图坐标）
+python3 tools/scen-stats.py --scen results/scen-20261002 --json exp/2026-10-02-scenarios-ds/scen-stats.json --tex-out overleaf/gen   # 预定分析方案：整群自助法区间与预先声明的比较（\Ds*）
 python3 tools/review-results.py --exp exp/2026-10-02-cache-baseline-tpcds --out overleaf/gen
+python3 tools/figures/build.py   # 四幅图：overleaf/figures/<名称>.pdf 与 <名称>-zh.pdf
 ```
 
-Section 2.1 values are written in the text from the two workload reports. Section 7's scenario table, both figures, and the in-text number macros are generated into `gen/` from raw outputs; rerun the script after the remaining scenario repetitions.
+Section 2.1 values are written in the text from the two workload reports. Section 7's scenario tables and the in-text number macros are generated into `gen/` from raw outputs; the four figures are vector PDFs drawn by `tools/figures/build.py`, which reads the archived results and checks them against `gen/`.
 
 ## 已支撑的结果 / Supported results
 

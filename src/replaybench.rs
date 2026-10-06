@@ -3,8 +3,9 @@
 //! 答案一律用当时提供的修订的规范 SQL（`metric::compile`）在当前数据上计算并与标准答案比较，即“智能体完全按定义作答”
 //! 时维护方式本身带来的正确、过期使用与不可用，排除了学习与作答的随机性。
 //!
-//! G8 参照有两种：judge = 学习题的判题 SQL（本文基准的做法，预先写入了状态与版本过滤）；example = 智能体学习时
-//! 自己写的 SQL（部署中真正可得的参照）。只影响修复，因此只对会修复的条件级与定义级各跑两种。
+//! G8 参照有两种：example = 智能体学习时自己写的 SQL（部署中真正可得的参照）；judge = 学习题的标准答案 SQL
+//! （本文基准的做法，预先写入了状态与版本过滤）。`--oracles` 的第一个是各方法共用的主参照（准入与修复回归都用它），
+//! 其后的参照只对条件级（MAVRA）再跑一遍。
 
 use crate::db::{Db, QKind};
 use crate::etl;
@@ -34,8 +35,8 @@ pub struct Options {
     #[arg(long, value_delimiter = ',', default_value = "condition,definition,definition-cache,schema,revoke,tabletest",
           value_parser = ["condition", "definition", "definition-cache", "schema", "revoke", "tabletest"])]
     policies: Vec<String>,
-    /// G8 参照（只对条件级与定义级区分；其余方式不修复，用 judge 准入）
-    #[arg(long, value_delimiter = ',', default_value = "judge,example", value_parser = ["judge", "example"])]
+    /// G8 参照：第一个为各方法共用的主参照（准入与修复回归都用它）；其后的参照只对条件级再跑一遍
+    #[arg(long, value_delimiter = ',', default_value = "example,judge", value_parser = ["judge", "example"])]
     oracles: Vec<String>,
     /// 负载：synthetic = 合成零售数据（按 --rows 生成）；tpcds = 从模板库复制真实 TPC-DS 数据（tools/tpcds-load.sh 装入），
     /// 变化为 `tpcds::Change`，库为 tools/tpcds-library.py 导出的模板定义库（留出题与标准答案随库给出）
@@ -290,6 +291,8 @@ fn db_ms(mid: &Middle) -> (f64, u64) {
 
 pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     let changes = o.changes.iter().map(|c| Ch::parse(&o.schema, c)).collect::<Result<Vec<_>>>()?;
+    ensure!(!o.oracles.is_empty(), "至少需要一种 G8 参照");
+    let primary = o.oracles[0].clone();
     let mut files = vec![];
     for l in &o.libs {
         find_cells(Path::new(l), &mut files)?;
@@ -338,11 +341,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 if policy == "tabletest" {
                     continue; // 不经中间层，见下面的表级测试基线
                 }
-                let oracles: Vec<&str> = if matches!(policy.as_str(), "condition" | "definition") {
-                    o.oracles.iter().map(String::as_str).collect()
-                } else {
-                    vec!["judge"]
-                };
+                let oracles: Vec<&str> =
+                    if policy == "condition" { o.oracles.iter().map(String::as_str).collect() } else { vec![primary.as_str()] };
                 for oracle in oracles {
                     specs.push((li, policy.clone(), oracle.to_string()));
                 }
@@ -373,6 +373,20 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         }))
         .await;
         let runs: Vec<Run> = seeded_runs.into_iter().collect::<Result<_>>()?;
+        // 表级测试不经准入；为与各方法逐题配对，只计主参照下每个实例都准入的条目（没有实例的库计全部条目）
+        let admitted: Vec<BTreeSet<usize>> = (0..libs.len())
+            .map(|li| {
+                let sets: Vec<BTreeSet<usize>> = runs
+                    .iter()
+                    .filter(|r| r.lib == li && r.oracle == primary)
+                    .map(|r| r.seeded.iter().map(|(ei, _, _)| *ei).collect())
+                    .collect();
+                match sets.split_first() {
+                    Some((first, rest)) => first.iter().copied().filter(|ei| rest.iter().all(|s| s.contains(ei))).collect(),
+                    None => (0..libs[li].entries.len()).collect(),
+                }
+            })
+            .collect();
 
         let (mut outcomes, mut maint) = (vec![], vec![]);
         for (ci, &ch) in changes.iter().enumerate() {
@@ -472,7 +486,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                     let bad: BTreeSet<String> =
                         tests.iter().filter(|x| x["failed"] == true).map(|x| x["table"].as_str().unwrap_or_default().to_string()).collect();
                     let mut used = 0;
-                    for (ei, e) in lib.entries.iter().enumerate().filter(|(_, e)| affected(e, ch)) {
+                    for (ei, e) in lib.entries.iter().enumerate().filter(|(ei, e)| admitted[li].contains(ei) && affected(e, ch)) {
                         used += 1;
                         let quarantined = e.metric.tables().iter().any(|t| bad.contains(t));
                         for (tid, _) in &e.held {
@@ -484,7 +498,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                                 (true, true) => "unavailable_unneeded",
                             };
                             outcomes.push(json!({
-                                "lib": lib.id, "policy": "tabletest", "oracle": "judge", "change": ch.name(), "entry": e.name, "def": e.def,
+                                "lib": lib.id, "policy": "tabletest", "oracle": primary, "change": ch.name(), "entry": e.name, "def": e.def,
                                 "task": tid, "status": if quarantined { "quarantined" } else { "valid" }, "revision": 0, "repaired": false,
                                 "value": (!quarantined).then(|| orig_value.clone()), "gold": gold[tid], "orig_value": orig_value,
                                 "orig_ok": orig_ok, "class": class,
@@ -492,7 +506,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                         }
                     }
                     maint.push(json!({
-                        "lib": lib.id, "policy": "tabletest", "oracle": "judge", "change": ch.name(), "entries_used": used,
+                        "lib": lib.id, "policy": "tabletest", "oracle": primary, "change": ch.name(), "entries_used": used,
                         "db_ms": d.db_ms, "queries": d.queries, "wall_ms": t0.elapsed().as_secs_f64() * 1000.0, "events": tests,
                     }));
                 }
@@ -525,8 +539,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 "pairing": "每个库在各维护方式下各有一个中间层实例，准入、变化、留出题完全相同；每个变化从 v1 施加，结束后回滚并恢复各实例的准入快照",
                 "answer": "答案 = 当时提供的修订的规范 SQL 在当前数据上的结果；不提供（撤销或候选）记为不可用",
                 "classes": "correct / served_wrong（提供了但答错：过期使用或错误修复）/ unavailable_needed（原定义已答错）/ unavailable_unneeded（原定义仍答对）",
-                "oracle": "judge = 学习题判题 SQL；example = 智能体学习时自己写的 SQL；只影响修复的 G8",
-                "tabletest": "dbt 式表级测试基线：按初始快照校准的 unique / not_null / relationships 测试，变化后全部重跑，失败的表上的定义全部隔离，不修复",
+                "oracle": "example = 智能体学习时自己写的 SQL；judge = 学习题的标准答案 SQL；第一个为各方法共用的主参照（准入与修复回归），其后的只对条件级再跑",
+                "tabletest": "dbt 式表级测试基线：按初始快照校准的 unique / not_null / relationships 测试，变化后全部重跑，失败的表上的定义全部隔离，不修复；只计主参照下准入的条目",
                 "db_time": "各实例按顺序评估，数据库耗时为评估前后中间层连接池计量的差值（答案查询走独立连接，不计入）",
             },
             "outcomes": outcomes, "maintenance": maint,

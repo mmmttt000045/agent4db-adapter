@@ -20,7 +20,7 @@
 \swatch{mDef}\ \bt{Full recheck per definition}{整定义重查} & \bt{rechecks a definition's conditions on use}{使用时重查该定义的全部条件} & \bt{is more than conditions and repair needed}{条件和修复之外是否还需要别的机制} & R, C, E\\
 \swatch{mCache}\ \bt{Full recheck + query cache}{整定义重查 + 查询缓存} & \bt{check queries cached by SQL text and version}{检查查询按 SQL 文本与表版本缓存} & \bt{whether the savings need typed conditions}{节省是否需要类型化条件} & C\\
 \swatch{mScope}\ \bt{Recheck changed tables only}{只重查变化的表} & \bt{rechecks changed tables' conditions, no reuse}{只重查变化表上的条件，不复用} & \bt{whether narrowing the scope alone saves work}{只缩小范围能否省工作} & C\\
-\swatch{mCond}\ \system & \bt{reuse by condition, same snapshot, as-of repair}{按条件复用、同快照、按学习时刻修复} & \bt{the system}{本文系统} & R, C, E\\
+\swatch{mCond}\ \bt{\system\ (ours)}{\system（本文）} & \bt{reuse by condition, same snapshot, as-of repair}{按条件复用、同快照、按学习时刻修复} & \bt{the system}{本文系统} & R, C, E\\
 \swatch{mCondCur}\ \bhl{\system, regression\\on current data}{\system，回归测试用当前数据} & \bt{regression test compares on current data}{回归测试在当前数据上比较} & \bt{what the as-of comparison adds}{按学习时刻比较带来什么} & R, E\\
 \swatch{mCondGold}\ \bt{\system, gold-SQL reference}{\system，标准答案作参照} & \bt{regression against the benchmark's gold SQL}{回归测试以基准的标准答案 SQL 为参照} & \bt{is the agent's SQL as good a reference}{智能体自己的 SQL 作参照是否够好} & R, E\\
 \bottomrule

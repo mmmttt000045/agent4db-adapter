@@ -80,7 +80,7 @@ def figure(lang):
             # Labels sit where the staggered lines are far apart.
             ax.text(2.4, 103, style.method('definition', lang)[0], color=ORANGE, fontsize=mplstyle.LABEL,
                     ha='left', va='bottom')
-            ax.text(9.2, 89.5, scope, color=scope_color, fontsize=mplstyle.LABEL, ha='left', va='bottom')
+            ax.text(20.6, 89.5, scope, color=scope_color, fontsize=mplstyle.LABEL, ha='right', va='bottom')
             cache, cache_color = style.method('definition-cache', lang)
             ax.text(5.0, 60, cache, color=cache_color, fontsize=mplstyle.LABEL, ha='left', va='bottom')
             mavra, mavra_color = style.method('condition', lang)

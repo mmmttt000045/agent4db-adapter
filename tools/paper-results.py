@@ -42,7 +42,7 @@ METHODS = [  # (mode, 英文, 中文)；全文统一的方法名（表 2）。me
     ("metric-global-schema", "Invalidate on schema change", "模式变更时失效"),
     ("metric-global-revoke", "Invalidate on every write", "每次写入即失效"),
     ("metric-global-def", "Full recheck per definition", "整定义重查"),
-    ("metric-global-snap", r"\system", r"\system"),
+    ("metric-global-snap", r"\system\ (ours)", r"\system（本文）"),
     ("metric-global-exref", r"\system, regression on current data", r"\system，回归测试用当前数据"),
     ("metric-global", r"\system, gold-SQL reference", r"\system，标准答案作参照"),
 ]

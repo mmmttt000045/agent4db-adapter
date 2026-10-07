@@ -44,14 +44,14 @@ METHODS = {
     'metric-global-schema': ('Invalidate on schema change', '模式变更时失效', 'mSchema'),
     'metric-global-revoke': ('Invalidate on every write', '每次写入即失效', 'mRevoke'),
     'metric-global-def': ('Full recheck per definition', '整定义重查', 'mDef'),
-    'metric-global-snap': ('MAVRA', 'MAVRA', 'mCond'),
+    'metric-global-snap': ('MAVRA (ours)', 'MAVRA（本文）', 'mCond'),
     'metric-global-exref': ('MAVRA, regression on current data', 'MAVRA，回归测试用当前数据', 'mCondCur'),
     'metric-global': ('MAVRA, gold-SQL reference', 'MAVRA，标准答案作参照', 'mCondGold'),
     'tabletest': ('dbt-style table tests', 'dbt 式表级测试', 'mTable'),
     'definition': ('Full recheck per definition', '整定义重查', 'mDef'),
     'definition-cache': ('Full recheck + query cache', '整定义重查 + 查询缓存', 'mCache'),
     'condition-scope': ('Recheck changed tables only', '只重查变化的表', 'mScope'),
-    'condition': ('MAVRA', 'MAVRA', 'mCond'),
+    'condition': ('MAVRA (ours)', 'MAVRA（本文）', 'mCond'),
     'condition-current': ('MAVRA, regression on current data', 'MAVRA，回归测试用当前数据', 'mCondCur'),
 }
 

@@ -2157,7 +2157,7 @@
    ]
   },
   "metric-global-snap": {
-   "name": "MAVRA",
+   "name": "MAVRA (ours)",
    "cells": 3,
    "provider_errors": 0,
    "all": {

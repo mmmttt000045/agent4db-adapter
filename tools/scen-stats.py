@@ -32,7 +32,7 @@ NAMES = {"middle": "No memory", "traj-global": "Example retrieval", "traj-verify
          "metric-global-noguard": "Never revalidated", "metric-global-schema": "Invalidate on schema change",
          "metric-global-revoke": "Invalidate on every write", "metric-global-def": "Full recheck per definition",
          "metric-global": "MAVRA, gold-SQL reference", "metric-global-exref": "MAVRA, regression on current data",
-         "metric-global-snap": "MAVRA"}
+         "metric-global-snap": "MAVRA (ours)"}
 PHASES = ["holdout", "append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"]
 GROUPS = {
     "all": PHASES,

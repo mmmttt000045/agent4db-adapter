@@ -355,8 +355,8 @@ takeaway(s, `并发写入下：先检查后执行 ${n('SnPreUnannMin')}–${n('S
 
 // 12 Step 4: bounded repair.
 s = slide('处理失效：三道关才发布修复，否则让它失效', '做法 · 处理失效', '论文 §5.3；算法 1；§7.4',
-  '条件不成立时，有两种结局：修好，或让它失效。修复只做一件事：在低基数列上找一个等值过滤。三道关：过滤后要恢复“一键一行”而且不丢任何业务键；候选过滤必须恰好一个；再通过准入检查，并在学习时快照上用学习题做回归测试。用两个例子说明为什么要“唯一”：状态变更行的例子里，“状态=完成”是唯一能恢复粒度的过滤，修复成功；备份副本的例子里，“来源=主库”和“来源=备份”都能恢复粒度，结构上分不出哪个是真实业务数据，所以让它失效。宁可不可用，也不发布可能错的修复。');
-const gates = [['恢复结构', '过滤后每个业务键一行，\n且不丢任何业务键', C.blue], ['候选唯一', '没有候选或多个候选，\n都让口径失效', C.purple], ['通过回归', '重新通过准入检查，\n在学习时快照上比对数值', C.green]];
+  '条件不成立时，有两种结局：修好，或让它失效。修复只做一件事：在低基数列上找一个等值过滤。三道关：过滤后要恢复“一键一行”而且不丢任何业务键；候选过滤必须恰好一个；再通过准入检查，并按学习时刻作 as-of 查询、用学习题做回归测试。用两个例子说明为什么要“唯一”：状态变更行的例子里，“状态=完成”是唯一能恢复粒度的过滤，修复成功；备份副本的例子里，“来源=主库”和“来源=备份”都能恢复粒度，结构上分不出哪个是真实业务数据，所以让它失效。宁可不可用，也不发布可能错的修复。');
+const gates = [['恢复结构', '过滤后每个业务键一行，\n且不丢任何业务键', C.blue], ['候选唯一', '没有候选或多个候选，\n都让口径失效', C.purple], ['通过回归', '重新通过准入检查，\n按学习时刻 as-of 比对数值', C.green]];
 gates.forEach(([head, body, color], i) => {
   step(s, 0.6 + i * 4.2, 1.7, 3.7, 2.15, i + 1, head, body, color, C.light, 15);
   if (i < 2) arrow(s, 4.33 + i * 4.2, 2.77, 4.77 + i * 4.2, 2.77);
@@ -390,7 +390,7 @@ takeaway(s, '系统层回答“维护对不对、贵不贵”，端到端回答�
 
 // 15 Q1 results.
 s = slide(`数据变化后：维护后的口径零错误答案，按模式变更失效 ${n('RpSchemaWrongModeled')} 个`, '实验 · 正确性', '论文 §7.2；gen/review.tex；图 4',
-  `定义库回放把同一个口径库放在不同维护方式下经历同样的变化，所以差异只来自维护；所有方法都用智能体自己的学习 SQL 作回归对照，在学习时快照上比较。在条件能发现的变化下，MAVRA 没有给出任何错误答案，按模式变更失效给出 ${n('RpSchemaWrongModeled')} 个；真实 TPC-DS 数据上是 ${n('TrCondWrongModeled')} 对 ${n('TrSchemaWrongModeled')}。dbt 式的表级测试也能让被破坏的口径失效，但不会修，少答对 ${integer(num('RpCondCorrect') - num('RpTableCorrect'))} 题。条件级、定义级和检查结果缓存三种重验方式逐题答案完全一样，说明端到端里它们的差异来自学到的库而不是维护。图里的 ${n('RpCondWrong')} 个错误全部来自单位换算这个对照，它不违反任何条件，论文明确把它划在边界之外。`);
+  `定义库回放把同一个口径库放在不同维护方式下经历同样的变化，所以差异只来自维护；所有方法都用智能体自己的学习 SQL 作回归对照，按学习时刻作 as-of 比较。在条件能发现的变化下，MAVRA 没有给出任何错误答案，按模式变更失效给出 ${n('RpSchemaWrongModeled')} 个；真实 TPC-DS 数据上是 ${n('TrCondWrongModeled')} 对 ${n('TrSchemaWrongModeled')}。dbt 式的表级测试也能让被破坏的口径失效，但不会修，少答对 ${integer(num('RpCondCorrect') - num('RpTableCorrect'))} 题。条件级、定义级和检查结果缓存三种重验方式逐题答案完全一样，说明端到端里它们的差异来自学到的库而不是维护。图里的 ${n('RpCondWrong')} 个错误全部来自单位换算这个对照，它不违反任何条件，论文明确把它划在边界之外。`);
 table(s, [
   ['维护方式', '答对', '答错', '其中：条件能发现的变化下答错'],
   ['按模式变更失效', n('RpSchemaCorrect'), n('RpSchemaWrong'), n('RpSchemaWrongModeled')],
@@ -496,14 +496,14 @@ s = slide('形式化：定义、命题 1、引理 1 与算法 1', '形式化', '
 tx(s, '修订  mʳ = (B, I, C, E, r)   业务含义 · 结构化实现 · 条件集 · 证据 · 修订号；规范 SQL 由 I 编译', 0.63, 1.62, 12.0, 0.45, 16.5, { color: C.blue, bold: true });
 card(s, 0.6, 2.25, 5.95, 1.95, '命题 1（充分性）', 'B1、B2 与 C(mʳ) 在快照 Dₛ 上成立 ⇒ 对每个期间 p，规范 SQL 返回角色日期落在 p 内的事件度量的聚合，每个事件恰好贡献一次；遗漏仅为日期键匹配不到日期维度的事件，其比例受完整性条件约束。', C.green, { size: 13.5, headSize: 16 });
 card(s, 6.75, 2.25, 5.95, 1.95, '引理 1（检查结果复用）', '两个快照 s₁、s₂ 中，条件 c 读到的每张表 T 的事务性版本相同 ⇒ c(D_{s₁}) = c(D_{s₂})。证明用快照嵌套与“写入和版本递增在同一事务提交”。', C.purple, { size: 13.5, headSize: 16 });
-card(s, 0.6, 4.4, 12.1, 1.7, '算法 1（有界修复）', '粒度条件失效 → 在低基数列上枚举等值过滤 → 保留恢复一键一行且不丢业务键的候选 → 候选恰好一个 → 通过准入检查 G3–G5 与学习时快照上的回归 G8 → 发布新修订；任一步失败则让口径失效。', C.orange, { size: 13.5, headSize: 16 });
+card(s, 0.6, 4.4, 12.1, 1.7, '算法 1（有界修复）', '粒度条件失效 → 在低基数列上枚举等值过滤 → 保留恢复一键一行且不丢业务键的候选 → 候选恰好一个 → 通过准入检查 G3–G5 与按学习时刻 as-of 的回归 G8 → 发布新修订；任一步失败则让口径失效。', C.orange, { size: 13.5, headSize: 16 });
 takeaway(s, '命题划定检测边界：取值变化、结构等价的总体、合法但错误的日期键不由结构条件证明。', 6.3, C.orange, C.paleOrange);
 
 // A2 Repair reference and the uniqueness counterexample.
-s = slide('回归测试放在学习时快照上做：不需要标准答案也能修好', '修复细节', '论文 §5.3、§7.4；gen/review.tex',
-  `问答备用。智能体的学习 SQL 只在学习时的那份数据上被判过对。MAVRA 把它和修复后的定义放在学习时快照上比较（数仓用 time travel，原型在准入时复制相关表）：同一批 ${n('RpCurPairN')} 道题答对 ${n('RpCurPairCond')} 道，多版本更正 ${n('RpCurRevisionCond')}/${n('RpCurRevisionN')}、缓慢变化维 ${n('RpCurDimhistCond')}/${n('RpCurDimhistN')} 全部修好。同样的测试放在当前数据上只答对 ${n('RpCurPairOther')} 道：多版本更正之后智能体的 SQL 会把旧版本也算进去，正确的修复也被拒绝。预先写入区分列的标准答案 SQL 答对 ${n('RpGoldPairOther')} 道。TPC-DS 上是 ${n('TrCurPairCond')} 对 ${n('TrCurPairOther')}（共 ${n('TrCurPairN')} 道）。端到端：每次运行自动修好 ${n('DsCondRepaired')} 个，G8 用当前数据时只有 ${n('DsCondCurRepaired')} 个；正确率 ${n('DsCondModeled')}% 对 ${n('DsCondCurModeled')}%，因为口径失效后智能体会自己推出过滤。备份副本反例：不要求候选唯一时，一个预见来源列的参照会让错误修复发布；要求唯一后都让口径失效。`, { appendix: true });
+s = slide('回归测试按学习时刻作 as-of 查询：不需要标准答案也能修好', '修复细节', '论文 §5.3、§7.4；gen/review.tex',
+  `问答备用。智能体的学习 SQL 只在学习时的那份数据上被判过对。MAVRA 把它和修复后的定义按学习时刻作 as-of 查询再比较（数仓用 time travel 回答 as-of 查询，原型在准入时保留一份表的副本）：同一批 ${n('RpCurPairN')} 道题答对 ${n('RpCurPairCond')} 道，多版本更正 ${n('RpCurRevisionCond')}/${n('RpCurRevisionN')}、缓慢变化维 ${n('RpCurDimhistCond')}/${n('RpCurDimhistN')} 全部修好。同样的测试放在当前数据上只答对 ${n('RpCurPairOther')} 道：多版本更正之后智能体的 SQL 会把旧版本也算进去，正确的修复也被拒绝。预先写入区分列的标准答案 SQL 答对 ${n('RpGoldPairOther')} 道。TPC-DS 上是 ${n('TrCurPairCond')} 对 ${n('TrCurPairOther')}（共 ${n('TrCurPairN')} 道）。端到端：每次运行自动修好 ${n('DsCondRepaired')} 个，G8 用当前数据时只有 ${n('DsCondCurRepaired')} 个；正确率 ${n('DsCondModeled')}% 对 ${n('DsCondCurModeled')}%，因为口径失效后智能体会自己推出过滤。备份副本反例：不要求候选唯一时，一个预见来源列的参照会让错误修复发布；要求唯一后都让口径失效。`, { appendix: true });
 table(s, [
-  ['同一批题：答对', 'G8 在学习时快照上（MAVRA）', 'G8 在当前数据上'],
+  ['同一批题：答对', 'G8 按学习时刻 as-of（MAVRA）', 'G8 在当前数据上'],
   [`定义库回放（${n('RpCurPairN')} 道）`, n('RpCurPairCond'), n('RpCurPairOther')],
   ['其中：多版本更正', `${n('RpCurRevisionCond')}/${n('RpCurRevisionN')}`, `${n('RpCurRevisionOther')}/${n('RpCurRevisionN')}`],
   ['其中：缓慢变化维', `${n('RpCurDimhistCond')}/${n('RpCurDimhistN')}`, `${n('RpCurDimhistOther')}/${n('RpCurDimhistN')}`],
@@ -511,7 +511,7 @@ table(s, [
 ], 0.6, 1.7, [4.6, 3.9, 3.6], 0.56, 15.5);
 card(s, 0.6, 4.6, 5.95, 1.55, '反例：追加备份副本', '不要求候选唯一时可发布错误修复；要求唯一时让口径失效。', C.orange, { size: 15, headSize: 17 });
 card(s, 6.75, 4.6, 5.95, 1.55, '修复期间等待', `同时到达的不可用从 ${n('WrCondOff')} 降为 0；后到的请求共享已有的维护结果。`, C.blue, { size: 15, headSize: 17 });
-takeaway(s, '参照只在它被判对的快照上可信；放回那个快照，就不需要标准答案。');
+takeaway(s, '参照只在它被判对的那个时刻的数据上可信；按那个时刻作 as-of 查询，就不需要标准答案。');
 
 // A3 Baseline coverage.
 s = slide('各类方法分别覆盖生命周期的哪些环节', '基线与定位', '论文 §2.4、表 3；概念对照',

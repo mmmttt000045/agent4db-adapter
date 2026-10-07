@@ -18,9 +18,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from vecfig import Scale, measure  # noqa: E402
+from matplotlib import transforms  # noqa: E402
+from matplotlib.gridspec import GridSpec  # noqa: E402
+from matplotlib.patches import Patch  # noqa: E402
+import mplstyle  # noqa: E402
 import style  # noqa: E402
-from style import ACC_PALE, GRID, INK, MUTED, RED, WHITE  # noqa: E402
+from style import ACC_PALE, INK, MUTED, RED, WHITE  # noqa: E402
 
 NAME = 'replay-outcomes'
 W, H = style.COLUMN, 64.0
@@ -54,7 +57,7 @@ TEXT = {
            'titles': ('学到的定义库：{libs} 个库，每种方法 {n} 题',
                       'TPC-DS SF1：{defs} 个模板导出的定义，{n} 题')},
 }
-LABEL, NUM, TICK, TITLE = 6.5, 6.0, 6.0, 7.0   # font sizes, pt (acmart \scriptsize 6, \footnotesize 7)
+LEFT, RIGHT = .40, .85          # axes span in figure fractions: labels left, DB seconds right
 
 
 def _int(n):
@@ -78,8 +81,7 @@ def load():
             style.agree(f'{prefix}{macro}DB', f'{db:.1f}', printed[f'{prefix}{macro}DB'])
             style.agree(f'{prefix}{macro}N', _int(cell['n']), printed[f'{prefix}{macro}N'])
             rows.append((key, mark, counts, db))
-        n = rows[0][2]
-        numbers = {'n': f'{sum(n):,}'}
+        numbers = {'n': f'{sum(rows[0][2]):,}'}
         if prefix == 'Rp':
             style.agree('RpLibs', str(stats['libraries']), printed['RpLibs'])
             numbers['libs'] = stats['libraries']
@@ -92,60 +94,52 @@ def load():
     return panels
 
 
-def draw(s, lang):
-    panels, T, text = load(), TEXT[lang], s.text
-
-    # Legend: one swatch per outcome, wrapped to the figure width.
-    x, y = 0, 2.6
-    for (_, _, fill, _), label in zip(OUTCOMES, T['outcomes']):
-        width = 2.2 + measure(label, LABEL) + 2.6
-        if x + width > W:
-            x, y = 0, y + 3.6
-        s.rect(x, y - 1.9, 1.6, 1.6, fill, None, r=.2)
-        text(x + 2.2, y - .35, label, LABEL, INK)
-        x += width
-    y += 2.2
-
-    def label_of(key, mark):
-        label, color = style.method(key, lang)
-        return label + (f'${{}}^{mark}$' if mark else ''), color
-    left = 2.4 + max(measure(label_of(key, mark)[0], LABEL) for _, key, _, mark in ROWS) + 1.4
-    right = W - 11.5
-    bar = Scale(0, 1, left, right)
-    pitch, height = 3.6, 2.6
-
-    text(W, y + 2.6, T['db'], LABEL - .5, MUTED, align='right')
-    for k, ((numbers, rows), title) in enumerate(zip(panels, T['titles'])):
-        text(0, y + 2.6, title.format(**numbers), TITLE, INK, 'bold', width=right - 1.0)
-        top = y + 4.2
-        bottom = top + pitch * len(rows)
-        for v in (.25, .5, .75):
-            s.line(bar(v), top, bar(v), bottom, GRID, .14)
-        for i, (key, mark, counts, db) in enumerate(rows):
-            yc = top + pitch * (i + .5)
-            label, color = label_of(key, mark)
+def figure(lang):
+    panels, T = load(), TEXT[lang]
+    fig = mplstyle.figure(W, H)
+    heights = [len(rows) for _, rows in panels]
+    gs = GridSpec(len(panels), 1, figure=fig, height_ratios=heights, hspace=.55,
+                  left=LEFT, right=RIGHT, top=.835, bottom=.085)
+    fig.legend(handles=[Patch(facecolor=fill, label=label) for (_, _, fill, _), label in zip(OUTCOMES, T['outcomes'])],
+               loc='upper left', bbox_to_anchor=(.0, 1.0), ncol=4, handlelength=1.0, handleheight=.9,
+               columnspacing=.9)
+    axes_width_pt = (RIGHT - LEFT) * W * 72 / 25.4
+    fig.text(.995, .905, T['db'], ha='right', va='center', fontsize=mplstyle.TICK, color=MUTED)
+    for k, (ax, (numbers, rows), title) in enumerate(zip([fig.add_subplot(g) for g in gs], panels, T['titles'])):
+        n = len(rows)
+        ys = list(range(n))[::-1]
+        swatch = transforms.blended_transform_factory(ax.transAxes, ax.transData)
+        for y, (key, mark, counts, db) in zip(ys, rows):
+            label, color = style.method(key, lang)
             if key == 'condition':
-                s.rect(0, yc - pitch / 2, W, pitch, ACC_PALE, None)
-            s.rect(0, yc - .8, 1.6, 1.6, color, None, r=.2)
-            text(2.4, yc + .8, label, LABEL, INK)
+                ax.axhspan(y - .5, y + .5, xmin=-1.0, xmax=1.6, color=ACC_PALE, lw=0, zorder=0, clip_on=False)
+            ax.scatter([-.015], [y], marker='s', s=11, color=color, transform=swatch, clip_on=False, zorder=3)
+            mplstyle.label_with_mark(ax, -.035, y, label, mark, swatch)
             total, done = sum(counts), 0
             for (_, _, fill, ink), count in zip(OUTCOMES, counts):
                 if count:
-                    x0, x1 = bar(done / total), bar((done + count) / total)
-                    s.rect(x0, yc - height / 2, x1 - x0, height, fill, WHITE, .12)
-                    number = f'{count:,}'
-                    if measure(number, NUM) + .35 <= x1 - x0:
-                        text((x0 + x1) / 2, yc + .75, number, NUM, ink, align='center')
+                    ax.barh(y, 100 * count / total, left=100 * done / total, height=.74, color=fill,
+                            edgecolor=WHITE, lw=.35, zorder=2)
+                    text = f'{count:,}'
+                    if axes_width_pt * count / total >= 3.0 * len(text) + 1.2:
+                        ax.text(100 * (done + count / 2) / total, y, text, ha='center', va='center',
+                                fontsize=mplstyle.TICK, color=ink, zorder=4)
                 done += count
-            text(W, yc + .8, f'{db:,.1f}', NUM, INK, align='right')
-        s.line(left, bottom, right, bottom, MUTED, .16)
+            ax.text(1.17, y, f'{db:,.1f}', transform=swatch, ha='right', va='center',
+                    fontsize=mplstyle.TICK, color=INK, clip_on=False)
+        ax.set_title(title.format(**numbers), loc='left', pad=3, x=-.47)
+        ax.set_xlim(0, 100)
+        ax.set_ylim(-.5, n - .5)
+        ax.set_yticks([])
+        ax.spines['left'].set_visible(False)
+        for v in (25, 50, 75):
+            ax.axvline(v, color=style.GRID, lw=.4, zorder=1)
         if k == len(panels) - 1:
-            for v in (0, .25, .5, .75, 1):
-                s.line(bar(v), bottom, bar(v), bottom + .7, MUTED, .16)
-                align = 'left' if v == 0 else 'right' if v == 1 else 'center'
-                dx = -.3 if v == 0 else .3 if v == 1 else 0
-                text(bar(v) + dx, bottom + 3.1, f'{round(100 * v)}%', TICK, MUTED, align=align)
-        y = bottom + 2.4
+            ax.set_xticks([0, 25, 50, 75, 100])
+            ax.set_xticklabels(['0%', '25%', '50%', '75%', '100%'])
+        else:
+            ax.set_xticks([])
+    return fig
 
 
 if __name__ == '__main__':

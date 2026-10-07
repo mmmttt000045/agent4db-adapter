@@ -1,16 +1,16 @@
 % 由 tools/paper-results.py 生成，请勿手改。
-\begin{tabular}{@{}lrrrrr@{}}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
-\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale tasks\\covered /\\other}{过期使用\\覆盖／其他} & \bh{Invalidated /\\repaired}{失效／修复} & \bh{Maint.\\DB (s)}{维护 DB 秒} & \bh{Input tok.\\(k)}{输入千 token}\\
+\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale tasks\\covered / other}{过期使用\\覆盖／其他} & \bh{Maint.\\DB (s)}{维护 DB 秒} & \bh{Input tok.\\(k)}{输入千 token}\\
 \midrule
-\swatch{mNoShare}\ \bhl{No sharing}{不共享} & 32 & 0 / 0 & -- & -- & 15.6\\
-\swatch{mTraj}\ \bhl{Trajectory retrieval}{轨迹检索} & 76 & 0 / 0 & -- & -- & 11.0\\
-\swatch{mTrajVerify}\ \bhl{Trajectory + self-check}{轨迹检索 + 自检} & 77 & 0 / 0 & -- & -- & 13.5\\
-\swatch{mUnguarded}\ \bhl{No validation}{共享不验证} & 75 & 99 / 45 & -- & 0 & 10.4\\
-\swatch{mSchema}\ \bhl{Schema-change\\invalidation}{按模式变更失效} & 75 & 100 / 45 & -- & 0 & 11.7\\
-\swatch{mRevoke}\ \bhl{Invalidate-on-write}{写入即失效} & 79 & 0 / 0 & 40.0 / 0.0 & 0 & 10.0\\
-\swatch{mDef}\ \bhl{Definition-level}{定义级} & 82 & 0 / 27 & 21.3 / 8.7 & 534 & 11.9\\
-\swatch{mCond}\ \bhl{\system}{\system} & 81 & 0 / 27 & 25.7 / 10.3 & 347 & 10.3\\
-\swatch{mCondCur}\ \bhl{\system, G8 on\\current data}{\system，G8 用当前数据} & 80 & 0 / 27 & 21.0 / 4.7 & 299 & 10.9\\
+\swatch{mNoShare}\ \bhl{No sharing}{不共享} & 32 & 0 / 0 & -- & 15.6\\
+\swatch{mTraj}\ \bhl{Trajectory retrieval}{轨迹检索} & 76 & 0 / 0 & -- & 11.0\\
+\swatch{mTrajVerify}\ \bhl{Trajectory + self-check}{轨迹检索 + 自检} & 77 & 0 / 0 & -- & 13.5\\
+\swatch{mUnguarded}\ \bhl{No validation}{共享不验证} & 75 & 99 / 45 & 0 & 10.4\\
+\swatch{mSchema}\ \bhl{Schema-change invalidation}{按模式变更失效} & 75 & 100 / 45 & 0 & 11.7\\
+\swatch{mRevoke}\ \bhl{Invalidate-on-write}{写入即失效} & 79 & 0 / 0 & 0 & 10.0\\
+\swatch{mDef}\ \bhl{Definition-level}{定义级} & 82 & 0 / 27 & 534 & 11.9\\
+\swatch{mCond}\ \bhl{\system}{\system} & 81 & 0 / 27 & 347 & 10.3\\
+\swatch{mCondCur}\ \bhl{\system, G8 on current data}{\system，G8 用当前数据} & 80 & 0 / 27 & 299 & 10.9\\
 \bottomrule
 \end{tabular}

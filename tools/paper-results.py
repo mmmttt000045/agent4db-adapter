@@ -66,8 +66,7 @@ COLOR = {  # 与正文导言的方法颜色一致
 }
 
 
-TABLE_EN = {"metric-global-schema": r"Schema-change\\invalidation",  # 窄栏表格里需要断行的方法名
-            "metric-global-exref": r"\system, G8 on\\current data"}
+TABLE_EN = {}  # 窄栏表格里需要断行的方法名（目前没有）
 
 
 def main_mode():
@@ -272,10 +271,9 @@ def tex_cost_table(A):
     changed = [p for p, *_ in PHASES[1:]]
     covered = [p for p, cls, *_ in PHASES if cls in ("grain", "fanout", "coverage")]
     other = [p for p in changed if p not in covered]
-    lines = [r"\begin{tabular}{@{}lrrrrr@{}}", r"\toprule"]
+    lines = [r"\begin{tabular}{@{}lrrrr@{}}", r"\toprule"]
     lines.append(
-        r"\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale tasks\\covered /\\other}{过期使用\\覆盖／其他}"
-        r" & \bh{Invalidated /\\repaired}{失效／修复}"
+        r"\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale tasks\\covered / other}{过期使用\\覆盖／其他}"
         r" & \bh{Maint.\\DB (s)}{维护 DB 秒} & \bh{Input tok.\\(k)}{输入千 token}\\"
     )
     lines.append(r"\midrule")
@@ -291,9 +289,8 @@ def tex_cost_table(A):
         ms = mean([x for (m, mo), xs in A["maint"].items() if mo == mode for x in xs])
         tk = mean([mean(xs) for (m, mo), xs in A["hold_tokens"].items() if mo == mode and xs])
         ms_s = "--" if mode in ("middle", "traj-global", "traj-verify") or ms is None else f"{ms:.0f}"
-        rr = "--" if mode in ("middle", "traj-global", "traj-verify", "metric-global-noguard", "metric-global-schema") else f"{rev:.1f} / {rep:.1f}"
         en = TABLE_EN.get(mode, en)  # 窄栏表格里把长方法名断成两行
-        lines.append(rf"\swatch{{{COLOR[mode]}}}\ \bhl{{{en}}}{{{zh}}} & {100 * v:.0f} & {st} & {rr} & {ms_s} & {tk / 1000:.1f}\\")
+        lines.append(rf"\swatch{{{COLOR[mode]}}}\ \bhl{{{en}}}{{{zh}}} & {100 * v:.0f} & {st} & {ms_s} & {tk / 1000:.1f}\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines) + "\n"
 

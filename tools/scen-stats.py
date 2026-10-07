@@ -2,7 +2,8 @@
 """场景主实验的统计，按 exp/2026-10-02-scenarios-ds/README.md 中预先写定的分析方案。
 
 用法：python3 tools/scen-stats.py --scen results/scen-20261002 [--json OUT] [--reps 4000] [--tex-out overleaf/gen]
---tex-out 时另写 scen-ds.tex（\\Ds* 数值宏）。逐情形热力图（tools/figures/scenario_changes.py）的末行直接读取 --json 的输出。
+--tex-out 时另写 scen-ds.tex（\\Ds* 数值宏）。逐情形正确率图（tools/figures/scenario_changes.py）直接读取 --json 的输出，
+包括每种方法 runs 里逐次运行的计数。
 
 - 计分题：留出题与各变化下重问的题；学习题与重新学习题不计分。
 - 服务端失败的题（outcome = error）不计分，单列数量；replaced.txt 中被整组重跑替换的原组不计。
@@ -206,6 +207,9 @@ def main():
         allk = [t for c in cs for t in c["tokens"]]
         row["turns_per_task"] = sum(allt) / len(allt) if allt else None
         row["input_tokens_per_task"] = sum(allk) / len(allk) if allk else None
+        # 每次运行的原始计数，供 tools/figures/scenario_changes.py 画出逐次运行的点
+        row["runs"] = [{"acc": c["acc"], "stale": c["stale"], "revoked": c["revoked"], "repaired": c["repaired"],
+                        "maint_s": c["maint_s"]} for c in cs]
         res["methods"][m] = row
         res["per_change"][m] = {p: rate(cs, [p]) for p in PHASES}
 

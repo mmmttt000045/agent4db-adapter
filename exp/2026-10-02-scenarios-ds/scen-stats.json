@@ -70,7 +70,216 @@
    "repaired_per_cell": 0.0,
    "maint_db_s_per_cell": 0.0,
    "turns_per_task": 6.045454545454546,
-   "input_tokens_per_task": 22881.905594405594
+   "input_tokens_per_task": 22881.905594405594,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       7,
+       15
+      ],
+      "append": [
+       4,
+       9
+      ],
+      "backfill": [
+       3,
+       6
+      ],
+      "correct": [
+       3,
+       9
+      ],
+      "addcol": [
+       4,
+       6
+      ],
+      "status": [
+       2,
+       6
+      ],
+      "revision": [
+       2,
+       9
+      ],
+      "dupload": [
+       2,
+       9
+      ],
+      "dimhist": [
+       0,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       2,
+       9
+      ],
+      "mirror": [
+       3,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       7,
+       15
+      ],
+      "append": [
+       3,
+       8
+      ],
+      "backfill": [
+       1,
+       5
+      ],
+      "correct": [
+       3,
+       9
+      ],
+      "addcol": [
+       4,
+       6
+      ],
+      "status": [
+       1,
+       6
+      ],
+      "revision": [
+       2,
+       9
+      ],
+      "dupload": [
+       2,
+       9
+      ],
+      "dimhist": [
+       0,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       2,
+       9
+      ],
+      "mirror": [
+       2,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       8,
+       15
+      ],
+      "append": [
+       3,
+       9
+      ],
+      "backfill": [
+       3,
+       6
+      ],
+      "correct": [
+       2,
+       9
+      ],
+      "addcol": [
+       4,
+       6
+      ],
+      "status": [
+       4,
+       6
+      ],
+      "revision": [
+       2,
+       9
+      ],
+      "dupload": [
+       2,
+       9
+      ],
+      "dimhist": [
+       0,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       2,
+       9
+      ],
+      "mirror": [
+       3,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    }
+   ]
   },
   "traj-global": {
    "name": "Trajectory retrieval",
@@ -129,7 +338,216 @@
    "repaired_per_cell": 0.0,
    "maint_db_s_per_cell": 0.0,
    "turns_per_task": 5.03125,
-   "input_tokens_per_task": 15749.225694444445
+   "input_tokens_per_task": 15749.225694444445,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       3,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       3,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       5,
+       9
+      ],
+      "mirror": [
+       5,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    }
+   ]
   },
   "traj-verify": {
    "name": "Trajectory + self-check",
@@ -188,7 +606,216 @@
    "repaired_per_cell": 0.0,
    "maint_db_s_per_cell": 0.0,
    "turns_per_task": 5.826388888888889,
-   "input_tokens_per_task": 21686.32986111111
+   "input_tokens_per_task": 21686.32986111111,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       5,
+       6
+      ],
+      "revision": [
+       8,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       5,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       8,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       5,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       3,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    }
+   ]
   },
   "metric-global-noguard": {
    "name": "No validation",
@@ -247,7 +874,216 @@
    "repaired_per_cell": 0.0,
    "maint_db_s_per_cell": 0.0,
    "turns_per_task": 4.663194444444445,
-   "input_tokens_per_task": 18038.128472222223
+   "input_tokens_per_task": 18038.128472222223,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       2,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 6,
+      "revision": 9,
+      "dupload": 6,
+      "dimhist": 3,
+      "latekey": 9,
+      "unit": 9,
+      "mirror": 6
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       6,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 6,
+      "revision": 9,
+      "dupload": 6,
+      "dimhist": 3,
+      "latekey": 9,
+      "unit": 9,
+      "mirror": 6
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       5,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 6,
+      "revision": 9,
+      "dupload": 6,
+      "dimhist": 3,
+      "latekey": 9,
+      "unit": 9,
+      "mirror": 6
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    }
+   ]
   },
   "metric-global-schema": {
    "name": "Schema-change invalidation",
@@ -306,7 +1142,216 @@
    "repaired_per_cell": 0.0,
    "maint_db_s_per_cell": 0.0,
    "turns_per_task": 4.600694444444445,
-   "input_tokens_per_task": 19545.8125
+   "input_tokens_per_task": 19545.8125,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       5,
+       9
+      ],
+      "mirror": [
+       3,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 6,
+      "revision": 9,
+      "dupload": 6,
+      "dimhist": 3,
+      "latekey": 9,
+      "unit": 9,
+      "mirror": 6
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 6,
+      "revision": 9,
+      "dupload": 6,
+      "dimhist": 3,
+      "latekey": 9,
+      "unit": 9,
+      "mirror": 6
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       3,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 6,
+      "revision": 9,
+      "dupload": 7,
+      "dimhist": 3,
+      "latekey": 9,
+      "unit": 9,
+      "mirror": 6
+     },
+     "revoked": 0,
+     "repaired": 0,
+     "maint_s": 0.0
+    }
+   ]
   },
   "metric-global-revoke": {
    "name": "Invalidate-on-write",
@@ -365,7 +1410,216 @@
    "repaired_per_cell": 0.0,
    "maint_db_s_per_cell": 0.0,
    "turns_per_task": 5.131944444444445,
-   "input_tokens_per_task": 24052.375
+   "input_tokens_per_task": 24052.375,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       8,
+       9
+      ],
+      "dupload": [
+       3,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       5,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 50,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       9,
+       9
+      ],
+      "dupload": [
+       2,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       5,
+       9
+      ],
+      "mirror": [
+       2,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 27,
+     "repaired": 0,
+     "maint_s": 0.0
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       3,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 0,
+      "mirror": 0
+     },
+     "revoked": 43,
+     "repaired": 0,
+     "maint_s": 0.0
+    }
+   ]
   },
   "metric-global-def": {
    "name": "Definition-level",
@@ -424,7 +1678,216 @@
    "repaired_per_cell": 8.666666666666666,
    "maint_db_s_per_cell": 533.7801323333337,
    "turns_per_task": 5.652777777777778,
-   "input_tokens_per_task": 30057.98611111111
+   "input_tokens_per_task": 30057.98611111111,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       9,
+       9
+      ],
+      "dupload": [
+       3,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 20,
+     "repaired": 9,
+     "maint_s": 507.32782500000036
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       9,
+       9
+      ],
+      "dupload": [
+       7,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 20,
+     "repaired": 7,
+     "maint_s": 482.16233800000003
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       9,
+       9
+      ],
+      "dupload": [
+       6,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       5,
+       9
+      ],
+      "mirror": [
+       3,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 24,
+     "repaired": 10,
+     "maint_s": 611.8502340000005
+    }
+   ]
   },
   "metric-global": {
    "name": "MAVRA (gold SQL)",
@@ -483,7 +1946,216 @@
    "repaired_per_cell": 9.0,
    "maint_db_s_per_cell": 361.2755166666666,
    "turns_per_task": 5.486111111111111,
-   "input_tokens_per_task": 28216.493055555555
+   "input_tokens_per_task": 28216.493055555555,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       9,
+       9
+      ],
+      "dupload": [
+       5,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 19,
+     "repaired": 8,
+     "maint_s": 324.51028399999996
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       9,
+       9
+      ],
+      "dupload": [
+       7,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 20,
+     "repaired": 9,
+     "maint_s": 345.62565899999987
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       9,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       0,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 23,
+     "repaired": 10,
+     "maint_s": 413.690607
+    }
+   ]
   },
   "metric-global-exref": {
    "name": "MAVRA, G8 on current data",
@@ -542,7 +2214,216 @@
    "repaired_per_cell": 4.666666666666667,
    "maint_db_s_per_cell": 298.6045899999999,
    "turns_per_task": 5.836805555555555,
-   "input_tokens_per_task": 31212.350694444445
+   "input_tokens_per_task": 31212.350694444445,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       8,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       8,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       7,
+       9
+      ],
+      "dupload": [
+       5,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 17,
+     "repaired": 3,
+     "maint_s": 286.40974999999986
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       8,
+       9
+      ],
+      "dupload": [
+       5,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       5,
+       9
+      ],
+      "mirror": [
+       3,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 21,
+     "repaired": 5,
+     "maint_s": 333.0402869999999
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       9,
+       9
+      ],
+      "dupload": [
+       6,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       5,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 25,
+     "repaired": 6,
+     "maint_s": 276.3637329999999
+    }
+   ]
   },
   "metric-global-snap": {
    "name": "MAVRA",
@@ -601,7 +2482,216 @@
    "repaired_per_cell": 10.333333333333334,
    "maint_db_s_per_cell": 347.24931566666675,
    "turns_per_task": 5.680555555555555,
-   "input_tokens_per_task": 32324.333333333332
+   "input_tokens_per_task": 32324.333333333332,
+   "runs": [
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       8,
+       9
+      ],
+      "dupload": [
+       6,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       2,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       3,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 27,
+     "repaired": 11,
+     "maint_s": 347.17576899999983
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       8,
+       9
+      ],
+      "dupload": [
+       4,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       4,
+       9
+      ],
+      "mirror": [
+       3,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 23,
+     "repaired": 9,
+     "maint_s": 279.63585600000016
+    },
+    {
+     "acc": {
+      "holdout": [
+       15,
+       15
+      ],
+      "append": [
+       9,
+       9
+      ],
+      "backfill": [
+       6,
+       6
+      ],
+      "correct": [
+       9,
+       9
+      ],
+      "addcol": [
+       6,
+       6
+      ],
+      "status": [
+       6,
+       6
+      ],
+      "revision": [
+       9,
+       9
+      ],
+      "dupload": [
+       6,
+       9
+      ],
+      "dimhist": [
+       3,
+       3
+      ],
+      "latekey": [
+       1,
+       9
+      ],
+      "unit": [
+       5,
+       9
+      ],
+      "mirror": [
+       4,
+       6
+      ]
+     },
+     "stale": {
+      "holdout": 0,
+      "append": 0,
+      "backfill": 0,
+      "correct": 0,
+      "addcol": 0,
+      "status": 0,
+      "revision": 0,
+      "dupload": 0,
+      "dimhist": 0,
+      "latekey": 0,
+      "unit": 9,
+      "mirror": 0
+     },
+     "revoked": 27,
+     "repaired": 11,
+     "maint_s": 414.93632200000036
+    }
+   ]
   }
  },
  "comparisons": {

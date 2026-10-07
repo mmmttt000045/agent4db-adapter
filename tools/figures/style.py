@@ -74,12 +74,21 @@ def agree(what, shown, printed):
 
 
 def build(figure, out=OUT):
-    """Write <name>.pdf and <name>-zh.pdf for a figure module."""
+    """Write <name>.pdf and <name>-zh.pdf for a figure module.
+
+    A module with figure(lang) is a matplotlib figure (see mplstyle.py); one
+    with draw(sheet, lang) is drawn with the vecfig kit.
+    """
     paths = []
     for lang, suffix in (('en', ''), ('zh', '-zh')):
         path = Path(out) / f'{figure.NAME}{suffix}.pdf'
-        sheet = Sheet(path, figure.W, figure.H)
-        figure.draw(sheet, lang)
-        sheet.save()
+        if hasattr(figure, 'figure'):
+            import mplstyle
+            mplstyle.setup(lang)
+            mplstyle.save(figure.figure(lang), path)
+        else:
+            sheet = Sheet(path, figure.W, figure.H)
+            figure.draw(sheet, lang)
+            sheet.save()
         paths.append(path)
     return paths

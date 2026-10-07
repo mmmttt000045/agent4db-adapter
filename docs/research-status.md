@@ -100,6 +100,10 @@ Compiled on noctis on 2026-10-04 after the abstract/introduction rewrite and the
 
 Compiled on noctis on 2026-10-07 after consolidating the figures and tables (Tables 3 and 4 removed and Table 2 given a studies column; the sharing figure and the by-group dot plot removed, the dot plot's intervals folded into the heatmap's last row; a TPC-DS panel added to the replay figure; abstract shortened; float separation 14pt): English 14 pages with the body ending about two thirds down the left column of page 13 (roughly 0.3 page over the 12-page body limit); bilingual 22 pages.
 
+2026-10-07 稍后：三张数据图改用 matplotlib 重画（`tools/figures/mplstyle.py`），主实验图由热力图改为每次运行一个小点的点图，右面板为每次运行的失效与修复数，表 4 去掉该列；页数不变（英文稿 14 页，正文仍在第 13 页左栏约三分之二处结束）。
+
+Later on 2026-10-07 the three data figures were redrawn with matplotlib (`tools/figures/mplstyle.py`); the main-experiment figure changed from a heatmap to a dot plot with one small dot per run and a right panel of invalidations and repairs per run, and Table 4 lost that column. Page count unchanged (English 14 pages, body still ending about two thirds down the left column of page 13).
+
 ## 10-03 补充实验与已回退的重构 / Supplementary experiments and the reverted restructure
 
 2026-10-03 晚曾把论文主线改写为“共享数据库知识与经验证的经验层”（标题 *Shared Database Knowledge and Verified Experience for Data Agents*）。2026-10-04 决定回退：该主线把贡献放宽到已有大量先例的共享记忆领域，而模型、命题、引理、算法和最强证据都只覆盖指标定义；新增主实验四组正确率相同，只在 token 与秒数上有差别。论文回到 `60d0783` 的主线（有效性模型、使用时的强制保证、有界修复）。重构稿 47 个源文件归档在 `exp/2026-10-03-shared-memory/overleaf-restructure-2026-10-03.tar.gz`，其验收记录见 [refactor-acceptance.md](refactor-acceptance.md)。

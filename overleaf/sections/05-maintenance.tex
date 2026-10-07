@@ -1,5 +1,6 @@
 \section{\bt{Admission, Maintenance, and Bounded Repair}{准入、维护与有界修复}}
 \label{sec:maintenance}
+\input{figures/lifecycle}
 \subsection{\bt{Admission from successful trajectories}{从成功轨迹准入}}
 \bi{Candidates are extracted only from tasks with explicit business evidence and a successful judgment. The extractor sees the question, the SQL and derivation of the answer provenance, rejected queries, and metadata, but no business rows or result values. Seven deterministic admission checks follow: a stated business basis; the judgment that the answer is correct; static well-formedness (columns exist, the measure uses only permitted columns, joins follow validated paths, and required grain filters are present without question literals); grain on the current snapshot; SQL review; replay of the example SQL; and replay of the canonical SQL compiled from the fields. The canonical replay checks what other agents will actually read, so a candidate that omits a filter or hard-codes a parameter fails it. Learning questions supply admission evidence; held-out questions only measure transfer.}
 {只从具备显式业务依据且判题成功的任务中提取候选。提取器能看到题面、答案溯源中的 SQL 与算式、被拦下的查询以及元数据，但看不到业务行和结果值。随后执行七项确定性的准入检查：业务依据；答案经判定正确；静态合法性（列存在、度量只用允许的列、连接沿已验证路径、包含必需的粒度过滤且不含题目字面量）；当前快照上的粒度；SQL 审查；示例 SQL 重放；由字段编译的规范 SQL 重放。规范 SQL 重放检查的是其他智能体实际会读到的内容，因此遗漏过滤或把参数写死的候选会失败。学习题提供准入证据，留出题只用于测量迁移。}

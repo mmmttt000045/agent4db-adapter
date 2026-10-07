@@ -7,7 +7,7 @@ templates on TPC-DS SF1. One 100% bar per method splits its questions into
 correct, wrong, and invalidated (correctly or falsely); maintenance database
 time sits at the right. All methods use the agent's own SQL as the G8
 reference, compared as of learning time; the last row of each panel repeats
-MAVRA with G8 on current data. Counts are over the questions every row
+MAVRA with the regression test on current data. Counts are over the questions every row
 answers (task_level_common). Data: exp/2026-10-02-cache-baseline-tpcds/
 replay-stats.json and tpcds-replay-stats.json, the archives that
 tools/review-results.py turns into the \\Rp* and \\Tr* macros; every count,
@@ -26,20 +26,19 @@ import style  # noqa: E402
 from style import ACC_PALE, INK, MUTED, RED, WHITE  # noqa: E402
 
 NAME = 'replay-outcomes'
-W, H = style.COLUMN, 64.0
+W, H = style.COLUMN, 66.0
 EXP = style.ROOT / 'exp/2026-10-02-cache-baseline-tpcds'
 
 # (replay group, method key in style.METHODS, macro key, footnote mark)
+# Invalidation on every write (answers nothing without relearning) and the query
+# cache (identical to the full recheck) are replayed but not drawn; see \Rp*.
 ROWS = [('schema/snapshot', 'metric-global-schema', 'Schema', ''),
         ('tabletest/snapshot', 'tabletest', 'Table', ''),
-        ('revoke/snapshot', 'metric-global-revoke', 'Revoke', 'a'),
         ('definition/snapshot', 'definition', 'Def', ''),
-        ('definition-cache/snapshot', 'definition-cache', 'Cache', ''),
         ('condition/snapshot', 'condition', 'Cond', ''),
-        ('condition/example', 'condition-current', 'Cur', 'b')]
-# The TPC-DS replay runs the methods whose outcome can differ from MAVRA's: the
-# definition-level baseline and the check-result cache give identical answers.
-TPCDS_ROWS = [r for r in ROWS if r[0] not in ('definition/snapshot', 'definition-cache/snapshot')]
+        ('condition/example', 'condition-current', 'Cur', 'a')]
+# The TPC-DS replay does not run the full recheck per definition.
+TPCDS_ROWS = [r for r in ROWS if r[0] != 'definition/snapshot']
 # (stats file, macro prefix, rows)
 PANELS = [('replay-stats.json', 'Rp', ROWS), ('tpcds-replay-stats.json', 'Tr', TPCDS_ROWS)]
 # (field, macro suffix, fill, text color)
@@ -58,6 +57,8 @@ TEXT = {
                       'TPC-DS SF1：{defs} 个模板导出的定义，{n} 题')},
 }
 LEFT, RIGHT = .40, .85          # axes span in figure fractions: labels left, DB seconds right
+# Labels too long for the margin are broken over two lines here.
+LABELS = {'condition-current': {'en': 'MAVRA, regression\non current data', 'zh': 'MAVRA，回归测试\n用当前数据'}}
 
 
 def _int(n):
@@ -111,6 +112,7 @@ def figure(lang):
         swatch = transforms.blended_transform_factory(ax.transAxes, ax.transData)
         for y, (key, mark, counts, db) in zip(ys, rows):
             label, color = style.method(key, lang)
+            label = LABELS.get(key, {}).get(lang, label)
             if key == 'condition':
                 ax.axhspan(y - .5, y + .5, xmin=-1.0, xmax=1.6, color=ACC_PALE, lw=0, zorder=0, clip_on=False)
             ax.scatter([-.015], [y], marker='s', s=11, color=color, transform=swatch, clip_on=False, zorder=3)

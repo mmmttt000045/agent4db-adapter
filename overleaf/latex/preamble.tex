@@ -68,7 +68,8 @@
 \newcommand{\bi}[2]{#1\par\ifbilingual #2\par\fi}
 \newcommand{\bt}[2]{#1\ifbilingual\space / #2\fi}
 \newcommand{\bh}[2]{\begin{tabular}[b]{@{}c@{}}#1\ifbilingual\\#2\fi\end{tabular}}
-\newcommand{\bhl}[2]{\begin{tabular}[b]{@{}l@{}}#1\ifbilingual\\#2\fi\end{tabular}}
+% Top-aligned so that a two-line method name starts on the row's baseline, next to its swatch.
+\newcommand{\bhl}[2]{\begin{tabular}[t]{@{}l@{}}#1\ifbilingual\\#2\fi\end{tabular}}
 \newcommand{\code}[1]{\texttt{#1}}
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
 \newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}

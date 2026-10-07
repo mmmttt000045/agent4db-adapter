@@ -1,9 +1,9 @@
 {
  "numbers": {
   "ScenModels": 1,
-  "ScenCells": 30,
+  "ScenCells": 27,
   "ScenCellsDropped": 24,
-  "ScenValidTasks": 2878,
+  "ScenValidTasks": 2590,
   "ScenQuotaTasks": 2,
   "ScenAccNoShare": "32",
   "ScenHoldoutNoShare": "49",
@@ -32,15 +32,6 @@
   "ScenStaleUnitTrajVerify": 0,
   "ScenTokTrajVerify": "21.7",
   "ScenMaintTrajVerify": "0.0",
-  "ScenAccNoguard": "75",
-  "ScenHoldoutNoguard": "100",
-  "ScenModeledNoguard": "58",
-  "ScenBenignNoguard": "100",
-  "ScenStaleNoguard": 144,
-  "ScenStaleModeledNoguard": 99,
-  "ScenStaleUnitNoguard": 27,
-  "ScenTokNoguard": "18.0",
-  "ScenMaintNoguard": "0.0",
   "ScenAccSchema": "75",
   "ScenHoldoutSchema": "100",
   "ScenModeledSchema": "59",
@@ -150,10 +141,10 @@
   "MaintStagMax": "37.8",
   "MaintSimMin": "44.6",
   "MaintSimMax": "75.5",
-  "ScenAgentTasks": "3,340",
-  "ScenLLMCalls": "17,914",
-  "ScenTokensM": "88",
-  "ScenAgentHours": "31"
+  "ScenAgentTasks": "3,022",
+  "ScenLLMCalls": "16,432",
+  "ScenTokensM": "82",
+  "ScenAgentHours": "30"
  },
  "cells": [
   {
@@ -178,12 +169,6 @@
    "file": "results/scen-20261002/dsv41flash-r1-g3fix--exref/metric-1791301425690493/cell-r1-metric-global-exref-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "metric-global-exref",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r1-g3fix--noguard/metric-1791301605743236/cell-r1-metric-global-noguard-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-noguard",
    "excluded_phases": []
   },
   {
@@ -241,12 +226,6 @@
    "excluded_phases": []
   },
   {
-   "file": "results/scen-20261002/dsv41flash-r2-g3fix--noguard/metric-1791305177073940/cell-r1-metric-global-noguard-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-noguard",
-   "excluded_phases": []
-  },
-  {
    "file": "results/scen-20261002/dsv41flash-r2-g3fix--revoke/metric-1791307728166081/cell-r1-metric-global-revoke-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "metric-global-revoke",
@@ -298,12 +277,6 @@
    "file": "results/scen-20261002/dsv41flash-r3-g3fix--exref/metric-1791308418459823/cell-r1-metric-global-exref-named.json",
    "model": "DeepSeek V4.1 Flash",
    "mode": "metric-global-exref",
-   "excluded_phases": []
-  },
-  {
-   "file": "results/scen-20261002/dsv41flash-r3-g3fix--noguard/metric-1791309498901785/cell-r1-metric-global-noguard-named.json",
-   "model": "DeepSeek V4.1 Flash",
-   "mode": "metric-global-noguard",
    "excluded_phases": []
   },
   {
@@ -625,54 +598,6 @@
    27
   ],
   "DeepSeek V4.1 Flash|metric-global-exref|mirror": [
-   11,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|holdout": [
-   45,
-   45
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|append": [
-   27,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|backfill": [
-   18,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|correct": [
-   27,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|addcol": [
-   18,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|status": [
-   9,
-   18
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|revision": [
-   20,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|dupload": [
-   12,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|dimhist": [
-   9,
-   9
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|latekey": [
-   6,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|unit": [
-   12,
-   27
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard|mirror": [
    11,
    18
   ],
@@ -1111,54 +1036,6 @@
   ],
   "metric-global-exref|mirror": [
    0,
-   18
-  ],
-  "metric-global-noguard|holdout": [
-   0,
-   45
-  ],
-  "metric-global-noguard|append": [
-   0,
-   27
-  ],
-  "metric-global-noguard|backfill": [
-   0,
-   18
-  ],
-  "metric-global-noguard|correct": [
-   0,
-   27
-  ],
-  "metric-global-noguard|addcol": [
-   0,
-   18
-  ],
-  "metric-global-noguard|status": [
-   18,
-   18
-  ],
-  "metric-global-noguard|revision": [
-   27,
-   27
-  ],
-  "metric-global-noguard|dupload": [
-   18,
-   27
-  ],
-  "metric-global-noguard|dimhist": [
-   9,
-   9
-  ],
-  "metric-global-noguard|latekey": [
-   27,
-   27
-  ],
-  "metric-global-noguard|unit": [
-   27,
-   27
-  ],
-  "metric-global-noguard|mirror": [
-   18,
    18
   ],
   "metric-global-revoke|holdout": [
@@ -1755,18 +1632,7 @@
   "traj-verify|dimhist": {},
   "traj-verify|latekey": {},
   "traj-verify|unit": {},
-  "traj-verify|mirror": {},
-  "metric-global-noguard|append": {},
-  "metric-global-noguard|backfill": {},
-  "metric-global-noguard|correct": {},
-  "metric-global-noguard|addcol": {},
-  "metric-global-noguard|status": {},
-  "metric-global-noguard|revision": {},
-  "metric-global-noguard|dupload": {},
-  "metric-global-noguard|dimhist": {},
-  "metric-global-noguard|latekey": {},
-  "metric-global-noguard|unit": {},
-  "metric-global-noguard|mirror": {}
+  "traj-verify|mirror": {}
  },
  "maintenance_db_s_per_cell": {
   "DeepSeek V4.1 Flash|middle": [
@@ -1788,11 +1654,6 @@
    286.40974999999986,
    333.0402869999999,
    276.36373299999997
-  ],
-  "DeepSeek V4.1 Flash|metric-global-noguard": [
-   0.0,
-   0.0,
-   0.0
   ],
   "DeepSeek V4.1 Flash|metric-global-revoke": [
    0.0,

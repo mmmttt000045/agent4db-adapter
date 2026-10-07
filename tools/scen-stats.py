@@ -26,12 +26,13 @@ import json
 import os
 import random
 
-METHODS = ["middle", "traj-global", "traj-verify", "metric-global-noguard", "metric-global-schema", "metric-global-revoke",
+METHODS = ["middle", "traj-global", "traj-verify", "metric-global-schema", "metric-global-revoke",  # noguard 不进论文
            "metric-global-def", "metric-global", "metric-global-exref", "metric-global-snap"]
-NAMES = {"middle": "No sharing", "traj-global": "Trajectory retrieval", "traj-verify": "Trajectory + self-check",
-         "metric-global-noguard": "No validation", "metric-global-schema": "Schema-change invalidation",
-         "metric-global-revoke": "Invalidate-on-write", "metric-global-def": "Definition-level",
-         "metric-global": "MAVRA (gold SQL)", "metric-global-exref": "MAVRA, G8 on current data", "metric-global-snap": "MAVRA"}
+NAMES = {"middle": "No memory", "traj-global": "Example retrieval", "traj-verify": "Example retrieval + self-verification",
+         "metric-global-noguard": "Never revalidated", "metric-global-schema": "Invalidate on schema change",
+         "metric-global-revoke": "Invalidate on every write", "metric-global-def": "Full recheck per definition",
+         "metric-global": "MAVRA, gold-SQL reference", "metric-global-exref": "MAVRA, regression on current data",
+         "metric-global-snap": "MAVRA"}
 PHASES = ["holdout", "append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"]
 GROUPS = {
     "all": PHASES,

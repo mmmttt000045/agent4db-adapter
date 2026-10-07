@@ -25,7 +25,7 @@ pdftoppm -r 400 -png /tmp/x/architecture.pdf /tmp/x/architecture
 - 图 2–4 直接读取 `exp/` 中的存档，不经过 `gen/` 的中间文件。图里每个数值按正文的格式化方式，与 `overleaf/gen/` 中正文引用的宏比较，不一致就报错停止：图 2 对 `review.tex` 的 `\Rp*` 与 `\Tr*`，图 3 对 `\Cb*`，图 4 对 `numbers.tex` 的 `\ScenAcc*`（各方法平均值与正文引用的情形）以及 `scen-ds.tex` 的 `\Ds*Modeled*`、`\Ds*Revoked`、`\Ds*Repaired`；图 4 每个（方法，情形）的合并正确率还要与 `paper-results.json` 里 `tools/paper-results.py` 算出的一致，保证两份存档说的是同一批运行。
 - 图 4 的前身是逐情形热力图（2026-10-06 由表 7 改成），2026-10-07 改为每次运行一个小点的点图：热力图只有均值，看不出三次独立运行和离散程度；右面板的失效／修复数原来在表 4 里。
 - 原图 1（定义共享条件）于 2026-10-07 删去：它说明的共享不是本文的贡献，§2.4 的正文保留其计数；脚本在 git 历史中（`tools/figures/sharing.py`）。
-- 方法颜色从 `overleaf/latex/preamble.tex` 的 `\definecolor` 读取，与表格里的色块是同一组定义；方法名称与表 3 一致（`style.py` 的 `METHODS`）。
+- 方法颜色从 `overleaf/latex/preamble.tex` 的 `\definecolor` 读取，与表格里的色块是同一组定义；方法名称与表 2 一致（`style.py` 的 `METHODS`）。
 
 ## 怎么画出来的
 

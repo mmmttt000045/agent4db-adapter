@@ -115,9 +115,12 @@ def label_with_mark(ax, x, y, label, mark, transform, size=LABEL, color=INK, mar
                 clip_on=False)
         return
     ax.text(x - mark_width, y, label, transform=transform, ha='right', va='center', fontsize=size,
-            color=color, clip_on=False)
-    ax.annotate(mark, (x - mark_width, y), xycoords=transform, xytext=(0.3, 1.6), textcoords='offset points',
-                ha='left', va='center', fontsize=size * .72, color=color, annotation_clip=False)
+            color=color, clip_on=False, linespacing=.95)
+    # The mark sits after the last line of a multi-line label.
+    drop = label.count('\n') * size * .95 / 2
+    ax.annotate(mark, (x - mark_width, y), xycoords=transform, xytext=(0.3, 1.6 - drop),
+                textcoords='offset points', ha='left', va='center', fontsize=size * .72, color=color,
+                annotation_clip=False)
 
 
 def color(key):

@@ -34,17 +34,17 @@ MODELS = [  # (任务目录前缀, 显示名)；前缀长的先匹配
     ("dsv41flash", "DeepSeek V4.1 Flash"),
 ]
 MODEL_ORDER = ["DeepSeek V4.1 Flash", "GLM-5.3", "GLM-5.3 Flash"]
-METHODS = [  # (mode, 英文, 中文)；全文统一的方法名
-    ("middle", "No sharing", "不共享"),
-    ("traj-global", "Trajectory retrieval", "轨迹检索"),
-    ("traj-verify", "Trajectory + self-check", "轨迹检索 + 自检"),
-    ("metric-global-noguard", "No validation", "共享不验证"),
-    ("metric-global-schema", "Schema-change invalidation", "按模式变更失效"),
-    ("metric-global-revoke", "Invalidate-on-write", "写入即失效"),
-    ("metric-global-def", "Definition-level", "定义级"),
+METHODS = [  # (mode, 英文, 中文)；全文统一的方法名（表 2）。metric-global-noguard（共享但从不重验证）
+    # 2026-10-07 起不再进入论文：在这组变化里它与模式变更时失效只差 0–1 个点，其运行不计入任何统计。
+    ("middle", "No memory", "无记忆"),
+    ("traj-global", "Example retrieval", "示例检索"),
+    ("traj-verify", "Example retrieval + self-verification", "示例检索 + 自行核验"),
+    ("metric-global-schema", "Invalidate on schema change", "模式变更时失效"),
+    ("metric-global-revoke", "Invalidate on every write", "每次写入即失效"),
+    ("metric-global-def", "Full recheck per definition", "整定义重查"),
     ("metric-global-snap", r"\system", r"\system"),
-    ("metric-global-exref", r"\system, G8 on current data", r"\system，G8 用当前数据"),
-    ("metric-global", r"\system\ (gold SQL)", r"\system（标准答案 SQL）"),
+    ("metric-global-exref", r"\system, regression on current data", r"\system，回归测试用当前数据"),
+    ("metric-global", r"\system, gold-SQL reference", r"\system，标准答案作参照"),
 ]
 # 论文中的 MAVRA：G8 以智能体自己的 SQL 为参照、在学习时快照上比较（metric-global-snap）；metric-global-exref 是同一参照
 # 在当前数据上比较（消融）；metric-global 是 MAVRA (gold SQL)。较早的数据里没有前者时依次退回 exref、metric-global。
@@ -66,7 +66,8 @@ COLOR = {  # 与正文导言的方法颜色一致
 }
 
 
-TABLE_EN = {}  # 窄栏表格里需要断行的方法名（目前没有）
+TABLE_EN = {"traj-verify": r"Example retrieval\\+ self-verification",  # 窄栏表格里需要断行的方法名
+            "metric-global-exref": r"\system, regression\\on current data"}
 
 
 def main_mode():
@@ -427,6 +428,7 @@ def main():
     modes = {c["mode"] for c in cells}
     phases = {r["phase"] for c in cells for r in c["d"]["records"]}
     METHODS = [x for x in METHODS if x[0] in modes]
+    cells = [c for c in cells if c["mode"] in {m for m, *_ in METHODS}]  # 不在论文里的方法不计入任何统计
     PHASES = [x for x in PHASES if x[0] in phases]
     MODEL_ORDER = [m for m in MODEL_ORDER if any(c["model"] == m for c in cells)] + \
         sorted({c["model"] for c in cells} - set(MODEL_ORDER))

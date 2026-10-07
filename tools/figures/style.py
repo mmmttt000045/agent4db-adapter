@@ -2,7 +2,7 @@
 
 Method colors are read from overleaf/latex/preamble.tex, the same
 \\definecolor lines the tables' swatches use, so a figure can never show a
-method in a different color than Table 3. Figures that plot experiment data
+method in a different color than Table 2, whose names METHODS repeats. Figures that plot experiment data
 read the archived JSON in exp/ and compare every number the text also prints
 against the macros in overleaf/gen/; a mismatch stops the build.
 """
@@ -35,24 +35,24 @@ RED, WHITE = '#C2412E', '#FFFFFF'
 ORANGE, ORANGE_PALE = PAPER_COLORS['mDef'], '#FCE8DF'
 GRID = PAPER_COLORS['gridline']
 
-# Experiment method key -> (English, Chinese, color name), as in Table 3.
+# Experiment method key -> (English, Chinese, color name), as in Table 2.
 METHODS = {
-    'middle': ('No sharing', '不共享', 'mNoShare'),
-    'traj-global': ('Trajectory retrieval', '轨迹检索', 'mTraj'),
-    'traj-verify': ('Trajectory + self-check', '轨迹检索 + 自检', 'mTrajVerify'),
-    'metric-global-noguard': ('No validation', '共享不验证', 'mUnguarded'),
-    'metric-global-schema': ('Schema-change invalidation', '按模式变更失效', 'mSchema'),
-    'metric-global-revoke': ('Invalidate-on-write', '写入即失效', 'mRevoke'),
-    'metric-global-def': ('Definition-level', '定义级', 'mDef'),
+    'middle': ('No memory', '无记忆', 'mNoShare'),
+    'traj-global': ('Example retrieval', '示例检索', 'mTraj'),
+    'traj-verify': ('Example retrieval + self-verification', '示例检索 + 自行核验', 'mTrajVerify'),
+    'metric-global-noguard': ('Never revalidated', '从不重验证', 'mUnguarded'),   # not in the paper
+    'metric-global-schema': ('Invalidate on schema change', '模式变更时失效', 'mSchema'),
+    'metric-global-revoke': ('Invalidate on every write', '每次写入即失效', 'mRevoke'),
+    'metric-global-def': ('Full recheck per definition', '整定义重查', 'mDef'),
     'metric-global-snap': ('MAVRA', 'MAVRA', 'mCond'),
-    'metric-global-exref': ('MAVRA, G8 on current data', 'MAVRA，G8 用当前数据', 'mCondCur'),
-    'metric-global': ('MAVRA (gold SQL)', 'MAVRA（标准答案 SQL）', 'mCondGold'),
-    'tabletest': ('Table tests', '表级测试', 'mTable'),
-    'definition': ('Definition-level', '定义级', 'mDef'),
-    'definition-cache': ('Check-result cache', '检查结果缓存', 'mCache'),
-    'condition-scope': ('Affected-only', '只查受影响条件', 'mScope'),
+    'metric-global-exref': ('MAVRA, regression on current data', 'MAVRA，回归测试用当前数据', 'mCondCur'),
+    'metric-global': ('MAVRA, gold-SQL reference', 'MAVRA，标准答案作参照', 'mCondGold'),
+    'tabletest': ('dbt-style table tests', 'dbt 式表级测试', 'mTable'),
+    'definition': ('Full recheck per definition', '整定义重查', 'mDef'),
+    'definition-cache': ('Full recheck + query cache', '整定义重查 + 查询缓存', 'mCache'),
+    'condition-scope': ('Recheck changed tables only', '只重查变化的表', 'mScope'),
     'condition': ('MAVRA', 'MAVRA', 'mCond'),
-    'condition-current': ('MAVRA, G8 on current data', 'MAVRA，G8 用当前数据', 'mCondCur'),
+    'condition-current': ('MAVRA, regression on current data', 'MAVRA，回归测试用当前数据', 'mCondCur'),
 }
 
 

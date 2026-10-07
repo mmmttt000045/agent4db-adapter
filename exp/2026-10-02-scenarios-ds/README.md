@@ -128,3 +128,9 @@
 
 - 预先写定的比较：(g1) MAVRA − 轨迹检索 **+16**（11–19）；(g2) MAVRA − G8 用当前数据 +1（−3–6），无可分辨差别，差别在自动发布的修复数（10.3 对 4.7）；(a1) MAVRA (gold SQL) − 轨迹检索 +16（11–20）；(a2) MAVRA (gold SQL) − 定义级 −1（−7–5，修正前为 +9：定义级此前的较低正确率来自别名导致的未准入）；(d1) G8 用当前数据 − 轨迹检索 +14（11–18）；(e1) 自检 − 轨迹检索 +5（1–10）。补算：MAVRA − 定义级 −1（−6–4），MAVRA − 自检 +11（6–16）。
 - 备份副本：MAVRA 退货金额 7/9、退货率 3/9；轨迹检索 4/9 与 9/9。端到端维护 DB 时间：MAVRA 347 秒对定义级 534 秒（65%）。
+
+## 论文口径调整（2026-10-07）
+
+- 方法名改为通用说法（见 `tools/paper-results.py` 的 `METHODS` 与 `tools/scen-stats.py` 的 `NAMES`）：middle = No memory，traj-global = Example retrieval，traj-verify = Example retrieval + self-verification，metric-global-schema = Invalidate on schema change，metric-global-revoke = Invalidate on every write，metric-global-def = Full recheck per definition，metric-global-snap = MAVRA，metric-global-exref = MAVRA, regression on current data，metric-global = MAVRA, gold-SQL reference。
+- `metric-global-noguard`（共享但从不重验证）不再进入论文：在这 11 种变化里只有"新增列"是 DDL，且是良性的，它与 metric-global-schema 在每个情形上只差 0–1 个点；其 3 组运行保留在 `results/scen-20261002`，但 `paper-results.py` 与 `scen-stats.py` 已把它排除在所有统计之外（端到端 27 组、2,590 道计分题、3,022 个智能体任务、82 M token、30 智能体小时）。
+- `scen-stats.json` 自此含每种方法 `runs` 里逐次运行的计数，供论文图 4（逐次运行的点图）使用。

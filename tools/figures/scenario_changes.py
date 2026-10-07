@@ -1,7 +1,8 @@
 """Figure: accuracy of the user agent by data change, one small dot per run.
 
 Left: the twelve settings in the order of tools/paper-results.py, grouped by
-the condition the change targets (shaded bands). For six methods, one small
+the condition the change targets (shaded bands). For six methods (the
+baselines and MAVRA; the ablations are in the right panel and the text), one small
 dot per independent run and a large marker at the accuracy over the runs'
 tasks; a hollow marker means that at least 25% of the tasks used a stale
 definition. Right: invalidations and published repairs per run for the
@@ -34,7 +35,7 @@ paper_results = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(paper_results)
 PHASES, CLASSES = paper_results.PHASES, paper_results.CLASSES
 
-SHOWN = ['middle', 'traj-global', 'traj-verify', 'metric-global-noguard', 'metric-global-def',
+SHOWN = ['middle', 'traj-global', 'traj-verify', 'metric-global-schema', 'metric-global-revoke',
          'metric-global-snap']
 MAINTAINERS = ['metric-global-revoke', 'metric-global-def', 'metric-global-exref', 'metric-global-snap']
 # Macro keys of tools/scen-stats.py and tools/paper-results.py: \Ds<key>*, \ScenAcc<key>*.
@@ -56,13 +57,13 @@ TEXT = {
     'en': {'y': 'Accuracy of the user agent (%)', 'run': 'one run',
            'stale': 'hollow: at least 25% of the tasks used a stale definition',
            'title_b': 'Invalidations (light) and\npublished repairs (solid)\nper run',
-           'b_labels': {'metric-global-revoke': 'Invalidate-on-write', 'metric-global-def': 'Definition-level',
-                        'metric-global-exref': 'MAVRA, G8 on\ncurrent data', 'metric-global-snap': 'MAVRA'}},
+           'b_labels': {'metric-global-revoke': 'Invalidate on\nevery write', 'metric-global-def': 'Full recheck\nper definition',
+                        'metric-global-exref': 'MAVRA, regression\non current data', 'metric-global-snap': 'MAVRA'}},
     'zh': {'y': '用户端智能体正确率（%）', 'run': '一次运行',
            'stale': '空心：至少 25% 的题使用了过期定义',
            'title_b': '每次运行的失效数（浅）\n与发布的修复数（深）\n',
-           'b_labels': {'metric-global-revoke': '写入即失效', 'metric-global-def': '定义级',
-                        'metric-global-exref': 'MAVRA，G8 用\n当前数据', 'metric-global-snap': 'MAVRA'}},
+           'b_labels': {'metric-global-revoke': '每次写入\n即失效', 'metric-global-def': '整定义重查',
+                        'metric-global-exref': 'MAVRA，回归测\n试用当前数据', 'metric-global-snap': 'MAVRA'}},
 }
 
 
@@ -150,7 +151,6 @@ def figure(lang):
     handles = [Line2D([], [], marker='o', ls='', ms=3.6, color=mplstyle.color(m), label=mplstyle.name(m, lang))
                for m in SHOWN]
     handles.append(Line2D([], [], marker='o', ls='', ms=1.9, color=MUTED, alpha=.6, label=T['run']))
-    handles.append(Line2D([], [], marker='o', ls='', ms=3.6, mfc='white', mec=MUTED, mew=.7, label=T['stale']))
     fig.legend(handles=handles, loc='upper left', bbox_to_anchor=(.04, 1.0), ncol=4)
 
     # ── Right: invalidations and repairs per run ──────────────────────────────

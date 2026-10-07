@@ -3,7 +3,6 @@
   "middle": 3,
   "traj-global": 3,
   "traj-verify": 3,
-  "metric-global-noguard": 3,
   "metric-global-schema": 3,
   "metric-global-revoke": 3,
   "metric-global-def": 3,
@@ -14,7 +13,7 @@
  "replaced_cells_excluded": 24,
  "methods": {
   "middle": {
-   "name": "No sharing",
+   "name": "No memory",
    "cells": 3,
    "provider_errors": 2,
    "all": {
@@ -282,7 +281,7 @@
    ]
   },
   "traj-global": {
-   "name": "Trajectory retrieval",
+   "name": "Example retrieval",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -550,7 +549,7 @@
    ]
   },
   "traj-verify": {
-   "name": "Trajectory + self-check",
+   "name": "Example retrieval + self-verification",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -817,276 +816,8 @@
     }
    ]
   },
-  "metric-global-noguard": {
-   "name": "No validation",
-   "cells": 3,
-   "provider_errors": 0,
-   "all": {
-    "acc": 0.7469135802469135,
-    "ci95": [
-     0.726851851851852,
-     0.7685185185185186
-    ]
-   },
-   "holdout": {
-    "acc": 1.0,
-    "ci95": [
-     1.0,
-     1.0
-    ]
-   },
-   "benign": {
-    "acc": 1.0,
-    "ci95": [
-     1.0,
-     1.0
-    ]
-   },
-   "modeled": {
-    "acc": 0.5814814814814815,
-    "ci95": [
-     0.5666666666666667,
-     0.5888888888888889
-    ]
-   },
-   "mirror": {
-    "acc": 0.6111111111111112,
-    "ci95": [
-     0.3333333333333333,
-     0.8333333333333334
-    ]
-   },
-   "unit": {
-    "acc": 0.4444444444444444,
-    "ci95": [
-     0.4444444444444444,
-     0.4444444444444444
-    ]
-   },
-   "stale_tasks": {
-    "holdout": 0,
-    "benign": 0,
-    "modeled": 99,
-    "mirror": 18,
-    "unit": 27
-   },
-   "revoked_per_cell": 0.0,
-   "repaired_per_cell": 0.0,
-   "maint_db_s_per_cell": 0.0,
-   "turns_per_task": 4.663194444444445,
-   "input_tokens_per_task": 18038.128472222223,
-   "runs": [
-    {
-     "acc": {
-      "holdout": [
-       15,
-       15
-      ],
-      "append": [
-       9,
-       9
-      ],
-      "backfill": [
-       6,
-       6
-      ],
-      "correct": [
-       9,
-       9
-      ],
-      "addcol": [
-       6,
-       6
-      ],
-      "status": [
-       3,
-       6
-      ],
-      "revision": [
-       7,
-       9
-      ],
-      "dupload": [
-       4,
-       9
-      ],
-      "dimhist": [
-       3,
-       3
-      ],
-      "latekey": [
-       2,
-       9
-      ],
-      "unit": [
-       4,
-       9
-      ],
-      "mirror": [
-       2,
-       6
-      ]
-     },
-     "stale": {
-      "holdout": 0,
-      "append": 0,
-      "backfill": 0,
-      "correct": 0,
-      "addcol": 0,
-      "status": 6,
-      "revision": 9,
-      "dupload": 6,
-      "dimhist": 3,
-      "latekey": 9,
-      "unit": 9,
-      "mirror": 6
-     },
-     "revoked": 0,
-     "repaired": 0,
-     "maint_s": 0.0
-    },
-    {
-     "acc": {
-      "holdout": [
-       15,
-       15
-      ],
-      "append": [
-       9,
-       9
-      ],
-      "backfill": [
-       6,
-       6
-      ],
-      "correct": [
-       9,
-       9
-      ],
-      "addcol": [
-       6,
-       6
-      ],
-      "status": [
-       3,
-       6
-      ],
-      "revision": [
-       6,
-       9
-      ],
-      "dupload": [
-       4,
-       9
-      ],
-      "dimhist": [
-       3,
-       3
-      ],
-      "latekey": [
-       2,
-       9
-      ],
-      "unit": [
-       4,
-       9
-      ],
-      "mirror": [
-       4,
-       6
-      ]
-     },
-     "stale": {
-      "holdout": 0,
-      "append": 0,
-      "backfill": 0,
-      "correct": 0,
-      "addcol": 0,
-      "status": 6,
-      "revision": 9,
-      "dupload": 6,
-      "dimhist": 3,
-      "latekey": 9,
-      "unit": 9,
-      "mirror": 6
-     },
-     "revoked": 0,
-     "repaired": 0,
-     "maint_s": 0.0
-    },
-    {
-     "acc": {
-      "holdout": [
-       15,
-       15
-      ],
-      "append": [
-       9,
-       9
-      ],
-      "backfill": [
-       6,
-       6
-      ],
-      "correct": [
-       9,
-       9
-      ],
-      "addcol": [
-       6,
-       6
-      ],
-      "status": [
-       3,
-       6
-      ],
-      "revision": [
-       7,
-       9
-      ],
-      "dupload": [
-       4,
-       9
-      ],
-      "dimhist": [
-       3,
-       3
-      ],
-      "latekey": [
-       2,
-       9
-      ],
-      "unit": [
-       4,
-       9
-      ],
-      "mirror": [
-       5,
-       6
-      ]
-     },
-     "stale": {
-      "holdout": 0,
-      "append": 0,
-      "backfill": 0,
-      "correct": 0,
-      "addcol": 0,
-      "status": 6,
-      "revision": 9,
-      "dupload": 6,
-      "dimhist": 3,
-      "latekey": 9,
-      "unit": 9,
-      "mirror": 6
-     },
-     "revoked": 0,
-     "repaired": 0,
-     "maint_s": 0.0
-    }
-   ]
-  },
   "metric-global-schema": {
-   "name": "Schema-change invalidation",
+   "name": "Invalidate on schema change",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -1354,7 +1085,7 @@
    ]
   },
   "metric-global-revoke": {
-   "name": "Invalidate-on-write",
+   "name": "Invalidate on every write",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -1622,7 +1353,7 @@
    ]
   },
   "metric-global-def": {
-   "name": "Definition-level",
+   "name": "Full recheck per definition",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -1890,7 +1621,7 @@
    ]
   },
   "metric-global": {
-   "name": "MAVRA (gold SQL)",
+   "name": "MAVRA, gold-SQL reference",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -2158,7 +1889,7 @@
    ]
   },
   "metric-global-exref": {
-   "name": "MAVRA, G8 on current data",
+   "name": "MAVRA, regression on current data",
    "cells": 3,
    "provider_errors": 0,
    "all": {
@@ -2713,7 +2444,7 @@
    "diff": 0.49320289369308973,
    "ci95": [
     0.4574074074074073,
-    0.5320216049382716
+    0.5359953703703704
    ]
   },
   "c holdout: MAVRA (gold SQL) - trajectory": {
@@ -2768,7 +2499,7 @@
   "f2 all: MAVRA, G8 on current data - no sharing": {
    "diff": 0.4824004245572873,
    "ci95": [
-    0.4425925925925925,
+    0.44043209876543193,
     0.527391975308642
    ]
   },
@@ -2789,8 +2520,8 @@
   "f5 all: MAVRA, G8 on current data - trajectory+self-check": {
    "diff": 0.030864197530864335,
    "ci95": [
-    -0.007716049382716084,
-    0.07098765432098753
+    -0.007716049382715973,
+    0.06944444444444442
    ]
   },
   "g1 modeled: MAVRA - trajectory": {
@@ -2817,7 +2548,7 @@
   "h2 all: MAVRA - no sharing": {
    "diff": 0.48703005418691697,
    "ci95": [
-    0.45154320987654334,
+    0.44660493827160513,
     0.531304012345679
    ]
   },
@@ -2892,20 +2623,6 @@
    "latekey": 0.2222222222222222,
    "unit": 0.48148148148148145,
    "mirror": 0.6666666666666666
-  },
-  "metric-global-noguard": {
-   "holdout": 1.0,
-   "append": 1.0,
-   "backfill": 1.0,
-   "correct": 1.0,
-   "addcol": 1.0,
-   "status": 0.5,
-   "revision": 0.7407407407407407,
-   "dupload": 0.4444444444444444,
-   "dimhist": 1.0,
-   "latekey": 0.2222222222222222,
-   "unit": 0.4444444444444444,
-   "mirror": 0.6111111111111112
   },
   "metric-global-schema": {
    "holdout": 1.0,

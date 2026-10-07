@@ -1,305 +1,262 @@
-"""Draft figure 2: how request handling serves a user agent's two requests, by example.
+"""Deck figure 2 (query and execution): how the query service answers a user agent.
 
-Top lane, the text request: the agent asks for "return amount" (its question
-is the return amount in May). Lookup matches names and aliases, compares
-the dependency versions recorded with the definition against the current ones,
-reuses check results keyed by (id(c), V(dep(c))) or runs the missing checks,
-and returns only a valid revision. Bottom lane, the SQL request: the agent's
-query declares that revision; the middleware checks the declaration and reviews
-the SQL, then validates the revision's conditions on the query's own snapshot,
-in which a writer has meanwhile raised the version of store_returns, and runs
-the query in the same transaction.
-
-The example continues draft figure 3's: revision 2 is the repaired return-amount
-definition (filter sr_status = 'completed'); the return-rate definition shares
-its grain condition, one row per return. Labels use words, not the paper's
-symbols (m_1^2, D_s, Q_c, V(T)). The question and its answer, 3,294,349.93,
-are a held-out task of the end-to-end study (task M2-P1).
-Coordinates are millimetres from the top-left at printed size (178 mm).
+Top lane: the agent asks for "return amount"; the service matches names and
+aliases, compares the data versions recorded at the last validation with the
+current ones, looks each validation rule up in the cache (reusing hits,
+validating and caching misses), and returns the valid definition v2. Middle:
+the validation cache, keyed by (rule, data version) and shared by every
+definition and agent, with who wrote each entry and which step reused it.
+Bottom lane: the agent's SQL names v2; the service checks the version, validates
+the rules on the query's own snapshot (a write has meanwhile moved store_returns
+to version 16), and runs the SQL on that snapshot. Values come from the
+end-to-end study (task M2-P1: 3,294,349.93). Drawn at slide size for the
+report deck, with everyday terms rather than the paper's notation.
 """
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import style  # noqa: E402
-from vecfig import measure  # noqa: E402
-from parts import (EXEC, NOTE, THIN, TITLE, USE, WAIT, baseline, legend, mark,  # noqa: E402
-                   node, person, step)
-from style import (ACC, ACC_DK, ACC_PALE, AMBER, AMBER_PALE, EDGE, FIELD, INK, MUTED, RED,  # noqa: E402
-                   WHITE)
+from parts import (EXEC, HEAD, NOTE, PANEL_EDGE, THIN, TITLE, USE, WAIT, legend_pill, mark,  # noqa: E402
+                   node, person, stage, step)
+from style import ACC, ACC_DK, ACC_PALE, AMBER, AMBER_PALE, FIELD, INK, MUTED, RED, RULE, WHITE  # noqa: E402
 
 NAME = 'lookup'
-W, H = style.TEXTWIDTH, 78.0
+W, H = 300.0, 149.0
 
 LABELS = {
-    'en': {
-        'agent': 'User agent', 'mavra': 'MAVRA request handling',
-        'paths': ('use path', 'execution path'),
-        'text_req': 'Text request', 'question': ('Return amount', 'in May?'),
-        'lookup_of': 'lookup “return amount”',
-        'sql_req': 'SQL request', 'declares': 'declares: return amount, revision 2',
-        'sql': ('SELECT SUM(sr_return_amt)', 'FROM store_returns', 'JOIN date_dim ON …',
-                "WHERE sr_status = 'completed'", 'AND d_moy = 5 AND …'),
-        's1': ('Match name', 'name or alias contains it'),
-        'names': (('store return amount', True), ('store return rate', False),
-                  ('store revenue', False)),
-        's2': ('Compare versions', 'did its tables change?'),
-        'checked': 'last check', 'now': 'now', 'pending': 'changed: recheck needed',
-        's3': ('Reuse or check', 'look up each condition’s result'),
-        'conds': ('one row per return', 'one date per date key', 'no lost dates'),
-        'reuse_a': ('found at 15: reuse', 'found at 3: reuse', 'none at 15: check, store'),
-        's4': ('Return', 'to the agent, if valid'),
-        'valid': 'revision 2, valid', 'fields': ('`store_returns`', '`SUM(sr_return_amt)`',
-                                                 "`sr_status='completed'`"),
-        'then': ('then writes', 'its SQL'),
-        'cr_title': 'Reuse of check results',
-        'cr_note': ('Each check result is kept under its condition and',
-                    'the version of the tables the check read. Every',
-                    'definition and agent that needs the same condition',
-                    'on the same version reuses it; only a new version',
-                    'needs a new check.'),
-        'cr_head': ('condition', 'table version', 'stored by', 'reused in'),
-        'cr_rows': (('one row per return', '`store_returns` 15', 'return rate', (3,)),
-                    ('one date per date key', '`date_dim` 3', 'an earlier check', (3, 6)),
-                    ('no lost dates', '`store_returns` 15', 3, ()),
-                    ('one row per return', '`store_returns` 16', 6, ()),
-                    ('no lost dates', '`store_returns` 16', 6, ())),
-        'reuse_store': 'reuse or store',
-        's5': ('Check the declaration', 'can revision 2 be used?'),
-        'decl': ('exists, not invalidated', 'still the latest revision', 'SQL keeps the status filter'),
-        'reject': 'revision 1: outdated, rejected',
-        's6': ('Same-snapshot validation', 'conditions hold on the query’s snapshot'),
-        'snap': 'a write committed: `store_returns` now at 16',
-        'reuse_b': ('none at 16: check, store', 'found at 3: reuse', 'none at 16: check, store'),
-        's7': ('Execute', 'on the same snapshot'),
-        'run': 'run the query', 'answer': 'answer',
-        'if_fail': ('a failed condition', 'rejects the query'),
-    },
     'zh': {
-        'agent': '用户端智能体', 'mavra': 'MAVRA 请求处理',
-        'paths': ('使用路径', '执行路径'),
-        'text_req': '文本请求', 'question': ('5 月的门店', '退货金额？'),
-        'lookup_of': '查找“退货金额”',
-        'sql_req': 'SQL 请求', 'declares': '声明：退货金额，修订 2',
+        'agent': '用户智能体', 'mavra': 'MAVRA 查询服务', 'paths': ('查询指标定义', '执行 SQL'),
+        'text_req': '文本请求', 'question': ('5 月门店', '退货金额？'), 'ask': '查“退货金额”',
+        's1': ('匹配名称', '名称或别名包含它'),
+        'names': (('门店退货金额', True), ('门店退货率', False), ('门店营业额', False)),
+        's2': ('看数据版本', '上次校验时 → 现在'), 'then_now': ('上次', '现在'),
+        'changed': '变了：要重新校验',
+        's3': ('校验（先查缓存）', '每条规则：查缓存，没有才执行校验'),
+        'rules': ('每笔退货一行', '日期键唯一', '退货都有日期'),
+        'lookup_out': ('缓存命中：复用', '缓存命中：复用', '未命中：校验后缓存'),
+        's4': ('返回', '有效时返回定义'), 'valid': '退货金额 v2，有效',
+        'fields': ('`store_returns`', '`SUM(sr_return_amt)`', "`sr_status='完成'`"),
+        'then': ('然后', '写 SQL'),
+        'cache_title': '校验结果缓存',
+        'cache_note': ('按（校验规则，数据版本）缓存校验结果。', '同一规则、同一数据版本：所有指标定义、',
+                       '所有智能体共用一份，不重复校验。', '数据版本变了，才需要重新校验。'),
+        'cache_head': ('规则', '数据版本', '写入者', '使用者'),
+        'cache_rows': (('每笔退货一行', '`store_returns` 15', '退货率', (3,)),
+                       ('日期键唯一', '`date_dim` 3', '之前的校验', (3, 6)),
+                       ('退货都有日期', '`store_returns` 15', 3, ()),
+                       ('每笔退货一行', '`store_returns` 16', 6, ()),
+                       ('退货都有日期', '`store_returns` 16', 6, ())),
+        'lookup_cache': '查 / 写缓存',
+        'sql_req': 'SQL 请求',
         'sql': ('SELECT SUM(sr_return_amt)', 'FROM store_returns', 'JOIN date_dim ON …',
                 "WHERE sr_status = '完成'", 'AND d_moy = 5 AND …'),
-        's1': ('匹配名称', '名称或别名包含请求'),
-        'names': (('门店退货金额', True), ('门店退货率', False), ('门店营业额', False)),
-        's2': ('比较版本', '它读的表变了吗？'),
-        'checked': '上次检查', 'now': '当前', 'pending': '有变化：需要重验证',
-        's3': ('复用或检查', '查每个条件的检查结果'),
-        'conds': ('每笔退货一行', '每个日期键一个日期', '日期不丢失'),
-        'reuse_a': ('15 上已有：复用', '3 上已有：复用', '15 上没有：检查并存入'),
-        's4': ('返回', '有效时返回给智能体'),
-        'valid': '修订 2，有效', 'fields': ('`store_returns`', '`SUM(sr_return_amt)`',
-                                          "`sr_status='完成'`"),
-        'then': ('然后写出', 'SQL'),
-        'cr_title': '检查结果的复用',
-        'cr_note': ('每个检查结果按“条件 + 检查所读表的版本”保存。',
-                    '任何定义、任何智能体只要需要同一条件、同一',
-                    '表版本，就直接复用；只有表版本变了，',
-                    '才需要重新检查。'),
-        'cr_head': ('条件', '表版本', '存入者', '复用于'),
-        'cr_rows': (('每笔退货一行', '`store_returns` 15', '退货率', (3,)),
-                    ('每个日期键一个日期', '`date_dim` 3', '更早的检查', (3, 6)),
-                    ('日期不丢失', '`store_returns` 15', 3, ()),
-                    ('每笔退货一行', '`store_returns` 16', 6, ()),
-                    ('日期不丢失', '`store_returns` 16', 6, ())),
-        'reuse_store': '复用或存入',
-        's5': ('核对声明', '修订 2 能用吗？'),
-        'decl': ('存在且未失效', '仍是最新修订', 'SQL 含状态过滤'),
-        'reject': '修订 1：已过时，拒绝',
-        's6': ('同快照验证', '条件在查询的快照上成立'),
-        'snap': '写入已提交：`store_returns` 变为 16',
-        'reuse_b': ('16 上没有：检查并存入', '3 上已有：复用', '16 上没有：检查并存入'),
-        's7': ('执行', '在同一快照上'),
-        'run': '执行查询', 'answer': '答案',
-        'if_fail': ('条件失败', '则拒绝查询'),
+        'declares': '注明：退货金额 v2',
+        's5': ('检查版本', '注明的 v2 能用吗？'),
+        'version_rows': ('v2 存在、未停用', 'v2 是最新版本', 'SQL 含状态过滤', '若注明 v1：已过期，拒绝'),
+        's6': ('快照内校验', '在本次查询的快照上，规则都成立？'),
+        'snap': '快照里 `store_returns` 已是 16',
+        'snap_out': ('未命中：快照内校验', '命中：复用', '未命中：快照内校验'),
+        's7': ('执行', '同一快照上执行'), 'run': '执行 SQL', 'result': '结果', 'value': '329.4 万',
+        'fail': ('校验失败则', '拒绝执行'),
+    },
+    'en': {
+        'agent': 'User agent', 'mavra': 'MAVRA query service', 'paths': ('find definition', 'run SQL'),
+        'text_req': 'Text request', 'question': ('Return amount', 'in May?'), 'ask': 'ask “amount”',
+        's1': ('Match name', 'name or alias'),
+        'names': (('return amount', True), ('return rate', False), ('revenue', False)),
+        's2': ('Data versions', 'last check → now'), 'then_now': ('then', 'now'),
+        'changed': 'changed: recheck',
+        's3': ('Validate (cache first)', 'look up each rule; validate misses'),
+        'rules': ('one row/return', 'date key unique', 'dates complete'),
+        'lookup_out': ('cache hit: reuse', 'cache hit: reuse', 'miss: check, cache'),
+        's4': ('Return', 'only if valid'), 'valid': 'amount v2, valid',
+        'fields': ('`store_returns`', '`SUM(sr_return_amt)`', "`sr_status='done'`"),
+        'then': ('then', 'writes SQL'),
+        'cache_title': 'Validation cache',
+        'cache_note': ('Results are cached per (rule, data version).',
+                       'Same rule, same data version: every definition',
+                       'and every agent shares one result. Only a new',
+                       'data version needs a new check.'),
+        'cache_head': ('rule', 'data version', 'written by', 'used in'),
+        'cache_rows': (('one row/return', '`store_returns` 15', 'return rate', (3,)),
+                       ('date key unique', '`date_dim` 3', 'earlier', (3, 6)),
+                       ('dates complete', '`store_returns` 15', 3, ()),
+                       ('one row/return', '`store_returns` 16', 6, ()),
+                       ('dates complete', '`store_returns` 16', 6, ())),
+        'lookup_cache': 'read / write',
+        'sql_req': 'SQL request',
+        'sql': ('SELECT SUM(sr_return_amt)', 'FROM store_returns', 'JOIN date_dim ON …',
+                "WHERE sr_status = 'done'", 'AND d_moy = 5 AND …'),
+        'declares': 'declares amount v2',
+        's5': ('Check version', 'is the named v2 usable?'),
+        'version_rows': ('v2 exists, not retired', 'v2 is the latest', 'SQL keeps the filter',
+                         'naming v1: rejected'),
+        's6': ('Snapshot check', 'do the rules hold on this snapshot?'),
+        'snap': 'snapshot sees `store_returns` 16',
+        'snap_out': ('miss: check here', 'hit: reuse', 'miss: check here'),
+        's7': ('Run', 'on the same snapshot'), 'run': 'run the SQL', 'result': 'result',
+        'value': '3,294,349.93', 'fail': ('a failed rule', 'rejects the SQL'),
     },
 }
 
-TOP = 6.5                                # lanes start below the header
-A_Y, A_H = TOP, 21.5                     # text request lane
-CR = (92.0, 32.0, 84.5, 19.6)            # check results, between the lanes
-B_Y, B_H = 55.5, 21.5                    # SQL request lane
-REQ_A = (1.5, A_Y, 24.3, A_H)
-S1 = (30.0, A_Y, 25.0, A_H)
-S2 = (59.0, A_Y, 29.0, A_H)
-S3 = (92.0, A_Y, 54.5, A_H)
-S4 = (150.5, A_Y, 26.0, A_H)
-REQ_B = (1.5, B_Y, 36.5, B_H)
-S5 = (42.0, B_Y, 46.0, B_H)
-S6 = (92.0, B_Y, 54.5, B_H)
-S7 = (150.5, B_Y, 26.0, B_H)
-FIELD_BOX = (28.0, .5, 149.0, H - 1.0)
-PANEL = 8.6                              # example area starts this far below a stage's top
-ROW = 3.0                                # pitch of example rows
+A_Y, B_Y, LANE = 13.0, 107.0, 40.0
+REQ_A = (2.0, A_Y, 44.0, LANE)
+S1 = (52.0, A_Y, 45.0, LANE)
+S2 = (101.0, A_Y, 52.0, LANE)
+S3 = (157.0, A_Y, 86.0, LANE)
+S4 = (247.0, A_Y, 51.0, LANE)
+CACHE = (157.0, 59.0, 141.0, 40.0)
+REQ_B = (2.0, B_Y, 62.0, LANE)
+S5 = (69.0, B_Y, 84.0, LANE)
+S6 = (157.0, B_Y, 86.0, LANE)
+S7 = (247.0, B_Y, 51.0, LANE)
+FIELD_BOX = (49.0, 1.0, 250.0, H - 1.5)
+PITCH = 5.6
 
 
 def draw(s, lang):
     L = LABELS[lang]
     text, rect, route = s.text, s.rect, s.route
 
-    def stage(b, n, color, title_note):
-        """A step: badge, bold title, the rule in a muted note, then the example."""
-        x, y, w, h = b
-        rect(*b, WHITE, '#9DBBE2', .18, r=.8)
-        step(s, x + 2.5, y + 2.6, n, color)
-        title, note = title_note
-        text(x + 4.6, baseline(y + 2.6, TITLE), title, TITLE, INK, 'bold', width=w - 5.4)
-        text(x + 1.4, y + 6.6, note, NOTE, MUTED, width=w - 2.4)
-        rect(x + .9, y + PANEL - .4, w - 1.8, h - PANEL - .5, '#F7F6F3', None, r=.5)
-        return x + 1.8, y + PANEL + 2.4, w - 3.6     # first example baseline and its room
-
-    def nomatch(x, y):
-        s.line(x - .55, y, x + .55, y, MUTED, .24)
-
-    # Header: who is where, and the path colours ------------------------------
-    rect(*FIELD_BOX, FIELD, None, r=1.4)
-    text(1.5, 3.6, L['agent'], TITLE, INK, 'bold')
-    rect(29.7, 1.4, .55, 2.6, ACC)
-    text(31.1, 3.6, L['mavra'], TITLE - .4, ACC_DK, 'bold')
-    x = 120
+    # Header -------------------------------------------------------------------------
+    rect(*FIELD_BOX, FIELD, None, r=2.8)
+    text(2.0, 8.0, L['agent'], TITLE, INK, 'bold')
+    rect(52.0, 3.6, 1.1, 5.4, ACC)
+    text(55.2, 8.4, L['mavra'], TITLE, ACC_DK, 'bold')
+    x = 190.0
     for label, color, steps in zip(L['paths'], (USE, EXEC), ('1–4', '5–7')):
-        legend(s, x, 2.6, [(label, color, steps)])
-        x += 6.6 + 1.2 + measure(label, NOTE) + 4.0
+        x += legend_pill(s, x, 6.6, label, color, steps) + 6.0
 
-    # Text request: a person asking, the lookup it sends ---------------------
+    # Text request -------------------------------------------------------------------
     x, y, w, h = REQ_A
     node(s, REQ_A)
-    text(x + 1.4, y + 3.6, L['text_req'], TITLE, INK, 'bold', width=w - 2.4)
-    person(s, x + 1.4, y + 6.6)
-    bx, by, bw, bh = x + 4.8, y + 5.6, w - 6.0, 6.8
-    rect(bx, by, bw, bh, ACC_PALE, ACC, .12, r=.9)
-    q1, q2 = L['question']
-    text(bx + bw / 2, by + 2.8, q1, NOTE, ACC_DK, align='center', width=bw - .6)
-    text(bx + bw / 2, by + 5.4, q2, NOTE, ACC_DK, align='center', width=bw - .6)
-    rect(x + 1.4, y + 15.4, w - 2.8, 2.6, WHITE, USE, .14, r=.5)
-    text(x + w / 2, y + 17.25, L['lookup_of'], NOTE, USE, align='center', width=w - 3.2)
+    text(x + 3.0, y + 7.0, L['text_req'], TITLE, INK, 'bold', width=w - 5)
+    person(s, x + 3.0, y + 12.0)
+    bx, by, bw, bh = x + 10.5, y + 10.5, w - 13.5, 13.0
+    rect(bx, by, bw, bh, ACC_PALE, ACC, .25, r=1.8)
+    for k, line in enumerate(L['question']):
+        text(bx + bw / 2, by + 5.4 + 5.2 * k, line, NOTE, ACC_DK, align='center', width=bw - 1.6)
+    rect(x + 3.0, y + 28.5, w - 6.0, 6.5, WHITE, USE, .3, r=1.2)
+    text(x + w / 2, y + 33.0, L['ask'], NOTE, USE, align='center', width=w - 7.0)
 
-    # 1 Match name -----------------------------------------------------------
-    ex, ey, ew = stage(S1, 1, USE, L['s1'])
+    # 1 Match the name ------------------------------------------------------------------
+    ex, ey, ew = stage(s, S1, 1, USE, *L['s1'])
     for k, (name, hit) in enumerate(L['names']):
-        yy = ey + ROW * k
+        yy = ey + PITCH * k
         if hit:
-            rect(ex - .6, yy - 2.1, ew + 1.2, 2.9, ACC_PALE, None, r=.4)
-        text(ex, yy, name, NOTE, INK if hit else MUTED, width=ew - 2.6)
-        if hit:
-            mark(s, ex + ew - 1.0, yy - .75, 'ok')
+            rect(ex - 1.2, yy - 4.3, ew + 2.4, 5.8, ACC_PALE, None, r=.8)
+            mark(s, ex + ew - 1.6, yy - 1.5, 'ok')
         else:
-            nomatch(ex + ew - 1.0, yy - .75)
+            s.line(ex + ew - 2.7, yy - 1.5, ex + ew - .5, yy - 1.5, MUTED, .5)
+        text(ex, yy, name, NOTE, INK if hit else MUTED, width=ew - 5.0)
 
-    # 2 Compare versions -----------------------------------------------------
-    ex, ey, ew = stage(S2, 2, USE, L['s2'])
-    c1, c2 = ex + ew - 8.0, ex + ew - 1.2           # right edges of the two version columns
-    text(c1, ey, L['checked'], NOTE, MUTED, align='right')
-    text(c2, ey, L['now'], NOTE, MUTED, align='right')
+    # 2 Compare data versions ----------------------------------------------------------------
+    ex, ey, ew = stage(s, S2, 2, USE, *L['s2'])
+    c1, c2 = ex + ew - 11.0, ex + ew - 1.0
+    for cx_, head in zip((c1, c2), L['then_now']):
+        text(cx_, ey, head, NOTE, MUTED, align='right')
     for k, (table, then, now) in enumerate((('`store_returns`', 14, 15), ('`date_dim`', 3, 3))):
-        yy = ey + ROW * (k + 1)
+        yy = ey + PITCH * (k + 1)
         if then != now:
-            rect(ex - .6, yy - 2.1, ew + 1.2, 2.9, AMBER_PALE, AMBER, .12, r=.4)
+            rect(ex - 1.2, yy - 4.3, ew + 2.4, 5.8, AMBER_PALE, AMBER, .25, r=.8)
         text(ex, yy, table, NOTE, INK)
-        text(c1, yy, f'${then}$', NOTE, INK, align='right')
-        text(c2, yy, f'${now}$', NOTE, WAIT if then != now else INK, align='right')
-    text(ex, ey + ROW * 3 + .2, L['pending'], NOTE, WAIT, 'bold')
+        text(c1, yy, str(then), NOTE, INK, align='right')
+        text(c2, yy, str(now), NOTE, WAIT if then != now else INK, align='right')
+    text(ex, ey + PITCH * 3, L['changed'], NOTE, WAIT, 'bold', width=ew)
 
-    # 3 Reuse a check result or run the check ---------------------------------
-    ex, ey, ew = stage(S3, 3, USE, L['s3'])
-    for k, (cond, outcome) in enumerate(zip(L['conds'], L['reuse_a'])):
-        yy = ey + ROW * k
-        text(ex, yy, cond, NOTE, INK, width=21.0)
-        text(ex + 21.5, yy, outcome, NOTE, MUTED if k < 2 else WAIT, width=ew - 24.0)
-        mark(s, ex + ew - 1.0, yy - .75, 'ok')
+    # 3 Validate, cache first ------------------------------------------------------------------
+    ex, ey, ew = stage(s, S3, 3, USE, *L['s3'])
+    for k, (rule, out) in enumerate(zip(L['rules'], L['lookup_out'])):
+        yy = ey + PITCH * k
+        text(ex, yy, rule, NOTE, INK, width=28.0)
+        text(ex + 29.0, yy, out, NOTE, MUTED if k < 2 else WAIT, width=ew - 33.6)
+        mark(s, ex + ew - 1.6, yy - 1.5, 'ok')
 
-    # 4 Return the valid revision ---------------------------------------------
-    ex, ey, ew = stage(S4, 4, USE, L['s4'])
-    text(ex, ey, L['valid'], NOTE, ACC_DK, 'bold')
+    # 4 Return the valid definition ----------------------------------------------------------
+    ex, ey, ew = stage(s, S4, 4, USE, *L['s4'])
+    text(ex, ey, L['valid'], NOTE, ACC_DK, 'bold', width=ew)
     for k, field in enumerate(L['fields']):
-        text(ex, ey + 2.7 * (k + 1), field, NOTE, INK, width=ew + .6)
-    # The agent then writes the SQL of the second lane from the returned fields.
-    xa = REQ_A[0] + 8.0
-    route([(xa, A_Y + A_H), (xa, B_Y - 1.6)], INK, THIN, length=1.0)
+        text(ex, ey + PITCH * (k + 1), field, NOTE, INK, width=ew + 1.0)
+
+    # The agent then writes the SQL of the second lane --------------------------------------
+    xa = REQ_A[0] + 12.0
+    route([(xa, A_Y + LANE), (xa, B_Y - 3.4)], INK, THIN, length=HEAD)
     for k, line in enumerate(L['then']):
-        text(xa + 1.6, (A_Y + A_H + B_Y) / 2 - .4 + 2.6 * k, line, NOTE, MUTED)
+        text(xa + 3.0, 77.0 + 5.4 * k, line, NOTE, MUTED)
 
-    # Check results, between the lanes: who stored each entry, which step reused it
-    nx, ny = 31.1, CR[1] + 3.0
-    text(nx, ny, L['cr_title'], TITLE, ACC_DK, 'bold')
-    for k, line in enumerate(L['cr_note']):
-        text(nx, ny + 3.4 + 2.75 * k, line, NOTE, INK, width=CR[0] - nx - 2.0)
-    x, y, w, h = CR
-    rect(*CR, WHITE, '#9DBBE2', .18, r=.8)
-    cols = (x + 1.8, x + 23.5, x + 43.5, x + 47.5, x + 70.0)     # condition, version, mark, by, in
-    hy = y + 3.0
-    for cx_, head in zip((cols[0], cols[1], cols[3], cols[4]), L['cr_head']):
+    # The validation cache: note on the left, table on the right ------------------------------
+    nx = 55.2
+    text(nx, CACHE[1] + 6.5, L['cache_title'], TITLE, ACC_DK, 'bold')
+    for k, line in enumerate(L['cache_note']):
+        text(nx, CACHE[1] + 13.5 + 5.6 * k, line, NOTE, INK, width=CACHE[0] - nx - 3.0)
+    x, y, w, h = CACHE
+    rect(*CACHE, WHITE, PANEL_EDGE, .4, r=1.6)
+    cols = (x + 3.5, x + 33.0, x + 71.5, x + 78.0, x + 113.0)   # rule, version, mark, writer, users
+    hy = y + 6.0
+    for cx_, head in zip((cols[0], cols[1], cols[3], cols[4]), L['cache_head']):
         text(cx_, hy, head, NOTE, MUTED)
-    s.line(x + 1.0, hy + 1.0, x + w - 1.0, hy + 1.0, '#D3D0CA', .14)
-    for k, (cond, version, by, used) in enumerate(L['cr_rows']):
-        yy = hy + 3.3 + 2.95 * k
-        new = not isinstance(by, str)
+    s.line(x + 2.0, hy + 2.0, x + w - 2.0, hy + 2.0, RULE, .3)
+    for k, (rule, version, writer, users) in enumerate(L['cache_rows']):
+        yy = hy + 7.4 + 5.6 * k
+        new = not isinstance(writer, str)
         if new:
-            rect(x + .9, yy - 2.05, w - 1.8, 2.75, '#FBF6EA', None, r=.4)
-        text(cols[0], yy, cond, NOTE, INK, width=cols[1] - cols[0] - .6)
-        text(cols[1], yy, version, NOTE, INK, width=cols[2] - cols[1] - .4)
-        mark(s, cols[2] + .6, yy - .75, 'ok')
+            rect(x + 1.8, yy - 4.3, w - 3.6, 5.6, '#FBF6EA', None, r=.8)
+        text(cols[0], yy, rule, NOTE, INK, width=cols[1] - cols[0] - 1.0)
+        text(cols[1], yy, version, NOTE, INK, width=cols[2] - cols[1] - 1.0)
+        mark(s, cols[2] + 1.0, yy - 1.5, 'ok')
         if new:
-            step(s, cols[3] + 1.5, yy - .75, by, USE if by == 3 else EXEC)
+            step(s, cols[3] + 3.0, yy - 1.5, writer, USE if writer == 3 else EXEC, r=2.6)
         else:
-            text(cols[3], yy, by, NOTE, MUTED, width=cols[4] - cols[3] - .6)
-        for j, n in enumerate(used):
-            step(s, cols[4] + 1.5 + 3.4 * j, yy - .75, n, USE if n == 3 else EXEC)
-    # The two steps that read and write it.
-    xc = S3[0] + 14.0
-    route([(xc, A_Y + A_H), (xc, y)], USE, THIN, heads='both', length=1.0)
-    text(xc + 1.6, baseline((A_Y + A_H + y) / 2, NOTE), L['reuse_store'], NOTE, USE)
-    route([(xc, y + h), (xc, B_Y)], EXEC, THIN, heads='both', length=1.0)
-    text(xc + 1.6, baseline((y + h + B_Y) / 2, NOTE), L['reuse_store'], NOTE, EXEC)
+            text(cols[3], yy, writer, NOTE, MUTED, width=cols[4] - cols[3] - 1.0)
+        for j, n in enumerate(users):
+            step(s, cols[4] + 3.0 + 6.8 * j, yy - 1.5, n, USE if n == 3 else EXEC, r=2.6)
+    xc = S3[0] + 40.0
+    route([(xc, A_Y + LANE), (xc, y)], USE, THIN, heads='both', length=HEAD)
+    text(xc + 2.4, (A_Y + LANE + y) / 2 + 2.0, L['lookup_cache'], NOTE, USE)
+    route([(xc, y + h), (xc, B_Y)], EXEC, THIN, heads='both', length=HEAD)
+    text(xc + 2.4, (y + h + B_Y) / 2 + 2.0, L['lookup_cache'], NOTE, EXEC)
 
-    # SQL request: the agent's query declaring m_1^2 ---------------------------
+    # SQL request --------------------------------------------------------------------------
     x, y, w, h = REQ_B
     node(s, REQ_B)
-    text(x + 1.4, y + 3.6, L['sql_req'], TITLE, INK, 'bold', width=w - 2.4)
+    text(x + 3.0, y + 7.0, L['sql_req'], TITLE, INK, 'bold', width=w - 5)
     for k, line in enumerate(L['sql']):
-        text(x + 1.4, y + 6.9 + 2.55 * k, line, NOTE, INK, 'code', width=w - 2.2)
-    rect(x + 1.4, y + h - 3.3, w - 2.8, 2.6, WHITE, EXEC, .14, r=.5)
-    text(x + w / 2, y + h - 1.45, L['declares'], NOTE, EXEC, align='center', width=w - 3.2)
+        text(x + 3.0, y + 12.6 + 4.9 * k, line, NOTE, INK, 'code', width=w - 5.0)
+    rect(x + 3.0, y + h - 6.6, w - 6.0, 5.6, WHITE, EXEC, .3, r=1.2)
+    text(x + w / 2, y + h - 2.5, L['declares'], NOTE, EXEC, align='center', width=w - 7.0)
 
-    # 5 Check the declaration ---------------------------------------------------
-    ex, ey, ew = stage(S5, 5, EXEC, L['s5'])
-    for k, line in enumerate(L['decl']):
-        yy = ey + ROW * k
-        mark(s, ex + .7, yy - .75, 'ok')
-        text(ex + 2.2, yy, line, NOTE, INK, width=ew - 2.2)
-    yy = ey + ROW * 3
-    mark(s, ex + .7, yy - .75, 'fail')
-    text(ex + 2.2, yy, L['reject'], NOTE, RED, width=ew - 2.2)
+    # 5 Check the named version ---------------------------------------------------------------
+    ex, ey, ew = stage(s, S5, 5, EXEC, *L['s5'])
+    for k, line in enumerate(L['version_rows']):
+        yy = ey + PITCH * k
+        mark(s, ex + 1.4, yy - 1.5, 'ok' if k < 3 else 'fail')
+        text(ex + 4.4, yy, line, NOTE, INK if k < 3 else RED, width=ew - 4.4)
 
-    # 6 Same-snapshot validation -------------------------------------------------
-    ex, ey, ew = stage(S6, 6, EXEC, L['s6'])
-    rect(ex - .6, ey - 2.1, ew + 1.2, 2.9, AMBER_PALE, AMBER, .12, r=.4)
+    # 6 Validate on the query's snapshot ------------------------------------------------------
+    ex, ey, ew = stage(s, S6, 6, EXEC, *L['s6'])
+    rect(ex - 1.2, ey - 4.3, ew + 2.4, 5.8, AMBER_PALE, AMBER, .25, r=.8)
     text(ex, ey, L['snap'], NOTE, WAIT, width=ew)
-    for k, (cond, outcome) in enumerate(zip(L['conds'], L['reuse_b'])):
-        yy = ey + ROW * (k + 1)
-        text(ex, yy, cond, NOTE, INK, width=21.0)
-        text(ex + 21.5, yy, outcome, NOTE, MUTED if k == 1 else WAIT, width=ew - 24.0)
-        mark(s, ex + ew - 1.0, yy - .75, 'ok')
+    for k, (rule, out) in enumerate(zip(L['rules'], L['snap_out'])):
+        yy = ey + PITCH * (k + 1)
+        text(ex, yy, rule, NOTE, INK, width=28.0)
+        text(ex + 29.0, yy, out, NOTE, MUTED if k == 1 else WAIT, width=ew - 33.6)
+        mark(s, ex + ew - 1.6, yy - 1.5, 'ok')
 
-    # 7 Execute on the same snapshot -------------------------------------------
-    ex, ey, ew = stage(S7, 7, EXEC, L['s7'])
+    # 7 Run on the same snapshot --------------------------------------------------------------
+    ex, ey, ew = stage(s, S7, 7, EXEC, *L['s7'])
     text(ex, ey, L['run'], NOTE, INK)
-    text(ex, ey + ROW + .2, L['answer'], NOTE, MUTED)
-    text(ex + ew, ey + ROW + .5, '3,294,349.93', TITLE, EXEC, align='right')
-    f1, f2 = L['if_fail']
-    text(ex, ey + ROW * 2 + .6, f1, NOTE, MUTED, width=ew)
-    text(ex, ey + ROW * 3 + .6, f2, NOTE, MUTED, width=ew)
+    text(ex, ey + PITCH, L['result'], NOTE, MUTED)
+    text(ex + ew, ey + PITCH, L['value'], NOTE + 1, EXEC, 'bold', align='right')
+    for k, line in enumerate(L['fail']):
+        text(ex, ey + PITCH * (k + 2), line, NOTE, MUTED, width=ew)
 
-    # Arrows from one step to the next -----------------------------------------
-    ya, yb_ = A_Y + 2.6, B_Y + 2.6
-    for (l, r), color, yy in (((REQ_A, S1), USE, ya), ((S1, S2), USE, ya), ((S2, S3), USE, ya),
-                              ((S3, S4), USE, ya), ((REQ_B, S5), EXEC, yb_),
-                              ((S5, S6), EXEC, yb_), ((S6, S7), EXEC, yb_)):
-        x0 = l[0] + l[2] + (1.5 if l in (REQ_A, REQ_B) else 0)
-        route([(x0, yy), (r[0], yy)], color, THIN, length=1.0)
+    # Arrows from one step to the next ----------------------------------------------------------
+    for (l, r), color in (((REQ_A, S1), USE), ((S1, S2), USE), ((S2, S3), USE), ((S3, S4), USE),
+                          ((REQ_B, S5), EXEC), ((S5, S6), EXEC), ((S6, S7), EXEC)):
+        yy = l[1] + 5.6
+        x0 = l[0] + l[2] + (3.0 if l in (REQ_A, REQ_B) else 0)
+        route([(x0, yy), (r[0], yy)], color, THIN, length=HEAD)
 
 
 if __name__ == '__main__':

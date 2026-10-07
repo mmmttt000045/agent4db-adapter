@@ -20,9 +20,9 @@ pdftoppm -r 400 -png /tmp/x/architecture.pdf /tmp/x/architecture
 
 依赖：`reportlab`、`matplotlib`、`fonttools`、Ghostscript（`gs`），以及带 `kpsewhich` 的 TeX Live（libertine、inconsolata、fandol 字体）；架构图的中文版另需 Noto Sans CJK SC。noctis 上都已具备，本机没有装 reportlab。生成的 PDF 是论文源文件，要提交到仓库，Overleaf 不运行 Python。
 
-## 系统图草稿
+## 汇报用的三张图
 
-`overview.py`、`lookup.py`、`lifecycle.py` 是把架构图拆成三张的草稿（总体结构、请求处理、学习与维护），目前不进论文，也不进 PPT（PPT 改用原生的简单示意图，见 `tools/deck/`），留作以后重画论文图的参考。三张图讲同一个例子（门店退货金额，数值取自端到端实验的任务 M2-L1、M2-P1），图中只用文字、不用论文符号，也不写年份；共用部件在 `parts.py`。预览：`python3 tools/figures/build.py --drafts --out /tmp/x`。
+`overview.py`、`lookup.py`、`lifecycle.py` 是汇报 PPT 用的三张图（系统结构、查询与执行、学习与维护），不进论文。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`），用通用词汇（指标定义、指标库、校验规则、校验结果缓存、数据版本、快照、v1/v2、停用、回归测试），不用论文符号，也不写年份；三张图讲同一个例子（门店退货金额，数值取自端到端实验的任务 M2-L1、M2-P1）。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
 
 ## 数据核对
 

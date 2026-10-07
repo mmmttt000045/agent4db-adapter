@@ -1,4 +1,4 @@
-"""Deck figure 1 (system overview): a user agent's requests through MAVRA.
+"""Draft figure 1 (system overview): a user agent's requests through MAVRA.
 
 A user agent sends two kinds of request. A text request names a metric
 ("return amount"); request handling looks it up in the shared store, which
@@ -7,10 +7,10 @@ the agent receives a valid revision. An SQL request declares that revision;
 same-snapshot validation checks its conditions on the query's snapshot and runs
 the query there. Learning and maintenance is the third module: MAVRA's built-in
 analysis optimizer, an LLM agent, learns definitions that admission publishes,
-and maintenance rechecks, repairs, or invalidates them. Deck figure 2 opens
-request handling (lookup.py), deck figure 3 learning and maintenance
-(lifecycle.py). These figures are for the report deck (tools/deck), not the
-paper.
+and maintenance rechecks, repairs, or invalidates them. Draft figure 2 opens
+request handling (lookup.py), draft figure 3 learning and maintenance
+(lifecycle.py). These are drafts for a later paper figure; neither the paper nor
+the deck uses them yet.
 
 Step numbers and arrows are coloured by path: use 1-5 (blue), execution
 6-8 (amber), learning (violet). Line weight says what an arrow does: thin =

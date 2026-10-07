@@ -1,4 +1,4 @@
-"""Deck figure 3: how MAVRA learns a definition and keeps it valid, by example.
+"""Draft figure 3: how MAVRA learns a definition and keeps it valid, by example.
 
 One definition, store return amount, through its life. Top row: the built-in
 analysis optimizer, an LLM agent, answers a learning question whose meaning is

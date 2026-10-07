@@ -1,27 +1,24 @@
 # 汇报 PPT
 
-`build-deck.js` 生成 `docs/mavra-system.pptx`：6 页中文 PPT，只讲 MAVRA 的结构、功能和工作流，围绕三张系统图展开，每页带讲稿备注。
+`build-deck.js` 生成 `docs/mavra-system.pptx`：10 页中文 PPT，给老师讲清楚 MAVRA 的结构、功能和工作流。全部用 PowerPoint 原生的简单示意图（方框、箭头、流程图、小表格），可直接在 PowerPoint 里改；不放论文图。每页带讲稿备注，全程用“门店退货金额”一个例子。
 
 | 页 | 内容 |
 | --- | --- |
 | 1 | 标题 |
-| 2 | MAVRA 做三件事：学习并共享口径、数据变了就维护、使用时把关 |
-| 3 | 系统结构（`figures/overview-zh.png`）：一个请求怎样流经三个模块 |
-| 4 | 工作流①（`figures/lookup-zh.png`）：查找有效定义、在快照上执行，检查结果的复用 |
-| 5 | 工作流②（`figures/lifecycle-zh.png`）：口径的学习、失效与修复 |
-| 6 | 小结：结构、功能、工作流各一句 |
-
-三张图由 `tools/figures/overview.py`、`lookup.py`、`lifecycle.py` 画成（说明见 `tools/figures/README.md`），不进论文。改图后先在 noctis 上重画并转成 PNG，再在本机生成 PPT：
+| 2 | 问题：共享的口径会悄悄过期（学会 → 共享 → 数据变了 → 悄悄算错） |
+| 3 | 系统结构：智能体 ↔ MAVRA（请求处理、共享知识库、学习与维护）↔ 数据库 |
+| 4 | 三个模块各管什么 |
+| 5 | 工作流①：智能体来问口径（按名字找 → 看数据变没变 → 需要就重新检查 → 返回） |
+| 6 | 检查结果：查一次，大家都能用（按“条件 + 数据版本”保存） |
+| 7 | 工作流②：智能体执行 SQL（声明 → 核对 → 执行；不成立就拒绝） |
+| 8 | 工作流③：一个口径的一生（流程图：学习、发布、使用、写入、检查、修复或停用） |
+| 9 | 修复的例子：退货表多了“申请”行 |
+| 10 | 小结 |
 
 ```bash
-# noctis，仓库根目录
-python3 tools/figures/build.py --deck
-cd tools/deck/figures && for f in *.pdf; do pdftoppm -r 400 -png -singlefile $f ${f%.pdf}; done
-
-# 本机（把 tools/deck/figures 取回后）
 cd tools/deck
 npm ci          # 只需一次，pptxgenjs 4.0.1
 npm run build   # 写 docs/mavra-system.pptx；或 node build-deck.js --out 其他路径
 ```
 
-字体为 Microsoft YaHei；在 Linux 上用 LibreOffice 预览时由 Noto Sans CJK SC 代替。
+数值取自端到端实验：5 月门店退货金额 329.4 万（不维护时 658.9 万），学习题 4 月 313.3 万；第 9 页的明细行是示意。字体为 Microsoft YaHei；在 Linux 上用 LibreOffice 预览时由 Noto Sans CJK SC 代替。

@@ -3,7 +3,7 @@
 \label{alg:repair}
 \footnotesize
 \begin{algorithmic}[1]
-\Require \bt{revision $m^r$ whose $\operatorname{KeyUnique}(F,K,\varphi)$ failed; learning question $x$; the agent's learning SQL $R$; learning snapshot $D_\ell$; low-cardinality columns $A$ of $F$}{$\operatorname{KeyUnique}(F,K,\varphi)$ 失效的修订 $m^r$；学习题 $x$；智能体的学习 SQL $R$；学习时快照 $D_\ell$；$F$ 的低基数列 $A$}
+\Require \bt{revision $m^r$ whose $\operatorname{KeyUnique}(F,K,\varphi)$ failed; learning question $x$; the agent's learning SQL $R$; the database $D_\ell$ as of learning time; low-cardinality columns $A$ of $F$}{$\operatorname{KeyUnique}(F,K,\varphi)$ 失效的修订 $m^r$；学习题 $x$；智能体的学习 SQL $R$；学习时刻的数据库 $D_\ell$（as-of）；$F$ 的低基数列 $A$}
 \State $P\gets\emptyset$
 \ForAll{$a\in A$ \textbf{and} $v\in\pi_a(F)$}
   \State $\psi\gets\varphi\wedge(a=v)$

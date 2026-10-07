@@ -1,15 +1,17 @@
 """Deck figure 3 (learning and maintenance): one metric definition through its life.
 
-Top row: the built-in agent (an LLM) answers a learning question whose meaning
-is given, the answer is verified, and v1 is published after validation; a normal
-write (late returns) leaves every rule true, so v1 stays. Bottom row: a breaking
-write (an application-state row per return) breaks "one row per return" and v1
-is retired; the repair tries filters on low-cardinality columns, exactly one
-works, the regression test on the data as of learning gives the same answer,
-and v2 is published. The red box is the other outcome: when two filters work
-(a full backup copy), the definition stays retired until it is relearned.
-Values come from the end-to-end study (tasks M2-L1, M2-P1). Drawn at slide size
-for the report deck, with everyday terms rather than the paper's notation.
+Store revenue (门店营业额). Top row: the built-in agent (an LLM) answers a learning
+question whose meaning is given (March, 13,570,368.70), the answer is verified,
+and v1 is published after validation; appending new sales leaves every rule
+true, so v1 stays and the other metrics reuse the results. Bottom row: a
+restatement keeps the old rows as non-current (ss_is_current = 0) and breaks
+"one row per sale"; v1 is retired; the repair tries filters on low-cardinality
+columns, exactly one works, the regression test on the learning-time data gives
+the same answer (on current data it would refuse the fix), and v2 is published.
+The red box is the other outcome: after a duplicate load no filter works and the
+definition stays retired. Values come from the end-to-end study (run r1 of
+MAVRA; tasks M1-L1 and M1-P1). Drawn at slide size for the report deck, with
+everyday terms rather than the paper's notation.
 """
 import sys
 from pathlib import Path
@@ -26,53 +28,54 @@ W, H = 300.0, 110.0
 LABELS = {
     'zh': {
         'title': 'MAVRA 学习与维护', 'paths': ('学习', '维护'), 'otherwise': '另一种结果',
+        'table': '`store_sales`',
         'learn': ('学习', '内置智能体（大模型）'),
-        'l_rows': ('题目：4 月门店退货金额', '`SUM(sr_return_amt) … d_moy = 4`',
-                   '答案 313.3 万，核验正确', '发布前校验通过'),
+        'l_rows': ('题目：3 月门店营业额（给口径）', '`SUM(ss_net_paid) … d_moy = 3`',
+                   '答案 1357.0 万，核验正确', '发布前校验通过'),
         'pub1': ('发布 v1', '指标定义包含'),
-        'p1_rows': ('计算：`SUM(sr_return_amt)`', '规则：每笔退货一行、', '日期键唯一、退货都有日期',
+        'p1_rows': ('计算：`SUM(ss_net_paid)`', '规则：每笔销售一行、', '日期键唯一、丢行率不超标',
                     '保存：学习时的 SQL'),
-        'benign': ('普通写入', '追加迟到的退货'),
-        'b_rows': ('重新校验：仍成立', '`date_dim` 未变：复用缓存', '仍为 v1'),
+        'benign': ('追加新数据', '追加一批新销售（新小票号）'),
+        'b_rows': ('重新校验：仍成立', '其他指标：直接复用结果', '仍为 v1'),
         'later': '之后的一次写入',
-        'breaking': ('破坏性写入', '每笔退货追加一行“申请”状态'),
-        'k_rows': ('每笔退货一行：不成立', 'v1 停用', '不处理：658.9 万（翻倍）'),
+        'breaking': ('数据更正', '旧行保留为非当前，新增当前行'),
+        'k_rows': ('每笔销售一行：不成立', 'v1 停用', '不处理：1430.1 万（多算旧行）'),
         'search': ('寻找修复', '在取值少的列上逐个试过滤'),
-        's_rows': ("`sr_status='完成'`", "`sr_status='申请'` 丢退货", '只有一个可行'),
-        'regress': ('回归测试', '用学习时的数据重算'),
-        'r_rows': ('原 SQL', '加过滤后', '一致：接受修复'), 'value': '313.3 万',
+        's_rows': ("`ss_is_current='1'`", "`ss_is_current='0'` 丢销售", '只有一个可行'),
+        'regress': ('回归测试', '用学习时的数据重算 3 月'),
+        'r_rows': ('原 SQL', '加过滤后', '一致：接受修复', '用现在的数据比，会错拒'), 'value': '1357.0 万',
         'pub2': ('发布 v2', '同一指标的新版本'),
-        'p2_rows': ('v2 = v1 + 过滤', "`sr_status='完成'`", '注明 v1 的 SQL 被拒绝', '等待中的请求拿到 v2'),
-        'nofix': ('无法唯一修复', '例：追加了一整份备份数据'),
-        'n_rows': ("`sr_source='primary'`", "`sr_source='backup'`", '两个都可行：无法判断',
-                   '停用，等待重新学习'),
-        'two': '两个可行，或一个也没有', 'relearn': '重新学习',
+        'p2_rows': ('v2 = v1 + 过滤', "`ss_is_current='1'`", '注明 v1 的 SQL 被拒绝', '等待中的请求拿到 v2'),
+        'nofix': ('无法修复', '例：一批销售被重复装载'),
+        'n_rows': ('每笔销售一行：不成立', '没有任何过滤能修好', '停用，提醒用过的智能体', '等待重新学习'),
+        'two': '一个也没有（或不止一个）', 'relearn': '重新学习',
     },
     'en': {
         'title': 'MAVRA learning and maintenance', 'paths': ('learning', 'maintenance'),
-        'otherwise': 'other outcome',
+        'otherwise': 'other outcome', 'table': '`store_sales`',
         'learn': ('Learn', 'built-in agent (LLM)'),
-        'l_rows': ('question: April return amount', '`SUM(sr_return_amt) … d_moy = 4`',
-                   'answer 3,133,115.63, verified', 'validated before publishing'),
+        'l_rows': ('question: March store revenue', '`SUM(ss_net_paid) … d_moy = 3`',
+                   'answer 13,570,368.70, verified', 'validated before publishing'),
         'pub1': ('Publish v1', 'the definition holds'),
-        'p1_rows': ('`SUM(sr_return_amt)`', 'rules: one row per return,', 'date key unique,',
-                    'dates complete; learning SQL'),
-        'benign': ('Normal write', 'late returns appended'),
-        'b_rows': ('rechecked: still holds', '`date_dim` same: cached', 'stays v1'),
+        'p1_rows': ('`SUM(ss_net_paid)`', 'rules: one row per sale,', 'date key unique,',
+                    'loss in bound; learning SQL'),
+        'benign': ('New data', 'new sales appended'),
+        'b_rows': ('rechecked: still holds', 'other metrics: reuse', 'stays v1'),
         'later': 'a later write',
-        'breaking': ('Breaking write', 'a status row per return'),
-        'k_rows': ('one row per return: fails', 'v1 retired', 'unfixed: answer doubles'),
+        'breaking': ('Restatement', 'old rows kept as non-current'),
+        'k_rows': ('one row per sale: fails', 'v1 retired', 'unfixed: old rows counted'),
         'search': ('Find a repair', 'try filters on few-value columns'),
-        's_rows': ("`sr_status='done'`", "`sr_status='applied'` loses rows", 'exactly one works'),
-        'regress': ('Regression test', 'rerun on the learning-time data'),
-        'r_rows': ('learning SQL', 'with the filter', 'same: fix accepted'), 'value': '3,133,115.63',
+        's_rows': ("`ss_is_current='1'`", "`ss_is_current='0'` loses sales", 'exactly one works'),
+        'regress': ('Regression test', 'rerun March on learning-time data'),
+        'r_rows': ('learning SQL', 'with the filter', 'same: fix accepted', 'current data would refuse it'),
+        'value': '13,570,368.70',
         'pub2': ('Publish v2', 'new version, same metric'),
-        'p2_rows': ('v2 = v1 + filter', "`sr_status='done'`", 'SQL naming v1: rejected',
+        'p2_rows': ('v2 = v1 + filter', "`ss_is_current='1'`", 'SQL naming v1: rejected',
                     'waiting requests get v2'),
-        'nofix': ('No unique repair', 'e.g. a full backup copy'),
-        'n_rows': ("`sr_source='primary'`", "`sr_source='backup'`", 'both work: cannot tell',
+        'nofix': ('No repair', 'e.g. a batch loaded twice'),
+        'n_rows': ('one row per sale: fails', 'no filter restores it', 'retired; agents told',
                    'retired until relearned'),
-        'two': 'two work, or none', 'relearn': 'relearn',
+        'two': 'none (or several) work', 'relearn': 'relearn',
     },
 }
 
@@ -95,7 +98,7 @@ def draw(s, lang):
 
     def version(ex, ey, ew, old, new):
         rect(ex - 1.2, ey - 4.3, ew + 2.4, 5.8, AMBER_PALE, AMBER, .25, r=.8)
-        text(ex, ey, '`store_returns`', NOTE, INK)
+        text(ex, ey, L['table'], NOTE, INK)
         text(ex + ew, ey, f'{old} → {new}', NOTE, WAIT, align='right')
 
     rect(0, 0, W, H, FIELD, None, r=2.8)
@@ -136,7 +139,7 @@ def draw(s, lang):
         yy = ey + PITCH * k
         text(ex, yy, label, NOTE, INK)
         text(ex + ew - 4.6, yy, L['value'], NOTE, INK, align='right')
-    rows(s, ex, ey, ew, L['r_rows'][2:], PITCH, first=2, colors={0: ACC_DK}, marks={0: 'ok'})
+    rows(s, ex, ey, ew, L['r_rows'][2:], PITCH, first=2, colors={0: ACC_DK, 1: MUTED}, marks={0: 'ok'})
 
     # 7 Publish v2 ---------------------------------------------------------------------------
     ex, ey, ew = stage(s, PUB2, 7, USE, *L['pub2'])
@@ -144,7 +147,7 @@ def draw(s, lang):
 
     # The other outcome: no unique repair ---------------------------------------------------
     ex, ey, ew = stage(s, NOFIX, None, RED, *L['nofix'], edge=RED, dash=(1.6, 1.0))
-    rows(s, ex, ey, ew, L['n_rows'], PITCH, colors={2: RED, 3: LEARN}, marks={0: 'ok', 1: 'ok'})
+    rows(s, ex, ey, ew, L['n_rows'], PITCH, colors={0: RED, 1: RED, 3: LEARN}, marks={0: 'fail'})
 
     # Arrows ---------------------------------------------------------------------------------
     for (l, r), color in (((LEARN_B, PUB1), LEARN), ((PUB1, BENIGN), USE), ((BREAK, SEARCH), USE),

@@ -1,6 +1,6 @@
 """Deck figure 1 (system structure): how a user agent's two requests flow through MAVRA.
 
-A user agent asks for a metric by name ("return amount"); the query service
+A user agent asks for a metric by name ("store revenue"); the query service
 reads its definition from the metric store; a validation result missing for the
 current data version is computed by maintenance and cached; a valid definition
 (v2) goes back. The agent then sends SQL that names v2; the pre-execution check
@@ -25,39 +25,39 @@ W, H = 300.0, 139.5
 
 LABELS = {
     'zh': {
-        'agents': '用户智能体', 'question': ('5 月门店', '退货金额？'), 'sql': 'SQL',
-        'declares': '注明：退货金额 v2', 'middleware': 'MAVRA 中间件',
+        'agents': '用户智能体', 'question': ('9 月门店', '营业额？'), 'sql': 'SQL',
+        'declares': '注明：营业额 v2', 'middleware': 'MAVRA 中间件',
         'paths': ('学习', '查询指标定义', '执行 SQL'), 'lines': ('调用 / 返回', '写入指标库', '读数据库'),
         'service': '查询服务', 'lookup': ('查指标定义', '按名称匹配，看数据变没变'),
         'check': ('执行前校验', '同一快照内校验，再执行'),
         'store': '指标库', 'defs': '指标定义',
-        'def_chips': (('退货金额 v2', '待校验'), ('退货率 v2', '有效'), ('营业额 v1', '有效')),
+        'def_chips': (('营业额 v2', '待校验'), ('电子品类 v2', '有效'), ('退货率 v2', '有效')),
         'cache': '校验结果缓存', 'cache_note': '按（规则，数据版本）缓存，大家共用',
-        'cache_chips': (('每笔退货一行', '数据版本 15', 'ok'), ('日期键唯一', '数据版本 3', 'ok'),
-                        ('退货都有日期', '数据版本 15', 'wait')),
+        'cache_chips': (('每笔销售一行', '数据版本 15', 'ok'), ('日期键唯一', '数据版本 3', 'ok'),
+                        ('丢行率不超标', '数据版本 15', 'wait')),
         'agent': ('内置智能体（大模型）', '学习新指标定义，发布前校验'),
         'maint': ('维护', '执行校验 · 修复或停用'),
-        'req_text': '查“退货金额”', 'resp_text': '有效定义 v2', 'req_sql': '执行 SQL', 'resp_sql': '查询结果',
+        'req_text': '查“营业额”', 'resp_text': '有效定义 v2', 'req_sql': '执行 SQL', 'resp_sql': '查询结果',
         'read': '读定义', 'reuse': ('复用', '校验结果'), 'missing': '缺结果：执行校验',
         'store_result': '写入结果', 'publish': '发布',
         'run': '在快照上执行 SQL', 'qc': '校验 SQL、数据版本',
         'db': '数据库', 'snapshot': '快照', 'etl': 'ETL / 写入方', 'write': '写入',
     },
     'en': {
-        'agents': 'User agents', 'question': ('Return amount', 'in May?'), 'sql': 'SQL',
+        'agents': 'User agents', 'question': ('Store revenue', 'in September?'), 'sql': 'SQL',
         'declares': 'declares v2', 'middleware': 'MAVRA middleware',
         'paths': ('learning', 'find definition', 'run SQL'),
         'lines': ('call / response', 'write to store', 'read database'),
         'service': 'Query service', 'lookup': ('Find definition', 'match name, check data'),
         'check': ('Pre-run check', 'validate on one snapshot'),
         'store': 'Metric store', 'defs': 'Definitions',
-        'def_chips': (('amount v2', 'pending'), ('rate v2', 'valid'), ('revenue v1', 'valid')),
+        'def_chips': (('revenue v2', 'pending'), ('electr. v2', 'valid'), ('rate v2', 'valid')),
         'cache': 'Validation cache', 'cache_note': 'per (rule, data version), shared',
-        'cache_chips': (('one row/return', 'version 15', 'ok'), ('date key unique', 'version 3', 'ok'),
-                        ('dates complete', 'version 15', 'wait')),
+        'cache_chips': (('one row/sale', 'version 15', 'ok'), ('date key unique', 'version 3', 'ok'),
+                        ('loss in bound', 'version 15', 'wait')),
         'agent': ('Built-in agent (LLM)', 'learns and validates definitions'),
         'maint': ('Maintenance', 'run checks · repair or retire'),
-        'req_text': 'ask “amount”', 'resp_text': 'valid v2', 'req_sql': 'run SQL', 'resp_sql': 'result',
+        'req_text': 'ask “revenue”', 'resp_text': 'valid v2', 'req_sql': 'run SQL', 'resp_sql': 'result',
         'read': 'read', 'reuse': ('reuse', 'results'), 'missing': 'missing: run check',
         'store_result': 'store', 'publish': 'publish',
         'run': 'run SQL on the snapshot', 'qc': 'check SQL, data versions',
@@ -217,7 +217,7 @@ def draw(s, lang):
         table_card(s, nx + 21.0 + k * 12.0, 10.5, top + 1.2, inner - 2.4)
     vx, vw = VERS
     rect(vx, top, vw, inner, WHITE, EDGE, .28, r=.8)
-    for k, (table, old, new) in enumerate((('`store_returns`', 14, 15), ('`date_dim`', 3, None))):
+    for k, (table, old, new) in enumerate((('`store_sales`', 14, 15), ('`date_dim`', 3, None))):
         yy = top + 4.6 + 6.4 * k
         if new:
             rect(vx + 1.0, yy - 3.0, vw - 2.0, 5.2, AMBER_PALE, AMBER, .28, r=.9)
@@ -226,7 +226,7 @@ def draw(s, lang):
         text(vx + vw - 2.6, baseline(yy - .4, NOTE), value, NOTE, WAIT if new else INK, align='right')
     tx, tw_ = TABLES
     cw3 = (tw_ - 2.0) / 2
-    for k, (label, changed) in enumerate((('`store_returns`', (1, 2)), ('`date_dim`', ()))):
+    for k, (label, changed) in enumerate((('`store_sales`', (1, 2)), ('`date_dim`', ()))):
         table_card(s, tx + k * (cw3 + 2.0), cw3, top, inner, label, changed,
                    outline=AMBER if changed else EDGE)
 

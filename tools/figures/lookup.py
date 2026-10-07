@@ -1,15 +1,15 @@
 """Deck figure 2 (query and execution): how the query service answers a user agent.
 
-Top lane: the agent asks for "return amount"; the service matches names and
+Top lane: the agent asks for "store revenue"; the service matches names and
 aliases, compares the data versions recorded at the last validation with the
 current ones, looks each validation rule up in the cache (reusing hits,
 validating and caching misses), and returns the valid definition v2. Middle:
 the validation cache, keyed by (rule, data version) and shared by every
 definition and agent, with who wrote each entry and which step reused it.
 Bottom lane: the agent's SQL names v2; the service checks the version, validates
-the rules on the query's own snapshot (a write has meanwhile moved store_returns
+the rules on the query's own snapshot (a write has meanwhile moved store_sales
 to version 16), and runs the SQL on that snapshot. Values come from the
-end-to-end study (task M2-P1: 3,294,349.93). Drawn at slide size for the
+end-to-end study (task M1-P1 under the restatement: 12,932,888.04). Drawn at slide size for the
 report deck, with everyday terms rather than the paper's notation.
 """
 import sys
@@ -27,51 +27,51 @@ W, H = 300.0, 149.0
 LABELS = {
     'zh': {
         'agent': '用户智能体', 'mavra': 'MAVRA 查询服务', 'paths': ('查询指标定义', '执行 SQL'),
-        'text_req': '文本请求', 'question': ('5 月门店', '退货金额？'), 'ask': '查“退货金额”',
+        'text_req': '文本请求', 'question': ('9 月门店', '营业额？'), 'ask': '查“门店营业额”',
         's1': ('匹配名称', '名称或别名包含它'),
-        'names': (('门店退货金额', True), ('门店退货率', False), ('门店营业额', False)),
+        'names': (('门店营业额', True), ('电子品类门店营业额', True), ('目录渠道营业额', False)),
         's2': ('看数据版本', '上次校验时 → 现在'), 'then_now': ('上次', '现在'),
-        'changed': '变了：要重新校验',
+        'tables': ('`store_sales`', '`date_dim`'), 'changed': '变了：要重新校验',
         's3': ('校验（先查缓存）', '每条规则：查缓存，没有才执行校验'),
-        'rules': ('每笔退货一行', '日期键唯一', '退货都有日期'),
+        'rules': ('每笔销售一行', '日期键唯一', '丢行率不超标'),
         'lookup_out': ('缓存命中：复用', '缓存命中：复用', '未命中：校验后缓存'),
-        's4': ('返回', '有效时返回定义'), 'valid': '退货金额 v2，有效',
-        'fields': ('`store_returns`', '`SUM(sr_return_amt)`', "`sr_status='完成'`"),
+        's4': ('返回', '有效时返回定义'), 'valid': '门店营业额 v2，有效',
+        'fields': ('`store_sales`', '`SUM(ss_net_paid)`', "`ss_is_current='1'`"),
         'then': ('然后', '写 SQL'),
         'cache_title': '校验结果缓存',
         'cache_note': ('按（校验规则，数据版本）缓存校验结果。', '同一规则、同一数据版本：所有指标定义、',
                        '所有智能体共用一份，不重复校验。', '数据版本变了，才需要重新校验。'),
         'cache_head': ('规则', '数据版本', '写入者', '使用者'),
-        'cache_rows': (('每笔退货一行', '`store_returns` 15', '退货率', (3,)),
+        'cache_rows': (('每笔销售一行', '`store_sales` 15', '电子品类', (3,)),
                        ('日期键唯一', '`date_dim` 3', '之前的校验', (3, 6)),
-                       ('退货都有日期', '`store_returns` 15', 3, ()),
-                       ('每笔退货一行', '`store_returns` 16', 6, ()),
-                       ('退货都有日期', '`store_returns` 16', 6, ())),
+                       ('丢行率不超标', '`store_sales` 15', 3, ()),
+                       ('每笔销售一行', '`store_sales` 16', 6, ()),
+                       ('丢行率不超标', '`store_sales` 16', 6, ())),
         'lookup_cache': '查 / 写缓存',
         'sql_req': 'SQL 请求',
-        'sql': ('SELECT SUM(sr_return_amt)', 'FROM store_returns', 'JOIN date_dim ON …',
-                "WHERE sr_status = '完成'", 'AND d_moy = 5 AND …'),
-        'declares': '注明：退货金额 v2',
+        'sql': ('SELECT SUM(ss_net_paid)', 'FROM store_sales', 'JOIN date_dim ON …',
+                "WHERE ss_is_current = '1'", 'AND d_moy = 9 AND …'),
+        'declares': '注明：门店营业额 v2',
         's5': ('检查版本', '注明的 v2 能用吗？'),
-        'version_rows': ('v2 存在、未停用', 'v2 是最新版本', 'SQL 含状态过滤', '若注明 v1：已过期，拒绝'),
+        'version_rows': ('v2 存在、未停用', 'v2 是最新版本', 'SQL 含当前行过滤', '若注明 v1：已过期，拒绝'),
         's6': ('快照内校验', '在本次查询的快照上，规则都成立？'),
-        'snap': '快照里 `store_returns` 已是 16',
+        'snap': '快照里 `store_sales` 已是 16',
         'snap_out': ('未命中：快照内校验', '命中：复用', '未命中：快照内校验'),
-        's7': ('执行', '同一快照上执行'), 'run': '执行 SQL', 'result': '结果', 'value': '329.4 万',
+        's7': ('执行', '同一快照上执行'), 'run': '执行 SQL', 'result': '结果', 'value': '1293.3 万',
         'fail': ('校验失败则', '拒绝执行'),
     },
     'en': {
         'agent': 'User agent', 'mavra': 'MAVRA query service', 'paths': ('find definition', 'run SQL'),
-        'text_req': 'Text request', 'question': ('Return amount', 'in May?'), 'ask': 'ask “amount”',
+        'text_req': 'Text request', 'question': ('Store revenue', 'in September?'), 'ask': 'ask “revenue”',
         's1': ('Match name', 'name or alias'),
-        'names': (('return amount', True), ('return rate', False), ('revenue', False)),
+        'names': (('store revenue', True), ('electronics revenue', True), ('catalog revenue', False)),
         's2': ('Data versions', 'last check → now'), 'then_now': ('then', 'now'),
-        'changed': 'changed: recheck',
+        'tables': ('`store_sales`', '`date_dim`'), 'changed': 'changed: recheck',
         's3': ('Validate (cache first)', 'look up each rule; validate misses'),
-        'rules': ('one row/return', 'date key unique', 'dates complete'),
+        'rules': ('one row/sale', 'date key unique', 'loss in bound'),
         'lookup_out': ('cache hit: reuse', 'cache hit: reuse', 'miss: check, cache'),
-        's4': ('Return', 'only if valid'), 'valid': 'amount v2, valid',
-        'fields': ('`store_returns`', '`SUM(sr_return_amt)`', "`sr_status='done'`"),
+        's4': ('Return', 'only if valid'), 'valid': 'revenue v2, valid',
+        'fields': ('`store_sales`', '`SUM(ss_net_paid)`', "`ss_is_current='1'`"),
         'then': ('then', 'writes SQL'),
         'cache_title': 'Validation cache',
         'cache_note': ('Results are cached per (rule, data version).',
@@ -79,31 +79,31 @@ LABELS = {
                        'and every agent shares one result. Only a new',
                        'data version needs a new check.'),
         'cache_head': ('rule', 'data version', 'written by', 'used in'),
-        'cache_rows': (('one row/return', '`store_returns` 15', 'return rate', (3,)),
+        'cache_rows': (('one row/sale', '`store_sales` 15', 'electronics', (3,)),
                        ('date key unique', '`date_dim` 3', 'earlier', (3, 6)),
-                       ('dates complete', '`store_returns` 15', 3, ()),
-                       ('one row/return', '`store_returns` 16', 6, ()),
-                       ('dates complete', '`store_returns` 16', 6, ())),
+                       ('loss in bound', '`store_sales` 15', 3, ()),
+                       ('one row/sale', '`store_sales` 16', 6, ()),
+                       ('loss in bound', '`store_sales` 16', 6, ())),
         'lookup_cache': 'read / write',
         'sql_req': 'SQL request',
-        'sql': ('SELECT SUM(sr_return_amt)', 'FROM store_returns', 'JOIN date_dim ON …',
-                "WHERE sr_status = 'done'", 'AND d_moy = 5 AND …'),
-        'declares': 'declares amount v2',
+        'sql': ('SELECT SUM(ss_net_paid)', 'FROM store_sales', 'JOIN date_dim ON …',
+                "WHERE ss_is_current = '1'", 'AND d_moy = 9 AND …'),
+        'declares': 'declares revenue v2',
         's5': ('Check version', 'is the named v2 usable?'),
         'version_rows': ('v2 exists, not retired', 'v2 is the latest', 'SQL keeps the filter',
                          'naming v1: rejected'),
         's6': ('Snapshot check', 'do the rules hold on this snapshot?'),
-        'snap': 'snapshot sees `store_returns` 16',
+        'snap': 'snapshot sees `store_sales` 16',
         'snap_out': ('miss: check here', 'hit: reuse', 'miss: check here'),
         's7': ('Run', 'on the same snapshot'), 'run': 'run the SQL', 'result': 'result',
-        'value': '3,294,349.93', 'fail': ('a failed rule', 'rejects the SQL'),
+        'value': '12,932,888.04', 'fail': ('a failed rule', 'rejects the SQL'),
     },
 }
 
 A_Y, B_Y, LANE = 13.0, 107.0, 40.0
 REQ_A = (2.0, A_Y, 44.0, LANE)
-S1 = (52.0, A_Y, 45.0, LANE)
-S2 = (101.0, A_Y, 52.0, LANE)
+S1 = (52.0, A_Y, 50.0, LANE)
+S2 = (106.0, A_Y, 47.0, LANE)
 S3 = (157.0, A_Y, 86.0, LANE)
 S4 = (247.0, A_Y, 51.0, LANE)
 CACHE = (157.0, 59.0, 141.0, 40.0)
@@ -149,14 +149,14 @@ def draw(s, lang):
             mark(s, ex + ew - 1.6, yy - 1.5, 'ok')
         else:
             s.line(ex + ew - 2.7, yy - 1.5, ex + ew - .5, yy - 1.5, MUTED, .5)
-        text(ex, yy, name, NOTE, INK if hit else MUTED, width=ew - 5.0)
+        text(ex, yy, name, NOTE, INK if hit else MUTED, width=ew - 4.4)
 
     # 2 Compare data versions ----------------------------------------------------------------
     ex, ey, ew = stage(s, S2, 2, USE, *L['s2'])
     c1, c2 = ex + ew - 11.0, ex + ew - 1.0
     for cx_, head in zip((c1, c2), L['then_now']):
         text(cx_, ey, head, NOTE, MUTED, align='right')
-    for k, (table, then, now) in enumerate((('`store_returns`', 14, 15), ('`date_dim`', 3, 3))):
+    for k, (table, then, now) in enumerate(zip(L['tables'], (14, 3), (15, 3))):
         yy = ey + PITCH * (k + 1)
         if then != now:
             rect(ex - 1.2, yy - 4.3, ew + 2.4, 5.8, AMBER_PALE, AMBER, .25, r=.8)

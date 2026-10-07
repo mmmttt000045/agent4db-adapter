@@ -22,7 +22,7 @@ pdftoppm -r 400 -png /tmp/x/architecture.pdf /tmp/x/architecture
 
 ## 汇报用的三张图
 
-`overview.py`、`lookup.py`、`lifecycle.py` 是汇报 PPT 用的三张图（系统结构、查询与执行、学习与维护），不进论文。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`），用通用词汇（指标定义、指标库、校验规则、校验结果缓存、数据版本、快照、v1/v2、停用、回归测试），不用论文符号，也不写年份；三张图讲同一个例子（门店退货金额，数值取自端到端实验的任务 M2-L1、M2-P1）。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
+`overview.py`、`lookup.py`、`lifecycle.py` 是汇报 PPT 用的三张图（系统结构、查询与执行、学习与维护），不进论文。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`），用通用词汇（指标定义、指标库、校验规则、校验结果缓存、数据版本、快照、v1/v2、停用、回归测试），不用论文符号，也不写年份；三张图讲同一个例子（门店营业额在追加、数据更正、重复装载三种日常写入下的经历，数值取自端到端实验 MAVRA 第 1 次运行的任务 M1-L1、M1-P1）。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
 
 ## 数据核对
 

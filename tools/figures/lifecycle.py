@@ -31,81 +31,69 @@ from style import ACC, ACC_DK, AMBER, AMBER_PALE, FIELD, INK, MUTED, RED, WHITE 
 from vecfig import measure  # noqa: E402
 
 NAME = 'lifecycle'
-W, H = style.TEXTWIDTH, 62.5
+W, H = style.TEXTWIDTH, 57.0
 
 LABELS = {
     'en': {
         'title': 'MAVRA learning and maintenance', 'paths': ('learning path', 'maintenance on use'),
         'otherwise': 'other outcome',
         'learn': ('Learn', 'built-in analysis optimizer, an LLM agent'),
-        'question': '“Return amount in April?” + stated meaning',
-        'r_sql': ('SELECT SUM(sr_return_amt) …', 'WHERE d_moy = 4 AND …'),
-        'judged': 'answer 3,133,115.63, judged correct',
-        'admitted': 'extracted, admission checks pass',
+        'l_rows': ('“Return amount in April?” + stated meaning',
+                   '`SELECT SUM(sr_return_amt) … d_moy = 4`',
+                   'answer 3,133,115.63, judged correct', 'admission checks pass'),
         'publish1': ('Publish revision 1', 'what the definition records'),
-        'm1': ('`SUM(sr_return_amt)` by return date', 'no filter on `store_returns`',
-               'conditions: one row per return,', 'one date per date key, no lost dates',
-               "evidence: agent's SQL, table version 12"),
+        'm1': ('`SUM(sr_return_amt)` by return date', 'relies on: one row per return,',
+               'one date per date key, no lost dates', "evidence: the agent's SQL"),
         'benign': ('Benign write', 'late returns appended'),
-        'b_rows': ('revision 1 pending', 'affected conditions: hold', '`date_dim` unchanged: kept',
-                   'still valid, still revision 1'),
+        'b_rows': ('rechecked: still holds', '`date_dim` same: result reused',
+                   'stays revision 1'),
         'later': 'a later write',
         'breaking': ('Breaking write', 'an application-state row per return'),
-        'k_rows': ('one return, two rows: completed, applied', 'one row per return fails: invalidated',
-                   'unmaintained answer for May:', '6,588,699.86, not 3,294,349.93'),
-        'search': ('Search filters', 'filters on columns with few values'),
-        's_rows': ("`sr_status='completed'`", 'one row per return, none lost',
-                   "`sr_status='applied'`", 'loses returns without an application row',
-                   'exactly one fix: unique'),
-        'regress': ('Regression test', 'both run on the data as of learning'),
-        'r_rows': ("revision 1 + `sr_status='completed'`", 'April, as of learning time:',
-                   "agent's learning SQL", 'replacement', 'other admission checks pass'),
+        'k_rows': ('one row per return: fails', 'revision 1 invalidated',
+                   'unmaintained: 6,588,699.86 (2×)'),
+        'search': ('Search filters', 'one filter per column value'),
+        's_rows': ("`sr_status='completed'`", "`sr_status='applied'` loses returns",
+                   'exactly one keeps one row per return'),
+        'regress': ('Regression test', 'on the data as of learning'),
+        'r_rows': ("agent's SQL", 'with the filter', 'same answer: fix accepted'),
         'publish2': ('Publish revision 2', 'same definition, new revision'),
-        'p_rows': ('revision 2, valid', "filter `sr_status='completed'`", 'conditions re-derived',
-                   'SQL declaring revision 1 rejected', 'waiting lookups get revision 2'),
+        'p_rows': ('revision 1 + filter', "`sr_status='completed'`", 'SQL citing revision 1: rejected',
+                   'waiting lookups get revision 2'),
         'nofix': ('No unique fix', 'e.g. a full backup copy appended'),
-        'n_rows': ("`sr_source='primary'`", "`sr_source='backup'`", 'both restore one row per return',
-                   'invalidated, not repaired', 'relearned from a new judged task'),
+        'n_rows': ("`sr_source='primary'`", "`sr_source='backup'`", 'both work: invalidate',
+                   'relearn from a new judged task'),
         'two': 'two fixes, or none', 'relearn': 'relearn',
     },
     'zh': {
         'title': 'MAVRA 学习与维护', 'paths': ('学习路径', '使用时维护'),
         'otherwise': '另一种结果',
         'learn': ('学习', '内置分析优化器（大模型智能体）'),
-        'question': '“4 月的门店退货金额？”+ 给定口径',
-        'r_sql': ('SELECT SUM(sr_return_amt) …', 'WHERE d_moy = 4 AND …'),
-        'judged': '答案 3,133,115.63，判题正确',
-        'admitted': '提取，通过准入检查',
+        'l_rows': ('“4 月的门店退货金额？”+ 给定口径',
+                   '`SELECT SUM(sr_return_amt) … d_moy = 4`',
+                   '答案 3,133,115.63，判题正确', '通过准入检查'),
         'publish1': ('发布修订 1', '定义记录的内容'),
-        'm1': ('`SUM(sr_return_amt)` 按退货日期', '`store_returns` 上无过滤',
-               '条件：每笔退货一行，', '每个日期键一个日期，日期不丢失',
-               '证据：智能体的 SQL、表版本 12'),
+        'm1': ('`SUM(sr_return_amt)` 按退货日期', '依赖：每笔退货一行、',
+               '每个日期键一个日期、日期不丢失', '证据：智能体的 SQL'),
         'benign': ('正常写入', '追加迟到的退货'),
-        'b_rows': ('修订 1 待验证', '受影响的条件：成立', '`date_dim` 未变：保留',
-                   '仍然有效，仍是修订 1'),
+        'b_rows': ('变化的表：重查，成立', '`date_dim` 未变：复用结果', '仍是修订 1'),
         'later': '之后的一次写入',
         'breaking': ('破坏性写入', '每笔退货追加申请状态行'),
-        'k_rows': ('同一笔退货两行：完成、申请', '每笔退货一行不再成立：失效',
-                   '不维护时 5 月的答案：', '6,588,699.86，应为 3,294,349.93'),
-        'search': ('搜索过滤', '在取值很少的列上尝试过滤'),
-        's_rows': ("`sr_status='完成'`", '每笔退货一行，不丢退货',
-                   "`sr_status='申请'`", '丢掉没有申请行的退货',
-                   '恰好一个修复：唯一'),
-        'regress': ('回归测试', '都在学习时刻的数据上执行'),
-        'r_rows': ("修订 1 + `sr_status='完成'`", '4 月，按学习时刻：',
-                   '智能体的学习 SQL', '替代修订', '其余准入检查通过'),
+        'k_rows': ('每笔退货一行：不成立', '修订 1 失效', '不维护：6,588,699.86（2 倍）'),
+        'search': ('搜索过滤', '每列每个取值试一个过滤'),
+        's_rows': ("`sr_status='完成'`", "`sr_status='申请'` 丢掉退货", '恰好一个能恢复每笔退货一行'),
+        'regress': ('回归测试', '在学习时刻的数据上'),
+        'r_rows': ('智能体的 SQL', '加上过滤', '答案相同：接受修复'),
         'publish2': ('发布修订 2', '同一定义的新修订'),
-        'p_rows': ('修订 2，有效', "过滤 `sr_status='完成'`", '重新推导条件',
-                   '声明修订 1 的 SQL 被拒绝', '等待的查找得到修订 2'),
+        'p_rows': ('修订 1 + 过滤', "`sr_status='完成'`", '引用修订 1 的 SQL：拒绝', '等待的查找得到修订 2'),
         'nofix': ('没有唯一修复', '例：追加整份备份副本'),
-        'n_rows': ("`sr_source='primary'`", "`sr_source='backup'`", '两者都恢复每笔退货一行',
-                   '失效，不修复', '由新的判题任务重新学习'),
+        'n_rows': ("`sr_source='primary'`", "`sr_source='backup'`", '两个都可以：失效',
+                   '由新的判题任务重新学习'),
         'two': '两个修复，或没有', 'relearn': '重新学习',
     },
 }
 
 ROUTE_Y = 7.0                            # the relearn route runs above the top row
-R1, R2, RH = 9.0, 38.5, 23.5             # tops of the two rows, their height
+R1, R2, RH = 9.0, 35.5, 20.5             # tops of the two rows, their height
 LEARN_B = (1.5, R1, 47.0, RH)
 PUB1 = (52.5, R1, 41.0, RH)
 BENIGN = (97.5, R1, 33.5, RH)
@@ -164,13 +152,7 @@ def draw(s, lang):
     # 1 Learn: the optimizer answers a question whose meaning is stated -------
     ex, ey, ew = stage(LEARN_B, 1, LEARN, L['learn'])
     llm_badge(s, LEARN_B[0] + LEARN_B[2] - 3.0, LEARN_B[1] + 2.9, 1.6)
-    text(ex, ey, L['question'], NOTE, INK, width=ew)
-    for k, line in enumerate(L['r_sql']):
-        text(ex, ey + ROW * (k + 1), line, NOTE, INK, 'code', width=ew)
-    text(ex, ey + ROW * 3, L['judged'], NOTE, INK, width=ew - 2.4)
-    mark(s, ex + ew - 1.0, ey + ROW * 3 - .75, 'ok')
-    text(ex, ey + ROW * 4, L['admitted'], NOTE, INK, width=ew - 2.4)
-    mark(s, ex + ew - 1.0, ey + ROW * 4 - .75, 'ok')
+    rows(ex, ey, ew, L['l_rows'], marks={2: 'ok', 3: 'ok'})
 
     # 2 Publish m_1^1 with its conditions and evidence --------------------------
     ex, ey, ew = stage(PUB1, 2, LEARN, L['publish1'])
@@ -179,35 +161,32 @@ def draw(s, lang):
     # 3 A benign write: the rechecks pass, the revision stays --------------------
     ex, ey, ew = stage(BENIGN, 3, USE, L['benign'])
     version(ex, ey, ew, 12, 13)
-    rows(ex, ey, ew, L['b_rows'], first=1, colors={0: WAIT, 3: ACC_DK}, marks={1: 'ok', 2: 'ok'})
+    rows(ex, ey, ew, L['b_rows'], first=1, colors={2: ACC_DK}, marks={0: 'ok', 1: 'ok'})
 
     # 4 A breaking write invalidates m_1^1 -----------------------------------------
     ex, ey, ew = stage(BREAK, 4, USE, L['breaking'])
     version(ex, ey, ew, 13, 14)
-    rows(ex, ey, ew, L['k_rows'], first=1, colors={1: RED, 2: MUTED, 3: MUTED}, marks={1: 'fail'})
+    rows(ex, ey, ew, L['k_rows'], first=1, colors={0: RED, 1: RED, 2: MUTED}, marks={0: 'fail'})
 
     # 5 Bounded repair: search for exactly one filter ---------------------------
     ex, ey, ew = stage(SEARCH, 5, USE, L['search'])
-    rows(ex, ey, ew, L['s_rows'], colors={1: MUTED, 3: MUTED, 4: ACC_DK},
-         marks={0: 'ok', 2: 'fail', 4: 'ok'})
+    rows(ex, ey, ew, L['s_rows'], colors={2: ACC_DK}, marks={0: 'ok', 1: 'fail', 2: 'ok'})
 
     # 6 Regression test as of learning time ---------------------------------------
     ex, ey, ew = stage(REGRESS, 6, USE, L['regress'])
-    rows(ex, ey, ew, L['r_rows'][:2], colors={1: MUTED})
-    for k, label in enumerate(L['r_rows'][2:4]):
-        yy = ey + ROW * (k + 2)
+    for k, label in enumerate(L['r_rows'][:2]):
+        yy = ey + ROW * k
         text(ex, yy, label, NOTE, INK)
         text(ex + ew - 2.4, yy, '3,133,115.63', NOTE, INK, align='right')
-    mark(s, ex + ew - 1.0, ey + ROW * 3 - .75, 'ok')
-    rows(ex, ey, ew, L['r_rows'][4:], first=4, marks={0: 'ok'})
+    rows(ex, ey, ew, L['r_rows'][2:], first=2, colors={0: ACC_DK}, marks={0: 'ok'})
 
     # 7 Publish the replacement -----------------------------------------------------
     ex, ey, ew = stage(PUB2, 7, USE, L['publish2'])
-    rows(ex, ey, ew, L['p_rows'], colors={0: ACC_DK})
+    rows(ex, ey, ew, L['p_rows'], colors={0: ACC_DK, 1: ACC_DK})
 
     # The other outcome: no unique fix, so invalidate and relearn ------------------
     ex, ey, ew = stage(NOFIX, None, RED, L['nofix'], edge=RED, dash=(.8, .5))
-    rows(ex, ey, ew, L['n_rows'], colors={2: MUTED, 3: RED, 4: LEARN}, marks={0: 'ok', 1: 'ok'})
+    rows(ex, ey, ew, L['n_rows'], colors={2: RED, 3: LEARN}, marks={0: 'ok', 1: 'ok'})
 
     # Arrows ---------------------------------------------------------------------
     for (l, r), color in (((LEARN_B, PUB1), LEARN), ((PUB1, BENIGN), USE), ((BREAK, SEARCH), USE),

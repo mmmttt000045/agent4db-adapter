@@ -1,4 +1,4 @@
-"""Figure 2: how request handling serves a user agent's two requests, by example.
+"""Deck figure 2: how request handling serves a user agent's two requests, by example.
 
 Top lane, the text request: the agent asks for "return amount" (its question
 is the return amount in May). Lookup matches names and aliases, compares
@@ -10,7 +10,7 @@ the SQL, then validates the revision's conditions on the query's own snapshot,
 in which a writer has meanwhile raised the version of store_returns, and runs
 the query in the same transaction.
 
-The example continues Figure 3's: revision 2 is the repaired return-amount
+The example continues deck figure 3's: revision 2 is the repaired return-amount
 definition (filter sr_status = 'completed'); the return-rate definition shares
 its grain condition, one row per return. Labels use words, not the paper's
 symbols (m_1^2, D_s, Q_c, V(T)). The question and its answer, 3,294,349.93,

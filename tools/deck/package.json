@@ -2,9 +2,9 @@
   "name": "mavra-report-deck",
   "version": "1.0.0",
   "private": true,
-  "description": "MAVRA research presentation generated from the paper and archived results",
+  "description": "MAVRA system deck: structure, functions and workflows around the three system figures",
   "scripts": {
-    "build": "node build-deck.js ../../overleaf --date 2026-10-12"
+    "build": "node build-deck.js"
   },
   "dependencies": {
     "pptxgenjs": "4.0.1"

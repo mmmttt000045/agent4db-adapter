@@ -15,9 +15,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import style  # noqa: E402
 
-FIGURES = {'sharing': 'sharing', 'architecture': 'architecture', 'replay-outcomes': 'replay_outcomes',
-           'maintenance-cost': 'maintenance_cost', 'scenario-groups': 'scenario_groups',
-           'scenario-changes': 'scenario_changes'}
+FIGURES = {'architecture': 'architecture', 'replay-outcomes': 'replay_outcomes',
+           'maintenance-cost': 'maintenance_cost', 'scenario-changes': 'scenario_changes'}
 
 
 def main():

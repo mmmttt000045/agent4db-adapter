@@ -92,6 +92,10 @@ def draw(s, lang):
             text(x(4) + 1.4, y(59), cache, LABEL, cache_color)
             mavra, mavra_color = style.method('condition', lang)
             text(x(19.4), y(2), mavra, LABEL, mavra_color, 'bold', 'right')
+        else:
+            # Only affected-only revalidation leaves the band of the other series here.
+            scope, scope_color = style.method('condition-scope', lang)
+            text(x(17.6), y(119.3) + .7, scope, LABEL, scope_color, align='right')
 
     text((panels[0][0] + panels[1][1]) / 2, H - .9, T['x'], LABEL, MUTED, align='center')
 

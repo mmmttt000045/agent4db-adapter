@@ -1,7 +1,7 @@
 \begin{table}[t]
-\caption{\bt{End-to-end safety and cost per method. DeepSeek V4.1 Flash, three runs per method. Correct: mean over the 12 settings. Stale: scored tasks after an update that used a stale definition. Invalidated/repaired and maintenance DB time: per run, summed over the eleven scenarios. Input tokens: per held-out task.}{各方法的端到端安全性与代价。DeepSeek V4.1 Flash，每种方法 3 次运行。正确率：12 种情形平均。过期使用：更新后使用过期定义的计分题数。失效／修复与维护 DB 时间：每次运行 11 个场景合计。输入 token：每道留出题。}}
+\caption{\bt{End-to-end safety and cost per method, DeepSeek V4.1 Flash, three runs per method. Correct: mean over the 12 settings. Stale tasks: scored tasks that used a stale definition, under the five covered breaking changes / under the other changes (benign updates, the unit change, the backup copy). Invalidated/repaired and maintenance DB time: per run over the eleven scenarios. Input tokens: per held-out task. Dashes: not applicable.}{各方法的端到端安全性与代价，DeepSeek V4.1 Flash，每种方法 3 次运行。正确率：12 种情形平均。过期使用：使用了过期定义的计分题数，条件覆盖的 5 种破坏性变化下／其他变化下（正常更新、单位变化、备份副本）。失效／修复与维护 DB 时间：每次运行 11 个场景合计。输入 token：每道留出题。短横：不适用。}}
 \label{tab:scen-cost}
 \footnotesize
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{2.5pt}
 \input{gen/scen-cost}
 \end{table}

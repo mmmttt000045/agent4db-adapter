@@ -40,7 +40,7 @@ python3 tools/paper-results.py --scen results/scen-20260930 --prefix PrevScen --
 python3 tools/paper-results.py --scen results/scen-20261002 --models "DeepSeek V4.1 Flash" --out overleaf/gen --json exp/2026-10-02-scenarios-ds/paper-results.json
 python3 tools/scen-stats.py --scen results/scen-20261002 --json exp/2026-10-02-scenarios-ds/scen-stats.json --tex-out overleaf/gen   # 预定分析方案：整群自助法区间与预先声明的比较（\Ds*）
 python3 tools/review-results.py --exp exp/2026-10-02-cache-baseline-tpcds --out overleaf/gen
-python3 tools/figures/build.py   # 六幅图：overleaf/figures/<名称>.pdf 与 <名称>-zh.pdf
+python3 tools/figures/build.py   # 四幅图：overleaf/figures/<名称>.pdf 与 <名称>-zh.pdf
 ```
 
 Section 2.1 values are written in the text from the two workload reports. Section 7's scenario cost table and the in-text number macros are generated into `gen/` from raw outputs; the six figures are vector PDFs drawn by `tools/figures/build.py`, which reads the archived results and checks them against `gen/`.
@@ -95,6 +95,10 @@ Compiled on noctis with TeX Live 2026: English 13 pages including references (bo
 2026-10-04（摘要与引言重写、引用核对后）在 noctis 用 `./build.sh all` 编译：英文稿 15 页，正文在第 13 页右栏约四分之一处结束，超出 12 页正文上限约 0.6 页；双语稿 23 页（CJK 字体改用 Noto，浏览器可正常显示）。
 
 Compiled on noctis on 2026-10-04 after the abstract/introduction rewrite and the citation audit: English 15 pages with the body ending about a quarter down the right column of page 13 (roughly 0.6 page over the 12-page body limit); bilingual 23 pages.
+
+2026-10-07 图表整理后（表 3、表 4 删除，表 2 增加“实验”列；原图 1 定义共享与原图 6 按类别点图删除，点图的区间并入热力图末行；回放图增加 TPC-DS 面板；摘要精简；浮动体与正文间距 14pt）在 noctis 编译：英文稿 14 页，正文在第 13 页左栏约三分之二处结束，超出 12 页正文上限约 0.3 页；双语稿 22 页。
+
+Compiled on noctis on 2026-10-07 after consolidating the figures and tables (Tables 3 and 4 removed and Table 2 given a studies column; the sharing figure and the by-group dot plot removed, the dot plot's intervals folded into the heatmap's last row; a TPC-DS panel added to the replay figure; abstract shortened; float separation 14pt): English 14 pages with the body ending about two thirds down the left column of page 13 (roughly 0.3 page over the 12-page body limit); bilingual 22 pages.
 
 ## 10-03 补充实验与已回退的重构 / Supplementary experiments and the reverted restructure
 

@@ -1,12 +1,16 @@
-"""Figure: accuracy of agent B by data change and method, as a heatmap.
+"""Figure: accuracy of the user agent by data change and method, as a heatmap.
 
 Rows are the twelve settings grouped by the condition they target, with what
 each update does; columns are the nine methods. Cells carry the accuracy and
 a neutral shade (blue stays reserved for MAVRA); a red corner marks settings
-where at least 25% of the tasks used a stale definition. Data: the per-cell
-counts in exp/2026-10-02-scenarios-ds/paper-results.json, aggregated the way
-tools/paper-results.py does; row labels come from that script. Every value
-the text prints (\\ScenAcc* in gen/numbers.tex) is checked.
+where at least 25% of the tasks used a stale definition. Two summary rows
+close the table: the mean over all settings, and the mean over the five
+covered breaking changes with its 95% cluster-bootstrap interval over runs.
+Data: the per-cell counts in exp/2026-10-02-scenarios-ds/paper-results.json,
+aggregated the way tools/paper-results.py does, and the intervals in
+scen-stats.json (tools/scen-stats.py); row labels come from paper-results.py.
+Every value the text prints (\\ScenAcc* in gen/numbers.tex, \\Ds*Modeled* in
+gen/scen-ds.tex) is checked.
 """
 import importlib.util
 import json
@@ -16,13 +20,19 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from vecfig import measure  # noqa: E402
 import style  # noqa: E402
-from scenario_groups import KEY  # noqa: E402
 from style import ACC, ACC_DK, INK, MUTED, RED, WHITE  # noqa: E402
 
 NAME = 'scenario-changes'
-W, H = style.TEXTWIDTH, 62.0
+W, H = style.TEXTWIDTH, 68.5
 DATA = style.ROOT / 'exp/2026-10-02-scenarios-ds/paper-results.json'
+INTERVALS = style.ROOT / 'exp/2026-10-02-scenarios-ds/scen-stats.json'
 STALE = .25                      # share of tasks that used a stale definition
+COVERED = ('grain', 'fanout', 'coverage')   # classes of the covered breaking changes
+# Macro keys of tools/scen-stats.py: \Ds<method><group>.
+KEY = {'middle': 'NoShare', 'traj-global': 'Traj', 'traj-verify': 'TrajVerify',
+       'metric-global-noguard': 'Noguard', 'metric-global-schema': 'Schema',
+       'metric-global-revoke': 'Revoke', 'metric-global-def': 'Def', 'metric-global-snap': 'Cond',
+       'metric-global-exref': 'CondCur', 'metric-global': 'CondGold'}
 
 _spec = importlib.util.spec_from_file_location('paper_results', style.ROOT / 'tools/paper-results.py')
 paper_results = importlib.util.module_from_spec(_spec)
@@ -44,13 +54,16 @@ HEAD = {  # column heads, two lines; abbreviations of the method names in Table 
 }
 TEXT = {
     'en': {'class': 'Class', 'change': 'Change', 'what': 'What the update does',
-           'mean': 'Mean over the {} settings', 'scale': 'Accuracy (%)',
+           'mean': 'Mean over the {} settings',
+           'covered': 'Mean over the 5 covered breaking changes, 95% interval over runs',
+           'scale': 'Accuracy (%)',
            'stale': 'At least 25% of the tasks used a stale definition'},
     'zh': {'class': '类别', 'change': '数据变化', 'what': '更新内容', 'mean': '{} 种情形平均',
+           'covered': '条件覆盖的 5 种破坏性变化平均，运行间 95% 区间',
            'scale': '正确率（%）', 'stale': '至少 25% 的题使用了过期定义'},
 }
 RAMP = [(0, '#F4F3F0'), (.5, '#CBC7C1'), (1, '#6E6A65')]   # neutral, light to dark
-LABEL, CELL, HEADPT = 6.3, 6.3, 6.2    # font sizes, pt
+LABEL, CELL, HEADPT, SMALL = 6.3, 6.3, 6.2, 5.6    # font sizes, pt
 
 
 def shade(v):
@@ -88,8 +101,31 @@ def load():
     return cells, means
 
 
+def load_covered(cells):
+    """Mean and 95% interval over the covered breaking changes, as tools/scen-stats.py computes them.
+
+    The point estimate must agree with the mean of the heatmap's own cells for
+    those changes, and every value with the \\Ds*Modeled* macros the text prints.
+    """
+    stats = json.loads(INTERVALS.read_text(encoding='utf-8'))['methods']
+    printed = style.macros('scen-ds')
+    covered = [p for p, cls, *_ in PHASES if cls in COVERED]
+    out = {}
+    for mode in MODES:
+        cell = stats[mode]['modeled']
+        acc, (lo, hi) = cell['acc'], cell['ci95']
+        own = sum(cells[mode, p][0] for p in covered) / len(covered)
+        style.agree(f'{mode} covered mean', f'{100 * own:.0f}', f'{100 * acc:.0f}')
+        name = f'Ds{KEY[mode]}Modeled'
+        for suffix, v in (('', acc), ('Lo', lo), ('Hi', hi)):
+            style.agree(name + suffix, f'{100 * v:.0f}', printed[name + suffix])
+        out[mode] = (100 * acc, 100 * lo, 100 * hi)
+    return out
+
+
 def draw(s, lang):
     cells, means = load()
+    covered = load_covered(cells)
     T, text = TEXT[lang], s.text
     zh = lang == 'zh'
     rows = [(CLASSES[cls][zh], (zh_change if zh else en_change).replace('\\ ', ' '),
@@ -148,7 +184,19 @@ def draw(s, lang):
         mavra = mode == 'metric-global-snap'
         text(x_cells + cw * (j + .5), base, f'{100 * means[mode]:.0f}', CELL,
              ACC_DK if mavra else INK, 'bold', 'center')
-    table_bottom = y + .45 + pitch + .3
+    y += .45 + pitch
+
+    # Covered breaking changes: mean in bold, the 95% interval over runs beneath it.
+    tall = 5.6
+    s.line(0, y + .2, W, y + .2, MUTED, .16)
+    text(0, y + .2 + tall / 2 + .8, T['covered'], LABEL, INK, 'bold', width=x_cells - .8)
+    for j, mode in enumerate(MODES):
+        mavra = mode == 'metric-global-snap'
+        acc, lo, hi = covered[mode]
+        cx = x_cells + cw * (j + .5)
+        text(cx, y + .2 + 2.75, f'{acc:.0f}', CELL, ACC_DK if mavra else INK, 'bold', 'center')
+        text(cx, y + .2 + 5.15, f'{lo:.0f}–{hi:.0f}', SMALL, MUTED, align='center')
+    table_bottom = y + .2 + tall + .3
     s.line(0, table_bottom, W, table_bottom, MUTED, .2)
 
     # MAVRA's column framed in its color.

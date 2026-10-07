@@ -17,8 +17,8 @@
 | `sections/abstract.tex` | 中英文摘要、关键词与 `\maketitle` |
 | `sections/01-*.tex` 至 `10-*.tex` | 原论文的十个章节，编号和顺序不变 |
 | `sections/evaluation/` | 实验设置、有效性、并发、修复、维护代价与场景六个小节 |
-| `figures/` | 六幅图：`*.tex` 写标题、标签与描述，图本身是 [`tools/figures/build.py`](../tools/figures/README.md) 生成的矢量 PDF（`<名称>.pdf` 用于英文稿，`<名称>-zh.pdf` 用于双语稿），不要手改；另有算法 1 |
-| `tables/` | 六张表，包括标题和生成数据的加载位置 |
+| `figures/` | 四幅图：`*.tex` 写标题、标签与描述，图本身是 [`tools/figures/build.py`](../tools/figures/README.md) 生成的矢量 PDF（`<名称>.pdf` 用于英文稿，`<名称>-zh.pdf` 用于双语稿），不要手改；另有算法 1 |
+| `tables/` | 四张表，包括标题和生成数据的加载位置 |
 | `references.tex` | 原样保留的 `thebibliography`，引用键与条目顺序不变 |
 | `gen/` | 实验统计脚本生成的数值宏、表格数据和绘图坐标；不要手改 |
 | `build.sh` | 编译或生成 Overleaf 上传包 |
@@ -77,7 +77,7 @@ tlmgr path add
 | `gen/scen-ds.tex` | `tools/scen-stats.py`；汇总存档在 `exp/2026-10-02-scenarios-ds/scen-stats.json` |
 | `gen/review.tex`、`gen/snapshot-stress.tex` | `tools/review-results.py`；本地存档在 `exp/2026-10-02-cache-baseline-tpcds/` |
 | `gen/session-latency.tex` | `tools/session-latency-stats.py --tex-out`；存档在 `exp/2026-10-03-session-latency/` |
-| `figures/*.pdf` | `tools/figures/build.py`；图 3–6 直接读取上面的存档（`replay-stats.json`、`cb-1m-share-stats.json`、`scen-stats.json`、`paper-results.json`），并与 `gen/` 中正文引用的数值逐一核对 |
+| `figures/*.pdf` | `tools/figures/build.py`；图 2–4 直接读取上面的存档（`replay-stats.json`、`tpcds-replay-stats.json`、`cb-1m-share-stats.json`、`paper-results.json`、`scen-stats.json`），并与 `gen/` 中正文引用的数值逐一核对 |
 | 工作负载表中的数值 | `exp/2026-10-01-workload-characterization/` |
 
 在 noctis 的仓库根目录重新生成（2026-10-06 核对：前四条命令逐字节复现 `gen/` 中对应文件）：

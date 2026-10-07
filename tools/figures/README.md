@@ -1,32 +1,30 @@
 # 论文矢量图生成器
 
-论文的六幅图都由这里的 Python 脚本直接画成矢量 PDF，不经过 TikZ、pgfplots、Visio 或 PPT：
+论文的四幅图都由这里的 Python 脚本直接画成矢量 PDF，不经过 TikZ、pgfplots、Visio 或 PPT：
 
 | 图 | 脚本 | 输出（`overleaf/figures/`） | 数据 |
 | --- | --- | --- | --- |
-| 图 1 定义共享条件 | `sharing.py` | `sharing.pdf` | 受控负载的结构（写在脚本里，计数与图注核对） |
-| 图 2 系统架构 | `architecture.py` | `architecture.pdf` | 无 |
-| 图 3 配对回放 | `replay_outcomes.py` | `replay-outcomes.pdf` | `exp/2026-10-02-cache-baseline-tpcds/replay-stats.json` |
-| 图 4 维护代价 | `maintenance_cost.py` | `maintenance-cost.pdf` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
-| 图 5 按变化类别的正确率 | `scenario_groups.py` | `scenario-groups.pdf` | `exp/2026-10-02-scenarios-ds/scen-stats.json` |
-| 图 6 逐情形正确率热力图（通栏） | `scenario_changes.py` | `scenario-changes.pdf` | `exp/2026-10-02-scenarios-ds/paper-results.json`；行标签取自 `tools/paper-results.py` 的 `PHASES` |
+| 图 1 系统架构 | `architecture.py` | `architecture.pdf` | 无 |
+| 图 2 定义库回放（两个面板） | `replay_outcomes.py` | `replay-outcomes.pdf` | `exp/2026-10-02-cache-baseline-tpcds/replay-stats.json`、`tpcds-replay-stats.json`、`tpcds-library.json`（定义数） |
+| 图 3 维护代价 | `maintenance_cost.py` | `maintenance-cost.pdf` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
+| 图 4 逐情形正确率热力图（通栏） | `scenario_changes.py` | `scenario-changes.pdf` | `exp/2026-10-02-scenarios-ds/paper-results.json`，末行区间取自 `scen-stats.json`；行标签取自 `tools/paper-results.py` 的 `PHASES` |
 
 每幅图生成两份：`<名称>.pdf` 用于英文稿（`main-en.tex`），`<名称>-zh.pdf` 用于双语稿（`main.tex`），标签为中文。`overleaf/figures/<名称>.tex` 按 `\ifbilingual` 选用其中一份，标题、标签和 `\Description` 仍写在 tex 文件里。
 
 ```bash
 python3 tools/figures/build.py                  # 全部，写入 overleaf/figures/
-python3 tools/figures/build.py sharing          # 只生成某几幅
+python3 tools/figures/build.py architecture     # 只生成某几幅
 python3 tools/figures/build.py --out /tmp/x     # 写到别处预览
-pdftoppm -r 400 -png /tmp/x/sharing.pdf /tmp/x/sharing
+pdftoppm -r 400 -png /tmp/x/architecture.pdf /tmp/x/architecture
 ```
 
 依赖：`reportlab`、`matplotlib`、`fonttools`，以及带 `kpsewhich` 的 TeX Live（libertine、inconsolata 字体）；中文版另需 Noto Sans CJK SC。noctis 上都已具备，本机没有装 reportlab。生成的 PDF 是论文源文件，要提交到仓库，Overleaf 不运行 Python。
 
 ## 数据核对
 
-- 图 3–6 直接读取 `exp/` 中的存档，不经过 `gen/` 的中间文件。图里每个数值按正文的格式化方式，与 `overleaf/gen/` 中正文引用的宏比较，不一致就报错停止：图 3 对 `review.tex` 的 `\Rp*`，图 4 对 `\Cb*`，图 5 对 `scen-ds.tex` 的 `\Ds*`，图 6 对 `numbers.tex` 的 `\ScenAcc*`（各方法平均值与正文引用的单元格）。
-- 图 6 改自原来的表 7；2026-10-06 替换时 108 个单元格、全部过期标记和 9 个平均值都与原表逐一核对一致。
-- 图 1 的 19 个定义、41 个条件实例、7 个条件、8 个待验证定义、19 次与 3 次检查，都由脚本里的结构算出，并与图注写的数比较。
+- 图 2–4 直接读取 `exp/` 中的存档，不经过 `gen/` 的中间文件。图里每个数值按正文的格式化方式，与 `overleaf/gen/` 中正文引用的宏比较，不一致就报错停止：图 2 对 `review.tex` 的 `\Rp*` 与 `\Tr*`，图 3 对 `\Cb*`，图 4 对 `numbers.tex` 的 `\ScenAcc*`（各方法平均值与正文引用的单元格）和 `scen-ds.tex` 的 `\Ds*Modeled*`（末行的均值与区间，均值还要与热力图自己 5 个单元格的平均一致）。
+- 图 4 改自原来的表 7；2026-10-07 把按变化类别的点图并入其末行，只保留它唯一有信息量的一列——条件覆盖的破坏性变化的均值与区间；2026-10-06 替换时 108 个单元格、全部过期标记和 9 个平均值都与原表逐一核对一致。
+- 原图 1（定义共享条件）于 2026-10-07 删去：它说明的共享不是本文的贡献，§2.4 的正文保留其计数；脚本在 git 历史中（`tools/figures/sharing.py`）。
 - 方法颜色从 `overleaf/latex/preamble.tex` 的 `\definecolor` 读取，与表格里的色块是同一组定义；方法名称与表 3 一致（`style.py` 的 `METHODS`）。
 
 ## 怎么画出来的
@@ -59,8 +57,7 @@ Scale(d0, d1, p0, p1)                          # 数据值到毫米的线性映�
 | 某个标签的文字 | 各脚本里的 `LABELS` / `TEXT` 字典，`en` 与 `zh` 各一份 |
 | 方法名称或颜色 | 名称在 `style.py` 的 `METHODS`；颜色改 `preamble.tex` 的 `\definecolor`，图和表一起变 |
 | 架构图的模块位置 | `architecture.py` 顶部的 `ADM`、`STORE`、`MAINT` 等框，箭头按框的边自动对齐 |
-| 图 1 的定义族与条件 | `sharing.py` 的 `FAMILIES` 与 `CONDITIONS` |
-| 数据图的方法与顺序 | `replay_outcomes.py` 的 `ROWS`，`maintenance_cost.py` 的 `SERIES`，`scenario_groups.py` 的 `ROWS` 与 `GROUPS`，`scenario_changes.py` 的 `HEAD` |
+| 数据图的方法与顺序 | `replay_outcomes.py` 的 `ROWS`，`maintenance_cost.py` 的 `SERIES`，`scenario_changes.py` 的 `HEAD` |
 | 热力图的颜色与过期阈值 | `scenario_changes.py` 的 `RAMP`（中性灰阶，蓝色只留给 MAVRA）与 `STALE` |
 | 图的尺寸 | 各脚本的 `W, H`（单栏图宽用 `style.COLUMN`） |
 

@@ -66,7 +66,8 @@ COLOR = {  # 与正文导言的方法颜色一致
 }
 
 
-TABLE_EN = {}  # 窄栏表格里需要断行的方法名（目前没有）
+TABLE_EN = {"metric-global-schema": r"Schema-change\\invalidation",  # 窄栏表格里需要断行的方法名
+            "metric-global-exref": r"\system, G8 on\\current data"}
 
 
 def main_mode():
@@ -269,9 +270,12 @@ def per_model(acc, model, mode, reps=4000, seed=7):
 def tex_cost_table(A):
     allp = [p for p, *_ in PHASES]
     changed = [p for p, *_ in PHASES[1:]]
+    covered = [p for p, cls, *_ in PHASES if cls in ("grain", "fanout", "coverage")]
+    other = [p for p in changed if p not in covered]
     lines = [r"\begin{tabular}{@{}lrrrrr@{}}", r"\toprule"]
     lines.append(
-        r"\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale\\(tasks)}{过期使用} & \bh{Invalidated /\\repaired}{失效／修复}"
+        r"\bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale tasks\\covered /\\other}{过期使用\\覆盖／其他}"
+        r" & \bh{Invalidated /\\repaired}{失效／修复}"
         r" & \bh{Maint.\\DB (s)}{维护 DB 秒} & \bh{Input tok.\\(k)}{输入千 token}\\"
     )
     lines.append(r"\midrule")
@@ -280,7 +284,7 @@ def tex_cost_table(A):
         if mode not in shown:
             continue
         v = phase_mean(A["acc"], mode, allp)
-        st = sum(A["stale"][(mode, p)][0] for p in changed)
+        st = f"{sum(A['stale'][(mode, p)][0] for p in covered)} / {sum(A['stale'][(mode, p)][0] for p in other)}"
         nc = sum(n for (m, mo), n in A["ncells"].items() if mo == mode)
         rev = sum(A["events"][(mode, p)]["revoked"] for p in changed) / nc if nc else 0
         rep = sum(A["events"][(mode, p)]["repair_promoted"] for p in changed) / nc if nc else 0

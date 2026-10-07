@@ -50,7 +50,7 @@ LABELS = {
         'available': '$m^r$ available · SQL review', 'prov': 'provenance',
         'shared': 'shared by all user agents', 'from_a': 'learned',
         'maint': 'Condition maintenance', 'maint_note': 'reuse result, else run $Q_c$',
-        'repair': 'Bounded repair', 'repair_note': 'unique filter',
+        'repair': 'Bounded repair', 'repair_note': 'unique filter', 'checks': 'checks', 'regression': 'regression',
         'lookup': 'Lookup', 'lookup_note': 'compare versions $V(T)$',
         'tracker': 'Version tracker', 'tracker_note': 'per-table versions',
         'exec': ('Same-snapshot', 'validation'), 'declares': '$q$ declares $m^r$',
@@ -77,7 +77,7 @@ LABELS = {
         'available': '$m^r$ 可用 · SQL 审查', 'prov': '答案溯源',
         'shared': '所有用户端智能体共享', 'from_a': '学到',
         'maint': '条件维护', 'maint_note': '复用结果，否则执行 $Q_c$',
-        'repair': '有界修复', 'repair_note': '唯一过滤',
+        'repair': '有界修复', 'repair_note': '唯一过滤', 'checks': '检查', 'regression': '回归测试',
         'lookup': '查找', 'lookup_note': '比较版本 $V(T)$',
         'tracker': '版本跟踪', 'tracker_note': '每张表的版本',
         'exec': ('同快照验证', None), 'declares': '$q$ 声明 $m^r$',
@@ -310,7 +310,7 @@ def draw(s, lang):
     gx, gy = ax + aw - 4.6, cy + 4.6
     route([(cx + 8.6, gy), (gx - 2.0, gy)], LEARN, .18, length=1.0)
     gate(gx, gy)
-    text(gx, cy + 12.6, 'G1–G7', NOTE, ACC_DK, 'sans', 'center')
+    text(gx, cy + 12.6, L['checks'], NOTE, ACC_DK, 'sans', 'center', width=8.5)
     text(ax + aw / 2, ay + ah - 2.4, L['admission'], TITLE, INK, 'bold', 'center', width=aw - 2)
     sx = STORE[0]
     route([(gx + 2.0, gy), (sx, gy)], LEARN, THICK)
@@ -367,7 +367,7 @@ def draw(s, lang):
     titled(REPAIR, L['repair'], L['repair_note'], reserve=6)
     rx, ry, rw, rh = REPAIR
     gate(rx + rw - 3.6, ry + 3.0, 1.6)
-    text(rx + rw - 3.6, ry + 6.8, 'G8', NOTE, ACC_DK, 'sans', 'center')
+    text(rx + rw - .8, ry + 6.8, L['regression'], NOTE, ACC_DK, 'sans', 'right', width=11.5)
 
     lx_, ly, lw, lh = LOOKUP
     box(LOOKUP)

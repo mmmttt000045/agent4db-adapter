@@ -15,8 +15,8 @@
   \State \Return \textsc{invalidate} \Comment{\bt{no fix, or several equivalent fixes}{没有修复，或多个等价修复}}
 \EndIf
 \State $m'\gets m^r$ \bt{with}{，令} $\varphi:=\psi$ \bt{for the single $\psi\in P$; re-derive $C(m')$}{（$\psi$ 为 $P$ 的唯一元素），重新推导 $C(m')$}
-\If{$m'$ \bt{fails G3--G5}{未通过 G3--G5} \textbf{or} $\operatorname{compile}(m',x)(D_\ell)\neq R(D_\ell)$}\label{alg:repair:g8}
-  \State \Return \textsc{invalidate} \Comment{G8}
+\If{$m'$ \bt{fails well-formedness, grain, or SQL review}{未通过合法性、粒度或 SQL 审查} \textbf{or} $\operatorname{compile}(m',x)(D_\ell)\neq R(D_\ell)$}\label{alg:repair:regression}
+  \State \Return \textsc{invalidate} \Comment{\bt{regression test}{回归测试}}
 \EndIf
 \State \bt{publish}{发布} $m^{r+1}=m'$
 \end{algorithmic}

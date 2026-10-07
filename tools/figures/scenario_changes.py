@@ -1,15 +1,15 @@
-"""Figure: accuracy of the user agent by data change, one small dot per run.
+"""Figure: accuracy of the user agent by data change, with the spread over runs.
 
 Left: the twelve settings in the order of tools/paper-results.py, grouped by
-the condition the change targets (shaded bands). For six methods (the
-baselines and MAVRA; the ablations are in the right panel and the text), one small
-dot per independent run and a large marker at the accuracy over the runs'
-tasks; a hollow marker means that at least 25% of the tasks used a stale
-definition. Right: invalidations and published repairs per run for the
-methods that maintain definitions. Data: exp/2026-10-02-scenarios-ds/
-scen-stats.json (per-run counts written by tools/scen-stats.py), cross-checked
-against paper-results.json and against every value the text prints (\\ScenAcc*
-in gen/numbers.tex, \\Ds* in gen/scen-ds.tex).
+the condition the change targets (brackets under the axis). For the baselines
+and MAVRA, one marker per setting at the accuracy over the three independent
+runs, a thin line behind it spanning the three runs, and a red ring when at
+least 25% of the tasks used a stale definition. Right: invalidations and
+published repairs per run for the methods that keep definitions, with the
+spread over runs. Data: exp/2026-10-02-scenarios-ds/scen-stats.json (per-run
+counts written by tools/scen-stats.py), cross-checked against
+paper-results.json and against every value the text prints (\\ScenAcc* in
+gen/numbers.tex, \\Ds* in gen/scen-ds.tex).
 """
 import importlib.util
 import json
@@ -18,14 +18,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np  # noqa: E402
+from matplotlib import transforms  # noqa: E402
 from matplotlib.gridspec import GridSpec  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
+from matplotlib.patches import Patch  # noqa: E402
 import mplstyle  # noqa: E402
 import style  # noqa: E402
-from style import GRID, INK, MUTED  # noqa: E402
+from style import GRID, INK, MUTED, RED  # noqa: E402
 
 NAME = 'scenario-changes'
-W, H = style.TEXTWIDTH, 70.0
+W, H = style.TEXTWIDTH, 76.0
 STATS = style.ROOT / 'exp/2026-10-02-scenarios-ds/scen-stats.json'
 RESULTS = style.ROOT / 'exp/2026-10-02-scenarios-ds/paper-results.json'
 STALE = .25                      # share of tasks that used a stale definition
@@ -35,18 +37,24 @@ paper_results = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(paper_results)
 PHASES, CLASSES = paper_results.PHASES, paper_results.CLASSES
 
+# Left panel: the baselines and MAVRA. The ablations are in the right panel and the text.
 SHOWN = ['middle', 'traj-global', 'traj-verify', 'metric-global-schema', 'metric-global-revoke',
          'metric-global-snap']
-MAINTAINERS = ['metric-global-revoke', 'metric-global-def', 'metric-global-exref', 'metric-global-snap']
+MARKER = {'traj-verify': 'D'}    # the variant of example retrieval keeps its hue, changes shape
+# Legend order puts the variant right under its base method; its legend label is the suffix.
+LEGEND = ['traj-global', 'traj-verify', 'middle', 'metric-global-schema', 'metric-global-revoke',
+          'metric-global-snap']
+LEGEND_LABEL = {'traj-verify': {'en': '+ self-verification', 'zh': '+ 自行核验'}}
+MAINTAINERS = ['metric-global-revoke', 'metric-global-snap', 'metric-global-def', 'metric-global-exref']
 # Macro keys of tools/scen-stats.py and tools/paper-results.py: \Ds<key>*, \ScenAcc<key>*.
 KEY = {'middle': 'NoShare', 'traj-global': 'Traj', 'traj-verify': 'TrajVerify',
        'metric-global-noguard': 'Noguard', 'metric-global-schema': 'Schema',
        'metric-global-revoke': 'Revoke', 'metric-global-def': 'Def', 'metric-global-snap': 'Cond',
        'metric-global-exref': 'CondCur', 'metric-global': 'CondGold'}
-SHORT = {  # two-line tick labels for the twelve settings
-    'en': {'holdout': 'Held-out', 'append': 'Append', 'backfill': 'Late-\narriving',
+SHORT = {  # tick labels for the twelve settings; line breaks only between words
+    'en': {'holdout': 'Held-out', 'append': 'Append', 'backfill': 'Late\narriving',
            'correct': 'In-place\nfix', 'addcol': 'New\ncolumn', 'status': 'Status\nrows',
-           'revision': 'Restate-\nment', 'dupload': 'Duplicate\nload', 'dimhist': 'SCD\nType 2',
+           'revision': 'Restatement', 'dupload': 'Duplicate\nload', 'dimhist': 'SCD\nType 2',
            'latekey': 'Date-key\nformat', 'unit': 'Unit\nchange', 'mirror': 'Backup\ncopy'},
     'zh': {'holdout': '留出', 'append': '正常\n追加', 'backfill': '迟到\n事实', 'correct': '原地\n更正',
            'addcol': '新增\n无关列', 'status': '状态\n变更行', 'revision': '多版本\n更正',
@@ -54,16 +62,20 @@ SHORT = {  # two-line tick labels for the twelve settings
            'unit': '金额\n单位', 'mirror': '备份\n副本'},
 }
 TEXT = {
-    'en': {'y': 'Accuracy of the user agent (%)', 'run': 'one run',
-           'stale': 'hollow: at least 25% of the tasks used a stale definition',
-           'title_b': 'Invalidations (light) and\npublished repairs (solid)\nper run',
-           'b_labels': {'metric-global-revoke': 'Invalidate on\nevery write', 'metric-global-def': 'Full recheck\nper definition',
-                        'metric-global-exref': 'MAVRA, regression\non current data', 'metric-global-snap': 'MAVRA'}},
-    'zh': {'y': '用户端智能体正确率（%）', 'run': '一次运行',
-           'stale': '空心：至少 25% 的题使用了过期定义',
-           'title_b': '每次运行的失效数（浅）\n与发布的修复数（深）\n',
-           'b_labels': {'metric-global-revoke': '每次写入\n即失效', 'metric-global-def': '整定义重查',
-                        'metric-global-exref': 'MAVRA，回归测\n试用当前数据', 'metric-global-snap': 'MAVRA'}},
+    'en': {'y': 'Accuracy of the user agent (%)', 'range': 'range of the three runs',
+           'stale': 'red ring: stale definition in ≥25% of tasks',
+           'maint_title': 'Maintenance per run\n(methods that keep definitions)',
+           'inval': 'invalidations', 'repairs': 'published repairs',
+           'b_labels': {'metric-global-revoke': 'Invalidate on\nevery write', 'metric-global-snap': 'MAVRA',
+                        'metric-global-def': 'Full recheck\nper definition',
+                        'metric-global-exref': 'MAVRA, regression\non current data'}},
+    'zh': {'y': '用户端智能体正确率（%）', 'range': '三次运行的范围',
+           'stale': '红圈：≥25% 的题使用了过期定义',
+           'maint_title': '每次运行的维护\n（维护定义的方法）',
+           'inval': '失效数', 'repairs': '发布的修复数',
+           'b_labels': {'metric-global-revoke': '每次写入\n即失效', 'metric-global-snap': 'MAVRA',
+                        'metric-global-def': '整定义重查',
+                        'metric-global-exref': 'MAVRA，回归测\n试用当前数据'}},
 }
 
 
@@ -109,74 +121,97 @@ def figure(lang):
     T, zh = TEXT[lang], lang == 'zh'
     fig = mplstyle.figure(W, H)
     gs = GridSpec(1, 2, figure=fig, width_ratios=[3.35, 1.0], wspace=.27,
-                  left=.045, right=.985, top=.80, bottom=.19)
+                  left=.045, right=.985, top=.80, bottom=.31)
 
     # ── Left: accuracy by data change ──────────────────────────────────────────
     ax = fig.add_subplot(gs[0])
-    offsets = np.linspace(-.36, .36, len(SHOWN))
-    rng = np.random.default_rng(7)
-    prev, band = None, 0
-    for i, (phase, cls, *_) in enumerate(PHASES):
-        if cls != prev:
-            span = sum(1 for _, c, *_ in PHASES if c == cls)
-            if band % 2:
-                ax.axvspan(i - .5, i + span - .5, color='#F3F2EF', lw=0, zorder=0)
-            level = 105 if span > 1 or band % 2 == 0 else 113
-            ax.text(i + span / 2 - .5, level, CLASSES[cls][zh], ha='center', va='bottom',
-                    fontsize=mplstyle.LABEL, color=INK, fontweight='bold', clip_on=False)
-            if span == 1:
-                ax.plot([i, i], [103, level - 1], color=MUTED, lw=.4, clip_on=False)
-            band += 1
-        prev = cls
+    n = len(PHASES)
+    groups = []                                   # [class, first index, last index]
+    for i, (_, cls, *_) in enumerate(PHASES):
+        if groups and groups[-1][0] == cls:
+            groups[-1][2] = i
+        else:
+            groups.append([cls, i, i])
+    for i in range(n - 1):
+        ax.axvline(i + .5, color=GRID, lw=.4, zorder=0)
+    for _, i0, _ in groups[1:]:
+        ax.axvline(i0 - .5, color=MUTED, lw=.5, zorder=0)
+    offsets = np.linspace(-.3, .3, len(SHOWN))
+    for i, (phase, *_) in enumerate(PHASES):
         for off, mode in zip(offsets, SHOWN):
             runs, mean, stale = cells[mode, phase]
             if mean is None:
                 continue
             x, color = i + off, mplstyle.color(mode)
-            ax.scatter(x + rng.uniform(-.03, .03, len(runs)), runs, s=4, color=color, alpha=.45,
-                       lw=0, zorder=2)
-            ax.scatter([x], [mean], s=17, facecolor='white' if stale else color, edgecolor=color,
-                       lw=.7 if stale else .35, zorder=3)
-    ax.set_xlim(-.5, len(PHASES) - .5)
+            if runs and max(runs) - min(runs) > .5:
+                ax.plot([x, x], [min(runs), max(runs)], color=color, lw=.9, alpha=.8,
+                        solid_capstyle='butt', zorder=2)
+            marker = MARKER.get(mode, 'o')
+            ax.scatter([x], [mean], s=18 if marker == 'D' else 20, marker=marker, facecolor=color,
+                       edgecolor=RED if stale else 'white', lw=1.0 if stale else .35, zorder=3)
+    ax.set_xlim(-.5, n - .5)
     ax.set_ylim(-3, 103)
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.yaxis.grid(True)
     ax.set_axisbelow(True)
-    ax.set_xticks(range(len(PHASES)))
+    ax.set_xticks(range(n))
     ax.set_xticklabels([SHORT[lang][p] for p, *_ in PHASES], linespacing=.95)
     ax.tick_params(axis='x', length=0, pad=2.5)
     ax.spines['bottom'].set_visible(False)
     ax.set_ylabel(T['y'])
+    # Class brackets under the tick labels: a two-level categorical axis.
+    below = transforms.blended_transform_factory(ax.transData, ax.transAxes)
+    yb, singles = -.17, 0
+    for cls, i0, i1 in groups:
+        x0, x1 = i0 - .42, i1 + .42
+        ax.plot([x0, x0, x1, x1], [yb + .03, yb, yb, yb + .03], transform=below, color=MUTED, lw=.6,
+                clip_on=False, solid_capstyle='butt')
+        # Labels of consecutive one-slot classes alternate between two rows so they do not collide.
+        drop = .105 if i0 == i1 and singles % 2 else 0
+        singles = singles + 1 if i0 == i1 else 0
+        ax.text((i0 + i1) / 2, yb - .03 - drop, CLASSES[cls][zh], transform=below, ha='center', va='top',
+                fontsize=mplstyle.LABEL, color=INK, fontweight='bold', clip_on=False)
 
-    handles = [Line2D([], [], marker='o', ls='', ms=3.6, color=mplstyle.color(m), label=mplstyle.name(m, lang))
-               for m in SHOWN]
-    handles.append(Line2D([], [], marker='o', ls='', ms=1.9, color=MUTED, alpha=.6, label=T['run']))
-    fig.legend(handles=handles, loc='upper left', bbox_to_anchor=(.04, 1.0), ncol=4)
+    handles = [Line2D([], [], marker=MARKER.get(m, 'o'), ls='', ms=3.6 if MARKER.get(m) else 4.0,
+                      color=mplstyle.color(m), label=LEGEND_LABEL.get(m, {}).get(lang, mplstyle.name(m, lang)))
+               for m in LEGEND]
+    handles.append(Line2D([], [], color=MUTED, lw=.9, label=T['range']))
+    handles.append(Line2D([], [], marker='o', ls='', ms=4.0, mfc=MUTED, mec=RED, mew=1.0, label=T['stale']))
+    fig.legend(handles=handles, loc='upper left', bbox_to_anchor=(.02, 1.0), ncol=4, columnspacing=1.0)
 
     # ── Right: invalidations and repairs per run ──────────────────────────────
     ax2 = fig.add_subplot(gs[1])
     ys = np.arange(len(MAINTAINERS))[::-1]
+    xmax = 60
     for y, mode in zip(ys, MAINTAINERS):
         rev, rep, runs = events[mode]
         color = mplstyle.color(mode)
-        ax2.barh(y + .18, rev, height=.33, color=color, alpha=.35, lw=0)
-        ax2.barh(y - .18, rep, height=.33, color=color, lw=0)
-        ax2.scatter([r for r, _ in runs], [y + .18] * len(runs), s=3.5, color=INK, alpha=.6, lw=0, zorder=3)
-        ax2.scatter([p for _, p in runs], [y - .18] * len(runs), s=3.5, color=INK, alpha=.6, lw=0, zorder=3)
-        ax2.text(max([rev] + [r for r, _ in runs]) + 1.0, y + .18, f'{rev:.1f}', va='center',
-                 fontsize=mplstyle.TICK, color=INK)
-        ax2.text(max([rep] + [p for _, p in runs]) + 1.0, y - .18, f'{rep:.1f}', va='center',
-                 fontsize=mplstyle.TICK, color=INK)
+        for dy, value, values, alpha in ((.18, rev, [r for r, _ in runs], .35),
+                                         (-.18, rep, [p for _, p in runs], 1.0)):
+            if value > 0:
+                ax2.barh(y + dy, value, height=.33, color=color, alpha=alpha, lw=0, zorder=2)
+                if max(values) - min(values) > .05:
+                    ax2.plot([min(values), max(values)], [y + dy, y + dy], color=INK, lw=.8,
+                             solid_capstyle='butt', zorder=3)
+            ax2.text(xmax - .8, y + dy, f'{value:.1f}' if value else '0', ha='right', va='center',
+                     fontsize=mplstyle.TICK, color=INK)
     ax2.set_yticks(ys)
     ax2.set_yticklabels([T['b_labels'][m] for m in MAINTAINERS], linespacing=.95)
     ax2.tick_params(axis='y', length=0, pad=2.5)
     ax2.set_ylim(-.6, len(MAINTAINERS) - .4)
-    ax2.set_xlim(0, 56)
+    ax2.set_xlim(0, xmax)
     ax2.set_xticks([0, 20, 40])
     ax2.xaxis.grid(True)
     ax2.set_axisbelow(True)
     ax2.spines['left'].set_visible(False)
-    ax2.set_title(T['title_b'], loc='left', pad=4, linespacing=1.0)
+    # Title and shade legend sit under the panel, so the header band belongs to the left legend.
+    shades = [Patch(facecolor=MUTED, alpha=.35, label=T['inval']), Patch(facecolor=MUTED, label=T['repairs'])]
+    pos = ax2.get_position()
+    legend = fig.legend(handles=shades, loc='upper left', bbox_to_anchor=(pos.x0 - .05, pos.y0 - .085),
+                        ncol=1, title=T['maint_title'], alignment='left', handlelength=1.2, handleheight=.8)
+    legend.get_title().set_fontsize(mplstyle.TITLE)
+    legend.get_title().set_fontweight('bold')
+    legend.get_title().set_color(INK)
     return fig
 
 

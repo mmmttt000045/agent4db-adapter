@@ -1,8 +1,8 @@
 """Deck figure 1 (system structure): how a user agent's two requests flow through MAVRA.
 
 A user agent asks for a metric by name ("store revenue"); the query service
-reads its definition from the shared memory; a validation result missing for the
-current data version is computed by maintenance and cached; a valid definition
+reads its definition from the shared memory; validation results missing for the
+current data version are computed by maintenance and cached; a valid definition
 (v2) goes back. The agent then sends SQL that names v2; the pre-execution check
 reuses cached validation results on the query's snapshot and runs the SQL there.
 Maintenance queries the database and writes validation results to the cache and
@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import style  # noqa: E402
+from vecfig import measure  # noqa: E402
 from parts import (DASH, EXEC, HEAD, LEARN, NOTE, PANEL_EDGE, THICK, THIN, TITLE, USE, WAIT,  # noqa: E402
                    baseline, box, legend_line, legend_pill, llm_badge, mark, node, person, slab, step,
                    table_card, titled)
@@ -33,10 +34,10 @@ LABELS = {
         'service': '查询服务', 'lookup': ('检索指标定义', '名称匹配；比较表版本'),
         'check': ('执行前验证', '同一快照内验证并执行'),
         'store': '共享记忆', 'store_note': '另有表统计信息、连接路径', 'defs': '指标定义',
-        'def_chips': (('营业额 v2', '待验证'), ('电子品类 v2', '有效'), ('退货率 v2', '有效')),
+        'def_chips': (('营业额 v2', '待验证', 'wait'), ('电子品类 v2', '待验证', 'wait'), ('退货金额 v2', '有效', 'ok')),
         'cache': '验证结果缓存', 'cache_note': '按（条件，表版本）缓存，跨定义共享',
-        'cache_chips': (('粒度键唯一', '表版本 v15', 'ok'), ('日期键完整性', '表版本 v15', 'wait'),
-                        ('日期键唯一', '表版本 v3', 'ok')),
+        'cache_chips': (('日期键唯一', '表版本 v3', 'ok'), ('粒度键唯一', '表版本 v15', 'wait'),
+                        ('日期键完整性', '表版本 v15', 'wait')),
         'agent': ('内置 agent（大模型）', '学习指标定义，提出优化写法'),
         'maint': ('维护', '执行验证 · 修复、优化或失效'),
         'req_text': '检索“营业额”', 'resp_text': '有效修订 v2', 'req_sql': '执行 SQL', 'resp_sql': '查询结果',
@@ -53,10 +54,10 @@ LABELS = {
         'service': 'Query service', 'lookup': ('Find definition', 'match name, check data'),
         'check': ('Pre-run check', 'validate on one snapshot'),
         'store': 'Shared memory', 'store_note': 'also table profiles, join paths', 'defs': 'Definitions',
-        'def_chips': (('revenue v2', 'pending'), ('electr. v2', 'valid'), ('rate v2', 'valid')),
+        'def_chips': (('revenue v2', 'pending', 'wait'), ('electr. v2', 'pending', 'wait'), ('returns v2', 'valid', 'ok')),
         'cache': 'Validation cache', 'cache_note': 'per (rule, data version), shared',
-        'cache_chips': (('one row/sale', 'version v15', 'ok'), ('loss in bound', 'version v15', 'wait'),
-                        ('date key unique', 'version v3', 'ok')),
+        'cache_chips': (('date key unique', 'version v3', 'ok'), ('one row/sale', 'version v15', 'wait'),
+                        ('loss in bound', 'version v15', 'wait')),
         'agent': ('Built-in agent (LLM)', 'learns definitions, proposes rewrites'),
         'maint': ('Maintenance', 'checks · repair, optimize, retire'),
         'req_text': 'ask “revenue”', 'resp_text': 'valid v2', 'req_sql': 'run SQL', 'resp_sql': 'result',
@@ -155,8 +156,8 @@ def draw(s, lang):
     box(s, DEFS)
     tl = text(x + 3.0, baseline(y + h / 2, NOTE), L['defs'], NOTE, INK, 'bold')
     cw2 = min(27.0, (w - 3.0 - tl - 2.0 - 2.0 - 4.0) / 3)   # chips right-aligned, clear of the label
-    for k, ((name, state), col, pale) in enumerate(zip(
-            L['def_chips'], (AMBER, ACC_DK, ACC_DK), (AMBER_PALE, ACC_PALE, ACC_PALE))):
+    for k, (name, state, kind) in enumerate(L['def_chips']):
+        col, pale = (AMBER, AMBER_PALE) if kind == 'wait' else (ACC_DK, ACC_PALE)
         xx = x + w - 2.0 - (3 - k) * cw2 - (2 - k) * 2.0
         rect(xx, y + 1.5, cw2, h - 3.0, pale, None, r=1.0)
         rect(xx + 1.2, y + 2.8, 1.0, h - 5.6, col)
@@ -179,7 +180,7 @@ def draw(s, lang):
     # Maintenance --------------------------------------------------------------------------
     titled(s, MAINT, *L['maint'])
 
-    # Inside MAVRA: read the definition, reuse cached results, fill the missing one ------
+    # Inside MAVRA: read the definition, reuse cached results, fill the missing ones -----
     ga, gb = PA[0] + PA[2], PB[0]
     gm = (ga + gb) / 2
     yr = DEFS[1] + DEFS[3] / 2
@@ -192,22 +193,26 @@ def draw(s, lang):
     text(gm, yc - 7.2, r1, NOTE, EXEC, align='center')
     text(gm, yc - 2.0, r2, NOTE, EXEC, align='center', width=gb - ga + 4)
     step(s, gm, yc + 4.2, 7, EXEC)
-    km = next(k for k, c in enumerate(L['cache_chips']) if c[2] == 'wait')
-    xm0 = CACHE[0] + 1.5 + km * (chip_w + 1.5)      # the missing entry
-    xd, xu = xm0 + 3.5, xm0 + chip_w - 3.0
-    yb, yt = CACHE[1] + 18.5, MAINT[1]
-    route([(xd, yb), (xd, yt)], USE, THIN, length=HEAD)
-    route([(xu, yt), (xu, yb)], USE, THICK, length=HEAD)
-    ym = (yb + yt) / 2
+    # The missing results share one connector: maintenance computes them all and writes them back.
+    miss = [CACHE[0] + 1.5 + k * (chip_w + 1.5) + chip_w / 2
+            for k, c in enumerate(L['cache_chips']) if c[2] == 'wait']
+    yb, yj, yt = CACHE[1] + 18.5, PB[1] + PB[3] + 1.5, MAINT[1]
+    xn = (DEFS[0] + DEFS[2] + PB[0] + PB[2]) / 2     # maintenance -> definitions, right of the store
+    xu = xn - 6.0 - measure(L['revise'], NOTE)
+    xd = xu - 10.5 - measure(L['store_result'], NOTE)
+    for xc in miss:
+        route([(xc, yb), (xc, yj)], USE, THIN, heads=None)
+    route([(min(miss[0], xd), yj), (max(miss[-1], xu), yj)], USE, THIN, heads=None)
+    route([(xd, yj), (xd, yt)], USE, THIN, length=HEAD)
+    route([(xu, yt), (xu, yj)], USE, THICK, length=HEAD)
+    ym = (yj + yt) / 2
     w3 = text(xd - 2.0, baseline(ym, NOTE), L['missing'], NOTE, USE, align='right')
     step(s, xd - 2.0 - w3 - 4.0, ym, 3, USE)
-    w4 = text(xu - 2.0, baseline(ym, NOTE), L['store_result'], NOTE, USE, align='right',
-              width=xu - xd - 9.0)
+    w4 = text(xu - 2.0, baseline(ym, NOTE), L['store_result'], NOTE, USE, align='right')
     step(s, xu - 2.0 - w4 - 4.0, ym, 4, USE)
     # Maintenance also writes the definitions: a repaired or cheaper revision, or an invalidation.
-    xn = (DEFS[0] + DEFS[2] + PB[0] + PB[2]) / 2
     route([(xn, yt), (xn, yr), (DEFS[0] + DEFS[2], yr)], INK, THICK, length=HEAD)
-    text(xn - 2.0, baseline(ym, NOTE), L['revise'], NOTE, INK, align='right', width=xn - xu - 6.0)
+    text(xn - 2.0, baseline(ym, NOTE), L['revise'], NOTE, INK, align='right')
     # Learning: the built-in agent publishes into the definitions.
     xp = DEFS[0] + DEFS[2] - 10.0
     route([(xp, OPT[1] + OPT[3]), (xp, DEFS[1])], LEARN, THICK, length=HEAD)

@@ -34,7 +34,7 @@ pub struct Options {
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",
           value_parser = ["direct", "middle", "metric-local", "metric-global", "metric-global-noguard",
                           "metric-global-schema", "metric-global-revoke", "metric-global-def", "metric-global-exref",
-                          "metric-global-snap", "traj-global", "traj-verify"])]
+                          "metric-global-snap", "metric-global-opt", "traj-global", "traj-verify"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
     phrasings: Vec<String>,
@@ -466,6 +466,12 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         "metric-global-snap" => {
             (MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, g8_snapshot_db: true, ..base }, true, true)
         }
+        // 同 -snap，并在学习之后对每条已发布定义尝试优化修订（规则改写与模型提议；验证等价与代价后发布）
+        "metric-global-opt" => (
+            MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, g8_snapshot_db: true, optimize: true, ..base },
+            true,
+            true,
+        ),
         // 匹配的轨迹检索基线：同样的中间层工具与学习题，学习成功的轨迹原样保存、按题面检索，不提炼、不维护；
         // traj-verify 只多一句提示：复用前先在当前数据上核对 SQL 依赖的前提
         "traj-global" | "traj-verify" => (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false),
@@ -813,6 +819,18 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
         }
     }
     events.insert("learn".into(), json!(mid.take_metric_events()));
+    // 优化修订：学习之后、留出之前，对每条已发布定义尝试规则改写与模型提议；通过等价与代价验证的作为新修订发布
+    let optimizing = if mid.cfg.optimize {
+        let octx = Ctx::new("O", &format!("{}-optimize", cell.id), "optimize");
+        let t1 = Instant::now();
+        let rounds = mid.optimize_sweep(&octx, Some(env.extractor), env.o.extract_attempts).await?;
+        let published = rounds.iter().filter(|r| !r["published"].is_null()).count();
+        eprintln!("  优化修订：{} 条定义中 {published} 条发布了新修订（{:.1} 秒）", rounds.len(), t1.elapsed().as_secs_f64());
+        events.insert("optimize".into(), json!(mid.take_metric_events()));
+        json!({"rounds": rounds, "published": published, "seconds": t1.elapsed().as_secs_f64()})
+    } else {
+        Value::Null
+    };
 
     // 留出之后的每个场景都从 v1 与留出后的经验库开始：先施加改变业务事实的部分并计算标准答案，
     // 再施加只改变数据表示的部分；答完后回滚、核对内容回到 v1，并恢复经验库快照。
@@ -879,7 +897,7 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     }
     Ok(json!({
         "cell": cell.id, "mode": mode, "phrasing": phrasing, "repeat": repeat, "seconds": t0.elapsed().as_secs_f64(),
-        "learning": learning, "relearning": relearning, "audits": audits, "events": events, "writes": writes,
+        "learning": learning, "relearning": relearning, "optimizing": optimizing, "audits": audits, "events": events, "writes": writes,
         "metric_report": mid.metric_report(), "trajectories": mid.trajectories(), "stats": mid.stats_json(), "records": records,
     }))
 }

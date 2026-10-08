@@ -9,7 +9,7 @@
 use crate::catalog;
 use crate::db::{diff, Db, QKind};
 use crate::etl;
-use crate::knowledge::{Basis, Content, EmptyRule, JoinKind, JoinRef, Metric, Status, TimeSpec};
+use crate::knowledge::{Basis, Content, EmptyRule, JoinKind, JoinRef, Metric, Status, TimeSpec, TimeStrategy};
 use crate::metric::{self, parse_answer, same_value, Ask, Period};
 use crate::metricbench::{self, md_table, GROWTH_OFFSET};
 use crate::middle::{Ctx, Maint, Middle, MiddleConfig};
@@ -173,6 +173,7 @@ fn metric(s: &Spec) -> Metric {
             dim_col: "d_date_sk".into(),
             grain: "month".into(),
             loss_ratio: 0.0,
+            strategy: TimeStrategy::DimJoin,
         }),
         joins,
         filters: BTreeMap::new(),

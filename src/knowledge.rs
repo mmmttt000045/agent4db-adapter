@@ -121,6 +121,21 @@ pub struct TimeSpec {
     /// 准入时事实表关联不上时间维度的行占比（空键或孤儿键），由中间层按已验证路径填写；覆盖条件以它为基线
     #[serde(default)]
     pub loss_ratio: f64,
+    /// 期间谓词的实现方式；优化修订可以把它改为按日期键范围过滤
+    #[serde(default)]
+    pub strategy: TimeStrategy,
+}
+
+/// 期间谓词的实现方式。
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum TimeStrategy {
+    /// 连接日期维度，按维度列过滤（默认）
+    #[default]
+    DimJoin,
+    /// 事实表按日期键范围过滤，不连接日期维度。等价于维度连接的前提是日期键按月连续（`Check::DateKeysContiguous`），
+    /// 优化修订发布时验证，之后作为该修订的条件维护
+    KeyRange,
 }
 
 /// 指标引用的已验证关联：方向、基数、过滤与丢行比例都记下，关联能执行不等于不放大聚合。

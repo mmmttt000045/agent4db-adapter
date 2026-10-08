@@ -190,7 +190,7 @@ fn rank(priority: &[String], kind: &str) -> usize {
     priority.iter().position(|k| k == kind).unwrap_or(usize::MAX)
 }
 
-fn summarize(pairs: &[(f64, f64)]) -> Evidence {
+pub(crate) fn summarize(pairs: &[(f64, f64)]) -> Evidence {
     let n = pairs.len();
     if n == 0 {
         return Evidence::default();

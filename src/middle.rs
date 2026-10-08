@@ -8,6 +8,7 @@
 //! - 指标经验：从成功轨迹提炼的业务口径，经门槛晋升后共享，见子模块 `metrics`。
 
 mod metrics;
+mod optimize;
 
 pub use metrics::MetricEvidence;
 
@@ -128,6 +129,11 @@ pub struct MiddleConfig {
     /// 修复回归（G8）在单独保存的学习时快照库上比较（库由调用方建好并设到 `Middle::learn_db`）。
     /// 与 `g8_snapshot` 的区别：快照在另一个库里，智能体的连接看不到它
     pub g8_snapshot_db: bool,
+    /// 优化修订：对已发布定义尝试保持语义的改写（规则改写、模型提议），在学习时快照与当前快照上验证等价、配对测量执行代价，
+    /// 等价且显著更省的候选作为新修订发布；旧修订仍然正确，执行端宽限接受。默认关闭，其他实验的行为不变
+    pub optimize: bool,
+    /// 优化修订要求的最小平均节省比例（样本期间的执行时间）
+    pub optimize_min_saving: f64,
 }
 
 impl Default for MiddleConfig {
@@ -157,6 +163,8 @@ impl Default for MiddleConfig {
             g8_example: false,
             g8_snapshot: None,
             g8_snapshot_db: false,
+            optimize: false,
+            optimize_min_saving: 0.10,
         }
     }
 }
@@ -194,6 +202,7 @@ impl Ctx {
 #[derive(Default)]
 pub struct Stats {
     pub hits: AtomicU64,
+    pub optimizations: AtomicU64,
     pub misses: AtomicU64,
     pub guard_runs: AtomicU64,
     pub guard_fails: AtomicU64,
@@ -341,6 +350,8 @@ pub struct Middle {
     pub trace: Option<crate::llm::Trace>,
     /// 学习时快照库的只读连接（`MiddleConfig::g8_snapshot_db`）；G8 在其中比较
     pub learn_db: Option<Arc<Db>>,
+    /// 被优化修订替代的旧修订号（完整键 → 修订号）：仍然正确，执行端宽限接受并附通知
+    opt_prev: Mutex<HashMap<String, u32>>,
 }
 
 fn join_key(a: &str, b: &str) -> String {
@@ -394,6 +405,9 @@ fn outcome_text(c: &Check, o: &Outcome) -> String {
         Check::KeyUnique { .. } => {
             format!("{} 行只有 {} 个不同键（平均每键 {:.2} 行）", o.metrics["n_rows"], o.metrics["n_keys"], metric(o, "avg_mult"))
         }
+        Check::DateKeysContiguous { .. } => {
+            format!("{} 个月份中 {} 个月的日期键不连续", o.metrics["n_months"], o.metrics["n_bad"])
+        }
         Check::SampleFanout { .. } => format!(
             "抽样 {} 行中 {} 行匹配多行（最多 {}，平均 {:.2}）",
             o.metrics["n_sample"],
@@ -432,6 +446,7 @@ impl Middle {
             maint_inflight: Mutex::new(HashMap::new()),
             trace: None,
             learn_db: None,
+            opt_prev: Mutex::new(HashMap::new()),
         })
     }
 
@@ -515,7 +530,7 @@ impl Middle {
         json!({
             "knowledge_hits": g(&s.hits), "knowledge_misses": g(&s.misses), "inflight_merged": self.merged(),
             "guard_runs": g(&s.guard_runs), "guard_fails": g(&s.guard_fails), "revocations": g(&s.revocations),
-            "repairs": g(&s.repairs), "sql_rejections": g(&s.rejections), "notices": g(&s.notices),
+            "repairs": g(&s.repairs), "optimizations": g(&s.optimizations), "sql_rejections": g(&s.rejections), "notices": g(&s.notices),
             "entries": self.store.len(), "feedback": self.fb.report(), "db": self.db.meter.snap(),
             "sql_cache": {"hits": g(&s.sql_cache_hits), "misses": g(&s.sql_cache_misses)},
             "snapshot_exec": {"checks_run": g(&s.snapshot_checks_run), "checks_reused": g(&s.snapshot_checks_reused),

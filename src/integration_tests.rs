@@ -2,7 +2,7 @@
 //! Creates a uniquely named database, never loads fixtures into the supplied database.
 
 use crate::db::{Db, QKind};
-use crate::knowledge::{Basis, EmptyRule, JoinKind, JoinRef, Metric, TimeSpec};
+use crate::knowledge::{Basis, EmptyRule, JoinKind, JoinRef, Metric, TimeSpec, TimeStrategy};
 use crate::metric::{self, Ask, Period};
 use crate::middle::{Checkpoint, Ctx, Maint, Middle, MiddleConfig};
 use crate::scenario::{self, Change};
@@ -232,6 +232,7 @@ fn seeded_metrics() -> Vec<(&'static str, Metric)> {
             dim_col: "d_date_sk".into(),
             grain: "month".into(),
             loss_ratio: 0.0,
+            strategy: TimeStrategy::DimJoin,
         })
     };
     let join = |right: &str, on: &[(&str, &str)], kind: JoinKind| JoinRef {

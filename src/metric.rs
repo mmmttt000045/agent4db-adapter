@@ -2,7 +2,7 @@
 //! 需要数据库的门槛、守护、受限修复与回归在 `middle::metrics`。协议见 docs/metric-experience-protocol.md。
 
 use crate::catalog::Catalog;
-use crate::knowledge::{Basis, EmptyRule, JoinKind, Metric, TimeSpec};
+use crate::knowledge::{Basis, EmptyRule, JoinKind, Metric, TimeSpec, TimeStrategy};
 use crate::llm::{Provider, Turn};
 use crate::sqlscan;
 use anyhow::{anyhow, bail, ensure, Result};
@@ -331,19 +331,35 @@ pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
     if let Some(f) = m.filters.get(&m.fact) {
         push_unique(&mut wheres, &mut seen, f);
     }
-    from.push_str(&format!(" join {} on {} = {}", time.dim, time.fact_col, time.dim_col));
+    let joined = format!("{from} join {} on {} = {}", time.dim, time.fact_col, time.dim_col);
     let cond = |extra: String| {
         let mut w = wheres.clone();
         w.push(extra);
         w.join(" and ")
     };
     let expr = if m.empty == EmptyRule::Zero { format!("coalesce({}, 0)", m.measure) } else { m.measure.clone() };
-    let value = |p: &Period| format!("select {expr} as value from {from} where {}", cond(period_pred(p)));
+    // 日期键范围：期间的日期键集合是一个整数区间（条件“日期键按月连续”），事实表按键范围过滤，不连接维度表；
+    // 按月排名仍需维度列，照旧连接
+    let range = time.strategy == TimeStrategy::KeyRange;
+    let value = |p: &Period| {
+        if range {
+            let pp = period_pred(p);
+            let between = format!(
+                "{} between (select min({dc}) from {dim} where {pp}) and (select max({dc}) from {dim} where {pp})",
+                time.fact_col,
+                dc = time.dim_col,
+                dim = time.dim
+            );
+            format!("select {expr} as value from {from} where {}", cond(between))
+        } else {
+            format!("select {expr} as value from {joined} where {}", cond(period_pred(p)))
+        }
+    };
     Ok(match ask {
         Ask::Single { period } => value(period),
         Ask::Diff { a, b } => format!("select ({}) - ({}) as value", value(a), value(b)),
         Ask::RankMonth { year } => format!(
-            "select d_moy as value from {from} where {} group by d_moy order by {} desc nulls last, d_moy limit 1",
+            "select d_moy as value from {joined} where {} group by d_moy order by {} desc nulls last, d_moy limit 1",
             cond(format!("d_year = {year}")),
             m.measure
         ),
@@ -517,7 +533,7 @@ pub fn same_structure(a: &Metric, b: &Metric) -> bool {
             .collect()
     };
     let filters = |m: &Metric| -> Vec<String> { m.filters.iter().map(|(t, f)| format!("{t}:{}", squash(f))).collect() };
-    let time = |m: &Metric| m.time.as_ref().map(|t| (t.fact_col.clone(), t.dim.clone(), t.dim_col.clone()));
+    let time = |m: &Metric| m.time.as_ref().map(|t| (t.fact_col.clone(), t.dim.clone(), t.dim_col.clone(), t.strategy));
     let grain = |m: &Metric| m.grain.iter().cloned().collect::<BTreeSet<_>>();
     a.fact == b.fact
         && squash(&a.measure) == squash(&b.measure)
@@ -526,6 +542,53 @@ pub fn same_structure(a: &Metric, b: &Metric) -> bool {
         && joins(a) == joins(b)
         && filters(a) == filters(b)
         && a.empty == b.empty
+}
+
+/// 优化候选：在结构化定义上做保持语义的改写，由中间层逐一验证等价与代价后决定是否发布。
+/// - 期间谓词改为日期键范围过滤（不连接日期维度；前提“日期键按月连续”成为新修订的条件）；
+/// - 去掉口径里没有用到其任何列、也不带过滤的关联（左关联，或经验证不丢行的内关联）。
+/// 可叠加时先给出叠加后的候选，再给出各单项。
+pub fn rewrite_candidates(m: &Metric, cat: &Catalog) -> Vec<(String, Metric)> {
+    let mut singles: Vec<(String, Metric)> = vec![];
+    let range_ok = m.time.as_ref().is_some_and(|t| t.strategy == TimeStrategy::DimJoin && t.dim == "date_dim");
+    if range_ok {
+        let mut c = m.clone();
+        if let Some(t) = c.time.as_mut() {
+            t.strategy = TimeStrategy::KeyRange;
+        }
+        singles.push(("期间谓词改为日期键范围过滤，不连接 date_dim".into(), c));
+    }
+    let used = |table: &str| -> bool {
+        let exprs = std::iter::once(&m.measure).chain(m.filters.values()).chain(m.joins.iter().flat_map(|j| j.filters.values()));
+        exprs.flat_map(|e| sqlscan::words(e)).any(|w| cat.table_of(&w) == Some(table))
+    };
+    let mut dropped: Vec<String> = vec![];
+    for (i, j) in m.joins.iter().enumerate() {
+        let droppable = j.filters.is_empty()
+            && !m.filters.contains_key(&j.right)
+            && !used(&j.right)
+            && !m.joins.iter().any(|o| o.left == j.right)
+            && (j.kind == JoinKind::Left || j.loss_ratio == 0.0);
+        if droppable {
+            let mut c = m.clone();
+            c.joins.remove(i);
+            dropped.push(j.right.clone());
+            singles.push((format!("去掉未使用的关联 {}", j.right), c));
+        }
+    }
+    let mut out = vec![];
+    if singles.len() > 1 {
+        let mut c = m.clone();
+        if range_ok {
+            if let Some(t) = c.time.as_mut() {
+                t.strategy = TimeStrategy::KeyRange;
+            }
+        }
+        c.joins.retain(|j| !dropped.contains(&j.right));
+        out.push((singles.iter().map(|(l, _)| l.as_str()).collect::<Vec<_>>().join("；"), c));
+    }
+    out.extend(singles);
+    out
 }
 
 // ───────────────────────── 离线提炼 ─────────────────────────
@@ -570,14 +633,8 @@ struct RawDraft {
     example_sql: String,
 }
 
-/// 解析提炼器输出。关联的键、基数、丢行比例和修订号由中间层按已验证路径填写，这里清空。
-pub fn parse_draft(text: &str) -> std::result::Result<Draft, String> {
-    let (Some(a), Some(b)) = (text.find('{'), text.rfind('}')) else { return Err("输出中没有 JSON 对象".into()) };
-    if b < a {
-        return Err("输出中没有 JSON 对象".into());
-    }
-    let raw: RawDraft = serde_json::from_str(&text[a..=b]).map_err(|e| format!("JSON 不符合格式：{e}"))?;
-    let mut m = raw.metric;
+/// 清掉由中间层按已验证路径填写的元数据与来源信息（提炼器与优化器的输出都经此处理）。
+fn scrub(m: &mut Metric) {
     m.basis = Basis::None;
     m.examples.clear();
     if let Some(t) = &mut m.time {
@@ -589,6 +646,17 @@ pub fn parse_draft(text: &str) -> std::result::Result<Draft, String> {
         j.loss_ratio = 0.0;
         j.revision = 0;
     }
+}
+
+/// 解析提炼器输出。关联的键、基数、丢行比例和修订号由中间层按已验证路径填写，这里清空。
+pub fn parse_draft(text: &str) -> std::result::Result<Draft, String> {
+    let (Some(a), Some(b)) = (text.find('{'), text.rfind('}')) else { return Err("输出中没有 JSON 对象".into()) };
+    if b < a {
+        return Err("输出中没有 JSON 对象".into());
+    }
+    let raw: RawDraft = serde_json::from_str(&text[a..=b]).map_err(|e| format!("JSON 不符合格式：{e}"))?;
+    let mut m = raw.metric;
+    scrub(&mut m);
     if m.name.trim().is_empty() || m.fact.trim().is_empty() || m.measure.trim().is_empty() {
         return Err("name、fact、measure 不能为空".into());
     }
@@ -625,6 +693,94 @@ pub async fn extract(p: &Provider, input: &Value, max_attempts: u32) -> Extracti
     }
     ex.seconds = t0.elapsed().as_secs_f64();
     ex
+}
+
+// ───────────────────────── 优化提议 ─────────────────────────
+
+const OPTIMIZE_SYSTEM: &str = "你是数据中间层的指标口径优化器。输入是一条已发布的指标口径（结构化字段）、它的规范 SQL 与执行计划、\
+相关表的行数与列。请提出至多 3 个与原口径计算结果完全相同、但执行代价更低的改写。允许的改写：time.strategy 改为 \\"key_range\\"\
+（事实表按日期键范围过滤，不连接日期维度）；去掉结果不依赖的关联；等价地简化聚合表达式或过滤写法。不得改变业务含义：\
+度量所用的列、过滤的语义、粒度键必须与原口径一致，不得加入题目参数。只输出一个 JSON 数组，不要输出其他文字；每项是一个对象，\
+字段与原口径相同（name, aliases, definition, fact, measure, grain, time{role, fact_col, dim, dim_col, grain, strategy}, joins, filters, \
+empty, caveats），外加 rationale：一句话说明为什么等价且更省。中间层会逐一验证等价与代价，只有通过的才会发布。";
+
+#[derive(Debug, Default, Serialize)]
+pub struct Proposals {
+    #[serde(skip)]
+    pub drafts: Vec<(String, Metric)>,
+    pub attempts: u32,
+    pub input_tokens: u64,
+    pub output_tokens: u64,
+    pub seconds: f64,
+    pub errors: Vec<String>,
+}
+
+/// 解析优化器输出：一个 JSON 数组，每项是口径字段加 rationale。解析不了的单项跳过并记录。
+pub fn parse_proposals(text: &str) -> std::result::Result<(Vec<(String, Metric)>, Vec<String>), String> {
+    let (Some(a), Some(b)) = (text.find('['), text.rfind(']')) else { return Err("输出中没有 JSON 数组".into()) };
+    if b < a {
+        return Err("输出中没有 JSON 数组".into());
+    }
+    let arr: Vec<Value> = serde_json::from_str(&text[a..=b]).map_err(|e| format!("JSON 不符合格式：{e}"))?;
+    let (mut out, mut errors) = (vec![], vec![]);
+    for (i, mut v) in arr.into_iter().enumerate() {
+        let Some(obj) = v.as_object_mut() else {
+            errors.push(format!("第 {} 项不是对象", i + 1));
+            continue;
+        };
+        for k in ["name", "definition", "fact", "measure"] {
+            obj.entry(k).or_insert(Value::String(String::new()));
+        }
+        let rationale = obj.remove("rationale").and_then(|x| x.as_str().map(str::to_string)).unwrap_or_default();
+        let mut m: Metric = match serde_json::from_value(v) {
+            Ok(m) => m,
+            Err(e) => {
+                errors.push(format!("第 {} 项：{e}", i + 1));
+                continue;
+            }
+        };
+        scrub(&mut m);
+        if m.fact.trim().is_empty() || m.measure.trim().is_empty() {
+            errors.push(format!("第 {} 项缺少 fact 或 measure", i + 1));
+            continue;
+        }
+        let label = if rationale.trim().is_empty() { format!("模型提议 {}", i + 1) } else { format!("模型提议：{}", rationale.trim()) };
+        out.push((label, m));
+    }
+    Ok((out, errors))
+}
+
+/// 调用模型提出优化候选；格式错误时按固定次数重试，所有尝试的 token 与耗时都计入。
+pub async fn propose(p: &Provider, input: &Value, max_attempts: u32) -> Proposals {
+    let mut pr = Proposals::default();
+    let t0 = Instant::now();
+    let mut turns = vec![Turn::User(serde_json::to_string_pretty(input).unwrap_or_default())];
+    for _ in 0..max_attempts.max(1) {
+        pr.attempts += 1;
+        let r = match p.chat(OPTIMIZE_SYSTEM, &turns, &[]).await {
+            Ok(r) => r,
+            Err(e) => {
+                pr.errors.push(format!("{e:#}"));
+                break;
+            }
+        };
+        pr.input_tokens += r.input_tokens;
+        pr.output_tokens += r.output_tokens;
+        match parse_proposals(&r.text) {
+            Ok((d, errs)) => {
+                pr.drafts = d;
+                pr.errors.extend(errs);
+                break;
+            }
+            Err(e) => {
+                pr.errors.push(e.clone());
+                turns.push(Turn::Assistant { raw: r.raw });
+                turns.push(Turn::User(format!("上一次输出无法解析：{e}。请只输出一个符合要求的 JSON 数组。")));
+            }
+        }
+    }
+    pr.seconds = t0.elapsed().as_secs_f64();
+    pr
 }
 
 #[cfg(test)]
@@ -664,6 +820,7 @@ mod tests {
                 dim_col: "d_date_sk".into(),
                 grain: "day".into(),
                 loss_ratio: 0.0,
+                strategy: TimeStrategy::DimJoin,
             }),
             joins: vec![JoinRef {
                 key: String::new(),

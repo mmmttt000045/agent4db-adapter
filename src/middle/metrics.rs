@@ -5,7 +5,7 @@ use super::{inc, join_key, outcome_text, scope_prefix, snap_key, ver_sig, Ctx, M
 use crate::catalog::{self, TableVersion};
 use crate::checks::{same_on, Check, On, Outcome};
 use crate::db::QKind;
-use crate::knowledge::{Basis, Content, Entry, Example, JoinPath, Metric, Status};
+use crate::knowledge::{Basis, Content, Entry, Example, JoinPath, Metric, Status, TimeSpec, TimeStrategy};
 use crate::metric::{self, Answer, Ask, Draft, Trajectory};
 use crate::sqlscan;
 use anyhow::Result;
@@ -35,6 +35,9 @@ pub struct MetricEvidence {
     pub repaired: bool,
     /// 学习题的判题查询，供修复后的 G8 回归在当前快照上重算期望值
     pub judge: Option<String>,
+    /// 已发布的优化修订数（等价且更省的改写）
+    #[serde(default)]
+    pub optimized: u32,
 }
 
 enum Checked {
@@ -132,9 +135,9 @@ fn same_cond(a: &Check, b: &Check) -> bool {
     }
 }
 
-type Gate = std::result::Result<(), String>;
+pub(super) type Gate = std::result::Result<(), String>;
 
-fn record(gates: &mut Vec<Value>, gate: &str, r: Gate) -> Option<(String, String)> {
+pub(super) fn record(gates: &mut Vec<Value>, gate: &str, r: Gate) -> Option<(String, String)> {
     match r {
         Ok(()) => {
             gates.push(json!({"gate": gate, "pass": true}));
@@ -161,7 +164,7 @@ fn covers(sup: &BTreeMap<String, String>, sub: &BTreeMap<String, String>) -> boo
     sub.iter().all(|(t, f)| sup.get(t).is_some_and(|x| sqlscan::contains_filter(x, f)))
 }
 
-fn metric_of(e: &Entry) -> Option<&Metric> {
+pub(super) fn metric_of(e: &Entry) -> Option<&Metric> {
     if let Content::Metric(m) = &e.content {
         Some(m)
     } else {
@@ -211,14 +214,19 @@ fn fact_filter(m: &Metric) -> Option<String> {
 }
 
 /// 粒度条件。键列排序，使列顺序不同的同一条件得到相同的检查键（在途合并按检查键进行）。
-fn grain_check(m: &Metric) -> Check {
+pub(super) fn grain_check(m: &Metric) -> Check {
     let mut cols = m.grain.clone();
     cols.sort();
     Check::KeyUnique { table: m.fact.clone(), cols, filter: fact_filter(m) }
 }
 
+/// 日期键连续条件：期间谓词按日期键范围过滤的修订所依赖（`TimeStrategy::KeyRange`）。
+pub(super) fn time_contiguity_check(t: &TimeSpec) -> Check {
+    Check::DateKeysContiguous { dim: t.dim.clone(), key: t.dim_col.clone(), year_col: "d_year".into(), month_col: "d_moy".into() }
+}
+
 /// 绑定快照执行要核对的条件（与 `metric_breach` 维护的条件一致）：各关联一侧的键唯一性、时间维度键的唯一性、
-/// 覆盖（附准入基线）、粒度。返回条件与覆盖基线（只有覆盖条件有）。
+/// 覆盖（附准入基线）、粒度；日期键范围修订另加日期键连续。返回条件与覆盖基线（只有覆盖条件有）。
 fn bound_conditions(m: &Metric) -> Vec<(Check, Option<f64>)> {
     let mut out = vec![];
     for j in &m.joins {
@@ -230,6 +238,9 @@ fn bound_conditions(m: &Metric) -> Vec<(Check, Option<f64>)> {
         out.push((Check::KeyUnique { table: t.dim.clone(), cols: vec![t.dim_col.clone()], filter: None }, None));
         if let Some(c) = coverage_check(m) {
             out.push((c, Some(t.loss_ratio + COVERAGE_TOLERANCE)));
+        }
+        if t.strategy == TimeStrategy::KeyRange {
+            out.push((time_contiguity_check(t), None));
         }
     }
     out.push((grain_check(m), None));
@@ -269,11 +280,11 @@ impl TaskLog {
 }
 
 impl Middle {
-    fn mfk(&self, ctx: &Ctx, key: &str) -> String {
+    pub(super) fn mfk(&self, ctx: &Ctx, key: &str) -> String {
         format!("{}|{}", scope_prefix(self.cfg.metric_scope, ctx), key)
     }
 
-    fn metric_event(&self, v: Value) {
+    pub(super) fn metric_event(&self, v: Value) {
         self.metric_events.lock().push(v);
     }
 
@@ -419,6 +430,7 @@ impl Middle {
             corroborations: 0,
             repaired: false,
             judge: if self.cfg.g8_example { Some(example_ref) } else { traj.judge.clone() },
+            optimized: 0,
         };
         self.metric_evidence.lock().insert(fk, evidence);
         let v = json!({
@@ -501,6 +513,7 @@ impl Middle {
             corroborations: 0,
             repaired: false,
             judge: Some(judge.to_string()),
+            optimized: 0,
         };
         self.metric_evidence.lock().insert(fk.clone(), evidence);
         let revision = self.store.get(&fk).map_or(0, |x| x.revision);
@@ -533,7 +546,7 @@ impl Middle {
     /// G3：表列存在；关联属于已验证路径且方向一致、包含路径要求的过滤；聚合表达式与过滤只引用口径内的表；
     /// 非时间连接必须从事实表指向一侧；过滤不含题目参数；必需的粒度过滤都在。
     /// 顺带按已验证路径填写关联的键、基数、丢行比例与修订号。
-    async fn static_gate(&self, ctx: &Ctx, m: &mut Metric, ask: &Ask) -> Result<Gate> {
+    pub(super) async fn static_gate(&self, ctx: &Ctx, m: &mut Metric, ask: &Ask) -> Result<Gate> {
         macro_rules! bad {
             ($($t:tt)*) => { return Ok(Err(format!($($t)*))) };
         }
@@ -649,7 +662,7 @@ impl Middle {
 
     /// G4：事实表在粒度键上唯一（带口径过滤）。`reuse`：同一条件在当前版本上已有结论就复用（条件级维护的修复回归用）；
     /// 晋升时各组都重新执行。
-    async fn grain_gate(&self, ctx: &Ctx, m: &Metric, reuse: bool) -> Gate {
+    pub(super) async fn grain_gate(&self, ctx: &Ctx, m: &Metric, reuse: bool) -> Gate {
         let c = grain_check(m);
         let r = if reuse {
             self.cond_check(ctx, &c, QKind::Metric).await.map(|x| x.0)
@@ -689,7 +702,7 @@ impl Middle {
     }
 
     /// G5：示例是单条只读查询，并通过 run_sql 的执行前审查。
-    async fn review_gate(&self, ctx: &Ctx, sql: &str) -> Result<Gate> {
+    pub(super) async fn review_gate(&self, ctx: &Ctx, sql: &str) -> Result<Gate> {
         let s = sql.trim().trim_end_matches(';').trim();
         let low = s.to_lowercase();
         if !(low.starts_with("select") || low.starts_with("with")) || s.contains(';') {
@@ -709,7 +722,7 @@ impl Middle {
     /// 规范 SQL 只有一列）；执行失败算不通过。
     /// G8 的学习时快照版本：参照查询与替代修订在同一个只读事务里执行，数据是学习时快照——单独的快照库
     /// （`schema` 为空），或同一库里保存学习时数据的模式（以它为 search_path）。
-    async fn learned_snapshot_gate(&self, db: &crate::db::Db, schema: Option<&str>, reference: &str, sql: &str, decimals: u32) -> Gate {
+    pub(super) async fn learned_snapshot_gate(&self, db: &crate::db::Db, schema: Option<&str>, reference: &str, sql: &str, decimals: u32) -> Gate {
         let run = async {
             let snap = db.snapshot().await?;
             if let Some(schema) = schema {
@@ -971,6 +984,26 @@ impl Middle {
                     return Ok(Some(Breach::Time(format!("时间关联不再成立：{}", x.reason))));
                 }
             }
+            // 日期键范围修订：日期键必须仍按月连续，否则范围谓词不再等价于维度连接（不在受限修复范围）
+            if t.strategy == TimeStrategy::KeyRange {
+                let c = time_contiguity_check(t);
+                let label = format!("日期键连续 {}", t.dim);
+                if !force && !changed.contains(&t.dim) {
+                    conds.push(json!({"cond": label, "tables": [t.dim.clone()], "action": "skipped"}));
+                } else {
+                    let (o, how) = if self.cfg.cond_reuse && !force {
+                        self.cond_check(ctx, &c, QKind::Metric).await?
+                    } else {
+                        let (o, merged) = self.exec_check(ctx, &c, QKind::Metric).await?;
+                        (o, if merged { "merged" } else { "executed" })
+                    };
+                    let ms = if how == "executed" { o.ms } else { 0.0 };
+                    conds.push(json!({"cond": label, "tables": [t.dim.clone()], "action": how, "pass": o.pass, "ms": ms}));
+                    if !o.pass {
+                        return Ok(Some(Breach::Time(format!("日期键不再按月连续：{}", outcome_text(&c, &o)))));
+                    }
+                }
+            }
             // 覆盖：每条事实都应能归入某个期间。关联不上时间维度的行占比超过准入基线即不成立
             if let Some(c) = coverage_check(m) {
                 let label = format!("覆盖 {}⋈{}", m.fact, t.dim);
@@ -1182,8 +1215,17 @@ impl Middle {
     /// 工具 run_sql 的执行端检查：声明的指标引用须仍有效且修订号一致。不能证明 SQL 遵循了口径，原有审查照常执行。
     pub(super) async fn check_metric_refs(&self, ctx: &Ctx, refs: &[(String, u32)]) -> Result<Option<Value>> {
         for (key, rev) in refs {
-            let problem = match self.metric_check(ctx, &self.mfk(ctx, key)).await? {
+            let fk = self.mfk(ctx, key);
+            let problem = match self.metric_check(ctx, &fk).await? {
                 Checked::Valid(e) if e.revision == *rev => None,
+                // 被等价且更省的修订替代的旧修订：仍然正确，宽限可用，附通知
+                Checked::Valid(e) if self.opt_prev.lock().get(&fk) == Some(rev) => {
+                    self.notices.lock().entry(ctx.agent.clone()).or_default().push(format!(
+                        "指标经验 {key} 已发布等价且更省的修订 r{}（你引用的 r{rev} 仍可用），建议重新调用 find_metric 改用新修订",
+                        e.revision
+                    ));
+                    None
+                }
                 Checked::Valid(e) => Some(format!("指标经验 {key} 已修订为 r{}（你引用的是 r{rev}），请重新调用 find_metric", e.revision)),
                 Checked::Unavailable(_, r) => Some(format!("指标经验 {key} 当前不可用：{r}")),
                 Checked::Missing => Some(format!("指标经验 {key} 不存在或无权访问")),

@@ -16,6 +16,9 @@ pub enum Check {
     SampleFanout { left: String, right: String, on: On, lf: Option<String>, rf: Option<String>, n: u32 },
     /// 行数守恒：关联后行数与左表行数对比（发现膨胀，并量化丢行）。
     RowConservation { left: String, right: String, on: On, lf: Option<String>, rf: Option<String> },
+    /// 日期键连续：日期维度按（年, 月）分组后，每组的键恰好是 [min, max] 内的全部整数，且相邻月份首尾相接。
+    /// 成立时任一期间的日期键集合就是一个整数区间，期间谓词可以写成事实表日期键的范围过滤，不必连接维度表。
+    DateKeysContiguous { dim: String, key: String, year_col: String, month_col: String },
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -31,6 +34,7 @@ impl Check {
             Check::KeyUnique { .. } => "KeyUnique",
             Check::SampleFanout { .. } => "SampleFanout",
             Check::RowConservation { .. } => "RowConservation",
+            Check::DateKeysContiguous { .. } => "DateKeysContiguous",
         }
     }
 
@@ -41,6 +45,7 @@ impl Check {
     pub fn tables(&self) -> Vec<String> {
         match self {
             Check::KeyUnique { table, .. } => vec![table.clone()],
+            Check::DateKeysContiguous { dim, .. } => vec![dim.clone()],
             Check::SampleFanout { left, right, .. } | Check::RowConservation { left, right, .. } => {
                 vec![left.clone(), right.clone()]
             }
@@ -51,6 +56,7 @@ impl Check {
     pub fn context(&self) -> String {
         match self {
             Check::KeyUnique { table, cols, .. } => format!("{table}({})", cols.join(",")),
+            Check::DateKeysContiguous { dim, key, .. } => format!("{dim}({key})"),
             Check::SampleFanout { left, right, on, .. } | Check::RowConservation { left, right, on, .. } => {
                 format!("{left}>{right}:{}", fmt_on(on))
             }
@@ -61,6 +67,7 @@ impl Check {
     pub fn rows_touched(&self, rows: &dyn Fn(&str) -> f64) -> f64 {
         match self {
             Check::KeyUnique { table, cols, .. } => rows(table) * (1.0 + 0.5 * (cols.len() as f64 - 1.0)),
+            Check::DateKeysContiguous { dim, .. } => rows(dim),
             Check::SampleFanout { right, .. } => rows(right),
             Check::RowConservation { left, right, .. } => rows(left) * 2.0 + rows(right),
         }
@@ -71,6 +78,7 @@ impl Check {
             Check::KeyUnique { table, cols, filter } => {
                 format!("{table}({}) 是否唯一{}", cols.join(", "), filter.as_ref().map(|f| format!(" [过滤 {f}]")).unwrap_or_default())
             }
+            Check::DateKeysContiguous { dim, key, .. } => format!("{dim}({key}) 日期键是否按月连续"),
             Check::SampleFanout { left, right, on, .. } => format!("抽样：{left}→{right} 按 {} 是否一对多", fmt_on(on)),
             Check::RowConservation { left, right, on, .. } => {
                 format!("行数守恒：{left}⋈{right} 按 {} 后行数是否超过 {left}", fmt_on(on))
@@ -88,6 +96,13 @@ impl Check {
                 }
                 format!("select count(*) as n_rows, count(distinct {key}) as n_keys from {table} where {}", conds.join(" and "))
             }
+            Check::DateKeysContiguous { dim, key, year_col, month_col } => format!(
+                "with m as (select {year_col} as y, {month_col} as mo, count(*) as c, min({key}) as mn, max({key}) as mx \
+                 from {dim} where {key} is not null group by 1, 2), \
+                 s as (select c, mn, mx, lag(mx) over (order by y, mo) as prev_mx from m) \
+                 select count(*) filter (where c <> mx - mn + 1 or (prev_mx is not null and mn <> prev_mx + 1)) as n_bad, \
+                        count(*) as n_months from s"
+            ),
             Check::SampleFanout { left, right, on, lf, rf, n } => {
                 let lcols: Vec<&str> = on.iter().map(|(l, _)| l.as_str()).collect();
                 let mut lconds: Vec<String> = lcols.iter().map(|c| format!("{c} is not null")).collect();
@@ -133,6 +148,10 @@ impl Check {
                 let (n_rows, n_keys) = (rows.i64(0, 0).unwrap_or(0), rows.i64(0, 1).unwrap_or(0));
                 let avg = if n_keys > 0 { n_rows as f64 / n_keys as f64 } else { 0.0 };
                 Outcome { pass: n_rows == n_keys, metrics: json!({"n_rows": n_rows, "n_keys": n_keys, "avg_mult": avg}), ms }
+            }
+            Check::DateKeysContiguous { .. } => {
+                let (n_bad, n_months) = (rows.i64(0, 0).unwrap_or(0), rows.i64(0, 1).unwrap_or(0));
+                Outcome { pass: n_bad == 0, metrics: json!({"n_bad": n_bad, "n_months": n_months}), ms }
             }
             Check::SampleFanout { .. } => {
                 let max_mult = rows.i64(0, 1).unwrap_or(0);

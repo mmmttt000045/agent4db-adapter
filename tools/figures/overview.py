@@ -1,7 +1,7 @@
 """Deck figure 1 (system structure): how a user agent's two requests flow through MAVRA.
 
 A user agent asks for a metric by name ("store revenue"); the query service
-reads its definition from the metric store; a validation result missing for the
+reads its definition from the shared memory; a validation result missing for the
 current data version is computed by maintenance and cached; a valid definition
 (v2) goes back. The agent then sends SQL that names v2; the pre-execution check
 reuses cached validation results on the query's snapshot and runs the SQL there.
@@ -27,10 +27,10 @@ LABELS = {
     'zh': {
         'agents': '用户智能体', 'question': ('9 月门店', '营业额？'), 'sql': 'SQL',
         'declares': '注明：营业额 v2', 'middleware': 'MAVRA 中间件',
-        'paths': ('学习', '查询指标定义', '执行 SQL'), 'lines': ('调用 / 返回', '写入指标库', '读数据库'),
+        'paths': ('学习', '查询指标定义', '执行 SQL'), 'lines': ('调用 / 返回', '写入记忆', '读数据库'),
         'service': '查询服务', 'lookup': ('查指标定义', '按名称匹配，看数据变没变'),
         'check': ('执行前校验', '同一快照内校验，再执行'),
-        'store': '指标库', 'defs': '指标定义',
+        'store': '共享记忆', 'store_note': '另有表画像、关联路径', 'defs': '指标定义',
         'def_chips': (('营业额 v2', '待校验'), ('电子品类 v2', '有效'), ('退货率 v2', '有效')),
         'cache': '校验结果缓存', 'cache_note': '按（规则，数据版本）缓存，大家共用',
         'cache_chips': (('每笔销售一行', '数据版本 15', 'ok'), ('日期键唯一', '数据版本 3', 'ok'),
@@ -47,10 +47,10 @@ LABELS = {
         'agents': 'User agents', 'question': ('Store revenue', 'in September?'), 'sql': 'SQL',
         'declares': 'declares v2', 'middleware': 'MAVRA middleware',
         'paths': ('learning', 'find definition', 'run SQL'),
-        'lines': ('call / response', 'write to store', 'read database'),
+        'lines': ('call / response', 'write to memory', 'read database'),
         'service': 'Query service', 'lookup': ('Find definition', 'match name, check data'),
         'check': ('Pre-run check', 'validate on one snapshot'),
-        'store': 'Metric store', 'defs': 'Definitions',
+        'store': 'Shared memory', 'store_note': 'also table profiles, join paths', 'defs': 'Definitions',
         'def_chips': (('revenue v2', 'pending'), ('electr. v2', 'valid'), ('rate v2', 'valid')),
         'cache': 'Validation cache', 'cache_note': 'per (rule, data version), shared',
         'cache_chips': (('one row/sale', 'version 15', 'ok'), ('date key unique', 'version 3', 'ok'),
@@ -89,7 +89,7 @@ def draw(s, lang):
     def panel(b, title):
         x, y, w, h = b
         rect(*b, '#FBFCFE', PANEL_EDGE, .4, r=1.6)
-        text(x + 3.0, y + 6.5, title, TITLE, ACC_DK, 'bold', width=w - 6)
+        return text(x + 3.0, y + 6.5, title, TITLE, ACC_DK, 'bold', width=w - 6)
 
     # MAVRA's area, title and legend --------------------------------------------
     rect(*FIELD_BOX, FIELD, None, r=2.8)
@@ -146,8 +146,9 @@ def draw(s, lang):
     text(ox + 13.0, oy + 7.2, title, TITLE, INK, 'bold', width=ow - 15)
     text(ox + 13.0, oy + 14.0, note, NOTE, ACC_DK, width=ow - 15)
 
-    # Metric store: definitions and the validation cache ---------------------------------
-    panel(PB, L['store'])
+    # Shared memory: definitions and the validation cache ---------------------------------
+    tw = panel(PB, L['store'])
+    text(PB[0] + 7.0 + tw, PB[1] + 6.5, L['store_note'], NOTE, MUTED, width=OPT[0] + OPT[2] - 14.0 - PB[0] - tw)
     x, y, w, h = DEFS
     box(s, DEFS)
     text(x + 3.0, baseline(y + h / 2, NOTE), L['defs'], NOTE, INK, 'bold')

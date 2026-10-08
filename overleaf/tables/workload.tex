@@ -1,5 +1,5 @@
 \begin{table*}[t]
-\caption{\bt{Application and agent workloads. Application: Redset~\cite{vanrenen2024redset}, 441\,M queries from 400 Redshift clusters; pooled rates, with cross-cluster medians where clusters differ widely. Agent: 100 fresh sessions (25 questions, two phrasings, two repetitions, three concurrent) issuing 521 database calls, 176 of them SQL. A \emph{lookup} is a schema lookup, data probe, or validation call.}{应用与智能体负载。应用：Redset~\cite{vanrenen2024redset}，400 个 Redshift 集群的 4.41 亿条查询；给出汇总比例，集群差异大时同时给出跨集群中位数。智能体：100 个全新会话（25 道题、两种题面、各两次，三个并发），共 521 次数据库调用，其中 SQL 176 条。\emph{查找}指结构查找、数据探查或验证调用。}}
+\caption{\bt{Application and agent workloads. Application: Redset~\cite{vanrenen2024redset}, 441\,M queries from 400 Redshift clusters. Agent: 100 fresh sessions (25 questions, two phrasings, two repetitions) issuing 521 database calls, 176 of them SQL. A \emph{lookup} is a schema lookup, data probe, or validation call.}{应用与智能体负载。应用：Redset~\cite{vanrenen2024redset}，400 个 Redshift 集群的 4.41 亿条查询。智能体：100 个全新会话（25 道题、两种题面、各两次），共 521 次数据库调用，其中 SQL 176 条。\emph{查找}指结构查找、数据探查或验证调用。}}
 \label{tab:workload-characterization}
 \footnotesize
 \begin{tabularx}{\textwidth}{@{}P{0.15\textwidth}LL@{}}
@@ -7,13 +7,9 @@
 \bt{Dimension}{维度} & \bt{Application (Redset)}{应用（Redset）} & \bt{Data agents (100 sessions)}{数据智能体（100 个会话）}\\
 \midrule
 \bt{SQL stability}{SQL 稳定性} & \bt{93.4\% of read queries repeat an earlier template (90.1\% of SELECTs); 6.6 templates per 100 queries.}{93.4\% 的读查询重复已出现的模板（SELECT 中 90.1\%）；每 100 条查询 6.6 个模板。} & \bt{24\% of SQL statements repeat an earlier template; 133 templates for 176 statements.}{24\% 的 SQL 重复已出现的模板；176 条 SQL 有 133 个模板。}\\
-\bt{Exploration}{探索} & \bt{System-table-only queries: 7.6\% pooled, 2.2\% median.}{只访问系统表的查询：汇总 7.6\%，中位数 2.2\%。} & \bt{68\% of database calls explore, mostly schema lookups; every session starts with one.}{68\% 的数据库调用用于探索，以结构查找为主；每个会话都以结构查找开始。}\\
 \bt{Failures}{失败} & \bt{0.35\% of read queries abort (0.54\% of SELECTs).}{0.35\% 的读查询中止（SELECT 中 0.54\%）。} & \bt{1.7\% of SQL fails, but all 32 wrong answers come from SQL that ran without error.}{1.7\% 的 SQL 出错；但 32 个错误答案全部来自执行成功的 SQL。}\\
 \bt{Validation}{验证} & \bt{None in parameterized SQL.}{参数化 SQL 中没有。} & \bt{4.8\% of calls; 16\% of sessions check key uniqueness or duplicate keys themselves.}{占调用的 4.8\%；16\% 的会话自行检查键唯一性或重复键。}\\
-\bt{Same meaning, different SQL}{同义不同 SQL} & \bt{One template per question type.}{每类题一个模板。} & \bt{87.5\% of questions are answered correctly with $\geq 2$ templates; 47 templates for 15 question types.}{87.5\% 的题目以至少 2 个模板答对；15 类题共 47 个模板。}\\
-\bt{Session lifetime}{会话寿命} & \bt{97.8\% of queries come from principals active on $\geq 7$ days; median activity span 80 days.}{97.8\% 的查询来自活跃天数至少 7 天的用户主体；活跃跨度中位数 80 天。} & \bt{Median session lasts 36\,s and makes 5 calls; nothing carries over.}{会话时长中位数 36 秒、5 次调用；不保留任何状态。}\\
 \bt{Where DB knowledge lives}{数据库知识的位置} & \bt{In application code.}{在应用代码中。} & \bt{Rediscovered per session: 93\% of lookups repeat a fact an earlier session obtained (77\% of lookup DB time). Most are schema facts; 38\% of SQL lookups repeat a fact, none with repeated SQL text.}{每个会话重新获取：93\% 的查找重复此前会话得到的事实（占查找数据库时间的 77\%）。大部分是表结构事实；SQL 查找中 38\% 重复事实，SQL 文本没有一条重复。}\\
-\bt{Concurrent repeated work}{并发重复工作} & \bt{Same template from another user within 60\,s: 0.61\% pooled, 0.01\% median.}{60 秒内其他用户使用同一模板：汇总 0.61\%，中位数 0.01\%。} & \bt{91\% of lookups are repeated by another session within 60\,s.}{91\% 的查找在 60 秒内被其他会话重复。}\\
 \bottomrule
 \end{tabularx}
 \end{table*}

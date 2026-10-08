@@ -25,7 +25,7 @@
 
 例子页的数字都取自 noctis `results/scen-20261002/` 的存档：MAVRA 第 1 次运行 `dsv41flash-r1-g3fix--snap`（第 3 页用 r1–r3），对照组 `dsv41flash-r{1,2,3}-g3fix--schema`（只在表结构变化时失效），不共享指标定义的智能体 `dsv41flash-r1-a`、`r2-b`、`r3-a`（`middle`），回归测试对照 `dsv41flash-r1-g3fix--exref`。第 17 页的准确率与 `overleaf/gen/scen-ds.tex` 的 `\Ds*` 宏一致。题目中的年份略去（合成数据的日期在 2000–2002 年）。
 
-三张图由 `tools/figures/overview.py`、`lookup.py`、`lifecycle.py` 画成，按幻灯片尺寸设计（300 mm 宽，12–15 pt 字），用通用词汇：指标定义、共享记忆、校验规则、校验结果缓存、数据版本、快照、v1/v2、停用、回归测试，不用论文里的符号和自造词。改图后先在 noctis 上重画并转成 PNG，再在本机生成 PPT：
+三张图由 `tools/figures/overview.py`、`lookup.py`、`lifecycle.py` 画成，按幻灯片尺寸设计（300 mm 宽，12–15 pt 字），用标准的数据库术语：指标定义、共享记忆、验证条件、验证结果缓存、表版本、快照、修订 v1/v2、失效、准入检查、修复搜索、谓词、回归测试，不用论文里的符号、自造词或口语化说法。改图后先在 noctis 上重画并转成 PNG，再在本机生成 PPT：
 
 ```bash
 # noctis，仓库根目录

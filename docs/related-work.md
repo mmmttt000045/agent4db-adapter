@@ -248,4 +248,9 @@
 
 AgentSM（2601.15709）10-08 仍只有 v1，无同行评审版本，继续按预印本引用。
 
-MemTX 相关工作里还有几篇只核对了元数据、未读全文：Orogat & Mansour, Is Agent Memory a Database? Rethinking Data Foundations for Long-Term AI Agent Memory（2605.26252，以数据库视角看记忆，最该先读）；Cordon（2606.17573）；TOKI（2606.06240）；Governed Shared Memory for Multi-Agent LLM Systems（2606.24535）；STALE（2605.06527）；Dependency-Guided Rollback Repair for Memory-Augmented Agents（2608.10502，未核）。第 5 节表中的 Revoked but Still Authoritative（2609.08258）、Patel et al.（2609.03141）在新定位下也更相关，同样待读。
+Orogat & Mansour, Is Agent Memory a Database? Rethinking Data Foundations for Long-Term AI Agent Memory（arXiv:2605.26252，v1，2026-05-25，cs.AI/cs.DB，预印本，7 页愿景论文）**10-08 已读全文**：
+- 做了什么：单个长期运行的个人助理式智能体的记忆（例子是用户告诉它的项目截止日期 3 月 15 日改成 4 月 20 日、午餐偏好）。把记忆形式化为状态 M_t = (D_t, S_t, P_t)，用摄入、修订、遗忘、检索四个状态级算子代替记录级 CRUD，给出六条正确性条件（C1 查询返回“most recent non-archived value”；C2 迁移满足策略；C3 依赖一致；C4 保留溯源；C5 活跃状态有界；C6 检索改变显著度）。原型 MemState 建在 Kùzu 上，只是“feasibility sketch”，没有实验数字。研究议程第三项才提共享记忆（多租户隐私）。
+- 与 MAVRA 的关系：只在论点层面相通——智能体记忆是数据管理问题，需要有版本历史、溯源、依赖传播和提交时检查的策略。实质不重叠：①它的记忆内容是用户提供的事实，只有新输入到来时才会变（修订由记忆内部的证据 Δ 触发：重复、冲突、依赖不一致），从不对照外部世界检查；MAVRA 的记忆描述外部数据库，没有任何新输入也会因数据变化而失效。②它的正确性是“返回最新值”（C1），恰恰是 MAVRA 场景里不成立的：最新修订本身可能已经失效，正确性取决于查询所读快照上条件是否成立。③单智能体、生产者即使用者；没有使用时的强制、快照绑定、受验证的修复或优化修订；没有 SQL、没有评估。
+- 结论：不构成抢先，反而支持我们的动机（数据库社区认为记忆需要数据管理语义）。如引用，用一句话放在“智能体记忆”段：它把长期记忆的正确性定义为状态轨迹上的性质、以最新值为当前值；我们的记忆描述外部数据库，最新修订也可能失效，正确性要在使用时对照数据判定。
+
+其余只核对了元数据、未读全文：Cordon（2606.17573）；TOKI（2606.06240）；Governed Shared Memory for Multi-Agent LLM Systems（2606.24535）；STALE（2605.06527）；Dependency-Guided Rollback Repair for Memory-Augmented Agents（2608.10502，未核）。第 5 节表中的 Revoked but Still Authoritative（2609.08258）、Patel et al.（2609.03141）在新定位下也更相关，同样待读。

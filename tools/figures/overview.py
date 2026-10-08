@@ -153,8 +153,8 @@ def draw(s, lang):
     text(PB[0] + 7.0 + tw, PB[1] + 6.5, L['store_note'], NOTE, MUTED, width=OPT[0] + OPT[2] - 14.0 - PB[0] - tw)
     x, y, w, h = DEFS
     box(s, DEFS)
-    text(x + 3.0, baseline(y + h / 2, NOTE), L['defs'], NOTE, INK, 'bold')
-    cw2 = 27.0
+    tl = text(x + 3.0, baseline(y + h / 2, NOTE), L['defs'], NOTE, INK, 'bold')
+    cw2 = min(27.0, (w - 3.0 - tl - 2.0 - 2.0 - 4.0) / 3)   # chips right-aligned, clear of the label
     for k, ((name, state), col, pale) in enumerate(zip(
             L['def_chips'], (AMBER, ACC_DK, ACC_DK), (AMBER_PALE, ACC_PALE, ACC_PALE))):
         xx = x + w - 2.0 - (3 - k) * cw2 - (2 - k) * 2.0

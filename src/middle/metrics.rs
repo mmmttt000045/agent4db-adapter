@@ -5,7 +5,7 @@ use super::{inc, join_key, outcome_text, scope_prefix, snap_key, ver_sig, Ctx, M
 use crate::catalog::{self, TableVersion};
 use crate::checks::{same_on, Check, On, Outcome};
 use crate::db::QKind;
-use crate::knowledge::{Basis, Content, Entry, Example, JoinPath, Metric, Status, TimeSpec, TimeStrategy};
+use crate::knowledge::{Basis, Content, Entry, Example, JoinKind, JoinPath, JoinRef, Metric, Status, TimeSpec, TimeStrategy};
 use crate::metric::{self, Answer, Ask, Draft, Trajectory};
 use crate::sqlscan;
 use anyhow::Result;
@@ -57,9 +57,11 @@ enum Breach {
         reason: String,
     },
     Time(String),
-    /// 事实行无法归入期间（时间关联丢行比例超过基线）；不在受限修复范围
+    /// 事实行无法归入期间（时间关联丢行比例超过基线），或被内连接排除（关联不上维度的比例超过基线）；不在受限修复范围
     Coverage(String),
     Grain(String),
+    /// 优化修订新增的前提不成立（日期键不再按月连续）：前一修订的条件仍成立时恢复前一修订，否则失效
+    Premise(String),
 }
 
 impl Breach {
@@ -70,6 +72,7 @@ impl Breach {
             | Breach::Time(r)
             | Breach::Coverage(r)
             | Breach::Grain(r)
+            | Breach::Premise(r)
             | Breach::Join { reason: r, .. } => r.clone(),
         }
     }
@@ -193,6 +196,11 @@ fn coverage_check(m: &Metric) -> Option<Check> {
     })
 }
 
+/// 内连接的完整性条件：左表关联不上右表任何行的行占比（两侧都不带过滤；过滤排除的行属于口径本身）。
+fn join_coverage_check(j: &JoinRef) -> Check {
+    Check::RowConservation { left: j.left.clone(), right: j.right.clone(), on: j.on.clone(), lf: None, rf: None }
+}
+
 /// 关联不上的行占比（空键或孤儿键）。
 fn loss_of(o: &Outcome) -> f64 {
     (1.0 - o.metrics["join_ratio"].as_f64().unwrap_or(1.0)).max(0.0)
@@ -225,14 +233,17 @@ pub(super) fn time_contiguity_check(t: &TimeSpec) -> Check {
     Check::DateKeysContiguous { dim: t.dim.clone(), key: t.dim_col.clone(), year_col: "d_year".into(), month_col: "d_moy".into() }
 }
 
-/// 绑定快照执行要核对的条件（与 `metric_breach` 维护的条件一致）：各关联一侧的键唯一性、时间维度键的唯一性、
-/// 覆盖（附准入基线）、粒度；日期键范围修订另加日期键连续。返回条件与覆盖基线（只有覆盖条件有）。
+/// 绑定快照执行要核对的条件（与 `metric_breach` 维护的条件一致）：各关联一侧的键唯一性、内连接的完整性（附准入基线）、
+/// 时间维度键的唯一性、覆盖（附准入基线）、粒度；日期键范围修订另加日期键连续。返回条件与覆盖基线（只有完整性条件有）。
 fn bound_conditions(m: &Metric) -> Vec<(Check, Option<f64>)> {
     let mut out = vec![];
     for j in &m.joins {
         let mut cols: Vec<String> = j.on.iter().map(|(_, r)| r.clone()).collect();
         cols.sort();
         out.push((Check::KeyUnique { table: j.right.clone(), cols, filter: j.filters.get(&j.right).cloned() }, None));
+        if j.kind == JoinKind::Inner {
+            out.push((join_coverage_check(j), Some(j.orphan_ratio + COVERAGE_TOLERANCE)));
+        }
     }
     if let Some(t) = &m.time {
         out.push((Check::KeyUnique { table: t.dim.clone(), cols: vec![t.dim_col.clone()], filter: None }, None));
@@ -406,7 +417,7 @@ impl Middle {
             return Ok(v);
         }
         let (fk, rev) = match &same {
-            Some((k, e)) => (k.clone(), e.revision + 1),
+            Some((k, e)) => (k.clone(), self.next_revision(k, e.revision)),
             None if existing.is_empty() => (prefix.clone(), 0),
             None => (format!("{prefix}#{}", existing.len() + 1), 0),
         };
@@ -497,7 +508,7 @@ impl Middle {
         let guards = vec![grain_check(&m)];
         let mut e = self.new_entry(ctx, &key, Content::Metric(Box::new(m)), deps.clone(), guards);
         // 重新提交（逐写入撤销组的重新提炼）得到新修订号
-        e.revision = self.store.get(&fk).map_or(0, |x| x.revision + 1);
+        e.revision = self.store.get(&fk).map_or(0, |x| self.next_revision(&fk, x.revision));
         e.status = match &failed {
             None => Status::Valid,
             Some((g, r)) => Status::Candidate(format!("{g}：{r}")),
@@ -627,6 +638,11 @@ impl Middle {
             j.key = jk;
             j.cardinality = p.cardinality().to_string();
             j.loss_ratio = p.loss_ratio;
+            // 内连接排除关联不上的行：记下准入时的比例，作为完整性条件的基线
+            if j.kind == JoinKind::Inner {
+                let (o, _) = self.cond_outcome(ctx, &join_coverage_check(j), false).await?;
+                j.orphan_ratio = loss_of(&o);
+            }
             allowed.insert(j.left.clone());
             allowed.insert(j.right.clone());
         }
@@ -905,11 +921,25 @@ impl Middle {
             Some(b) => {
                 let reason = b.reason();
                 let reextract = matches!(b, Breach::Write(_));
-                self.revoke(fk, e, reason.clone(), true);
+                let premise = matches!(b, Breach::Premise(_));
+                self.revoke(fk, e, reason.clone(), !premise);
+                self.retire(fk, e.revision, &reason);
                 self.metric_event(json!({"event": "revoked", "key": e.key, "revision": e.revision, "reason": reason, "agent": ctx.agent,
                                          "policy": policy.name(), "reextract": reextract}));
+                if !premise {
+                    // 前一修订与失效的修订共有这条不成立的条件，同样不再可用
+                    if let Some(p) = self.opt_prev.lock().remove(fk) {
+                        self.retire(fk, p.revision, &reason);
+                    }
+                }
                 if reextract {
                     "revoked_on_write"
+                } else if premise {
+                    if self.reinstate(ctx, fk, e, &reason).await? {
+                        "reinstated"
+                    } else {
+                        "revoked"
+                    }
                 } else {
                     crate::timing::measure("repair", self.restricted_repair(ctx, fk, e, &m, b)).await?;
                     if self.store.get(fk).is_some_and(|x| x.status == Status::Valid) {
@@ -979,6 +1009,30 @@ impl Middle {
                 return Ok(breach);
             }
         }
+        // 内连接的完整性：关联不上右表任何行的左表行会被内连接排除；比例超过准入基线即不成立（不在受限修复范围）
+        for j in m.joins.iter().filter(|j| j.kind == JoinKind::Inner) {
+            let c = join_coverage_check(j);
+            let label = format!("关联完整 {}⋈{}", j.left, j.right);
+            if !force && !c.tables().iter().any(|x| changed.contains(x)) {
+                conds.push(json!({"cond": label, "tables": c.tables(), "action": "skipped"}));
+                continue;
+            }
+            let (o, how) = self.cond_outcome(ctx, &c, force).await?;
+            let loss = loss_of(&o);
+            let pass = loss <= j.orphan_ratio + COVERAGE_TOLERANCE;
+            let ms = if how == "executed" { o.ms } else { 0.0 };
+            conds.push(json!({"cond": label, "tables": c.tables(), "action": how, "pass": pass,
+                              "loss": loss, "baseline": j.orphan_ratio, "ms": ms}));
+            if !pass {
+                return Ok(Some(Breach::Coverage(format!(
+                    "{} 中关联不上 {} 的行占比从 {:.2}% 升至 {:.2}%，这些事实被内连接排除",
+                    j.left,
+                    j.right,
+                    j.orphan_ratio * 100.0,
+                    loss * 100.0
+                ))));
+            }
+        }
         if let Some(t) = &m.time {
             let on = vec![(t.fact_col.clone(), t.dim_col.clone())];
             let label = format!("时间关联 {}⋈{}", m.fact, t.dim);
@@ -991,38 +1045,13 @@ impl Middle {
                     return Ok(Some(Breach::Time(format!("时间关联不再成立：{}", x.reason))));
                 }
             }
-            // 日期键范围修订：日期键必须仍按月连续，否则范围谓词不再等价于维度连接（不在受限修复范围）
-            if t.strategy == TimeStrategy::KeyRange {
-                let c = time_contiguity_check(t);
-                let label = format!("日期键连续 {}", t.dim);
-                if !force && !changed.contains(&t.dim) {
-                    conds.push(json!({"cond": label, "tables": [t.dim.clone()], "action": "skipped"}));
-                } else {
-                    let (o, how) = if self.cfg.cond_reuse && !force {
-                        self.cond_check(ctx, &c, QKind::Metric).await?
-                    } else {
-                        let (o, merged) = self.exec_check(ctx, &c, QKind::Metric).await?;
-                        (o, if merged { "merged" } else { "executed" })
-                    };
-                    let ms = if how == "executed" { o.ms } else { 0.0 };
-                    conds.push(json!({"cond": label, "tables": [t.dim.clone()], "action": how, "pass": o.pass, "ms": ms}));
-                    if !o.pass {
-                        return Ok(Some(Breach::Time(format!("日期键不再按月连续：{}", outcome_text(&c, &o)))));
-                    }
-                }
-            }
             // 覆盖：每条事实都应能归入某个期间。关联不上时间维度的行占比超过准入基线即不成立
             if let Some(c) = coverage_check(m) {
                 let label = format!("覆盖 {}⋈{}", m.fact, t.dim);
                 if !force && !c.tables().iter().any(|x| changed.contains(x)) {
                     conds.push(json!({"cond": label, "tables": c.tables(), "action": "skipped"}));
                 } else {
-                    let (o, how) = if self.cfg.cond_reuse && !force {
-                        self.cond_check(ctx, &c, QKind::Metric).await?
-                    } else {
-                        let (o, merged) = self.exec_check(ctx, &c, QKind::Metric).await?;
-                        (o, if merged { "merged" } else { "executed" })
-                    };
+                    let (o, how) = self.cond_outcome(ctx, &c, force).await?;
                     let loss = loss_of(&o);
                     let pass = loss <= t.loss_ratio + COVERAGE_TOLERANCE;
                     let ms = if how == "executed" { o.ms } else { 0.0 };
@@ -1044,20 +1073,123 @@ impl Middle {
         let label = format!("粒度 {}", c.describe());
         if !force && !changed.contains(&m.fact) {
             conds.push(json!({"cond": label, "tables": [m.fact], "action": "skipped"}));
-            return Ok(None);
-        }
-        let (o, how) = if self.cfg.cond_reuse && !force {
-            self.cond_check(ctx, &c, QKind::Metric).await?
         } else {
-            let (o, merged) = self.exec_check(ctx, &c, QKind::Metric).await?;
-            (o, if merged { "merged" } else { "executed" })
-        };
-        let ms = if how == "executed" { o.ms } else { 0.0 };
-        conds.push(json!({"cond": label, "tables": [m.fact], "action": how, "pass": o.pass, "ms": ms}));
-        if !o.pass {
-            return Ok(Some(Breach::Grain(format!("粒度守卫失败：{}，{}", c.describe(), outcome_text(&c, &o)))));
+            let (o, how) = self.cond_outcome(ctx, &c, force).await?;
+            let ms = if how == "executed" { o.ms } else { 0.0 };
+            conds.push(json!({"cond": label, "tables": [m.fact], "action": how, "pass": o.pass, "ms": ms}));
+            if !o.pass {
+                return Ok(Some(Breach::Grain(format!("粒度守卫失败：{}，{}", c.describe(), outcome_text(&c, &o)))));
+            }
+        }
+        // 优化修订新增的前提最后检查：只有它不成立时，其余条件（也就是前一修订共有的条件）都已确认成立。
+        // 日期键范围修订要求日期键仍按月连续，否则范围谓词不再等价于维度连接
+        if let Some(t) = m.time.as_ref().filter(|t| t.strategy == TimeStrategy::KeyRange) {
+            let c = time_contiguity_check(t);
+            let label = format!("日期键连续 {}", t.dim);
+            if !force && !changed.contains(&t.dim) {
+                conds.push(json!({"cond": label, "tables": [t.dim.clone()], "action": "skipped"}));
+            } else {
+                let (o, how) = self.cond_outcome(ctx, &c, force).await?;
+                let ms = if how == "executed" { o.ms } else { 0.0 };
+                conds.push(json!({"cond": label, "tables": [t.dim.clone()], "action": how, "pass": o.pass, "ms": ms}));
+                if !o.pass {
+                    return Ok(Some(Breach::Premise(format!("日期键不再按月连续：{}", outcome_text(&c, &o)))));
+                }
+            }
         }
         Ok(None)
+    }
+
+    /// 维护中执行一个条件：条件级复用同一版本上已有的结论；定义级（force）或不复用时重跑，并发的同一检查合并执行。
+    async fn cond_outcome(&self, ctx: &Ctx, c: &Check, force: bool) -> Result<(Outcome, &'static str)> {
+        if self.cfg.cond_reuse && !force {
+            self.cond_check(ctx, c, QKind::Metric).await
+        } else {
+            let (o, merged) = self.exec_check(ctx, c, QKind::Metric).await?;
+            Ok((o, if merged { "merged" } else { "executed" }))
+        }
+    }
+
+    /// 记下不再接受的修订及原因：声明它的查询被拒绝时说明原因，新修订号也不与它重复。
+    pub(super) fn retire(&self, fk: &str, rev: u32, reason: &str) {
+        self.retired.lock().entry(fk.to_string()).or_default().entry(rev).or_insert_with(|| reason.to_string());
+    }
+
+    fn retired_reason(&self, fk: &str, rev: u32) -> Option<String> {
+        self.retired.lock().get(fk).and_then(|m| m.get(&rev).cloned())
+    }
+
+    /// 新修订号：大于当前修订与所有已失效的修订，恢复前一修订之后也不会重用已失效的修订号。
+    pub(super) fn next_revision(&self, fk: &str, cur: u32) -> u32 {
+        let retired = self.retired.lock().get(fk).and_then(|m| m.keys().next_back().copied()).unwrap_or(0);
+        cur.max(retired) + 1
+    }
+
+    /// 被优化修订替代的前一修订是否仍满足它自己的条件：读到的表与其记录版本不同的条件重新检查（同一版本上已有的结论直接复用）。
+    /// 成立时刷新它的记录版本并返回 None；不成立时它失效（不再宽限，记入已失效修订）并返回原因。
+    async fn prev_breach(&self, ctx: &Ctx, fk: &str) -> Result<Option<String>> {
+        let Some(p) = self.opt_prev.lock().get(fk).cloned() else { return Ok(Some("前一修订已不再保留".into())) };
+        let Some(m) = metric_of(&p).cloned() else { return Ok(Some("不是指标定义".into())) };
+        let cur = self.versions().await?;
+        let changed: Vec<String> = p.deps.iter().filter(|(t, v)| cur.get(*t) != Some(*v)).map(|(t, _)| t.clone()).collect();
+        if changed.is_empty() {
+            return Ok(None);
+        }
+        let mut conds = vec![];
+        let breach = self.metric_breach(ctx, &m, &p, &cur, &changed, &mut conds).await?;
+        let pass = breach.is_none();
+        let reason = breach.map(|b| b.reason());
+        self.metric_event(json!({"event": "predecessor_checked", "key": p.key, "revision": p.revision, "pass": pass,
+                                 "reason": reason, "conditions": conds}));
+        match reason {
+            None => {
+                let deps: BTreeMap<String, TableVersion> =
+                    p.deps.keys().filter_map(|t| cur.get(t).map(|v| (t.clone(), v.clone()))).collect();
+                if let Some(x) = self.opt_prev.lock().get_mut(fk).filter(|x| x.revision == p.revision) {
+                    x.deps = deps;
+                }
+                Ok(None)
+            }
+            Some(r) => {
+                self.opt_prev.lock().remove(fk);
+                self.retire(fk, p.revision, &r);
+                Ok(Some(r))
+            }
+        }
+    }
+
+    /// 优化修订只因新增的前提不成立而失效时：前一修订若在当前数据上仍满足它自己的全部条件，就恢复为当前修订
+    /// （修订号不变，使用者与命中数沿用）并通知使用者；否则两者都失效。返回是否恢复。
+    async fn reinstate(&self, ctx: &Ctx, fk: &str, failed: &Entry, reason: &str) -> Result<bool> {
+        let restored = match self.prev_breach(ctx, fk).await? {
+            None => self.opt_prev.lock().remove(fk),
+            Some(_) => None,
+        };
+        let mut n = self.notices.lock();
+        let Some(mut p) = restored else {
+            for a in &failed.consumers {
+                n.entry(a.clone())
+                    .or_default()
+                    .push(format!("你用过的经验「{}」已撤销（{}）。此前基于它得到的结果建议复核。", failed.key, reason));
+                inc(&self.stats.notices);
+            }
+            return Ok(false);
+        };
+        let (from, to) = (failed.revision, p.revision);
+        for a in &failed.consumers {
+            n.entry(a.clone()).or_default().push(format!(
+                "指标经验 {} 的优化修订 r{from} 已失效（{reason}），已恢复前一修订 r{to}；请重新调用 find_metric",
+                failed.key
+            ));
+            inc(&self.stats.notices);
+        }
+        drop(n);
+        p.status = Status::Valid;
+        p.consumers = failed.consumers.clone();
+        p.hits = failed.hits;
+        self.store.put(fk, p);
+        self.metric_event(json!({"event": "reinstated", "key": failed.key, "from": from, "revision": to, "reason": reason}));
+        Ok(true)
     }
 
     /// 关联条件读到的表：已验证路径的守卫（唯一侧的键唯一性）涉及的表。关联经验不是有效状态、修订号与引用时不同、
@@ -1179,8 +1311,9 @@ impl Middle {
         }
         let deps = self.deps_for(&m2.tables()).await?;
         let guards = vec![grain_check(&m2)];
+        let rev = self.next_revision(fk, old.revision);
         let mut e = self.new_entry(ctx, &old.key, Content::Metric(Box::new(m2)), deps, guards);
-        e.revision = old.revision + 1;
+        e.revision = rev;
         e.status = Status::Candidate("修复待回归验证".into());
         e.created_by = old.created_by.clone();
         e.consumers = old.consumers.clone();
@@ -1188,7 +1321,7 @@ impl Middle {
         if let Some(ev) = self.metric_evidence.lock().get_mut(fk) {
             ev.repaired = true;
         }
-        self.metric_event(json!({"event": "repair_candidate", "key": old.key, "revision": old.revision + 1, "change": change}));
+        self.metric_event(json!({"event": "repair_candidate", "key": old.key, "revision": rev, "change": change}));
         self.regress(ctx, fk).await
     }
 
@@ -1223,17 +1356,24 @@ impl Middle {
     pub(super) async fn check_metric_refs(&self, ctx: &Ctx, refs: &[(String, u32)]) -> Result<Option<Value>> {
         for (key, rev) in refs {
             let fk = self.mfk(ctx, key);
+            let superseded = self.opt_prev.lock().get(&fk).is_some_and(|p| p.revision == *rev);
             let problem = match self.metric_check(ctx, &fk).await? {
                 Checked::Valid(e) if e.revision == *rev => None,
-                // 被等价且更省的修订替代的旧修订：仍然正确，宽限可用，附通知
-                Checked::Valid(e) if self.opt_prev.lock().get(&fk) == Some(rev) => {
-                    self.notices.lock().entry(ctx.agent.clone()).or_default().push(format!(
-                        "指标经验 {key} 已发布等价且更省的修订 r{}（你引用的 r{rev} 仍可用），建议重新调用 find_metric 改用新修订",
-                        e.revision
-                    ));
-                    None
-                }
-                Checked::Valid(e) => Some(format!("指标经验 {key} 已修订为 r{}（你引用的是 r{rev}），请重新调用 find_metric", e.revision)),
+                // 被等价且更省的修订替代的旧修订：只要它自己的条件仍成立就可用，附通知；条件不成立则失效
+                Checked::Valid(e) if superseded => match self.prev_breach(ctx, &fk).await? {
+                    None => {
+                        self.notices.lock().entry(ctx.agent.clone()).or_default().push(format!(
+                            "指标经验 {key} 已发布等价且更省的修订 r{}（你引用的 r{rev} 仍可用），建议重新调用 find_metric 改用新修订",
+                            e.revision
+                        ));
+                        None
+                    }
+                    Some(r) => Some(format!("指标经验 {key} 的 r{rev} 已失效（{r}），当前修订为 r{}，请重新调用 find_metric", e.revision)),
+                },
+                Checked::Valid(e) => match self.retired_reason(&fk, *rev) {
+                    Some(r) => Some(format!("指标经验 {key} 的 r{rev} 已失效（{r}），当前修订为 r{}，请重新调用 find_metric", e.revision)),
+                    None => Some(format!("指标经验 {key} 已修订为 r{}（你引用的是 r{rev}），请重新调用 find_metric", e.revision)),
+                },
                 Checked::Unavailable(_, r) => Some(format!("指标经验 {key} 当前不可用：{r}")),
                 Checked::Missing => Some(format!("指标经验 {key} 不存在或无权访问")),
             };
@@ -1251,8 +1391,11 @@ impl Middle {
     /// 任一条件不成立即放弃快照并拒绝，同时让下一次请求重读版本，后续使用按常规维护处理。
     pub(super) async fn run_bound(&self, ctx: &Ctx, sql: &str, refs: &[(String, u32)]) -> Result<Value> {
         let mut conds: Vec<(Check, Option<f64>)> = vec![];
-        for (key, _) in refs {
-            let Some(e) = self.store.get(&self.mfk(ctx, key)) else { continue };
+        for (key, rev) in refs {
+            // 声明的是被优化修订替代、仍然可用的前一修订时，核对它自己的条件
+            let fk = self.mfk(ctx, key);
+            let prev = self.opt_prev.lock().get(&fk).filter(|p| p.revision == *rev).cloned();
+            let Some(e) = prev.or_else(|| self.store.get(&fk)) else { continue };
             for c in metric_of(&e).map(bound_conditions).unwrap_or_default() {
                 if !conds.iter().any(|(k, _)| same_cond(k, &c.0) || k.key() == c.0.key()) {
                     conds.push(c);

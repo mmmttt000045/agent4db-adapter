@@ -156,6 +156,10 @@ pub struct JoinRef {
     pub cardinality: String,
     #[serde(default)]
     pub loss_ratio: f64,
+    /// 准入时左表关联不上右表任何行的行占比（空键或孤儿键，两侧都不带过滤），由中间层填写；
+    /// 内连接会排除这些行，其完整性条件以它为基线（与日期键完整性相同）
+    #[serde(default)]
+    pub orphan_ratio: f64,
     /// 引用时关联条目的修订号
     #[serde(default)]
     pub revision: u32,

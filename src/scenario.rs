@@ -37,6 +37,9 @@ pub enum Change {
     /// 粒度（语义歧义，受限修复的反例）：退货表写入整份备份副本（来源列取 backup），2002 年被更正的退货在副本里仍是旧金额。
     /// 取 primary 或 backup 都能恢复唯一性且不丢键，只有业务语义能区分；不在 ALL 中，需显式指定
     Mirror,
+    /// 优化前提：日期维度重装载，2002-02 的日期换成新的代理键（接在最大键之后），三张事实表的日期键同步改指向新键。
+    /// 所有日期键仍存在、关联仍唯一、完整性不变，只有日期键按月连续不再成立；不在 ALL 中，需显式指定
+    Rekey,
 }
 
 pub const ALL: [Change; 10] = [
@@ -59,6 +62,10 @@ const DUP_FROM: &str = "2002-06-01";
 const DUP_TO: &str = "2002-09-30";
 const UNIT_FROM: &str = "2002-07-01";
 
+/// 日期键重编号：被换键的月份与新键相对原键的偏移（fixture 的日期键不超过 1096）。
+const REKEY_MONTH: &str = "d_year = 2002 and d_moy = 2";
+const REKEY_SHIFT: i64 = 10_000;
+
 /// 备份副本场景中被更正的退货（2002 年起、小票号尾数为 3）。
 const MIRROR_FIXED: &str = "sr_ticket_number % 10 = 3 and sr_returned_date_sk >= 732";
 
@@ -73,6 +80,9 @@ impl Change {
         if s == "mirror" {
             return Ok(Change::Mirror);
         }
+        if s == "rekey" {
+            return Ok(Change::Rekey);
+        }
         match NAMES.iter().position(|n| *n == s) {
             Some(i) => Ok(ALL[i]),
             None => bail!("未知场景：{s}（可选 {}）", NAMES.join(" / ")),
@@ -82,6 +92,7 @@ impl Change {
     pub fn name(self) -> &'static str {
         match self {
             Change::Mirror => "mirror",
+            Change::Rekey => "rekey",
             _ => NAMES[ALL.iter().position(|c| *c == self).unwrap_or(0)],
         }
     }
@@ -100,6 +111,7 @@ impl Change {
             Change::LateKey => "日期键格式变化",
             Change::Unit => "金额单位变化",
             Change::Mirror => "备份副本",
+            Change::Rekey => "日期键重编号",
         }
     }
 
@@ -111,6 +123,7 @@ impl Change {
             Change::DimHistory => "连接放大",
             Change::LateKey => "覆盖",
             Change::Unit => "未建模",
+            Change::Rekey => "优化前提",
         }
     }
 
@@ -129,6 +142,9 @@ impl Change {
             Change::Mirror => {
                 "2002 年小票号尾数为 3 的退货金额更正减 1；另写入整份退货备份副本（sr_source = 'backup'），被更正的行在副本里仍是旧金额"
             }
+            Change::Rekey => {
+                "日期维度重装载：2002-02 的日期键加 10000（接在最大键之后），门店销售、门店退货与目录销售的日期键同步改指向新键"
+            }
         }
     }
 
@@ -137,6 +153,7 @@ impl Change {
         match self {
             Change::Backfill | Change::AddColumn | Change::Status | Change::Mirror => &["store_returns"],
             Change::DimHistory => &["item"],
+            Change::Rekey => &["date_dim", "store_sales", "store_returns", "catalog_sales"],
             _ => &["store_sales"],
         }
     }
@@ -203,7 +220,7 @@ impl Change {
                 )
                 .await
             }
-            Change::AddColumn | Change::Status | Change::Duplicate | Change::DimHistory | Change::Unit => Ok(0),
+            Change::AddColumn | Change::Status | Change::Duplicate | Change::DimHistory | Change::Unit | Change::Rekey => Ok(0),
         }
     }
 
@@ -289,6 +306,32 @@ impl Change {
                 )
                 .await
             }
+            Change::Rekey => {
+                // 先改事实表（按维度上的旧键），再改维度表；业务事实不变
+                let mut n = 0;
+                for (t, col) in
+                    [("store_sales", "ss_sold_date_sk"), ("store_returns", "sr_returned_date_sk"), ("catalog_sales", "cs_sold_date_sk")]
+                {
+                    n += write(
+                        db,
+                        t,
+                        "日期维度重装载：事实表改指向新日期键",
+                        &format!(
+                            "update {t} set {col} = {col} + {REKEY_SHIFT} \
+                             where {col} in (select d_date_sk from date_dim where {REKEY_MONTH})"
+                        ),
+                    )
+                    .await?;
+                }
+                n += write(
+                    db,
+                    "date_dim",
+                    "日期维度重装载：换成新的代理键",
+                    &format!("update date_dim set d_date_sk = d_date_sk + {REKEY_SHIFT} where {REKEY_MONTH}"),
+                )
+                .await?;
+                Ok(n)
+            }
             Change::Append | Change::Backfill | Change::Correct | Change::Revision => Ok(0),
         }
     }
@@ -358,6 +401,29 @@ impl Change {
                     &format!("update store_returns set sr_return_amt = sr_return_amt + 1 where {MIRROR_FIXED}"),
                 )
                 .await?;
+                Ok(())
+            }
+            Change::Rekey => {
+                write(
+                    db,
+                    "date_dim",
+                    "撤回日期维度重装载",
+                    &format!("update date_dim set d_date_sk = d_date_sk - {REKEY_SHIFT} where d_date_sk > {REKEY_SHIFT}"),
+                )
+                .await?;
+                for (t, col) in
+                    [("store_sales", "ss_sold_date_sk"), ("store_returns", "sr_returned_date_sk"), ("catalog_sales", "cs_sold_date_sk")]
+                {
+                    write(
+                        db,
+                        t,
+                        "撤回日期维度重装载",
+                        &format!(
+                            "update {t} set {col} = {col} - {REKEY_SHIFT} where {col} between {REKEY_SHIFT} + 1 and 2 * {REKEY_SHIFT}"
+                        ),
+                    )
+                    .await?;
+                }
                 Ok(())
             }
             Change::Unit => {

@@ -350,8 +350,11 @@ pub struct Middle {
     pub trace: Option<crate::llm::Trace>,
     /// 学习时快照库的只读连接（`MiddleConfig::g8_snapshot_db`）；G8 在其中比较
     pub learn_db: Option<Arc<Db>>,
-    /// 被优化修订替代的旧修订号（完整键 → 修订号）：仍然正确，执行端宽限接受并附通知
-    opt_prev: Mutex<HashMap<String, u32>>,
+    /// 被优化修订替代的前一修订（完整键 → 条目）：它自己的条件仍成立时执行端宽限接受并附通知；
+    /// 优化修订只因新增的前提失效时恢复为当前修订
+    opt_prev: Mutex<HashMap<String, Entry>>,
+    /// 已失效、不再接受的修订（完整键 → 修订号 → 原因）
+    retired: Mutex<HashMap<String, BTreeMap<u32, String>>>,
 }
 
 fn join_key(a: &str, b: &str) -> String {
@@ -447,6 +450,7 @@ impl Middle {
             trace: None,
             learn_db: None,
             opt_prev: Mutex::new(HashMap::new()),
+            retired: Mutex::new(HashMap::new()),
         })
     }
 

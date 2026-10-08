@@ -563,13 +563,15 @@ pub fn rewrite_candidates(m: &Metric, cat: &Catalog) -> Vec<(String, Metric)> {
         let exprs = std::iter::once(&m.measure).chain(m.filters.values()).chain(m.joins.iter().flat_map(|j| j.filters.values()));
         exprs.flat_map(|e| sqlscan::words(e)).any(|w| cat.table_of(&w) == Some(table))
     };
+    // 只去掉左连接：右侧在连接键上唯一（连接基数条件）时，左连接保留每个左表行恰好一次，去掉它结果不变。
+    // 内连接会排除关联不上的行，去掉它的等价性要依赖一个不受维护的数据性质，因此不作为规则候选
     let mut dropped: Vec<String> = vec![];
     for (i, j) in m.joins.iter().enumerate() {
-        let droppable = j.filters.is_empty()
+        let droppable = j.kind == JoinKind::Left
+            && j.filters.is_empty()
             && !m.filters.contains_key(&j.right)
             && !used(&j.right)
-            && !m.joins.iter().any(|o| o.left == j.right)
-            && (j.kind == JoinKind::Left || j.loss_ratio == 0.0);
+            && !m.joins.iter().any(|o| o.left == j.right);
         if droppable {
             let mut c = m.clone();
             c.joins.remove(i);
@@ -824,6 +826,11 @@ mod tests {
         assert_eq!(c.len(), 3, "{:?}", c.iter().map(|x| &x.0).collect::<Vec<_>>());
         assert!(c[0].1.joins.is_empty() && c[0].1.time.as_ref().unwrap().strategy == TimeStrategy::KeyRange);
         assert!(c.iter().skip(1).any(|(_, m)| m.joins.is_empty()));
+        // 同样未使用的内连接不能去掉：它排除关联不上的行，去掉后可能多算
+        unused.joins[0].kind = JoinKind::Inner;
+        let c = rewrite_candidates(&unused, &cat());
+        assert_eq!(c.len(), 1, "{:?}", c.iter().map(|x| &x.0).collect::<Vec<_>>());
+        assert_eq!(c[0].1.joins.len(), 1);
     }
 
     fn cat() -> Catalog {
@@ -868,6 +875,7 @@ mod tests {
                 filters,
                 cardinality: String::new(),
                 loss_ratio: 0.0,
+                orphan_ratio: 0.0,
                 revision: 0,
             }],
             filters: BTreeMap::new(),

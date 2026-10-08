@@ -47,6 +47,7 @@ impl Change {
             scenario::Change::LateKey => Change::LateKey,
             scenario::Change::Unit => Change::Unit,
             scenario::Change::Mirror => Change::Mirror,
+            scenario::Change::Rekey => anyhow::bail!("TPC-DS 上没有日期键重编号场景"),
         })
     }
 

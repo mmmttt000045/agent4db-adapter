@@ -305,6 +305,223 @@ async fn postgres_optimization_revision() -> Result<()> {
     Ok(())
 }
 
+#[tokio::test]
+#[ignore = "requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission"]
+async fn postgres_premise_break() -> Result<()> {
+    let _ = dotenvy::dotenv();
+    let url = std::env::var("AGENTDB_TEST_URL").context("设置 AGENTDB_TEST_URL 为测试服务器连接串")?;
+    let admin = Db::connect(&url, 1, false)?;
+    let unique = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
+    let name = format!("agentdb_premise_{}_{unique}", std::process::id());
+    let mut test_url = reqwest::Url::parse(&url)?;
+    test_url.set_path(&format!("/{name}"));
+    admin.query(QKind::Meta, &format!("create database {name}")).await?;
+    let result = tokio::time::timeout(Duration::from_secs(3600), premise_break(test_url.as_str())).await;
+    let cleanup = admin.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
+    let report = match &result {
+        Ok(Ok(v)) => v.clone(),
+        Ok(Err(e)) => json!({"status": "failed", "error": format!("{e:#}")}),
+        Err(_) => json!({"status": "failed", "error": "优化前提测试超时"}),
+    };
+    let out = format!("results/premise-test-{unique}");
+    std::fs::create_dir_all(&out)?;
+    std::fs::write(format!("{out}/report.json"), serde_json::to_string_pretty(&report)?)?;
+    println!("优化前提测试报告：{out}/report.json；测试库清理：{}", cleanup.is_ok());
+    cleanup.context("测试库清理失败")?;
+    result.context("优化前提测试超时")??;
+    Ok(())
+}
+
+/// 规范 SQL 在当前数据上的取值。
+async fn value_of(db: &Db, sql: &str) -> Result<metric::Answer> {
+    Ok(metric::parse_answer(db.query(QKind::Meta, sql).await?.cell(0, 0).unwrap_or("NULL")))
+}
+
+/// 被引用的修订是否被执行端接受（只看引用检查，执行的 SQL 无关紧要）。
+async fn accepted(mid: &Middle, ctx: &Ctx, key: &str, rev: u32) -> Result<(bool, Value)> {
+    let r = mid.run_sql_with(ctx, "select 1 as value", &[(key.to_string(), rev)]).await?;
+    Ok((r.get("rejected").is_none(), r))
+}
+
+/// 优化修订的前提被破坏，以及三种被替代的修订。种子定义（M1 / M2 / M3 / M5）经一轮规则优化得到日期键范围修订后：
+/// (1) 日期键重编号：2002-02 的日期换成新的代理键并让事实表改指向它。所有日期键仍存在、关联仍唯一、完整性不变，
+///     只有日期键按月连续不再成立。预期日期键范围修订失效、前一修订（连接日期维度）恢复为当前修订，按它回答的各期间
+///     都正确；不维护这一前提时，日期键范围修订在跨月期间上漏掉被重编号的月份。声明失效修订的查询被拒绝，声明恢复的修订被接受。
+/// (2) 另一个实例中，门店退货金额优化后施加状态流水：退货粒度失效并被修复。被修复替代的修订与它的前一修订都被拒绝。
+/// (3) 补录的销售中一半的商品键关联不上商品维度：内连接商品维度的电子品类营业额被完整性条件判为失效，不连接商品维度的门店营业额不受影响。
+async fn premise_break(url: &str) -> Result<Value> {
+    let admin = Db::connect(url, 2, false)?;
+    let rows = std::env::var("AGENTDB_SCENARIO_ROWS").ok().and_then(|v| v.parse().ok()).unwrap_or(200_000);
+    admin.query(QKind::Meta, &metricbench::fixture(rows)).await?;
+    etl::setup(&admin).await?;
+    scenario::setup(&admin).await?;
+    let v1 = scenario::fingerprint(&admin).await?;
+    let db = Arc::new(Db::connect(url, 4, true)?);
+    let cfg = MiddleConfig {
+        name: "premise".into(),
+        version_ttl_ms: 0,
+        metric_maint: Maint::Condition,
+        cond_reuse: true,
+        optimize: true,
+        ..Default::default()
+    };
+    let mid = Middle::new(db, cfg.clone()).await?;
+    let seed = Ctx::new("A", "seed", "seed");
+    let user = Ctx::new("B", "use", "use");
+    let octx = Ctx::new("O", "optimize", "optimize");
+    let learn = Period::month(2001, 3);
+    let defs = seeded_metrics();
+    let key_of = |m: &Metric| format!("metric:{}", m.name);
+    for (id, m) in &defs {
+        let v = mid.seed_metric(&seed, m.clone(), Ask::Single { period: learn }, 2, &metricbench::gold_period(id, &learn)).await?;
+        ensure!(v["promoted"] == true, "{id} 未晋升：{v}");
+        let u = mid.use_metric(&user, &key_of(m)).await?;
+        ensure!(u["status"] == "valid" && u["revision"] == 0, "{id}：{u}");
+    }
+
+    // (1) 一轮规则优化，然后日期键重编号
+    let t = Instant::now();
+    let rounds = mid.optimize_sweep(&octx, None, 1).await?;
+    let sweep_s = t.elapsed().as_secs_f64();
+    let mut optimized: BTreeMap<&str, Metric> = BTreeMap::new();
+    for (id, m) in &defs {
+        let u = mid.use_metric(&user, &key_of(m)).await?;
+        if u["revision"] == 1 {
+            optimized.insert(*id, serde_json::from_value(u["metric"].clone())?);
+        }
+    }
+    ensure!(!optimized.is_empty(), "没有定义得到优化修订：{rounds:?}");
+    // (2) 被修复替代：另一个实例只放门店退货金额，优化后施加状态流水，退货粒度失效并被修复
+    let mid2 = Middle::new(Arc::new(Db::connect(url, 4, true)?), cfg.clone()).await?;
+    let (m2_id, m2) = defs.iter().find(|(id, _)| *id == "M2").context("没有 M2")?;
+    let m2_key = key_of(m2);
+    let v = mid2.seed_metric(&seed, m2.clone(), Ask::Single { period: learn }, 2, &metricbench::gold_period(m2_id, &learn)).await?;
+    ensure!(v["promoted"] == true, "{m2_id} 未晋升：{v}");
+    let rounds2 = mid2.optimize_sweep(&octx, None, 1).await?;
+    let before2 = mid2.use_metric(&user, &m2_key).await?;
+    let st = Change::Status;
+    st.apply_truth(&admin).await?;
+    st.apply_hidden(&admin).await?;
+    mid2.invalidate_versions();
+    let after2 = mid2.use_metric(&user, &m2_key).await?;
+    let mut status_refs = json!({"skipped": "门店退货金额没有得到优化修订", "rounds": rounds2, "before": before2});
+    if before2["revision"] == 1 {
+        ensure!(after2["status"] == "valid" && after2["revision"] == 2, "{m2_id}：状态流水后应修复为 r2：{after2}");
+        let mut seen = serde_json::Map::new();
+        for rev in [0u32, 1, 2] {
+            let (a, r) = accepted(&mid2, &user, &m2_key, rev).await?;
+            ensure!(a == (rev == 2), "{m2_id}：r{rev} 的接受情况不对：{r}");
+            seen.insert(format!("r{rev}"), json!({"accepted": a, "response": r}));
+        }
+        status_refs = json!({"before": before2["revision"], "after": after2["revision"], "references": seen});
+    }
+    st.reset(&admin).await?;
+    scenario::ensure_v1(&admin, &v1, "状态流水回滚").await?;
+    mid.invalidate_versions();
+
+    let periods = [
+        ("2002-02", Period::month(2002, 2)),
+        ("2002-Q1", Period { year: 2002, m1: 1, m2: 3 }),
+        ("2002-H1", Period { year: 2002, m1: 1, m2: 6 }),
+        ("2002", Period { year: 2002, m1: 1, m2: 12 }),
+        ("2002-09", Period::month(2002, 9)),
+    ];
+    let mut gold_before = BTreeMap::new();
+    for (id, _) in &defs {
+        for (pn, p) in &periods {
+            gold_before.insert((*id, *pn), value_of(&admin, &metricbench::gold_period(id, p)).await?);
+        }
+    }
+    mid.take_metric_events();
+    let ch = Change::Rekey;
+    ch.apply_truth(&admin).await?;
+    ch.apply_hidden(&admin).await?;
+    mid.invalidate_versions();
+    let mut per_def = vec![];
+    let (mut served_wrong, mut unmaintained_wrong, mut answers) = (0, 0, 0);
+    for (id, m) in &defs {
+        let key = key_of(m);
+        let u = mid.use_metric(&user, &key).await?;
+        ensure!(u["status"] == "valid", "{id} 重编号后不可用：{u}");
+        let served: Metric = serde_json::from_value(u["metric"].clone())?;
+        let mut rows_out = vec![];
+        for (pn, p) in &periods {
+            let gold = value_of(&admin, &metricbench::gold_period(id, p)).await?;
+            ensure!(metric::same_value(&gold, &gold_before[&(*id, *pn)], 2), "{id} {pn}：重编号改变了业务事实");
+            let ask = Ask::Single { period: *p };
+            let s = value_of(&admin, &metric::compile(&served, &ask)?).await?;
+            let ok = metric::same_value(&s, &gold, 2);
+            answers += 1;
+            served_wrong += usize::from(!ok);
+            let stale = match optimized.get(id) {
+                Some(om) => {
+                    let v = value_of(&admin, &metric::compile(om, &ask)?).await?;
+                    let ok = metric::same_value(&v, &gold, 2);
+                    unmaintained_wrong += usize::from(!ok);
+                    json!({"value": v, "correct": ok})
+                }
+                None => Value::Null,
+            };
+            rows_out.push(json!({"period": pn, "gold": gold, "served": s, "served_correct": ok, "key_range_unmaintained": stale}));
+        }
+        let mut refs = json!(null);
+        if optimized.contains_key(id) {
+            ensure!(u["revision"] == 0, "{id}：日期键范围修订失效后应恢复前一修订 r0：{u}");
+            let (a1, r1) = accepted(&mid, &user, &key, 1).await?;
+            let (a0, r0) = accepted(&mid, &user, &key, 0).await?;
+            ensure!(!a1 && r1["reason"].as_str().unwrap_or("").contains("日期键"), "{id}：声明失效的 r1 应被拒绝并说明原因：{r1}");
+            ensure!(a0, "{id}：声明恢复的 r0 应被接受：{r0}");
+            refs = json!({"r1": r1, "r0_accepted": a0});
+        }
+        per_def.push(json!({"id": id, "key": key, "optimized": optimized.contains_key(id), "revision_served": u["revision"],
+                            "answers": rows_out, "references": refs}));
+    }
+    ensure!(served_wrong == 0, "恢复前一修订后仍有 {served_wrong} 个错误答案：{per_def:?}");
+    ensure!(unmaintained_wrong > 0, "不维护前提时日期键范围修订应在跨月期间上出错：{per_def:?}");
+    let rekey_events: Vec<Value> = mid
+        .take_metric_events()
+        .into_iter()
+        .filter(|e| matches!(e["event"].as_str(), Some("maintenance" | "reinstated" | "predecessor_checked" | "revoked")))
+        .collect();
+    let rekey_notices = mid.take_notices("B");
+    ch.reset(&admin).await?;
+    scenario::ensure_v1(&admin, &v1, "日期键重编号回滚").await?;
+    mid.invalidate_versions();
+
+    // (3) 关联不上商品维度的销售：内连接的完整性条件
+    metricbench::apply_growth(&admin).await?;
+    let before = catalog::versions(&admin).await?.get("store_sales").map(|v| v.dml).unwrap_or(0);
+    let n = admin
+        .execute(&format!(
+            "update store_sales set ss_item_sk = ss_item_sk + 1000000 \
+             where ss_ticket_number > {} and ss_ticket_number % 2 = 0",
+            metricbench::GROWTH_OFFSET
+        ))
+        .await?;
+    admin.query(QKind::Meta, "select pg_stat_force_next_flush()").await?;
+    metricbench::log_batch(&admin, "store_sales", "补录销售中一半的商品键关联不上商品维度").await?;
+    admin.query(QKind::Meta, "analyze store_sales").await?;
+    etl::wait_table_stats(&admin, "store_sales", before).await?;
+    mid.invalidate_versions();
+    let (_, m5) = defs.iter().find(|(id, _)| *id == "M5").context("没有 M5")?;
+    let (_, m1) = defs.iter().find(|(id, _)| *id == "M1").context("没有 M1")?;
+    let e5 = mid.use_metric(&user, &key_of(m5)).await?;
+    let e1 = mid.use_metric(&user, &key_of(m1)).await?;
+    ensure!(e5["status"] == "unavailable" && e5["reason"].as_str().unwrap_or("").contains("内连接排除"), "M5 应被完整性条件判为失效：{e5}");
+    ensure!(e1["status"] == "valid", "M1 不连接商品维度，应不受影响：{e1}");
+    metricbench::reset_growth(&admin).await?;
+    scenario::ensure_v1(&admin, &v1, "孤儿商品键回滚").await?;
+
+    Ok(json!({
+        "status": "passed", "rows": rows, "sweep_s": sweep_s, "rounds": rounds,
+        "rekey": {"definitions": per_def, "answers": answers, "served_wrong": served_wrong,
+                  "key_range_unmaintained_wrong": unmaintained_wrong, "events": rekey_events, "notices": rekey_notices},
+        "status_change": status_refs,
+        "orphan_items": {"rows_updated": n, "m5": e5, "m1": e1},
+        "stats": mid.stats_json(),
+    }))
+}
+
 // ───────────────────────── 数据变化场景：不调用 LLM 的维护预期 ─────────────────────────
 
 fn seeded_metrics() -> Vec<(&'static str, Metric)> {
@@ -328,6 +545,7 @@ fn seeded_metrics() -> Vec<(&'static str, Metric)> {
         filters: BTreeMap::new(),
         cardinality: String::new(),
         loss_ratio: 0.0,
+        orphan_ratio: 0.0,
         revision: 0,
     };
     let base = |name: &str, fact: &str, measure: &str, grain: &[&str]| Metric {
@@ -373,6 +591,8 @@ fn expected(c: Change) -> [&'static str; 4] {
         Change::Duplicate | Change::LateKey => [NA, V0, NA, NA],
         Change::DimHistory => [V0, V0, V0, V1],
         Change::Mirror => [V0, V1, V1, V0],
+        // 未优化的定义不依赖日期键连续：各条件都成立
+        Change::Rekey => [V0, V0, V0, V0],
     }
 }
 

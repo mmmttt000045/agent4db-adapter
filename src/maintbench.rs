@@ -154,6 +154,7 @@ fn metric(s: &Spec) -> Metric {
             filters: BTreeMap::new(),
             cardinality: String::new(),
             loss_ratio: 0.0,
+            orphan_ratio: 0.0,
             revision: 0,
         }]
     } else {

@@ -1,7 +1,8 @@
 //! 优化修订：对已发布的指标口径尝试保持语义的改写（规则改写，或模型提议），逐一验证——结构不同（O1）、静态合法（G3）、
 //! 粒度（G4）、范围谓词所需的日期键连续（O2）、规范 SQL 可编译（O3）与可审查（G5）、学习时快照上与当前修订结果相同（O4）、
 //! 当前快照上逐期间结果相同（O5）、配对测量的执行代价显著更低（O6）。全部通过才作为同一键的新修订发布；旧修订仍然正确，
-//! 执行端宽限接受并附通知。等价与代价都在同一个快照里按期间配对比较，不跨表版本。
+//! 只要它自己的条件仍成立，执行端就宽限接受并附通知。新修订只因新增的前提不成立而失效时恢复旧修订（见 `reinstate`）。
+//! 等价与代价都在同一个快照里按期间配对比较，不跨表版本。
 
 use super::metrics::{grain_check, metric_of, record, time_contiguity_check, Gate, MetricEvidence};
 use super::{inc, outcome_text, scope_prefix, Ctx, Middle};
@@ -83,14 +84,15 @@ impl Middle {
         // 发布：同一键的新修订，使用者与命中数沿用；旧修订号记为宽限可用
         let deps = self.deps_for(&cand.tables()).await?;
         let guards = vec![grain_check(&cand)];
+        let rev = self.next_revision(&fk, old.revision);
         let mut e = self.new_entry(ctx, &old.key, Content::Metric(Box::new(cand)), deps, guards);
-        e.revision = old.revision + 1;
+        e.revision = rev;
         e.status = Status::Valid;
         e.created_by = source.to_string();
         e.consumers = old.consumers.clone();
         e.hits = old.hits;
         self.store.put(&fk, e);
-        self.opt_prev.lock().insert(fk.clone(), old.revision);
+        self.opt_prev.lock().insert(fk.clone(), old.clone());
         if let Some(x) = self.metric_evidence.lock().get_mut(&fk) {
             x.gates.extend(gates.clone());
             x.optimized += 1;
@@ -103,14 +105,14 @@ impl Middle {
                 n.entry(a.clone()).or_default().push(format!(
                     "指标经验 {} 已发布等价且更省的修订 r{}（{label}；样本期间执行时间约省 {:.0}%）。旧修订 r{} 仍可用，建议重新调用 find_metric 改用新修订。",
                     old.key,
-                    old.revision + 1,
+                    rev,
                     saving * 100.0,
                     old.revision
                 ));
                 inc(&self.stats.notices);
             }
         }
-        let v = json!({"event": "optimize_promoted", "key": key, "revision": old.revision + 1, "from": old.revision, "candidate": label,
+        let v = json!({"event": "optimize_promoted", "key": key, "revision": rev, "from": old.revision, "candidate": label,
                        "source": source, "saving": saving, "gates": gates, "cost": cost});
         self.metric_event(v.clone());
         Ok(v)
@@ -299,7 +301,7 @@ impl Middle {
             "metric": m, "canonical_sql": sql, "plan": plan, "tables": tables,
             "rules": [
                 "time.strategy 可取 dim_join（连接日期维度）或 key_range（事实表按日期键范围过滤，不连接维度表；要求日期键按月连续）",
-                "只能去掉结果不依赖的关联；度量、过滤与粒度的业务含义不得改变，不得加入题目参数",
+                "只能去掉结果不依赖的左连接（内连接会排除关联不上的行）；度量、过滤与粒度的业务含义不得改变，不得加入题目参数",
             ],
         })
     }

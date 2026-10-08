@@ -33,8 +33,8 @@ LABELS = {
         'store': '共享记忆', 'store_note': '另有表统计信息、连接路径', 'defs': '指标定义',
         'def_chips': (('营业额 v2', '待验证'), ('电子品类 v2', '有效'), ('退货率 v2', '有效')),
         'cache': '验证结果缓存', 'cache_note': '按（条件，表版本）缓存，跨定义共享',
-        'cache_chips': (('粒度键唯一', '表版本 15', 'ok'), ('日期键唯一', '表版本 3', 'ok'),
-                        ('日期键完整性', '表版本 15', 'wait')),
+        'cache_chips': (('粒度键唯一', '表版本 v15', 'ok'), ('日期键唯一', '表版本 v3', 'ok'),
+                        ('日期键完整性', '表版本 v15', 'wait')),
         'agent': ('内置 agent（大模型）', '学习指标定义，准入检查'),
         'maint': ('维护', '执行验证 · 修复、优化或失效'),
         'req_text': '检索“营业额”', 'resp_text': '有效修订 v2', 'req_sql': '执行 SQL', 'resp_sql': '查询结果',
@@ -53,8 +53,8 @@ LABELS = {
         'store': 'Shared memory', 'store_note': 'also table profiles, join paths', 'defs': 'Definitions',
         'def_chips': (('revenue v2', 'pending'), ('electr. v2', 'valid'), ('rate v2', 'valid')),
         'cache': 'Validation cache', 'cache_note': 'per (rule, data version), shared',
-        'cache_chips': (('one row/sale', 'version 15', 'ok'), ('date key unique', 'version 3', 'ok'),
-                        ('loss in bound', 'version 15', 'wait')),
+        'cache_chips': (('one row/sale', 'version v15', 'ok'), ('date key unique', 'version v3', 'ok'),
+                        ('loss in bound', 'version v15', 'wait')),
         'agent': ('Built-in agent (LLM)', 'learns and validates definitions'),
         'maint': ('Maintenance', 'checks · repair, optimize, retire'),
         'req_text': 'ask “revenue”', 'resp_text': 'valid v2', 'req_sql': 'run SQL', 'resp_sql': 'result',
@@ -223,7 +223,7 @@ def draw(s, lang):
         if new:
             rect(vx + 1.0, yy - 3.0, vw - 2.0, 5.2, AMBER_PALE, AMBER, .28, r=.9)
         text(vx + 2.6, baseline(yy - .4, NOTE), table, NOTE, INK)
-        value = f'{old} → {new}' if new else f'{old}'
+        value = f'v{old} → v{new}' if new else f'v{old}'
         text(vx + vw - 2.6, baseline(yy - .4, NOTE), value, NOTE, WAIT if new else INK, align='right')
     tx, tw_ = TABLES
     cw3 = (tw_ - 2.0) / 2

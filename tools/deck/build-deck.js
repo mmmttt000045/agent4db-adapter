@@ -1,9 +1,10 @@
 // Builds docs/mavra-system.pptx, a 19-slide Chinese deck that tells MAVRA as one story:
 // how it differs from Text-to-SQL; a shared rule breaks when the data changes (toy ledger, then the real record); the three
-// things MAVRA does (what to check, when, what if it fails); where it sits; how a rule is
-// admitted; the four conditions; table versions, lazy maintenance and the same-snapshot
-// contract; repair with the uniqueness rule and the as-of regression test; the restatement
-// story from the run record; two results slides; guarantees and limits. The three system
+// responsibilities of the shared memory layer (publish, rely, maintain and improve); where it sits, its tools and the
+// traced learning and use calls; publish: admission and the four conditions; rely: table versions, lazy maintenance and
+// the same-snapshot contract; maintain and improve: repair with the uniqueness rule and the as-of regression test, then
+// optimization revisions, then the lifecycle figure; the restatement as traced; two results slides; guarantees and
+// limits. One running example numbers the revisions: 门店营业额 v1 (learned) → v2 (optimized) → v3 (repaired). The three system
 // figures come from tools/deck/figures/ (drawn by `python3 tools/figures/build.py --deck`,
 // rendered to PNG). Toy tables are marked 示意; every other number comes from the archived
 // run records or the paper's generated macros (overleaf/gen/*.tex). Wording uses standard
@@ -300,14 +301,17 @@ table(s, [
     mono('{metrics:[{key, revision, definition, fact, measure, grain, time, joins, filters, caveats, examples}], ambiguous, unavailable:[{key, revision, status}]}')],
   [mono('run_sql'), mono('sql, metrics?: [{key, revision}]'), '只读检查；声明的修订：核对有效且为当前，在这条查询的快照上验证其条件；执行前审查（证伪的连接写法、必需的粒度过滤）；记录溯源（验证结果、使用记录）',
     mono('{result:{columns, rows, row_count}, ref: "rN", source: executed|reused|snapshot} 或 {rejected, reason, suggestion | required_filter}')],
-  [mono('final_answer'), mono('answer, used:["rN"], derivation'), '结束任务；按算式核算答案；溯源：答案 ← rN ← 声明的定义修订', '—'],
+  [mono('final_answer'), mono('answer, used:["rN"], derivation'), '结束任务；按算式核算答案；溯源：答案 ← 查询 #N ← 声明的定义修订', '—'],
   [mono('ask_clarification'), mono('question'), '口径不明且工具无法给出时结束任务', '—'],
   ['每次返回', '—', '附带 notices（使用记录）', mono('notices: ["你用过的经验「…」已撤销（…）", "已发布等价且更省的修订 rN…"]')],
 ], { x: M, y: 1.15, w: W - 2 * M, colW: [1.4, 2.3, 4.7, 3.733], size: 10 });
 band(s, [
-  { text: '内置智能体用同一套工具学习；', options: { bold: true, color: C.violet } },
-  { text: '判定正确后，抽取模型把题面、参与答案的 SQL 链与算式、被拦下的写法、表元数据整理成知识卡（不含业务行）。轨迹检索基线另有 find_trajectory(query)，不做维护。' },
-], { y: 6.05, h: 0.65, size: 11 });
+  { text: '编号约定：', options: { bold: true, color: C.blue } },
+  { text: '贯穿全场的例子“门店营业额”依次有 v1（学到）→ v2（优化为日期键范围）→ v3（数据更正后修复）三个修订。调用原文里的 revision: N 即 v(N+1)；'
+    + 'ref / used / derivation 里的 rN 是本会话第 N 条查询的结果，下文写作“查询 #N”。', options: { breakLine: true } },
+  { text: '内置智能体用同一套工具学习，', options: { bold: true, color: C.violet } },
+  { text: '判定正确后由抽取模型整理成知识卡（不含业务行）。轨迹检索基线另有 find_trajectory(query)，不做维护。' },
+], { y: 5.95, h: 0.8, size: 10 });
 s.addNotes('这是智能体能调用的全部工具，一行一个：参数是什么，MAVRA 在背后读写哪类记忆，返回什么字段。'
   + '前四个是探索工具，结果都会记下来给后来的智能体复用；find_metric 是读取定义，依赖表版本变了会先维护；run_sql 带 metrics 参数就是声明，MAVRA 据此核对修订、在快照上验证条件、记录溯源；'
   + 'final_answer 提交答案并说明用了哪几条查询；每次返回都可能附带通知。内置智能体用同一套工具做学习任务，学到的轨迹再由抽取模型整理成知识卡。');
@@ -324,18 +328,18 @@ table(s, [
   ['3', call('join_path("store_sales", "date_dim")'), '{paths: [{on: [ss_sold_date_sk = d_date_sk], right_unique: true, loss_ratio: 1.03%, evidence: "1000000 行中 989695 行关联得上"}], known_bad: [], source: explored}', '155 ms'],
   ['4', call('run_sql("SELECT ROUND(SUM(ss.ss_net_paid), 2) FROM store_sales ss JOIN date_dim d ON … WHERE d.d_year = 2001 AND d.d_moy = 3")'),
     '{result: [["13570368.70"]], ref: "r1", source: executed}', '31 ms'],
-  ['5', call('final_answer(answer: "13570368.70", used: ["r1"], derivation: "r1")'), '任务结束；答案 ← r1', '—'],
+  ['5', call('final_answer(answer: "13570368.70", used: ["r1"], derivation: "r1")'), '任务结束；答案 ← 查询 #1', '—'],
 ], { x: M, y: 1.15, w: W - 2 * M, colW: [0.4, 4.6, 6.3, 0.833], size: 11 });
 band(s, [
   { text: '智能体退出之后，MAVRA 接着做：', options: { bold: true, color: C.violet } },
-  { text: '① 判定：答案与参考答案一致（部署中由指标负责人确认一次）；② 抽取：把题面、r1 的 SQL、算式 r1、被拦下的写法、两张表的元数据与已验证连接交给抽取模型，得到知识卡 JSON；'
-    + '③ 7 项准入检查：业务依据、判定正确、静态合法、粒度（select count(*), count(distinct 粒度键) from store_sales …）、SQL 审查、重放 r1 的 SQL、重放由字段编译的规范 SQL；'
-    + '④ 发布 metric:门店营业额 r0，写入依赖的表版本与证据。' + LEARN_TIMING },
+  { text: '① 判定：答案与参考答案一致（部署中由指标负责人确认一次）；② 抽取：把题面、查询 #1 的 SQL 与算式、被拦下的写法、两张表的元数据与已验证连接交给抽取模型，得到知识卡 JSON；'
+    + '③ 7 项准入检查：业务依据、判定正确、静态合法、粒度（select count(*), count(distinct 粒度键) from store_sales …）、SQL 审查、重放查询 #1 的 SQL、重放由字段编译的规范 SQL；'
+    + '④ 发布 metric:门店营业额 v1（revision 0），写入依赖的表版本与证据。' + LEARN_TIMING },
 ], { y: 5.0, h: 1.7, size: 12 });
 footnote(s, TRACE_SOURCE);
 s.addNotes('这是内置智能体学习时真实的 7 次工具调用，来自带 --trace 的运行记录。第 1 轮它并行调了两个工具：列出表，以及检索“门店营业额”——此时还没人学过，返回空。'
-  + '第 2 轮描述两张表，第 3 轮问两张表怎么连接，MAVRA 现场验证并记下这条连接路径（一侧键唯一，1.03% 关联不上）。第 4 轮执行 SQL 得到 r1，第 5 轮提交答案并说明答案就是 r1。'
-  + '智能体退出后 MAVRA 接着做四件事：判定、抽取、7 项准入检查、发布 r0。');
+  + '第 2 轮描述两张表，第 3 轮问两张表怎么连接，MAVRA 现场验证并记下这条连接路径（一侧键唯一，1.03% 关联不上）。第 4 轮执行 SQL 得到查询 #1，第 5 轮提交答案并说明答案就是查询 #1。'
+  + '智能体退出后 MAVRA 接着做四件事：判定、抽取、7 项准入检查、发布 v1。');
 
 // 4c Use: the user agent's real tool calls on a held-out question -----------------------------------
 s = content('使用：用户智能体 B 的真实调用序列（留出题 M1-P1，4 轮 6 次）', 'MAVRA');
@@ -343,23 +347,23 @@ table(s, [
   ['轮', '调用', 'MAVRA 做什么 → 返回', '耗时'],
   ['1', call('list_tables()'), '表名、估计行数、注释', '0 ms'],
   ['1', call('find_metric("门店营业额")'),
-    '名称匹配到 2 条（门店营业额、门店营业额#2，都是 r1）；依赖表版本未变 → {ambiguous: true, metrics: [{key: "metric:门店营业额", revision: 1, definition, measure: sum(ss_net_paid), grain, time, caveats: ["不含税…", "期间谓词按日期键范围过滤，前提是日期键按月连续…"], examples}]}', '4 ms'],
+    '名称匹配到 2 条（门店营业额、门店营业额#2，都是 v2，即优化后的 revision 1）；依赖表版本未变 → {ambiguous: true, metrics: [{key: "metric:门店营业额", revision: 1, definition, measure: sum(ss_net_paid), grain, time, caveats: ["不含税…", "期间谓词按日期键范围过滤，前提是日期键按月连续…"], examples}]}', '4 ms'],
   ['2', call('describe_table("store_sales")  describe_table("date_dim")'), '表版本未变 → 直接返回记住的表统计信息', '3 ms'],
   ['3', call('run_sql("select round(sum(ss_net_paid), 2) as value from store_sales where ss_sold_date_sk between (select min(d_date_sk) from date_dim where d_year = 2002 and d_moy = 9) and (select max(d_date_sk) …)", metrics: [{key: "metric:门店营业额", revision: 1}])'),
-    '声明 r1：核对有效且为当前修订；在这条查询的快照上验证 r1 的条件（粒度键唯一、日期键唯一、日期键完整性、日期键按月连续，命中缓存则复用）；执行 → {result: [["13069651.80"]], ref: "r1"}', '24 ms'],
-  ['4', call('final_answer(answer: "13069651.80", used: ["r1"], derivation: "r1")'), '溯源：答案 ← r1 ← metric:门店营业额 r1', '—'],
+    '声明 v2：核对有效且为当前修订；在这条查询的快照上验证 v2 的条件（粒度键唯一、日期键唯一、日期键完整性、日期键按月连续，命中缓存则复用）；执行 → {result: [["13069651.80"]], ref: "r1"}（查询 #1）', '24 ms'],
+  ['4', call('final_answer(answer: "13069651.80", used: ["r1"], derivation: "r1")'), '溯源：答案 ← 查询 #1 ← metric:门店营业额 v2', '—'],
 ], { x: M, y: 1.15, w: W - 2 * M, colW: [0.4, 4.6, 6.3, 0.833], size: 11 });
 table(s, [
   ['声明的修订…', 'MAVRA 的回应（运行记录原文）'],
-  ['已被修复替代（数据更正后仍声明 r0）', bad('拒绝：“指标经验 metric:门店营业额 已修订为 r1（你引用的是 r0），请重新调用 find_metric”')],
+  ['已被修复替代（数据更正后仍声明修复前的修订）', bad('拒绝：“指标经验 metric:门店营业额 已修订为 r1（你引用的是 r0），请重新调用 find_metric”')],
   ['已失效（重复加载后）', bad('拒绝：“当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，1110165 行只有 1000000 个不同键”')],
   ['已被等价且更省的修订替代', good('接受，附通知：“已发布等价且更省的修订 r1（你引用的 r0 仍可用），建议重新调用 find_metric”')],
   ['没有声明', '照常执行与审查（连接写法、粒度过滤），但不在“条件成立”的保证范围内'],
 ], { x: M, y: 4.7, w: W - 2 * M, colW: [3.2, 8.933], size: 10 });
-footnote(s, TRACE_SOURCE + ' 检索到的 r1 是优化轮发布的日期键范围修订，智能体照着示例写出了范围写法并声明 revision 1。拒绝与通知文字取自 results/scen-20261002 的记录。');
-s.addNotes('这是用户智能体做留出题时真实的 6 次调用。第 1 轮并行：列出表，检索“门店营业额”——匹配到两条、都是 r1，MAVRA 看依赖表版本没变，直接返回定义、度量、粒度、注意事项和示例。'
-  + '第 2 轮描述两张表，直接拿到记住的统计信息。第 3 轮执行 SQL，并在 metrics 参数里声明依据 metric:门店营业额 r1——注意它照着示例写出了日期键范围的写法。'
-  + 'MAVRA 核对 r1 有效且是当前修订，在这条查询的快照上验证 r1 的四个条件，执行，返回 r1。第 4 轮提交答案，溯源记下答案来自 r1、r1 依据门店营业额 r1。'
+footnote(s, TRACE_SOURCE + ' v2 是优化轮发布的日期键范围修订（第 14 页）。拒绝文字取自 results/scen-20261002（未做优化，r1 即修复后的修订）。');
+s.addNotes('这是用户智能体做留出题时真实的 6 次调用。第 1 轮并行：列出表，检索“门店营业额”——匹配到两条、都是 v2（优化后的修订），MAVRA 看依赖表版本没变，直接返回定义、度量、粒度、注意事项和示例。'
+  + '第 2 轮描述两张表，直接拿到记住的统计信息。第 3 轮执行 SQL，并在 metrics 参数里声明依据 metric:门店营业额 v2——注意它照着示例写出了日期键范围的写法。'
+  + 'MAVRA 核对 v2 有效且是当前修订，在这条查询的快照上验证 v2 的四个条件，执行，返回查询 #1。第 4 轮提交答案，溯源记下答案来自查询 #1、查询 #1 依据门店营业额 v2。'
   + '下面是声明的修订处在另外四种状态时 MAVRA 的真实回应。');
 
 // 5 Admission: how a rule gets in ----------------------------------------------------------------
@@ -495,8 +499,8 @@ text(s, bulleted(null, C.amber, [
 ]), { x: M, y: 3.4, w: hw, h: 1.8, fontSize: 12, valign: 'top', paraSpaceAfter: 4 });
 heading(s, '回归测试：新定义要在学习时的数据上复现当初的答案', hx2, 1.1, hw2, C.blue);
 table(s, [
-  ['比较所用的数据', '学习时的 SQL', '修复后的 v2', '结果'],
-  ['学习时刻 as-of', '1357.0 万', '1357.0 万', good('一致 → 发布 v2')],
+  ['比较所用的数据', '学习时的 SQL', '修复后的 v3', '结果'],
+  ['学习时刻 as-of', '1357.0 万', '1357.0 万', good('一致 → 发布 v3')],
   ['当前数据', '1489.1 万', '1342.4 万', bad('不一致 → 误拒')],
 ], { x: hx2, y: 1.45, w: hw2, colW: [1.6, 1.25, 1.25, hw2 - 4.1], size: 12 });
 text(s, bulleted(null, C.blue, [
@@ -504,8 +508,8 @@ text(s, bulleted(null, C.blue, [
   '学习时的答案是唯一被确认过的答案，所以修复不需要参考答案。数据仓库用时间旅行查询（FOR SYSTEM_TIME AS OF）取学习时刻的数据，原型保留学习时的副本',
 ]), { x: hx2, y: 3.0, w: hw2, h: 2.2, fontSize: 12, valign: 'top', paraSpaceAfter: 4 });
 band(s, [
-  { text: '发布 v2 之后：', options: { bold: true, color: C.blue } },
-  { text: 'v1 失效，声明 v1 的查询被拒绝；修复期间到达的请求等待结果；其他定义遇到相同的条件失败直接复用验证结果与修复；修不好的定义失效并通知使用方，等学到新证据再发布。' },
+  { text: '发布 v3 之后：', options: { bold: true, color: C.blue } },
+  { text: 'v2 失效，声明旧修订的查询被拒绝；修复期间到达的请求等待结果；其他定义遇到相同的条件失败直接复用验证结果与修复；修不好的定义失效并通知使用方，等学到新证据再发布。' },
 ], { y: 5.3, h: 0.95, fill: C.paleBlue, size: 13 });
 footnote(s, '上表为示意；回归测试数字来自 ' + SOURCE.slice(3, SOURCE.indexOf('。') + 1)
   + '“当前数据”一行来自对照实验 dsv41flash-r1-g3fix--exref（系统记录：“结果 13423672.28 与期望 14890636.48 不一致”）。');
@@ -513,53 +517,10 @@ s.addNotes('回到订单 002。MAVRA 发现订单号重复，一行是旧记录�
   + '但不能看到一个像样的条件就用。候选必须满足两件事：过滤后每个键恰好一行；原来的键一个不丢——“只保留金额大于 200”也能去重，但 100 元的订单没了，这不叫修复。'
   + '还要唯一：如果 is_current 和 is_backup 两个过滤都通过，表结构说不出哪份是业务事实，MAVRA 不擅自选，定义失效，交给人确认。宁可说不知道怎么安全地修，也不猜。'
   + '修复通过结构检查之后还要考一次试：像换一种解法重做老师判过的那道题，答案必须一样。必须用当初那份数据，因为今天的数据已经变了，当初的 SQL 在上面同样过期，我们实际跑过：按当前数据比，正确的修复会被拒绝。'
-  + '通过后发布 v2，v1 失效。');
+  + '通过后发布 v3，v2 失效。');
 
-// 10 Lifecycle figure ------------------------------------------------------------------------------
-s = content('一条定义的生命周期：学习、优化、维护、修复、失效', '维护与改进');
-figure(s, 'lifecycle', 1.15, 4.5);
-band(s, [
-  { text: '修订规则：', options: { bold: true, color: C.blue } },
-  { text: '同结构再次学到 → 为原定义记一次佐证；同名不同结构 → 并存，由智能体依据口径选择；'
-    + '其他定义遇到相同的条件失败 → 复用验证结果与修复；失效后 → 重新学习，通过准入检查再作为新修订发布。' },
-], { y: 5.75, h: 0.95, size: 13 });
-s.addNotes('把前面几页串在一张图上。内置智能体求解“3 月门店营业额”，判定正确、准入检查通过，发布 v1。'
-  + '第 3 步是优化：规则改写把期间谓词改为日期键范围，14 个样本期间结果一致、执行时间省 19.8%，发布 v2；新前提“日期键按月连续”成为 v2 的条件，v1 宽限可用。'
-  + '之后一批销售被更正：旧行标记为非当前，插入当前行——“粒度键唯一”不成立，v2 失效，不处理会把新旧版本都算进去。'
-  + '修复搜索在低基数列上枚举等值谓词，只有“ss_is_current = 1”可行；按学习时刻重算 3 月，结果一致，发布 v3。'
-  + '红框是另一种结果：批次重复加载，没有谓词能恢复唯一性，定义失效并通知使用方，等待重新学习。');
-
-// 11 The restatement as it really happened: B's calls and the queries MAVRA ran behind them --------
-pres.addSection({ title: '真实记录' });
-s = content('数据更正之后：B 的真实调用序列与 MAVRA 背后的查询', '真实记录');
-table(s, [
-  ['', '调用', 'MAVRA 做什么 → 返回', '耗时'],
-  ['0', call("ETL：insert into store_sales (…, ss_is_current) select …, 0 …;  update store_sales set ss_net_paid = round(ss_net_paid * 0.9, 2) …"),
-    '65,915 行被更正（旧行保留为非当前，当前行改九折）；语句级触发器把 store_sales 的表版本 +1', '—'],
-  ['1', call('list_tables()  find_metric("门店营业额")'),
-    lines('store_sales 版本已变 → 在这次调用里维护匹配到的 2 条定义：粒度查询 select count(*), count(distinct (粒度键)) … → 1,055,610 行 / 989,695 键，不成立 → r1 失效；',
-      "修复搜索（pg_stats 低基数列，… group by ss_is_current）→ 唯一可行 ss_is_current = '1'；4 项检查含学习时快照上的回归 → 发布 r2（31.6 秒；#2 22.9 秒）",
-      '→ 返回 2 条 r2 定义（示例 SQL 已带过滤）+ notices ×2'), '54.5 s'],
-  ['2', call('describe_table("store_sales")  describe_table("date_dim")'), '版本已变 → 重新采样并更新表统计信息', '166 ms'],
-  ['3', call('run_sql("select ss_is_current, count(*) … group by ss_is_current")  — 无过滤的探查 ×2'),
-    bad("执行前审查拦下：“表 store_sales 现在每个键有多行（状态流水）；统计前需要加过滤 ss_is_current = '1'，否则会重复计算” → {rejected, required_filter}"), '5 ms'],
-  ['4', call("run_sql(\"select count(*), count(distinct (…)) … where ss_is_current = '1'\")"), '通过 → r1：1,000,000 行 = 1,000,000 键', '9.5 s'],
-  ['5', call("run_sql(\"select round(sum(ss_net_paid), 2) as value from store_sales where ss_is_current = '1' and ss_sold_date_sk between (select min(d_date_sk) …) and (select max(d_date_sk) …)\")"),
-    '执行 → r2 = 12,932,888.04（这条没有声明 metrics：照常审查执行，不在条件保证范围内）', '26 ms'],
-  ['6', call('final_answer(answer: "12932888.04", used: ["r2"], derivation: "r2")'), good('正确 ✓；同一阶段的 M1-T1 声明了 revision 2，答 −9,803.47 ✓'), '—'],
-], { x: M, y: 1.15, w: W - 2 * M, colW: [0.35, 4.3, 6.7, 0.783], size: 10 });
-band(s, [
-  { text: '三种更新的结果（百万行端到端）：', options: { bold: true, color: C.blue } },
-  { text: '增量加载——条件仍成立，保持 v1（6 条定义仅 2 次验证）；数据更正——失效 → 修复为新修订，1293.3 万 ✓；重复加载——无唯一修复，失效并通知，智能体自行去重，3 次运行中 2 次答对。' },
-], { y: 6.1, h: 0.6, size: 10 });
-footnote(s, TRACE_SOURCE + ' 维护耗时取自 maintenance 事件；三种更新的结果取自 results/scen-20261002。');
-s.addNotes('这是数据更正之后用户智能体 B 真实的调用序列。第 1 轮它检索“门店营业额”，这一次 MAVRA 发现 store_sales 的版本变了，就在这次调用里完成了维护：'
-  + '粒度查询发现 105 万行只有 99 万个键，r1 失效；修复搜索在低基数列上按值分组，只有 ss_is_current = 1 能恢复每键一行且不丢键；四项检查包括学习时快照上的回归，发布 r2；另一条同名定义复用结论。所以这次 find_metric 花了 54 秒，返回的是带过滤的新定义和两条通知。'
-  + '第 3 轮 B 自己先探查了没加过滤的 SQL，被执行前审查拦下两次，原因写得很具体：这张表现在每个键多行，统计前要加过滤。第 4 轮加了过滤再查，通过；第 5 轮算出 9 月的值，正确。'
-  + '诚实地说，这一条 run_sql 没有声明 metrics，所以它不在条件保证范围内——但审查仍然拦住了错误写法；同阶段的另一题声明了 revision 2。');
-
-// 12 Revision by optimization: equivalent, cheaper rewrites published and shared ----------------
-s = content('迭代：常见指标的写法可以更省——验证等价与代价后作为新修订共享', '真实记录');
+// 10 Improvement: optimization revisions: equivalent, cheaper rewrites published and shared ----------------
+s = content('改进：常见指标的写法可以更省——验证等价与代价后作为新修订共享', '维护与改进');
 const ow = 6.2, ox2 = M + ow + 0.3, ow2 = W - M - ox2;
 heading(s, '怎么做：候选 → 等价 → 更省 → 发布', M, 1.1, ow);
 table(s, [
@@ -576,7 +537,7 @@ table(s, [
   ['新写法', "ss_sold_date_sk between (select min(d_date_sk) from date_dim where …) and (select max(d_date_sk) …)"],
   ['等价', '9 条定义都通过：学习时快照一致；当前快照 14 个期间全部一致'],
   ['代价', lines('门店营业额 29.1 → 23.3 ms（−19.8%），95% 区间 [−9.1, −2.5]', '9 条定义省 15.6%–36.1%（退货率 173 → 111 ms）')],
-  ['发布', lines(good('9 条定义全部 r0 → r1，474 秒'), '之后留出与 11 种更新 78/96 答对（未优化 77/96）')],
+  ['发布', lines(good('9 条定义全部 v1 → v2，474 秒'), '之后留出与 11 种更新 78/96 答对（未优化 77/96）')],
 ], { x: ox2, y: 1.45, w: ow2, colW: [0.9, ow2 - 0.9], size: 12 });
 band(s, [
   { text: '更省的写法同样有前提：', options: { bold: true, color: C.blue } },
@@ -589,10 +550,53 @@ footnote(s, '记录：noctis results/scen-20261008-opt/metric-1791439498065570�
 s.addNotes('前面讲的都是“保持正确”。这页讲“变得更省”：常见指标的写法常常有更省的等价形式，比如按期间统计时不连接日期维度，直接按日期键范围过滤。'
   + 'MAVRA 的做法和修复一样严格：候选可以来自规则、模型提议或智能体的成功轨迹；先验证等价——结构合法、新前提成立、学习时快照和当前快照上 14 个样本期间结果全部相同；'
   + '再验证更省——同一快照内配对做 EXPLAIN ANALYZE，配对差的 95% 区间整体低于 0 且平均省 10% 以上；都通过才作为新修订发布，旧修订宽限可用并通知使用方。'
-  + '右边是百万行端到端实验的真实记录：9 条定义都改为日期键范围过滤，14 个期间全部一致，执行时间省 15.6% 到 36.1%，全部发布为 r1；之后的留出题和 11 种数据变化答对 78/96，和未优化时相同。'
+  + '右边是百万行端到端实验的真实记录：9 条定义都改为日期键范围过滤，14 个期间全部一致，执行时间省 15.6% 到 36.1%，全部发布为 v2；之后的留出题和 11 种数据变化答对 78/96，和未优化时相同。'
   + '关键是最后一句：更省的写法同样有前提，日期键按月连续；它被当作条件维护，前提被破坏时该修订失效。');
 
-// 12 Results: end to end ---------------------------------------------------------------------------
+// 11 Lifecycle figure ------------------------------------------------------------------------------
+s = content('一条定义的生命周期：学习、优化、维护、修复、失效', '维护与改进');
+figure(s, 'lifecycle', 1.15, 4.5);
+band(s, [
+  { text: '修订规则：', options: { bold: true, color: C.blue } },
+  { text: '同结构再次学到 → 为原定义记一次佐证；同名不同结构 → 并存，由智能体依据口径选择；'
+    + '其他定义遇到相同的条件失败 → 复用验证结果与修复；失效后 → 重新学习，通过准入检查再作为新修订发布。' },
+], { y: 5.75, h: 0.95, size: 13 });
+s.addNotes('把前面几页串在一张图上。内置智能体求解“3 月门店营业额”，判定正确、准入检查通过，发布 v1。'
+  + '第 3 步是优化：规则改写把期间谓词改为日期键范围，14 个样本期间结果一致、执行时间省 19.8%，发布 v2；新前提“日期键按月连续”成为 v2 的条件，v1 宽限可用。'
+  + '之后一批销售被更正：旧行标记为非当前，插入当前行——“粒度键唯一”不成立，v2 失效，不处理会把新旧版本都算进去。'
+  + '修复搜索在低基数列上枚举等值谓词，只有“ss_is_current = 1”可行；按学习时刻重算 3 月，结果一致，发布 v3。'
+  + '红框是另一种结果：批次重复加载，没有谓词能恢复唯一性，定义失效并通知使用方，等待重新学习。');
+
+// 12 The restatement as it really happened: B's calls and the queries MAVRA ran behind them --------
+pres.addSection({ title: '真实记录' });
+s = content('数据更正之后：B 的真实调用序列与 MAVRA 背后的查询', '真实记录');
+table(s, [
+  ['', '调用', 'MAVRA 做什么 → 返回', '耗时'],
+  ['0', call("ETL：insert into store_sales (…, ss_is_current) select …, 0 …;  update store_sales set ss_net_paid = round(ss_net_paid * 0.9, 2) …"),
+    '65,915 行被更正（旧行保留为非当前，当前行改九折）；语句级触发器把 store_sales 的表版本 +1', '—'],
+  ['1', call('list_tables()  find_metric("门店营业额")'),
+    lines('store_sales 版本已变 → 在这次调用里维护匹配到的 2 条定义：粒度查询 select count(*), count(distinct (粒度键)) … → 1,055,610 行 / 989,695 键，不成立 → v2 失效；',
+      "修复搜索（pg_stats 低基数列，… group by ss_is_current）→ 唯一可行 ss_is_current = '1'；4 项检查含学习时快照上的回归 → 发布 v3（31.6 秒；#2 22.9 秒）",
+      '→ 返回 2 条 v3 定义（示例 SQL 已带过滤）+ notices ×2'), '54.5 s'],
+  ['2', call('describe_table("store_sales")  describe_table("date_dim")'), '版本已变 → 重新采样并更新表统计信息', '166 ms'],
+  ['3', call('run_sql("select ss_is_current, count(*) … group by ss_is_current")  — 无过滤的探查 ×2'),
+    bad("执行前审查拦下：“表 store_sales 现在每个键有多行（状态流水）；统计前需要加过滤 ss_is_current = '1'，否则会重复计算” → {rejected, required_filter}"), '5 ms'],
+  ['4', call("run_sql(\"select count(*), count(distinct (…)) … where ss_is_current = '1'\")"), '通过 → 查询 #1：1,000,000 行 = 1,000,000 键', '9.5 s'],
+  ['5', call("run_sql(\"select round(sum(ss_net_paid), 2) as value from store_sales where ss_is_current = '1' and ss_sold_date_sk between (select min(d_date_sk) …) and (select max(d_date_sk) …)\")"),
+    '执行 → 查询 #2 = 12,932,888.04（这条没有声明 metrics：照常审查执行，不在条件保证范围内）', '26 ms'],
+  ['6', call('final_answer(answer: "12932888.04", used: ["r2"], derivation: "r2")'), good('正确 ✓；同一阶段的 M1-T1 声明了 revision 2（v3），答 −9,803.47 ✓'), '—'],
+], { x: M, y: 1.15, w: W - 2 * M, colW: [0.35, 4.3, 6.7, 0.783], size: 10 });
+band(s, [
+  { text: '三种更新的结果（百万行端到端）：', options: { bold: true, color: C.blue } },
+  { text: '增量加载——条件仍成立，保持当前修订（6 条定义仅 2 次验证）；数据更正——失效 → 修复为新修订，1293.3 万 ✓；重复加载——无唯一修复，失效并通知，智能体自行去重，3 次运行中 2 次答对。' },
+], { y: 6.1, h: 0.6, size: 10 });
+footnote(s, TRACE_SOURCE + ' 维护耗时取自 maintenance 事件；三种更新的结果取自 results/scen-20261002。');
+s.addNotes('这是数据更正之后用户智能体 B 真实的调用序列。第 1 轮它检索“门店营业额”，这一次 MAVRA 发现 store_sales 的版本变了，就在这次调用里完成了维护：'
+  + '粒度查询发现 105 万行只有 99 万个键，v2 失效；修复搜索在低基数列上按值分组，只有 ss_is_current = 1 能恢复每键一行且不丢键；四项检查包括学习时快照上的回归，发布 v3；另一条同名定义复用结论。所以这次 find_metric 花了 54 秒，返回的是带过滤的新定义和两条通知。'
+  + '第 3 轮 B 自己先探查了没加过滤的 SQL，被执行前审查拦下两次，原因写得很具体：这张表现在每个键多行，统计前要加过滤。第 4 轮加了过滤再查，通过；第 5 轮算出 9 月的值，正确。'
+  + '诚实地说，这一条 run_sql 没有声明 metrics，所以它不在条件保证范围内——但审查仍然拦住了错误写法；同阶段的另一题声明了 revision 2，即 v3。');
+
+// 13 Results: end to end ---------------------------------------------------------------------------
 pres.addSection({ title: '实验结果' });
 s = content('实验结果①：端到端（DeepSeek V4.1 Flash，3 次独立运行）', '实验结果');
 table(s, [
@@ -604,21 +608,26 @@ table(s, [
   ['逐写入失效', '100%', '79%', '69%', '52%', '50%'],
   ['整定义重查', '100%', '82%', '74%', '48%', '61%'],
   [strong('MAVRA', C.blue), strong('100%', C.green), strong('81%', C.green), strong('73%', C.green), '48%', '56%'],
-], { x: M, y: 1.25, w: W - 2 * M, colW: [2.9, 1.8, 1.9, 2.0, 1.6, 1.933], size: 14 });
+], { x: M, y: 1.15, w: W - 2 * M, colW: [2.9, 1.8, 1.9, 2.0, 1.6, 1.933], size: 12 });
 band(s, bulleted(null, C.blue, [
   '共享本身：数据未变时 49% → 100%，每题 5.6 → 3.6 轮，输入 token −34%（任何共享方法均获得）；216 个固定库会话中每任务 37.7 s，无共享 64.5 s',
   '维护：更新后 75% → 81%，破坏性更新下 59% → 73%；MAVRA 与整定义重查答案相同，差异来自各次运行学到的定义不同',
-  '对照与负结果：单位变化不违反任何条件，所有方法同样过期；备份副本下修复有歧义，MAVRA 使定义失效，检索示例碰巧答对',
-]), { y: 5.0, h: 1.7, size: 13 });
+  '代价与回本：建立记忆每轮 18.1 万 token、283 s（学习、抽取、准入）；之后每道留出题 1.09 万 token、8.5 s，独自探索 1.79 万 token、75.6 s'
+    + '——按时间 5 道题后回本，按 token 26 道题后回本',
+  '对照与负结果：单位变化不违反任何条件，所有方法同样过期；备份副本下修复有歧义，MAVRA 使定义失效，检索示例碰巧答对；'
+    + '定义失效且修不好时，使用者每题 9.36 万 token，比独自探索（2.69 万）更费，正确率 42% 对 24%——下一步把使用者找到的修正经准入共享',
+]), { y: 4.35, h: 2.4, size: 12 });
 footnote(s, '5 种破坏性更新：退货状态行、保留旧行的销售更正、重复加载、商品维度 SCD Type 2、日期键格式变更。'
-  + '来源：exp/2026-10-02-scenarios-ds、exp/2026-10-03-session-latency，与论文宏 \\Ds*、\\ScenHold*、\\Sl* 一致。');
+  + '来源：exp/2026-10-02-scenarios-ds、exp/2026-10-03-session-latency；代价与回本由 tools/sharing-stats.py 从同一批记录算出。与论文宏 \\Ds*、\\ScenHold*、\\Sl*、\\Am* 一致。');
 s.addNotes('端到端实验：DeepSeek V4.1 Flash 智能体，每种方法独立运行 3 次，15 道留出题，再加 11 种数据更新。'
   + '共享本身的收益：数据未变时准确率从 49% 到 100%，轮数和 token 都下降——任何共享方法都有这个收益，不是 MAVRA 独有。'
   + '维护的收益：更新后从 75% 到 81%，5 种破坏性更新下从 59% 到 73%；检索历史示例即使提示它自行验证也只有 63%。MAVRA 与整定义重查答案相同，差异来自各次运行学到的定义不同。'
+  + '代价：建立记忆每轮 18.1 万 token、283 秒；之后每道题使用者省 7 千 token、67 秒，按时间 5 道题、按 token 26 道题就回本，维护每次变化只做一次。'
   + '两个对照：单位变化不违反任何条件，所有方法同样过期，与命题的范围一致；备份副本下修复有歧义，MAVRA 按规则使定义失效，检索示例碰巧答对，这是如实保留的负结果。'
+  + '还有一个负结果：定义失效又修不好时，工作退回给使用者，它们每题花 9.36 万 token，比独自探索还多，因为通知告诉了它们哪里坏了、它们会自己去修，正确率更高但更费。下一步是把使用者找到的修正经准入共享，只付一次。'
   + '这些数字来自我们设定的实验，不是说在所有数据库和模型上都能达到。');
 
-// 13 Results: system level -------------------------------------------------------------------------
+// 14 Results: system level -------------------------------------------------------------------------
 s = content('实验结果②：系统层（无大模型，固定定义库，只改变维护方式）', '实验结果');
 table(s, [
   ['实验', '设置', '结果'],
@@ -648,7 +657,7 @@ s.addNotes('系统层实验不用大模型：固定各次运行学到的定义�
   + '修复的回归基准：按学习时刻比较，修复成功的数量与使用标准答案参照完全相同；按当前数据比较会误拒正确的修复。'
   + '维护成本：19 条定义时为整定义重查的 14%，因为很多定义依赖同一张表的同一个条件；但按表版本缓存验证查询也能得到同样的节省，所以效率不是本文的贡献，贡献在于什么可以发布、何时可以依赖、维护与改进由这一层替所有使用者承担。');
 
-// 14 Guarantees, limits, and the three sentences ---------------------------------------------------
+// 15 Guarantees, limits, and the three sentences ---------------------------------------------------
 pres.addSection({ title: '边界与总结' });
 s = content('MAVRA 的保证边界，以及三句话总结', '边界与总结');
 const bw = 7.2, bx2 = M + bw + 0.35, bw2 = W - M - bx2;
@@ -662,14 +671,14 @@ table(s, [
   ['SQL 没有在 run_sql 的 metrics 参数里声明依据的定义', bad('照常执行与审查，但不在条件保证范围内')],
 ], { x: M, y: 1.2, w: bw, colW: [3.5, bw - 3.5], size: 13 });
 [
-  ['问题', 'AI 学会的计算规则会因数据变化而不再正确，但 SQL 仍能正常执行。', C.red, C.grey],
-  ['方法', 'MAVRA 不仅保存规则，还保存规则成立的条件；使用时保证这些条件在实际执行的数据快照上仍然成立。', C.blue, C.paleBlue],
-  ['贡献', '条件被破坏后，只有找到唯一且通过回归测试的修复才发布新修订，否则让旧修订失效，防止错误知识继续传播。', C.violet, C.paleViolet],
+  ['问题', '智能体学到的数据库知识共享给别人后，会因数据变化悄悄失效，而 SQL 照常执行、不报错。', C.red, C.grey],
+  ['方法', '共享记忆层承担三项职责：只发布通过准入、带条件的知识；条件在查询快照上成立才允许依赖；数据变化后替所有使用者修复或失效，并发布更省的等价修订。', C.blue, C.paleBlue],
+  ['结果', '破坏性更新下答对 73%（检索示例 57%）；覆盖的更新 0 错答；并发写入下 0 次在被破坏的数据上作答；建立记忆按时间 5 道题后回本。', C.violet, C.paleViolet],
 ].forEach(([label, body, color, pale], k) => {
-  const y = 1.2 + k * 1.45;
-  s.addShape('roundRect', { x: bx2, y, w: bw2, h: 1.3, fill: { color: pale }, line: { color: pale }, rectRadius: 0.1 });
-  text(s, label, { x: bx2 + 0.25, y: y + 0.12, w: 1.0, h: 0.4, fontSize: 16, bold: true, color });
-  text(s, body, { x: bx2 + 0.25, y: y + 0.5, w: bw2 - 0.5, h: 0.75, fontSize: 13, valign: 'top' });
+  const y = 1.2 + k * 1.5;
+  s.addShape('roundRect', { x: bx2, y, w: bw2, h: 1.4, fill: { color: pale }, line: { color: pale }, rectRadius: 0.1 });
+  text(s, label, { x: bx2 + 0.25, y: y + 0.1, w: 1.0, h: 0.4, fontSize: 16, bold: true, color });
+  text(s, body, { x: bx2 + 0.25, y: y + 0.45, w: bw2 - 0.5, h: 0.9, fontSize: 12, valign: 'top' });
 });
 band(s, [
   { text: '两点要分清：', options: { bold: true, color: C.blue } },
@@ -678,6 +687,7 @@ band(s, [
 s.addNotes('MAVRA 是严谨的管理员，但不是无所不知。能做的：旧记录有唯一的当前标志，检测并修复；整批重复加载，检测但修不了，失效并通知；主表和备份都合理，不擅自选，交给人。'
   + '做不到的：金额换了单位、日期键指向错误日期，行数和键都没变，四类条件发现不了；智能体没声明用了哪个修订，也不在保证范围内。'
   + '两点要分清：MAVRA 不判断业务含义对不对，那需要有人给口径；它也不保证每条 SQL 都对，保护的是声明了受管修订的查询。'
-  + '最后三句话：问题——学会的规则会因数据变化而失效，SQL 却不报错；方法——保存规则成立的条件，使用时在实际执行的快照上保证成立；贡献——只有唯一且通过回归测试的修复才发布，否则失效，不让错误知识传播。');
+  + '最后三句话：问题——学到的知识共享出去后会因数据变化悄悄失效，SQL 却不报错；方法——共享记忆层替使用者把住发布、依赖、维护与改进三关；'
+  + '结果——破坏性更新下 73% 对 57%，覆盖的更新 0 错答，并发下 0 次误答，建立记忆很快回本。');
 
 pres.writeFile({ fileName: OUT }).then(() => console.log(OUT));

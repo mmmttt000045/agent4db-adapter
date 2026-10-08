@@ -3,10 +3,10 @@
 Top lane: the agent asks for "store revenue"; the service matches names and
 aliases, compares the data versions recorded at the last validation with the
 current ones, looks each validation rule up in the cache (reusing hits,
-validating and caching misses), and returns the valid definition v2. Middle:
+validating and caching misses), and returns the valid definition v3 (repaired after the restatement). Middle:
 the validation cache, keyed by (rule, data version) and shared by every
 definition and agent, with who wrote each entry and which step reused it.
-Bottom lane: the agent's SQL names v2; the service checks the version, validates
+Bottom lane: the agent's SQL names v3; the service checks the version, validates
 the rules on the query's own snapshot (a write has meanwhile moved store_sales
 to version 16), and runs the SQL on that snapshot. Values come from the
 end-to-end study (task M1-P1 under the restatement: 12,932,888.04). Drawn at slide size for the
@@ -35,7 +35,7 @@ LABELS = {
         's3': ('验证（先查缓存）', '每个条件：命中则复用，未命中则执行'),
         'rules': ('粒度键唯一', '日期键唯一', '日期键完整性'),
         'lookup_out': ('缓存命中：复用', '缓存命中：复用', '未命中：验证并缓存'),
-        's4': ('返回', '返回有效修订'), 'valid': '门店营业额 v2，有效',
+        's4': ('返回', '返回有效修订'), 'valid': '门店营业额 v3，有效',
         'fields': ('`store_sales`', '`SUM(ss_net_paid)`', "`ss_is_current='1'`"),
         'then': ('然后', '生成 SQL'),
         'cache_title': '验证结果缓存',
@@ -51,9 +51,9 @@ LABELS = {
         'sql_req': 'SQL 请求',
         'sql': ('SELECT SUM(ss_net_paid)', 'FROM store_sales', 'JOIN date_dim ON …',
                 "WHERE ss_is_current = '1'", 'AND d_moy = 9 AND …'),
-        'declares': 'metrics: 门店营业额 v2',
-        's5': ('检查修订', 'metrics 里声明的 v2 是否有效'),
-        'version_rows': ('v2 存在且未失效', 'v2 为当前修订', 'SQL 含所需过滤谓词', '若声明 v1：已被替代，拒绝'),
+        'declares': 'metrics: 门店营业额 v3',
+        's5': ('检查修订', 'metrics 里声明的 v3 是否有效'),
+        'version_rows': ('v3 存在且未失效', 'v3 为当前修订', 'SQL 含所需过滤谓词', '若声明 v2：已被替代，拒绝'),
         's6': ('快照内验证', '在查询快照上验证全部条件'),
         'snap': '快照中 `store_sales` 已是 16',
         'snap_out': ('未命中：快照内验证', '命中：复用', '未命中：快照内验证'),
@@ -70,7 +70,7 @@ LABELS = {
         's3': ('Validate (cache first)', 'look up each rule; validate misses'),
         'rules': ('one row/sale', 'date key unique', 'loss in bound'),
         'lookup_out': ('cache hit: reuse', 'cache hit: reuse', 'miss: check, cache'),
-        's4': ('Return', 'only if valid'), 'valid': 'revenue v2, valid',
+        's4': ('Return', 'only if valid'), 'valid': 'revenue v3, valid',
         'fields': ('`store_sales`', '`SUM(ss_net_paid)`', "`ss_is_current='1'`"),
         'then': ('then', 'writes SQL'),
         'cache_title': 'Validation cache',
@@ -88,10 +88,10 @@ LABELS = {
         'sql_req': 'SQL request',
         'sql': ('SELECT SUM(ss_net_paid)', 'FROM store_sales', 'JOIN date_dim ON …',
                 "WHERE ss_is_current = '1'", 'AND d_moy = 9 AND …'),
-        'declares': 'declares revenue v2',
-        's5': ('Check version', 'is the named v2 usable?'),
-        'version_rows': ('v2 exists, not retired', 'v2 is the latest', 'SQL keeps the filter',
-                         'naming v1: rejected'),
+        'declares': 'declares revenue v3',
+        's5': ('Check version', 'is the named v3 usable?'),
+        'version_rows': ('v3 exists, not retired', 'v3 is the latest', 'SQL keeps the filter',
+                         'naming v2: rejected'),
         's6': ('Snapshot check', 'do the rules hold on this snapshot?'),
         'snap': 'snapshot sees `store_sales` 16',
         'snap_out': ('miss: check here', 'hit: reuse', 'miss: check here'),

@@ -218,7 +218,10 @@ const LEARN_SCHEMA: &str = "mavra_learn";
 /// 准入前把 public 模式的全部基表原样复制到 `LEARN_SCHEMA`，返回复制的表数。
 async fn copy_learning_snapshot(db: &Db) -> Result<usize> {
     let tables = db
-        .query(QKind::Meta, "select table_name from information_schema.tables where table_schema = 'public' and table_type = 'BASE TABLE' order by 1")
+        .query(
+            QKind::Meta,
+            "select table_name from information_schema.tables where table_schema = 'public' and table_type = 'BASE TABLE' order by 1",
+        )
         .await?;
     db.execute(&format!("drop schema if exists {LEARN_SCHEMA} cascade; create schema {LEARN_SCHEMA}")).await?;
     let mut n = 0;
@@ -230,11 +233,8 @@ async fn copy_learning_snapshot(db: &Db) -> Result<usize> {
 }
 
 fn config(policy: &str, oracle: &str) -> MiddleConfig {
-    let base = MiddleConfig {
-        name: policy.into(),
-        g8_snapshot: (oracle == "snapshot").then(|| LEARN_SCHEMA.to_string()),
-        ..Default::default()
-    };
+    let base =
+        MiddleConfig { name: policy.into(), g8_snapshot: (oracle == "snapshot").then(|| LEARN_SCHEMA.to_string()), ..Default::default() };
     match policy {
         "condition" => MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, ..base },
         "definition" => MiddleConfig { metric_maint: Maint::Definition, ..base },

@@ -463,11 +463,9 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         // 条件级维护，但修复回归以提炼出的示例 SQL 为参照（部署中真正可得的参照），而不是基准的判题 SQL
         "metric-global-exref" => (MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, ..base }, true, true),
         // 同上，但 G8 在学习时快照上比较：快照是单独建的、与 v1 内容相同的库，智能体的连接看不到它
-        "metric-global-snap" => (
-            MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, g8_snapshot_db: true, ..base },
-            true,
-            true,
-        ),
+        "metric-global-snap" => {
+            (MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, g8_snapshot_db: true, ..base }, true, true)
+        }
         // 匹配的轨迹检索基线：同样的中间层工具与学习题，学习成功的轨迹原样保存、按题面检索，不提炼、不维护；
         // traj-verify 只多一句提示：复用前先在当前数据上核对 SQL 依赖的前提
         "traj-global" | "traj-verify" => (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false),

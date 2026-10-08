@@ -1,5 +1,5 @@
-// Builds docs/mavra-system.pptx, a 14-slide Chinese deck that tells MAVRA as one story:
-// a shared rule breaks when the data changes (toy ledger, then the real record); the three
+// Builds docs/mavra-system.pptx, a 15-slide Chinese deck that tells MAVRA as one story:
+// how it differs from Text-to-SQL; a shared rule breaks when the data changes (toy ledger, then the real record); the three
 // things MAVRA does (what to check, when, what if it fails); where it sits; how a rule is
 // admitted; the four conditions; table versions, lazy maintenance and the same-snapshot
 // contract; repair with the uniqueness rule and the as-of regression test; the restatement
@@ -139,8 +139,54 @@ s.addNotes('很多数据智能体在同一个数据库上工作。一个智能�
   + 'MAVRA 是放在智能体与数据库之间的中间件：保存智能体学到的规则，记住规则成立的条件，在规则被使用时保证条件在实际执行的数据上仍然成立，条件被破坏时修复或禁用。'
   + '顺序：问题 → MAVRA 做的三件事 → 放在哪里 → 规则怎样存进去 → 检查什么 → 何时检查 → 失败后怎么办 → 一个完整的真实例子 → 实验 → 边界。');
 
-// 2 The problem, on a toy ledger and then the real record ------------------------------------
+// 2 Text-to-SQL vs MAVRA ----------------------------------------------------------------------
 pres.addSection({ title: '问题' });
+s = content('Text-to-SQL 与 MAVRA：不同层次的问题', '问题');
+const half = (W - 2 * M - 0.4) / 2;
+[
+  { x: M, tag: 'Text-to-SQL', head: '将自然语言问题翻译为 SQL 查询', color: C.muted, pale: C.grey, rows: [
+    ['输入', '自然语言问题 + 数据库模式（可附示例查询）'],
+    ['输出', '一条 SQL 查询'],
+    ['状态', '无状态：每个问题独立处理，不保留结果'],
+    ['关注', '单条查询的正确性'],
+  ] },
+  { x: M + half + 0.4, tag: 'MAVRA', head: '智能体与数据库之间的记忆中间件', color: C.blue, pale: C.paleBlue, rows: [
+    ['位置', '智能体对数据库的全部访问经由它转发'],
+    ['记忆', '智能体获得的数据库知识：表统计、连接路径、指标定义'],
+    ['共享', '跨智能体、跨会话共享'],
+    ['关注', '已有知识在当前数据上的有效性'],
+  ] },
+].forEach(({ x, tag, head, color, pale, rows }) => {
+  s.addShape('roundRect', { x, y: 1.15, w: half, h: 2.55, fill: { color: pale }, line: { color: pale },
+    rectRadius: 0.12, objectName: `card ${tag}` });
+  text(s, tag, { x: x + 0.35, y: 1.28, w: half - 0.7, h: 0.35, fontSize: 15, bold: true, color });
+  text(s, head, { x: x + 0.35, y: 1.62, w: half - 0.7, h: 0.5, fontSize: 20, bold: true, color: C.ink });
+  rows.forEach(([k, v], i) => {
+    const y = 2.2 + i * 0.38;
+    text(s, k, { x: x + 0.35, y, w: 0.75, h: 0.36, fontSize: 14, bold: true, color, valign: 'middle' });
+    text(s, v, { x: x + 1.1, y, w: half - 1.45, h: 0.36, fontSize: 14, valign: 'middle' });
+  });
+});
+heading(s, '实验记录：同一问题“9 月的门店营业额是多少？”（只给名称）三次独立求解', M, 3.8, W - 2 * M);
+table(s, [
+  ['', '所选度量列', '答案', '轮数'],
+  ['无共享定义 · 第 1、2 次', 'ss_ext_sales_price（扩展销售额，折扣前）', bad('1413.8 万 ✗'), '5'],
+  ['无共享定义 · 第 3 次', 'ss_net_paid（净支付额）', good('1307.0 万 ✓'), '5'],
+  [strong('有 MAVRA · 3 次结果一致', C.blue), 'ss_net_paid（检索到共享的指标定义）', good('1307.0 万 ✓'), '3'],
+], { x: M, y: 4.15, w: W - 2 * M, colW: [3.0, 6.0, 2.0, 1.133], size: 12 });
+band(s, [
+  { text: '两者处于不同层次：', options: { bold: true, color: C.blue } },
+  { text: '任何 Text-to-SQL 模型或数据智能体都可以作为用户智能体接入 MAVRA。MAVRA 不生成 SQL；它提供经过验证的知识，并在查询执行前验证其有效性。', options: { breakLine: true } },
+  { text: '业务口径不在模式中：', options: { bold: true, color: C.blue } },
+  { text: 'Text-to-SQL 每次重新推断选哪一列，同一问题的答案不稳定；共享已验证的定义后，答案一致且轮数更少。' },
+], { y: 5.8, h: 0.95, fill: C.paleAmber, size: 12 });
+footnote(s, '记录：noctis results/scen-20261002，留出任务 M1-P1；无共享定义：dsv41flash-r1-a、r2-b、r3-a；MAVRA：r1–r3-g3fix--snap。' + DATA);
+s.addNotes('先说清楚这不是一个 Text-to-SQL 工作。Text-to-SQL 研究的是翻译：给定自然语言问题和数据库模式，生成一条 SQL，评价这条 SQL 对不对；它是无状态的，每个问题独立处理，不保留任何结果。'
+  + 'MAVRA 不生成 SQL。它位于智能体与数据库之间，智能体对数据库的访问都经由它转发；它关注的是智能体在探索中获得的知识——营业额对应哪一列、两张表怎么连——如何持久化、如何共享、数据更新后是否仍然有效。'
+  + '下面是实验记录：题目只给“门店营业额”这个名称，无共享定义的智能体三次独立求解，两次选了折扣前的扩展销售额，错；一次选了净支付额，对。选哪一列是业务口径，模式里没有，Text-to-SQL 每次重新猜，答案不稳定。接入 MAVRA 后检索到共享的定义，三次都对，3 轮完成。'
+  + '所以两者处于不同层次：任何 Text-to-SQL 模型都可以作为用户智能体接在 MAVRA 上面。');
+
+// 3 The problem, on a toy ledger and then the real record ------------------------------------
 s = content('问题：共享的计算规则会因数据变化而失效，而 SQL 不报错', '问题');
 const colL = 5.9, colR = W - 2 * M - colL - 0.35, xR = M + colL + 0.35;
 heading(s, '第一天（示意）：规则“营业额 = 每笔销售金额之和”成立', M, 1.1, colL);

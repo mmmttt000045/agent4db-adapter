@@ -221,6 +221,90 @@ async fn postgres_metric_join_orientation() -> Result<()> {
     Ok(())
 }
 
+/// 优化修订：对已发布的门店营业额尝试规则改写（期间谓词改为日期键范围），记录各门槛与配对代价证据；
+/// 发布后新修订的示例 SQL 不再连接日期维度，声明旧修订的查询宽限可用并收到通知。
+async fn optimization_revision(url: &str) -> Result<Value> {
+    let admin = Db::connect(url, 2, false)?;
+    let rows = std::env::var("AGENTDB_SCENARIO_ROWS").ok().and_then(|v| v.parse().ok()).unwrap_or(20_000);
+    admin.query(QKind::Meta, &metricbench::fixture(rows)).await?;
+    etl::setup(&admin).await?;
+    scenario::setup(&admin).await?;
+    let db = Arc::new(Db::connect(url, 4, true)?);
+    let cfg = MiddleConfig {
+        name: "optimize".into(),
+        version_ttl_ms: 0,
+        metric_maint: Maint::Condition,
+        cond_reuse: true,
+        optimize: true,
+        ..Default::default()
+    };
+    let mid = Middle::new(db, cfg).await?;
+    let seed = Ctx::new("A", "seed", "seed");
+    let learn = Period::month(2001, 3);
+    let (id, m) = seeded_metrics().into_iter().find(|(id, _)| *id == "M1").context("没有 M1")?;
+    let v = mid.seed_metric(&seed, m, Ask::Single { period: learn }, 2, &metricbench::gold_period(id, &learn)).await?;
+    ensure!(v["promoted"] == true, "M1 未晋升：{v}");
+    let key = "metric:门店营业额";
+    let user = Ctx::new("B", "use", "use");
+    let before = mid.use_metric(&user, key).await?;
+    ensure!(before["status"] == "valid" && before["revision"] == 0, "{before}");
+    let octx = Ctx::new("O", "optimize", "optimize");
+    let rounds = mid.optimize_sweep(&octx, None, 1).await?;
+    let round = rounds.iter().find(|r| r["key"] == key).context("没有 M1 的优化轮")?;
+    let tried = round["tried"].as_array().context("tried")?;
+    let first = tried.first().context("没有候选")?;
+    ensure!(first["candidate"].as_str().unwrap_or("").contains("日期键范围"), "{first}");
+    let gates = first["gates"].as_array().context("gates")?;
+    for g in ["O1", "G3", "G4", "O2", "O3", "G5", "O5"] {
+        ensure!(gates.iter().any(|x| x["gate"] == g && x["pass"] == true), "门槛 {g} 未通过：{first}");
+    }
+    let o6 = gates.iter().find(|x| x["gate"] == "O6").context("没有 O6")?.clone();
+    let promoted = first["event"] == "optimize_promoted";
+    let after = mid.use_metric(&user, key).await?;
+    let mut grace = Value::Null;
+    if promoted {
+        ensure!(after["revision"] == 1, "{after}");
+        let sql = after["metric"]["examples"][0]["sql"].as_str().context("示例 SQL")?.to_string();
+        ensure!(!sql.contains("join date_dim"), "新修订的示例 SQL 仍连接 date_dim：{sql}");
+        let r = mid.run_sql_with(&user, "select 1 as value", &[(key.to_string(), 0)]).await?;
+        ensure!(r.get("rejected").is_none(), "旧修订应宽限可用：{r}");
+        let notices = mid.take_notices("B");
+        ensure!(notices.iter().any(|n| n.contains("等价且更省")), "缺少通知：{notices:?}");
+        grace = json!({"old_revision_accepted": true, "notices": notices});
+    } else {
+        ensure!(after["revision"] == 0, "{after}");
+    }
+    Ok(json!({"rows": rows, "promoted": promoted, "candidate": first["candidate"], "o6": o6, "cost": first["cost"],
+              "revision_after": after["revision"], "grace": grace, "stats": mid.stats_json()}))
+}
+
+#[tokio::test]
+#[ignore = "requires AGENTDB_TEST_URL and PostgreSQL 15+ with CREATE DATABASE permission"]
+async fn postgres_optimization_revision() -> Result<()> {
+    let _ = dotenvy::dotenv();
+    let url = std::env::var("AGENTDB_TEST_URL").context("设置 AGENTDB_TEST_URL 为测试服务器连接串")?;
+    let admin = Db::connect(&url, 1, false)?;
+    let unique = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
+    let name = format!("agentdb_optimize_{}_{unique}", std::process::id());
+    let mut test_url = reqwest::Url::parse(&url)?;
+    test_url.set_path(&format!("/{name}"));
+    admin.query(QKind::Meta, &format!("create database {name}")).await?;
+    let result = tokio::time::timeout(Duration::from_secs(900), optimization_revision(test_url.as_str())).await;
+    let cleanup = admin.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
+    let report = match &result {
+        Ok(Ok(v)) => v.clone(),
+        Ok(Err(e)) => json!({"status": "failed", "error": format!("{e:#}")}),
+        Err(_) => json!({"status": "failed", "error": "优化修订测试超时"}),
+    };
+    let out = format!("results/optimize-test-{unique}");
+    std::fs::create_dir_all(&out)?;
+    std::fs::write(format!("{out}/report.json"), serde_json::to_string_pretty(&report)?)?;
+    println!("优化修订测试报告：{out}/report.json；测试库清理：{}", cleanup.is_ok());
+    cleanup.context("测试库清理失败")?;
+    result.context("优化修订测试超时")??;
+    Ok(())
+}
+
 // ───────────────────────── 数据变化场景：不调用 LLM 的维护预期 ─────────────────────────
 
 fn seeded_metrics() -> Vec<(&'static str, Metric)> {

@@ -547,6 +547,7 @@ pub fn same_structure(a: &Metric, b: &Metric) -> bool {
 /// 优化候选：在结构化定义上做保持语义的改写，由中间层逐一验证等价与代价后决定是否发布。
 /// - 期间谓词改为日期键范围过滤（不连接日期维度；前提“日期键按月连续”成为新修订的条件）；
 /// - 去掉口径里没有用到其任何列、也不带过滤的关联（左关联，或经验证不丢行的内关联）。
+///
 /// 可叠加时先给出叠加后的候选，再给出各单项。
 pub fn rewrite_candidates(m: &Metric, cat: &Catalog) -> Vec<(String, Metric)> {
     let mut singles: Vec<(String, Metric)> = vec![];
@@ -715,8 +716,11 @@ pub struct Proposals {
     pub errors: Vec<String>,
 }
 
+/// 解析出的优化候选（说明, 口径）与被跳过单项的原因。
+pub type Proposed = (Vec<(String, Metric)>, Vec<String>);
+
 /// 解析优化器输出：一个 JSON 数组，每项是口径字段加 rationale。解析不了的单项跳过并记录。
-pub fn parse_proposals(text: &str) -> std::result::Result<(Vec<(String, Metric)>, Vec<String>), String> {
+pub fn parse_proposals(text: &str) -> std::result::Result<Proposed, String> {
     let (Some(a), Some(b)) = (text.find('['), text.rfind(']')) else { return Err("输出中没有 JSON 数组".into()) };
     if b < a {
         return Err("输出中没有 JSON 数组".into());
@@ -813,6 +817,7 @@ mod tests {
         let mut unused = rate();
         unused.measure = "sum(ss_net_paid)".into();
         unused.filters.clear();
+        unused.joins[0].filters.clear();
         unused.joins[0].kind = JoinKind::Left;
         let c = rewrite_candidates(&unused, &cat());
         assert_eq!(c.len(), 3, "{:?}", c.iter().map(|x| &x.0).collect::<Vec<_>>());

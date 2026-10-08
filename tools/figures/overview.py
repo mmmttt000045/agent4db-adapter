@@ -26,7 +26,7 @@ W, H = 300.0, 139.5
 LABELS = {
     'zh': {
         'agents': '用户智能体', 'question': ('9 月门店', '营业额？'), 'sql': 'SQL',
-        'declares': '声明：营业额 v2', 'middleware': 'MAVRA 中间件',
+        'declares': 'metrics: 营业额 v2', 'middleware': 'MAVRA 中间件',
         'paths': ('学习', '查询指标定义', '执行 SQL'), 'lines': ('调用 / 返回', '写入记忆', '读数据库'),
         'service': '查询服务', 'lookup': ('检索指标定义', '名称匹配；比较表版本'),
         'check': ('执行前验证', '同一快照内验证并执行'),
@@ -45,7 +45,7 @@ LABELS = {
     },
     'en': {
         'agents': 'User agents', 'question': ('Store revenue', 'in September?'), 'sql': 'SQL',
-        'declares': 'declares v2', 'middleware': 'MAVRA middleware',
+        'declares': 'metrics: revenue v2', 'middleware': 'MAVRA middleware',
         'paths': ('learning', 'find definition', 'run SQL'),
         'lines': ('call / response', 'write to memory', 'read database'),
         'service': 'Query service', 'lookup': ('Find definition', 'match name, check data'),

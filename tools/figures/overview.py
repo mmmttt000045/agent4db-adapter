@@ -5,6 +5,8 @@ reads its definition from the shared memory; a validation result missing for the
 current data version is computed by maintenance and cached; a valid definition
 (v2) goes back. The agent then sends SQL that names v2; the pre-execution check
 reuses cached validation results on the query's snapshot and runs the SQL there.
+Maintenance queries the database and writes validation results to the cache and
+new revisions or invalidations to the definitions.
 The built-in agent (an LLM) learns definitions and publishes them after
 validation. Drawn at slide size (300 mm, 12-15 pt) for the report deck, with
 everyday terms rather than the paper's notation.
@@ -33,13 +35,13 @@ LABELS = {
         'store': '共享记忆', 'store_note': '另有表统计信息、连接路径', 'defs': '指标定义',
         'def_chips': (('营业额 v2', '待验证'), ('电子品类 v2', '有效'), ('退货率 v2', '有效')),
         'cache': '验证结果缓存', 'cache_note': '按（条件，表版本）缓存，跨定义共享',
-        'cache_chips': (('粒度键唯一', '表版本 v15', 'ok'), ('日期键唯一', '表版本 v3', 'ok'),
-                        ('日期键完整性', '表版本 v15', 'wait')),
+        'cache_chips': (('粒度键唯一', '表版本 v15', 'ok'), ('日期键完整性', '表版本 v15', 'wait'),
+                        ('日期键唯一', '表版本 v3', 'ok')),
         'agent': ('内置 agent（大模型）', '学习指标定义，提出优化写法'),
         'maint': ('维护', '执行验证 · 修复、优化或失效'),
         'req_text': '检索“营业额”', 'resp_text': '有效修订 v2', 'req_sql': '执行 SQL', 'resp_sql': '查询结果',
         'read': '读定义', 'reuse': ('复用', '验证结果'), 'missing': '未命中：执行验证',
-        'store_result': '写入结果', 'publish': '准入检查后发布',
+        'store_result': '写入结果', 'revise': '新修订或失效', 'publish': '准入检查后发布',
         'run': '在快照上执行 SQL', 'qc': '验证查询、表版本',
         'db': '数据库', 'snapshot': '快照', 'etl': 'ETL / 写入方', 'write': '写入',
     },
@@ -53,13 +55,13 @@ LABELS = {
         'store': 'Shared memory', 'store_note': 'also table profiles, join paths', 'defs': 'Definitions',
         'def_chips': (('revenue v2', 'pending'), ('electr. v2', 'valid'), ('rate v2', 'valid')),
         'cache': 'Validation cache', 'cache_note': 'per (rule, data version), shared',
-        'cache_chips': (('one row/sale', 'version v15', 'ok'), ('date key unique', 'version v3', 'ok'),
-                        ('loss in bound', 'version v15', 'wait')),
+        'cache_chips': (('one row/sale', 'version v15', 'ok'), ('loss in bound', 'version v15', 'wait'),
+                        ('date key unique', 'version v3', 'ok')),
         'agent': ('Built-in agent (LLM)', 'learns definitions, proposes rewrites'),
         'maint': ('Maintenance', 'checks · repair, optimize, retire'),
         'req_text': 'ask “revenue”', 'resp_text': 'valid v2', 'req_sql': 'run SQL', 'resp_sql': 'result',
         'read': 'read', 'reuse': ('reuse', 'results'), 'missing': 'missing: run check',
-        'store_result': 'store', 'publish': 'admit, publish',
+        'store_result': 'store', 'revise': 'new revision or retire', 'publish': 'admit, publish',
         'run': 'run SQL on the snapshot', 'qc': 'check SQL, data versions',
         'db': 'Database', 'snapshot': 'snapshot', 'etl': 'ETL / writers', 'write': 'write',
     },
@@ -72,9 +74,9 @@ LOOKUP = (89.0, 40.0, 58.0, 16.0)
 CHECK = (89.0, 60.0, 58.0, 17.0)
 OPT = (200.0, 4.0, 97.0, 18.0)                   # built-in agent, above the store
 PB = (176.0, 30.0, 121.0, 49.0)                  # metric store
-DEFS = (179.0, 40.0, 115.0, 15.5)
-CACHE = (179.0, 58.0, 115.0, 20.0)
-MAINT = (218.0, 89.0, 79.0, 16.0)                # maintenance, below the store
+DEFS = (179.0, 40.0, 107.0, 15.5)                # leaves a channel on the right for maintenance
+CACHE = (179.0, 58.0, 107.0, 20.0)
+MAINT = (210.0, 89.0, 87.0, 16.0)                # maintenance, below the store
 DB = (50.0, 116.5, 246.0, 19.0)
 SNAP = (89.0, 57.0)                              # (x, w) of the snapshot region, under the check
 VERS = (179.0, 52.0)                             # data versions, under the store
@@ -152,7 +154,7 @@ def draw(s, lang):
     x, y, w, h = DEFS
     box(s, DEFS)
     text(x + 3.0, baseline(y + h / 2, NOTE), L['defs'], NOTE, INK, 'bold')
-    cw2 = 29.0
+    cw2 = 27.0
     for k, ((name, state), col, pale) in enumerate(zip(
             L['def_chips'], (AMBER, ACC_DK, ACC_DK), (AMBER_PALE, ACC_PALE, ACC_PALE))):
         xx = x + w - 2.0 - (3 - k) * cw2 - (2 - k) * 2.0
@@ -164,7 +166,7 @@ def draw(s, lang):
     box(s, CACHE)
     tw = text(x + 3.0, y + 5.4, L['cache'], NOTE, INK, 'bold')
     text(x + 5.5 + tw, y + 5.4, L['cache_note'], NOTE, MUTED, width=w - 8.5 - tw)
-    chip_w = 36.5
+    chip_w = (w - 6.0) / 3
     for k, (rule, version, kind) in enumerate(L['cache_chips']):
         xx = x + 1.5 + k * (chip_w + 1.5)
         missing = kind == 'wait'
@@ -190,7 +192,8 @@ def draw(s, lang):
     text(gm, yc - 7.2, r1, NOTE, EXEC, align='center')
     text(gm, yc - 2.0, r2, NOTE, EXEC, align='center', width=gb - ga + 4)
     step(s, gm, yc + 4.2, 7, EXEC)
-    xm0 = CACHE[0] + 1.5 + 2 * (chip_w + 1.5)       # the missing entry
+    km = next(k for k, c in enumerate(L['cache_chips']) if c[2] == 'wait')
+    xm0 = CACHE[0] + 1.5 + km * (chip_w + 1.5)      # the missing entry
     xd, xu = xm0 + 3.5, xm0 + chip_w - 3.0
     yb, yt = CACHE[1] + 18.5, MAINT[1]
     route([(xd, yb), (xd, yt)], USE, THIN, length=HEAD)
@@ -201,8 +204,12 @@ def draw(s, lang):
     w4 = text(xu - 2.0, baseline(ym, NOTE), L['store_result'], NOTE, USE, align='right',
               width=xu - xd - 9.0)
     step(s, xu - 2.0 - w4 - 4.0, ym, 4, USE)
+    # Maintenance also writes the definitions: a repaired or cheaper revision, or an invalidation.
+    xn = (DEFS[0] + DEFS[2] + PB[0] + PB[2]) / 2
+    route([(xn, yt), (xn, yr), (DEFS[0] + DEFS[2], yr)], INK, THICK, length=HEAD)
+    text(xn - 2.0, baseline(ym, NOTE), L['revise'], NOTE, INK, align='right', width=xn - xu - 6.0)
     # Learning: the built-in agent publishes into the definitions.
-    xp = OPT[0] + OPT[2] - 10.0
+    xp = DEFS[0] + DEFS[2] - 10.0
     route([(xp, OPT[1] + OPT[3]), (xp, DEFS[1])], LEARN, THICK, length=HEAD)
     text(xp - 2.0, 28.6, L['publish'], NOTE, LEARN, align='right')
 
@@ -235,8 +242,8 @@ def draw(s, lang):
     xq = CHECK[0] + CHECK[2] / 2
     route([(xq, CHECK[1] + CHECK[3]), (xq, py - 3.2)], EXEC, THIN, length=HEAD)
     text(xq + 2.4, 97.0, L['run'], NOTE, EXEC)
-    xr = MAINT[0] + 22.0
-    route([(xr, py - 3.2), (xr, MAINT[1] + MAINT[3])], SLATE, THIN, dash=DASH, length=HEAD)
+    xr = TABLES[0] + 3.0
+    route([(xr, MAINT[1] + MAINT[3]), (xr, py - 3.2)], SLATE, THIN, dash=DASH, length=HEAD)
     text(xr + 2.4, baseline((MAINT[1] + MAINT[3] + py - 3.2) / 2, NOTE), L['qc'], NOTE, SLATE)
 
     # Writers ---------------------------------------------------------------------------

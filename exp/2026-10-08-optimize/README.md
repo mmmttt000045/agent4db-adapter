@@ -27,4 +27,9 @@
 
 - 命令（noctis，2026-10-08）：`agentdb-mid --pool 8 --out results/scen-20261008-opt metric-bench --agent cline --extractor cline --modes metric-global-opt --metrics M1,M2,M3,M4,M5 --phrasings named --changes append,backfill,correct,addcol,status,revision,dupload,dimhist,latekey,unit,mirror --repeats 1 --rows 1000000 --sql-timeout-secs 120`，日志 `results/scen-20261008-opt/r1.log`。
 - 看什么：`optimizing.rounds`（每条定义的候选、门槛与代价证据、是否发布）、`events.optimize`、留出与各变化阶段的正确率（应与 `-snap` 相同；`latekey` 下日期键范围修订与维度连接同样因覆盖条件失效）、用户智能体 SQL 的 `explain.exec_ms`（是否采用了新修订的示例写法）。
-- 结果：待补。
+- 结果（`results/scen-20261008-opt/metric-1791439498065570/`，本目录 `opt-stats.md`、`report.md`；对照 `dsv41flash-r1-g3fix--snap`）：
+  - 优化轮 474 秒：9 条已发布定义（5 个指标各两条结构不同的定义，退货金额 `#2` 之外都有）全部由规则候选“期间谓词改为日期键范围过滤，不连接 date_dim”发布为 r1；每条 14 个配对期间，学习时快照与当前快照结果全部一致。
+  - 执行时间（EXPLAIN ANALYZE，当前 → 候选，配对差 95% 区间）：门店营业额 29.1 → 23.3 ms（−19.8%，[−9.1, −2.5]）；电子品类 29.4 → 24.8（−15.6%）；目录渠道 14.8 → 12.1（−18.4%）；退货金额 14.6 → 10.7（−26.7%）；退货率 173.1 → 110.5（−36.1%，[−74.4, −50.6]；读块反而从 146 万增到 167 万，采纳只看执行时间）。9 条定义省 15.6%–36.1%。
+  - 模型提议：每条定义调用一次（27–75 秒，各得 1 个候选），但规则候选已发布，本轮未评估——已改为规则候选都没发布时才请模型（提交 7648784）。
+  - 之后的留出与 11 种更新：78/96 答对，对照 77/96；逐阶段差异（mirror 5/6 对 3/6、dupload 5/9 对 6/9、latekey 1/9 对 2/9）在运行间波动范围内。`latekey` 下日期键范围修订与维度连接一样因覆盖条件失效（关联不上 date_dim 的行占比 1.03% → 3.64%），`dimhist` 下电子品类的连接路径修复照常进行。
+  - 留出题 15 条用户智能体查询中 9 条采用了新修订示例里的日期键范围写法（按月排名题还自己写出了按月 min/max 的变体）；智能体 SQL 的 EXPLAIN 均值 122 ms 对 100 ms 不是受控比较（两次运行写的 SQL 不同，含排名题的大查询），受控比较是优化轮的配对测量。

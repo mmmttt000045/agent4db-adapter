@@ -1,0 +1,16 @@
+生成合成零售数据：门店销售 1000000 行，目录销售 500000 行
+学习时快照库 agentdb_metric_32989_1791449167012862_learn 已建，内容与 v1 一致
+== r1-metric-global-opt-named
+  r1-metric-global-opt-named learn    A M1-L1  correct  轮  5 工具  7 拦下 0 | 答 13570368.70 / 标准 13570368.70
+  提炼 M1-L1 → promoted 
+  r1-metric-global-opt-named learn    A M1-L2  correct  轮  4 工具  5 拦下 0 | 答 13085788.40 / 标准 13085788.40
+  提炼 M1-L2 → promoted 
+  优化修订：2 条定义中 2 条发布了新修订（4.3 秒）
+  r1-metric-global-opt-named holdout  B M1-P1  correct  轮  4 工具  6 拦下 0 | 答 13069651.80 / 标准 13069651.80
+  r1-metric-global-opt-named holdout  B M1-T1  correct  轮  4 工具  7 拦下 0 | 答 -12007.70 / 标准 -12007.70
+  r1-metric-global-opt-named holdout  B M1-T2  correct  轮  4 工具  5 拦下 0 | 答 12 / 标准 12
+  场景 revision（版本化更正，粒度）：写入 65915 + 0 行
+  r1-metric-global-opt-named revision B M1-P1  correct  轮  6 工具  9 拦下 2 | 答 12932888.04 / 标准 12932888.04
+  r1-metric-global-opt-named revision B M1-T1  correct  轮  3 工具  4 拦下 0 | 答 -9803.47 / 标准 -9803.47
+  r1-metric-global-opt-named revision B M1-T2  correct  轮  3 工具  4 拦下 0 | 答 12 / 标准 12
+指标经验评测报告：results/scen-20261008-trace/metric-1791449167012862/report.md

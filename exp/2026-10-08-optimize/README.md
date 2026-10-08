@@ -33,3 +33,10 @@
   - 模型提议：每条定义调用一次（27–75 秒，各得 1 个候选），但规则候选已发布，本轮未评估——已改为规则候选都没发布时才请模型（提交 7648784）。
   - 之后的留出与 11 种更新：78/96 答对，对照 77/96；逐阶段差异（mirror 5/6 对 3/6、dupload 5/9 对 6/9、latekey 1/9 对 2/9）在运行间波动范围内。`latekey` 下日期键范围修订与维度连接一样因覆盖条件失效（关联不上 date_dim 的行占比 1.03% → 3.64%），`dimhist` 下电子品类的连接路径修复照常进行。
   - 留出题 15 条用户智能体查询中 9 条采用了新修订示例里的日期键范围写法（按月排名题还自己写出了按月 min/max 的变体）；智能体 SQL 的 EXPLAIN 均值 122 ms 对 100 ms 不是受控比较（两次运行写的 SQL 不同，含排名题的大查询），受控比较是优化轮的配对测量。
+
+## 带 --trace 的小规模运行（PPT 第 7、8、15 页的调用序列）
+
+- 命令：`agentdb-mid --pool 8 --out results/scen-20261008-trace metric-bench --agent cline --extractor cline --modes metric-global-opt --metrics M1 --phrasings named --changes revision --repeats 1 --rows 1000000 --sql-timeout-secs 120 --trace`（`--trace` 为本次新增：每个 cell 写 `trace-<cell>.jsonl`，逐次记录工具名、参数、结果摘要与耗时）。本目录 `trace/` 有 trace、`trace-calls.md`（`tools/trace-stats.py` 的逐任务调用序列）、`opt-stats.md`、`run.log`。
+- 学习 M1-L1：5 轮 7 次调用（list_tables + find_metric 空 → describe_table ×2 → join_path → run_sql r1 → final_answer）；抽取 12.7 秒，准入检查 5.6 秒，发布 r0。优化轮：两条定义都改为日期键范围（39.7 → 33.3 ms，−16.1%，95% 区间 [−12.2, −0.5]；#2 −16.8%），4.3 秒（规则候选先发布，未调用模型）。
+- 留出 M1-P1：4 轮 6 次调用，find_metric 返回两条 r1（示例已是日期键范围写法），B 照样写出范围写法并在 run_sql 的 metrics 里声明 revision 1，答对。
+- 数据更正后 M1-P1：find_metric 这一次调用里完成了两条定义的维护与修复（r1 失效 → 唯一谓词 ss_is_current = '1' → 回归通过 → r2；31.6 秒与 22.9 秒，共 54.5 秒）并附两条通知；B 之后两条无过滤的探查被执行前审查拦下（required_filter），加过滤后通过，最终答案 12,932,888.04 正确。这一条 run_sql 没有声明 metrics；同阶段 M1-T1 声明了 revision 2。

@@ -789,6 +789,37 @@ mod tests {
     use crate::catalog::{Column, Table};
     use crate::knowledge::JoinRef;
 
+    #[test]
+    fn compile_key_range_filters_by_date_key_bounds_without_joining_the_dimension() {
+        let mut m = rate();
+        m.time.as_mut().unwrap().strategy = TimeStrategy::KeyRange;
+        let sql = compile(&m, &Ask::Single { period: Period::month(2001, 3) }).unwrap();
+        let bounds = "ss_sold_date_sk between (select min(d_date_sk) from date_dim where d_year = 2001 and d_moy between 3 and 3) \
+                      and (select max(d_date_sk) from date_dim where d_year = 2001 and d_moy between 3 and 3)";
+        assert!(sql.contains(bounds), "{sql}");
+        assert!(!sql.contains("join date_dim"), "{sql}");
+        let rank = compile(&m, &Ask::RankMonth { year: 2001 }).unwrap();
+        assert!(rank.contains("join date_dim"), "按月排名仍需维度列：{rank}");
+        assert!(!same_structure(&rate(), &m), "期间谓词的实现方式是结构的一部分");
+    }
+
+    #[test]
+    fn rewrite_candidates_offer_key_range_and_drop_only_unused_joins() {
+        // 退货率的度量用到 store_returns 的列，该关联不能去掉：只有日期键范围一个候选
+        let c = rewrite_candidates(&rate(), &cat());
+        assert_eq!(c.len(), 1, "{:?}", c.iter().map(|x| &x.0).collect::<Vec<_>>());
+        assert_eq!(c[0].1.time.as_ref().unwrap().strategy, TimeStrategy::KeyRange);
+        // 度量与过滤都不再用到 store_returns 时，该关联可以去掉：先给出叠加候选，再给出两个单项
+        let mut unused = rate();
+        unused.measure = "sum(ss_net_paid)".into();
+        unused.filters.clear();
+        unused.joins[0].kind = JoinKind::Left;
+        let c = rewrite_candidates(&unused, &cat());
+        assert_eq!(c.len(), 3, "{:?}", c.iter().map(|x| &x.0).collect::<Vec<_>>());
+        assert!(c[0].1.joins.is_empty() && c[0].1.time.as_ref().unwrap().strategy == TimeStrategy::KeyRange);
+        assert!(c.iter().skip(1).any(|(_, m)| m.joins.is_empty()));
+    }
+
     fn cat() -> Catalog {
         let t = |name: &str, cols: &[&str]| Table {
             name: name.into(),

@@ -2,12 +2,14 @@
 
 Store revenue (门店营业额). Top row: the built-in agent (an LLM) answers a learning
 question whose meaning is given (March, 13,570,368.70), the answer is verified,
-and v1 is published after validation; appending new sales leaves every rule
-true, so v1 stays and the other metrics reuse the results. Bottom row: a
-restatement keeps the old rows as non-current (ss_is_current = 0) and breaks
-"one row per sale"; v1 is retired; the repair tries filters on low-cardinality
-columns, exactly one works, the regression test on the learning-time data gives
-the same answer (on current data it would refuse the fix), and v2 is published.
+and v1 is published after validation; an optimization rewrites the period
+predicate as a date-key range, which agrees on 14 sample periods and runs
+19.8% faster, so v2 is published with "contiguous date keys" as a new
+condition (v1 stays accepted). Bottom row: a restatement keeps the old rows as
+non-current (ss_is_current = 0) and breaks "one row per sale"; v2 is retired;
+the repair tries filters on low-cardinality columns, exactly one works, the
+regression test on the learning-time data gives the same answer (on current
+data it would refuse the fix), and v3 is published.
 The red box is the other outcome: after a duplicate load no filter works and the
 definition stays retired. Values come from the end-to-end study (run r1 of
 MAVRA; tasks M1-L1 and M1-P1). Drawn at slide size for the report deck, with
@@ -27,7 +29,7 @@ W, H = 300.0, 110.0
 
 LABELS = {
     'zh': {
-        'title': 'MAVRA 学习与维护', 'paths': ('学习', '维护'), 'otherwise': '另一种结果',
+        'title': 'MAVRA 学习、优化与维护', 'paths': ('学习', '优化', '维护'), 'otherwise': '另一种结果',
         'table': '`store_sales`',
         'learn': ('学习', '内置智能体（大模型）'),
         'l_rows': ('任务：3 月门店营业额（给定口径）', '`SUM(ss_net_paid) … d_moy = 3`',
@@ -35,23 +37,23 @@ LABELS = {
         'pub1': ('发布 v1', '定义内容'),
         'p1_rows': ('度量：`SUM(ss_net_paid)`', '条件：粒度键唯一、', '日期键唯一、日期键完整性',
                     '证据：学习时的 SQL'),
-        'benign': ('增量加载', '追加新销售记录（新小票号）'),
-        'b_rows': ('重新验证：条件成立', '其他定义：复用验证结果', '仍为 v1'),
+        'opt': ('优化修订', '期间谓词改为日期键范围'),
+        'o_rows': ('14 个期间结果一致', '29.1 → 23.3 ms，省 19.8%', '新条件：日期键按月连续', '发布 v2，v1 宽限可用'),
         'later': '后续更新',
         'breaking': ('数据更正', '旧行标记为非当前，插入当前行'),
-        'k_rows': ('粒度键唯一：不成立', 'v1 失效', '不处理：1430.1 万（计入旧行）'),
+        'k_rows': ('粒度键唯一：不成立', 'v2 失效', '不处理：1430.1 万（计入旧行）'),
         'search': ('修复搜索', '在低基数列上枚举等值谓词'),
         's_rows': ("`ss_is_current='1'`", "`ss_is_current='0'` 丢失键", '唯一可行'),
         'regress': ('回归测试', '按学习时刻重算 3 月'),
         'r_rows': ('学习时 SQL', '修复后', '一致：接受修复', '按当前数据比较会误拒'), 'value': '1357.0 万',
-        'pub2': ('发布 v2', '同一定义的新修订'),
-        'p2_rows': ('v2 = v1 + 谓词', "`ss_is_current='1'`", '声明 v1 的查询被拒绝', '等待中的请求获得 v2'),
+        'pub2': ('发布 v3', '同一定义的新修订'),
+        'p2_rows': ('v3 = v2 + 谓词', "`ss_is_current='1'`", '声明 v2 的查询被拒绝', '等待中的请求获得 v3'),
         'nofix': ('无法修复', '例：批次重复加载'),
         'n_rows': ('粒度键唯一：不成立', '没有谓词能恢复唯一性', '失效，通知使用方', '等待重新学习'),
         'two': '无候选或多个候选', 'relearn': '重新学习',
     },
     'en': {
-        'title': 'MAVRA learning and maintenance', 'paths': ('learning', 'maintenance'),
+        'title': 'MAVRA learning, optimization and maintenance', 'paths': ('learning', 'optimization', 'maintenance'),
         'otherwise': 'other outcome', 'table': '`store_sales`',
         'learn': ('Learn', 'built-in agent (LLM)'),
         'l_rows': ('question: March store revenue', '`SUM(ss_net_paid) … d_moy = 3`',
@@ -59,19 +61,19 @@ LABELS = {
         'pub1': ('Publish v1', 'the definition holds'),
         'p1_rows': ('`SUM(ss_net_paid)`', 'rules: one row per sale,', 'date key unique,',
                     'loss in bound; learning SQL'),
-        'benign': ('New data', 'new sales appended'),
-        'b_rows': ('rechecked: still holds', 'other metrics: reuse', 'stays v1'),
+        'opt': ('Optimize', 'period predicate as a key range'),
+        'o_rows': ('14 periods agree', '29.1 → 23.3 ms, −19.8%', 'new condition: contiguous keys', 'publish v2; v1 still accepted'),
         'later': 'a later write',
         'breaking': ('Restatement', 'old rows kept as non-current'),
-        'k_rows': ('one row per sale: fails', 'v1 retired', 'unfixed: old rows counted'),
+        'k_rows': ('one row per sale: fails', 'v2 retired', 'unfixed: old rows counted'),
         'search': ('Find a repair', 'try filters on few-value columns'),
         's_rows': ("`ss_is_current='1'`", "`ss_is_current='0'` loses sales", 'exactly one works'),
         'regress': ('Regression test', 'rerun March on learning-time data'),
         'r_rows': ('learning SQL', 'with the filter', 'same: fix accepted', 'current data would refuse it'),
         'value': '13,570,368.70',
-        'pub2': ('Publish v2', 'new version, same metric'),
-        'p2_rows': ('v2 = v1 + filter', "`ss_is_current='1'`", 'SQL naming v1: rejected',
-                    'waiting requests get v2'),
+        'pub2': ('Publish v3', 'new version, same metric'),
+        'p2_rows': ('v3 = v2 + filter', "`ss_is_current='1'`", 'SQL naming v2: rejected',
+                    'waiting requests get v3'),
         'nofix': ('No repair', 'e.g. a batch loaded twice'),
         'n_rows': ('one row per sale: fails', 'no filter restores it', 'retired; agents told',
                    'retired until relearned'),
@@ -105,7 +107,7 @@ def draw(s, lang):
     rect(3.0, 3.4, 1.1, 5.4, ACC)
     text(6.2, 8.2, L['title'], TITLE, ACC_DK, 'bold')
     x = 150.0
-    for label, color, steps in zip(L['paths'], (LEARN, USE), ('1–2', '3–7')):
+    for label, color, steps in zip(L['paths'], (LEARN, AMBER, USE), ('1–2', '3', '4–7')):
         x += legend_pill(s, x, 6.2, label, color, steps) + 6.0
     legend_pill(s, x, 6.2, L['otherwise'], RED, dashed=True)
 
@@ -118,10 +120,9 @@ def draw(s, lang):
     ex, ey, ew = stage(s, PUB1, 2, LEARN, *L['pub1'])
     rows(s, ex, ey, ew, L['p1_rows'], PITCH)
 
-    # 3 A normal write: the rules still hold ----------------------------------------------
-    ex, ey, ew = stage(s, BENIGN, 3, USE, *L['benign'])
-    version(ex, ey, ew, 12, 13)
-    rows(s, ex, ey, ew, L['b_rows'], PITCH, first=1, colors={2: ACC_DK}, marks={0: 'ok', 1: 'ok'})
+    # 3 Optimization: an equivalent, cheaper rewrite becomes v2 ------------------------------
+    ex, ey, ew = stage(s, BENIGN, 3, AMBER, *L['opt'])
+    rows(s, ex, ey, ew, L['o_rows'], PITCH, colors={2: AMBER, 3: ACC_DK}, marks={0: 'ok', 1: 'ok'})
 
     # 4 A breaking write retires v1 ----------------------------------------------------------
     ex, ey, ew = stage(s, BREAK, 4, USE, *L['breaking'])
@@ -150,7 +151,7 @@ def draw(s, lang):
     rows(s, ex, ey, ew, L['n_rows'], PITCH, colors={0: RED, 1: RED, 3: LEARN}, marks={0: 'fail'})
 
     # Arrows ---------------------------------------------------------------------------------
-    for (l, r), color in (((LEARN_B, PUB1), LEARN), ((PUB1, BENIGN), USE), ((BREAK, SEARCH), USE),
+    for (l, r), color in (((LEARN_B, PUB1), LEARN), ((PUB1, BENIGN), AMBER), ((BREAK, SEARCH), USE),
                           ((SEARCH, REGRESS), USE), ((REGRESS, PUB2), USE)):
         yy = l[1] + 5.6
         route([(l[0] + l[2], yy), (r[0], yy)], color, THIN, length=HEAD)

@@ -698,7 +698,7 @@ pub async fn extract(p: &Provider, input: &Value, max_attempts: u32) -> Extracti
 // ───────────────────────── 优化提议 ─────────────────────────
 
 const OPTIMIZE_SYSTEM: &str = "你是数据中间层的指标口径优化器。输入是一条已发布的指标口径（结构化字段）、它的规范 SQL 与执行计划、\
-相关表的行数与列。请提出至多 3 个与原口径计算结果完全相同、但执行代价更低的改写。允许的改写：time.strategy 改为 \\"key_range\\"\
+相关表的行数与列。请提出至多 3 个与原口径计算结果完全相同、但执行代价更低的改写。允许的改写：time.strategy 改为 \"key_range\"\
 （事实表按日期键范围过滤，不连接日期维度）；去掉结果不依赖的关联；等价地简化聚合表达式或过滤写法。不得改变业务含义：\
 度量所用的列、过滤的语义、粒度键必须与原口径一致，不得加入题目参数。只输出一个 JSON 数组，不要输出其他文字；每项是一个对象，\
 字段与原口径相同（name, aliases, definition, fact, measure, grain, time{role, fact_col, dim, dim_col, grain, strategy}, joins, filters, \

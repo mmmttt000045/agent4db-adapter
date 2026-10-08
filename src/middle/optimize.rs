@@ -225,7 +225,7 @@ impl Middle {
         Ok((equiv, evidence, blocks))
     }
 
-    /// 对本范围内每条有效定义做一轮优化：先规则改写，再（有模型时）模型提议；每条定义本轮最多发布一个新修订。
+    /// 对本范围内每条有效定义做一轮优化：先规则改写，规则候选都没有发布时再（有模型时）请模型提议；每条定义本轮最多发布一个新修订。
     /// 返回每条定义尝试的候选与结果。
     pub async fn optimize_sweep(&self, ctx: &Ctx, llm: Option<&Provider>, attempts: u32) -> Result<Vec<Value>> {
         let prefix = format!("{}|metric:", scope_prefix(self.cfg.metric_scope, ctx));
@@ -236,25 +236,34 @@ impl Middle {
                 continue;
             }
             let Some(ev) = self.metric_evidence.lock().get(&fk).cloned() else { continue };
-            let mut cands: Vec<(String, Metric, &str)> =
+            // 先试规则改写；没有规则候选发布时才请模型提议（模型调用慢，且规则候选发布后本轮不再继续）
+            let rules: Vec<(String, Metric, &str)> =
                 metric::rewrite_candidates(&m, &self.cat).into_iter().map(|(l, c)| (l, c, "rule")).collect();
-            let mut proposals = Value::Null;
-            if let Some(p) = llm {
-                let input = self.optimize_input(&m, &ev).await;
-                let pr = metric::propose(p, &input, attempts).await;
-                proposals = json!({"attempts": pr.attempts, "input_tokens": pr.input_tokens, "output_tokens": pr.output_tokens,
-                                   "seconds": pr.seconds, "errors": pr.errors, "proposed": pr.drafts.len()});
-                cands.extend(pr.drafts.into_iter().map(|(l, c)| (l, c, "llm")));
-            }
             let mut tried = vec![];
             let mut published = None;
-            for (label, cand, source) in cands {
+            for (label, cand, source) in rules {
                 let r = self.optimize_metric(ctx, &e.key, cand, &label, source).await?;
                 let ok = r["event"] == "optimize_promoted";
                 tried.push(r);
                 if ok {
                     published = Some(label);
                     break;
+                }
+            }
+            let mut proposals = Value::Null;
+            if let (None, Some(p)) = (&published, llm) {
+                let input = self.optimize_input(&m, &ev).await;
+                let pr = metric::propose(p, &input, attempts).await;
+                proposals = json!({"attempts": pr.attempts, "input_tokens": pr.input_tokens, "output_tokens": pr.output_tokens,
+                                   "seconds": pr.seconds, "errors": pr.errors, "proposed": pr.drafts.len()});
+                for (label, cand) in pr.drafts {
+                    let r = self.optimize_metric(ctx, &e.key, cand, &label, "llm").await?;
+                    let ok = r["event"] == "optimize_promoted";
+                    tried.push(r);
+                    if ok {
+                        published = Some(label);
+                        break;
+                    }
                 }
             }
             out.push(json!({"key": e.key, "revision_before": e.revision, "published": published, "tried": tried, "proposals": proposals}));

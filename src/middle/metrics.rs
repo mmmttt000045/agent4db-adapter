@@ -1158,15 +1158,21 @@ impl Middle {
         }
     }
 
-    /// 优化修订只因新增的前提不成立而失效时：前一修订若在当前数据上仍满足它自己的全部条件，就恢复为当前修订
-    /// （修订号不变，使用者与命中数沿用）并通知使用者；否则两者都失效。返回是否恢复。
+    /// 优化修订只因新增的前提不成立而失效时回退：前一修订若在当前数据上仍满足它自己的全部条件，就恢复为当前修订
+    /// （修订号不变，使用者与命中数沿用）；没有可恢复的前一修订（例如优化修订之后又被修复替代过）时撤销改写规则，
+    /// 把日期键范围改回连接日期维度，作为新修订发布——它的条件正是刚确认成立的那些（去掉前提）。两者都不行时失效。
+    /// 返回是否回退成功；使用者收到通知。
     async fn reinstate(&self, ctx: &Ctx, fk: &str, failed: &Entry, reason: &str) -> Result<bool> {
         let restored = match self.prev_breach(ctx, fk).await? {
-            None => self.opt_prev.lock().remove(fk),
+            None => self.opt_prev.lock().remove(fk).map(|p| (p, "predecessor")),
             Some(_) => None,
         };
+        let restored = match restored {
+            Some(x) => Some(x),
+            None => self.undo_key_range(ctx, fk, failed).await?.map(|e| (e, "undo_rule")),
+        };
         let mut n = self.notices.lock();
-        let Some(mut p) = restored else {
+        let Some((mut p, how)) = restored else {
             for a in &failed.consumers {
                 n.entry(a.clone())
                     .or_default()
@@ -1177,10 +1183,14 @@ impl Middle {
         };
         let (from, to) = (failed.revision, p.revision);
         for a in &failed.consumers {
-            n.entry(a.clone()).or_default().push(format!(
-                "指标经验 {} 的优化修订 r{from} 已失效（{reason}），已恢复前一修订 r{to}；请重新调用 find_metric",
-                failed.key
-            ));
+            let what = if how == "predecessor" {
+                format!("已恢复前一修订 r{to}")
+            } else {
+                format!("已发布连接日期维度的写法 r{to}")
+            };
+            n.entry(a.clone())
+                .or_default()
+                .push(format!("指标经验 {} 的优化修订 r{from} 已失效（{reason}），{what}；请重新调用 find_metric", failed.key));
             inc(&self.stats.notices);
         }
         drop(n);
@@ -1188,8 +1198,29 @@ impl Middle {
         p.consumers = failed.consumers.clone();
         p.hits = failed.hits;
         self.store.put(fk, p);
-        self.metric_event(json!({"event": "reinstated", "key": failed.key, "from": from, "revision": to, "reason": reason}));
+        self.metric_event(json!({"event": "reinstated", "key": failed.key, "from": from, "revision": to, "how": how, "reason": reason}));
         Ok(true)
+    }
+
+    /// 撤销日期键范围规则：同一结构改回连接日期维度（示例 SQL 重新编译），作为新修订。由命题 2，前提成立时两者相等；
+    /// 前提不成立时连接写法的条件（除前提外的全部条件）刚在本次维护中确认成立。失效的修订不是日期键范围写法时返回 None。
+    async fn undo_key_range(&self, ctx: &Ctx, fk: &str, failed: &Entry) -> Result<Option<Entry>> {
+        let Some(mut m) = metric_of(failed).cloned() else { return Ok(None) };
+        let Some(t) = m.time.as_mut().filter(|t| t.strategy == TimeStrategy::KeyRange) else { return Ok(None) };
+        t.strategy = TimeStrategy::DimJoin;
+        m.caveats.retain(|c| !c.contains("日期键范围"));
+        let ask = self.metric_evidence.lock().get(fk).map(|x| x.ask);
+        if let Some(sql) = ask.and_then(|a| metric::compile(&m, &a).ok()) {
+            let question = m.examples.first().map(|x| x.question.clone()).unwrap_or_default();
+            m.examples = vec![Example { question, sql }];
+        }
+        let deps = self.deps_for(&m.tables()).await?;
+        let guards = vec![grain_check(&m)];
+        let rev = self.next_revision(fk, failed.revision);
+        let mut e = self.new_entry(ctx, &failed.key, Content::Metric(Box::new(m)), deps, guards);
+        e.revision = rev;
+        e.created_by = failed.created_by.clone();
+        Ok(Some(e))
     }
 
     /// 关联条件读到的表：已验证路径的守卫（唯一侧的键唯一性）涉及的表。关联经验不是有效状态、修订号与引用时不同、

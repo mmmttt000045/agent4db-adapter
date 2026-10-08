@@ -445,6 +445,20 @@ impl Change {
     }
 }
 
+/// 生命周期评测的清理：删除此前重复加载的批次。只删除与另一行完全重复的副本（同一小票、商品与版本标志），
+/// 保留版本化更正留下的旧版本行。返回删除行数。
+pub async fn cleanup_duplicate_load(db: &Db) -> Result<i64> {
+    write(
+        db,
+        "store_sales",
+        "删除重复装载的批次",
+        "delete from store_sales a using store_sales b \
+         where a.ss_ticket_number = b.ss_ticket_number and a.ss_item_sk = b.ss_item_sk \
+           and a.ss_is_current = b.ss_is_current and a.ctid > b.ctid",
+    )
+    .await
+}
+
 /// 执行一条写入，记批次，刷新统计信息并等待 DML 计数上报（避免同一次变化被感知两次）。返回影响行数。
 async fn write(db: &Db, table: &str, note: &str, sql: &str) -> Result<i64> {
     let before = catalog::versions(db).await?.get(table).map(|v| v.dml).unwrap_or(0);

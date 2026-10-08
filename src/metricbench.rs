@@ -12,6 +12,7 @@ use crate::middle::{
 };
 use crate::scenario::{self, Change};
 use anyhow::{ensure, Context, Result};
+use futures::StreamExt;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashMap, HashSet};
@@ -34,7 +35,7 @@ pub struct Options {
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",
           value_parser = ["direct", "middle", "metric-local", "metric-global", "metric-global-noguard",
                           "metric-global-schema", "metric-global-revoke", "metric-global-def", "metric-global-exref",
-                          "metric-global-snap", "metric-global-opt", "traj-global", "traj-verify"])]
+                          "metric-global-snap", "metric-global-opt", "metric-global-full", "traj-global", "traj-verify"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
     phrasings: Vec<String>,
@@ -62,6 +63,17 @@ pub struct Options {
     /// 逐次记录每个 Agent 的工具调用（trace-<cell>.jsonl：工具名、参数、结果摘要、耗时）
     #[arg(long)]
     trace: bool,
+    /// 生命周期评测：同一个共享库在依次到来的数据更新与使用者下持续运行（更新累积、不回滚），见 `lifecycle_cell`。
+    /// 每个进程只跑一个组、一轮（各组各自从 v1 开始）
+    #[arg(long)]
+    lifecycle: bool,
+    /// 生命周期评测的时间线，每一步先施加更新再来一波使用者：none 不更新；cleanup 删除此前重复装载的批次
+    #[arg(long, value_delimiter = ',', default_value = "none,append,status,revision,dimhist,rekey,dupload,cleanup,correct",
+          value_parser = ["none", "append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "rekey", "cleanup"])]
+    timeline: Vec<String>,
+    /// 生命周期评测中每一波使用者同时进行的任务数
+    #[arg(long, default_value_t = 2, value_parser = clap::value_parser!(u32).range(1..=8))]
+    concurrency: u32,
 }
 
 // ───────────────────────── 指标与题目 ─────────────────────────
@@ -469,6 +481,20 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         "metric-global-snap" => {
             (MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, g8_snapshot_db: true, ..base }, true, true)
         }
+        // 完整配置：同 -opt，并在同一快照中核对所声明修订的条件后执行（事务性版本，见 `catalog::install_tx_versions`）
+        "metric-global-full" => (
+            MiddleConfig {
+                metric_maint: Maint::Condition,
+                cond_reuse: true,
+                g8_example: true,
+                g8_snapshot_db: true,
+                optimize: true,
+                snapshot_exec: true,
+                ..base
+            },
+            true,
+            true,
+        ),
         // 同 -snap，并在学习之后对每条已发布定义尝试优化修订（规则改写与模型提议；验证等价与代价后发布）
         "metric-global-opt" => (
             MiddleConfig {
@@ -917,6 +943,168 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     }))
 }
 
+// ───────────────────────── 生命周期 ─────────────────────────
+
+/// 生命周期时间线上的一步：施加的更新。
+#[derive(Clone, Copy)]
+enum Step {
+    None,
+    Change(Change),
+    /// 删除此前重复装载的批次（运维修正）
+    Cleanup,
+}
+
+fn step_of(s: &str) -> Result<Step> {
+    Ok(match s {
+        "none" => Step::None,
+        "cleanup" => Step::Cleanup,
+        x => Step::Change(Change::parse(x)?),
+    })
+}
+
+/// 已有条目、但没有一条有效的指标（全部失效或修复未通过）：内置学习者在下一步重新学习它们。
+fn unavailable_metrics(mid: &Middle) -> HashSet<String> {
+    let mut seen: HashMap<String, bool> = HashMap::new();
+    for (_, e, ev) in mid.metric_entries() {
+        let Some(def) = ev.as_ref().and_then(|x| x.task.split('-').next().map(str::to_string)) else { continue };
+        *seen.entry(def).or_insert(false) |= e.status == Status::Valid;
+    }
+    seen.into_iter().filter(|(_, valid)| !valid).map(|(d, _)| d).collect()
+}
+
+/// 生命周期评测：一个共享库从学习开始，沿时间线依次经历数据更新（累积、不回滚）与一波波新来的使用者。
+/// 每一步：施加更新（先改业务事实并计算标准答案，再改数据表示，与场景评测相同）；没有有效定义的指标由内置学习者
+/// 重新学习、提炼与准入（之后再做一轮优化）；然后每道计分题各由一个新的使用者回答，`concurrency` 个同时进行。
+/// 维护照常在首次使用时发生，同时到达的请求合并等待。
+async fn lifecycle_cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u32, timeline: &[(String, Step)]) -> Result<Value> {
+    let (cfg, middle_tools, metric_tools) = config(mode);
+    let traj = cfg.traj_memory;
+    let mut tools = tool_specs_with(middle_tools, metric_tools);
+    let mut system_text = system(middle_tools, metric_tools);
+    if traj {
+        tools.push(trajectory_tool_spec());
+        system_text.push('\n');
+        system_text.push_str(SYSTEM_TRAJ);
+        if mode == "traj-verify" {
+            system_text.push('\n');
+            system_text.push_str(SYSTEM_TRAJ_VERIFY);
+        }
+    }
+    tools.push(llm::final_answer_spec(true));
+    tools.push(llm::clarification_spec());
+    let cell = Cell { id: format!("life-r{repeat}-{mode}-{phrasing}"), mode, phrasing, repeat, system: system_text, tools };
+    eprintln!("== {}", cell.id);
+    scenario::ensure_v1(env.admin, env.v1, "开始").await?;
+    let snapshot_db = cfg.g8_snapshot_db;
+    let mut mid = Middle::new(db, cfg).await?;
+    if env.o.trace {
+        mid.trace = Some(llm::Trace::create(&format!("{}/trace-{}.jsonl", env.dir, cell.id))?);
+    }
+    if snapshot_db {
+        mid.learn_db = Some(env.learn.clone().context("没有建学习时快照库")?);
+    }
+    let defined = phrasing == "defined";
+    let maintained = metric_tools && mid.cfg.metric_maint == Maint::Condition;
+    let mut records = vec![];
+    let mut learning = vec![];
+    let t0 = Instant::now();
+
+    // 生产：A 用带口径的题面学习，提炼与准入（检索基线只保存轨迹）
+    let gold = gold_map(env.admin, env.tasks).await?;
+    let none = HashSet::new();
+    let ph = Phase { env, mid: &mid, cell: &cell, name: "learn", gold: &gold, bad: &none };
+    for t in env.tasks.iter().filter(|t| t.set == Set::Learn) {
+        let rec = run_task(&ph, "A", t, true).await?;
+        if metric_tools {
+            learning.push(learn_step(env, &mid, &rec, t).await?);
+        } else if traj {
+            learning.push(remember_step(&mid, &rec, t));
+        }
+        records.push(rec.json);
+    }
+    let learn_events = mid.take_metric_events();
+    let sweep = |label: String| {
+        let mid = &mid;
+        async move {
+            let octx = Ctx::new("O", &label, "optimize");
+            let t1 = Instant::now();
+            let rounds = mid.optimize_sweep(&octx, Some(env.extractor), env.o.extract_attempts).await?;
+            let published = rounds.iter().filter(|r| !r["published"].is_null()).count();
+            eprintln!("  优化修订：{} 条定义中 {published} 条发布了新修订（{:.1} 秒）", rounds.len(), t1.elapsed().as_secs_f64());
+            anyhow::Ok(json!({"rounds": rounds, "published": published, "seconds": t1.elapsed().as_secs_f64()}))
+        }
+    };
+    let optimizing = if mid.cfg.optimize { sweep(format!("{}-optimize", cell.id)).await? } else { Value::Null };
+    let optimize_events = mid.take_metric_events();
+
+    let mut epochs = vec![];
+    for (k, (name, step)) in timeline.iter().enumerate() {
+        let phase = format!("e{k}-{name}");
+        let t1 = Instant::now();
+        let (gold, writes) = match step {
+            Step::None => (gold_map(env.admin, env.tasks).await?, Value::Null),
+            Step::Change(c) => {
+                let truth = c.apply_truth(env.admin).await?;
+                let gold = gold_map(env.admin, env.tasks).await?;
+                let hidden = c.apply_hidden(env.admin).await?;
+                eprintln!("  {phase}（{}，{}）：写入 {truth} + {hidden} 行", c.label(), c.class());
+                (gold, json!({"truth_rows": truth, "hidden_rows": hidden}))
+            }
+            Step::Cleanup => {
+                let n = scenario::cleanup_duplicate_load(env.admin).await?;
+                eprintln!("  {phase}（删除重复装载的批次）：删除 {n} 行");
+                (gold_map(env.admin, env.tasks).await?, json!({"deleted_rows": n}))
+            }
+        };
+        mid.invalidate_versions();
+        let (rows, bad) = audit(env, &mid, &gold).await?;
+        // 按需生产：上一波之后没有有效定义的指标，由内置学习者在当前数据上重新学习
+        let mut relearn = vec![];
+        let mut reoptimizing = Value::Null;
+        if maintained {
+            let defs = unavailable_metrics(&mid);
+            if !defs.is_empty() {
+                let name = format!("{phase}-relearn");
+                let ph = Phase { env, mid: &mid, cell: &cell, name: &name, gold: &gold, bad: &bad };
+                for t in env.tasks.iter().filter(|t| t.set == Set::Learn && defs.contains(t.def.id)) {
+                    let rec = run_task(&ph, "A", t, true).await?;
+                    relearn.push(learn_step(env, &mid, &rec, t).await?);
+                    records.push(rec.json);
+                }
+                if mid.cfg.optimize {
+                    reoptimizing = sweep(format!("{}-{phase}-optimize", cell.id)).await?;
+                }
+            }
+        }
+        let production_events = mid.take_metric_events();
+        // 一波新来的使用者：每道计分题一个新智能体
+        let ph = Phase { env, mid: &mid, cell: &cell, name: &phase, gold: &gold, bad: &bad };
+        let set: Vec<(String, &Task)> =
+            env.tasks.iter().filter(|t| t.set != Set::Learn).enumerate().map(|(i, t)| (format!("U{k}-{i}"), t)).collect();
+        let t2 = Instant::now();
+        let recs: Vec<Result<TaskRec>> = futures::stream::iter(set.iter().map(|(a, t)| run_task(&ph, a, t, defined)))
+            .buffer_unordered(env.o.concurrency as usize)
+            .collect()
+            .await;
+        let wave_s = t2.elapsed().as_secs_f64();
+        for r in recs {
+            records.push(r?.json);
+        }
+        epochs.push(json!({
+            "epoch": k, "name": name, "phase": phase, "writes": writes, "audit": rows,
+            "relearn": relearn, "reoptimizing": reoptimizing, "production_events": production_events,
+            "events": mid.take_metric_events(), "wave_seconds": wave_s, "seconds": t1.elapsed().as_secs_f64(),
+        }));
+    }
+    Ok(json!({
+        "cell": cell.id, "mode": mode, "phrasing": phrasing, "repeat": repeat, "lifecycle": true,
+        "timeline": timeline.iter().map(|(n, _)| n.clone()).collect::<Vec<_>>(), "concurrency": env.o.concurrency,
+        "seconds": t0.elapsed().as_secs_f64(), "learning": learning, "learn_events": learn_events,
+        "optimizing": optimizing, "optimize_events": optimize_events, "epochs": epochs,
+        "metric_report": mid.metric_report(), "trajectories": mid.trajectories(), "stats": mid.stats_json(), "records": records,
+    }))
+}
+
 pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     ensure!(
         !o.holdout_agents.is_empty() && o.holdout_agents.iter().all(|a| !a.trim().is_empty() && !a.contains(['/', '|'])),
@@ -925,6 +1113,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     let agent = Provider::from_env(&o.agent)?;
     let extractor = Provider::from_env(&o.extractor)?;
     let changes = o.changes.iter().map(|c| Change::parse(c)).collect::<Result<Vec<_>>>()?;
+    let timeline = o.timeline.iter().map(|s| Ok((s.clone(), step_of(s)?))).collect::<Result<Vec<_>>>()?;
+    ensure!(!o.lifecycle || (o.modes.len() == 1 && o.repeats == 1), "生命周期评测每个进程只跑一个组、一轮（更新累积，各组要从 v1 开始）");
     let stamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
     let name = format!("agentdb_metric_{}_{stamp}", std::process::id());
     let directory = format!("{out}/metric-{stamp}");
@@ -940,6 +1130,10 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         admin.query(QKind::Meta, &fixture(o.rows)).await?;
         etl::setup(&admin).await?;
         scenario::setup(&admin).await?;
+        // 同快照执行需要事务性表版本：写入事务内由语句级触发器递增（内部表 mavra_versions，不对智能体暴露）
+        if o.modes.iter().any(|m| config(m).0.snapshot_exec) {
+            catalog::install_tx_versions(&admin, &scenario::TABLES).await?;
+        }
         let v1 = scenario::fingerprint(&admin).await?;
         let mut dataset = serde_json::Map::new();
         for t in ["store_sales", "store_returns", "catalog_sales", "date_dim", "item"] {
@@ -971,7 +1165,11 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             for k in 0..o.modes.len() {
                 let mode = &o.modes[(k + r as usize - 1) % o.modes.len()];
                 for phrasing in &o.phrasings {
-                    let c = cell(&env, db.clone(), mode, phrasing, r).await?;
+                    let c = if o.lifecycle {
+                        lifecycle_cell(&env, db.clone(), mode, phrasing, r, &timeline).await?
+                    } else {
+                        cell(&env, db.clone(), mode, phrasing, r).await?
+                    };
                     std::fs::write(format!("{directory}/cell-{}.json", c["cell"].as_str().unwrap_or("cell")), serde_json::to_string_pretty(&c)?)?;
                     cells.push(c);
                 }
@@ -1010,7 +1208,12 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         Ok(mut report) => {
             report["database_cleaned_up"] = json!(cleanup.is_ok());
             std::fs::write(format!("{directory}/report.json"), serde_json::to_string_pretty(&report)?)?;
-            std::fs::write(format!("{directory}/report.md"), markdown(&report))?;
+            let md = if report["options"]["lifecycle"] == true {
+                "生命周期评测：逐步结果见 report.json 与 cell-*.json，汇总用 tools/lifecycle-stats.py。\n".to_string()
+            } else {
+                markdown(&report)
+            };
+            std::fs::write(format!("{directory}/report.md"), md)?;
             println!("指标经验评测报告：{directory}/report.md");
             cleanup.context("实验库清理失败")?;
             Ok(())

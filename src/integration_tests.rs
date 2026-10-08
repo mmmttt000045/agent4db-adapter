@@ -413,7 +413,24 @@ async fn premise_break(url: &str) -> Result<Value> {
             ensure!(a == (rev == 2), "{m2_id}：r{rev} 的接受情况不对：{r}");
             seen.insert(format!("r{rev}"), json!({"accepted": a, "response": r}));
         }
-        status_refs = json!({"before": before2["revision"], "after": after2["revision"], "references": seen});
+        // 修复之后不再保留前一修订；此时日期键重编号只破坏日期键连续，回退方式是撤销改写规则：同一结构改回连接日期维度
+        let rk = Change::Rekey;
+        rk.apply_truth(&admin).await?;
+        rk.apply_hidden(&admin).await?;
+        mid2.invalidate_versions();
+        let undone = mid2.use_metric(&user, &m2_key).await?;
+        ensure!(
+            undone["status"] == "valid" && undone["revision"] == 3 && undone["metric"]["time"]["strategy"] == "dim_join",
+            "{m2_id}：重编号后应撤销日期键范围规则，发布连接日期维度的 r3：{undone}"
+        );
+        let q1 = Period { year: 2002, m1: 1, m2: 3 };
+        let served: Metric = serde_json::from_value(undone["metric"].clone())?;
+        let got = value_of(&admin, &metric::compile(&served, &Ask::Single { period: q1 })?).await?;
+        let gold = value_of(&admin, &metricbench::gold_period(m2_id, &q1)).await?;
+        ensure!(metric::same_value(&got, &gold, 2), "{m2_id}：撤销规则后的 Q1 答案 {got:?}，标准 {gold:?}");
+        rk.reset(&admin).await?;
+        status_refs = json!({"before": before2["revision"], "after": after2["revision"], "references": seen,
+                             "rekey_after_repair": {"revision": undone["revision"], "strategy": undone["metric"]["time"]["strategy"]}});
     }
     st.reset(&admin).await?;
     scenario::ensure_v1(&admin, &v1, "状态流水回滚").await?;

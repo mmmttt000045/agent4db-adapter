@@ -59,6 +59,9 @@ pub struct Options {
     /// 不对参与答案的 SQL 执行 EXPLAIN (ANALYZE, BUFFERS)
     #[arg(long)]
     no_explain: bool,
+    /// 逐次记录每个 Agent 的工具调用（trace-<cell>.jsonl：工具名、参数、结果摘要、耗时）
+    #[arg(long)]
+    trace: bool,
 }
 
 // ───────────────────────── 指标与题目 ─────────────────────────
@@ -529,6 +532,8 @@ struct Env<'a> {
     v1: &'a BTreeMap<String, String>,
     /// 学习时快照库的只读连接（有 `g8_snapshot_db` 的组时才建）
     learn: Option<Arc<Db>>,
+    /// 本次运行的输出目录（trace 文件写在这里）
+    dir: &'a str,
 }
 
 struct Cell<'a> {
@@ -798,6 +803,9 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     scenario::ensure_v1(env.admin, env.v1, "上一组").await?;
     let snapshot_db = cfg.g8_snapshot_db;
     let mut mid = Middle::new(db, cfg).await?;
+    if env.o.trace {
+        mid.trace = Some(llm::Trace::create(&format!("{}/trace-{}.jsonl", env.dir, cell.id))?);
+    }
     if snapshot_db {
         mid.learn_db = Some(env.learn.clone().context("没有建学习时快照库")?);
     }
@@ -956,7 +964,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         let db = Arc::new(Db::connect_timeout(isolated.as_str(), pool, true, o.sql_timeout_secs)?);
         let tasks = tasks(&o.metrics);
         let env =
-            Env { o: &o, admin: &admin, probe: &probe, agent: &agent, extractor: &extractor, tasks: &tasks, changes: &changes, v1: &v1, learn };
+            Env { o: &o, admin: &admin, probe: &probe, agent: &agent, extractor: &extractor, tasks: &tasks, changes: &changes, v1: &v1, learn, dir: &directory };
         let mut cells = vec![];
         for r in 1..=o.repeats {
             // 每轮轮换组的执行顺序

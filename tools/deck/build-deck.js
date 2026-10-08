@@ -1,4 +1,4 @@
-// Builds docs/mavra-system.pptx, a 16-slide Chinese deck that tells MAVRA as one story:
+// Builds docs/mavra-system.pptx, an 18-slide Chinese deck that tells MAVRA as one story:
 // how it differs from Text-to-SQL; a shared rule breaks when the data changes (toy ledger, then the real record); the three
 // things MAVRA does (what to check, when, what if it fails); where it sits; how a rule is
 // admitted; the four conditions; table versions, lazy maintenance and the same-snapshot
@@ -87,6 +87,11 @@ const lines = (...parts) => ({ text: parts.map((p, k) => {
   if (k < parts.length - 1) run.options.breakLine = true;
   return run;
 }) });
+// A cell with a main line and a smaller second line (a call or a code fragment).
+const sub = (main, second, code = true) => ({ text: [
+  { text: main, options: { breakLine: true } },
+  { text: second, options: { fontSize: 11, color: C.muted, fontFace: code ? CODE : FONT } },
+] });
 // A section heading inside a slide.
 function heading(slide, value, x, y, w, color = C.blue) {
   text(slide, value, { x, y, w, h: 0.35, fontSize: 15, bold: true, color, valign: 'middle' });
@@ -257,18 +262,49 @@ s.addNotes('把 MAVRA 想成一个很认真的账本管理员，它做三件事�
 
 // 4 Where it sits: architecture ------------------------------------------------------------------
 s = content('MAVRA 放在哪里：智能体与数据库之间的中间件', 'MAVRA');
-figure(s, 'overview', 1.15, 4.55);
+figure(s, 'overview', 1.1, 4.2);
 band(s, [
   { text: '智能体看到的是工具：', options: { bold: true, color: C.blue } },
-  { text: 'list_tables · describe_table · join_path · find_metric · run_sql（声明所依赖的指标修订）。', options: { breakLine: true } },
-  { text: 'MAVRA 记四类记忆：', options: { bold: true, color: C.blue } },
-  { text: '表统计信息、连接路径、指标定义、验证结果。最重要的是后两类：不仅记住公式，还记住公式成立的条件和最近一次检查是否通过。' },
-], { y: 5.8, h: 0.9, size: 13 });
+  { text: 'list_tables · describe_table · join_path · find_metric(名称) · run_sql(sql, metrics=[{key, revision}])——metrics 参数就是“声明”：这条 SQL 依据哪条定义的哪个修订。'
+    + 'MAVRA 记四类记忆：表统计信息、连接路径、指标定义、验证结果。', options: { breakLine: true } },
+  { text: '谁参与：', options: { bold: true, color: C.blue } },
+  { text: '学习——内置智能体（大模型）求解给定口径的任务，抽取模型整理成定义，7 项准入检查自动执行，人只在“答案判定正确”确认一次；'
+    + '使用——用户智能体检索、声明、执行；维护——由数据更新后第一个用到该定义的请求触发，MAVRA 执行，期间到达的请求等待结果；'
+    + '优化——学习之后 MAVRA 自动做一轮；修复有歧义时才交给人。' },
+], { y: 5.35, h: 1.4, size: 12 });
 s.addNotes('原来智能体直接访问数据库，现在 MAVRA 放在中间，不替代智能体，也不替代数据库。'
   + '智能体看到的是一组工具：列出表、描述表、查询连接路径、检索指标定义、执行 SQL。'
   + '图中蓝色 1–5 是检索指标定义：智能体只说“营业额”，查询服务从共享记忆读出定义；表版本变了，缺少验证结果的条件交给维护执行，结果写入缓存，再返回有效修订 v2。'
   + '橙色 6–8 是执行 SQL：智能体声明依赖 v2，执行前验证复用缓存，在同一快照上执行。紫色是学习：内置智能体学到的定义通过准入检查后写入。'
   + 'MAVRA 记四类记忆：有什么表什么列、表之间怎么连、学会过哪些计算规则、这些规则依赖的条件最近检查是否通过。');
+
+// 4b One use end to end: who sends what, what MAVRA checks, what comes back ----------------------
+s = content('一次使用的完整交互（真实记录）', 'MAVRA');
+table(s, [
+  ['', '用户智能体 B 发出', 'MAVRA 做什么', '返回给智能体'],
+  ['1', sub('find_metric("门店营业额")', '留出题：9 月的门店营业额是多少？', false),
+    '按名称/别名匹配到 3 条（门店营业额、电子品类门店营业额 ×2，标记 ambiguous）；依赖表版本未变，直接返回',
+    '每条的 key、revision、口径、度量 sum(ss_net_paid)、粒度、时间维度、注意事项、示例 SQL'],
+  ['2', '按口径说明选中“门店营业额”，写出 SQL', '—', '—'],
+  ['3', sub('run_sql(sql, metrics=[{key: "metric:门店营业额", revision: 0}])', '这就是“声明”：这条 SQL 依据哪条定义的哪个修订', false),
+    '核对 r0 有效且是当前修订；在这条查询的快照上验证该修订的条件（粒度键唯一、日期键唯一、日期键完整性，命中缓存则复用）；同一快照上执行',
+    lines('{result: 13,069,651.80, ref: "r1"}', '以及 notices（本次为空）')],
+  ['4', sub('final_answer(13069651.80, used=["r1"])', '答案引用 r1', false),
+    '记录溯源：答案 ← r1 ← 门店营业额 r0；日后该修订失效时据此通知', '（判定正确与否在系统之外）'],
+], { x: M, y: 1.2, w: W - 2 * M, colW: [0.4, 3.9, 4.8, 3.033], size: 12 });
+table(s, [
+  ['声明的修订…', 'MAVRA 的回应（系统记录原文）'],
+  ['已被修复替代（数据更正后仍声明 r0）', bad('拒绝：“指标经验 metric:门店营业额 已修订为 r1（你引用的是 r0），请重新调用 find_metric”')],
+  ['已失效（重复加载后）', bad('拒绝：“当前不可用：已撤销：粒度守卫失败：store_sales(ss_item_sk, ss_ticket_number) 是否唯一，1110165 行只有 1000000 个不同键”')],
+  ['已被等价且更省的修订替代', good('接受，附通知：“已发布等价且更省的修订 r1（你引用的 r0 仍可用），建议重新调用 find_metric”')],
+  ['没有声明', '照常执行与审查（连接写法、粒度过滤），但不在“条件成立”的保证范围内'],
+], { x: M, y: 4.55, w: W - 2 * M, colW: [3.2, 8.933], size: 12 });
+footnote(s, '记录：noctis results/scen-20261002/dsv41flash-r1-g3fix--snap，留出题 M1-P1（3 轮、4 次工具调用、5.6 秒）；15 道留出题全部声明了依据的修订。'
+  + '修订号从 0 计起，图中的 v1/v2 即 r0/r1。拒绝与通知文字取自运行记录。');
+s.addNotes('这页把“声明”讲清楚。用户智能体先按名称检索，拿到定义的 key 和 revision 以及口径、度量、粒度、注意事项和示例 SQL；'
+  + '它按口径说明选中门店营业额、写出 SQL，然后调用 run_sql，在 metrics 参数里写明这条 SQL 依据的是哪条定义的哪个修订——这就是声明，由智能体自己填，提示词里要求它这样做。'
+  + 'MAVRA 据此做三件事：核对这个修订还有效、没被替代；在这条查询自己的快照上验证这个修订的条件；记录溯源，以后这条定义失效时知道通知谁。'
+  + '下面是四种情况的真实回应：修订被修复替代——拒绝并让它重新检索；定义失效——拒绝并给出原因；被更省的修订替代——接受但附通知；没有声明——照常执行，只是不在保证范围内。');
 
 // 5 Admission: how a rule gets in ----------------------------------------------------------------
 pres.addSection({ title: '检查什么' });
@@ -466,6 +502,31 @@ s.addNotes('把整套系统的合作串起来。三条共享定义——电子�
   + '退货率要连接销售表，连接路径现在也要求这个谓词，同样修复。最后相关智能体收到通知，按新修订写 SQL，答案正确。'
   + '这页的重点不是快，而是一个智能体发现的问题修好后，所有相关智能体得到一致的新知识。');
 
+// 11b The same story as the queries MAVRA actually ran ------------------------------------------
+s = content('数据更正之后，MAVRA 实际执行了什么（真实 SQL 与记录）', '真实记录');
+const code = (t) => ({ text: t, options: { fontFace: CODE, fontSize: 10 } });
+table(s, [
+  ['', '谁', '实际执行', '结果 / 耗时'],
+  ['0', 'ETL', code("insert into store_sales (…, ss_is_current) select …, 0 from store_sales where ss_ticket_number % 10 = 7 and ss_sold_date_sk >= 367 and ss_is_current = 1;\nupdate store_sales set ss_net_paid = round(ss_net_paid * 0.9, 2) … where … and ss_is_current = 1"),
+    '65,915 行；语句级触发器把 store_sales 的表版本 +1'],
+  ['1', '智能体 B', code('find_metric("电子品类门店营业额")'), 'MAVRA 发现 store_sales 版本已变 → 触发维护'],
+  ['2', 'MAVRA', code('select count(*) as n_rows, count(distinct (ss_item_sk, ss_ticket_number)) as n_keys from store_sales where ss_item_sk is not null and ss_ticket_number is not null'),
+    lines(bad('1,065,915 行 / 1,000,000 键 → 粒度键唯一不成立'), 'v1 失效（5.5 秒）')],
+  ['3', 'MAVRA', code("从 pg_stats 取低基数列，按不同值数升序逐个试：\nselect ss_is_current::text, count(*), count(distinct (ss_item_sk, ss_ticket_number)) from store_sales where … group by ss_is_current"),
+    lines("'1'：1,000,000 行 = 1,000,000 键，且等于全部键数 ✓", "'0'：只剩 65,915 个键，丢键 ✗ → 唯一可行")],
+  ['4', 'MAVRA', code("G3 静态合法 · G4 带谓词再查粒度 · G5 审查 · G8 回归：在学习时快照库上执行智能体的学习 SQL 与 v2 规范 SQL\nselect sum(ss_net_paid) as value from store_sales join date_dim on ss_sold_date_sk = d_date_sk where ss_is_current = '1' and d_year = 2001 and d_moy between 3 and 3"),
+    lines(good('两者都是 13,570,368.70 → 发布 v2'), '1–4 步共 28.7 秒')],
+  ['5', 'MAVRA', '“门店营业额”依赖同一张表、同一组键：复用第 2、3 步的结论与谓词', good('45.8 毫秒发布 v2')],
+  ['6', 'B ← MAVRA', code('notices: ["你用过的经验「metric:门店营业额」已撤销（粒度守卫失败：…）。此前基于它得到的结果建议复核。"]\nfind_metric → v2（含 ss_is_current = \'1\'）；run_sql(…, metrics=[{key, revision: 1}])'),
+    good('12,932,888.04 ✓（4 轮，61.7 秒）')],
+], { x: M, y: 1.2, w: W - 2 * M, colW: [0.4, 1.2, 7.5, 3.033], size: 11 });
+footnote(s, SOURCE + ' 检查与修复查询为中间件实际使用的语句（checks.rs、repair_grain）；通知文字取自运行记录。');
+s.addNotes('这页把前一页的故事换成 MAVRA 真正执行的语句。第 0 步是 ETL 的两条普通 DML：把被更正的销售复制一份标为非当前，再把当前行改成九折；触发器把表版本加一。'
+  + '第 1 步智能体 B 来检索，MAVRA 发现版本变了。第 2 步是粒度条件的实际查询：行数和不同键数，1,065,915 对 1,000,000，不成立，v1 失效。'
+  + '第 3 步修复搜索：从 pg_stats 取低基数列，逐个按值分组数行数和键数；ss_is_current = 1 这一组行数等于键数、也等于全部键数，不丢键；= 0 那组只剩 6.6 万个键，丢键，所以唯一可行。'
+  + '第 4 步四项检查，回归在学习时快照库上执行智能体当初的 SQL 和 v2 的规范 SQL，都是 1357 万，发布 v2，一共 28.7 秒。'
+  + '第 5 步门店营业额复用结论和谓词，45.8 毫秒。第 6 步 B 在下一次工具返回里看到通知，重新检索拿到 v2，SQL 带上过滤并声明 revision 1，答对。');
+
 // 12 Revision by optimization: equivalent, cheaper rewrites published and shared ----------------
 s = content('迭代：常见指标的写法可以更省——验证等价与代价后作为新修订共享', '真实记录');
 const ow = 6.2, ox2 = M + ow + 0.3, ow2 = W - M - ox2;
@@ -567,7 +628,7 @@ table(s, [
   ['主表与备份副本都看起来合理', lines('无法判断哪份是业务事实', '→ 不擅自选择，失效并交给人确认')],
   ['金额从“元”改成“美元”，行数与键不变', bad('四类条件发现不了（单位变化对照）')],
   ['日期键有效，但指向了错误的日期', bad('发现不了：取值语义不在条件范围内')],
-  ['智能体没有声明所依赖的指标修订', bad('不在执行保证范围内')],
+  ['SQL 没有在 run_sql 的 metrics 参数里声明依据的定义', bad('照常执行与审查，但不在条件保证范围内')],
 ], { x: M, y: 1.2, w: bw, colW: [3.5, bw - 3.5], size: 13 });
 [
   ['问题', 'AI 学会的计算规则会因数据变化而不再正确，但 SQL 仍能正常执行。', C.red, C.grey],

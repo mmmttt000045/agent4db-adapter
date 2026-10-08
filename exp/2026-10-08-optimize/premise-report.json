@@ -1,0 +1,1471 @@
+{
+  "orphan_items": {
+    "m1": {
+      "metric": {
+        "aliases": [],
+        "basis": {
+          "by": "maint-bench",
+          "kind": "confirmed"
+        },
+        "caveats": [],
+        "definition": "门店营业额",
+        "empty": "unspecified",
+        "examples": [
+          {
+            "question": "门店营业额（学习参数）",
+            "sql": "select sum(ss_net_paid) as value from store_sales join date_dim on ss_sold_date_sk = d_date_sk where d_year = 2001 and d_moy between 3 and 3"
+          }
+        ],
+        "fact": "store_sales",
+        "filters": {},
+        "grain": [
+          "ss_ticket_number",
+          "ss_item_sk"
+        ],
+        "joins": [],
+        "measure": "sum(ss_net_paid)",
+        "name": "门店营业额",
+        "time": {
+          "dim": "date_dim",
+          "dim_col": "d_date_sk",
+          "fact_col": "ss_sold_date_sk",
+          "grain": "month",
+          "loss_ratio": 0.010305000000000009,
+          "role": "销售日",
+          "strategy": "dim_join"
+        }
+      },
+      "revision": 0,
+      "status": "valid"
+    },
+    "m5": {
+      "reason": "已撤销：store_sales 中关联不上 item 的行占比从 0.00% 升至 1.32%，这些事实被内连接排除",
+      "revision": 0,
+      "status": "unavailable"
+    },
+    "rows_updated": 13550
+  },
+  "rekey": {
+    "answers": 20,
+    "definitions": [
+      {
+        "answers": [
+          {
+            "gold": 12224745.3,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 12224745.3
+            },
+            "period": "2002-02",
+            "served": 12224745.3,
+            "served_correct": true
+          },
+          {
+            "gold": 39242420.1,
+            "key_range_unmaintained": {
+              "correct": false,
+              "value": 159197193.5
+            },
+            "period": "2002-Q1",
+            "served": 39242420.1,
+            "served_correct": true
+          },
+          {
+            "gold": 78947366.3,
+            "key_range_unmaintained": {
+              "correct": false,
+              "value": 159197193.5
+            },
+            "period": "2002-H1",
+            "served": 78947366.3,
+            "served_correct": true
+          },
+          {
+            "gold": 159197193.5,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 159197193.5
+            },
+            "period": "2002",
+            "served": 159197193.5,
+            "served_correct": true
+          },
+          {
+            "gold": 13069651.8,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 13069651.8
+            },
+            "period": "2002-09",
+            "served": 13069651.8,
+            "served_correct": true
+          }
+        ],
+        "id": "M1",
+        "key": "metric:门店营业额",
+        "optimized": true,
+        "references": {
+          "r0_accepted": true,
+          "r1": {
+            "metric": "metric:门店营业额",
+            "reason": "指标经验 metric:门店营业额 的 r1 已失效（日期键不再按月连续：36 个月份中 2 个月的日期键不连续），当前修订为 r0，请重新调用 find_metric",
+            "rejected": true
+          }
+        },
+        "revision_served": 0
+      },
+      {
+        "answers": [
+          {
+            "gold": 2886301.88,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 2886301.88
+            },
+            "period": "2002-02",
+            "served": 2886301.88,
+            "served_correct": true
+          },
+          {
+            "gold": 9321052.77,
+            "key_range_unmaintained": {
+              "correct": false,
+              "value": 39496631.89
+            },
+            "period": "2002-Q1",
+            "served": 9321052.77,
+            "served_correct": true
+          },
+          {
+            "gold": 18880299.96,
+            "key_range_unmaintained": {
+              "correct": false,
+              "value": 39496631.89
+            },
+            "period": "2002-H1",
+            "served": 18880299.96,
+            "served_correct": true
+          },
+          {
+            "gold": 39496631.89,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 39496631.89
+            },
+            "period": "2002",
+            "served": 39496631.89,
+            "served_correct": true
+          },
+          {
+            "gold": 3091249.41,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 3091249.41
+            },
+            "period": "2002-09",
+            "served": 3091249.41,
+            "served_correct": true
+          }
+        ],
+        "id": "M2",
+        "key": "metric:门店退货金额",
+        "optimized": true,
+        "references": {
+          "r0_accepted": true,
+          "r1": {
+            "metric": "metric:门店退货金额",
+            "reason": "指标经验 metric:门店退货金额 的 r1 已失效（日期键不再按月连续：36 个月份中 2 个月的日期键不连续），当前修订为 r0，请重新调用 find_metric",
+            "rejected": true
+          }
+        },
+        "revision_served": 0
+      },
+      {
+        "answers": [
+          {
+            "gold": 23.65624173781355,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 23.65624173781355
+            },
+            "period": "2002-02",
+            "served": 23.65624173781355,
+            "served_correct": true
+          },
+          {
+            "gold": 23.76842589277515,
+            "key_range_unmaintained": {
+              "correct": false,
+              "value": 23.773836371053864
+            },
+            "period": "2002-Q1",
+            "served": 23.76842589277515,
+            "served_correct": true
+          },
+          {
+            "gold": 23.780164937560432,
+            "key_range_unmaintained": {
+              "correct": false,
+              "value": 23.773836371053864
+            },
+            "period": "2002-H1",
+            "served": 23.780164937560432,
+            "served_correct": true
+          },
+          {
+            "gold": 23.773836371053864,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 23.773836371053864
+            },
+            "period": "2002",
+            "served": 23.773836371053864,
+            "served_correct": true
+          },
+          {
+            "gold": 23.80798484623745,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 23.80798484623745
+            },
+            "period": "2002-09",
+            "served": 23.80798484623745,
+            "served_correct": true
+          }
+        ],
+        "id": "M3",
+        "key": "metric:门店退货率",
+        "optimized": true,
+        "references": {
+          "r0_accepted": true,
+          "r1": {
+            "metric": "metric:门店退货率",
+            "reason": "指标经验 metric:门店退货率 的 r1 已失效（日期键不再按月连续：36 个月份中 2 个月的日期键不连续），当前修订为 r0，请重新调用 find_metric",
+            "rejected": true
+          }
+        },
+        "revision_served": 0
+      },
+      {
+        "answers": [
+          {
+            "gold": 2481382.4,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 2481382.4
+            },
+            "period": "2002-02",
+            "served": 2481382.4,
+            "served_correct": true
+          },
+          {
+            "gold": 7976235.4,
+            "key_range_unmaintained": {
+              "correct": false,
+              "value": 32355989.7
+            },
+            "period": "2002-Q1",
+            "served": 7976235.4,
+            "served_correct": true
+          },
+          {
+            "gold": 16039118.8,
+            "key_range_unmaintained": {
+              "correct": false,
+              "value": 32355989.7
+            },
+            "period": "2002-H1",
+            "served": 16039118.8,
+            "served_correct": true
+          },
+          {
+            "gold": 32355989.7,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 32355989.7
+            },
+            "period": "2002",
+            "served": 32355989.7,
+            "served_correct": true
+          },
+          {
+            "gold": 2659254.2,
+            "key_range_unmaintained": {
+              "correct": true,
+              "value": 2659254.2
+            },
+            "period": "2002-09",
+            "served": 2659254.2,
+            "served_correct": true
+          }
+        ],
+        "id": "M5",
+        "key": "metric:电子品类门店营业额",
+        "optimized": true,
+        "references": {
+          "r0_accepted": true,
+          "r1": {
+            "metric": "metric:电子品类门店营业额",
+            "reason": "指标经验 metric:电子品类门店营业额 的 r1 已失效（日期键不再按月连续：36 个月份中 2 个月的日期键不连续），当前修订为 r0，请重新调用 find_metric",
+            "rejected": true
+          }
+        },
+        "revision_served": 0
+      }
+    ],
+    "events": [
+      {
+        "agent": "B",
+        "event": "revoked",
+        "key": "metric:门店营业额",
+        "policy": "condition",
+        "reason": "日期键不再按月连续：36 个月份中 2 个月的日期键不连续",
+        "reextract": false,
+        "revision": 1
+      },
+      {
+        "conditions": [
+          {
+            "action": "checked",
+            "cond": "时间关联 store_sales⋈date_dim",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "reused",
+            "baseline": 0.010305000000000009,
+            "cond": "覆盖 store_sales⋈date_dim",
+            "loss": 0.010305000000000009,
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales",
+              "date_dim"
+            ]
+          },
+          {
+            "action": "reused",
+            "cond": "粒度 store_sales(ss_item_sk, ss_ticket_number) 是否唯一",
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales"
+            ]
+          }
+        ],
+        "event": "predecessor_checked",
+        "key": "metric:门店营业额",
+        "pass": true,
+        "reason": null,
+        "revision": 0
+      },
+      {
+        "event": "reinstated",
+        "from": 1,
+        "key": "metric:门店营业额",
+        "reason": "日期键不再按月连续：36 个月份中 2 个月的日期键不连续",
+        "revision": 0
+      },
+      {
+        "agent": "B",
+        "changed": [
+          "date_dim",
+          "store_sales"
+        ],
+        "conditions": [
+          {
+            "action": "checked",
+            "cond": "时间关联 store_sales⋈date_dim",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "executed",
+            "baseline": 0.010305000000000009,
+            "cond": "覆盖 store_sales⋈date_dim",
+            "loss": 0.010305000000000009,
+            "ms": 266.317558,
+            "pass": true,
+            "tables": [
+              "store_sales",
+              "date_dim"
+            ]
+          },
+          {
+            "action": "executed",
+            "cond": "粒度 store_sales(ss_item_sk, ss_ticket_number) 是否唯一",
+            "ms": 7710.341922,
+            "pass": true,
+            "tables": [
+              "store_sales"
+            ]
+          },
+          {
+            "action": "executed",
+            "cond": "日期键连续 date_dim",
+            "ms": 1.218486,
+            "pass": false,
+            "tables": [
+              "date_dim"
+            ]
+          }
+        ],
+        "db": {
+          "by_kind": {
+            "check": [
+              0,
+              0.0
+            ],
+            "exec": [
+              0,
+              0.0
+            ],
+            "guard": [
+              1,
+              5.659
+            ],
+            "meta": [
+              13,
+              49.43799999999999
+            ],
+            "metric": [
+              3,
+              7977.797000000002
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "ms": 8032.894,
+          "queries": 17
+        },
+        "event": "maintenance",
+        "key": "metric:门店营业额",
+        "outcome": "reinstated",
+        "policy": "condition",
+        "revision": 1,
+        "wall_ms": 8036.854792
+      },
+      {
+        "agent": "B",
+        "event": "revoked",
+        "key": "metric:门店退货金额",
+        "policy": "condition",
+        "reason": "日期键不再按月连续：36 个月份中 2 个月的日期键不连续",
+        "reextract": false,
+        "revision": 1
+      },
+      {
+        "conditions": [
+          {
+            "action": "checked",
+            "cond": "时间关联 store_returns⋈date_dim",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "reused",
+            "baseline": 0.0,
+            "cond": "覆盖 store_returns⋈date_dim",
+            "loss": 0.0,
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_returns",
+              "date_dim"
+            ]
+          },
+          {
+            "action": "reused",
+            "cond": "粒度 store_returns(sr_item_sk, sr_ticket_number) 是否唯一",
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_returns"
+            ]
+          }
+        ],
+        "event": "predecessor_checked",
+        "key": "metric:门店退货金额",
+        "pass": true,
+        "reason": null,
+        "revision": 0
+      },
+      {
+        "event": "reinstated",
+        "from": 1,
+        "key": "metric:门店退货金额",
+        "reason": "日期键不再按月连续：36 个月份中 2 个月的日期键不连续",
+        "revision": 0
+      },
+      {
+        "agent": "B",
+        "changed": [
+          "date_dim",
+          "store_returns"
+        ],
+        "conditions": [
+          {
+            "action": "checked",
+            "cond": "时间关联 store_returns⋈date_dim",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "executed",
+            "baseline": 0.0,
+            "cond": "覆盖 store_returns⋈date_dim",
+            "loss": 0.0,
+            "ms": 184.740082,
+            "pass": true,
+            "tables": [
+              "store_returns",
+              "date_dim"
+            ]
+          },
+          {
+            "action": "executed",
+            "cond": "粒度 store_returns(sr_item_sk, sr_ticket_number) 是否唯一",
+            "ms": 2766.253128,
+            "pass": true,
+            "tables": [
+              "store_returns"
+            ]
+          },
+          {
+            "action": "reused",
+            "cond": "日期键连续 date_dim",
+            "ms": 0.0,
+            "pass": false,
+            "tables": [
+              "date_dim"
+            ]
+          }
+        ],
+        "db": {
+          "by_kind": {
+            "check": [
+              0,
+              0.0
+            ],
+            "exec": [
+              0,
+              0.0
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              11,
+              51.16300000000001
+            ],
+            "metric": [
+              2,
+              2950.928
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "ms": 3002.0910000000003,
+          "queries": 13
+        },
+        "event": "maintenance",
+        "key": "metric:门店退货金额",
+        "outcome": "reinstated",
+        "policy": "condition",
+        "revision": 1,
+        "wall_ms": 3005.61531
+      },
+      {
+        "agent": "B",
+        "event": "revoked",
+        "key": "metric:门店退货率",
+        "policy": "condition",
+        "reason": "日期键不再按月连续：36 个月份中 2 个月的日期键不连续",
+        "reextract": false,
+        "revision": 1
+      },
+      {
+        "conditions": [
+          {
+            "action": "checked",
+            "cond": "关联 store_sales⋈store_returns",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "checked",
+            "cond": "时间关联 store_sales⋈date_dim",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "reused",
+            "baseline": 0.010305000000000009,
+            "cond": "覆盖 store_sales⋈date_dim",
+            "loss": 0.010305000000000009,
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales",
+              "date_dim"
+            ]
+          },
+          {
+            "action": "reused",
+            "cond": "粒度 store_sales(ss_item_sk, ss_ticket_number) 是否唯一",
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales"
+            ]
+          }
+        ],
+        "event": "predecessor_checked",
+        "key": "metric:门店退货率",
+        "pass": true,
+        "reason": null,
+        "revision": 0
+      },
+      {
+        "event": "reinstated",
+        "from": 1,
+        "key": "metric:门店退货率",
+        "reason": "日期键不再按月连续：36 个月份中 2 个月的日期键不连续",
+        "revision": 0
+      },
+      {
+        "agent": "B",
+        "changed": [
+          "date_dim",
+          "store_returns",
+          "store_sales"
+        ],
+        "conditions": [
+          {
+            "action": "checked",
+            "cond": "关联 store_sales⋈store_returns",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "checked",
+            "cond": "时间关联 store_sales⋈date_dim",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "reused",
+            "baseline": 0.010305000000000009,
+            "cond": "覆盖 store_sales⋈date_dim",
+            "loss": 0.010305000000000009,
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales",
+              "date_dim"
+            ]
+          },
+          {
+            "action": "reused",
+            "cond": "粒度 store_sales(ss_item_sk, ss_ticket_number) 是否唯一",
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales"
+            ]
+          },
+          {
+            "action": "reused",
+            "cond": "日期键连续 date_dim",
+            "ms": 0.0,
+            "pass": false,
+            "tables": [
+              "date_dim"
+            ]
+          }
+        ],
+        "db": {
+          "by_kind": {
+            "check": [
+              0,
+              0.0
+            ],
+            "exec": [
+              0,
+              0.0
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              12,
+              44.24899999999997
+            ],
+            "metric": [
+              0,
+              0.0
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "ms": 44.249000000003434,
+          "queries": 12
+        },
+        "event": "maintenance",
+        "key": "metric:门店退货率",
+        "outcome": "reinstated",
+        "policy": "condition",
+        "revision": 1,
+        "wall_ms": 47.828361
+      },
+      {
+        "agent": "B",
+        "event": "revoked",
+        "key": "metric:电子品类门店营业额",
+        "policy": "condition",
+        "reason": "日期键不再按月连续：36 个月份中 2 个月的日期键不连续",
+        "reextract": false,
+        "revision": 1
+      },
+      {
+        "conditions": [
+          {
+            "action": "skipped",
+            "cond": "关联 store_sales⋈item",
+            "tables": [
+              "item"
+            ]
+          },
+          {
+            "action": "reused",
+            "baseline": 0.0,
+            "cond": "关联完整 store_sales⋈item",
+            "loss": 0.0,
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales",
+              "item"
+            ]
+          },
+          {
+            "action": "checked",
+            "cond": "时间关联 store_sales⋈date_dim",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "reused",
+            "baseline": 0.010305000000000009,
+            "cond": "覆盖 store_sales⋈date_dim",
+            "loss": 0.010305000000000009,
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales",
+              "date_dim"
+            ]
+          },
+          {
+            "action": "reused",
+            "cond": "粒度 store_sales(ss_item_sk, ss_ticket_number) 是否唯一",
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales"
+            ]
+          }
+        ],
+        "event": "predecessor_checked",
+        "key": "metric:电子品类门店营业额",
+        "pass": true,
+        "reason": null,
+        "revision": 0
+      },
+      {
+        "event": "reinstated",
+        "from": 1,
+        "key": "metric:电子品类门店营业额",
+        "reason": "日期键不再按月连续：36 个月份中 2 个月的日期键不连续",
+        "revision": 0
+      },
+      {
+        "agent": "B",
+        "changed": [
+          "date_dim",
+          "store_sales"
+        ],
+        "conditions": [
+          {
+            "action": "skipped",
+            "cond": "关联 store_sales⋈item",
+            "tables": [
+              "item"
+            ]
+          },
+          {
+            "action": "executed",
+            "baseline": 0.0,
+            "cond": "关联完整 store_sales⋈item",
+            "loss": 0.0,
+            "ms": 262.759845,
+            "pass": true,
+            "tables": [
+              "store_sales",
+              "item"
+            ]
+          },
+          {
+            "action": "checked",
+            "cond": "时间关联 store_sales⋈date_dim",
+            "pass": true,
+            "source": "reused"
+          },
+          {
+            "action": "reused",
+            "baseline": 0.010305000000000009,
+            "cond": "覆盖 store_sales⋈date_dim",
+            "loss": 0.010305000000000009,
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales",
+              "date_dim"
+            ]
+          },
+          {
+            "action": "reused",
+            "cond": "粒度 store_sales(ss_item_sk, ss_ticket_number) 是否唯一",
+            "ms": 0.0,
+            "pass": true,
+            "tables": [
+              "store_sales"
+            ]
+          },
+          {
+            "action": "reused",
+            "cond": "日期键连续 date_dim",
+            "ms": 0.0,
+            "pass": false,
+            "tables": [
+              "date_dim"
+            ]
+          }
+        ],
+        "db": {
+          "by_kind": {
+            "check": [
+              0,
+              0.0
+            ],
+            "exec": [
+              0,
+              0.0
+            ],
+            "guard": [
+              0,
+              0.0
+            ],
+            "meta": [
+              11,
+              37.474999999999966
+            ],
+            "metric": [
+              1,
+              262.73199999999633
+            ],
+            "probe": [
+              0,
+              0.0
+            ],
+            "repair": [
+              0,
+              0.0
+            ]
+          },
+          "ms": 300.2069999999949,
+          "queries": 12
+        },
+        "event": "maintenance",
+        "key": "metric:电子品类门店营业额",
+        "outcome": "reinstated",
+        "policy": "condition",
+        "revision": 1,
+        "wall_ms": 303.923938
+      }
+    ],
+    "key_range_unmaintained_wrong": 8,
+    "notices": [],
+    "served_wrong": 0
+  },
+  "rounds": [
+    {
+      "key": "metric:电子品类门店营业额",
+      "proposals": null,
+      "published": "期间谓词改为日期键范围过滤，不连接 date_dim",
+      "revision_before": 0,
+      "tried": [
+        {
+          "candidate": "期间谓词改为日期键范围过滤，不连接 date_dim",
+          "cost": {
+            "ms": 2295.131999999998,
+            "queries": 64,
+            "wall_ms": 2306.997054
+          },
+          "event": "optimize_promoted",
+          "from": 0,
+          "gates": [
+            {
+              "gate": "O1",
+              "pass": true
+            },
+            {
+              "gate": "G3",
+              "pass": true
+            },
+            {
+              "gate": "G4",
+              "pass": true
+            },
+            {
+              "gate": "O2",
+              "pass": true
+            },
+            {
+              "gate": "O3",
+              "pass": true
+            },
+            {
+              "gate": "G5",
+              "pass": true
+            },
+            {
+              "gate": "O4",
+              "pass": true
+            },
+            {
+              "gate": "O5",
+              "pass": true
+            },
+            {
+              "blocks": {
+                "new": 87128.0,
+                "old": 95090.0
+              },
+              "evidence": {
+                "baseline_ms": 51.7835,
+                "ci95": [
+                  -25.359226022633713,
+                  -7.051916834509134
+                ],
+                "episodes": 14,
+                "mean_delta_ms": -16.205571428571425,
+                "policy_ms": 35.57792857142857
+              },
+              "gate": "O6",
+              "pass": true,
+              "reason": null,
+              "saving": 0.31294855366229446
+            }
+          ],
+          "key": "metric:电子品类门店营业额",
+          "revision": 1,
+          "saving": 0.31294855366229446,
+          "source": "rule"
+        }
+      ]
+    },
+    {
+      "key": "metric:门店营业额",
+      "proposals": null,
+      "published": "期间谓词改为日期键范围过滤，不连接 date_dim",
+      "revision_before": 0,
+      "tried": [
+        {
+          "candidate": "期间谓词改为日期键范围过滤，不连接 date_dim",
+          "cost": {
+            "ms": 2043.6990000000005,
+            "queries": 59,
+            "wall_ms": 2052.6038909999997
+          },
+          "event": "optimize_promoted",
+          "from": 0,
+          "gates": [
+            {
+              "gate": "O1",
+              "pass": true
+            },
+            {
+              "gate": "G3",
+              "pass": true
+            },
+            {
+              "gate": "G4",
+              "pass": true
+            },
+            {
+              "gate": "O2",
+              "pass": true
+            },
+            {
+              "gate": "O3",
+              "pass": true
+            },
+            {
+              "gate": "G5",
+              "pass": true
+            },
+            {
+              "gate": "O4",
+              "pass": true
+            },
+            {
+              "gate": "O5",
+              "pass": true
+            },
+            {
+              "blocks": {
+                "new": 87038.0,
+                "old": 95000.0
+              },
+              "evidence": {
+                "baseline_ms": 45.04671428571429,
+                "ci95": [
+                  -15.355820418605326,
+                  -2.5907510099661053
+                ],
+                "episodes": 14,
+                "mean_delta_ms": -8.973285714285716,
+                "policy_ms": 36.07342857142857
+              },
+              "gate": "O6",
+              "pass": true,
+              "reason": null,
+              "saving": 0.19919956109055045
+            }
+          ],
+          "key": "metric:门店营业额",
+          "revision": 1,
+          "saving": 0.19919956109055045,
+          "source": "rule"
+        }
+      ]
+    },
+    {
+      "key": "metric:门店退货率",
+      "proposals": null,
+      "published": "期间谓词改为日期键范围过滤，不连接 date_dim",
+      "revision_before": 0,
+      "tried": [
+        {
+          "candidate": "期间谓词改为日期键范围过滤，不连接 date_dim",
+          "cost": {
+            "ms": 12060.968999999997,
+            "queries": 61,
+            "wall_ms": 12073.955454
+          },
+          "event": "optimize_promoted",
+          "from": 0,
+          "gates": [
+            {
+              "gate": "O1",
+              "pass": true
+            },
+            {
+              "gate": "G3",
+              "pass": true
+            },
+            {
+              "gate": "G4",
+              "pass": true
+            },
+            {
+              "gate": "O2",
+              "pass": true
+            },
+            {
+              "gate": "O3",
+              "pass": true
+            },
+            {
+              "gate": "G5",
+              "pass": true
+            },
+            {
+              "gate": "O4",
+              "pass": true
+            },
+            {
+              "gate": "O5",
+              "pass": true
+            },
+            {
+              "blocks": {
+                "new": 1668787.0,
+                "old": 1458917.0
+              },
+              "evidence": {
+                "baseline_ms": 278.73935714285716,
+                "ci95": [
+                  -144.5129590814194,
+                  -75.53875520429489
+                ],
+                "episodes": 14,
+                "mean_delta_ms": -110.02585714285715,
+                "policy_ms": 168.7135
+              },
+              "gate": "O6",
+              "pass": true,
+              "reason": null,
+              "saving": 0.39472666605336115
+            }
+          ],
+          "key": "metric:门店退货率",
+          "revision": 1,
+          "saving": 0.39472666605336115,
+          "source": "rule"
+        }
+      ]
+    },
+    {
+      "key": "metric:门店退货金额",
+      "proposals": null,
+      "published": "期间谓词改为日期键范围过滤，不连接 date_dim",
+      "revision_before": 0,
+      "tried": [
+        {
+          "candidate": "期间谓词改为日期键范围过滤，不连接 date_dim",
+          "cost": {
+            "ms": 1136.3930000000037,
+            "queries": 59,
+            "wall_ms": 1145.834014
+          },
+          "event": "optimize_promoted",
+          "from": 0,
+          "gates": [
+            {
+              "gate": "O1",
+              "pass": true
+            },
+            {
+              "gate": "G3",
+              "pass": true
+            },
+            {
+              "gate": "G4",
+              "pass": true
+            },
+            {
+              "gate": "O2",
+              "pass": true
+            },
+            {
+              "gate": "O3",
+              "pass": true
+            },
+            {
+              "gate": "G5",
+              "pass": true
+            },
+            {
+              "gate": "O4",
+              "pass": true
+            },
+            {
+              "gate": "O5",
+              "pass": true
+            },
+            {
+              "blocks": {
+                "new": 49791.0,
+                "old": 95281.0
+              },
+              "evidence": {
+                "baseline_ms": 25.4295,
+                "ci95": [
+                  -15.336981370826816,
+                  -4.095161486316045
+                ],
+                "episodes": 14,
+                "mean_delta_ms": -9.71607142857143,
+                "policy_ms": 15.71342857142857
+              },
+              "gate": "O6",
+              "pass": true,
+              "reason": null,
+              "saving": 0.38207874431551664
+            }
+          ],
+          "key": "metric:门店退货金额",
+          "revision": 1,
+          "saving": 0.38207874431551664,
+          "source": "rule"
+        }
+      ]
+    }
+  ],
+  "rows": 1000000,
+  "stats": {
+    "db": {
+      "by_kind": {
+        "check": [
+          12,
+          5128.435
+        ],
+        "exec": [
+          1,
+          0.347
+        ],
+        "guard": [
+          2,
+          7.765
+        ],
+        "meta": [
+          142,
+          542.464
+        ],
+        "metric": [
+          244,
+          48773.781
+        ],
+        "probe": [
+          0,
+          0.0
+        ],
+        "repair": [
+          0,
+          0.0
+        ]
+      },
+      "db_ms": 54452.792,
+      "queries": 401
+    },
+    "entries": 24,
+    "feedback": {
+      "adaptive": {
+        "adopted": false,
+        "at": 0,
+        "evidence": {
+          "baseline_ms": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "episodes": 0,
+          "mean_delta_ms": 0.0,
+          "policy_ms": 0.0
+        }
+      },
+      "adaptive_uses": 0,
+      "contexts": {
+        "KeyUnique|date_dim(d_date_sk)": {
+          "fails": 0,
+          "hits": 1,
+          "mrows": 0.001096,
+          "ms": 2.320361,
+          "runs": 1
+        },
+        "KeyUnique|item(i_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.001,
+          "ms": 1.861473,
+          "runs": 1
+        },
+        "KeyUnique|store_returns(sr_ticket_number,sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.593817,
+          "ms": 2094.152138,
+          "runs": 1
+        },
+        "KeyUnique|store_sales(ss_ticket_number,ss_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 1.5,
+          "ms": 1702.9746850000001,
+          "runs": 1
+        },
+        "RowConservation|store_returns>date_dim:(sr_returned_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.792852,
+          "ms": 197.471909,
+          "runs": 1
+        },
+        "RowConservation|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 2.001096,
+          "ms": 213.151238,
+          "runs": 1
+        },
+        "RowConservation|store_sales>item:(ss_item_sk=i_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 2.001,
+          "ms": 320.978425,
+          "runs": 1
+        },
+        "RowConservation|store_sales>store_returns:(ss_ticket_number=sr_ticket_number, ss_item_sk=sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 2.395878,
+          "ms": 576.645821,
+          "runs": 1
+        },
+        "SampleFanout|store_returns>date_dim:(sr_returned_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.001096,
+          "ms": 3.706578,
+          "runs": 1
+        },
+        "SampleFanout|store_sales>date_dim:(ss_sold_date_sk=d_date_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.001096,
+          "ms": 4.852345,
+          "runs": 1
+        },
+        "SampleFanout|store_sales>item:(ss_item_sk=i_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.001,
+          "ms": 4.948174,
+          "runs": 1
+        },
+        "SampleFanout|store_sales>store_returns:(ss_ticket_number=sr_ticket_number, ss_item_sk=sr_item_sk)": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.395878,
+          "ms": 5.783026,
+          "runs": 1
+        }
+      },
+      "evaluation": "frozen scorer; future distinct candidate groups; observed incremental costs",
+      "evidence": {
+        "audited_failures_in_window": 0,
+        "audited_failures_total": 0,
+        "min_evidence": 8,
+        "passed": 4,
+        "unaudited_failures": 0
+      },
+      "kinds": {
+        "KeyUnique": {
+          "fails": 0,
+          "hits": 1,
+          "mrows": 2.095913,
+          "ms": 3801.308657,
+          "runs": 4
+        },
+        "RowConservation": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 7.1908259999999995,
+          "ms": 1308.247393,
+          "runs": 4
+        },
+        "SampleFanout": {
+          "fails": 0,
+          "hits": 0,
+          "mrows": 0.39907000000000004,
+          "ms": 19.290123,
+          "runs": 4
+        }
+      },
+      "order_calls": 4,
+      "pending_validation": {
+        "baseline_ms": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "episodes": 0,
+        "mean_delta_ms": 0.0,
+        "policy_ms": 0.0
+      }
+    },
+    "guard_fails": 0,
+    "guard_runs": 5,
+    "inflight_merged": 0,
+    "knowledge_hits": 31,
+    "knowledge_misses": 17,
+    "notices": 9,
+    "optimizations": 4,
+    "repairs": 0,
+    "revocations": 5,
+    "snapshot_exec": {
+      "checks_reused": 0,
+      "checks_run": 0,
+      "rejections": 0
+    },
+    "sql_cache": {
+      "hits": 0,
+      "misses": 0
+    },
+    "sql_rejections": 0
+  },
+  "status": "passed",
+  "status_change": {
+    "after": 2,
+    "before": 1,
+    "references": {
+      "r0": {
+        "accepted": false,
+        "response": {
+          "metric": "metric:门店退货金额",
+          "reason": "指标经验 metric:门店退货金额 的 r0 已失效（粒度守卫失败：store_returns(sr_item_sk, sr_ticket_number) 是否唯一，566694 行只有 395878 个不同键（平均每键 1.43 行）），当前修订为 r2，请重新调用 find_metric",
+          "rejected": true
+        }
+      },
+      "r1": {
+        "accepted": false,
+        "response": {
+          "metric": "metric:门店退货金额",
+          "reason": "指标经验 metric:门店退货金额 的 r1 已失效（粒度守卫失败：store_returns(sr_item_sk, sr_ticket_number) 是否唯一，566694 行只有 395878 个不同键（平均每键 1.43 行）），当前修订为 r2，请重新调用 find_metric",
+          "rejected": true
+        }
+      },
+      "r2": {
+        "accepted": true,
+        "response": {
+          "result": {
+            "columns": [
+              "value"
+            ],
+            "row_count": 1,
+            "rows": [
+              [
+                "1"
+              ]
+            ],
+            "truncated": false
+          },
+          "source": "executed"
+        }
+      }
+    }
+  },
+  "sweep_s": 17.595229761
+}

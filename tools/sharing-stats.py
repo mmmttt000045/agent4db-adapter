@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publication and amortization statistics of the shared memory layer, from archived end-to-end runs.
+"""Publication and consumer-performance statistics of the shared memory layer, from archived end-to-end runs.
 
 usage: sharing-stats.py --scen results/scen-20261002 --prev results/scen-20260930 \
            --opt results/scen-20261008-opt/metric-*/cell-r1-metric-global-opt-named.json [--tex-out overleaf/gen]
@@ -9,22 +9,21 @@ corroborated, refused) is counted on the cells of the current implementation (th
 the replay checks (G6 example SQL, G7 canonical SQL) and by the provenance chain are counted over both studies, and the
 G7 refusal whose canonical answer is furthest from the learned answer is reported as the example.
 
-Amortization (MAVRA = metric-global-snap, three runs; exploring alone = middle; example retrieval = traj-global and
-traj-verify):
+Consumer performance (MAVRA = metric-global-snap, three runs; exploring alone = middle; example retrieval = traj-global
+and traj-verify):
 - production per run: the learning sessions (all tokens and seconds), extraction and admission;
-- held-out consumer tasks: tokens (input + output), seconds and accuracy per task; break-even numbers of consumer tasks
-  at which production is repaid in tokens and in time;
+- held-out consumer tasks: tokens (input + output), seconds and accuracy per task, the speedup and the token saving
+  against exploring alone, per task and per correct answer;
 - maintenance per change (database time of the maintenance events, per run) against the extra cost per task when the
   example-retrieval agent verifies validity itself;
 - the cost of invalidated definitions (duplicate load, date-key format, backup copy) for consumers;
-- optimization: the test cost per published rule candidate against its per-execution saving.
+- optimization: the test time per published rule candidate and its per-execution saving.
 """
 import argparse
 import collections
 import glob
 import importlib.util
 import json
-import math
 import os
 import re
 import statistics
@@ -126,7 +125,7 @@ def maint_per_change(cells, phases):
 
 def optimization(path):
     d = json.load(open(path, encoding="utf-8"))
-    tests, saves, paybacks = [], [], []
+    tests, saves = [], []
     for r in (d.get("optimizing") or {}).get("rounds", []):
         for t in r.get("tried", []):
             if t.get("event") != "optimize_promoted":
@@ -136,8 +135,7 @@ def optimization(path):
             save_ms = -o6["evidence"]["mean_delta_ms"]
             tests.append(wall_s)
             saves.append(save_ms)
-            paybacks.append(wall_s * 1000 / save_ms)
-    return tests, saves, paybacks
+    return tests, saves
 
 
 def main():
@@ -166,15 +164,15 @@ def main():
     prod_s = prod["learn_s"] + prod["extract_s"] + prod["admit_s"]
     hold_c, hold_a = per_task(cond, ["holdout"]), per_task(alone, ["holdout"])
     hold_per_run = hold_c["n"] / len(cond)
-    break_tok = math.ceil(prod_tok / (hold_a["tok"] - hold_c["tok"]))
-    break_s = math.ceil(prod_s / (hold_a["s"] - hold_c["s"]))
+    speedup = hold_a["s"] / hold_c["s"]
+    tok_save = 100 * (1 - hold_c["tok"] / hold_a["tok"])
     print("\n## Production and consumers")
     print(f"production per run: {prod}; tokens {prod_tok:.0f}, seconds {prod_s:.0f}")
     print(f"held-out per task: alone {hold_a}, MAVRA {hold_c}; {hold_per_run:.0f} held-out tasks per run")
-    print(f"break-even: {break_tok} tasks (tokens), {break_s} tasks (time)")
+    print(f"held-out speedup {speedup:.1f}x, token saving {tok_save:.0f}%")
     per_correct_a, per_correct_c = hold_a["tok"] / hold_a["acc"], hold_c["tok"] / hold_c["acc"]
-    break_correct = math.ceil(prod_tok / (per_correct_a - per_correct_c))
-    print(f"tokens per correct answer: alone {per_correct_a:.0f}, MAVRA {per_correct_c:.0f}; break-even after {break_correct} correct answers")
+    correct_save = 100 * (1 - per_correct_c / per_correct_a)
+    print(f"tokens per correct answer: alone {per_correct_a:.0f}, MAVRA {per_correct_c:.0f} ({correct_save:.0f}% fewer)")
 
     tv = per_task(traj, ["holdout"] + BENIGN)
     vv = per_task(verify, ["holdout"] + BENIGN)
@@ -190,17 +188,15 @@ def main():
     print("\n## Invalidated definitions")
     print(f"MAVRA valid or repaired: {valid_c}; invalidated: {inval_c}; alone on the invalidating changes: {inval_a}")
 
-    tests, saves, paybacks = optimization(a.opt)
+    tests, saves = optimization(a.opt)
     print("\n## Optimization")
     print(f"test wall s per published candidate: {[round(x, 1) for x in tests]}")
     print(f"saving ms per execution: {[round(x, 1) for x in saves]}")
-    print(f"payback executions: {[round(x) for x in paybacks]}")
 
     if not a.tex_out:
         return
     k = lambda v: f"{v / 1000:.0f}"
     k1 = lambda v: f"{v / 1000:.1f}"
-    num = lambda v: f"{v:,}".replace(",", "{,}")
     money = lambda v: f"{v:,.2f}".replace(",", "{,}")
     macros = {
         "PubTasks": funnel["tasks"], "PubJudged": funnel["judged"], "PubJudgeRefused": funnel["judge_refused"],
@@ -214,8 +210,8 @@ def main():
         "AmHoldPerRun": f"{hold_per_run:.0f}",
         "AmHoldTokAloneK": k1(hold_a["tok"]), "AmHoldTokCondK": k1(hold_c["tok"]),
         "AmHoldSAlone": f"{hold_a['s']:.1f}", "AmHoldSCond": f"{hold_c['s']:.1f}",
-        "AmBreakTok": break_tok, "AmBreakS": break_s,
-        "AmTokPerCorrectAloneK": k1(per_correct_a), "AmTokPerCorrectCondK": k1(per_correct_c), "AmBreakCorrect": break_correct,
+        "AmHoldSpeedup": f"{speedup:.1f}", "AmHoldTokSave": f"{tok_save:.0f}",
+        "AmTokPerCorrectAloneK": k1(per_correct_a), "AmTokPerCorrectCondK": k1(per_correct_c), "AmCorrectTokSave": f"{correct_save:.0f}",
         "AmMaintBenignS": f"{m_benign:.1f}", "AmMaintRepairS": f"{m_repair:.0f}", "AmMaintInvalS": f"{m_inval:.0f}",
         "AmVerifyExtraS": f"{vv['s'] - tv['s']:.0f}", "AmVerifyExtraTokK": k1(vv["tok"] - tv["tok"]),
         "AmTasksPerChange": f"{tasks_per_change:.0f}",
@@ -225,7 +221,6 @@ def main():
         "AmInvalAccCond": f"{100 * inval_c['acc']:.0f}", "AmInvalAccAlone": f"{100 * inval_a['acc']:.0f}",
         "AmOptTestMinS": f"{min(tests):.1f}", "AmOptTestMaxS": f"{max(tests):.1f}", "AmOptTestTotalS": f"{sum(tests):.0f}",
         "AmOptSaveMinMs": f"{min(saves):.1f}", "AmOptSaveMaxMs": f"{max(saves):.1f}",
-        "AmOptPaybackMin": num(round(min(paybacks))), "AmOptPaybackMax": num(round(max(paybacks))),
     }
     path = os.path.join(a.tex_out, "sharing.tex")
     with open(path, "w", encoding="utf-8") as f:

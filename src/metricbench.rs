@@ -468,7 +468,14 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         }
         // 同 -snap，并在学习之后对每条已发布定义尝试优化修订（规则改写与模型提议；验证等价与代价后发布）
         "metric-global-opt" => (
-            MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, g8_snapshot_db: true, optimize: true, ..base },
+            MiddleConfig {
+                metric_maint: Maint::Condition,
+                cond_reuse: true,
+                g8_example: true,
+                g8_snapshot_db: true,
+                optimize: true,
+                ..base
+            },
             true,
             true,
         ),

@@ -748,7 +748,8 @@ pub fn parse_proposals(text: &str) -> std::result::Result<Proposed, String> {
             errors.push(format!("第 {} 项缺少 fact 或 measure", i + 1));
             continue;
         }
-        let label = if rationale.trim().is_empty() { format!("模型提议 {}", i + 1) } else { format!("模型提议：{}", rationale.trim()) };
+        let label =
+            if rationale.trim().is_empty() { format!("模型提议 {}", i + 1) } else { format!("模型提议：{}", rationale.trim()) };
         out.push((label, m));
     }
     Ok((out, errors))

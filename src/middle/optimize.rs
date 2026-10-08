@@ -75,7 +75,9 @@ impl Middle {
             self.metric_event(v.clone());
             return Ok(v);
         }
-        if cand.time.as_ref().is_some_and(|t| t.strategy == TimeStrategy::KeyRange) && !cand.caveats.iter().any(|c| c.contains("日期键范围")) {
+        if cand.time.as_ref().is_some_and(|t| t.strategy == TimeStrategy::KeyRange)
+            && !cand.caveats.iter().any(|c| c.contains("日期键范围"))
+        {
             cand.caveats.push("期间谓词按日期键范围过滤，不连接日期维度；前提是日期键按月连续，由中间层作为该修订的条件维护".into());
         }
         // 发布：同一键的新修订，使用者与命中数沿用；旧修订号记为宽限可用
@@ -180,7 +182,13 @@ impl Middle {
     /// 在一个可重复读的只读快照里，对样本期间逐个执行当前修订与候选的规范 SQL：结果须相同；再各做一次
     /// EXPLAIN (ANALYZE, BUFFERS)，先后顺序逐期交替以减轻缓存偏向。返回等价判定、执行时间的配对证据（候选 − 当前）
     /// 与两者读到的共享块数。编译结果相同的题型（按月排名）不计。
-    async fn compare_on_snapshot(&self, old: &Metric, cand: &Metric, decimals: u32, learn_ask: &Ask) -> Result<(Gate, Evidence, (f64, f64))> {
+    async fn compare_on_snapshot(
+        &self,
+        old: &Metric,
+        cand: &Metric,
+        decimals: u32,
+        learn_ask: &Ask,
+    ) -> Result<(Gate, Evidence, (f64, f64))> {
         let snap = self.db.snapshot().await?;
         let mut pairs: Vec<(f64, f64)> = vec![];
         let mut blocks = (0.0, 0.0);

@@ -80,8 +80,8 @@
 | 预印本 | 重叠 | 区别（据摘要） |
 |---|---|---|
 | Tk-Boost，arXiv 2602.13521（2026-02） | 从 Agent 错误中学可复用知识，带适用条件，执行 SQL 验证，可接任意 Agent | 知识是文本，适用条件是表、列、关键词；不绑数据版本，无撤销与修复 |
-| Invalidation Contracts for Cross-Episode Agent Memory，2609.00243（2026-08） | 用服务端版本戳在数据漂移后驱逐 Agent 缓存的修正；讨论失效粒度（行级可行、表级抹掉收益） | 只驱逐，不重验、不修复；键值 API 而非 SQL；单 Agent |
-| Fresh Memory, Stale Plans，2609.03340（2026-09） | 存储的 Agent 计划链接到带版本的输入，执行前重查 | 不感知数据库，没有数据条件检查 |
+| Invalidation Contracts for Cross-Episode Agent Memory，2609.00243（2026-08）**已读全文，已引用（10-08，见第 12 节）** | 用服务端版本戳在数据漂移后驱逐 Agent 缓存的修正；讨论失效粒度（行级可行、表级抹掉收益） | 只驱逐，不重验、不修复；键值 API 而非 SQL；单 Agent |
+| Fresh Memory, Stale Plans，2609.03340（2026-09）**已读全文，已引用（10-08，见第 12 节）** | 存储的 Agent 计划链接到带版本的输入，执行前重查 | 不感知数据库，没有数据条件检查 |
 | EvoOntology，2609.15779（2026-09） | 面向数据 Agent 的类型化、带版本的本体，从轨迹演化，编辑经任务评估门槛 | 门槛是任务正确率，不是键或关联条件；不处理数据变化 |
 | GATE，2606.05634（2026-06） | 用执行结果验证语义层条目，存为记忆 | 只在学习时验证，无失效 |
 | GROUND，2608.26157（2026-08） | 按指标、关联、粒度、过滤规则检查生成的 SQL | 规则人工编写，无版本与数据变化处理 |
@@ -233,3 +233,19 @@
 | BIRD-Interact | **没有**“有/无知识”的正确率对比，只是删除知识条目制造歧义；不能引作“业务语义提高正确率” |
 
 当天改掉的问题：Lenz97 被引作“每次更新都要重查”（应为 Mazón09 §4.1）；BIRD-Interact 被引作提高正确率；Breck19 的 “looks perfectly fine” 挂了两篇且写成普遍规律；引言里“becoming the norm”“every agent”“instances of”“defeat the safeguards”四处措辞收紧；状态流水混粒度的例子注明是我们的例子、Kimball 只禁止混粒度；Adapton 不是构建系统也不用哈希；参考文献里未被引用的 Cache-Craft 条目删除。
+
+## 12. 2026-10-08 全文核对（论文改为“共享记忆层”定位后补引）
+
+检索代理读了 PDF 全文；引文逐字取自 PDF。五篇都已进 `overleaf/references.tex` 与第 8 节“智能体记忆与经验复用”段。
+
+| 条目 | 状态 | 做了什么 | 与 MAVRA 的区别（论文中的说法） |
+|---|---|---|---|
+| Michael Wu, Arquimedes Canedo. Invalidation Contracts for Cross-Episode Agent Memory. arXiv:2609.00243（2026-08-31，v1，预印本） | 预印本 | 单个 Agent 跨回合缓存 REST API 服务端给的修正建议；服务端附表级版本戳、数据重载时给行级差异（再高一级给依赖图），客户端据此驱逐或重新打戳。§6.5：“validity is asserted, not verified … the client has no independent evidence a table moved” | 只比较版本并驱逐；不对照数据检查、不绑定快照、不修复；没有数据库/SQL；单 Agent |
+| Evan Chen, Shiqiang Wang, Christopher G. Brinton. Fresh Memory, Stale Plans: Derivation Currency for Distributed LLM-Agent Memory. arXiv:2609.03340（v2，2026-09-27；v1 副标题为 Dependency-Scoped Validation for Distributed LLM-Agent Memory） | 预印本 | PlanFence：共享记忆中的计划记录其输入的精确版本；受保护动作前向各输入的所有者读当前版本，有变化则刷新、允许一次重规划，否则阻止。§6.2：“derivation currency does not imply semantic correctness”；§7：“owner reads provide neither a common snapshot nor atomicity with the effect” | 只比较版本；不对照数据检查；明确不提供共同快照；SQLite 只用作记忆存储 |
+| Joseph Fioresi, Parth Parag Kulkarni, Ashmal Vayani, Song Wang, Mubarak Shah. Learning to Share: Selective Memory for Efficient Parallel Agentic Systems. ICML 2026, PMLR 306:31146–31160 | 已发表 | 并行 Agent 团队共享一个任务内的全局记忆库；Qwen3-0.6B 控制器（强化学习训练）逐步决定是否把中间步骤加入记忆。§4.4：“instantiated per task and does not persist across problem instances”；不处理删除或修订 | 准入是学到的有用性判断，不是正确性检查；记忆不跨任务；不处理数据变化。论文里自称“verified shared memory”，不要沿用这个词 |
+| Xiaoyang Li, Yiqi Wang, Haohui Lu, Zhi Chen, Mo Li, Pingan Song, Mingkai Zheng, Taotao Cai. MemTX: Transactional Belief Commit for Stateful Agent Memory. arXiv:2607.23929（v2，2026-07-28；v1 少 Mingkai Zheng） | 预印本（“Under review”） | 智能体与共享记忆之间的中间件：写观测与提交信念分开；记录带证据、权限、派生链接、逻辑时钟上的有效区间和置信度，八状态生命周期；写入在快照隔离事务中暂存，经四项提交检查（置信度/权威阈值、有效区间含当前逻辑时间、同一实体属性槽的规则冲突、祖先无待撤销）；撤销沿派生图传播（信念撤销、视图隔离、工具动作补偿或记为泄漏）。§3.5：不变式是存在性的，“not that the action's own inputs did”；§3.4：“Repair covers only recorded provenance” | 四项检查都不查询信念所描述的数据；失效只由显式撤销或中止触发，不发现数据变化；快照只覆盖记忆记录；重建交给规划器、不检查；没有优化修订；没有 SQL |
+| Yang Zhao, Chengxiao Dai, Mengying Kou, Yue Xiu. MEMOREPAIR: Barrier-First Cascade Repair in Agentic Memory. arXiv:2605.07242（v1，2026-05-08） | 预印本 | 记忆是派生产物的溯源图；修复事件（删除、更正、迁移）先撤下所有可达后继，再用最小割按代价选择修复哪些，只有通过验证（重算的重放一致、重生成的模式与任务回归、沙箱、遗忘检查）的后继才重新发布。§5：“A successor that passes the implemented checks is not guaranteed to be semantically correct” | 修复事件是输入，不检测是否过期；验收不要求唯一、不要求按学习时刻复现；无事务、无快照、无多智能体；无 SQL。它把自己与视图维护对比（§4），评审可能对 MAVRA 提同样的对比 |
+
+AgentSM（2601.15709）10-08 仍只有 v1，无同行评审版本，继续按预印本引用。
+
+MemTX 相关工作里还有几篇只核对了元数据、未读全文：Orogat & Mansour, Is Agent Memory a Database? Rethinking Data Foundations for Long-Term AI Agent Memory（2605.26252，以数据库视角看记忆，最该先读）；Cordon（2606.17573）；TOKI（2606.06240）；Governed Shared Memory for Multi-Agent LLM Systems（2606.24535）；STALE（2605.06527）；Dependency-Guided Rollback Repair for Memory-Augmented Agents（2608.10502，未核）。第 5 节表中的 Revoked but Still Authoritative（2609.08258）、Patel et al.（2609.03141）在新定位下也更相关，同样待读。

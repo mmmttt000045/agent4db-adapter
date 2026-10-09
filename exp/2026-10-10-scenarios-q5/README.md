@@ -27,4 +27,6 @@
 
 ## 运行记录
 
-（启动后补写。）
+- 10-09 17:4x 冒烟（`results/smoke-q5`，20 万行，`metric-global-snap` + `middle` 与 `metric-global-snap` + `traj-global` 两个进程，变化只有重复加载）。MAVRA 一组跑完：留出 25/25（T3、T4 各 5/5），留出阶段 audit 全部 ok（两种新题型的规范 SQL 与判题 SQL 一致）；重复加载下过期定义在 T3、T4 上同样被审计为答错（新题型对破坏敏感），失效后智能体自答 7/15。无记忆组在留出题上 T3、T4 多数答错。其余组在启动正式运行前停止，未跑完。
+- 10-09 18:11 首次启动后发现磁盘只剩 2.4 GB（`results/workload-baselines/redset/data` 下 17 GB 的 Redset parquet 缓存）：停止运行，删除 204 个 parquet 分片（重跑负载特征分析前按 `redset/download.log` 重新下载），释放后剩 20 GB；清理冒烟留下的 `agentdb_metric_*` 库。
+- 10-09 18:14:46 正式启动：`queue-scen-q5.sh`，15 个进程（每轮 3 个，各 3 种方法），并发 6，`results/scen-20261010/queue.log` 记录每组的启动与退出。预计约 30 小时。

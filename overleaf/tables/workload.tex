@@ -1,15 +1,23 @@
-\begin{table*}[t]
-\caption{\bt{Application and agent workloads. Application: Redset~\cite{vanrenen2024redset}, 441\,M queries from 400 Redshift clusters. Agent: 100 fresh sessions (25 questions, two phrasings, two repetitions) issuing 521 database calls, 176 of them SQL. A \emph{lookup} is a schema lookup, data probe, or validation call.}{应用与智能体负载。应用：Redset~\cite{vanrenen2024redset}，400 个 Redshift 集群的 4.41 亿条查询。智能体：100 个全新会话（25 道题、两种题面、各两次），共 521 次数据库调用，其中 SQL 176 条。\emph{查找}指结构查找、数据探查或验证调用。}}
+\begin{table}[t]
+\caption{\bt{Application and agent workloads. Application: Redset~\cite{vanrenen2024redset}, 441\,M queries from 400 Redshift clusters (read queries). Agents: 100 fresh sessions issuing 521 database calls, 176 of them SQL; a \emph{lookup} is a schema lookup, data probe, or validation call.}{应用与智能体负载。应用：Redset~\cite{vanrenen2024redset}，400 个 Redshift 集群的 4.41 亿条查询（读查询）。智能体：100 个全新会话共 521 次数据库调用，其中 SQL 176 条；\emph{查找}指结构查找、数据探查或验证调用。}}
 \label{tab:workload-characterization}
 \footnotesize
-\begin{tabularx}{\textwidth}{@{}P{0.15\textwidth}LL@{}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}Lrr@{}}
 \toprule
-\bt{Dimension}{维度} & \bt{Application (Redset)}{应用（Redset）} & \bt{Data agents (100 sessions)}{数据智能体（100 个会话）}\\
+& \bt{Redset}{Redset} & \bt{Agents}{智能体}\\
 \midrule
-\bt{SQL stability}{SQL 稳定性} & \bt{93.4\% of read queries repeat an earlier template (90.1\% of SELECTs); 6.6 templates per 100 queries.}{93.4\% 的读查询重复已出现的模板（SELECT 中 90.1\%）；每 100 条查询 6.6 个模板。} & \bt{24\% of SQL statements repeat an earlier template; 133 templates for 176 statements.}{24\% 的 SQL 重复已出现的模板；176 条 SQL 有 133 个模板。}\\
-\bt{Failures}{失败} & \bt{0.35\% of read queries abort (0.54\% of SELECTs).}{0.35\% 的读查询中止（SELECT 中 0.54\%）。} & \bt{1.7\% of SQL fails, but all 32 wrong answers come from SQL that ran without error.}{1.7\% 的 SQL 出错；但 32 个错误答案全部来自执行成功的 SQL。}\\
-\bt{Validation}{验证} & \bt{None in parameterized SQL.}{参数化 SQL 中没有。} & \bt{4.8\% of calls; 16\% of sessions check key uniqueness or duplicate keys themselves.}{占调用的 4.8\%；16\% 的会话自行检查键唯一性或重复键。}\\
-\bt{Where DB knowledge lives}{数据库知识的位置} & \bt{In application code.}{在应用代码中。} & \bt{Rediscovered per session: 93\% of lookups repeat a fact an earlier session obtained (77\% of lookup DB time). Most are schema facts; 38\% of SQL lookups repeat a fact, none with repeated SQL text.}{每个会话重新获取：93\% 的查找重复此前会话得到的事实（占查找数据库时间的 77\%）。大部分是表结构事实；SQL 查找中 38\% 重复事实，SQL 文本没有一条重复。}\\
+\bt{SQL repeating an earlier template}{SQL 重复已有模板} & 93.4\% & 24\%\\
+\bt{Templates / statements}{模板数 / 语句数} & 6.6 / 100 & 133 / 176\\
+\bt{Answered from the result cache}{由结果缓存回答} & 34\% & --\\
+\bt{SQL that fails}{出错的 SQL} & 0.35\% & 1.7\%\\
+\bt{Wrong answers from SQL without error}{错误答案来自无报错 SQL} & -- & 32 / 32\\
+\bt{Calls that validate}{验证类调用} & \bt{none}{无} & 4.8\%\\
+\bt{Sessions checking key uniqueness}{检查键唯一性的会话} & -- & 16\%\\
+\bt{Lookups repeating an earlier fact}{查找重复已有事实} & -- & 93\%\\
+\bt{\quad share of lookup DB time}{\quad 占查找数据库时间} & -- & 77\%\\
+\bt{SQL lookups repeating a fact}{SQL 查找重复事实} & -- & 38\%\\
+\bt{\quad with the same SQL text}{\quad 其中 SQL 文本相同} & -- & 0\%\\
 \bottomrule
 \end{tabularx}
-\end{table*}
+\end{table}

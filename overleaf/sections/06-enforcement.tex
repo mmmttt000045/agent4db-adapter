@@ -1,8 +1,8 @@
 \section{\bt{Use-Time Enforcement}{使用时的强制保证}}
 \label{sec:execution}
 \subsection{\bt{Version checks}{版本校验}}
-\bi{Agents declare the metric keys and revisions used by a query; the middleware checks those references at execution. It rejects absent, inaccessible, and invalidated revisions, including those that a repair replaced, naming the failed condition; it accepts a revision superseded by an optimization, with a notice that names its successor, after checking the revision's own conditions. SQL review checks the supported grain and join requirements. Explicit rechecking at use makes a definition's maintained state actionable, and invalidation notices reach agents on their next tool response. Canonical compilation supplies the calculation encoded by the recorded fields.}
-{智能体声明查询所用的指标键和修订号，中间件在执行时核对这些引用。它拒绝不存在、不可访问和已失效的修订（包括被修复替代的修订），并指明失败的条件；对被优化取代的修订，它先核对该修订自身的条件，然后接受，并附上指明后继修订的通知。SQL 审查检查支持的粒度与连接要求。使用时的显式重查使定义的维护状态直接约束执行，失效通知通过智能体下一次工具响应传达。规范编译提供记录字段所表达的计算。}
+\bi{Agents declare the metric keys and revisions used by a query; the middleware checks those references at execution. It rejects absent, inaccessible, and invalidated revisions, including those that a repair replaced, naming the failed condition; it accepts a revision superseded by an optimization, with a notice that names its successor, after checking the revision's own conditions. SQL review checks the supported grain and join requirements.}
+{智能体声明查询所用的指标键和修订号，中间件在执行时核对这些引用。它拒绝不存在、不可访问和已失效的修订（包括被修复替代的修订），并指明失败的条件；对被优化取代的修订，它先核对该修订自身的条件，然后接受，并附上指明后继修订的通知。SQL 审查检查支持的粒度与连接要求。}
 
 \subsection{\bt{Same-snapshot validation}{同快照验证}}
 \label{sec:snapshot}

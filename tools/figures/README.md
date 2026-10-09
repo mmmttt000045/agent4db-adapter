@@ -1,13 +1,14 @@
 # 论文矢量图生成器
 
-论文的四幅图都由这里的 Python 脚本画成矢量 PDF，不经过 TikZ、pgfplots、Visio 或 PPT。架构图用 `vecfig.py` 的 ReportLab 绘图套件（示意图需要毫米级的手工布局），三张数据图自 2026-10-07 起用 matplotlib（`mplstyle.py` 统一样式）：
+论文的五幅图都由这里的 Python 脚本画成矢量 PDF，不经过 TikZ、pgfplots、Visio 或 PPT。两张示意图用 `vecfig.py` 的 ReportLab 绘图套件（示意图需要毫米级的手工布局；贯穿示例沿用汇报图的 `parts.py`，按 300 mm 画、由 LaTeX 缩到版宽），三张数据图自 2026-10-07 起用 matplotlib（`mplstyle.py` 统一样式）：
 
 | 图 | 脚本 | 输出（`overleaf/figures/`） | 数据 |
 | --- | --- | --- | --- |
-| 图 1 系统架构 | `architecture.py` | `architecture.pdf` | 无 |
-| 图 2 定义库回放（两个面板） | `replay_outcomes.py` | `replay-outcomes.pdf` | `exp/2026-10-02-cache-baseline-tpcds/replay-stats.json`、`tpcds-replay-stats.json`、`tpcds-library.json`（定义数） |
-| 图 3 维护代价 | `maintenance_cost.py` | `maintenance-cost.pdf` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
-| 图 4 逐情形正确率点图（通栏） | `scenario_changes.py` | `scenario-changes.pdf` | `exp/2026-10-02-scenarios-ds/scen-stats.json`（每种方法 `runs` 里逐次运行的计数、`modeled` 区间、每次运行的失效与修复数），与 `paper-results.json` 交叉核对；情形顺序与类别取自 `tools/paper-results.py` 的 `PHASES`、`CLASSES` |
+| 图 1 贯穿示例：门店营业额从学习、优化、使用到修复（通栏） | `example.py` | `running-example.pdf` | 数值写在脚本里，来源见脚本顶部说明（`exp/2026-10-08-optimize/trace`、`exp/2026-10-08-optimize/README.md`、noctis `results/scen-20261002`） |
+| 图 2 系统架构 | `architecture.py` | `architecture.pdf` | 无 |
+| 图 3 定义库回放（两个面板） | `replay_outcomes.py` | `replay-outcomes.pdf` | `exp/2026-10-02-cache-baseline-tpcds/replay-stats.json`、`tpcds-replay-stats.json`、`tpcds-library.json`（定义数） |
+| 图 4 维护代价 | `maintenance_cost.py` | `maintenance-cost.pdf` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
+| 图 5 逐情形正确率结果矩阵（通栏；方法为行、情形为列，格内写正确率与三次运行范围，红框为过期定义，右侧为覆盖破坏上的正确率及每次运行的失效与修复数） | `scenario_changes.py` | `scenario-changes.pdf` | `exp/2026-10-02-scenarios-ds/scen-stats.json`（每种方法 `runs` 里逐次运行的计数、`modeled` 区间、每次运行的失效与修复数），与 `paper-results.json` 交叉核对；情形顺序与类别取自 `tools/paper-results.py` 的 `PHASES`、`CLASSES` |
 
 每幅图生成两份：`<名称>.pdf` 用于英文稿（`main-en.tex`），`<名称>-zh.pdf` 用于双语稿（`main.tex`），标签为中文。`overleaf/figures/<名称>.tex` 按 `\ifbilingual` 选用其中一份，标题、标签和 `\Description` 仍写在 tex 文件里。
 
@@ -63,8 +64,8 @@ Scale(d0, d1, p0, p1)                          # 数据值到毫米的线性映�
 | 某个标签的文字 | 各脚本里的 `LABELS` / `TEXT` 字典，`en` 与 `zh` 各一份 |
 | 方法名称或颜色 | 名称在 `style.py` 的 `METHODS`；颜色改 `preamble.tex` 的 `\definecolor`，图和表一起变 |
 | 架构图的模块位置 | `architecture.py` 顶部的 `ADM`、`STORE`、`MAINT` 等框，箭头按框的边自动对齐 |
-| 数据图的方法与顺序 | `replay_outcomes.py` 的 `ROWS`，`maintenance_cost.py` 的 `SERIES`，`scenario_changes.py` 的 `SHOWN`（左面板 6 种方法）与 `MAINTAINERS`（右面板） |
-| 点图的情形简称与过期阈值 | `scenario_changes.py` 的 `SHORT` 与 `STALE` |
+| 数据图的方法与顺序 | `replay_outcomes.py` 的 `ROWS`，`maintenance_cost.py` 的 `SERIES`，`scenario_changes.py` 的 `ROWS`（9 种方法，按表 2 分组）与 `MAINTAINERS`（右侧每次运行的失效与修复数） |
+| 结果矩阵的情形简称、分组与过期阈值 | `scenario_changes.py` 的 `TEXT`、`GROUP` 与 `STALE` |
 | 图的尺寸 | 各脚本的 `W, H`（单栏图宽用 `style.COLUMN`） |
 
 改完运行 `build.py`，再编译论文看效果。图里的含义变了，要同步改 `overleaf/figures/<名称>.tex` 里的图注和 `\Description`。实验数据更新后，先按 `overleaf/README.md` 重新生成 `gen/`，再重建图；核对不通过说明图和正文用的不是同一份数据。

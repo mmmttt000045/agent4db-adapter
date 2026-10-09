@@ -15,9 +15,9 @@
 | `latex/preamble.tex` | 宏包、语言宏、颜色、图表样式和数值宏加载 |
 | `latex/acmart/acmart.dtx` | 官方文档类的对应源码，保留版权及 LPPL 许可说明 |
 | `sections/abstract.tex` | 中英文摘要、关键词与 `\maketitle` |
-| `sections/01-*.tex` 至 `10-*.tex` | 原论文的十个章节，编号和顺序不变 |
+| `sections/01-*.tex` 至 `10-*.tex` | 正文各章（讨论已并入第 10 个文件的“讨论与结论”） |
 | `sections/evaluation/` | 实验设置、有效性、并发、修复、维护代价与场景六个小节 |
-| `figures/` | 四幅图：`*.tex` 写标题、标签与描述，图本身是 [`tools/figures/build.py`](../tools/figures/README.md) 生成的矢量 PDF（`<名称>.pdf` 用于英文稿，`<名称>-zh.pdf` 用于双语稿），不要手改；另有算法 1 |
+| `figures/` | 五幅图：`*.tex` 写标题、标签与描述，图本身是 [`tools/figures/build.py`](../tools/figures/README.md) 生成的矢量 PDF（`<名称>.pdf` 用于英文稿，`<名称>-zh.pdf` 用于双语稿），不要手改；另有算法 1 |
 | `tables/` | 四张表，包括标题和生成数据的加载位置 |
 | `references.tex` | 原样保留的 `thebibliography`，引用键与条目顺序不变 |
 | `gen/` | 实验统计脚本生成的数值宏、表格数据和绘图坐标；不要手改 |

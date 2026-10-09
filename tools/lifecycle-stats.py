@@ -110,14 +110,15 @@ def events_text(s):
         if n:
             en.append(f"{n} {e}")
             zh.append(f"{n} {z}" if z.startswith("个") else f"{z} {n}")
+    # Short labels: the table column is narrow, and the text explains each kind.
     add(s["repaired"], "repaired", "修复")
-    add(s["by_predecessor"], "predecessor reinstated", "恢复前一修订")
-    add(s["by_undo"], "rule undone", "撤销改写")
+    add(s["by_predecessor"], "reinstated", "恢复")
+    add(s["by_undo"], "undone", "撤销")
     add(s["revoked"], "invalidated", "失效")
-    add(s["relearned"], "metric relearned" if s["relearned"] == 1 else "metrics relearned", "个指标重新学习")
-    add(s["relearn_refused"], "candidates refused", "个候选被准入拒绝")
+    add(s["relearned"], "relearned", "重新学习")
+    add(s["relearn_refused"], "refused", "拒绝")
     add(s["optimized"], "optimized", "优化")
-    return ("; ".join(en) or "--", "；".join(zh) or "--")
+    return (", ".join(en) or "--", "，".join(zh) or "--")
 
 
 def main():
@@ -196,7 +197,7 @@ def main():
         f.write("\\begin{tabularx}{\\linewidth}{@{}lrrrL@{}}\n\\toprule\n")
         f.write("\\bt{Step}{步骤} & \\bt{\\shortstack[r]{No\\\\memory}}{\\shortstack[r]{无\\\\记忆}} & "
                 "\\bt{\\shortstack[r]{Example\\\\retrieval}}{\\shortstack[r]{示例\\\\检索}} & "
-                "\\bt{\\shortstack[r]{MAVRA\\\\(ours)}}{\\shortstack[r]{MAVRA\\\\（本文）}} & \\bt{\\system\\ layer}{\\system\\ 这一层}\\\\\n\\midrule\n")
+                "\\bt{\\shortstack[r]{MAVRA\\\\(ours)}}{\\shortstack[r]{MAVRA\\\\（本文）}} & \\bt{\\system\\ actions}{\\system\\ 的动作}\\\\\n\\midrule\n")
         for sz, st, sm in zip(z["steps"], t["steps"], m["steps"]):
             en, zh = STEP.get(sm["name"], (sm["name"], sm["name"]))
             ev_en, ev_zh = events_text(sm)

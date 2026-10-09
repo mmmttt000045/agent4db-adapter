@@ -652,7 +652,7 @@ async fn repair_ambiguity(url: &str) -> Result<Value> {
     let gold = |id: &str, a: &Ask| match a {
         Ask::Single { period } => metricbench::gold_period(id, period),
         Ask::RankMonth { year } => metricbench::gold_rank(id, *year),
-        Ask::Diff { .. } => unreachable!(),
+        _ => unreachable!(),
     };
     let returns: Vec<(&str, Metric)> = seeded_metrics().into_iter().filter(|(id, _)| matches!(*id, "M2" | "M3")).collect();
     let answer = |sql: String| {
@@ -765,7 +765,7 @@ async fn repair_ambiguity_precolumn(url: &str, admin: &Db, returns: &[(&str, Met
     let gold = |id: &str, a: &Ask| match a {
         Ask::Single { period } => metricbench::gold_period(id, period),
         Ask::RankMonth { year } => metricbench::gold_rank(id, *year),
-        Ask::Diff { .. } => unreachable!(),
+        _ => unreachable!(),
     };
     // 预见来源列的参照：在退货表上多一个 sr_source = 'primary'
     let anticipated = |sql: String| sql.replace("r.sr_status = '完成'", "r.sr_status = '完成' and r.sr_source = 'primary'");
@@ -1344,7 +1344,7 @@ async fn scenarios(url: &str) -> Result<Value> {
     let gold = |id: &str, a: &Ask| match a {
         Ask::Single { period } => metricbench::gold_period(id, period),
         Ask::RankMonth { year } => metricbench::gold_rank(id, *year),
-        Ask::Diff { .. } => unreachable!(),
+        _ => unreachable!(),
     };
     let mut out = vec![];
     let mut problems = vec![];

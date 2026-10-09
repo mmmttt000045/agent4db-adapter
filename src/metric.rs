@@ -27,13 +27,28 @@ impl Period {
     }
 }
 
-/// 题型：单期汇总、跨期差值（前者减后者）、全年中取值最高的月份。
+/// 题型：单期汇总、跨期差值（前者减后者）、全年中取值最高的月份、比上一个月增加最多的月份、高于各月平均值的月份数。
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum Ask {
-    Single { period: Period },
-    Diff { a: Period, b: Period },
-    RankMonth { year: i32 },
+    Single {
+        period: Period,
+    },
+    Diff {
+        a: Period,
+        b: Period,
+    },
+    RankMonth {
+        year: i32,
+    },
+    /// 全年中比上一个月增加最多的月份（2–12）
+    PeakRise {
+        year: i32,
+    },
+    /// 全年中取值高于各月平均值的月份个数（0–12）
+    AboveMean {
+        year: i32,
+    },
 }
 
 impl Ask {
@@ -42,7 +57,7 @@ impl Ask {
         match self {
             Ask::Single { period } => vec![period.year],
             Ask::Diff { a, b } => vec![a.year, b.year],
-            Ask::RankMonth { year } => vec![*year],
+            Ask::RankMonth { year } | Ask::PeakRise { year } | Ask::AboveMean { year } => vec![*year],
         }
     }
 }
@@ -355,6 +370,8 @@ pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
             format!("select {expr} as value from {joined} where {}", cond(period_pred(p)))
         }
     };
+    // 按月比较的题型需要维度列，两种策略都连接日期维度
+    let monthly = |year: i32| format!("select d_moy, {expr} as v from {joined} where {} group by d_moy", cond(format!("d_year = {year}")));
     Ok(match ask {
         Ask::Single { period } => value(period),
         Ask::Diff { a, b } => format!("select ({}) - ({}) as value", value(a), value(b)),
@@ -363,6 +380,15 @@ pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
             cond(format!("d_year = {year}")),
             m.measure
         ),
+        Ask::PeakRise { year } => format!(
+            "select d_moy as value from (select d_moy, v - lag(v) over (order by d_moy) as rise from ({}) m) r \
+             where rise is not null order by rise desc nulls last, d_moy limit 1",
+            monthly(*year)
+        ),
+        Ask::AboveMean { year } => {
+            let m = monthly(*year);
+            format!("select count(*) as value from ({m}) m where v > (select avg(v) from ({m}) a)")
+        }
     })
 }
 
@@ -970,6 +996,13 @@ mod tests {
         assert!(diff.starts_with("select (select ") && diff.contains(") - (select "));
         let rank = compile(&m, &Ask::RankMonth { year: 2001 }).unwrap();
         assert!(rank.ends_with("group by d_moy order by 100.0 * sum(sr_return_amt) / sum(ss_net_paid) desc nulls last, d_moy limit 1"));
+        let peak = compile(&m, &Ask::PeakRise { year: 2002 }).unwrap();
+        assert!(peak.contains("v - lag(v) over (order by d_moy) as rise from (select d_moy, 100.0 * sum(sr_return_amt)"));
+        assert!(
+            peak.contains("where d_year = 2002 group by d_moy) m) r where rise is not null order by rise desc nulls last, d_moy limit 1")
+        );
+        let above = compile(&m, &Ask::AboveMean { year: 2002 }).unwrap();
+        assert!(above.starts_with("select count(*) as value from (select d_moy,") && above.contains(") m where v > (select avg(v) from ("));
         let mut inner = m.clone();
         inner.joins[0].kind = JoinKind::Inner;
         let s = compile(&inner, &Ask::Single { period: p(2002, 9) }).unwrap();

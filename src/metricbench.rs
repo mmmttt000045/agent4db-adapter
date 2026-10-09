@@ -48,6 +48,9 @@ pub struct Options {
     /// 做留出题的 Agent；学习只由 A 完成，默认由未接触过指标的 B 做留出
     #[arg(long, value_delimiter = ',', default_value = "B")]
     holdout_agents: Vec<String>,
+    /// 计分题集：v1 每个指标 3 道（换参数、跨期差值、全年最高月）；v2 再加比上一个月增加最多的月份、高于各月平均值的月份数
+    #[arg(long, default_value = "v1", value_parser = ["v1", "v2"])]
+    question_set: String,
     #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=10))]
     repeats: u32,
     #[arg(long, default_value_t = 20, value_parser = clap::value_parser!(u32).range(1..=100))]
@@ -139,7 +142,13 @@ pub(crate) struct Task {
     pub(crate) set: Set,
 }
 
+/// 题集 v1：每个指标 2 道学习题、1 道换参数题、2 道新题型（跨期差值、全年最高月）。
 pub(crate) fn tasks(ids: &[String]) -> Vec<Task> {
+    tasks_with(ids, false)
+}
+
+/// 题集 v2 在 v1 之外每个指标再加 2 道新题型：比上一个月增加最多的月份、高于各月平均值的月份数（都问 2002 年）。
+pub(crate) fn tasks_with(ids: &[String], v2: bool) -> Vec<Task> {
     let p = Period::month;
     let single = |y, m| Ask::Single { period: p(y, m) };
     let diff = |a: (i32, u32), b: (i32, u32)| Ask::Diff { a: p(a.0, a.1), b: p(b.0, b.1) };
@@ -185,7 +194,12 @@ pub(crate) fn tasks(ids: &[String]) -> Vec<Task> {
     let mut out = vec![];
     for def in DEFS.iter().filter(|d| ids.iter().any(|x| x == d.id)) {
         let mut n: HashMap<&str, u32> = HashMap::new();
-        for (set, ask) in plan(def.id) {
+        let mut plan = plan(def.id);
+        if v2 {
+            plan.push((Set::Type, Ask::PeakRise { year: 2002 }));
+            plan.push((Set::Type, Ask::AboveMean { year: 2002 }));
+        }
+        for (set, ask) in plan {
             let tag = match set {
                 Set::Learn => "L",
                 Set::Param => "P",
@@ -213,8 +227,15 @@ pub(crate) fn text(t: &Task, defined: bool) -> String {
         Ask::Single { period } => format!("{}的{n}是多少？", cn(period)),
         Ask::Diff { a, b } => format!("{}的{n}比{}高多少？（用前者减去后者，结果可以为负数）", cn(a), cn(b)),
         Ask::RankMonth { year } => format!("{year} 年哪个月的{n}最高？"),
+        Ask::PeakRise { year } => format!("{year} 年哪个月的{n}比上一个月增加最多？"),
+        Ask::AboveMean { year } => format!("{year} 年有几个月的{n}高于当年 12 个月{n}的平均值？"),
     };
-    let fmt = if matches!(t.ask, Ask::RankMonth { .. }) { "只回答月份数字（1–12）。" } else { "保留两位小数。" };
+    let fmt = match t.ask {
+        Ask::RankMonth { .. } => "只回答月份数字（1–12）。",
+        Ask::PeakRise { .. } => "只回答月份数字（2–12）。",
+        Ask::AboveMean { .. } => "只回答月份个数（0–12）。",
+        _ => "保留两位小数。",
+    };
     if defined {
         format!("{body}口径：{}。{fmt}", t.def.definition)
     } else {
@@ -223,7 +244,7 @@ pub(crate) fn text(t: &Task, defined: bool) -> String {
 }
 
 pub(crate) fn decimals(ask: &Ask) -> u32 {
-    if matches!(ask, Ask::RankMonth { .. }) {
+    if matches!(ask, Ask::RankMonth { .. } | Ask::PeakRise { .. } | Ask::AboveMean { .. }) {
         0
     } else {
         2
@@ -287,11 +308,59 @@ pub(crate) fn gold_rank(def: &str, year: i32) -> String {
     }
 }
 
+/// 全年每月的取值（mo, v），口径与 gold_period 相同；按月比较的题型在它上面计算。
+pub(crate) fn gold_monthly(def: &str, year: i32) -> String {
+    match def {
+        "M1" => format!(
+            "select d_moy as mo, sum(ss_net_paid) as v from store_sales join date_dim on ss_sold_date_sk = d_date_sk \
+             where d_year = {year} and ss_is_current = 1 group by d_moy"
+        ),
+        "M2" => format!(
+            "select d_moy as mo, sum(sr_return_amt) as v from store_returns join date_dim on sr_returned_date_sk = d_date_sk \
+             where d_year = {year} and sr_status = '完成' group by d_moy"
+        ),
+        "M3" => format!(
+            "with s as (select ss_ticket_number as t, ss_item_sk as i, ss_net_paid as paid, d_moy as mo from store_sales \
+                        join date_dim on ss_sold_date_sk = d_date_sk where d_year = {year} and ss_is_current = 1), \
+                  r as (select s.mo, sum(r.sr_return_amt) as amt from store_returns r join s on r.sr_ticket_number = s.t and r.sr_item_sk = s.i \
+                        where r.sr_status = '完成' group by s.mo), \
+                  p as (select mo, sum(paid) as paid from s group by mo) \
+             select p.mo, 100.0 * coalesce(r.amt, 0) / p.paid as v from p left join r using (mo)"
+        ),
+        "M5" => format!(
+            "select d_moy as mo, sum(ss_net_paid) as v from store_sales join item on ss_item_sk = i_item_sk and i_is_current = 'Y' \
+             join date_dim on ss_sold_date_sk = d_date_sk where d_year = {year} and ss_is_current = 1 and i_category = '电子' \
+             group by d_moy"
+        ),
+        _ => format!(
+            "select d_moy as mo, sum(cs_net_paid) as v from catalog_sales join date_dim on cs_sold_date_sk = d_date_sk \
+             where d_year = {year} group by d_moy"
+        ),
+    }
+}
+
+/// 比上一个月增加最多的月份：环比差值最大者，平手取较早的月份。
+pub(crate) fn gold_peak_rise(def: &str, year: i32) -> String {
+    format!(
+        "select mo from (select mo, v - lag(v) over (order by mo) as rise from ({}) m) r where rise is not null \
+         order by rise desc, mo limit 1",
+        gold_monthly(def, year)
+    )
+}
+
+/// 取值高于各月平均值的月份个数。
+pub(crate) fn gold_above_mean(def: &str, year: i32) -> String {
+    let m = gold_monthly(def, year);
+    format!("select count(*) from ({m}) m where v > (select avg(v) from ({m}) a)")
+}
+
 pub(crate) fn gold_sql(t: &Task) -> String {
     match &t.ask {
         Ask::Single { period } => gold_period(t.def.id, period),
         Ask::Diff { a, b } => format!("select ({}) - ({})", gold_period(t.def.id, a), gold_period(t.def.id, b)),
         Ask::RankMonth { year } => gold_rank(t.def.id, *year),
+        Ask::PeakRise { year } => gold_peak_rise(t.def.id, *year),
+        Ask::AboveMean { year } => gold_above_mean(t.def.id, *year),
     }
 }
 
@@ -1156,7 +1225,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         };
         let probe = Db::connect(isolated.as_str(), 2, true)?;
         let db = Arc::new(Db::connect_timeout(isolated.as_str(), pool, true, o.sql_timeout_secs)?);
-        let tasks = tasks(&o.metrics);
+        let tasks = tasks_with(&o.metrics, o.question_set == "v2");
         let env =
             Env { o: &o, admin: &admin, probe: &probe, agent: &agent, extractor: &extractor, tasks: &tasks, changes: &changes, v1: &v1, learn, dir: &directory };
         let mut cells = vec![];

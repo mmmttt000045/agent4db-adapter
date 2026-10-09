@@ -22,10 +22,10 @@
 \begin{itemize}
 \item \bi{A shared memory layer for data agents that takes over publication, reliance, and maintenance and improvement, built on revisions with executable validity conditions that we prove sufficient (Sections~\ref{sec:overview} and~\ref{sec:model}).}
 {一个数据智能体的共享记忆层，承担发布、依赖以及维护与改进，建立在带有可执行有效性条件的修订之上，我们证明这些条件是充分的（第~\ref{sec:overview} 和~\ref{sec:model} 节）。}
-\item \bi{Use-time enforcement that binds every declared use to evidence on its own snapshot, with a check-result reuse rule that we prove sound (Section~\ref{sec:execution}).}
-{使用时的强制保证：把每一次声明了修订的使用绑定到其自身快照上的证据，检查结果的复用规则经我们证明是可靠的（第~\ref{sec:execution} 节）。}
 \item \bi{Maintenance and improvement as a shared service: revalidation per condition, unique as-of repair, and rewrites whose equivalence the maintained conditions imply (Section~\ref{sec:maintenance}).}
 {把维护与改进做成共享的服务：条件级重验证、按学习时刻的唯一修复，以及受维护条件蕴含其等价的改写（第~\ref{sec:maintenance} 节）。}
+\item \bi{Use-time enforcement that binds every declared use to evidence on its own snapshot, with a check-result reuse rule that we prove sound (Section~\ref{sec:execution}).}
+{使用时的强制保证：把每一次声明了修订的使用绑定到其自身快照上的证据，检查结果的复用规则经我们证明是可靠的（第~\ref{sec:execution} 节）。}
 \item \bi{An evaluation that separates the value of sharing from that of maintenance (Section~\ref{sec:evaluation}): on fixed libraries, maintained definitions serve no wrong answer under the covered changes, whereas invalidation on schema change serves \RpSchemaWrongModeled; end to end, maintained memory answers \DsCondModeled\% under the covered breaking changes, against \DsTrajModeled\% for example retrieval, which is as accurate on unchanged data.}
 {一套把共享的价值与维护的价值分开测量的评估（第~\ref{sec:evaluation} 节）：在固定的定义库上，维护后的定义在条件覆盖的变化下不给出错误答案，只在模式变更时失效则给出 \RpSchemaWrongModeled\ 个；端到端实验中，维护后的记忆在条件覆盖的破坏性变化下答对 \DsCondModeled\%，数据不变时同样准确的示例检索为 \DsTrajModeled\%。}
 \end{itemize}

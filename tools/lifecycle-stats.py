@@ -88,6 +88,9 @@ def analyze(path):
             "wave_s": e.get("wave_seconds", 0.0),
         })
     opt0 = (c.get("optimizing") or {}).get("published", 0) if c.get("optimizing") else 0
+    if c["mode"] == "middle":
+        # No memory: its learning sessions build nothing, so they are not production.
+        prod_tok, prod_s = 0, 0.0
     n = sum(s["n"] for s in steps)
     correct = sum(s["correct"] for s in steps)
     cons_tok = sum(s["tok"] for s in steps)

@@ -178,7 +178,7 @@ def main():
         "\\toprule",
         "& & \\multicolumn{2}{c}{\\bh{Check-then-execute}{先检查后执行}} & \\bh{Same-snapshot}{同快照验证}\\\\",
         "\\cmidrule(lr){3-4}",
-        "\\bt{Writer}{写者} & \\bt{Months}{月份} & \\bt{violations / answered}{违规／作答} & \\bh{trials}{试验} & \\bh{violations / answered}{违规／作答}\\\\",
+        "\\bt{Writer}{写者} & \\bt{Months}{月份} & \\bt{violations / answered}{违规／作答} & \\bh{trials with\\\\a violation}{有违规\\\\的试验} & \\bh{violations / answered}{违规／作答}\\\\",
         "\\midrule",
     ]
     tail = ["\\bottomrule", "\\end{tabularx}"]

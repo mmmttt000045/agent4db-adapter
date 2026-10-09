@@ -36,7 +36,7 @@ ROWS = [('schema/snapshot', 'metric-global-schema', 'Schema', ''),
         ('tabletest/snapshot', 'tabletest', 'Table', ''),
         ('definition/snapshot', 'definition', 'Def', ''),
         ('condition/snapshot', 'condition', 'Cond', ''),
-        ('condition/example', 'condition-current', 'Cur', 'a')]
+        ('condition/example', 'condition-current', 'Cur', '')]
 # The TPC-DS replay does not run the full recheck per definition.
 TPCDS_ROWS = [r for r in ROWS if r[0] != 'definition/snapshot']
 # (stats file, macro prefix, rows)
@@ -50,11 +50,11 @@ TEXT = {
     'en': {'outcomes': ('Correct', 'Wrong', 'Correct invalidation', 'False invalidation'),
            'db': 'Maint. DB s',
            'titles': ('Learned libraries: {libs} libraries, {n} questions per method',
-                      'TPC-DS SF1: {defs} template-derived definitions, {n} questions')},
+                      'TPC-DS SF1: {defs} admitted template-derived definitions, {n} questions')},
     'zh': {'outcomes': ('答对', '答错', '正确失效', '误失效'),
            'db': '维护 DB 秒',
            'titles': ('学到的定义库：{libs} 个库，每种方法 {n} 题',
-                      'TPC-DS SF1：{defs} 个模板导出的定义，{n} 题')},
+                      'TPC-DS SF1：{defs} 个通过准入的模板导出定义，{n} 题')},
 }
 LEFT, RIGHT = .40, .85          # axes span in figure fractions: labels left, DB seconds right
 # Labels too long for the margin are broken over two lines here.
@@ -88,9 +88,10 @@ def load():
             numbers['libs'] = stats['libraries']
         else:
             library = json.loads((EXP / 'tpcds-library.json').read_text(encoding='utf-8'))
-            defs = len(library['metric_report']['entries'])
-            style.agree('TrDefs', str(defs), printed['TrDefs'])
-            numbers['defs'] = defs
+            style.agree('TrDefs', str(len(library['metric_report']['entries'])), printed['TrDefs'])
+            # The panel names the definitions that passed admission (\TrSeeded), the ones the replay
+            # serves; the two that failed are counted by tools/review-results.py from the replay report.
+            numbers['defs'] = printed['TrSeeded']
         panels.append((numbers, rows))
     return panels
 

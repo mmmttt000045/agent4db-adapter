@@ -1,4 +1,4 @@
-"""Figure: maintenance database time relative to definition-level revalidation.
+"""Figure: maintenance database time relative to a full recheck per definition.
 
 Two panels (staggered and simultaneous arrivals) share the y axis; series are
 labelled on the lines instead of in a legend. Data:
@@ -27,9 +27,9 @@ SERIES = {'condition-scope': ('Scope', (0, (1.0, 1.6)), 's', True),
           'definition-cache': ('Cache', (0, (3.0, 1.6)), '^', False)}
 SHARES = (1, 2, 4, 6)
 TEXT = {
-    'en': {'y': 'DB time vs. definition-level', 'x': 'Definitions',
+    'en': {'y': 'DB time, % of full recheck per definition', 'x': 'Definitions',
            'panels': ('Staggered', 'Simultaneous')},
-    'zh': {'y': '相对定义级的 DB 时间', 'x': '定义数', 'panels': ('错峰', '同时到达')},
+    'zh': {'y': '相对整定义重查的 DB 时间', 'x': '定义数', 'panels': ('错峰', '同时到达')},
 }
 
 

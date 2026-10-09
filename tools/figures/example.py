@@ -4,9 +4,11 @@ Store revenue on the synthetic retail data (one million sales rows). Top row:
 the analysis optimizer, an LLM agent, answers a learning question whose
 meaning is given (March, 13,570,368.70) and admission publishes revision 0
 with the conditions derived from its structure; an optimization rewrites the
-period predicate as a date-key range, equal on 14 periods and 19.8% faster
-(29.1 -> 23.3 ms), published as revision 1 with date-key contiguity as a new
-condition; user agents that know only the metric name rely on revision 1.
+period predicate as a date-key range, equal on 14 periods and 20% faster
+(29.1 -> 23.3 ms, -19.8% on the unrounded times), published as revision 1 with
+date-key contiguity as a new condition (the admitted join-completeness loss is
+1.03%, bounded with the 0.1-point tolerance at 1.13%); user agents that know
+only the metric name rely on revision 1.
 Bottom row: a restatement keeps old sales as non-current rows, key uniqueness
 fails and revision 1 is invalid (run unmaintained it returns 14,300,525.64
 for September); bounded repair finds exactly one filter, ss_is_current = '1', the
@@ -42,9 +44,9 @@ LABELS = {
                    '13,570,368.70, judged correct', 'answer provenance extracted'),
         'pub': ('Publish revision 0', 'after the admission checks'),
         'p_rows': ('key uniqueness: one row per sale', 'date role: `d_date_sk` unique',
-                   'join completeness: loss ≤ 1.0%', 'evidence: learning SQL, snapshot'),
+                   'join completeness: loss ≤ 1.13%', 'evidence: learning SQL, snapshot'),
         'opt': ('Optimize: revision 1', 'period as a date-key range'),
-        'o_rows': ('equal on 14 periods', '29.1 → 23.3 ms, −19.8%', 'adds date-key contiguity',
+        'o_rows': ('equal on 14 periods', '29.1 → 23.3 ms, −20%', 'adds date-key contiguity',
                    'revision 0 stays usable'),
         'use': ('User agents rely on it', 'given only the metric name'),
         'u_rows': ('September store revenue?', 'lookup: revision 1, valid', 'declared, run on one snapshot',
@@ -69,10 +71,10 @@ LABELS = {
         'l_rows': ('3 月门店营业额（给定口径）', '`SUM(ss_net_paid) … d_moy = 3`',
                    '13,570,368.70，判定正确', '提取答案来源'),
         'pub': ('发布修订 0', '通过准入检查之后'),
-        'p_rows': ('键唯一：每笔销售一行', '日期角色：`d_date_sk` 唯一', '连接完整性：损失 ≤ 1.0%',
+        'p_rows': ('键唯一：每笔销售一行', '日期角色：`d_date_sk` 唯一', '连接完整性：损失 ≤ 1.13%',
                    '证据：学习时的 SQL 与快照'),
         'opt': ('优化：修订 1', '期间谓词改为日期键范围'),
-        'o_rows': ('14 个期间结果相等', '29.1 → 23.3 ms，−19.8%', '新条件：日期键连续', '修订 0 仍可使用'),
+        'o_rows': ('14 个期间结果相等', '29.1 → 23.3 ms，−20%', '新条件：日期键连续', '修订 0 仍可使用'),
         'use': ('用户端智能体依赖它', '只给出指标名'),
         'u_rows': ('9 月门店营业额？', '查找：修订 1，有效', '声明后在同一快照上执行', '13,069,651.80，正确'),
         'break': ('多版本更正', '旧销售保留为非当前行'),

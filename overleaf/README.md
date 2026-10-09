@@ -1,6 +1,6 @@
 # MAVRA Overleaf 工程
 
-论文标题：**MAVRA: Keeping Shared Metric Definitions Valid for Data Agents**。
+论文标题：**MAVRA: Maintainable Shared Memory for Data Agents**。
 
 `main.tex` 是双语入口，`main-en.tex` 是英文入口，两者直接读取同一份 `paper.tex`。修改对应章节即可同时更新两种语言，不再生成或维护正文副本。本次拆分保留原有正文、公式、图表、数值、引用顺序和排版设置。
 
@@ -16,7 +16,7 @@
 | `latex/acmart/acmart.dtx` | 官方文档类的对应源码，保留版权及 LPPL 许可说明 |
 | `sections/abstract.tex` | 中英文摘要、关键词与 `\maketitle` |
 | `sections/01-*.tex` 至 `10-*.tex` | 正文各章（讨论已并入第 10 个文件的“讨论与结论”） |
-| `sections/evaluation/` | 实验设置、有效性、并发、修复、维护代价与场景六个小节 |
+| `sections/evaluation/` | 实验设置、有效性、并发、修复、维护代价、场景、发布与使用者性能、优化修订、生命周期九个小节 |
 | `figures/` | 五幅图：`*.tex` 写标题、标签与描述，图本身是 [`tools/figures/build.py`](../tools/figures/README.md) 生成的矢量 PDF（`<名称>.pdf` 用于英文稿，`<名称>-zh.pdf` 用于双语稿），不要手改；另有算法 1 |
 | `tables/` | 四张表，包括标题和生成数据的加载位置 |
 | `references.tex` | 原样保留的 `thebibliography`，引用键与条目顺序不变 |

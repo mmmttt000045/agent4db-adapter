@@ -22,7 +22,7 @@
 \addlinespace
 \multicolumn{6}{@{}l}{\bt{\emph{Metric definitions shared, with validity conditions and bounded repair}}{\emph{共享指标定义，附有效性条件与有界修复}}}\\
 \bt{Full recheck per definition}{整定义重查} & \bt{rechecks all of a definition's conditions on use}{使用时重查该定义的全部条件} & \bt{what does check-result reuse save?}{复用检查结果省下多少？} & \usedin & \usedin & \usedin\\
-\bt{Full recheck + query cache}{整定义重查 + 查询缓存} & \bt{caches check queries by SQL text and table versions}{检查查询按 SQL 文本与表版本缓存} & \bt{do the savings need typed conditions?}{节省是否需要类型化条件？} & & \usedin & \\
+\bt{Full recheck + query cache}{整定义重查 + 查询缓存} & \bt{caches check queries by SQL text and table versions}{检查查询按 SQL 文本与表版本缓存} & \bt{do the savings need typed conditions?}{节省是否需要类型化条件？} & \usedin & \usedin & \\
 \bt{Recheck changed tables only}{只重查变化的表} & \bt{rechecks the conditions of changed tables, no reuse}{只重查变化表上的条件，不复用} & \bt{does narrowing the scope alone save work?}{只缩小范围能否省工作？} & & \usedin & \\
 \bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \bt{reuses checks by condition; same snapshot; as-of repair}{按条件复用检查；同快照；按学习时刻修复} & \bt{the system of this paper}{本文系统} & \usedin & \usedin & \usedin\\
 \bt{\system, regression on current data}{\system，回归测试用当前数据} & \bt{runs the regression test on current data}{回归测试在当前数据上比较} & \bt{what does the as-of comparison add?}{按学习时刻比较带来什么？} & \usedin & & \usedin\\

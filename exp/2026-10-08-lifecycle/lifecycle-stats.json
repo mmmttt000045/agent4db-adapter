@@ -757,11 +757,11 @@
   "acc": 0.45185185185185184,
   "acc_breaking": 0.4266666666666667,
   "consumer_tokens": 5058978,
-  "production_tokens": 137129,
-  "production_s": 124.60128352800001,
+  "production_tokens": 0,
+  "production_s": 0.0,
   "tok_per_task": 37473.91111111111,
   "s_per_task": 37.522098932570366,
-  "tok_per_correct": 85182.08196721312,
+  "tok_per_correct": 82934.0655737705,
   "seconds": 2922.674604118
  }
 }

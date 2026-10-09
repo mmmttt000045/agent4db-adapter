@@ -18,8 +18,8 @@
 \bi{The fact's date key joins the date dimension many-to-one through the declared role, as in a role-playing date dimension~\cite{kimball2013toolkit}.}
 {事实表的日期键按声明的角色与日期维度多对一关联，即角色扮演维度~\cite{kimball2013toolkit}。}
 \item[\bt{Join completeness}{连接完整性}]
-\bi{For the date join and every inner join $L\to R$, the fraction of $L$ rows that match no $R$ row stays within the fraction recorded at admission, so that facts are not silently dropped; for the date join we call it date-key completeness.}
-{对日期连接和每个内连接 $L\to R$，匹配不到 $R$ 中任何行的 $L$ 记录比例不超过准入时记录的比例，使事实不会被静默排除；对日期连接，我们称之为日期键完整性。}
+\bi{For the date join and every inner join $L\to R$, the fraction of $L$ rows that match no $R$ row stays within the fraction recorded at admission plus a tolerance of 0.1 percentage points, so that facts are not silently dropped; for the date join we call it date-key completeness.}
+{对日期连接和每个内连接 $L\to R$，匹配不到 $R$ 中任何行的 $L$ 记录比例不超过准入时记录的比例加 0.1 个百分点的容差，使事实不会被静默排除；对日期连接，我们称之为日期键完整性。}
 \end{description}
 
 \subsection{\bt{What the conditions guarantee}{条件保证了什么}}

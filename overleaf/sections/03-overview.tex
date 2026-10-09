@@ -1,7 +1,7 @@
 \section{\bt{System Overview}{系统概览}}
 \label{sec:overview}
-\bi{\system\ is a shared memory layer between data agents and a SQL database, PostgreSQL in our prototype (Figure~\ref{fig:architecture}). It exposes tool-style endpoints for listing and describing tables, finding join paths, looking up metric definitions (\code{find\_metric}), and running SQL (\code{run\_sql}); agents submit final answers with the query references and arithmetic that produced them, so the middleware records the provenance of every answer. The shared memory keeps versioned definitions, join paths, grain entries, check results, and evidence. The middleware is about 6,600 lines of Rust with 40 unit and integration tests.}
-{\system\ 是位于数据智能体与 SQL 数据库之间的共享记忆层，原型使用 PostgreSQL（图~\ref{fig:architecture}）。它以工具接口的形式提供列出和描述表、查找连接路径、查找指标定义（\code{find\_metric}）以及执行 SQL（\code{run\_sql}）等功能；智能体提交最终答案时附上产生答案的查询编号和算式，因此中间件为每个答案记录溯源。共享记忆保存版本化的定义、连接路径、粒度条目、检查结果和证据。中间件约 6,600 行 Rust 代码，含 40 个单元与集成测试。}
+\bi{\system\ is a shared memory layer between data agents and a SQL database, PostgreSQL in our prototype (Figure~\ref{fig:architecture}). It exposes tool-style endpoints for listing and describing tables, finding join paths, looking up metric definitions (\code{find\_metric}), and running SQL (\code{run\_sql}); agents submit final answers with the query references and arithmetic that produced them, so the middleware records the provenance of every answer. The shared memory keeps versioned definitions, join paths, grain entries, check results, and evidence. The middleware is about 7,700 lines of Rust, excluding the benchmark harnesses, with 49 unit and integration tests.}
+{\system\ 是位于数据智能体与 SQL 数据库之间的共享记忆层，原型使用 PostgreSQL（图~\ref{fig:architecture}）。它以工具接口的形式提供列出和描述表、查找连接路径、查找指标定义（\code{find\_metric}）以及执行 SQL（\code{run\_sql}）等功能；智能体提交最终答案时附上产生答案的查询编号和算式，因此中间件为每个答案记录溯源。共享记忆保存版本化的定义、连接路径、粒度条目、检查结果和证据。中间件约 7,700 行 Rust 代码（不含实验驱动程序），含 49 个单元与集成测试。}
 
 \input{figures/architecture}
 

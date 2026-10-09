@@ -134,23 +134,41 @@ def legend_line(s, x, y, label, sw, color, dash=None):
     return 15.4 + measure(label, NOTE)
 
 
-def stage(s, b, n, color, title, note, edge=PANEL_EDGE, dash=None):
+def stage(s, b, n, color, title, note, edge=PANEL_EDGE, dash=None, badge=True):
     """A step box: badge, bold title, a muted note, then a tinted area for the example.
 
+    n=None draws the other outcome's red badge with a cross; badge=False draws no
+    badge (a box the steps pass through without a number of its own); note=None
+    starts the example area right under the title.
     Returns (x, y, w) for the example rows: left edge, first baseline, room.
     """
     x, y, w, h = b
     s.rect(*b, WHITE, edge, .4, r=1.6, dash=dash)
-    if n is None:                                # the other outcome: a red badge with a cross
+    tx = x + 9.6
+    if not badge:
+        tx = x + 3.0
+    elif n is None:                              # the other outcome: a red badge with a cross
         s.circle(x + 5.0, y + 5.6, 3.0, RED)
         s.line(x + 3.9, y + 4.5, x + 6.1, y + 6.7, WHITE, .55)
         s.line(x + 3.9, y + 6.7, x + 6.1, y + 4.5, WHITE, .55)
     else:
         step(s, x + 5.0, y + 5.6, n, color)
-    s.text(x + 9.6, baseline(y + 5.6, TITLE), title, TITLE, INK, 'bold', width=w - 11)
+    s.text(tx, baseline(y + 5.6, TITLE), title, TITLE, color if not badge else INK, 'bold', width=x + w - 1.4 - tx)
+    if note is None:
+        s.rect(x + 1.8, y + 10.6, w - 3.6, h - 12.2, '#F7F6F3', None, r=1.0)
+        return x + 3.6, y + 16.0, w - 7.2
     s.text(x + 3.0, y + 12.6, note, NOTE, MUTED, width=w - 5)
     s.rect(x + 1.8, y + 15.0, w - 3.6, h - 16.6, '#F7F6F3', None, r=1.0)
     return x + 3.6, y + 20.6, w - 7.2
+
+
+def tag(s, x, y, label, fill='#17233B', size=NOTE - 1):
+    """A responsibility tag (publish, rely, maintain and improve): white bold text on a navy pill,
+    (x, y) its left edge and vertical centre; returns its width."""
+    w = measure(label, size, 'bold') + 4.4
+    s.rect(x, y - 2.9, w, 5.8, fill, None, r=1.4)
+    s.text(x + 2.2, baseline(y, size), label, size, WHITE, 'bold')
+    return w
 
 
 def rows(s, ex, ey, ew, lines, pitch, first=0, colors=None, marks=None, style='sans'):

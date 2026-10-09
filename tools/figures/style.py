@@ -74,13 +74,15 @@ def agree(what, shown, printed):
 
 
 def build(figure, out=OUT):
-    """Write <name>.pdf and <name>-zh.pdf for a figure module.
+    """Write <name>.pdf and <name>-zh.pdf for a figure module (only the languages in its LANGS, if set).
 
     A module with figure(lang) is a matplotlib figure (see mplstyle.py); one
     with draw(sheet, lang) is drawn with the vecfig kit.
     """
     paths = []
     for lang, suffix in (('en', ''), ('zh', '-zh')):
+        if lang not in getattr(figure, 'LANGS', ('en', 'zh')):   # the deck figures are Chinese only
+            continue
         path = Path(out) / f'{figure.NAME}{suffix}.pdf'
         if hasattr(figure, 'figure'):
             import mplstyle

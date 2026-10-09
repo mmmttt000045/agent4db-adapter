@@ -1,15 +1,20 @@
 """Deck figure 1 (system structure): how a user agent's two requests flow through MAVRA.
 
-A user agent asks for a metric by name ("store revenue"); the query service
-reads its definition from the shared memory; validation results missing for the
-current data version are computed by maintenance and cached; a valid definition
-(v2) goes back. The agent then sends SQL that names v2; the pre-execution check
-reuses cached validation results on the query's snapshot and runs the SQL there.
-Maintenance queries the database and writes validation results to the cache and
-new revisions or invalidations to the definitions.
-The built-in agent (an LLM) learns definitions and publishes them after
-validation. Drawn at slide size (300 mm, 12-15 pt) for the report deck, with
-everyday terms rather than the paper's notation.
+A user agent asks for a metric by name (store revenue, 门店营业额); the query
+service reads its definition from the shared memory; validation results missing
+for the current table version are computed by maintenance and cached; the valid
+revision v2 goes back. The agent then sends SQL that declares v2; the
+pre-execution check reuses cached validation results on the query's snapshot
+and runs the SQL there. Maintenance queries the database and writes validation
+results to the cache and new revisions or invalidations to the definitions.
+The built-in agent (an LLM) learns definitions and publishes them after the
+admission checks. The state is the incremental load of the end-to-end study
+(store_sales v14 -> v15, date_dim v7; table version numbers illustrative): the
+definitions that read store_sales are pending, the one reading store_returns
+stays valid, and the two store_sales conditions miss in the cache. Navy tags
+mark the deck's three responsibilities (publish, rely, maintain and improve).
+Drawn at slide size (300 mm, 12-15 pt), Chinese only, with standard database
+terms rather than the paper's notation; steps 1-8 match deck figure 2.
 """
 import sys
 from pathlib import Path
@@ -19,65 +24,49 @@ import style  # noqa: E402
 from vecfig import measure  # noqa: E402
 from parts import (DASH, EXEC, HEAD, LEARN, NOTE, PANEL_EDGE, THICK, THIN, TITLE, USE, WAIT,  # noqa: E402
                    baseline, box, legend_line, legend_pill, llm_badge, mark, node, person, slab, step,
-                   table_card, titled)
+                   table_card, tag, titled)
 from style import (ACC, ACC_DK, ACC_PALE, AMBER, AMBER_PALE, EDGE, FACE, FIELD, INK, MUTED,  # noqa: E402
                    RULE, SLATE, WHITE)
 
 NAME = 'overview'
 W, H = 300.0, 139.5
 
+LANGS = ('zh',)                                  # the report deck is Chinese
 LABELS = {
     'zh': {
         'agents': '用户 agent', 'question': ('9 月门店', '营业额？'), 'sql': 'SQL',
-        'declares': 'metrics: 营业额 v2', 'middleware': 'MAVRA 中间件',
-        'paths': ('学习', '查询指标定义', '执行 SQL'), 'lines': ('调用 / 返回', '写入记忆', '读数据库'),
+        'declares': ('metrics:', '门店营业额 v2'), 'middleware': 'MAVRA 中间件',
+        'paths': ('学习与发布', '查询指标定义', '执行 SQL'), 'lines': ('调用 / 返回', '写入记忆', '读数据库'),
         'service': '查询服务', 'lookup': ('检索指标定义', '名称匹配；比较表版本'),
         'check': ('执行前验证', '同一快照内验证并执行'),
-        'store': '共享记忆', 'store_note': '另有表统计信息、连接路径', 'defs': '指标定义',
-        'def_chips': (('营业额 v2', '待验证', 'wait'), ('电子品类 v2', '待验证', 'wait'), ('退货金额 v2', '有效', 'ok')),
+        'store': '共享记忆', 'store_note': '另有表统计信息、连接路径',
+        'defs': '指标定义', 'defs_note': '依赖的表有写入即待验证',
+        'def_chips': (('门店营业额', 'v2 待验证', 'wait'), ('电子品类门店营业额', 'v2 待验证', 'wait'),
+                      ('退货金额', 'v2 有效', 'ok')),
         'cache': '验证结果缓存', 'cache_note': '按（条件，表版本）缓存，跨定义共享',
         'cache_chips': (('日期键唯一', '表版本 v7', 'ok'), ('粒度键唯一', '表版本 v15', 'wait'),
                         ('日期键完整性', '表版本 v15', 'wait')),
         'agent': ('内置 agent（大模型）', '学习指标定义，提出优化写法'),
         'maint': ('维护', '执行验证 · 修复、优化或失效'),
-        'req_text': '检索“营业额”', 'resp_text': '有效修订 v2', 'req_sql': '执行 SQL', 'resp_sql': '查询结果',
+        'req_text': '检索“门店营业额”', 'resp_text': '有效修订 v2', 'req_sql': '执行 SQL', 'resp_sql': '查询结果',
         'read': '读定义', 'reuse': ('复用', '验证结果'), 'missing': '未命中：执行验证',
         'store_result': '写入结果', 'revise': '新修订或失效', 'publish': '准入检查后发布',
         'run': '在快照上执行 SQL', 'qc': '验证查询、表版本',
-        'db': '数据库', 'snapshot': '快照', 'etl': 'ETL / 写入方', 'write': '写入',
-    },
-    'en': {
-        'agents': 'User agents', 'question': ('Store revenue', 'in September?'), 'sql': 'SQL',
-        'declares': 'metrics: revenue v2', 'middleware': 'MAVRA middleware',
-        'paths': ('learning', 'find definition', 'run SQL'),
-        'lines': ('call / response', 'write to memory', 'read database'),
-        'service': 'Query service', 'lookup': ('Find definition', 'match name, check data'),
-        'check': ('Pre-run check', 'validate on one snapshot'),
-        'store': 'Shared memory', 'store_note': 'also table profiles, join paths', 'defs': 'Definitions',
-        'def_chips': (('revenue v2', 'pending', 'wait'), ('electr. v2', 'pending', 'wait'), ('returns v2', 'valid', 'ok')),
-        'cache': 'Validation cache', 'cache_note': 'per (rule, data version), shared',
-        'cache_chips': (('date key unique', 'version v7', 'ok'), ('one row/sale', 'version v15', 'wait'),
-                        ('loss in bound', 'version v15', 'wait')),
-        'agent': ('Built-in agent (LLM)', 'learns definitions, proposes rewrites'),
-        'maint': ('Maintenance', 'checks · repair, optimize, retire'),
-        'req_text': 'ask “revenue”', 'resp_text': 'valid v2', 'req_sql': 'run SQL', 'resp_sql': 'result',
-        'read': 'read', 'reuse': ('reuse', 'results'), 'missing': 'missing: run check',
-        'store_result': 'store', 'revise': 'new revision or retire', 'publish': 'admit, publish',
-        'run': 'run SQL on the snapshot', 'qc': 'check SQL, data versions',
-        'db': 'Database', 'snapshot': 'snapshot', 'etl': 'ETL / writers', 'write': 'write',
+        'db': '数据库', 'snapshot': '快照', 'etl': 'ETL / 写入方', 'write': '增量加载',
+        'duties': ('发布', '依赖', '维护与改进'),
     },
 }
 
-FIELD_BOX = (50.0, 1.0, 249.0, 107.0)            # MAVRA's area
-AGENT = (4.0, 33.0, 44.0, 44.0)
-PA = (86.0, 30.0, 64.0, 50.0)                    # query service
-LOOKUP = (89.0, 40.0, 58.0, 16.0)
-CHECK = (89.0, 60.0, 58.0, 17.0)
+FIELD_BOX = (50.0, 1.0, 249.0, 109.5)            # MAVRA's area
+AGENT = (4.0, 33.0, 40.0, 44.0)
+PA = (89.0, 30.0, 61.0, 50.0)                    # query service
+LOOKUP = (92.0, 40.0, 55.0, 16.0)
+CHECK = (92.0, 60.0, 55.0, 17.0)
 OPT = (200.0, 4.0, 97.0, 18.0)                   # built-in agent, above the store
-PB = (176.0, 30.0, 121.0, 49.0)                  # metric store
-DEFS = (179.0, 40.0, 107.0, 15.5)                # leaves a channel on the right for maintenance
-CACHE = (179.0, 58.0, 107.0, 20.0)
-MAINT = (210.0, 89.0, 87.0, 16.0)                # maintenance, below the store
+PB = (176.0, 30.0, 121.0, 55.0)                  # shared memory
+DEFS = (179.0, 40.0, 107.0, 20.0)                # leaves a channel on the right for maintenance
+CACHE = (179.0, 63.0, 107.0, 20.0)
+MAINT = (210.0, 93.0, 87.0, 15.0)                # maintenance, below the store
 DB = (50.0, 116.5, 246.0, 19.0)
 SNAP = (89.0, 57.0)                              # (x, w) of the snapshot region, under the check
 VERS = (179.0, 52.0)                             # data versions, under the store
@@ -118,10 +107,11 @@ def draw(s, lang):
     cx, cy, cw, ch = ax + 3.0, ay + 20.0, aw - 6.0, 21.0
     rect(cx, cy, cw, ch, WHITE, EDGE, .28, r=1.0)
     text(cx + 2.0, cy + 5.4, L['sql'], NOTE, MUTED, 'bold')
-    for k, length in enumerate((cw - 11, cw - 6, cw - 14)):
-        s.line(cx + 2.0, cy + 9.0 + 2.6 * k, cx + 2.0 + length, cy + 9.0 + 2.6 * k, RULE, .6)
-    rect(cx + 1.5, cy + ch - 6.2, cw - 3.0, 5.0, ACC_PALE, None, r=1.0)
-    text(cx + cw / 2, cy + ch - 2.3, L['declares'], NOTE - 1, ACC_DK, align='center', width=cw - 4.0)
+    for k, length in enumerate((cw - 11, cw - 6)):
+        s.line(cx + 2.0, cy + 8.6 + 2.4 * k, cx + 2.0 + length, cy + 8.6 + 2.4 * k, RULE, .6)
+    rect(cx + 1.5, cy + ch - 10.0, cw - 3.0, 8.8, ACC_PALE, None, r=1.0)
+    for k, line in enumerate(L['declares']):
+        text(cx + 3.0, cy + ch - 6.2 + 4.4 * k, line, NOTE - 1, ACC_DK, width=cw - 6.0)
 
     # Requests and responses ---------------------------------------------------------
     x0, x1 = ax + aw + 3.0, PA[0]
@@ -138,6 +128,8 @@ def draw(s, lang):
 
     # Query service --------------------------------------------------------------------
     panel(PA, L['service'])
+    publish, rely, maintain = L['duties']           # the three responsibilities, as tags on their parts
+    tag(s, PA[0] + PA[2] - 3.0 - measure(rely, NOTE - 1, 'bold') - 4.4, PA[1] + 4.7, rely)
     titled(s, LOOKUP, *L['lookup'])
     titled(s, CHECK, *L['check'])
 
@@ -154,15 +146,20 @@ def draw(s, lang):
     text(PB[0] + 7.0 + tw, PB[1] + 6.5, L['store_note'], NOTE, MUTED, width=OPT[0] + OPT[2] - 14.0 - PB[0] - tw)
     x, y, w, h = DEFS
     box(s, DEFS)
-    tl = text(x + 3.0, baseline(y + h / 2, NOTE), L['defs'], NOTE, INK, 'bold')
-    cw2 = min(27.0, (w - 3.0 - tl - 2.0 - 2.0 - 4.0) / 3)   # chips right-aligned, clear of the label
-    for k, (name, state, kind) in enumerate(L['def_chips']):
+    tl = text(x + 3.0, y + 5.4, L['defs'], NOTE, INK, 'bold')
+    text(x + 5.5 + tl, y + 5.4, L['defs_note'], NOTE, MUTED, width=w - 8.5 - tl)
+    widths = [max(measure(name, NOTE), measure(state, NOTE)) + 5.4 for name, state, _ in L['def_chips']]
+    gap = (w - 3.0 - sum(widths)) / (len(widths) - 1)
+    if gap < 1.5:
+        raise ValueError(f'definition chips need {sum(widths) + 3.0 + 3.0:.1f} mm; {w:.1f} mm available')
+    xx = x + 1.5
+    for cw2, (name, state, kind) in zip(widths, L['def_chips']):
         col, pale = (AMBER, AMBER_PALE) if kind == 'wait' else (ACC_DK, ACC_PALE)
-        xx = x + w - 2.0 - (3 - k) * cw2 - (2 - k) * 2.0
-        rect(xx, y + 1.5, cw2, h - 3.0, pale, None, r=1.0)
-        rect(xx + 1.2, y + 2.8, 1.0, h - 5.6, col)
-        text(xx + 3.4, y + 6.8, name, NOTE, INK, width=cw2 - 4.0)
-        text(xx + 3.4, y + 12.2, state, NOTE, WAIT if col == AMBER else col, width=cw2 - 4.0)
+        rect(xx, y + 7.5, cw2, 11.0, pale, None, r=1.0)
+        rect(xx + 1.2, y + 8.8, 1.0, 8.4, col)
+        text(xx + 3.4, y + 12.0, name, NOTE, INK, width=cw2 - 4.0)
+        text(xx + 3.4, y + 17.0, state, NOTE, WAIT if col == AMBER else col, width=cw2 - 4.0)
+        xx += cw2 + gap
     x, y, w, h = CACHE
     box(s, CACHE)
     tw = text(x + 3.0, y + 5.4, L['cache'], NOTE, INK, 'bold')
@@ -179,6 +176,7 @@ def draw(s, lang):
 
     # Maintenance --------------------------------------------------------------------------
     titled(s, MAINT, *L['maint'])
+    tag(s, MAINT[0] + 6.0 + measure(L['maint'][0], TITLE, 'bold'), MAINT[1] + 5.2, maintain)
 
     # Inside MAVRA: read the definition, reuse cached results, fill the missing ones -----
     ga, gb = PA[0] + PA[2], PB[0]
@@ -216,7 +214,8 @@ def draw(s, lang):
     # Learning: the built-in agent publishes into the definitions.
     xp = DEFS[0] + DEFS[2] - 10.0
     route([(xp, OPT[1] + OPT[3]), (xp, DEFS[1])], LEARN, THICK, length=HEAD)
-    text(xp - 2.0, 28.6, L['publish'], NOTE, LEARN, align='right')
+    wp = text(xp - 2.0, 27.6, L['publish'], NOTE, LEARN, align='right')
+    tag(s, xp - 4.5 - wp - measure(publish, NOTE - 1, 'bold') - 4.4, 25.8, publish)
 
     # Database ---------------------------------------------------------------------------
     px, py, pw, ph = DB

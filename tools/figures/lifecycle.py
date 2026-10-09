@@ -1,174 +1,172 @@
-"""Deck figure 3 (learning and maintenance): one metric definition through its life.
+"""Deck figure 3 (publish, maintain and improve): one definition, store revenue, through its life.
 
-Store revenue (门店营业额). Top row: the built-in agent (an LLM) answers a learning
-question whose meaning is given (March, 13,570,368.70), the answer is verified,
-and v1 is published after validation; an optimization rewrites the period
-predicate as a date-key range, which agrees on 14 sample periods and runs
-19.8% faster, so v2 is published with "contiguous date keys" as a new
-condition (v1 stays accepted). Bottom row: a restatement keeps the old rows as
-non-current (ss_is_current = 0) and breaks "one row per sale"; v2 is retired;
-the repair tries filters on low-cardinality columns, exactly one works, the
-regression test on the learning-time data gives the same answer (on current
-data it would refuse the fix), and v3 is published.
-The red box is the other outcome: after a duplicate load no filter works and the
-definition stays retired. Values come from the end-to-end study (run r1 of
-MAVRA; tasks M1-L1 and M1-P1). Drawn at slide size for the report deck, with
-everyday terms rather than the paper's notation.
+Top row: the built-in agent (an LLM) answers a learning question whose meaning
+is given (March, 13,570,368.70, judged correct, 5 turns and 7 tool calls); the
+admission checks pass and v1 is published with its three conditions; an
+improvement rewrites the period predicate as a date-key range (equal on 14
+periods, 29.1 -> 23.3 ms, -19.8%) and publishes v2 with "date keys contiguous
+by month" as a new condition. Bottom: a write to store_sales (table version
+v14 -> v15, illustrative); the next use validates v2's conditions, and the three
+everyday writes of deck slide 3 end three ways. Incremental load (+27,095 rows,
+new tickets): every condition holds, v2 stays valid and September is
+26,139,303.60. Correction keeping the old rows as non-current (+65,915 rows):
+grain-key uniqueness fails (1,065,915 rows, 1,000,000 keys), v2 is invalidated,
+the repair search finds exactly one filter, ss_is_current = '1', the regression
+test on the learning-time data gives the March answer again, and v3 serves
+September as 12,932,888.04 (v2 left in use: 14,300,525.64). Duplicate load
+(+110,165 rows): uniqueness fails (1,110,165 rows, 1,000,000 keys), no filter
+restores it, and the definition is invalidated.
+Values: learning, admission and optimization from the trace run
+(exp/2026-10-08-optimize/trace, README there) and the optimization run
+(results/scen-20261008-opt on noctis: the timing, and the three writes'
+maintenance events and M1-P1 answers); the unmaintained answer from
+results/scen-20261002 (dsv41flash-r1-g3fix--schema). Drawn at slide size
+(300 mm, 12-15 pt), Chinese only, with standard database terms rather than the
+paper's notation.
 """
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import style  # noqa: E402
-from parts import (DASH, HEAD, LEARN, NOTE, THIN, TITLE, USE, WAIT, legend_pill, llm_badge,  # noqa: E402
-                   rows, stage)
-from style import ACC, ACC_DK, AMBER, AMBER_PALE, FIELD, INK, MUTED, RED  # noqa: E402
+from parts import (EXEC, HEAD, LEARN, NOTE, PANEL_EDGE, THIN, TITLE, USE, WAIT, legend_pill,  # noqa: E402
+                   llm_badge, mark, rows, stage)
+from style import ACC, ACC_DK, AMBER, FIELD, INK, MUTED, RED, WHITE  # noqa: E402
 
 NAME = 'lifecycle'
-W, H = 300.0, 110.0
+LANGS = ('zh',)                                  # the report deck is Chinese
+W, H = 300.0, 134.0
 
 LABELS = {
     'zh': {
-        'title': 'MAVRA 学习、优化与维护', 'paths': ('学习', '优化', '维护'), 'otherwise': '另一种结果',
-        'table': '`store_sales`',
-        'learn': ('学习', '内置智能体（大模型）'),
-        'l_rows': ('任务：3 月门店营业额（给定口径）', '`SUM(ss_net_paid) … d_moy = 3`',
-                   '答案 1357.0 万，判定正确', '准入检查通过'),
-        'pub1': ('发布 v1', '定义内容'),
-        'p1_rows': ('度量：`SUM(ss_net_paid)`', '条件：粒度键唯一、', '日期键唯一、日期键完整性',
-                    '证据：学习时的 SQL'),
-        'opt': ('优化修订', '期间谓词改为日期键范围'),
-        'o_rows': ('14 个期间结果一致', '29.1 → 23.3 ms，省 19.8%', '新条件：日期键按月连续', '发布 v2，v1 宽限可用'),
-        'later': '后续更新',
-        'breaking': ('数据更正', '旧行标记为非当前，插入当前行'),
-        'k_rows': ('粒度键唯一：不成立', 'v2 失效', '不处理：1430.1 万（计入旧行）'),
-        'search': ('修复搜索', '在低基数列上枚举等值谓词'),
-        's_rows': ("`ss_is_current='1'`", "`ss_is_current='0'` 丢失键", '唯一可行'),
-        'regress': ('回归测试', '按学习时刻重算 3 月'),
-        'r_rows': ('学习时 SQL', '修复后', '一致：接受修复', '按当前数据比较会误拒'), 'value': '1357.0 万',
-        'pub2': ('发布 v3', '同一定义的新修订'),
-        'p2_rows': ('v3 = v2 + 谓词', "`ss_is_current='1'`", '声明 v2 的查询被拒绝', '等待中的请求获得 v3'),
-        'nofix': ('无法修复', '例：批次重复加载'),
-        'n_rows': ('粒度键唯一：不成立', '没有谓词能恢复唯一性', '失效，通知使用方', '等待重新学习'),
-        'two': '无候选或多个候选', 'relearn': '重新学习',
-    },
-    'en': {
-        'title': 'MAVRA learning, optimization and maintenance', 'paths': ('learning', 'optimization', 'maintenance'),
-        'otherwise': 'other outcome', 'table': '`store_sales`',
-        'learn': ('Learn', 'built-in agent (LLM)'),
-        'l_rows': ('question: March store revenue', '`SUM(ss_net_paid) … d_moy = 3`',
-                   'answer 13,570,368.70, verified', 'validated before publishing'),
-        'pub1': ('Publish v1', 'the definition holds'),
-        'p1_rows': ('`SUM(ss_net_paid)`', 'rules: one row per sale,', 'date key unique,',
-                    'loss in bound; learning SQL'),
-        'opt': ('Optimize', 'period predicate as a key range'),
-        'o_rows': ('14 periods agree', '29.1 → 23.3 ms, −19.8%', 'new condition: contiguous keys', 'publish v2; v1 still accepted'),
-        'later': 'a later write',
-        'breaking': ('Restatement', 'old rows kept as non-current'),
-        'k_rows': ('one row per sale: fails', 'v2 retired', 'unfixed: old rows counted'),
-        'search': ('Find a repair', 'try filters on few-value columns'),
-        's_rows': ("`ss_is_current='1'`", "`ss_is_current='0'` loses sales", 'exactly one works'),
-        'regress': ('Regression test', 'rerun March on learning-time data'),
-        'r_rows': ('learning SQL', 'with the filter', 'same: fix accepted', 'current data would refuse it'),
-        'value': '13,570,368.70',
-        'pub2': ('Publish v3', 'new version, same metric'),
-        'p2_rows': ('v3 = v2 + filter', "`ss_is_current='1'`", 'SQL naming v2: rejected',
-                    'waiting requests get v3'),
-        'nofix': ('No repair', 'e.g. a batch loaded twice'),
-        'n_rows': ('one row per sale: fails', 'no filter restores it', 'retired; agents told',
-                   'retired until relearned'),
-        'two': 'none (or several) work', 'relearn': 'relearn',
+        'title': '门店营业额的一生：发布、改进与维护',
+        'paths': ('发布', '维护与改进'), 'fails': '失效',
+        'learn': ('学习', '内置 agent（大模型），5 轮、7 次工具调用'),
+        'l_rows': ('任务：3 月门店营业额（给定口径）', '答案 1357.0 万，判定正确',
+                   'SQL：`SUM(ss_net_paid) … d_moy = 3`'),
+        'pub1': ('准入检查，发布 v1', '7 项检查通过后写入共享记忆'),
+        'p1_rows': ('条件：粒度键唯一、日期键唯一、', '日期键完整性', '证据：学习时的 SQL、答案、表版本'),
+        'opt': ('改进：发布 v2', '期间改为日期键范围，不连接 `date_dim`'),
+        'o_rows': ('14 个期间结果一致', '29.1 → 23.3 ms，快 19.8%', '新条件：日期键按月连续'),
+        'then': '之后 `store_sales` 有一次写入（v14 → v15），下次使用 v2 前先验证它的条件。三种写入，三种结果：',
+        'append': ('增量加载', '+27,095 行，新小票号'), 'a_rows': (('4 个条件都成立', 'ok', ACC_DK), ('多出的行都是新键，不是重复', None, MUTED)),
+        'keep': ('v2 继续有效', '所有 agent 照常使用（第 7 页）'),
+        'k_rows': (('9 月门店营业额 2613.9 万，与参考答案一致', 'ok', INK),
+                   ('只重验读 `store_sales` 的两项条件，结果所有定义共享', None, MUTED)),
+        'correct': ('数据更正', '+65,915 行，旧行保留'),
+        'c_rows': (('粒度键唯一：不成立', 'fail', RED), ('1,065,915 行，1,000,000 个键', None, MUTED),
+                   ('v2 失效', None, RED)),
+        'search': '修复搜索',
+        's_rows': (("`ss_is_current='1'`", 'ok', INK), ("`ss_is_current='0'`：丢键", 'fail', INK),
+                   ('只有一个过滤可行', None, ACC_DK)),
+        'regress': '回归测试',
+        'r_rows': ('按学习时的数据重算 3 月', '学习时的 SQL', '修复后的 v3'), 'value': '1357.0 万',
+        'pub3': '发布 v3',
+        'v_rows': (("v3 = v2 + `ss_is_current='1'`", None, ACC_DK), ('9 月 1293.3 万', 'ok', INK),
+                   ('沿用 v2 会得 1430.1 万', 'fail', MUTED)),
+        'dup': ('重复加载', '+110,165 行'),
+        'd_rows': (('粒度键唯一：不成立', 'fail', RED), ('1,110,165 行，1,000,000 个键', None, MUTED)),
+        'nofix': ('修复搜索', ''), 'n_rows': (('没有过滤能恢复唯一性', 'fail', RED),),
+        'retire': ('失效，通知使用方', ''),
+        'x_rows': (('声明 v2 的查询被拒绝，等待重新学习', None, INK), ('使用方自己从头探索作答', None, MUTED)),
     },
 }
 
-ROUTE_Y = 12.5                            # the relearn route runs above the top row
-R1, R2, RH = 16.0, 68.0, 40.0             # tops of the two rows, their height
-LEARN_B = (2.0, R1, 74.0, RH)
-PUB1 = (82.0, R1, 70.0, RH)
-BENIGN = (158.0, R1, 64.0, RH)
-NOFIX = (228.0, R1, 70.0, RH)
-BREAK = (2.0, R2, 70.0, RH)
-SEARCH = (78.0, R2, 74.0, RH)
-REGRESS = (158.0, R2, 66.0, RH)
-PUB2 = (230.0, R2, 68.0, RH)
-PITCH = 5.6
+TOP, TH = 12.0, 34.0                      # top row: learn, publish, improve
+T1 = (2.0, TOP, 96.0, TH)
+T2 = (104.0, TOP, 94.0, TH)
+T3 = (204.0, TOP, 94.0, TH)
+BUS_Y, BUS_X = 52.5, 5.0                  # the write, and the line down to the three outcomes
+LA, LB, LC = (56.0, 20.0), (79.0, 30.0), (112.0, 20.0)   # (top, height) of the three lanes
+C1, C2, C3, C4 = (10.0, 70.0), (86.0, 68.0), (158.0, 68.0), (230.0, 68.0)   # (left, width) of the columns
+PITCH = 5.2
 
 
 def draw(s, lang):
     L = LABELS[lang]
     text, rect, route = s.text, s.rect, s.route
 
-    def version(ex, ey, ew, old, new):
-        rect(ex - 1.2, ey - 4.3, ew + 2.4, 5.8, AMBER_PALE, AMBER, .25, r=.8)
-        text(ex, ey, L['table'], NOTE, INK)
-        text(ex + ew, ey, f'{old} → {new}', NOTE, WAIT, align='right')
+    def event(b, title, note, lines, edge, color=INK, dash=None):
+        """A compact box: bold title and a note on one line, then rows with result marks."""
+        x, y, w, h = b
+        rect(*b, WHITE, edge, .4, r=1.6, dash=dash)
+        tw = text(x + 3.0, y + 6.2, title, NOTE + 1, color, 'bold', width=w - 6.0)
+        if note:
+            text(x + 5.5 + tw, y + 6.2, note, NOTE, WAIT if edge == AMBER else MUTED, width=w - 8.5 - tw)
+        for k, (line, kind, ink) in enumerate(lines):
+            yy = y + 12.0 + PITCH * k
+            text(x + 3.0, yy, line, NOTE, ink, width=w - 6.0 - (4.6 if kind else 0))
+            if kind:
+                mark(s, x + w - 4.6, yy - 1.5, kind)
 
+    def marked(ex, ey, ew, lines):
+        for k, (line, kind, ink) in enumerate(lines):
+            yy = ey + PITCH * k
+            text(ex, yy, line, NOTE, ink, width=ew - (4.6 if kind else 0))
+            if kind:
+                mark(s, ex + ew - 1.6, yy - 1.5, kind)
+
+    # Header ----------------------------------------------------------------------------
     rect(0, 0, W, H, FIELD, None, r=2.8)
-    rect(3.0, 3.4, 1.1, 5.4, ACC)
-    text(6.2, 8.2, L['title'], TITLE, ACC_DK, 'bold')
-    x = 150.0
-    for label, color, steps in zip(L['paths'], (LEARN, AMBER, USE), ('1–2', '3', '4–7')):
-        x += legend_pill(s, x, 6.2, label, color, steps) + 6.0
-    legend_pill(s, x, 6.2, L['otherwise'], RED, dashed=True)
+    rect(3.0, 3.0, 1.1, 5.4, ACC)
+    text(6.2, 7.8, L['title'], TITLE, ACC_DK, 'bold')
+    x = 196.0
+    for label, color, steps in zip(L['paths'], (LEARN, USE), ('1–2', '3–6')):
+        x += legend_pill(s, x, 5.8, label, color, steps) + 6.0
+    legend_pill(s, x, 5.8, L['fails'], RED, dashed=True)
 
-    # 1 Learn ---------------------------------------------------------------------------
-    ex, ey, ew = stage(s, LEARN_B, 1, LEARN, *L['learn'])
-    llm_badge(s, LEARN_B[0] + LEARN_B[2] - 6.0, LEARN_B[1] + 5.8, 3.2)
-    rows(s, ex, ey, ew, L['l_rows'], PITCH, marks={2: 'ok', 3: 'ok'})
-
-    # 2 Publish v1 ----------------------------------------------------------------------
-    ex, ey, ew = stage(s, PUB1, 2, LEARN, *L['pub1'])
+    # 1 Learn, 2 publish v1, 3 improve to v2 ------------------------------------------------
+    ex, ey, ew = stage(s, T1, 1, LEARN, *L['learn'])
+    llm_badge(s, T1[0] + T1[2] - 6.0, T1[1] + 5.8, 3.2)
+    rows(s, ex, ey, ew, L['l_rows'], PITCH, marks={1: 'ok'})
+    ex, ey, ew = stage(s, T2, 2, LEARN, *L['pub1'])
     rows(s, ex, ey, ew, L['p1_rows'], PITCH)
+    ex, ey, ew = stage(s, T3, 3, USE, *L['opt'])
+    rows(s, ex, ey, ew, L['o_rows'], PITCH, colors={2: ACC_DK}, marks={0: 'ok', 1: 'ok'})
+    for (l, r), color in (((T1, T2), LEARN), ((T2, T3), USE)):
+        route([(l[0] + l[2], TOP + 5.6), (r[0], TOP + 5.6)], color, THIN, length=HEAD)
 
-    # 3 Optimization: an equivalent, cheaper rewrite becomes v2 ------------------------------
-    ex, ey, ew = stage(s, BENIGN, 3, AMBER, *L['opt'])
-    rows(s, ex, ey, ew, L['o_rows'], PITCH, colors={2: AMBER, 3: ACC_DK}, marks={0: 'ok', 1: 'ok'})
+    # The write, then a line down to the three outcomes ---------------------------------------
+    xs = T3[0] + T3[2] / 2
+    route([(xs, TOP + TH), (xs, BUS_Y), (BUS_X, BUS_Y), (BUS_X, LC[0] + 6.2)], INK, THIN, heads=None,
+          radius=1.8)
+    text(C1[0], BUS_Y - 1.8, L['then'], NOTE, INK, width=xs - C1[0] - 3.0)
+    for top, _ in (LA, LB, LC):
+        route([(BUS_X, top + 6.2), (C1[0], top + 6.2)], INK, THIN, length=HEAD)
 
-    # 4 A breaking write retires v1 ----------------------------------------------------------
-    ex, ey, ew = stage(s, BREAK, 4, USE, *L['breaking'])
-    version(ex, ey, ew, 13, 14)
-    rows(s, ex, ey, ew, L['k_rows'], PITCH, first=1, colors={0: RED, 1: RED, 2: MUTED},
-         marks={0: 'fail'})
+    def lane_arrow(top, x0, x1, color):
+        route([(x0, top + 6.2), (x1, top + 6.2)], color, THIN, length=HEAD)
 
-    # 5 Find a repair ----------------------------------------------------------------------
-    ex, ey, ew = stage(s, SEARCH, 5, USE, *L['search'])
-    rows(s, ex, ey, ew, L['s_rows'], PITCH, colors={2: ACC_DK}, marks={0: 'ok', 1: 'fail', 2: 'ok'})
+    # Incremental load: the conditions hold, v2 stays ----------------------------------------
+    top, h = LA
+    event((C1[0], top, C1[1], h), *L['append'], L['a_rows'], AMBER)
+    event((C2[0], top, C4[0] + C4[1] - C2[0], h), *L['keep'], L['k_rows'], EXEC, EXEC)
+    lane_arrow(top, C1[0] + C1[1], C2[0], EXEC)
 
-    # 6 Regression test on the learning-time data ---------------------------------------------
-    ex, ey, ew = stage(s, REGRESS, 6, USE, *L['regress'])
-    for k, label in enumerate(L['r_rows'][:2]):
-        yy = ey + PITCH * k
+    # Correction: invalidated, repaired, regression-tested, v3 -------------------------------
+    top, h = LB
+    event((C1[0], top, C1[1], h), *L['correct'], L['c_rows'], AMBER)
+    ex, ey, ew = stage(s, (C2[0], top, C2[1], h), 4, USE, L['search'], None)
+    marked(ex, ey, ew, L['s_rows'])
+    ex, ey, ew = stage(s, (C3[0], top, C3[1], h), 5, USE, L['regress'], None)
+    text(ex, ey, L['r_rows'][0], NOTE, INK, width=ew)
+    for k, label in enumerate(L['r_rows'][1:]):
+        yy = ey + PITCH * (k + 1)
         text(ex, yy, label, NOTE, INK)
         text(ex + ew - 4.6, yy, L['value'], NOTE, INK, align='right')
-    rows(s, ex, ey, ew, L['r_rows'][2:], PITCH, first=2, colors={0: ACC_DK, 1: MUTED}, marks={0: 'ok'})
+    mark(s, ex + ew - 1.6, ey + PITCH * 2 - 1.5, 'ok')
+    ex, ey, ew = stage(s, (C4[0], top, C4[1], h), 6, USE, L['pub3'], None)
+    marked(ex, ey, ew, L['v_rows'])
+    for x0, x1 in ((C1[0] + C1[1], C2[0]), (C2[0] + C2[1], C3[0]), (C3[0] + C3[1], C4[0])):
+        lane_arrow(top, x0, x1, USE)
 
-    # 7 Publish v2 ---------------------------------------------------------------------------
-    ex, ey, ew = stage(s, PUB2, 7, USE, *L['pub2'])
-    rows(s, ex, ey, ew, L['p2_rows'], PITCH, colors={0: ACC_DK, 1: ACC_DK})
-
-    # The other outcome: no unique repair ---------------------------------------------------
-    ex, ey, ew = stage(s, NOFIX, None, RED, *L['nofix'], edge=RED, dash=(1.6, 1.0))
-    rows(s, ex, ey, ew, L['n_rows'], PITCH, colors={0: RED, 1: RED, 3: LEARN}, marks={0: 'fail'})
-
-    # Arrows ---------------------------------------------------------------------------------
-    for (l, r), color in (((LEARN_B, PUB1), LEARN), ((PUB1, BENIGN), AMBER), ((BREAK, SEARCH), USE),
-                          ((SEARCH, REGRESS), USE), ((REGRESS, PUB2), USE)):
-        yy = l[1] + 5.6
-        route([(l[0] + l[2], yy), (r[0], yy)], color, THIN, length=HEAD)
-    # From the normal write to the breaking one: a later write.
-    xb, yc = BENIGN[0] + BENIGN[2] / 2, R1 + RH + 5.0
-    xk = BREAK[0] + BREAK[2] / 2
-    route([(xb, R1 + RH), (xb, yc), (xk, yc), (xk, R2)], USE, THIN, radius=1.8, length=HEAD)
-    text(xk + 2.8, R2 - 1.8, L['later'], NOTE, USE)
-    # From the repair search to the other outcome when no unique filter exists.
-    xs, yn, xn = SEARCH[0] + SEARCH[2] - 12.0, R2 - 4.5, NOFIX[0] + NOFIX[2] / 2
-    route([(xs, R2), (xs, yn), (xn, yn), (xn, R1 + RH)], RED, THIN, radius=1.8, length=HEAD)
-    text(xb + 3.0, yn - 2.0, L['two'], NOTE, RED, width=xn - xb - 5.0)
-    # From the other outcome back to learning.
-    xl = LEARN_B[0] + LEARN_B[2] / 2
-    route([(xn, R1), (xn, ROUTE_Y), (xl, ROUTE_Y), (xl, R1)], LEARN, THIN, radius=1.8, dash=DASH,
-          length=HEAD)
-    text(100.0, ROUTE_Y - 1.6, L['relearn'], NOTE, LEARN)
+    # Duplicate load: no filter restores the grain, the definition is invalidated -------------
+    top, h = LC
+    event((C1[0], top, C1[1], h), *L['dup'], L['d_rows'], AMBER)
+    event((C2[0], top, C2[1], h), *L['nofix'], L['n_rows'], PANEL_EDGE)
+    event((C3[0], top, C4[0] + C4[1] - C3[0], h), *L['retire'], L['x_rows'], RED, RED, dash=(1.6, 1.0))
+    lane_arrow(top, C1[0] + C1[1], C2[0], USE)
+    lane_arrow(top, C2[0] + C2[1], C3[0], RED)
 
 
 if __name__ == '__main__':

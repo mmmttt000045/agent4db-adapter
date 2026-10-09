@@ -23,7 +23,7 @@ pdftoppm -r 400 -png /tmp/x/architecture.pdf /tmp/x/architecture
 
 ## 汇报用的三张图
 
-`overview.py`、`lookup.py`、`lifecycle.py` 是汇报 PPT 用的三张图（系统结构、查询与执行、学习与维护），不进论文。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`），用通用词汇（指标定义、指标库、校验规则、校验结果缓存、数据版本、快照、v1/v2、停用、回归测试），不用论文符号，也不写年份；三张图讲同一个例子（门店营业额在追加、数据更正、重复装载三种日常写入下的经历，数值取自端到端实验 MAVRA 第 1 次运行的任务 M1-L1、M1-P1）。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
+`overview.py`、`lookup.py`、`lifecycle.py` 是汇报 PPT 的三张核心图，不进论文：图 1 系统结构（一次请求在各模块之间怎么流转，深色标签标出发布、依赖、维护与改进三项职责），图 2 查询与执行（图 1 的第 1–8 步按增量加载后的一次真实使用展开），图 3 发布、改进与维护（门店营业额从学习、发布 v1、改进为 v2，到三种写入的三种结局）。三张图讲同一个例子、用同一套编号，数值取自实验记录（来源写在各脚本开头），表版本号为示意。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`），只出中文版（`LANGS = ('zh',)`），用标准的数据库术语（指标定义、共享记忆、验证条件、验证结果缓存、表版本、快照、修订 v1/v2/v3、失效、准入检查、修复搜索、回归测试），不用论文符号，也不写年份。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
 
 ## 数据核对
 

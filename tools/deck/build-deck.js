@@ -1,14 +1,14 @@
 // Builds docs/mavra-system.pptx, a 10-slide Chinese deck that tells MAVRA as one story: title; how it differs from
 // Text-to-SQL; a shared rule breaks when the data changes (toy ledger, then the real record); MAVRA between agents and
 // the database with its three responsibilities (publish, rely, maintain and improve); the running example, 门店营业额
-// v1 (learned) → v2 (optimized) → v3 (repaired), as one table; publish (admission, the four conditions); rely (the traced
-// use with a declared revision, table versions, the same snapshot); maintain and improve (v1 → v2 and v2 → v3 as
-// recorded); results; guarantees, limits and three sentences. The user asked for 10 slides: don't add slides. The system
-// figure comes from tools/deck/figures/ (drawn by `python3 tools/figures/build.py --deck`,
-// rendered to PNG). Toy tables are marked 示意; every other number comes from the archived
-// run records or the paper's generated macros (overleaf/gen/*.tex); the slide footers only say
-// which numbers are 示意 and which are recorded, and the record paths go at the end of each slide's
-// speaker notes. Wording uses standard database terms, with a one-line plain reading beside each.
+// v1 (learned) → v2 (optimized) → v3 (repaired), as one table; publish (admission, the four conditions); rely (one
+// recorded use, steps 1-8: declared revision, table versions, the same snapshot); maintain and improve (v1 → v2, then
+// three writes and their three outcomes); results; guarantees, limits and three sentences. The user asked for 10
+// slides: don't add slides. The three figures carry slides 4, 7 and 8; they come from tools/deck/figures/ (drawn by
+// `python3 tools/figures/build.py --deck`, rendered to PNG). Toy tables are marked 示意; every other number comes from
+// the archived run records or the paper's generated macros (overleaf/gen/*.tex); the slide footers only say which
+// numbers are 示意 and which are recorded, and the record paths go at the end of each slide's speaker notes. Wording
+// uses standard database terms, with a one-line plain reading beside each.
 // Usage: node build-deck.js [--out path]
 'use strict';
 
@@ -46,6 +46,13 @@ function figure(slide, name, top = 1.2, maxH = 5.75) {
   let w = W - 2 * M, h = w / r;
   if (h > maxH) { h = maxH; w = h * r; }
   slide.addImage({ path: file, x: (W - w) / 2, y: top + (maxH - h) / 2, w, h, objectName: name });
+  return { y: top + (maxH - h) / 2, h };
+}
+
+// A responsibility tag as in the figures: white bold text on a navy pill.
+function tag(slide, value, x, y, w) {
+  slide.addShape('roundRect', { x, y, w, h: 0.32, fill: { color: C.navy }, line: { color: C.navy }, rectRadius: 0.06 });
+  text(slide, value, { x, y, w, h: 0.32, fontSize: 12, bold: true, color: C.white, align: 'center', valign: 'middle' });
 }
 
 function text(slide, value, opts) {
@@ -265,38 +272,29 @@ notes(s, '先用一个示意的小账本。第一天三笔订单，定义“把�
 pres.addSection({ title: 'MAVRA' });
 s = content('MAVRA：agent 与数据库之间的共享记忆层，承担三项职责', 'MAVRA');
 {
-  const file = path.join(FIG, 'overview-zh.png');
-  const fh = 4.05, fw = fh * aspect(file);
-  s.addImage({ path: file, x: M, y: 1.15, w: fw, h: fh, objectName: 'overview' });
-  const cx = M + fw + 0.25, cw2 = W - M - cx, ch = (fh - 0.2) / 3;
-  // No numbers on the cards: the figure already numbers its steps 1–8.
+  const { y, h } = figure(s, 'overview', 1.05, 5.02);
+  // One line per responsibility under the figure, with the same navy tags the figure carries.
+  const sy = y + h + 0.1, gap = 0.12;
+  const widths = [3.72, 3.72, W - 2 * M - 2 * 3.72 - 2 * gap];
+  let x = M;
   [
-    { head: '发布', where: '图中紫色路径', body: '只收答案被确认正确、通过准入检查的定义，连同它成立的条件一起保存', color: C.violet, pale: C.paleViolet },
-    { head: '依赖', where: '图中第 1–8 步', body: '放心使用：查询声明依据哪个定义的哪一版，MAVRA 先确认条件在这条查询读到的数据上成立，再执行', color: C.blue, pale: C.paleBlue },
-    { head: '维护与改进', where: '图中“维护”框', body: '替所有使用者只做一次：数据变了就重新检查，能修就发新版本，修不好就失效并通知；找到更快的等价写法也发新版本', color: C.amber, pale: C.paleAmber },
+    { head: '发布', w: 0.62, body: '答案经确认正确、通过准入检查的定义，连同它成立的条件一起保存' },
+    { head: '依赖', w: 0.62, body: '查询声明依据哪个定义的哪一版；条件在这条查询的快照上成立才执行' },
+    { head: '维护与改进', w: 1.18, body: '数据变了替所有使用者重新验证：能修就发新修订，修不好就失效；也发布更快的等价写法' },
   ].forEach((c, k) => {
-    const y = 1.15 + k * (ch + 0.1);
-    s.addShape('roundRect', { x: cx, y, w: cw2, h: ch, fill: { color: c.pale }, line: { color: c.pale }, rectRadius: 0.08 });
-    text(s, [
-      { text: c.head, options: { bold: true, color: c.color } },
-      { text: `  ${c.where}`, options: { fontSize: 11, color: C.muted } },
-    ], { x: cx + 0.18, y: y + 0.06, w: cw2 - 0.36, h: 0.34, fontSize: 15, valign: 'middle' });
-    text(s, c.body, { x: cx + 0.18, y: y + 0.42, w: cw2 - 0.36, h: ch - 0.48, fontSize: 11.5, valign: 'top' });
+    s.addShape('roundRect', { x, y: sy, w: widths[k], h: 0.62, fill: { color: C.grey }, line: { color: C.grey },
+      rectRadius: 0.06, objectName: `duty ${c.head}` });
+    tag(s, c.head, x + 0.12, sy + 0.15, c.w);
+    text(s, c.body, { x: x + c.w + 0.24, y: sy + 0.04, w: widths[k] - c.w - 0.34, h: 0.54, fontSize: 11, valign: 'middle' });
+    x += widths[k] + gap;
   });
 }
-band(s, [
-  { text: '承接上一页：', options: { bold: true, color: C.blue } },
-  { text: 'MAVRA 不只保存定义，还保存它成立的前提（条件），每次使用前检查条件是否仍然成立。', options: { breakLine: true } },
-  { text: '两种 agent：', options: { bold: true, color: C.blue } },
-  { text: '内置 agent 负责学习，学会的定义经准入后发布；用户 agent（可以很多个）通过工具取用：find_metric(名称) 取定义，'
-    + 'run_sql(sql, metrics=[{key, revision}]) 执行——metrics 参数就是“声明”这条 SQL 依据哪条定义的哪一版。人只确认一次学习答案是否正确，修复有歧义时才介入。' },
-], { y: 5.45, h: 1.1, size: 12 });
 s.addNotes('接着上一页的结论：既然问题出在前提，MAVRA 就把定义和它的前提（条件）一起存，用之前检查。原来 agent 直接访问数据库，现在 MAVRA 放在中间，不替代 agent，也不替代数据库。'
-  + '这张图细节很多，第一遍只看三条彩色路径，细节后面几页会逐个讲。'
-  + '内置 agent 还能为已发布的定义提出更省的写法：维护先试规则改写，没有规则候选时才请它提议，候选都要通过等价和更省的验证才发布新修订（第 8 页）。准入检查和这些验证都是 MAVRA 在数据库上执行的查询，不由大模型判断。'
-  + '图里紫色是学习：内置 agent 学到的定义通过准入检查后写入共享记忆；蓝色是检索定义：表版本变了，缺少验证结果的条件交给维护执行，再返回有效修订；橙色是执行 SQL：agent 声明依据的修订，在同一快照上验证后执行。黑色粗箭头是维护写回指标定义：修复或优化后发布新修订，修不好就标为失效。图里 store_sales 刚有写入（v14 → v15）：读它的营业额和电子品类变成待验证，不读它的退货金额仍有效；date_dim 没变，日期键唯一的结论直接复用；缺的两个结果由这次检索交给维护补上，电子品类下次被用到时直接复用，不再执行。待验证不是存下来的状态，是使用时比较表版本得出的。'
-  + '右边三张卡就是 MAVRA 的三项职责，也是论文的三个问题：什么可以发布，何时可以依赖，由谁维护与改进。每张卡标了它在图里对应哪一部分；后面每一节讲一项。'
-  + 'agent 看到的只是几个工具，最关键的是 run_sql 的 metrics 参数——声明这条 SQL 用的是哪条定义的哪个版本，MAVRA 的保证就挂在这个声明上。');
+  + '图上三个深色标签就是三项职责，也是论文的三个问题：什么可以发布，何时可以依赖，由谁维护与改进。后面三页各讲一项，第 7、8 页各用一张图展开。'
+  + '两种 agent：内置 agent（右上）负责学习，学到的定义经准入检查后发布（紫色）；用户 agent（左边，可以有很多个）通过工具取用：find_metric(名称) 取定义，run_sql(sql, metrics=[{key, revision}]) 执行——metrics 参数就是“声明”这条 SQL 依据哪条定义的哪一版，MAVRA 的保证挂在这个声明上。人只确认一次学习答案是否正确，修复有歧义时才介入。'
+  + '一次使用分 8 步：蓝色 1–5 是查找定义，橙色 6–8 是执行 SQL，第 7 页把这 8 步按真实记录逐步展开。黑色粗箭头是维护写回指标定义：修复或优化后发布新修订，修不好就标为失效。'
+  + '图里的时刻：ETL 刚做了一次增量加载，store_sales 从 v14 变成 v15。读它的门店营业额和电子品类门店营业额变成待验证，不读它的退货金额仍有效；date_dim 没变，日期键唯一的结论直接复用；缺的两个结果由这次检索交给维护补上，写进缓存后两条定义共用。待验证不是存下来的状态，是使用时比较表版本得出的。'
+  + '内置 agent 还能为已发布的定义提出更省的写法：维护先试规则改写，没有规则候选时才请它提议，候选都要通过等价和更省的验证才发布新修订（第 8 页）。准入检查和这些验证都是 MAVRA 在数据库上执行的查询，不由大模型判断。');
 
 // 5 The running example: three revisions of one definition ---------------------------------------
 s = content('一个例子贯穿全场：门店营业额的三个修订', 'MAVRA');
@@ -379,85 +377,50 @@ notes(s, '第一项职责：发布。一条定义不是学到就直接相信。�
   + '为什么不加一条“数值不能突变”的条件？因为只看数据分不清真增长和单位变化：第 3 页的增量加载也让 9 月翻了一倍，那是真的多卖了。这类问题要靠懂业务的人或数据质量监控（看分布、设阈值、人工确认）来发现，MAVRA 把它列为边界。',
   TRACE_SOURCE + '；拦下的一例：results/scen-20260930/glm53-r3（M5-L2，论文宏 \\PubEx*）。');
 
-// 7 Rely: declare, validate on the query's snapshot, execute ----------------------------------------
+// 7 Rely: one use, steps 1-8 of the overview, from the record --------------------------------------
 pres.addSection({ title: '依赖' });
 s = content('依赖：使用 v2 时先声明，在同一快照上验证后执行', '依赖');
-const call = (t) => ({ text: t, options: { fontFace: CODE, fontSize: 10 } });
-const gloss = (t) => ({ text: t, options: { fontSize: 10, color: C.blue } });
-heading(s, '用户 agent B 的真实调用（没见过的题：“9 月的门店营业额”，本次 4 轮）', M, 1.1, W - 2 * M, C.blue);
-table(s, [
-  ['轮', '调用', 'MAVRA 做什么 → 返回'],
-  ['1', call('find_metric("门店营业额")'), '依赖的表版本未变 → 返回当前修订 v2：口径、度量、粒度、注意事项、示例 SQL'],
-  ['2', call('describe_table("store_sales"), describe_table("date_dim")'), '表版本未变 → 直接返回记住的表统计信息'],
-  ['3', lines(call('run_sql(sql, metrics: [{key: "metric:门店营业额", revision: 1}])'),
-    gloss('revision: 1 即 v2（系统内部从 0 编号）')),
-    '声明 v2：核对是当前修订 → 在这条查询的快照上验证 v2 的四个条件（命中缓存则复用）→ 执行 → 13,069,651.80'],
-  ['4', lines(call('final_answer(answer, used: ["r1"])'), gloss('r1 = 本次会话的第 1 次查询，不是修订号')),
-    '溯源：答案 ← 查询 #1 ← 门店营业额 v2'],
-], { x: M, y: 1.45, w: W - 2 * M, colW: [0.45, 5.0, W - 2 * M - 5.45], size: 11 });
-const hw = 5.9, hx2 = M + hw + 0.35, hw2 = W - M - hx2;
-heading(s, '表版本 + 验证结果缓存：没变的数据不重复检查', M, 3.95, hw);
-text(s, bulleted(null, C.blue, [
-  '每张表有一个版本号，数据一写入就加一（在同一个事务里加，看到新数据就一定看到新版本号）',
-  '版本没变：直接复用验证结果，跨定义、跨 agent 共享；变了：首次使用时只重验受影响的条件（增量加载后 6 条定义只验证 2 次）',
-]), { x: M, y: 4.3, w: hw, h: 1.2, fontSize: 12, valign: 'top', paraSpaceAfter: 3 });
-heading(s, '为什么要同一快照：检查通过 ≠ 执行时仍成立', hx2, 3.95, hw2, C.amber);
-text(s, bulleted(null, C.amber, [
-  '10:00:00 检查通过 → 10:00:01 别人插入一行重复记录并提交 → 10:00:02 执行：在已被破坏的数据上作答',
-  'MAVRA：检查和执行用同一个“快照”——查询开始那一刻数据的样子，执行期间别人改了数据，这条查询也看不到；检查通过的数据，就是执行用的数据',
-]), { x: hx2, y: 4.3, w: hw2, h: 1.2, fontSize: 12, valign: 'top', paraSpaceAfter: 3 });
-band(s, [
-  { text: '实验：', options: { bold: true, color: C.blue } },
-  { text: '并发写入下 11,297 次使用，0 次在违反条件的数据上作答（检查和执行不在同一快照时为 3.8–4.6%）；读延迟不变。', options: { breakLine: true } },
-  { text: '声明了已停用的版本 → 拒绝并要求重新取定义；没有声明 → 照常执行与审查，但不在保证范围内。' },
-], { y: 5.62, h: 1.08, fill: C.paleBlue, size: 12 });
-footnote(s, '调用为实验记录，10:00 的时刻为示意（来源见备注）。' + DATA);
-notes(s, '第二项职责：依赖。这是另一个 agent B 做一道没见过的题的真实调用，4 轮（第 2 页那三次运行各 3 轮，轮数随运行略有不同，答案相同）。它检索到门店营业额 v2，照着示例写出 SQL，执行时在 metrics 参数里声明依据的是 v2。'
-  + '调用原文里的 revision: 1 就是 v2，系统内部从 0 编号；final_answer 里的 r1 是这次会话的第 1 次查询，不是修订号，用来把答案追溯到查询、再追溯到 v2。'
-  + 'MAVRA 收到声明后做三件事：核对 v2 还是当前修订；在这条查询的快照上验证 v2 的四个条件；然后在同一个快照上执行。'
-  + '为什么不每次都把几百万行重新检查一遍？因为每张表有版本号，版本没变，以前的验证结果就能复用，而且所有定义、所有 agent 共享。'
-  + '为什么要在同一快照？因为 10:00:00 检查通过、10:00:01 别人插了一条重复记录、10:00:02 执行，答案就错了。把检查和执行放进同一个可重复读的只读事务，相当于给账本拍一张照片，检查和计算都在这张照片上做。'
-  + '版本号由语句级触发器在写入事务里更新；论文的引理 1 证明了版本相同时复用验证结果是安全的。'
-  + '实验里并发写入下一万多次使用，没有一次在被破坏的数据上作答；对照是先检查、再另开事务执行，3.8–4.6% 的使用答在了被破坏的数据上。',
-  TRACE_SOURCE + '；并发数字来自快照压力测试（论文宏 \\Sn*）。');
+{
+  const { y, h } = figure(s, 'lookup', 1.05, 5.2);
+  band(s, [
+    { text: '实验：', options: { bold: true, color: C.blue } },
+    { text: '并发写入下 11,297 次使用，0 次在违反条件的数据上作答（检查与执行不在同一快照时为 3.8–4.6%）；读延迟不变。' },
+  ], { y: y + h + 0.08, h: 0.46, fill: C.paleBlue, size: 12 });
+}
+footnote(s, '图中的调用、耗时与数值为实验记录，表版本号为示意（来源见备注）。' + DATA);
+notes(s, '第二项职责：依赖。这张图把第 4 页的第 1–8 步按一次真实使用展开，编号和第 4 页一致。场景是第 3 页的增量加载：store_sales 刚追加了一批 9 月的新销售，表版本从 v14 变成 v15（版本号是示意）。用户 agent B 问 9 月的门店营业额。'
+  + '第 1 步，B 调用 find_metric("门店营业额")。第 2 步，名称匹配到两条定义：门店营业额和电子品类门店营业额，都已经是优化后的 v2；它们记下的 store_sales 版本是 v14，现在是 v15，所以要验证。'
+  + '第 3 步交给维护：两条定义都读 store_sales，粒度键唯一和日期键完整性这两项条件完全相同，只执行一次——粒度检查 5.3 秒、完整性 0.15 秒，是在维护电子品类时执行的；轮到门店营业额时两项都直接复用，0 条查询、0.3 毫秒。date_dim 没变，它上面的两项条件根本不用看。'
+  + '第 4 步把结果写进验证结果缓存，键是（条件，表版本）：同一条件在同一表版本上只验证一次，所有定义、所有 agent 共享；v14 上的旧结果不再命中。第 5 步返回门店营业额 v2，附口径和示例 SQL。'
+  + '第 6 步，B 照示例写出按日期键范围求和的 SQL，调用 run_sql，在 metrics 里声明 revision: 1，也就是 v2（系统内部从 0 编号）。第 7 步是执行前验证：先核对声明——v2 是当前修订，通过；如果声明的是已经失效的修订（比如数据更正后修复出了 v3，再声明 v2），直接拒绝并要求重新 find_metric；如果声明的是被优化替代的 v1，它自己的条件成立就接受并提醒改用新修订；没有声明的 SQL 照常执行和审查，但不在条件保证范围内。'
+  + '然后在这条查询的快照上验证 v2 的 4 个条件：快照里正是 store_sales v15、date_dim v7，4 个结果缓存里都有，全部复用，没有执行任何验证查询。'
+  + '为什么要在同一快照？如果 10:00:00 检查通过、10:00:01 别人插入一条重复记录并提交、10:00:02 再执行，答案就错了。MAVRA 把检查和执行放进同一个可重复读的只读事务：快照是查询开始那一刻数据的样子，执行期间别人提交的写入这条查询看不到；如果快照里已经是更新的表版本，就在这个快照上当场验证，不成立就拒绝执行。版本号在写入事务里由触发器更新，所以快照读到的版本恰好对应它看到的数据，论文的引理 1 证明了版本相同时复用验证结果是安全的。'
+  + '第 8 步在同一快照上执行，29 毫秒，结果 26,139,303.60，与参考答案一致；final_answer 里 used: ["r1"] 的 r1 是本次会话的第 1 次查询，不是修订号，所以答案能追溯到查询 #1，再追溯到门店营业额 v2。B 这道题共 4 轮、6 次工具调用。'
+  + '下面一行是并发实验：一万多次使用，没有一次在被破坏的数据上作答；对照是先检查、再另开事务执行，3.8–4.6% 的使用答在了被破坏的数据上。',
+  'noctis results/scen-20261008-opt/metric-1791439498065570（metric-global-opt，增量加载阶段 M1-P1：记录的 declared、answer、db 计量；events.append 中电子品类门店营业额与门店营业额的 maintenance 事件）；并发数字来自快照压力测试（论文宏 \\Sn*）。');
 
-// 8 Maintain and improve: v1 -> v2 and v2 -> v3 -----------------------------------------------------
+// 8 Maintain and improve: v1 -> v2, then three writes and their three outcomes -----------------------
 pres.addSection({ title: '维护与改进' });
-s = content('维护与改进：v1 → v2 换更快的写法，v2 → v3 修复数据变化', '维护与改进');
-const mw = (W - 2 * M - 0.35) / 2, mx2 = M + mw + 0.35;
-heading(s, '改进 v1 → v2：候选 → 等价 → 更省 → 发布', M, 1.1, mw, C.amber);
-table(s, [
-  ['环节', '门店营业额的真实记录'],
-  ['候选', '规则改写：期间改用日期键范围过滤，不连接日期表（没有规则候选时才请大模型提议）'],
-  ['等价', '学习时快照上与 v1 结果相同；当前快照 14 个期间结果全部相同；新前提“日期键按月连续”成立'],
-  ['更省', '同一快照内对每个期间成对测执行时间：29.1 → 23.3 ms（−19.8%），差值的 95% 区间整体小于 0'],
-  ['发布', 'v2，新前提成为它的条件；全部 9 条定义都得到更快的修订（省 15.6%–36.1%），后续 15 条查询有 9 条采用'],
-], { x: M, y: 1.45, w: mw, colW: [0.8, mw - 0.8], size: 12 });
-heading(s, '修复 v2 → v3：在数据更正后的一次 find_metric 里完成', mx2, 1.1, mw, C.blue);
-table(s, [
-  ['环节', '门店营业额的真实记录'],
-  ['发现', '表版本变了 → 粒度查询：1,055,610 行只有 989,695 个键（多出的 65,915 行就是第 3 页的数据更正）→ v2 失效'],
-  ['搜索', "在取值很少的列上找“列 = 值”的过滤，必须一笔一行且不丢数据：唯一可行 ss_is_current = '1'"],
-  ['唯一', '如果有两种过滤都能恢复“一笔一行”（比如一份当前数据、一份备份），说不出哪份是真的 → 不选，失效并交给人'],
-  ['回归', '用学习时那份数据重算 3 月：学习时的 SQL 与 v3 都是 1357.0 万 → 发布 v3。必须用学习时的数据：在今天的数据上，学习时的 SQL 本身也算错了'],
-  ['用时', '发现、搜索、回归都在这一次调用里完成，共 54.5 秒；之后的请求直接拿到 v3'],
-], { x: mx2, y: 1.45, w: mw, colW: [0.8, mw - 0.8], size: 12 });
-band(s, [
-  { text: '修不好时：', options: { bold: true, color: C.red } },
-  { text: '整批重复加载，没有过滤能恢复唯一性 → 定义失效并通知使用方，等重新学到再发布。', options: { breakLine: true } },
-  { text: '同一个发布通道：', options: { bold: true, color: C.blue } },
-  { text: '改进和修复出来的修订都要过检查，新前提都成为条件，所有使用者共享结果；之后的 agent 在 find_metric 里直接拿到 v3 和通知。' },
-], { y: 5.15, h: 1.4, size: 13 });
-footnote(s, RECORDED);
-notes(s, '第三项职责：维护与改进，正好对应例子里的两次版本变化。'
-  + '左边是 v1 到 v2，改进：规则改写把按年月连接日期表改成按日期键范围过滤；先验证等价——学习时的数据上和当前数据的 14 个期间结果全部相同；再验证更省——同一快照里配对测执行时间，快了 19.8%，置信区间整体小于 0。'
-  + '注意新写法多了一个前提：日期键按月连续，它被记成 v2 的条件，以后数据变了也会检查。实验里 9 条定义都得到了更快的版本，后来的 agent 多数照着新写法写。'
-  + '右边是 v2 到 v3，修复：数据更正后，下一个检索门店营业额的请求触发维护，发现 105 万行只有 99 万个键，v2 失效；在低基数列上找过滤，只有 ss_is_current = 1 能恢复每键一行且不丢键；'
-  + '如果两个过滤都可行，比如当前行和备份行，MAVRA 不擅自选；最后按学习时刻重算 3 月，和当初答案一致才发布 v3。必须用当初的数据比，因为今天的数据上当初的 SQL 也过期了：在今天的数据上比，学习时的 SQL 得 1489.1 万、v3 得 1342.4 万，会误拒正确的修复。'
-  + '54.5 秒里修了两条同名定义：门店营业额存了两条，粒度里含不含日期键各一条。'
-  + '修不好就失效并通知，不猜。'
-  + '还有一种情况：数据只破坏了 v2 新增的前提（比如日期维度重新装载、某个月换了新键，日期键不再按月连续），而 v1 的条件都成立。这时只撤下 v2、恢复 v1，不去搜索修复；实验里 4 条定义都这样回退，之后 20 个答案全对，而不维护这个前提的话季度和半年的答案会算错。',
-  TRACE_SOURCE + '；优化轮：results/scen-20261008-opt；回归在今天数据上的对比来自对照实验 dsv41flash-r1-g3fix--exref。');
+s = content('维护与改进：换更快的写法；数据变了就验证、修复或失效', '维护与改进');
+{
+  const { y, h } = figure(s, 'lifecycle', 1.05, 5.2);
+  band(s, [
+    { text: '同一个发布通道：', options: { bold: true, color: C.blue } },
+    { text: '改进和修复出的修订都要通过检查，新前提成为条件；实验中 9 条定义都得到更快的修订，执行时间省 15.6%–36.1%。' },
+  ], { y: y + h + 0.08, h: 0.46, size: 12 });
+}
+footnote(s, '实验记录，表版本号为示意（来源见备注）。' + DATA);
+notes(s, '第三项职责：维护与改进。这张图是门店营业额这一条定义的一生，上面一行回顾它怎么来的，下面三行是数据变化后的三种结局，正好对应第 3 页的三种日常写入。'
+  + '第 1、2 步是发布（第 6 页讲过）：内置 agent 用 5 轮、7 次工具调用答对 3 月门店营业额，通过 7 项准入检查，发布 v1，带 3 个条件。'
+  + '第 3 步是改进：规则改写把按年月连接日期表改成按日期键范围过滤。先验证等价——学习时的数据上和当前数据的 14 个期间结果全部相同；再验证更省——同一快照里配对测执行时间，29.1 到 23.3 毫秒，快 19.8%，置信区间整体小于 0。新写法多了一个前提：日期键按月连续，它成为 v2 的第 4 个条件，以后数据变了也要检查。实验里 9 条定义都得到了更快的修订，后来 15 条查询有 9 条照着新写法写。'
+  + '下面三行都从同一个状态开始：store_sales 有一次写入，下次使用 v2 之前先验证它的条件。'
+  + '增量加载：多出 27,095 行，都是新小票号，4 个条件都成立，v2 继续有效——这就是第 7 页那次使用，9 月 2613.9 万，答对。'
+  + '数据更正：旧行保留并标为非当前，多出 65,915 行。粒度检查发现 1,065,915 行只有 1,000,000 个键，v2 失效。第 4 步修复搜索：在取值很少的列上找“列 = 值”的过滤，必须一笔一行且不丢键，只有 ss_is_current = 1 可行；如果有两种过滤都可行（比如一份当前数据、一份备份），MAVRA 不擅自选，失效并交给人。'
+  + '第 5 步回归测试：用学习时那份数据重算 3 月，学习时的 SQL 和 v3 都是 1357.0 万，一致才接受。必须用学习时的数据比：在今天的数据上，学习时的 SQL 本身也算错了（1489.1 万对 v3 的 1342.4 万），会误拒正确的修复。'
+  + '第 6 步发布 v3，9 月 1293.3 万，答对；不维护、沿用 v2 会得 1430.1 万。发现、搜索、回归都在一次 find_metric 里完成，trace 运行中门店营业额的两条同名定义共用了 54.5 秒，之后的请求直接拿到 v3。'
+  + '重复加载：4 个月的销售批次被再装一次，多出 110,165 行，粒度键唯一同样不成立，但在取值很少的列上找不到能恢复唯一性的过滤，定义失效并通知使用方；声明 v2 的查询被拒绝，agent 只能自己从头探索，等重新学到再发布。'
+  + '还有一种情况图里没画：数据只破坏了 v2 新增的前提（比如日期维度重新装载、某个月换了新键，日期键不再按月连续），而 v1 的条件都成立。这时只撤下 v2、恢复 v1，不去搜索修复；实验里 4 条定义都这样回退，之后 20 个答案全对。',
+  'noctis results/scen-20261008-opt/metric-1791439498065570（metric-global-opt：优化轮计时；增量加载、数据更正、重复加载三个阶段门店营业额的 maintenance、revoked、repair_* 事件与 M1-P1 答案）；学习与 54.5 秒：' + TRACE_SOURCE + '；不维护时的 1430.1 万：results/scen-20261002 dsv41flash-r1-g3fix--schema；回归在今天数据上的对比来自对照实验 dsv41flash-r1-g3fix--exref；v1 回退：论文 §7.8（gen/premise.tex）。');
 
 // 9 Results ----------------------------------------------------------------------------------------
 pres.addSection({ title: '实验结果' });

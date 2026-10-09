@@ -50,11 +50,11 @@ TEXT = {
     'en': {'outcomes': ('Correct', 'Wrong', 'Correct invalidation', 'False invalidation'),
            'db': 'Maint. DB s',
            'titles': ('Learned libraries: {libs} libraries, {n} questions per method',
-                      'TPC-DS SF1: {defs} admitted template-derived definitions, {n} questions')},
+                      'TPC-DS SF1: {defs} admitted definitions, {n} questions')},
     'zh': {'outcomes': ('答对', '答错', '正确失效', '误失效'),
            'db': '维护 DB 秒',
            'titles': ('学到的定义库：{libs} 个库，每种方法 {n} 题',
-                      'TPC-DS SF1：{defs} 个通过准入的模板导出定义，{n} 题')},
+                      'TPC-DS SF1：通过准入的 {defs} 个定义，{n} 题')},
 }
 LEFT, RIGHT = .40, .85          # axes span in figure fractions: labels left, DB seconds right
 # Labels too long for the margin are broken over two lines here.

@@ -64,6 +64,9 @@ def cell_stats(c):
     d = c["d"]
     acc = collections.defaultdict(lambda: [0, 0])
     stale = collections.Counter()
+    # 按题型（P1 换参数、T1 跨期差值、T2 全年最高月、T3 环比增加最多的月份、T4 高于月均值的月份数）：留出题 / 全部计分题
+    types_holdout = collections.defaultdict(lambda: [0, 0])
+    types_all = collections.defaultdict(lambda: [0, 0])
     errors, turns, tokens = 0, [], []
     for r in d["records"]:
         p = r["phase"]
@@ -74,6 +77,12 @@ def cell_stats(c):
             continue
         acc[p][0] += r["outcome"] == "correct"
         acc[p][1] += 1
+        ty = r["task"].split("-")[1]
+        types_all[ty][0] += r["outcome"] == "correct"
+        types_all[ty][1] += 1
+        if p == "holdout":
+            types_holdout[ty][0] += r["outcome"] == "correct"
+            types_holdout[ty][1] += 1
         u = r.get("metric_use") or {}
         stale[p] += (u.get("bad_found", 0) or 0) > 0 or (u.get("bad_executed", 0) or 0) > 0
         turns.append(r["run"]["steps"])
@@ -88,6 +97,7 @@ def cell_stats(c):
             if e.get("event") == "maintenance":
                 maint += (e.get("db") or {}).get("ms", 0.0) / 1000.0
     return {"acc": dict(acc), "stale": dict(stale), "errors": errors, "turns": turns, "tokens": tokens,
+            "types_holdout": dict(types_holdout), "types_all": dict(types_all),
             "revoked": ev["revoked"], "repaired": ev["repair_promoted"], "maint_s": maint}
 
 
@@ -138,6 +148,10 @@ def tex(res, out):
         q[f"Ds{k}StaleUnit"] = r["stale_tasks"]["unit"]
         q[f"Ds{k}Revoked"] = f"{r['revoked_per_cell']:.1f}"
         q[f"Ds{k}Repaired"] = f"{r['repaired_per_cell']:.1f}"
+        for ty, scopes in r.get("by_type", {}).items():
+            for scope, (c, n) in scopes.items():
+                suffix = "" if scope == "holdout" else "All"
+                q[f"Ds{k}Type{suffix}{ty}"] = pct(c / n) if n else "--"
         q[f"Ds{k}Turns"] = f"{r['turns_per_task']:.1f}" if r["turns_per_task"] else "--"
         q[f"Ds{k}TokK"] = f"{r['input_tokens_per_task'] / 1000:.1f}" if r["input_tokens_per_task"] else "--"
         q[f"Ds{k}MaintS"] = f"{r['maint_db_s_per_cell']:.0f}"
@@ -208,6 +222,12 @@ def main():
         allk = [t for c in cs for t in c["tokens"]]
         row["turns_per_task"] = sum(allt) / len(allt) if allt else None
         row["input_tokens_per_task"] = sum(allk) / len(allk) if allk else None
+        # 按题型合并各组的计数：留出题与全部计分题
+        by_type = {}
+        for ty in sorted({t for c in cs for key in ("types_holdout", "types_all") for t in c[key]}):
+            by_type[ty] = {scope: [sum(c[key].get(ty, [0, 0])[i] for c in cs) for i in (0, 1)]
+                           for scope, key in (("holdout", "types_holdout"), ("all", "types_all"))}
+        row["by_type"] = by_type
         # 每次运行的原始计数，供 tools/figures/scenario_changes.py 画出逐次运行的点
         row["runs"] = [{"acc": c["acc"], "stale": c["stale"], "revoked": c["revoked"], "repaired": c["repaired"],
                         "maint_s": c["maint_s"]} for c in cs]

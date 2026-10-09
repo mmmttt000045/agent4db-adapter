@@ -36,7 +36,7 @@ LABELS = {
         'store': '共享记忆', 'store_note': '另有表统计信息、连接路径', 'defs': '指标定义',
         'def_chips': (('营业额 v2', '待验证', 'wait'), ('电子品类 v2', '待验证', 'wait'), ('退货金额 v2', '有效', 'ok')),
         'cache': '验证结果缓存', 'cache_note': '按（条件，表版本）缓存，跨定义共享',
-        'cache_chips': (('日期键唯一', '表版本 v3', 'ok'), ('粒度键唯一', '表版本 v15', 'wait'),
+        'cache_chips': (('日期键唯一', '表版本 v7', 'ok'), ('粒度键唯一', '表版本 v15', 'wait'),
                         ('日期键完整性', '表版本 v15', 'wait')),
         'agent': ('内置 agent（大模型）', '学习指标定义，提出优化写法'),
         'maint': ('维护', '执行验证 · 修复、优化或失效'),
@@ -56,7 +56,7 @@ LABELS = {
         'store': 'Shared memory', 'store_note': 'also table profiles, join paths', 'defs': 'Definitions',
         'def_chips': (('revenue v2', 'pending', 'wait'), ('electr. v2', 'pending', 'wait'), ('returns v2', 'valid', 'ok')),
         'cache': 'Validation cache', 'cache_note': 'per (rule, data version), shared',
-        'cache_chips': (('date key unique', 'version v3', 'ok'), ('one row/sale', 'version v15', 'wait'),
+        'cache_chips': (('date key unique', 'version v7', 'ok'), ('one row/sale', 'version v15', 'wait'),
                         ('loss in bound', 'version v15', 'wait')),
         'agent': ('Built-in agent (LLM)', 'learns definitions, proposes rewrites'),
         'maint': ('Maintenance', 'checks · repair, optimize, retire'),
@@ -230,7 +230,7 @@ def draw(s, lang):
         table_card(s, nx + 21.0 + k * 12.0, 10.5, top + 1.2, inner - 2.4)
     vx, vw = VERS
     rect(vx, top, vw, inner, WHITE, EDGE, .28, r=.8)
-    for k, (table, old, new) in enumerate((('`store_sales`', 14, 15), ('`date_dim`', 3, None))):
+    for k, (table, old, new) in enumerate((('`store_sales`', 14, 15), ('`date_dim`', 7, None))):
         yy = top + 4.6 + 6.4 * k
         if new:
             rect(vx + 1.0, yy - 3.0, vw - 2.0, 5.2, AMBER_PALE, AMBER, .28, r=.9)

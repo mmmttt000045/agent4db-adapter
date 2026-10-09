@@ -10,12 +10,13 @@ v14 -> v15, illustrative); the next use validates v2's conditions, and the three
 everyday writes of deck slide 3 end three ways. Incremental load (+27,095 rows,
 new tickets): every condition holds, v2 stays valid and September is
 26,139,303.60. Correction keeping the old rows as non-current (+65,915 rows):
-grain-key uniqueness fails (1,065,915 rows, 1,000,000 keys), v2 is invalidated,
+grain-key uniqueness fails (1,065,915 rows, 1,000,000 keys), revision v2 is invalidated,
 the repair search finds exactly one filter, ss_is_current = '1', the regression
 test on the learning-time data gives the March answer again, and v3 serves
 September as 12,932,888.04 (v2 left in use: 14,300,525.64). Duplicate load
 (+110,165 rows): uniqueness fails (1,110,165 rows, 1,000,000 keys), no filter
-restores it, and the definition is invalidated.
+restores it, and the definition itself is invalidated (the legend's 定义失效, as
+opposed to one revision).
 Values: learning, admission and optimization from the trace run
 (exp/2026-10-08-optimize/trace, README there) and the optimization run
 (results/scen-20261008-opt on noctis: the timing, and the three writes'
@@ -40,7 +41,7 @@ W, H = 300.0, 134.0
 LABELS = {
     'zh': {
         'title': '门店营业额的一生：发布、改进与维护',
-        'paths': ('发布', '维护与改进'), 'fails': '失效',
+        'paths': ('发布', '维护与改进'), 'fails': '定义失效',
         'learn': ('学习', '内置 agent（大模型），5 轮、7 次工具调用'),
         'l_rows': ('任务：3 月门店营业额（给定口径）', '答案 1357.0 万，判定正确',
                    'SQL：`SUM(ss_net_paid) … d_moy = 3`'),
@@ -55,7 +56,7 @@ LABELS = {
                    ('只重验读 `store_sales` 的两项条件，结果所有定义共享', None, MUTED)),
         'correct': ('数据更正', '+65,915 行，旧行保留'),
         'c_rows': (('粒度键唯一：不成立', 'fail', RED), ('1,065,915 行，1,000,000 个键', None, MUTED),
-                   ('v2 失效', None, RED)),
+                   ('v2 失效，转入修复', None, RED)),
         'search': '修复搜索',
         's_rows': (("`ss_is_current='1'`", 'ok', INK), ("`ss_is_current='0'`：丢键", 'fail', INK),
                    ('只有一个过滤可行', None, ACC_DK)),
@@ -67,7 +68,7 @@ LABELS = {
         'dup': ('重复加载', '+110,165 行'),
         'd_rows': (('粒度键唯一：不成立', 'fail', RED), ('1,110,165 行，1,000,000 个键', None, MUTED)),
         'nofix': ('修复搜索', ''), 'n_rows': (('没有过滤能恢复唯一性', 'fail', RED),),
-        'retire': ('失效，通知使用方', ''),
+        'retire': ('定义失效，通知使用方', ''),
         'x_rows': (('声明 v2 的查询被拒绝，等待重新学习', None, INK), ('使用方自己从头探索作答', None, MUTED)),
     },
 }
@@ -110,7 +111,7 @@ def draw(s, lang):
     rect(0, 0, W, H, FIELD, None, r=2.8)
     rect(3.0, 3.0, 1.1, 5.4, ACC)
     text(6.2, 7.8, L['title'], TITLE, ACC_DK, 'bold')
-    x = 196.0
+    x = 188.0
     for label, color, steps in zip(L['paths'], (LEARN, USE), ('1–2', '3–6')):
         x += legend_pill(s, x, 5.8, label, color, steps) + 6.0
     legend_pill(s, x, 5.8, L['fails'], RED, dashed=True)

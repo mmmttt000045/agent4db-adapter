@@ -5,7 +5,7 @@ write (table version v14 -> v15; date_dim unchanged at v7; version numbers are
 illustrative). User agent B asks for September store revenue.
 Top lane: find_metric("门店营业额") matches two definitions that read store_sales
 (门店营业额 and 电子品类门店营业额, both at revision v2); their recorded table
-versions differ from the current ones, so maintenance runs the two conditions on
+versions differ from the current ones, so both are pending and maintenance runs the two conditions on
 store_sales once (5.3 s and 0.15 s) and both definitions share the results; the
 two date_dim conditions are skipped because date_dim did not change; v2 is
 returned as valid. Middle: the validation cache keyed by (condition, table
@@ -26,6 +26,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import style  # noqa: E402
+from vecfig import measure  # noqa: E402
 from parts import (EXEC, HEAD, NOTE, PANEL_EDGE, THIN, TITLE, USE, WAIT, baseline, legend_pill,  # noqa: E402
                    mark, node, person, stage, step)
 from style import ACC, ACC_DK, ACC_PALE, AMBER, AMBER_PALE, FIELD, INK, MUTED, RED, RULE, WHITE  # noqa: E402
@@ -40,7 +41,7 @@ LABELS = {
         'paths': ('查询指标定义', '执行 SQL'),
         'question': ('9 月门店', '营业额？'), 'call': ('`find_metric(`', '`"门店营业额")`'),
         's2': ('读定义，比较表版本', '名称匹配到两条定义'),
-        'names': ('门店营业额 v2', '电子品类门店营业额 v2'),
+        'names': (('门店营业额', 'v2 待验证'), ('电子品类门店营业额', 'v2 待验证')),
         'tables': (('`store_sales`', 'v14 → v15'), ('`date_dim`', 'v7（未变）')),
         's3': ('维护：补齐缺少的验证结果', '两条定义共用，每项只执行一次'),
         'conds': (('粒度键唯一', '`store_sales` v15', '执行', 'run'),
@@ -82,10 +83,10 @@ A_Y, LA = 11.5, 39.0                             # top lane: find_metric
 M_Y, MH = 56.0, 35.0                             # validation cache
 B_Y, LB = 97.0, 36.0                             # bottom lane: run_sql
 REQ_A = (2.0, A_Y, 41.0, LA)
-S2 = (51.0, A_Y, 60.0, LA)
-S3 = (115.0, A_Y, 92.0, LA)
-S5 = (211.0, A_Y, 87.0, LA)
-CACHE = (115.0, M_Y, 183.0, MH)
+S2 = (51.0, A_Y, 69.0, LA)
+S3 = (124.0, A_Y, 92.0, LA)
+S5 = (220.0, A_Y, 78.0, LA)
+CACHE = (124.0, M_Y, 174.0, MH)
 REQ_B = (2.0, B_Y, 62.0, LB)
 S7 = (72.0, B_Y, 140.0, LB)
 S8 = (216.0, B_Y, 82.0, LB)
@@ -123,11 +124,11 @@ def draw(s, lang):
 
     # 2 Read the definitions, compare table versions -----------------------------------------
     ex, ey, ew = stage(s, S2, 2, USE, *L['s2'])
-    for k, name in enumerate(L['names']):
+    for k, (name, state) in enumerate(L['names']):    # pending, as in deck figure 1: the table they read was written
         yy = ey + PITCH * k
-        rect(ex - 1.2, yy - 4.1, ew + 2.4, 5.4, ACC_PALE, None, r=.8)
-        text(ex, yy, name, NOTE, INK, width=ew - 4.4)
-        mark(s, ex + ew - 1.6, yy - 1.5, 'ok')
+        rect(ex - 1.2, yy - 4.1, ew + 2.4, 5.4, AMBER_PALE, None, r=.8)
+        text(ex, yy, name, NOTE, INK, width=ew - measure(state, NOTE) - 1.5)
+        text(ex + ew, yy, state, NOTE, WAIT, align='right')
     for k, (table, versions) in enumerate(L['tables']):
         yy = ey + PITCH * (k + 2)
         changed = k == 0
@@ -186,7 +187,7 @@ def draw(s, lang):
         if kind != 'old':
             step(s, cols[4] + tw + 2.6, yy - 1.5, 7, EXEC, r=2.4)
     # 4: maintenance writes into the cache; 7: the pre-execution check reuses it.
-    xc = 168.0
+    xc = 177.0
     route([(xc, A_Y + LA), (xc, M_Y)], USE, THIN, length=HEAD)
     step(s, xc + 4.6, (A_Y + LA + M_Y) / 2, 4, USE, r=2.6)
     text(xc + 8.6, baseline((A_Y + LA + M_Y) / 2, NOTE), L['write'], NOTE, USE)

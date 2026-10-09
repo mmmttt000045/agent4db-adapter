@@ -11,7 +11,8 @@ The built-in agent (an LLM) learns definitions and publishes them after the
 admission checks. The state is the incremental load of the end-to-end study
 (store_sales v14 -> v15, date_dim v7; table version numbers illustrative): the
 definitions that read store_sales are pending, the one reading store_returns
-stays valid, and the two store_sales conditions miss in the cache. Navy tags
+stays valid, the two date_dim conditions (date key unique, contiguous by month)
+are cached at v7, and the two store_sales conditions miss in the cache. Navy tags
 mark the deck's three responsibilities (publish, rely, maintain and improve).
 Drawn at slide size (300 mm, 12-15 pt), Chinese only, with standard database
 terms rather than the paper's notation; steps 1-8 match deck figure 2.
@@ -44,7 +45,7 @@ LABELS = {
         'def_chips': (('门店营业额', 'v2 待验证', 'wait'), ('电子品类门店营业额', 'v2 待验证', 'wait'),
                       ('退货金额', 'v2 有效', 'ok')),
         'cache': '验证结果缓存', 'cache_note': '按（条件，表版本）缓存，跨定义共享',
-        'cache_chips': (('日期键唯一', '表版本 v7', 'ok'), ('粒度键唯一', '表版本 v15', 'wait'),
+        'cache_chips': (('日期键唯一、按月连续', '表版本 v7', 'ok'), ('粒度键唯一', '表版本 v15', 'wait'),
                         ('日期键完整性', '表版本 v15', 'wait')),
         'agent': ('内置 agent（大模型）', '学习指标定义，提出优化写法'),
         'maint': ('维护', '执行验证 · 修复、优化或失效'),
@@ -164,15 +165,25 @@ def draw(s, lang):
     box(s, CACHE)
     tw = text(x + 3.0, y + 5.4, L['cache'], NOTE, INK, 'bold')
     text(x + 5.5 + tw, y + 5.4, L['cache_note'], NOTE, MUTED, width=w - 8.5 - tw)
-    chip_w = (w - 6.0) / 3
-    for k, (rule, version, kind) in enumerate(L['cache_chips']):
-        xx = x + 1.5 + k * (chip_w + 1.5)
+    # v2's four conditions: the two on date_dim share one chip (same table version, both cached).
+    widths = [max(measure(rule, NOTE) + 2.4, measure(version, NOTE) + 6.6) for rule, version, _ in L['cache_chips']]
+    gap = 1.5
+    extra = (w - 3.0 - sum(widths) - gap * (len(widths) - 1)) / len(widths)   # spread the room left over
+    if extra < 0:
+        raise ValueError(f'cache chips need {sum(widths) + 3.0 + 3.0:.1f} mm; {w:.1f} mm available')
+    widths = [cw2 + extra for cw2 in widths]
+    xx, miss = x + 1.5 - gap, []
+    for chip_w, (rule, version, kind) in zip(widths, L['cache_chips']):
+        xx += gap
         missing = kind == 'wait'
+        if missing:
+            miss.append(xx + chip_w / 2)
         rect(xx, y + 7.5, chip_w, 11.0, AMBER_PALE if missing else FACE, AMBER if missing else EDGE,
              .3 if missing else .2, r=1.0)
         text(xx + 1.6, y + 12.0, rule, NOTE, INK, width=chip_w - 2.4)
         text(xx + 1.6, y + 17.0, version, NOTE, WAIT if missing else MUTED, width=chip_w - 6.0)
         mark(s, xx + chip_w - 2.6, y + 15.6, kind)
+        xx += chip_w
 
     # Maintenance --------------------------------------------------------------------------
     titled(s, MAINT, *L['maint'])
@@ -192,8 +203,6 @@ def draw(s, lang):
     text(gm, yc - 2.0, r2, NOTE, EXEC, align='center', width=gb - ga + 4)
     step(s, gm, yc + 4.2, 7, EXEC)
     # The missing results share one connector: maintenance computes them all and writes them back.
-    miss = [CACHE[0] + 1.5 + k * (chip_w + 1.5) + chip_w / 2
-            for k, c in enumerate(L['cache_chips']) if c[2] == 'wait']
     yb, yj, yt = CACHE[1] + 18.5, PB[1] + PB[3] + 1.5, MAINT[1]
     xn = (DEFS[0] + DEFS[2] + PB[0] + PB[2]) / 2     # maintenance -> definitions, right of the store
     xu = xn - 6.0 - measure(L['revise'], NOTE)

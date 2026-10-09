@@ -46,6 +46,13 @@ async fn exercise(url: &str) -> Result<Value> {
                 tokio::time::sleep(Duration::from_millis(50)).await;
             }
         }).await.context("HTTP 服务未启动")?;
+        let listed: Value = http.get(format!("{base}/v1/tools")).send().await?.json().await?;
+        let listed = listed.as_array().context("工具清单应为数组")?;
+        ensure!(listed.iter().any(|t| t["name"] == "find_metric"), "工具清单应包含 find_metric");
+        ensure!(
+            listed.iter().any(|t| t["name"] == "run_sql" && t["schema"]["properties"].get("metrics").is_some()),
+            "工具清单里的 run_sql 应带 metrics 声明"
+        );
         ensure!(db.query(QKind::Meta, "show default_transaction_read_only").await?.cell(0, 0) == Some("on"), "查询池应只读");
 
         let empty = tool(&http, &base, "run_sql", json!({"sql":"select ss_item_sk from store_sales where false"})).await?;

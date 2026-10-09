@@ -614,7 +614,7 @@ pub async fn run_agent_with(
 #[cfg(test)]
 mod provider_tests {
     use super::*;
-    use crate::middle::tool_specs;
+    use crate::middle::tool_specs_with;
     use axum::{routing::post, Json, Router};
 
     #[tokio::test]
@@ -684,7 +684,7 @@ mod provider_tests {
             },
             Turn::ToolResults(vec![("call-test".into(), "{}".into(), false)]),
         ];
-        let reply = provider.chat("test", &turns, &tool_specs(true)).await.unwrap();
+        let reply = provider.chat("test", &turns, &tool_specs_with(true, false)).await.unwrap();
         assert_eq!(reply.text, "OK");
         server.abort();
     }

@@ -1513,8 +1513,14 @@ pub struct ToolSpec {
     pub schema: Value,
 }
 
-pub fn tool_specs(middle_tools: bool) -> Vec<ToolSpec> {
-    tool_specs_with(middle_tools, false)
+/// 本实例能分派的全部工具，供 HTTP 工具清单使用：基础工具、关联工具、find_metric 与带 metrics 声明的 run_sql；
+/// 开了轨迹记忆时再加 find_trajectory。
+pub fn served_tool_specs(cfg: &MiddleConfig) -> Vec<ToolSpec> {
+    let mut v = tool_specs_with(true, true);
+    if cfg.traj_memory {
+        v.push(trajectory_tool_spec());
+    }
+    v
 }
 
 /// `metric_tools`：加上 find_metric，并让 run_sql 接受 metrics 引用。

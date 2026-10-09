@@ -1,11 +1,11 @@
 //! HTTP 接口：异构的用户 Agent 只和中间层对话（工具级 API，MCP 风格）。
 //!
-//!   GET  /v1/tools              工具列表与 JSON Schema
+//!   GET  /v1/tools              工具列表与 JSON Schema（含 find_metric，run_sql 带 metrics 声明）
 //!   POST /v1/tools/{name}       调用工具，body: {"agent": "...", "session": "...", "tables": [可选：角色可访问的表], "args": {...}}
 //!   GET  /v1/stats              中间层统计
 //!   GET  /v1/knowledge          经验库内容
 
-use crate::middle::{tool_specs, Ctx, Middle, Role};
+use crate::middle::{served_tool_specs, Ctx, Middle, Role};
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::routing::{get, post};
@@ -24,8 +24,8 @@ struct CallReq {
     args: Value,
 }
 
-async fn list_tools() -> Json<Value> {
-    Json(json!(tool_specs(true)))
+async fn list_tools(State(mid): State<Arc<Middle>>) -> Json<Value> {
+    Json(json!(served_tool_specs(&mid.cfg)))
 }
 
 async fn call(State(mid): State<Arc<Middle>>, Path(name): Path<String>, Json(req): Json<CallReq>) -> (StatusCode, Json<Value>) {

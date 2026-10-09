@@ -8,7 +8,7 @@ sit under the store, so their write-backs go up into it; the use side
 (lookup) and the execution side (same-snapshot validation) read from it on
 the right for the user agents (3D, outside MAVRA), and the revision
 m^r a lookup returns is the one a query declares.
-The SQL database is one storage slab at the bottom: tables, their versions
+The database is one storage slab at the bottom: tables, their versions
 V(T), and the snapshot D_s a query runs on. No engine-specific names appear;
 the figure explains the model, not the implementation.
 
@@ -54,7 +54,7 @@ LABELS = {
         'lookup': 'Lookup', 'lookup_note': 'compare versions $V(T)$',
         'tracker': 'Version tracker', 'tracker_note': 'per-table versions',
         'exec': ('Same-snapshot', 'validation'), 'declares': '$q$ declares $m^r$',
-        'run': 'run $q$ on $D_s$', 'db': 'SQL database',
+        'run': 'run $q$ on $D_s$', 'db': 'Database',
         'db_note': 'tables $T$ · versions $V(T)$ · snapshots $D_s$',
 
         'db_snapshot': 'snapshot',
@@ -81,7 +81,7 @@ LABELS = {
         'lookup': '查找', 'lookup_note': '比较版本 $V(T)$',
         'tracker': '版本跟踪', 'tracker_note': '每张表的版本',
         'exec': ('同快照验证', None), 'declares': '$q$ 声明 $m^r$',
-        'run': '在 $D_s$ 上执行 $q$', 'db': 'SQL 数据库',
+        'run': '在 $D_s$ 上执行 $q$', 'db': '数据库',
         'db_note': '表 $T$ · 版本 $V(T)$ · 快照 $D_s$',
 
         'db_snapshot': '快照',

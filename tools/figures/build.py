@@ -18,7 +18,7 @@ import style  # noqa: E402
 
 FIGURES = {'running-example': 'example', 'architecture': 'architecture', 'replay-outcomes': 'replay_outcomes',
            'maintenance-cost': 'maintenance_cost', 'scenario-changes': 'scenario_changes'}
-DECK = {'overview': 'overview', 'lookup': 'lookup', 'lifecycle': 'lifecycle'}   # report deck only
+DECK = {'structure': 'structure', 'definition': 'definition', 'process': 'process'}   # report deck only
 DECK_OUT = style.ROOT / 'tools/deck/figures'
 
 

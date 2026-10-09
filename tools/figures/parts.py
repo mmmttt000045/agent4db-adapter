@@ -23,6 +23,7 @@ HEAD = 2.6                                        # arrowhead length
 WAIT = '#9A6500'                                  # text on amber: missing result, changed version
 SOFT = '#BDB9B2'                                  # edges of grey 3D nodes
 PANEL_EDGE = '#9DBBE2'
+EX = '#2F7A70'                                    # the running example, set apart from the method's own words
 
 
 def baseline(y_center, size):
@@ -179,6 +180,35 @@ def rows(s, ex, ey, ew, lines, pitch, first=0, colors=None, marks=None, style='s
         s.text(ex, yy, line, NOTE, (colors or {}).get(k, INK), style, width=room)
         if marks and k in marks:
             mark(s, ex + ew - 1.6, yy - 1.5, marks[k])
+
+
+def example(s, x, y, label, width=None, size=NOTE):
+    """One line of the running example: a teal pill reading 例, then the text in teal.
+
+    (x, y) is the pill's left edge and the text baseline; width, when given, is the room
+    for pill and text together. Returns the width used.
+    """
+    pw = measure('例', size - 1, 'bold') + 2.6
+    s.rect(x, y - .36 * size * PT - 2.3, pw, 4.6, EX, None, r=1.0)
+    s.text(x + pw / 2, y - .36 * size * PT + .34 * (size - 1) * PT, '例', size - 1, WHITE, 'bold', 'center')
+    room = None if width is None else width - pw - 1.4
+    return pw + 1.4 + s.text(x + pw + 1.4, y, label, size, EX, width=room)
+
+
+def state(s, b, title, notes=(), ex=(), color=INK, edge=EDGE, sw=.4, fill=WHITE, dash=None, pitch=5.4, ex_size=NOTE):
+    """A box for one step or state: bold title, the method's lines in ink, then example lines."""
+    x, y, w, h = b
+    s.rect(*b, fill, edge, sw, r=1.6, dash=dash)
+    s.text(x + 3.0, y + 7.0, title, TITLE, color, 'bold', width=w - 6.0)
+    yy = y + 7.0 + 6.4
+    for line in notes:
+        s.text(x + 3.0, yy, line, NOTE, INK, width=w - 6.0)
+        yy += pitch
+    for line in ex:
+        example(s, x + 3.0, yy, line, width=w - 6.0, size=ex_size)
+        yy += pitch
+    if yy - pitch + 2.2 > y + h:
+        raise ValueError(f'{title!r}: rows need {yy - pitch + 2.2 - y:.1f} mm; box is {h:.1f} mm high')
 
 
 __all__ = ['AMBER', 'AMBER_PALE', 'RED']

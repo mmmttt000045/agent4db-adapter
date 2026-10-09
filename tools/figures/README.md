@@ -23,7 +23,7 @@ pdftoppm -r 400 -png /tmp/x/architecture.pdf /tmp/x/architecture
 
 ## 汇报用的三张图
 
-`overview.py`、`lookup.py`、`lifecycle.py` 是汇报 PPT 的三张核心图，不进论文：图 1 系统结构（一次请求在各模块之间怎么流转，深色标签标出发布、依赖、维护与改进三项职责），图 2 查询与执行（图 1 的第 1–8 步按增量加载后的一次真实使用展开），图 3 发布、改进与维护（门店营业额从学习、发布 v1、改进为 v2，到三种写入的三种结局）。三张图讲同一个例子、用同一套编号，数值取自实验记录（来源写在各脚本开头），表版本号为示意。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`），只出中文版（`LANGS = ('zh',)`），用标准的数据库术语（指标定义、共享记忆、验证条件、验证结果缓存、表版本、快照、修订 v1/v2/v3、失效、准入检查、修复搜索、回归测试），不用论文符号，也不写年份。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
+`structure.py`、`definition.py`、`process.py` 是汇报 PPT 的三张核心图，不进论文，从三个角度讲同一个方法：图 1 结构（MAVRA 在 agent 与数据库之间，共享记忆与发布、依赖、维护与改进三项职责），图 2 对象（一条定义 = 写法 + 从写法结构推出的验证条件；三种日常写入下条件怎样区分有害与无害），图 3 过程（定义随数据变化的状态图：学习、准入、有效、待验证、使用时验证、修复搜索、回归测试、新修订、改进、定义失效）。每张图先用黑色文字讲机制本身，再用绿色“例”（`parts.example`）标出贯穿全场的门店营业额，数值取自实验记录（来源写在各脚本开头）。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`，状态框用 `parts.state`），只出中文版（`LANGS = ('zh',)`），用标准的数据库术语，不用论文符号，也不写年份。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
 
 ## 数据核对
 

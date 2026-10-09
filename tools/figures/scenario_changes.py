@@ -28,7 +28,7 @@ import style  # noqa: E402
 from style import ACC_DK, FIELD, INK, MUTED, RED  # noqa: E402
 
 NAME = 'scenario-changes'
-W, H = style.TEXTWIDTH, 62.0
+W, H = style.TEXTWIDTH, 61.0
 STATS = style.ROOT / 'exp/2026-10-02-scenarios-ds/scen-stats.json'
 RESULTS = style.ROOT / 'exp/2026-10-02-scenarios-ds/paper-results.json'
 STALE = .25                      # share of tasks that used a stale definition

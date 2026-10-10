@@ -1,0 +1,22 @@
+{
+ "queries": 22,
+ "definitions": 13,
+ "by_fact": {
+  "lineitem": 11,
+  "orders": 2
+ },
+ "with_joins": 8,
+ "chains": 4,
+ "with_filters": 7,
+ "time_on_joined_table": 1,
+ "duplicates": 1,
+ "dropped": {
+  "date literal (question parameter)": 1,
+  "subquery": 5,
+  "join not a many-to-one tree": 1,
+  "references the time column": 1,
+  "multi-table or unresolved": 3,
+  "tables not reachable by many-to-one joins": 1
+ },
+ "parse_failures": 0
+}

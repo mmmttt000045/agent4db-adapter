@@ -1,0 +1,1235 @@
+{
+ "cell": "financial-queries",
+ "schema": "financial",
+ "templates": 106,
+ "parse_failures": [
+  {
+   "query": "bird138",
+   "error": "LIMIT #,# syntax is not supported, at index 197"
+  }
+ ],
+ "duplicates": [],
+ "metric_report": {
+  "entries": [
+   {
+    "key": "metric:bird90_b0_loan",
+    "status": "Valid",
+    "metric": {
+     "name": "bird90_b0_loan",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird90 block 0: count(account.account_id) over loan with 2 join(s)",
+     "fact": "loan",
+     "measure": "count(account.account_id)",
+     "grain": [
+      "loan_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "loan.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "loan",
+       "right": "account",
+       "on": [
+        [
+         "account_id",
+         "account_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "account",
+       "right": "district",
+       "on": [
+        [
+         "district_id",
+         "district_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "district": "district.a3 = 'Prague'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird90_b0_loan-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird90_b0_loan-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird90_b0_loan-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird90_b0_loan-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird90",
+     "block": 0,
+     "question": "How many accounts who have region in Prague are eligible for loans?"
+    }
+   },
+   {
+    "key": "metric:bird117_b0_loan",
+    "status": "Valid",
+    "metric": {
+     "name": "bird117_b0_loan",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird117 block 0: sum(CASE WHEN loan.status = 'A' THEN loan.amount ELSE 0 END) over loan",
+     "fact": "loan",
+     "measure": "sum(CASE WHEN loan.status = 'A' THEN loan.amount ELSE 0 END)",
+     "grain": [
+      "loan_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "loan.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [],
+     "filters": {},
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird117_b0_loan-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird117_b0_loan-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird117_b0_loan-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird117_b0_loan-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird117",
+     "block": 0,
+     "question": "What is the percentage of loan amount that has been fully paid with no issue."
+    }
+   },
+   {
+    "key": "metric:bird118_b0_loan",
+    "status": "Valid",
+    "metric": {
+     "name": "bird118_b0_loan",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird118 block 0: count(loan.account_id) over loan",
+     "fact": "loan",
+     "measure": "count(loan.account_id)",
+     "grain": [
+      "loan_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "loan.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [],
+     "filters": {
+      "loan": "loan.amount < 100000"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird118_b0_loan-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird118_b0_loan-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird118_b0_loan-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird118_b0_loan-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird118",
+     "block": 0,
+     "question": "For loan amount less than USD100,000, what is the percentage of accounts that is still running with no issue."
+    }
+   },
+   {
+    "key": "metric:bird135_b0_trans",
+    "status": "Valid",
+    "metric": {
+     "name": "bird135_b0_trans",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird135 block 0: count(trans.account_id) over trans with 1 join(s)",
+     "fact": "trans",
+     "measure": "count(trans.account_id)",
+     "grain": [
+      "trans_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "trans.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "trans",
+       "right": "account",
+       "on": [
+        [
+         "account_id",
+         "account_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "trans": "trans.balance < 0 and trans.operation = 'VYBER KARTOU'",
+      "account": "account.frequency = 'POPLATEK MESICNE'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird135_b0_trans-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird135_b0_trans-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird135_b0_trans-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird135_b0_trans-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird135",
+     "block": 0,
+     "question": "After making a credit card withdrawal, how many account/s with monthly issuance has a negative balance?"
+    }
+   },
+   {
+    "key": "metric:bird136_b0_loan",
+    "status": "Valid",
+    "metric": {
+     "name": "bird136_b0_loan",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird136 block 0: count(account.account_id) over loan with 1 join(s)",
+     "fact": "loan",
+     "measure": "count(account.account_id)",
+     "grain": [
+      "loan_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "loan.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "loan",
+       "right": "account",
+       "on": [
+        [
+         "account_id",
+         "account_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "account": "account.frequency = 'POPLATEK MESICNE'",
+      "loan": "loan.amount >= 250000"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird136_b0_loan-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird136_b0_loan-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird136_b0_loan-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird136_b0_loan-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird136",
+     "block": 0,
+     "question": "Between 1/1/1995 and 12/31/1997, how many loans in the amount of at least 250,000 per account that chose monthly statement issuance were approved?"
+    }
+   },
+   {
+    "key": "metric:bird137_b0_loan",
+    "status": "Valid",
+    "metric": {
+     "name": "bird137_b0_loan",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird137 block 0: count(account.account_id) over loan with 2 join(s)",
+     "fact": "loan",
+     "measure": "count(account.account_id)",
+     "grain": [
+      "loan_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "loan.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "loan",
+       "right": "account",
+       "on": [
+        [
+         "account_id",
+         "account_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "account",
+       "right": "district",
+       "on": [
+        [
+         "district_id",
+         "district_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "account": "account.district_id = 1",
+      "loan": "(loan.status = 'C' OR loan.status = 'D')"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird137_b0_loan-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird137_b0_loan-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird137_b0_loan-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird137_b0_loan-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird137",
+     "block": 0,
+     "question": "How many accounts have running contracts in Branch location 1?"
+    }
+   },
+   {
+    "key": "metric:bird145_b1_trans",
+    "status": "Valid",
+    "metric": {
+     "name": "bird145_b1_trans",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird145 block 1: avg(trans.amount) over trans",
+     "fact": "trans",
+     "measure": "avg(trans.amount)",
+     "grain": [
+      "trans_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "trans.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [],
+     "filters": {},
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird145_b1_trans-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird145_b1_trans-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird145_b1_trans-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird145_b1_trans-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird145",
+     "block": 1,
+     "question": "Who are the account holder identification numbers whose who have transactions on the credit card with the amount is less than the average, in 1998?"
+    }
+   },
+   {
+    "key": "metric:bird150_b0_trans",
+    "status": "Valid",
+    "metric": {
+     "name": "bird150_b0_trans",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird150 block 0: count(account.account_id) over trans with 2 join(s)",
+     "fact": "trans",
+     "measure": "count(account.account_id)",
+     "grain": [
+      "trans_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "trans.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "trans",
+       "right": "account",
+       "on": [
+        [
+         "account_id",
+         "account_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "account",
+       "right": "district",
+       "on": [
+        [
+         "district_id",
+         "district_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "trans": "trans.bank = 'AB'",
+      "district": "district.a3 = 'north Bohemia'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird150_b0_trans-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird150_b0_trans-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird150_b0_trans-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird150_b0_trans-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird150",
+     "block": 0,
+     "question": "How many accounts in North Bohemia has made a transaction with the partner's bank being AB?"
+    }
+   },
+   {
+    "key": "metric:bird160_b0_loan",
+    "status": "Valid",
+    "metric": {
+     "name": "bird160_b0_loan",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird160 block 0: count(loan.account_id) over loan with 1 join(s)",
+     "fact": "loan",
+     "measure": "count(loan.account_id)",
+     "grain": [
+      "loan_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "loan.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "loan",
+       "right": "account",
+       "on": [
+        [
+         "account_id",
+         "account_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "account": "account.frequency = 'POPLATEK TYDNE'",
+      "loan": "loan.amount < 200000"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird160_b0_loan-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird160_b0_loan-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird160_b0_loan-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird160_b0_loan-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird160",
+     "block": 0,
+     "question": "Among the weekly issuance accounts, how many have a loan of under 200000?"
+    }
+   },
+   {
+    "key": "metric:bird170_b0_trans",
+    "status": "Valid",
+    "metric": {
+     "name": "bird170_b0_trans",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird170 block 0: count(trans.account_id) over trans",
+     "fact": "trans",
+     "measure": "count(trans.account_id)",
+     "grain": [
+      "trans_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "trans.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [],
+     "filters": {
+      "trans": "trans.operation = 'VYBER KARTOU'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird170_b0_trans-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird170_b0_trans-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird170_b0_trans-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird170_b0_trans-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird170",
+     "block": 0,
+     "question": "How many credit card withdrawals were recorded after 1995?"
+    }
+   },
+   {
+    "key": "metric:bird191_b0_loan",
+    "status": "Valid",
+    "metric": {
+     "name": "bird191_b0_loan",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird191 block 0: count(loan.account_id) over loan with 1 join(s)",
+     "fact": "loan",
+     "measure": "count(loan.account_id)",
+     "grain": [
+      "loan_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "loan.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "loan",
+       "right": "account",
+       "on": [
+        [
+         "account_id",
+         "account_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "loan": "loan.duration = 24",
+      "account": "account.frequency = 'POPLATEK TYDNE'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird191_b0_loan-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird191_b0_loan-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird191_b0_loan-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird191_b0_loan-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird191",
+     "block": 0,
+     "question": "How many loan accounts are for pre-payment of duration of 24 months with weekly issuance of statement."
+    }
+   },
+   {
+    "key": "metric:bird192_b0_loan",
+    "status": "Valid",
+    "metric": {
+     "name": "bird192_b0_loan",
+     "aliases": [],
+     "definition": "Financial (BIRD) bird192 block 0: avg(loan.amount) over loan with 1 join(s)",
+     "fact": "loan",
+     "measure": "avg(loan.amount)",
+     "grain": [
+      "loan_id"
+     ],
+     "time": {
+      "role": "date",
+      "fact_col": "loan.date",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "loan",
+       "right": "account",
+       "on": [
+        [
+         "account_id",
+         "account_id"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "loan": "loan.status IN ('C', 'D')",
+      "account": "account.frequency = 'POPLATEK PO OBRATU'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "bird192_b0_loan-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "bird192_b0_loan-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "bird192_b0_loan-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "bird192_b0_loan-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "bird192",
+     "block": 0,
+     "question": "What is the average amount of loan which are still on running contract with statement issuance after each transaction?"
+    }
+   }
+  ]
+ }
+}

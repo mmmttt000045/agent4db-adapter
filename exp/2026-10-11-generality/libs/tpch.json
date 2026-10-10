@@ -1,0 +1,1355 @@
+{
+ "cell": "tpch-queries",
+ "schema": "tpch",
+ "templates": 22,
+ "parse_failures": [],
+ "duplicates": [
+  {
+   "query": "q20",
+   "block": 3,
+   "same_as": "q01_b0_lineitem"
+  }
+ ],
+ "metric_report": {
+  "entries": [
+   {
+    "key": "metric:q01_b0_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q01_b0_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q01 block 0: sum(lineitem.l_quantity) over lineitem",
+     "fact": "lineitem",
+     "measure": "sum(lineitem.l_quantity)",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "ship date",
+      "fact_col": "lineitem.l_shipdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [],
+     "filters": {},
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q01_b0_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q01_b0_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q01_b0_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q01_b0_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q01",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q03_b0_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q03_b0_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q03 block 0: sum(lineitem.l_extendedprice * (1 - lineitem.l_discount)) over lineitem with 2 join(s)",
+     "fact": "lineitem",
+     "measure": "sum(lineitem.l_extendedprice * (1 - lineitem.l_discount))",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "ship date",
+      "fact_col": "lineitem.l_shipdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineitem",
+       "right": "orders",
+       "on": [
+        [
+         "l_orderkey",
+         "o_orderkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "orders",
+       "right": "customer",
+       "on": [
+        [
+         "o_custkey",
+         "c_custkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "customer": "customer.c_mktsegment = 'BUILDING'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q03_b0_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q03_b0_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q03_b0_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q03_b0_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q03",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q04_b0_orders",
+    "status": "Valid",
+    "metric": {
+     "name": "q04_b0_orders",
+     "aliases": [],
+     "definition": "TPC-H q04 block 0: count(*) over orders",
+     "fact": "orders",
+     "measure": "count(*)",
+     "grain": [
+      "o_orderkey"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "orders.o_orderdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [],
+     "filters": {},
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q04_b0_orders-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q04_b0_orders-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q04_b0_orders-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q04_b0_orders-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q04",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q06_b0_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q06_b0_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q06 block 0: sum(lineitem.l_extendedprice * lineitem.l_discount) over lineitem",
+     "fact": "lineitem",
+     "measure": "sum(lineitem.l_extendedprice * lineitem.l_discount)",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "ship date",
+      "fact_col": "lineitem.l_shipdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [],
+     "filters": {
+      "lineitem": "lineitem.l_discount BETWEEN 0.05 AND 0.07 and lineitem.l_quantity < 24"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q06_b0_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q06_b0_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q06_b0_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q06_b0_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q06",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q10_b0_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q10_b0_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q10 block 0: sum(lineitem.l_extendedprice * (1 - lineitem.l_discount)) over lineitem with 3 join(s)",
+     "fact": "lineitem",
+     "measure": "sum(lineitem.l_extendedprice * (1 - lineitem.l_discount))",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "orders.o_orderdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineitem",
+       "right": "orders",
+       "on": [
+        [
+         "l_orderkey",
+         "o_orderkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "orders",
+       "right": "customer",
+       "on": [
+        [
+         "o_custkey",
+         "c_custkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "customer",
+       "right": "nation",
+       "on": [
+        [
+         "c_nationkey",
+         "n_nationkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "lineitem": "lineitem.l_returnflag = 'R'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q10_b0_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q10_b0_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q10_b0_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q10_b0_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q10",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q12_b0_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q12_b0_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q12 block 0: sum(CASE WHEN orders.o_orderpriority = '1-URGENT' OR orders.o_orderpriority = '2-HIGH' THEN 1 ELSE 0 END) over lineitem with 1 join(s)",
+     "fact": "lineitem",
+     "measure": "sum(CASE WHEN orders.o_orderpriority = '1-URGENT' OR orders.o_orderpriority = '2-HIGH' THEN 1 ELSE 0 END)",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "receipt date",
+      "fact_col": "lineitem.l_receiptdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineitem",
+       "right": "orders",
+       "on": [
+        [
+         "l_orderkey",
+         "o_orderkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "lineitem": "lineitem.l_shipmode IN ('MAIL', 'SHIP') and lineitem.l_shipdate < lineitem.l_commitdate"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q12_b0_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q12_b0_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q12_b0_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q12_b0_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q12",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q13_b1_orders",
+    "status": "Valid",
+    "metric": {
+     "name": "q13_b1_orders",
+     "aliases": [],
+     "definition": "TPC-H q13 block 1: count(orders.o_orderkey) over orders with 1 join(s)",
+     "fact": "orders",
+     "measure": "count(orders.o_orderkey)",
+     "grain": [
+      "o_orderkey"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "orders.o_orderdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "orders",
+       "right": "customer",
+       "on": [
+        [
+         "o_custkey",
+         "c_custkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "orders": "orders.o_comment NOT LIKE '%special%requests%'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q13_b1_orders-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q13_b1_orders-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q13_b1_orders-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q13_b1_orders-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q13",
+     "block": 1
+    }
+   },
+   {
+    "key": "metric:q14_b0_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q14_b0_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q14 block 0: sum(CASE WHEN part.p_type LIKE 'PROMO%' THEN lineitem.l_extendedprice * (1 - lineitem.l_discount) ELSE 0 END) over lineitem with 1 join(s)",
+     "fact": "lineitem",
+     "measure": "sum(CASE WHEN part.p_type LIKE 'PROMO%' THEN lineitem.l_extendedprice * (1 - lineitem.l_discount) ELSE 0 END)",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "ship date",
+      "fact_col": "lineitem.l_shipdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineitem",
+       "right": "part",
+       "on": [
+        [
+         "l_partkey",
+         "p_partkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {},
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q14_b0_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q14_b0_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q14_b0_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q14_b0_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q14",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q15_b2_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q15_b2_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q15 block 2: sum(lineitem.l_extendedprice * (1 - lineitem.l_discount)) over lineitem",
+     "fact": "lineitem",
+     "measure": "sum(lineitem.l_extendedprice * (1 - lineitem.l_discount))",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "ship date",
+      "fact_col": "lineitem.l_shipdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [],
+     "filters": {},
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q15_b2_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q15_b2_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q15_b2_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q15_b2_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q15",
+     "block": 2
+    }
+   },
+   {
+    "key": "metric:q17_b0_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q17_b0_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q17 block 0: sum(lineitem.l_extendedprice) over lineitem with 1 join(s)",
+     "fact": "lineitem",
+     "measure": "sum(lineitem.l_extendedprice)",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "ship date",
+      "fact_col": "lineitem.l_shipdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineitem",
+       "right": "part",
+       "on": [
+        [
+         "l_partkey",
+         "p_partkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "part": "part.p_brand = 'Brand#23' and part.p_container = 'MED BOX'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q17_b0_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q17_b0_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q17_b0_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q17_b0_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q17",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q17_b1_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q17_b1_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q17 block 1: avg(lineitem.l_quantity) over lineitem",
+     "fact": "lineitem",
+     "measure": "avg(lineitem.l_quantity)",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "ship date",
+      "fact_col": "lineitem.l_shipdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [],
+     "filters": {},
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q17_b1_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q17_b1_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q17_b1_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q17_b1_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q17",
+     "block": 1
+    }
+   },
+   {
+    "key": "metric:q18_b0_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q18_b0_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q18 block 0: sum(lineitem.l_quantity) over lineitem with 2 join(s)",
+     "fact": "lineitem",
+     "measure": "sum(lineitem.l_quantity)",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "ship date",
+      "fact_col": "lineitem.l_shipdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineitem",
+       "right": "orders",
+       "on": [
+        [
+         "l_orderkey",
+         "o_orderkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "orders",
+       "right": "customer",
+       "on": [
+        [
+         "o_custkey",
+         "c_custkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {},
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q18_b0_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q18_b0_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q18_b0_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q18_b0_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q18",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q21_b0_lineitem",
+    "status": "Valid",
+    "metric": {
+     "name": "q21_b0_lineitem",
+     "aliases": [],
+     "definition": "TPC-H q21 block 0: count(*) over lineitem with 3 join(s)",
+     "fact": "lineitem",
+     "measure": "count(*)",
+     "grain": [
+      "l_orderkey",
+      "l_linenumber"
+     ],
+     "time": {
+      "role": "ship date",
+      "fact_col": "lineitem.l_shipdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineitem",
+       "right": "supplier",
+       "on": [
+        [
+         "l_suppkey",
+         "s_suppkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineitem",
+       "right": "orders",
+       "on": [
+        [
+         "l_orderkey",
+         "o_orderkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "supplier",
+       "right": "nation",
+       "on": [
+        [
+         "s_nationkey",
+         "n_nationkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "orders": "orders.o_orderstatus = 'F'",
+      "lineitem": "lineitem.l_receiptdate > lineitem.l_commitdate",
+      "nation": "nation.n_name = 'SAUDI ARABIA'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q21_b0_lineitem-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q21_b0_lineitem-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q21_b0_lineitem-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q21_b0_lineitem-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q21",
+     "block": 0
+    }
+   }
+  ]
+ }
+}

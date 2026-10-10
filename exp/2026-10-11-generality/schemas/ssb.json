@@ -1,0 +1,18 @@
+{
+  "name": "ssb", "label": "SSB", "template_db": "ssb_sf1",
+  "calendar": {"kind": "dim", "table": "date", "key": "d_datekey", "date_col": "d_fulldate",
+               "year_col": "d_year", "month_col": "d_monthnuminyear"},
+  "years": {"learn": 1996, "holdout": 1997},
+  "facts": [
+    {"table": "lineorder", "grain": ["lo_orderkey", "lo_linenumber"], "date": "lo_orderdate",
+     "new_key": "lo_orderkey", "money": ["lo_extendedprice", "lo_ordertotalprice", "lo_revenue", "lo_supplycost"]}
+  ],
+  "dims": [
+    {"table": "part", "key": ["p_partkey"], "attr": "p_category", "refs": [["lineorder", "lo_partkey"]]},
+    {"table": "supplier", "key": ["s_suppkey"], "attr": "s_city", "refs": [["lineorder", "lo_suppkey"]]},
+    {"table": "customer", "key": ["c_custkey"], "attr": "c_city", "refs": [["lineorder", "lo_custkey"]]}
+  ],
+  "changes": {"append": "lineorder", "backfill": "lineorder", "correct": "lineorder", "addcol": "lineorder",
+              "status": "lineorder", "revision": "lineorder", "dupload": "lineorder", "dimhist": "part",
+              "latekey": "lineorder", "unit": "lineorder", "mirror": "lineorder"}
+}

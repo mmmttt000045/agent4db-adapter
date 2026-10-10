@@ -1,0 +1,86 @@
+[
+ {
+  "query": "q03",
+  "block": 0,
+  "fact": "lineitem",
+  "drop": "date literal (question parameter)",
+  "pred": "orders.o_orderdate < CAST('1995-03-15' AS date)"
+ },
+ {
+  "query": "q04",
+  "block": 0,
+  "fact": "orders",
+  "drop": "subquery",
+  "pred": "EXISTS (SELECT * FROM lineitem WHERE l_orderkey = o_orderkey AND l_commitdate < l_receiptdate)"
+ },
+ {
+  "query": "q05",
+  "block": 0,
+  "fact": "lineitem",
+  "drop": "join not a many-to-one tree",
+  "pred": "customer-supplier"
+ },
+ {
+  "query": "q12",
+  "block": 0,
+  "fact": "lineitem",
+  "drop": "references the time column",
+  "pred": "l_commitdate < l_receiptdate"
+ },
+ {
+  "query": "q17",
+  "block": 0,
+  "fact": "lineitem",
+  "drop": "subquery",
+  "pred": "l_quantity < (SELECT 0.2 * avg(l_quantity) FROM lineitem WHERE l_partkey = p_partkey)"
+ },
+ {
+  "query": "q17",
+  "block": 1,
+  "fact": "lineitem",
+  "drop": "multi-table or unresolved",
+  "pred": "l_partkey = p_partkey"
+ },
+ {
+  "query": "q18",
+  "block": 0,
+  "fact": "lineitem",
+  "drop": "subquery",
+  "pred": "o_orderkey IN (SELECT l_orderkey FROM lineitem GROUP BY l_orderkey HAVING sum(l_quantity) > 300)"
+ },
+ {
+  "query": "q19",
+  "block": 0,
+  "fact": "lineitem",
+  "drop": "tables not reachable by many-to-one joins: ['part']",
+  "pred": ""
+ },
+ {
+  "query": "q20",
+  "block": 3,
+  "fact": "lineitem",
+  "drop": "multi-table or unresolved",
+  "pred": "l_partkey = ps_partkey"
+ },
+ {
+  "query": "q20",
+  "block": 3,
+  "fact": "lineitem",
+  "drop": "multi-table or unresolved",
+  "pred": "l_suppkey = ps_suppkey"
+ },
+ {
+  "query": "q21",
+  "block": 0,
+  "fact": "lineitem",
+  "drop": "subquery",
+  "pred": "EXISTS (SELECT * FROM lineitem AS l2 WHERE l2.l_orderkey = l1.l_orderkey AND l2.l_suppkey <> l1.l_suppkey)"
+ },
+ {
+  "query": "q21",
+  "block": 0,
+  "fact": "lineitem",
+  "drop": "subquery",
+  "pred": "NOT EXISTS (SELECT * FROM lineitem AS l3 WHERE l3.l_orderkey = l1.l_orderkey AND l3.l_suppkey <> l1.l_suppkey AND l3.l_receiptdate > l3.l_commitdate)"
+ }
+]

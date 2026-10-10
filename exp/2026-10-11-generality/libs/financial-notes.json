@@ -1,0 +1,51 @@
+[
+ {
+  "query": "bird116",
+  "block": 0,
+  "fact": "trans",
+  "drop": "join not a many-to-one tree",
+  "pred": "account-loan"
+ },
+ {
+  "query": "bird118",
+  "block": 0,
+  "fact": null,
+  "drop": "aggregate over a boolean (SQLite dialect)",
+  "pred": "sum(status = 'C')"
+ },
+ {
+  "query": "bird132",
+  "block": 0,
+  "fact": "loan",
+  "drop": "join not a many-to-one tree",
+  "pred": "account-disp; client-disp"
+ },
+ {
+  "query": "bird144",
+  "block": 0,
+  "fact": "trans",
+  "drop": "join not a many-to-one tree",
+  "pred": "account-disp; card-disp"
+ },
+ {
+  "query": "bird169",
+  "block": 0,
+  "fact": "loan",
+  "drop": "join not a many-to-one tree",
+  "pred": "client-disp; account-disp"
+ },
+ {
+  "query": "bird179",
+  "block": 0,
+  "fact": "trans",
+  "drop": "join not a many-to-one tree",
+  "pred": "account-disp; client-disp"
+ },
+ {
+  "query": "bird182",
+  "block": 0,
+  "fact": "trans",
+  "drop": "join not a many-to-one tree",
+  "pred": "client-disp; account-disp"
+ }
+]

@@ -1,0 +1,16 @@
+{
+  "name": "financial", "label": "Financial (BIRD)", "template_db": "financial",
+  "calendar": {"kind": "column"},
+  "years": {"learn": 1996, "holdout": 1997},
+  "facts": [
+    {"table": "trans", "grain": ["trans_id"], "date": "date", "new_key": "trans_id", "money": ["amount", "balance"]},
+    {"table": "loan", "grain": ["loan_id"], "date": "date", "new_key": "loan_id", "money": ["amount", "payments"]}
+  ],
+  "dims": [
+    {"table": "account", "key": ["account_id"], "attr": "frequency", "refs": [["trans", "account_id"], ["loan", "account_id"]]},
+    {"table": "district", "key": ["district_id"], "attr": "a3", "refs": [["account", "district_id"]]}
+  ],
+  "changes": {"append": "trans", "backfill": "loan", "correct": "trans", "addcol": "loan",
+              "status": "loan", "revision": "trans", "dupload": "trans", "dimhist": "account",
+              "latekey": "trans", "unit": "trans", "mirror": "loan"}
+}

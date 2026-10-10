@@ -1,0 +1,14 @@
+{
+ "queries": 13,
+ "definitions": 11,
+ "by_fact": {
+  "lineorder": 11
+ },
+ "with_joins": 8,
+ "chains": 0,
+ "with_filters": 11,
+ "time_on_joined_table": 0,
+ "duplicates": 2,
+ "dropped": {},
+ "parse_failures": 0
+}

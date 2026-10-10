@@ -175,6 +175,8 @@ fn metric(s: &Spec) -> Metric {
             grain: "month".into(),
             loss_ratio: 0.0,
             strategy: TimeStrategy::DimJoin,
+            year_col: "d_year".into(),
+            month_col: "d_moy".into(),
         }),
         joins,
         filters: BTreeMap::new(),

@@ -558,6 +558,8 @@ fn seeded_metrics() -> Vec<(&'static str, Metric)> {
             grain: "month".into(),
             loss_ratio: 0.0,
             strategy: TimeStrategy::DimJoin,
+            year_col: "d_year".into(),
+            month_col: "d_moy".into(),
         })
     };
     let join = |right: &str, on: &[(&str, &str)], kind: JoinKind| JoinRef {

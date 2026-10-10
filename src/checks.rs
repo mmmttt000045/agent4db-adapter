@@ -19,6 +19,8 @@ pub enum Check {
     /// 日期键连续：日期维度按（年, 月）分组后，每组的键恰好是 [min, max] 内的全部整数，且相邻月份首尾相接。
     /// 成立时任一期间的日期键集合就是一个整数区间，期间谓词可以写成事实表日期键的范围过滤，不必连接维度表。
     DateKeysContiguous { dim: String, key: String, year_col: String, month_col: String },
+    /// 日期列完整性：没有日期维度时，日期列为空的行归不到任何期间；返回有日期的行占比，由调用方与准入基线比较。
+    DateCoverage { table: String, col: String },
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -35,6 +37,7 @@ impl Check {
             Check::SampleFanout { .. } => "SampleFanout",
             Check::RowConservation { .. } => "RowConservation",
             Check::DateKeysContiguous { .. } => "DateKeysContiguous",
+            Check::DateCoverage { .. } => "DateCoverage",
         }
     }
 
@@ -46,6 +49,7 @@ impl Check {
         match self {
             Check::KeyUnique { table, .. } => vec![table.clone()],
             Check::DateKeysContiguous { dim, .. } => vec![dim.clone()],
+            Check::DateCoverage { table, .. } => vec![table.clone()],
             Check::SampleFanout { left, right, .. } | Check::RowConservation { left, right, .. } => {
                 vec![left.clone(), right.clone()]
             }
@@ -57,6 +61,7 @@ impl Check {
         match self {
             Check::KeyUnique { table, cols, .. } => format!("{table}({})", cols.join(",")),
             Check::DateKeysContiguous { dim, key, .. } => format!("{dim}({key})"),
+            Check::DateCoverage { table, col } => format!("{table}({col})"),
             Check::SampleFanout { left, right, on, .. } | Check::RowConservation { left, right, on, .. } => {
                 format!("{left}>{right}:{}", fmt_on(on))
             }
@@ -68,6 +73,7 @@ impl Check {
         match self {
             Check::KeyUnique { table, cols, .. } => rows(table) * (1.0 + 0.5 * (cols.len() as f64 - 1.0)),
             Check::DateKeysContiguous { dim, .. } => rows(dim),
+            Check::DateCoverage { table, .. } => rows(table),
             Check::SampleFanout { right, .. } => rows(right),
             Check::RowConservation { left, right, .. } => rows(left) * 2.0 + rows(right),
         }
@@ -79,6 +85,7 @@ impl Check {
                 format!("{table}({}) 是否唯一{}", cols.join(", "), filter.as_ref().map(|f| format!(" [过滤 {f}]")).unwrap_or_default())
             }
             Check::DateKeysContiguous { dim, key, .. } => format!("{dim}({key}) 日期键是否按月连续"),
+            Check::DateCoverage { table, col } => format!("{table}.{col} 有日期的行占比"),
             Check::SampleFanout { left, right, on, .. } => format!("抽样：{left}→{right} 按 {} 是否一对多", fmt_on(on)),
             Check::RowConservation { left, right, on, .. } => {
                 format!("行数守恒：{left}⋈{right} 按 {} 后行数是否超过 {left}", fmt_on(on))
@@ -103,13 +110,14 @@ impl Check {
                  select count(*) filter (where c <> mx - mn + 1 or (prev_mx is not null and mn <> prev_mx + 1)) as n_bad, \
                         count(*) as n_months from s"
             ),
+            Check::DateCoverage { table, col } => format!("select count(*) as n_rows, count({col}) as n_dated from {table}"),
             Check::SampleFanout { left, right, on, lf, rf, n } => {
                 let lcols: Vec<&str> = on.iter().map(|(l, _)| l.as_str()).collect();
                 let mut lconds: Vec<String> = lcols.iter().map(|c| format!("{c} is not null")).collect();
                 if let Some(f) = lf {
                     lconds.push(format!("({f})"));
                 }
-                let mut jconds: Vec<String> = on.iter().map(|(l, r)| format!("r.{r} = s.{l}")).collect();
+                let mut jconds: Vec<String> = on.iter().map(|(l, r)| format!("{right}.{r} = s.{l}")).collect();
                 if let Some(f) = rf {
                     jconds.push(format!("({f})"));
                 }
@@ -117,25 +125,23 @@ impl Check {
                     "with s as (select {cols} from {left} where {lc} limit {n}) \
                      select count(*) as n_sample, coalesce(max(m), 0) as max_mult, coalesce(avg(m), 0) as avg_mult, \
                             count(*) filter (where m > 1) as n_fanned \
-                     from s cross join lateral (select count(*) as m from {right} r where {jc}) t",
+                     from s cross join lateral (select count(*) as m from {right} where {jc}) t",
                     cols = lcols.join(", "),
                     lc = lconds.join(" and "),
                     jc = jconds.join(" and "),
                 )
             }
             Check::RowConservation { left, right, on, lf, rf } => {
+                // 过滤在各自表的子查询里求值，过滤可以写成 表.列，也可以引用两表重名的列
                 let wl = lf.as_ref().map(|f| format!(" where {f}")).unwrap_or_default();
                 let wr = rf.as_ref().map(|f| format!(" where {f}")).unwrap_or_default();
-                let mut conds: Vec<String> = on.iter().map(|(l, r)| format!("l.{l} = r.{r}")).collect();
-                if let Some(f) = lf {
-                    conds.push(format!("({})", qualify(f, "l")));
-                }
-                if let Some(f) = rf {
-                    conds.push(format!("({})", qualify(f, "r")));
-                }
+                let side = |t: &str, w: &str| if w.is_empty() { t.to_string() } else { format!("(select * from {t}{w})") };
+                let conds: Vec<String> = on.iter().map(|(l, r)| format!("l.{l} = r.{r}")).collect();
                 format!(
                     "select (select count(*) from {left}{wl}) as n_left, (select count(*) from {right}{wr}) as n_right, \
-                            (select count(*) from {left} l join {right} r on {}) as n_join",
+                            (select count(*) from {} l join {} r on {}) as n_join",
+                    side(left, &wl),
+                    side(right, &wr),
                     conds.join(" and ")
                 )
             }
@@ -152,6 +158,11 @@ impl Check {
             Check::DateKeysContiguous { .. } => {
                 let (n_bad, n_months) = (rows.i64(0, 0).unwrap_or(0), rows.i64(0, 1).unwrap_or(0));
                 Outcome { pass: n_bad == 0, metrics: json!({"n_bad": n_bad, "n_months": n_months}), ms }
+            }
+            Check::DateCoverage { .. } => {
+                let (n_rows, n_dated) = (rows.i64(0, 0).unwrap_or(0), rows.i64(0, 1).unwrap_or(0));
+                let ratio = if n_rows > 0 { n_dated as f64 / n_rows as f64 } else { 1.0 };
+                Outcome { pass: true, metrics: json!({"n_rows": n_rows, "n_dated": n_dated, "join_ratio": ratio}), ms }
             }
             Check::SampleFanout { .. } => {
                 let max_mult = rows.i64(0, 1).unwrap_or(0);
@@ -182,11 +193,6 @@ impl Check {
 pub fn fmt_on(on: &On) -> String {
     let s: Vec<String> = on.iter().map(|(l, r)| format!("{l}={r}")).collect();
     format!("({})", s.join(", "))
-}
-
-/// 把形如 `col = 'v'` 的简单过滤条件加上表别名（TPC-DS 列名唯一，只需给开头的列名加前缀）。
-fn qualify(filter: &str, alias: &str) -> String {
-    format!("{alias}.{}", filter.trim())
 }
 
 /// 按列集合（不看顺序与方向）比较两个关联是否相同。

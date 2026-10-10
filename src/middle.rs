@@ -421,6 +421,9 @@ fn outcome_text(c: &Check, o: &Outcome) -> String {
         Check::RowConservation { .. } => {
             format!("左表 {} 行，关联后 {} 行（{:.1} 倍）", o.metrics["n_left"], o.metrics["n_join"], metric(o, "join_ratio"))
         }
+        Check::DateCoverage { .. } => {
+            format!("{} 行中 {} 行有日期（{:.2}%）", o.metrics["n_rows"], o.metrics["n_dated"], metric(o, "join_ratio") * 100.0)
+        }
     }
 }
 
@@ -1173,7 +1176,7 @@ impl Middle {
             for i in 0..r.rows.len() {
                 let (Some(v), Some(n), Some(k)) = (r.cell(i, 0), r.i64(i, 1), r.i64(i, 2)) else { continue };
                 if n == k && k == total {
-                    found.push(format!("{c} = {}", lit(v)));
+                    found.push(format!("{table}.{c} = {}", lit(v)));
                     if !self.cfg.repair_unique {
                         break 'search;
                     }

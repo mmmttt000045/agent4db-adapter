@@ -1,5 +1,6 @@
 //! 从 SQL 文本里抽取用到的表和等值关联谓词。
-//! 第一版不做完整解析：依赖 TPC-DS 列名全局唯一（带表前缀），`列 = 列` 且两列属于不同表即视为关联。
+//! 不做完整解析：`列 = 列` 且两列属于不同表即视为关联。列所属的表先按限定前缀（表名或 FROM / JOIN 中的别名）确定，
+//! 没有前缀时按列名反查（只在列名唯一时成立，如 TPC-DS 带表前缀的列名）。
 
 use crate::catalog::Catalog;
 use crate::checks::On;
@@ -10,7 +11,7 @@ use std::sync::OnceLock;
 fn eq_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
-        Regex::new(r"(?i)\b(?:[a-z_][a-z0-9_]*\.)?([a-z_][a-z0-9_]*)\s*=\s*(?:[a-z_][a-z0-9_]*\.)?([a-z_][a-z0-9_]*)\b").unwrap()
+        Regex::new(r"(?i)\b(?:([a-z_][a-z0-9_]*)\.)?([a-z_][a-z0-9_]*)\s*=\s*(?:([a-z_][a-z0-9_]*)\.)?([a-z_][a-z0-9_]*)\b").unwrap()
     })
 }
 
@@ -45,12 +46,44 @@ pub struct JoinUse {
 }
 
 /// 按表对分组的关联。同一表对内若某列重复出现（如 date_dim 被两次以不同列关联），拆成多个关联。
+/// FROM / JOIN 中的表别名（别名 → 表名），表名本身也映射到自己。
+fn aliases(s: &str, cat: &Catalog) -> BTreeMap<String, String> {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    let re = RE.get_or_init(|| Regex::new(r"(?i)\b(?:from|join)\s+([a-z_][a-z0-9_]*)(?:\s+(?:as\s+)?([a-z_][a-z0-9_]*))?").unwrap());
+    const NOT_ALIAS: &[&str] = &[
+        "where", "on", "join", "left", "right", "inner", "outer", "full", "cross", "group", "order", "limit", "using", "natural", "union",
+    ];
+    let mut out = BTreeMap::new();
+    for c in re.captures_iter(s) {
+        let t = c[1].to_string();
+        if cat.table(&t).is_none() {
+            continue;
+        }
+        if let Some(a) = c.get(2).map(|m| m.as_str().to_string()).filter(|a| !NOT_ALIAS.contains(&a.as_str())) {
+            out.insert(a, t.clone());
+        }
+        out.insert(t.clone(), t);
+    }
+    out
+}
+
+/// 列所属的表：前缀是表名或别名时按它确定，否则（无前缀，或前缀是子查询、CTE 的名字）按唯一的列名反查。
+fn owner<'a>(prefix: Option<&str>, col: &str, alias: &'a BTreeMap<String, String>, cat: &'a Catalog) -> Option<&'a str> {
+    match prefix.and_then(|p| alias.get(p)) {
+        Some(t) => cat.owners(col).iter().any(|o| o == t).then_some(t.as_str()),
+        None => cat.table_of(col),
+    }
+}
+
 pub fn joins(sql: &str, cat: &Catalog) -> Vec<JoinUse> {
     let s = strip(sql);
+    let alias = aliases(&s, cat);
     let mut groups: BTreeMap<(String, String), Vec<(String, String)>> = BTreeMap::new();
     for cap in eq_re().captures_iter(&s) {
-        let (a, b) = (cap[1].to_string(), cap[2].to_string());
-        let (Some(ta), Some(tb)) = (cat.table_of(&a), cat.table_of(&b)) else { continue };
+        let (a, b) = (cap[2].to_string(), cap[4].to_string());
+        let ta = owner(cap.get(1).map(|m| m.as_str()), &a, &alias, cat);
+        let tb = owner(cap.get(3).map(|m| m.as_str()), &b, &alias, cat);
+        let (Some(ta), Some(tb)) = (ta, tb) else { continue };
         if ta == tb {
             continue;
         }

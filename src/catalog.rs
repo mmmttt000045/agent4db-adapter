@@ -87,7 +87,8 @@ impl Table {
 
 pub struct Catalog {
     pub tables: BTreeMap<String, Table>,
-    col_table: HashMap<String, String>,
+    /// 列名 → 含有该列的表（按表名排序）
+    col_table: HashMap<String, Vec<String>>,
 }
 
 /// 表版本 = 结构指纹 + DML 计数 + ETL 批次号。任何一项变化都视为“依赖已变”。
@@ -163,7 +164,11 @@ impl Catalog {
                 comment: cols.cell(i, 3).map(str::to_string),
                 n_distinct: nd.get(&(t.clone(), c.clone())).copied(),
             });
-            col_table.insert(c, t);
+            let owners: &mut Vec<String> = col_table.entry(c).or_default();
+            if !owners.contains(&t) {
+                owners.push(t);
+                owners.sort();
+            }
         }
         Ok(Catalog { tables, col_table })
     }
@@ -172,14 +177,32 @@ impl Catalog {
         self.tables.get(t)
     }
 
-    /// TPC-DS 的列名全局唯一（带表前缀），所以可以由列名反查表。
+    /// 由列名反查表：只有一张表含有该列时才确定（TPC-DS 这类带表前缀的列名总是如此）；
+    /// 多张表同名的列（如 account_id）需要按口径涉及的表判断，见 `owners`。
     pub fn table_of(&self, col: &str) -> Option<&str> {
-        self.col_table.get(col).map(String::as_str)
+        match self.col_table.get(col).map(Vec::as_slice) {
+            Some([t]) => Some(t.as_str()),
+            _ => None,
+        }
+    }
+
+    /// 含有该列的全部表。
+    pub fn owners(&self, col: &str) -> &[String] {
+        self.col_table.get(col).map(Vec::as_slice).unwrap_or(&[])
     }
 
     #[cfg(test)]
     pub fn from_tables(tables: Vec<Table>) -> Catalog {
-        let col_table = tables.iter().flat_map(|t| t.cols.iter().map(|c| (c.name.clone(), t.name.clone()))).collect();
+        let mut col_table: HashMap<String, Vec<String>> = HashMap::new();
+        for t in &tables {
+            for c in &t.cols {
+                col_table.entry(c.name.clone()).or_default().push(t.name.clone());
+            }
+        }
+        for v in col_table.values_mut() {
+            v.sort();
+            v.dedup();
+        }
         Catalog { tables: tables.into_iter().map(|t| (t.name.clone(), t)).collect(), col_table }
     }
 

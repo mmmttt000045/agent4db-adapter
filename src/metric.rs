@@ -295,41 +295,58 @@ fn push_unique(v: &mut Vec<String>, seen: &mut BTreeSet<String>, f: &str) {
     }
 }
 
-fn period_pred(p: &Period) -> String {
-    if (p.m1, p.m2) == (1, 12) {
-        format!("d_year = {}", p.year)
+/// 期间谓词：日期维度方式按维度的年、月列过滤；日期列方式按日期取值的半开区间过滤。
+fn period_pred(t: &TimeSpec, fact: &str, p: &Period) -> String {
+    if t.is_column() {
+        let (tb, c) = t.column_of(fact);
+        let (y2, m2) = if p.m2 >= 12 { (p.year + 1, 1) } else { (p.year, p.m2 + 1) };
+        format!("{tb}.{c} >= date '{:04}-{:02}-01' and {tb}.{c} < date '{y2:04}-{m2:02}-01'", p.year, p.m1)
+    } else if (p.m1, p.m2) == (1, 12) {
+        format!("{}.{} = {}", t.dim, t.year_col, p.year)
     } else {
-        format!("d_year = {} and d_moy between {} and {}", p.year, p.m1, p.m2)
+        format!("{d}.{} = {} and {d}.{} between {} and {}", t.year_col, p.year, t.month_col, p.m1, p.m2, d = t.dim)
     }
 }
 
-/// 当前编译器以事实表为根；每个非时间连接必须从事实表指向被验证为至多一行的右侧。
-/// 反向引用只证明事实表键唯一，不能阻止另一侧把事实行放大。多跳与自连接也不在当前契约内。
+/// 按月比较的题型所用的月份（1–12）。
+fn month_expr(t: &TimeSpec, fact: &str) -> String {
+    if t.is_column() {
+        let (tb, c) = t.column_of(fact);
+        format!("extract(month from {tb}.{c})::int")
+    } else {
+        format!("{}.{}", t.dim, t.month_col)
+    }
+}
+
+/// 当前编译器以事实表为根：每个非时间连接从事实表或此前已关联的表出发（星型与雪花型），指向被验证为至多一行的右侧。
+/// 反向引用只证明左侧键唯一，不能阻止另一侧把事实行放大；同一张表出现两次（角色扮演维度）与自连接也不在当前契约内。
 pub fn check_join_orientation(m: &Metric) -> Result<()> {
+    let mut reached: BTreeSet<&str> = [m.fact.as_str()].into_iter().collect();
     for j in &m.joins {
         ensure!(
-            j.left == m.fact && j.right != m.fact,
-            "关联 {}⋈{} 必须从事实表 {} 指向至多一行的另一侧；反向、多跳和自连接尚不支持",
+            reached.contains(j.left.as_str()) && !reached.contains(j.right.as_str()),
+            "关联 {}⋈{} 必须从事实表 {} 或已关联的表指向至多一行的另一侧；反向、重复出现的表和自连接尚不支持",
             j.left,
             j.right,
             m.fact
         );
+        reached.insert(j.right.as_str());
     }
     Ok(())
 }
 
-/// 由口径字段编译规范 SQL（G7、G8 与修复后的示例使用）。列名不加表别名（本数据集列名全局唯一）；
-/// 期间谓词按 date_dim 的 d_year / d_moy 约定生成。左关联的过滤放在 ON 中，避免把左关联变成内关联。
+/// 由口径字段编译规范 SQL（G7、G8 与修复后的示例使用）。规范 SQL 不给表起别名：关联条件与期间谓词用表名限定列，
+/// 度量与过滤按口径原文（列名在口径涉及的表之间重名时，口径须写成 `表.列`）。左关联的过滤放在 ON 中，避免把左关联变成内关联。
 pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
     check_join_orientation(m)?;
     let time = m.time.as_ref().ok_or_else(|| anyhow!("口径没有时间定义，无法按期间编译"))?;
-    ensure!(time.dim == "date_dim", "规范编译只支持 date_dim 日历（d_year、d_moy）");
+    ensure!(time.is_column() || !(time.dim.is_empty() || time.dim_col.is_empty()), "日期维度方式需要维度表与键列");
     let mut from = m.fact.clone();
     let mut wheres = vec![];
     let mut seen = BTreeSet::new();
     for j in &m.joins {
         let other = &j.right;
-        let mut conds: Vec<String> = j.on.iter().map(|(l, r)| format!("{l} = {r}")).collect();
+        let mut conds: Vec<String> = j.on.iter().map(|(l, r)| format!("{}.{l} = {other}.{r}", j.left)).collect();
         let mut seen_on = BTreeSet::new();
         for f in j.filters.get(other).into_iter().chain(m.filters.get(other)) {
             match j.kind {
@@ -337,7 +354,7 @@ pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
                 JoinKind::Inner => push_unique(&mut wheres, &mut seen, f),
             }
         }
-        if let Some(f) = j.filters.get(&m.fact) {
+        if let Some(f) = j.filters.get(&j.left) {
             push_unique(&mut wheres, &mut seen, f);
         }
         let kw = if j.kind == JoinKind::Left { "left join" } else { "join" };
@@ -346,47 +363,55 @@ pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
     if let Some(f) = m.filters.get(&m.fact) {
         push_unique(&mut wheres, &mut seen, f);
     }
-    let joined = format!("{from} join {} on {} = {}", time.dim, time.fact_col, time.dim_col);
+    let joined = if time.is_column() {
+        from.clone()
+    } else {
+        format!("{from} join {d} on {}.{} = {d}.{}", m.fact, time.fact_col, time.dim_col, d = time.dim)
+    };
     let cond = |extra: String| {
         let mut w = wheres.clone();
         w.push(extra);
         w.join(" and ")
     };
+    let pred = |p: &Period| period_pred(time, &m.fact, p);
+    let year = |y: i32| pred(&Period { year: y, m1: 1, m2: 12 });
     let expr = if m.empty == EmptyRule::Zero { format!("coalesce({}, 0)", m.measure) } else { m.measure.clone() };
     // 日期键范围：期间的日期键集合是一个整数区间（条件“日期键按月连续”），事实表按键范围过滤，不连接维度表；
     // 按月排名仍需维度列，照旧连接
     let range = time.strategy == TimeStrategy::KeyRange;
     let value = |p: &Period| {
         if range {
-            let pp = period_pred(p);
+            let pp = pred(p);
             let between = format!(
-                "{} between (select min({dc}) from {dim} where {pp}) and (select max({dc}) from {dim} where {pp})",
+                "{}.{} between (select min({dc}) from {dim} where {pp}) and (select max({dc}) from {dim} where {pp})",
+                m.fact,
                 time.fact_col,
                 dc = time.dim_col,
                 dim = time.dim
             );
             format!("select {expr} as value from {from} where {}", cond(between))
         } else {
-            format!("select {expr} as value from {joined} where {}", cond(period_pred(p)))
+            format!("select {expr} as value from {joined} where {}", cond(pred(p)))
         }
     };
-    // 按月比较的题型需要维度列，两种策略都连接日期维度
-    let monthly = |year: i32| format!("select d_moy, {expr} as v from {joined} where {} group by d_moy", cond(format!("d_year = {year}")));
+    // 按月比较的题型需要月份，日期维度方式下两种策略都连接维度
+    let mo = month_expr(time, &m.fact);
+    let monthly = |y: i32| format!("select {mo} as mo, {expr} as v from {joined} where {} group by 1", cond(year(y)));
     Ok(match ask {
         Ask::Single { period } => value(period),
         Ask::Diff { a, b } => format!("select ({}) - ({}) as value", value(a), value(b)),
-        Ask::RankMonth { year } => format!(
-            "select d_moy as value from {joined} where {} group by d_moy order by {} desc nulls last, d_moy limit 1",
-            cond(format!("d_year = {year}")),
+        Ask::RankMonth { year: y } => format!(
+            "select {mo} as value from {joined} where {} group by 1 order by {} desc nulls last, 1 limit 1",
+            cond(year(*y)),
             m.measure
         ),
-        Ask::PeakRise { year } => format!(
-            "select d_moy as value from (select d_moy, v - lag(v) over (order by d_moy) as rise from ({}) m) r \
-             where rise is not null order by rise desc nulls last, d_moy limit 1",
-            monthly(*year)
+        Ask::PeakRise { year: y } => format!(
+            "select mo as value from (select mo, v - lag(v) over (order by mo) as rise from ({}) m) r \
+             where rise is not null order by rise desc nulls last, mo limit 1",
+            monthly(*y)
         ),
-        Ask::AboveMean { year } => {
-            let m = monthly(*year);
+        Ask::AboveMean { year: y } => {
+            let m = monthly(*y);
             format!("select count(*) as value from ({m}) m where v > (select avg(v) from ({m}) a)")
         }
     })
@@ -448,8 +473,9 @@ pub fn qualify_aliases(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog) ->
         if allowed.contains(&prefix) {
             return c[0].to_string();
         }
-        match cat.table_of(&col.to_lowercase()) {
-            Some(t) if allowed.contains(t) => format!("{t}.{col}"),
+        let owners: Vec<&String> = cat.owners(&col.to_lowercase()).iter().filter(|t| allowed.contains(*t)).collect();
+        match owners.as_slice() {
+            [t] => format!("{t}.{col}"),
             _ => c[0].to_string(),
         }
     })
@@ -469,8 +495,11 @@ pub fn check_expr(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog) -> std:
         if SQL_WORDS.contains(&w.as_str()) || allowed.contains(&w) {
             continue;
         }
-        match cat.table_of(&w) {
-            Some(t) if allowed.contains(t) => {}
+        let owners = cat.owners(&w);
+        if owners.iter().any(|t| allowed.contains(t)) {
+            continue;
+        }
+        match owners.first() {
             Some(t) => return Err(format!("{w} 属于表 {t}，不在口径涉及的表中")),
             None => return Err(format!("{w} 不是已知列或允许的函数")),
         }
@@ -488,14 +517,22 @@ fn date_re() -> &'static Regex {
     RE.get_or_init(|| Regex::new(r"\d{4}-\d{1,2}").unwrap())
 }
 
-/// 口径过滤只放口径必需条件：不在时间维度表上、不引用时间键、不含题目年份或日期字面量。
-pub fn check_filter(table: &str, filter: &str, time: Option<&TimeSpec>, ask: &Ask, cat: &Catalog) -> std::result::Result<(), String> {
+/// 口径过滤只放口径必需条件：不在时间维度表上、不引用时间键或日期列、不含题目年份或日期字面量。
+pub fn check_filter(
+    fact: &str,
+    table: &str,
+    filter: &str,
+    time: Option<&TimeSpec>,
+    ask: &Ask,
+    cat: &Catalog,
+) -> std::result::Result<(), String> {
     if let Some(t) = time {
-        if t.dim == table {
+        if !t.is_column() && t.dim == table {
             return Err(format!("时间维度表 {table} 上的过滤属于查询参数"));
         }
-        if sqlscan::words(filter).contains(&t.fact_col) {
-            return Err(format!("过滤引用了时间键 {}，属于查询参数", t.fact_col));
+        let (tt, col) = if t.is_column() { t.column_of(fact) } else { (fact.to_string(), t.fact_col.clone()) };
+        if tt == table && sqlscan::words(filter).contains(&col.to_lowercase()) {
+            return Err(format!("过滤引用了时间列 {col}，属于查询参数"));
         }
     }
     check_expr(filter, &[table.to_string()].into_iter().collect(), cat)?;
@@ -510,7 +547,7 @@ pub fn check_filter(table: &str, filter: &str, time: Option<&TimeSpec>, ask: &As
     Ok(())
 }
 
-/// 口径引用的列（表 → 列）：粒度、时间关联与关联键，聚合表达式与过滤中的列；按 date_dim 编译时还用到 d_year、d_moy。
+/// 口径引用的列（表 → 列）：粒度、时间关联（日期维度的键、年、月列，或日期列）与关联键，聚合表达式与过滤中的列。
 /// 结构依赖只比较这些列，无关列的增删不使口径失效。
 pub fn columns(m: &Metric, cat: &Catalog) -> BTreeMap<String, BTreeSet<String>> {
     let mut out: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
@@ -521,11 +558,14 @@ pub fn columns(m: &Metric, cat: &Catalog) -> BTreeMap<String, BTreeSet<String>> 
         add(&m.fact, c);
     }
     if let Some(t) = &m.time {
-        add(&m.fact, &t.fact_col);
-        add(&t.dim, &t.dim_col);
-        if t.dim == "date_dim" {
-            add("date_dim", "d_year");
-            add("date_dim", "d_moy");
+        if t.is_column() {
+            let (tb, c) = t.column_of(&m.fact);
+            add(&tb, &c);
+        } else {
+            add(&m.fact, &t.fact_col);
+            add(&t.dim, &t.dim_col);
+            add(&t.dim, &t.year_col);
+            add(&t.dim, &t.month_col);
         }
     }
     for j in &m.joins {
@@ -535,9 +575,17 @@ pub fn columns(m: &Metric, cat: &Catalog) -> BTreeMap<String, BTreeSet<String>> 
         }
     }
     let exprs = std::iter::once(&m.measure).chain(m.filters.values()).chain(m.joins.iter().flat_map(|j| j.filters.values()));
+    // 重名的列记到口径涉及的每张含有它的表上（宁可多记依赖）
+    let tables = m.tables();
     for e in exprs {
         for w in sqlscan::words(e) {
-            if let Some(t) = cat.table_of(&w) {
+            let owners: Vec<&String> = cat.owners(&w).iter().filter(|t| tables.contains(*t)).collect();
+            if owners.is_empty() {
+                if let Some(t) = cat.table_of(&w) {
+                    add(t, &w);
+                }
+            }
+            for t in owners {
                 add(t, &w);
             }
         }
@@ -577,17 +625,19 @@ pub fn same_structure(a: &Metric, b: &Metric) -> bool {
 /// 可叠加时先给出叠加后的候选，再给出各单项。
 pub fn rewrite_candidates(m: &Metric, cat: &Catalog) -> Vec<(String, Metric)> {
     let mut singles: Vec<(String, Metric)> = vec![];
-    let range_ok = m.time.as_ref().is_some_and(|t| t.strategy == TimeStrategy::DimJoin && t.dim == "date_dim");
+    let range_ok = m.time.as_ref().is_some_and(|t| t.strategy == TimeStrategy::DimJoin && !t.dim.is_empty());
     if range_ok {
         let mut c = m.clone();
+        let dim = m.time.as_ref().map(|t| t.dim.clone()).unwrap_or_default();
         if let Some(t) = c.time.as_mut() {
             t.strategy = TimeStrategy::KeyRange;
         }
-        singles.push(("期间谓词改为日期键范围过滤，不连接 date_dim".into(), c));
+        singles.push((format!("期间谓词改为日期键范围过滤，不连接 {dim}"), c));
     }
+    // 表名作限定前缀，或某个词是该表的列（重名的列算作各表都用到），就算用到了这张表
     let used = |table: &str| -> bool {
         let exprs = std::iter::once(&m.measure).chain(m.filters.values()).chain(m.joins.iter().flat_map(|j| j.filters.values()));
-        exprs.flat_map(|e| sqlscan::words(e)).any(|w| cat.table_of(&w) == Some(table))
+        exprs.flat_map(|e| sqlscan::words(e)).any(|w| w == table || cat.owners(&w).iter().any(|o| o == table))
     };
     // 只去掉左连接：右侧在连接键上唯一（连接基数条件）时，左连接保留每个左表行恰好一次，去掉它结果不变。
     // 内连接会排除关联不上的行，去掉它的等价性要依赖一个不受维护的数据性质，因此不作为规则候选
@@ -827,8 +877,9 @@ mod tests {
         let mut m = rate();
         m.time.as_mut().unwrap().strategy = TimeStrategy::KeyRange;
         let sql = compile(&m, &Ask::Single { period: Period::month(2001, 3) }).unwrap();
-        let bounds = "ss_sold_date_sk between (select min(d_date_sk) from date_dim where d_year = 2001 and d_moy between 3 and 3) \
-                      and (select max(d_date_sk) from date_dim where d_year = 2001 and d_moy between 3 and 3)";
+        let bounds = "store_sales.ss_sold_date_sk between (select min(d_date_sk) from date_dim where date_dim.d_year = 2001 \
+                      and date_dim.d_moy between 3 and 3) and (select max(d_date_sk) from date_dim where date_dim.d_year = 2001 \
+                      and date_dim.d_moy between 3 and 3)";
         assert!(sql.contains(bounds), "{sql}");
         assert!(!sql.contains("join date_dim"), "{sql}");
         let rank = compile(&m, &Ask::RankMonth { year: 2001 }).unwrap();
@@ -891,6 +942,8 @@ mod tests {
                 grain: "day".into(),
                 loss_ratio: 0.0,
                 strategy: TimeStrategy::DimJoin,
+                year_col: "d_year".into(),
+                month_col: "d_moy".into(),
             }),
             joins: vec![JoinRef {
                 key: String::new(),
@@ -989,24 +1042,30 @@ mod tests {
         let p = |y, mo| Period::month(y, mo);
         let single = compile(&m, &Ask::Single { period: p(2002, 9) }).unwrap();
         assert!(single.contains(
-            "left join store_returns on ss_ticket_number = sr_ticket_number and ss_item_sk = sr_item_sk and (sr_status = '完成')"
+            "left join store_returns on store_sales.ss_ticket_number = store_returns.sr_ticket_number \
+             and store_sales.ss_item_sk = store_returns.sr_item_sk and (sr_status = '完成')"
         ));
-        assert!(single.contains("join date_dim on ss_sold_date_sk = d_date_sk where d_year = 2002 and d_moy between 9 and 9"));
+        assert!(single.contains(
+            "join date_dim on store_sales.ss_sold_date_sk = date_dim.d_date_sk where date_dim.d_year = 2002 and date_dim.d_moy between 9 and 9"
+        ));
         let diff = compile(&m, &Ask::Diff { a: p(2002, 9), b: p(2001, 6) }).unwrap();
         assert!(diff.starts_with("select (select ") && diff.contains(") - (select "));
         let rank = compile(&m, &Ask::RankMonth { year: 2001 }).unwrap();
-        assert!(rank.ends_with("group by d_moy order by 100.0 * sum(sr_return_amt) / sum(ss_net_paid) desc nulls last, d_moy limit 1"));
+        assert!(rank.ends_with("group by 1 order by 100.0 * sum(sr_return_amt) / sum(ss_net_paid) desc nulls last, 1 limit 1"));
         let peak = compile(&m, &Ask::PeakRise { year: 2002 }).unwrap();
-        assert!(peak.contains("v - lag(v) over (order by d_moy) as rise from (select d_moy, 100.0 * sum(sr_return_amt)"));
+        assert!(peak.contains("v - lag(v) over (order by mo) as rise from (select date_dim.d_moy as mo, 100.0 * sum(sr_return_amt)"));
         assert!(
-            peak.contains("where d_year = 2002 group by d_moy) m) r where rise is not null order by rise desc nulls last, d_moy limit 1")
+            peak.contains("where date_dim.d_year = 2002 group by 1) m) r where rise is not null order by rise desc nulls last, mo limit 1")
         );
         let above = compile(&m, &Ask::AboveMean { year: 2002 }).unwrap();
-        assert!(above.starts_with("select count(*) as value from (select d_moy,") && above.contains(") m where v > (select avg(v) from ("));
+        assert!(
+            above.starts_with("select count(*) as value from (select date_dim.d_moy as mo,")
+                && above.contains(") m where v > (select avg(v) from (")
+        );
         let mut inner = m.clone();
         inner.joins[0].kind = JoinKind::Inner;
         let s = compile(&inner, &Ask::Single { period: p(2002, 9) }).unwrap();
-        assert!(s.contains("where (sr_status = '完成') and d_year = 2002"));
+        assert!(s.contains("where (sr_status = '完成') and date_dim.d_year = 2002"));
         let mut literal_filters = m.clone();
         literal_filters.joins[0].filters.insert("store_returns".into(), "sr_status = 'A B'".into());
         literal_filters.filters.insert("store_returns".into(), "sr_status = 'AB'".into());
@@ -1045,12 +1104,12 @@ mod tests {
         let m = rate();
         let ask = Ask::Single { period: Period::month(2002, 9) };
         let t = m.time.as_ref();
-        assert!(check_filter("store_returns", "sr_status = '完成'", t, &ask, &c).is_ok());
-        assert!(check_filter("date_dim", "d_year = 2002", t, &ask, &c).is_err());
-        assert!(check_filter("store_sales", "ss_sold_date_sk > 5", t, &ask, &c).is_err());
-        assert!(check_filter("store_sales", "ss_net_paid > 2002", t, &ask, &c).is_err());
-        assert!(check_filter("store_returns", "sr_status = '2002-09'", t, &ask, &c).is_err());
-        assert!(check_filter("store_returns", "ss_net_paid > 0", t, &ask, &c).is_err());
+        assert!(check_filter("store_sales", "store_returns", "sr_status = '完成'", t, &ask, &c).is_ok());
+        assert!(check_filter("store_sales", "date_dim", "d_year = 2002", t, &ask, &c).is_err());
+        assert!(check_filter("store_sales", "store_sales", "ss_sold_date_sk > 5", t, &ask, &c).is_err());
+        assert!(check_filter("store_sales", "store_sales", "ss_net_paid > 2002", t, &ask, &c).is_err());
+        assert!(check_filter("store_sales", "store_returns", "sr_status = '2002-09'", t, &ask, &c).is_err());
+        assert!(check_filter("store_sales", "store_returns", "ss_net_paid > 0", t, &ask, &c).is_err());
         let allowed: BTreeSet<String> = ["store_sales".to_string()].into_iter().collect();
         assert!(check_expr("sum(ss_net_paid)", &allowed, &c).is_ok());
         assert!(check_expr("sum(sr_return_amt)", &allowed, &c).is_err());
@@ -1098,5 +1157,86 @@ mod tests {
         assert_eq!(cols["store_sales"], set(&["ss_item_sk", "ss_net_paid", "ss_sold_date_sk", "ss_ticket_number"]));
         assert_eq!(cols["store_returns"], set(&["sr_item_sk", "sr_return_amt", "sr_status", "sr_ticket_number"]));
         assert_eq!(cols["date_dim"], set(&["d_date_sk", "d_moy", "d_year"]));
+    }
+
+    #[test]
+    fn compile_date_column_calendar_and_snowflake_chain() {
+        let mut m = rate();
+        m.joins.clear();
+        m.time = Some(TimeSpec {
+            role: "交易日".into(),
+            fact_col: "store_sales.ss_sold_date".into(),
+            dim: String::new(),
+            dim_col: String::new(),
+            grain: "month".into(),
+            loss_ratio: 0.0,
+            strategy: TimeStrategy::Column,
+            year_col: "d_year".into(),
+            month_col: "d_moy".into(),
+        });
+        let single = compile(&m, &Ask::Single { period: Period::month(2002, 12) }).unwrap();
+        assert!(
+            single.contains("store_sales.ss_sold_date >= date '2002-12-01' and store_sales.ss_sold_date < date '2003-01-01'"),
+            "{single}"
+        );
+        assert!(!single.contains("date_dim"), "{single}");
+        let peak = compile(&m, &Ask::PeakRise { year: 2002 }).unwrap();
+        assert!(peak.contains("select extract(month from store_sales.ss_sold_date)::int as mo,"), "{peak}");
+        assert!(peak.contains("store_sales.ss_sold_date >= date '2002-01-01' and store_sales.ss_sold_date < date '2003-01-01' group by 1"));
+        assert!(m.tables().iter().all(|t| !t.is_empty()), "日期列方式没有维度表：{:?}", m.tables());
+        // 雪花型：事实表 → item → 第二层维表；第二层的过滤进 WHERE，关联条件用表名限定
+        m.joins = vec![
+            JoinRef {
+                key: String::new(),
+                left: "store_sales".into(),
+                right: "item".into(),
+                on: vec![("ss_item_sk".into(), "i_item_sk".into())],
+                kind: JoinKind::Inner,
+                filters: BTreeMap::new(),
+                cardinality: String::new(),
+                loss_ratio: 0.0,
+                orphan_ratio: 0.0,
+                revision: 0,
+            },
+            JoinRef {
+                key: String::new(),
+                left: "item".into(),
+                right: "brand".into(),
+                on: vec![("i_brand_id".into(), "b_id".into())],
+                kind: JoinKind::Inner,
+                filters: [("brand".to_string(), "brand.b_region = 'EU'".to_string())].into_iter().collect(),
+                cardinality: String::new(),
+                loss_ratio: 0.0,
+                orphan_ratio: 0.0,
+                revision: 0,
+            },
+        ];
+        let s = compile(&m, &Ask::Single { period: Period::month(2002, 9) }).unwrap();
+        assert!(s.contains("join item on store_sales.ss_item_sk = item.i_item_sk join brand on item.i_brand_id = brand.b_id"), "{s}");
+        assert!(s.contains("where (brand.b_region = 'EU') and store_sales.ss_sold_date >= date '2002-09-01'"), "{s}");
+        // 链必须从已到达的表出发
+        m.joins.swap(0, 1);
+        assert!(compile(&m, &Ask::Single { period: Period::month(2002, 9) }).is_err());
+    }
+
+    #[test]
+    fn repeated_column_names_resolve_within_the_definition() {
+        let col = |n: &str| Column { name: n.into(), dtype: "integer".into(), comment: None, n_distinct: None };
+        let table =
+            |n: &str, cols: &[&str]| Table { name: n.into(), comment: None, rows_est: 1.0, cols: cols.iter().map(|c| col(c)).collect() };
+        let c = Catalog::from_tables(vec![
+            table("trans", &["trans_id", "account_id", "amount", "type"]),
+            table("loan", &["loan_id", "account_id", "amount"]),
+            table("account", &["account_id", "district_id"]),
+        ]);
+        assert_eq!(c.table_of("amount"), None);
+        assert_eq!(c.owners("amount"), ["loan".to_string(), "trans".to_string()]);
+        let allowed: BTreeSet<String> = ["trans".to_string()].into_iter().collect();
+        assert!(check_expr("sum(trans.amount)", &allowed, &c).is_ok());
+        assert!(check_expr("sum(amount)", &allowed, &c).is_ok());
+        assert!(check_expr("sum(district_id)", &allowed, &c).is_err());
+        assert_eq!(qualify_aliases("sum(t1.amount)", &allowed, &c), "sum(trans.amount)");
+        let both: BTreeSet<String> = ["trans".to_string(), "loan".to_string()].into_iter().collect();
+        assert_eq!(qualify_aliases("sum(t1.amount)", &both, &c), "sum(t1.amount)", "两张表都有 amount 时不猜");
     }
 }

@@ -103,7 +103,11 @@ impl Metric {
             t.insert(j.right.clone());
         }
         if let Some(tm) = &self.time {
-            t.insert(tm.dim.clone());
+            if tm.is_column() {
+                t.insert(tm.column_of(&self.fact).0);
+            } else {
+                t.insert(tm.dim.clone());
+            }
         }
         t.into_iter().collect()
     }
@@ -113,29 +117,65 @@ impl Metric {
 pub struct TimeSpec {
     /// 时间角色，如“销售日”“退货日”
     pub role: String,
+    /// 日期维度方式：事实表上的日期键列。日期列方式（`TimeStrategy::Column`）：日期列，可写成 `表.列`，
+    /// 指向事实表或经多对一关联到达的表
     pub fact_col: String,
+    /// 日期维度表与其键列；日期列方式下为空
+    #[serde(default)]
     pub dim: String,
+    #[serde(default)]
     pub dim_col: String,
     /// day / month / year
     pub grain: String,
-    /// 准入时事实表关联不上时间维度的行占比（空键或孤儿键），由中间层按已验证路径填写；覆盖条件以它为基线
+    /// 准入时归不到任何期间的事实占比（日期维度方式：空键或孤儿键；日期列方式：日期为空），由中间层填写；
+    /// 覆盖条件以它为基线
     #[serde(default)]
     pub loss_ratio: f64,
-    /// 期间谓词的实现方式；优化修订可以把它改为按日期键范围过滤
+    /// 期间谓词的实现方式；优化修订可以把维度连接改为按日期键范围过滤
     #[serde(default)]
     pub strategy: TimeStrategy,
+    /// 日期维度上的年份列与月份列（月份取 1–12）；缺省为 TPC-DS 的 d_year、d_moy
+    #[serde(default = "default_year_col")]
+    pub year_col: String,
+    #[serde(default = "default_month_col")]
+    pub month_col: String,
+}
+
+fn default_year_col() -> String {
+    "d_year".into()
+}
+
+fn default_month_col() -> String {
+    "d_moy".into()
+}
+
+impl TimeSpec {
+    /// 期间由日期列直接决定，不连接日期维度。
+    pub fn is_column(&self) -> bool {
+        self.strategy == TimeStrategy::Column
+    }
+
+    /// 日期列所在的表与列名：`表.列` 拆开，未限定时在事实表上。
+    pub fn column_of(&self, fact: &str) -> (String, String) {
+        match self.fact_col.split_once('.') {
+            Some((t, c)) => (t.to_string(), c.to_string()),
+            None => (fact.to_string(), self.fact_col.clone()),
+        }
+    }
 }
 
 /// 期间谓词的实现方式。
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum TimeStrategy {
-    /// 连接日期维度，按维度列过滤（默认）
+    /// 连接日期维度，按维度的年、月列过滤（默认）
     #[default]
     DimJoin,
     /// 事实表按日期键范围过滤，不连接日期维度。等价于维度连接的前提是日期键按月连续（`Check::DateKeysContiguous`），
     /// 优化修订发布时验证，之后作为该修订的条件维护
     KeyRange,
+    /// 没有日期维度：按 DATE / TIMESTAMP 列的取值范围过滤，按其月份分组
+    Column,
 }
 
 /// 指标引用的已验证关联：方向、基数、过滤与丢行比例都记下，关联能执行不等于不放大聚合。

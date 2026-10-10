@@ -184,9 +184,14 @@ fn view(e: &Entry) -> Value {
     v
 }
 
-/// 覆盖条件：事实表按时间键关联时间维度后的行数，与事实表行数比较。它读事实表与维度表，任一有写入都要重查。
+/// 覆盖条件：每条事实都应能归入某个期间。日期维度方式：事实表按时间键关联时间维度后的行数与事实表行数比较，
+/// 读事实表与维度表，任一有写入都要重查；日期列方式：日期列非空的行占比。
 fn coverage_check(m: &Metric) -> Option<Check> {
     let t = m.time.as_ref()?;
+    if t.is_column() {
+        let (table, col) = t.column_of(&m.fact);
+        return Some(Check::DateCoverage { table, col });
+    }
     Some(Check::RowConservation {
         left: m.fact.clone(),
         right: t.dim.clone(),
@@ -230,11 +235,12 @@ pub(super) fn grain_check(m: &Metric) -> Check {
 
 /// 日期键连续条件：期间谓词按日期键范围过滤的修订所依赖（`TimeStrategy::KeyRange`）。
 pub(super) fn time_contiguity_check(t: &TimeSpec) -> Check {
-    Check::DateKeysContiguous { dim: t.dim.clone(), key: t.dim_col.clone(), year_col: "d_year".into(), month_col: "d_moy".into() }
+    Check::DateKeysContiguous { dim: t.dim.clone(), key: t.dim_col.clone(), year_col: t.year_col.clone(), month_col: t.month_col.clone() }
 }
 
 /// 绑定快照执行要核对的条件（与 `metric_breach` 维护的条件一致）：各关联一侧的键唯一性、内连接的完整性（附准入基线）、
-/// 时间维度键的唯一性、覆盖（附准入基线）、粒度；日期键范围修订另加日期键连续。返回条件与覆盖基线（只有完整性条件有）。
+/// 时间维度键的唯一性（日期维度方式）、覆盖（附准入基线）、粒度；日期键范围修订另加日期键连续。
+/// 返回条件与覆盖基线（只有完整性条件有）。
 fn bound_conditions(m: &Metric) -> Vec<(Check, Option<f64>)> {
     let mut out = vec![];
     for j in &m.joins {
@@ -246,7 +252,9 @@ fn bound_conditions(m: &Metric) -> Vec<(Check, Option<f64>)> {
         }
     }
     if let Some(t) = &m.time {
-        out.push((Check::KeyUnique { table: t.dim.clone(), cols: vec![t.dim_col.clone()], filter: None }, None));
+        if !t.is_column() {
+            out.push((Check::KeyUnique { table: t.dim.clone(), cols: vec![t.dim_col.clone()], filter: None }, None));
+        }
         if let Some(c) = coverage_check(m) {
             out.push((c, Some(t.loss_ratio + COVERAGE_TOLERANCE)));
         }
@@ -584,11 +592,34 @@ impl Middle {
             if t.role.trim().is_empty() {
                 bad!("没有写明时间角色");
             }
+            if t.is_column() {
+                // 日期列方式：列在事实表或口径关联到的表上，类型是 DATE / TIMESTAMP；准入时日期为空的行占比作为覆盖基线
+                let (tb, c) = t.column_of(&m.fact);
+                match self.cat.table(&tb).and_then(|x| x.col(&c)) {
+                    None => bad!("日期列 {tb}.{c} 不存在"),
+                    Some(col) if !(col.dtype.starts_with("date") || col.dtype.starts_with("timestamp")) => {
+                        bad!("日期列 {tb}.{c} 的类型是 {}，不是 DATE / TIMESTAMP", col.dtype)
+                    }
+                    Some(_) => {}
+                }
+                if tb != m.fact && !m.joins.iter().any(|j| j.right == tb) {
+                    bad!("日期列所在的表 {tb} 不在口径的关联中");
+                }
+                if let Some(c) = coverage_check(m) {
+                    let (o, _) = self.cond_outcome(ctx, &c, false).await?;
+                    if let Some(tm) = m.time.as_mut() {
+                        tm.loss_ratio = loss_of(&o);
+                    }
+                }
+            }
+        }
+        if let Some(t) = time.as_ref().filter(|t| !t.is_column()) {
             if fact.col(&t.fact_col).is_none() {
                 bad!("时间键 {} 不在事实表 {}", t.fact_col, m.fact);
             }
-            if self.cat.table(&t.dim).and_then(|d| d.col(&t.dim_col)).is_none() {
-                bad!("维度列 {}.{} 不存在", t.dim, t.dim_col);
+            let Some(dim) = self.cat.table(&t.dim) else { bad!("日期维度 {} 不存在", t.dim) };
+            if let Some(c) = [&t.dim_col, &t.year_col, &t.month_col].into_iter().find(|c| dim.col(c).is_none()) {
+                bad!("维度列 {}.{c} 不存在", t.dim);
             }
             let on = vec![(t.fact_col.clone(), t.dim_col.clone())];
             match self.verdict(ctx, &m.fact, &t.dim, &on).await?.0 {
@@ -629,7 +660,7 @@ impl Middle {
                 if t != &j.left && t != &j.right {
                     bad!("关联过滤所在表 {t} 不在该关联中");
                 }
-                if let Err(e) = metric::check_filter(t, f, time.as_ref(), ask, &self.cat) {
+                if let Err(e) = metric::check_filter(&m.fact, t, f, time.as_ref(), ask, &self.cat) {
                     bad!("关联过滤 {t}：{e}");
                 }
             }
@@ -658,7 +689,7 @@ impl Middle {
             if !allowed.contains(t) {
                 bad!("过滤所在表 {t} 不在口径中");
             }
-            if let Err(e) = metric::check_filter(t, f, time.as_ref(), ask, &self.cat) {
+            if let Err(e) = metric::check_filter(&m.fact, t, f, time.as_ref(), ask, &self.cat) {
                 bad!("过滤 {t}：{e}");
             }
         }
@@ -1036,7 +1067,9 @@ impl Middle {
         if let Some(t) = &m.time {
             let on = vec![(t.fact_col.clone(), t.dim_col.clone())];
             let label = format!("时间关联 {}⋈{}", m.fact, t.dim);
-            if let Some(ts) = untouched(self.join_cond(ctx, &m.fact, &t.dim, &on, None, &BTreeMap::new())) {
+            if t.is_column() {
+                // 日期列方式没有时间关联，只维护覆盖
+            } else if let Some(ts) = untouched(self.join_cond(ctx, &m.fact, &t.dim, &on, None, &BTreeMap::new())) {
                 conds.push(json!({"cond": label, "tables": ts, "action": "skipped"}));
             } else {
                 let (r, src) = self.verdict_with(ctx, &m.fact, &t.dim, &on, force).await?;
@@ -1047,7 +1080,10 @@ impl Middle {
             }
             // 覆盖：每条事实都应能归入某个期间。关联不上时间维度的行占比超过准入基线即不成立
             if let Some(c) = coverage_check(m) {
-                let label = format!("覆盖 {}⋈{}", m.fact, t.dim);
+                let label = match &c {
+                    Check::DateCoverage { table, col } => format!("覆盖 {table}.{col}"),
+                    _ => format!("覆盖 {}⋈{}", m.fact, t.dim),
+                };
                 if !force && !c.tables().iter().any(|x| changed.contains(x)) {
                     conds.push(json!({"cond": label, "tables": c.tables(), "action": "skipped"}));
                 } else {
@@ -1058,10 +1094,12 @@ impl Middle {
                     conds.push(json!({"cond": label, "tables": c.tables(), "action": how, "pass": pass,
                                       "loss": loss, "baseline": t.loss_ratio, "ms": ms}));
                     if !pass {
+                        let what = match &c {
+                            Check::DateCoverage { table, col } => format!("{table} 中 {col} 为空的行"),
+                            _ => format!("{} 中关联不上 {} 的行", m.fact, t.dim),
+                        };
                         return Ok(Some(Breach::Coverage(format!(
-                            "{} 中关联不上 {} 的行占比从 {:.2}% 升至 {:.2}%，部分事实无法归入期间",
-                            m.fact,
-                            t.dim,
+                            "{what}占比从 {:.2}% 升至 {:.2}%，部分事实无法归入期间",
                             t.loss_ratio * 100.0,
                             loss * 100.0
                         ))));

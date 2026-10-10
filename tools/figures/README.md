@@ -8,7 +8,7 @@
 | 图 2 系统架构 | `architecture.py` | `architecture.pdf` | 无 |
 | 图 3 定义库回放（两个面板） | `replay_outcomes.py` | `replay-outcomes.pdf` | `exp/2026-10-02-cache-baseline-tpcds/replay-stats.json`、`tpcds-replay-stats.json`、`tpcds-library.json`（定义数） |
 | 图 4 维护代价 | `maintenance_cost.py` | `maintenance-cost.pdf` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
-| 图 5 逐情形正确率分组柱状图（通栏；每组一种情形、每柱一种方法，柱为 3 次运行合并的正确率，竖线为按运行重抽样的 95% 区间，斜线为过期定义，底色组为合并的同类情形，“全部覆盖的破坏”组加宽并印出数值；只画 6 种方法，自行核验与两个回归测试变体在正文） | `scenario_changes.py` | `scenario-changes.pdf` | `exp/2026-10-02-scenarios-ds/scen-stats.json`（每种方法 `runs` 里逐次运行的计数、各组的 95% 区间），与 `paper-results.json` 交叉核对；情形顺序取自 `tools/paper-results.py` 的 `PHASES` |
+| 图 5 逐情形正确率分组柱状图（通栏；每组一种情形、每柱一种方法，柱为 3 次运行合并的正确率，竖线为按运行重抽样的 95% 区间，斜线为过期定义，底色组为合并的同类情形，“全部覆盖的破坏”组加宽并印出数值；只画 6 种方法，自行核验与两个回归测试变体在正文） | `scenario_changes.py` | `scenario-changes.pdf` | `exp/2026-10-10-scenarios-q5/scen-stats.json`（每种方法 `runs` 里逐次运行的计数、各组的 95% 区间），与 `paper-results.json` 交叉核对；情形顺序取自 `tools/paper-results.py` 的 `PHASES` |
 
 每幅图生成两份：`<名称>.pdf` 用于英文稿（`main-en.tex`），`<名称>-zh.pdf` 用于双语稿（`main.tex`），标签为中文。`overleaf/figures/<名称>.tex` 按 `\ifbilingual` 选用其中一份，标题、标签和 `\Description` 仍写在 tex 文件里。
 

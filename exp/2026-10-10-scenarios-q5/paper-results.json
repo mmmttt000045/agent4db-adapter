@@ -1,0 +1,1797 @@
+{
+ "numbers": {
+  "ScenModels": 1,
+  "ScenCells": 45,
+  "ScenCellsDropped": 0,
+  "ScenValidTasks": 7164,
+  "ScenQuotaTasks": 36,
+  "ScenAccNoShare": "41",
+  "ScenHoldoutNoShare": "58",
+  "ScenModeledNoShare": "32",
+  "ScenBenignNoShare": "49",
+  "ScenStaleNoShare": 0,
+  "ScenStaleModeledNoShare": 0,
+  "ScenStaleUnitNoShare": 0,
+  "ScenTokNoShare": "28.5",
+  "ScenMaintNoShare": "0.0",
+  "ScenAccTraj": "73",
+  "ScenHoldoutTraj": "98",
+  "ScenModeledTraj": "59",
+  "ScenBenignTraj": "93",
+  "ScenStaleTraj": 0,
+  "ScenStaleModeledTraj": 0,
+  "ScenStaleUnitTraj": 0,
+  "ScenTokTraj": "25.5",
+  "ScenMaintTraj": "0.0",
+  "ScenAccTrajVerify": "78",
+  "ScenHoldoutTrajVerify": "100",
+  "ScenModeledTrajVerify": "63",
+  "ScenBenignTrajVerify": "95",
+  "ScenStaleTrajVerify": 0,
+  "ScenStaleModeledTrajVerify": 0,
+  "ScenStaleUnitTrajVerify": 0,
+  "ScenTokTrajVerify": "32.3",
+  "ScenMaintTrajVerify": "0.0",
+  "ScenAccSchema": "76",
+  "ScenHoldoutSchema": "100",
+  "ScenModeledSchema": "60",
+  "ScenBenignSchema": "98",
+  "ScenStaleSchema": 416,
+  "ScenStaleModeledSchema": 282,
+  "ScenStaleUnitSchema": 74,
+  "ScenTokSchema": "23.7",
+  "ScenMaintSchema": "0.0",
+  "ScenAccRevoke": "76",
+  "ScenHoldoutRevoke": "99",
+  "ScenModeledRevoke": "65",
+  "ScenBenignRevoke": "97",
+  "ScenStaleRevoke": 0,
+  "ScenStaleModeledRevoke": 0,
+  "ScenStaleUnitRevoke": 0,
+  "ScenTokRevoke": "29.8",
+  "ScenMaintRevoke": "0.0",
+  "ScenAccDef": "79",
+  "ScenHoldoutDef": "99",
+  "ScenModeledDef": "71",
+  "ScenBenignDef": "99",
+  "ScenStaleDef": 90,
+  "ScenStaleModeledDef": 0,
+  "ScenStaleUnitDef": 75,
+  "ScenTokDef": "29.9",
+  "ScenMaintDef": "556.8",
+  "ScenAccCond": "80",
+  "ScenHoldoutCond": "100",
+  "ScenModeledCond": "72",
+  "ScenBenignCond": "98",
+  "ScenStaleCond": 83,
+  "ScenStaleModeledCond": 0,
+  "ScenStaleUnitCond": 73,
+  "ScenTokCond": "33.2",
+  "ScenMaintCond": "375.2",
+  "ScenAccCondCur": "77",
+  "ScenHoldoutCondCur": "100",
+  "ScenModeledCondCur": "66",
+  "ScenBenignCondCur": "99",
+  "ScenStaleCondCur": 65,
+  "ScenStaleModeledCondCur": 0,
+  "ScenStaleUnitCondCur": 60,
+  "ScenTokCondCur": "35.5",
+  "ScenMaintCondCur": "376.3",
+  "ScenAccCondGold": "80",
+  "ScenHoldoutCondGold": "100",
+  "ScenModeledCondGold": "72",
+  "ScenBenignCondGold": "99",
+  "ScenStaleCondGold": 85,
+  "ScenStaleModeledCondGold": 0,
+  "ScenStaleUnitCondGold": 75,
+  "ScenTokCondGold": "31.8",
+  "ScenMaintCondGold": "352.0",
+  "ScenMaintRatio": "67",
+  "ScenRelearnTok": "1.59",
+  "ScenAccCondDupload": "52",
+  "ScenAccNoShareDupload": "21",
+  "ScenAccSchemaDupload": "40",
+  "ScenAccDefDupload": "48",
+  "ScenAccTrajDupload": "35",
+  "ScenAccCondLatekey": "7",
+  "ScenAccNoShareLatekey": "7",
+  "ScenAccSchemaLatekey": "13",
+  "ScenAccDefLatekey": "7",
+  "ScenAccTrajLatekey": "13",
+  "ScenAccCondUnit": "47",
+  "ScenAccNoShareUnit": "27",
+  "ScenAccSchemaUnit": "46",
+  "ScenAccDefUnit": "44",
+  "ScenAccTrajUnit": "43",
+  "ScenAccCondStatus": "100",
+  "ScenAccNoShareStatus": "50",
+  "ScenAccSchemaStatus": "62",
+  "ScenAccDefStatus": "100",
+  "ScenAccTrajStatus": "64",
+  "ScenAccCondRevision": "100",
+  "ScenAccNoShareRevision": "41",
+  "ScenAccSchemaRevision": "85",
+  "ScenAccDefRevision": "100",
+  "ScenAccTrajRevision": "83",
+  "ScenAccCondDimhist": "100",
+  "ScenAccNoShareDimhist": "40",
+  "ScenAccSchemaDimhist": "100",
+  "ScenAccDefDimhist": "100",
+  "ScenAccTrajDimhist": "100",
+  "ScenAccCondMirror": "56",
+  "ScenAccNoShareMirror": "46",
+  "ScenAccSchemaMirror": "74",
+  "ScenAccDefMirror": "58",
+  "ScenAccTrajMirror": "68",
+  "ScenRepairFailedDupload": 26,
+  "ScenRepairSkippedLatekey": 26,
+  "ScenRevokedDupload": 26,
+  "ScenRevokedLatekey": 26,
+  "ScenUnitStaleTasks": 73,
+  "ScenUnitTasks": 73,
+  "ScenAccCondModelA": "80",
+  "ScenCommonPhasesModelA": 12,
+  "ScenAccNoShareModelA": "41",
+  "ScenAccDefModelA": "79",
+  "ScenAccTrajModelA": "73",
+  "ScenHoldTokSaveModelA": "24",
+  "ScenHoldTurnsNoShareModelA": "5.8",
+  "ScenHoldTurnsCondModelA": "4.4",
+  "MaintStagMin": "12.5",
+  "MaintStagMax": "37.8",
+  "MaintSimMin": "44.6",
+  "MaintSimMax": "75.5",
+  "ScenAgentTasks": "7,884",
+  "ScenLLMCalls": "46,580",
+  "ScenTokensM": "254",
+  "ScenAgentHours": "78"
+ },
+ "cells": [
+  {
+   "file": "results/scen-20261010/dsv41flash-r1-a/metric-1791540886080183/cell-r1-middle-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "middle",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r1-a/metric-1791540886080183/cell-r1-traj-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r1-a/metric-1791540886080183/cell-r1-traj-verify-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-verify",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r1-b/metric-1791540946097600/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r1-b/metric-1791540946097600/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r1-b/metric-1791540946097600/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r1-c/metric-1791541006138173/cell-r1-metric-global-exref-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r1-c/metric-1791541006138173/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r1-c/metric-1791541006138173/cell-r1-metric-global-snap-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-snap",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r2-a/metric-1791541066160530/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r2-a/metric-1791541066160530/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r2-a/metric-1791541066160530/cell-r1-traj-verify-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-verify",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r2-b/metric-1791541126219276/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r2-b/metric-1791541126219276/cell-r1-metric-global-exref-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r2-b/metric-1791541126219276/cell-r1-metric-global-snap-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-snap",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r2-c/metric-1791541186223899/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r2-c/metric-1791541186223899/cell-r1-middle-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "middle",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r2-c/metric-1791541186223899/cell-r1-traj-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r3-a/metric-1791561024803023/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r3-a/metric-1791561024803023/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r3-a/metric-1791561024803023/cell-r1-metric-global-snap-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-snap",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r3-b/metric-1791563335940997/cell-r1-metric-global-exref-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r3-b/metric-1791563335940997/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r3-b/metric-1791563335940997/cell-r1-middle-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "middle",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r3-c/metric-1791563425981281/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r3-c/metric-1791563425981281/cell-r1-traj-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r3-c/metric-1791563425981281/cell-r1-traj-verify-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-verify",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r4-a/metric-1791563816166794/cell-r1-metric-global-exref-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r4-a/metric-1791563816166794/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r4-a/metric-1791563816166794/cell-r1-metric-global-snap-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-snap",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r4-b/metric-1791564866674818/cell-r1-middle-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "middle",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r4-b/metric-1791564866674818/cell-r1-traj-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r4-b/metric-1791564866674818/cell-r1-traj-verify-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-verify",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r4-c/metric-1791566427432250/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r4-c/metric-1791566427432250/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r4-c/metric-1791566427432250/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r5-a/metric-1791582335349346/cell-r1-metric-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r5-a/metric-1791582335349346/cell-r1-middle-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "middle",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r5-a/metric-1791582335349346/cell-r1-traj-global-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-global",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r5-b/metric-1791586807637111/cell-r1-metric-global-revoke-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-revoke",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r5-b/metric-1791586807637111/cell-r1-metric-global-schema-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-schema",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r5-b/metric-1791586807637111/cell-r1-traj-verify-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "traj-verify",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r5-c/metric-1791588578496892/cell-r1-metric-global-def-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-def",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r5-c/metric-1791588578496892/cell-r1-metric-global-exref-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-exref",
+   "excluded_phases": []
+  },
+  {
+   "file": "results/scen-20261010/dsv41flash-r5-c/metric-1791588578496892/cell-r1-metric-global-snap-named.json",
+   "model": "DeepSeek V4.1 Flash",
+   "mode": "metric-global-snap",
+   "excluded_phases": []
+  }
+ ],
+ "dropped": [],
+ "accuracy": {
+  "DeepSeek V4.1 Flash|middle|holdout": [
+   72,
+   125
+  ],
+  "DeepSeek V4.1 Flash|middle|append": [
+   33,
+   75
+  ],
+  "DeepSeek V4.1 Flash|middle|backfill": [
+   25,
+   50
+  ],
+  "DeepSeek V4.1 Flash|middle|correct": [
+   32,
+   75
+  ],
+  "DeepSeek V4.1 Flash|middle|addcol": [
+   30,
+   50
+  ],
+  "DeepSeek V4.1 Flash|middle|status": [
+   25,
+   50
+  ],
+  "DeepSeek V4.1 Flash|middle|revision": [
+   31,
+   75
+  ],
+  "DeepSeek V4.1 Flash|middle|dupload": [
+   16,
+   75
+  ],
+  "DeepSeek V4.1 Flash|middle|dimhist": [
+   10,
+   25
+  ],
+  "DeepSeek V4.1 Flash|middle|latekey": [
+   5,
+   75
+  ],
+  "DeepSeek V4.1 Flash|middle|unit": [
+   20,
+   75
+  ],
+  "DeepSeek V4.1 Flash|middle|mirror": [
+   23,
+   50
+  ],
+  "DeepSeek V4.1 Flash|traj-global|holdout": [
+   122,
+   125
+  ],
+  "DeepSeek V4.1 Flash|traj-global|append": [
+   63,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-global|backfill": [
+   48,
+   50
+  ],
+  "DeepSeek V4.1 Flash|traj-global|correct": [
+   74,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-global|addcol": [
+   46,
+   50
+  ],
+  "DeepSeek V4.1 Flash|traj-global|status": [
+   32,
+   50
+  ],
+  "DeepSeek V4.1 Flash|traj-global|revision": [
+   62,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-global|dupload": [
+   26,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-global|dimhist": [
+   25,
+   25
+  ],
+  "DeepSeek V4.1 Flash|traj-global|latekey": [
+   10,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-global|unit": [
+   32,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-global|mirror": [
+   34,
+   50
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|holdout": [
+   125,
+   125
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|append": [
+   62,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|backfill": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|correct": [
+   74,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|addcol": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|status": [
+   35,
+   50
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|revision": [
+   69,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|dupload": [
+   33,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|dimhist": [
+   24,
+   25
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|latekey": [
+   10,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|unit": [
+   36,
+   75
+  ],
+  "DeepSeek V4.1 Flash|traj-verify|mirror": [
+   43,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|holdout": [
+   124,
+   125
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|append": [
+   72,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|backfill": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|correct": [
+   75,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|addcol": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|status": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|revision": [
+   75,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|dupload": [
+   36,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|dimhist": [
+   25,
+   25
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|latekey": [
+   5,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|unit": [
+   33,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def|mirror": [
+   29,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|holdout": [
+   124,
+   125
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|append": [
+   69,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|backfill": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|correct": [
+   75,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|addcol": [
+   48,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|status": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|revision": [
+   67,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|dupload": [
+   16,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|dimhist": [
+   25,
+   25
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|latekey": [
+   10,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|unit": [
+   37,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke|mirror": [
+   26,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|holdout": [
+   125,
+   125
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|append": [
+   70,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|backfill": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|correct": [
+   75,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|addcol": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|status": [
+   31,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|revision": [
+   64,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|dupload": [
+   30,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|dimhist": [
+   25,
+   25
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|latekey": [
+   10,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|unit": [
+   34,
+   74
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema|mirror": [
+   37,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|holdout": [
+   125,
+   125
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|append": [
+   71,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|backfill": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|correct": [
+   75,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|addcol": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|status": [
+   46,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|revision": [
+   59,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|dupload": [
+   39,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|dimhist": [
+   25,
+   25
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|latekey": [
+   4,
+   67
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|unit": [
+   25,
+   60
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref|mirror": [
+   24,
+   40
+  ],
+  "DeepSeek V4.1 Flash|metric-global|holdout": [
+   125,
+   125
+  ],
+  "DeepSeek V4.1 Flash|metric-global|append": [
+   73,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global|backfill": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global|correct": [
+   75,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global|addcol": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global|status": [
+   49,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global|revision": [
+   75,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global|dupload": [
+   41,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global|dimhist": [
+   25,
+   25
+  ],
+  "DeepSeek V4.1 Flash|metric-global|latekey": [
+   5,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global|unit": [
+   34,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global|mirror": [
+   29,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|holdout": [
+   125,
+   125
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|append": [
+   70,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|backfill": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|correct": [
+   75,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|addcol": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|status": [
+   50,
+   50
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|revision": [
+   75,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|dupload": [
+   39,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|dimhist": [
+   25,
+   25
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|latekey": [
+   5,
+   75
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|unit": [
+   34,
+   73
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap|mirror": [
+   28,
+   50
+  ]
+ },
+ "quota_failed_tasks": {
+  "DeepSeek V4.1 Flash|metric-global-schema": 1,
+  "DeepSeek V4.1 Flash|metric-global-snap": 2,
+  "DeepSeek V4.1 Flash|metric-global-exref": 33
+ },
+ "stale": {
+  "middle|holdout": [
+   0,
+   125
+  ],
+  "middle|append": [
+   0,
+   75
+  ],
+  "middle|backfill": [
+   0,
+   50
+  ],
+  "middle|correct": [
+   0,
+   75
+  ],
+  "middle|addcol": [
+   0,
+   50
+  ],
+  "middle|status": [
+   0,
+   50
+  ],
+  "middle|revision": [
+   0,
+   75
+  ],
+  "middle|dupload": [
+   0,
+   75
+  ],
+  "middle|dimhist": [
+   0,
+   25
+  ],
+  "middle|latekey": [
+   0,
+   75
+  ],
+  "middle|unit": [
+   0,
+   75
+  ],
+  "middle|mirror": [
+   0,
+   50
+  ],
+  "traj-global|holdout": [
+   0,
+   125
+  ],
+  "traj-global|append": [
+   0,
+   75
+  ],
+  "traj-global|backfill": [
+   0,
+   50
+  ],
+  "traj-global|correct": [
+   0,
+   75
+  ],
+  "traj-global|addcol": [
+   0,
+   50
+  ],
+  "traj-global|status": [
+   0,
+   50
+  ],
+  "traj-global|revision": [
+   0,
+   75
+  ],
+  "traj-global|dupload": [
+   0,
+   75
+  ],
+  "traj-global|dimhist": [
+   0,
+   25
+  ],
+  "traj-global|latekey": [
+   0,
+   75
+  ],
+  "traj-global|unit": [
+   0,
+   75
+  ],
+  "traj-global|mirror": [
+   0,
+   50
+  ],
+  "traj-verify|holdout": [
+   0,
+   125
+  ],
+  "traj-verify|append": [
+   0,
+   75
+  ],
+  "traj-verify|backfill": [
+   0,
+   50
+  ],
+  "traj-verify|correct": [
+   0,
+   75
+  ],
+  "traj-verify|addcol": [
+   0,
+   50
+  ],
+  "traj-verify|status": [
+   0,
+   50
+  ],
+  "traj-verify|revision": [
+   0,
+   75
+  ],
+  "traj-verify|dupload": [
+   0,
+   75
+  ],
+  "traj-verify|dimhist": [
+   0,
+   25
+  ],
+  "traj-verify|latekey": [
+   0,
+   75
+  ],
+  "traj-verify|unit": [
+   0,
+   75
+  ],
+  "traj-verify|mirror": [
+   0,
+   50
+  ],
+  "metric-global-def|holdout": [
+   16,
+   125
+  ],
+  "metric-global-def|append": [
+   0,
+   75
+  ],
+  "metric-global-def|backfill": [
+   0,
+   50
+  ],
+  "metric-global-def|correct": [
+   0,
+   75
+  ],
+  "metric-global-def|addcol": [
+   15,
+   50
+  ],
+  "metric-global-def|status": [
+   0,
+   50
+  ],
+  "metric-global-def|revision": [
+   0,
+   75
+  ],
+  "metric-global-def|dupload": [
+   0,
+   75
+  ],
+  "metric-global-def|dimhist": [
+   0,
+   25
+  ],
+  "metric-global-def|latekey": [
+   0,
+   75
+  ],
+  "metric-global-def|unit": [
+   75,
+   75
+  ],
+  "metric-global-def|mirror": [
+   0,
+   50
+  ],
+  "metric-global-revoke|holdout": [
+   10,
+   125
+  ],
+  "metric-global-revoke|append": [
+   0,
+   75
+  ],
+  "metric-global-revoke|backfill": [
+   0,
+   50
+  ],
+  "metric-global-revoke|correct": [
+   0,
+   75
+  ],
+  "metric-global-revoke|addcol": [
+   0,
+   50
+  ],
+  "metric-global-revoke|status": [
+   0,
+   50
+  ],
+  "metric-global-revoke|revision": [
+   0,
+   75
+  ],
+  "metric-global-revoke|dupload": [
+   0,
+   75
+  ],
+  "metric-global-revoke|dimhist": [
+   0,
+   25
+  ],
+  "metric-global-revoke|latekey": [
+   0,
+   75
+  ],
+  "metric-global-revoke|unit": [
+   0,
+   75
+  ],
+  "metric-global-revoke|mirror": [
+   0,
+   50
+  ],
+  "metric-global-schema|holdout": [
+   10,
+   125
+  ],
+  "metric-global-schema|append": [
+   0,
+   75
+  ],
+  "metric-global-schema|backfill": [
+   0,
+   50
+  ],
+  "metric-global-schema|correct": [
+   0,
+   75
+  ],
+  "metric-global-schema|addcol": [
+   10,
+   50
+  ],
+  "metric-global-schema|status": [
+   50,
+   50
+  ],
+  "metric-global-schema|revision": [
+   75,
+   75
+  ],
+  "metric-global-schema|dupload": [
+   60,
+   75
+  ],
+  "metric-global-schema|dimhist": [
+   22,
+   25
+  ],
+  "metric-global-schema|latekey": [
+   75,
+   75
+  ],
+  "metric-global-schema|unit": [
+   74,
+   74
+  ],
+  "metric-global-schema|mirror": [
+   50,
+   50
+  ],
+  "metric-global-exref|holdout": [
+   5,
+   125
+  ],
+  "metric-global-exref|append": [
+   0,
+   75
+  ],
+  "metric-global-exref|backfill": [
+   0,
+   50
+  ],
+  "metric-global-exref|correct": [
+   0,
+   75
+  ],
+  "metric-global-exref|addcol": [
+   5,
+   50
+  ],
+  "metric-global-exref|status": [
+   0,
+   50
+  ],
+  "metric-global-exref|revision": [
+   0,
+   75
+  ],
+  "metric-global-exref|dupload": [
+   0,
+   75
+  ],
+  "metric-global-exref|dimhist": [
+   0,
+   25
+  ],
+  "metric-global-exref|latekey": [
+   0,
+   67
+  ],
+  "metric-global-exref|unit": [
+   60,
+   60
+  ],
+  "metric-global-exref|mirror": [
+   0,
+   40
+  ],
+  "metric-global|holdout": [
+   10,
+   125
+  ],
+  "metric-global|append": [
+   0,
+   75
+  ],
+  "metric-global|backfill": [
+   0,
+   50
+  ],
+  "metric-global|correct": [
+   0,
+   75
+  ],
+  "metric-global|addcol": [
+   10,
+   50
+  ],
+  "metric-global|status": [
+   0,
+   50
+  ],
+  "metric-global|revision": [
+   0,
+   75
+  ],
+  "metric-global|dupload": [
+   0,
+   75
+  ],
+  "metric-global|dimhist": [
+   0,
+   25
+  ],
+  "metric-global|latekey": [
+   0,
+   75
+  ],
+  "metric-global|unit": [
+   75,
+   75
+  ],
+  "metric-global|mirror": [
+   0,
+   50
+  ],
+  "metric-global-snap|holdout": [
+   10,
+   125
+  ],
+  "metric-global-snap|append": [
+   0,
+   75
+  ],
+  "metric-global-snap|backfill": [
+   0,
+   50
+  ],
+  "metric-global-snap|correct": [
+   0,
+   75
+  ],
+  "metric-global-snap|addcol": [
+   10,
+   50
+  ],
+  "metric-global-snap|status": [
+   0,
+   50
+  ],
+  "metric-global-snap|revision": [
+   0,
+   75
+  ],
+  "metric-global-snap|dupload": [
+   0,
+   75
+  ],
+  "metric-global-snap|dimhist": [
+   0,
+   25
+  ],
+  "metric-global-snap|latekey": [
+   0,
+   75
+  ],
+  "metric-global-snap|unit": [
+   73,
+   73
+  ],
+  "metric-global-snap|mirror": [
+   0,
+   50
+  ]
+ },
+ "events": {
+  "metric-global-def|append": {
+   "maintenance": 20
+  },
+  "metric-global-def|backfill": {
+   "maintenance": 13
+  },
+  "metric-global-def|correct": {
+   "maintenance": 21
+  },
+  "metric-global-def|addcol": {
+   "maintenance": 13
+  },
+  "metric-global-def|status": {
+   "revoked": 13,
+   "repair_candidate": 13,
+   "repair_promoted": 13,
+   "maintenance": 13
+  },
+  "metric-global-def|revision": {
+   "revoked": 21,
+   "repair_candidate": 21,
+   "repair_promoted": 21,
+   "maintenance": 21
+  },
+  "metric-global-def|dupload": {
+   "revoked": 22,
+   "repair_failed": 22,
+   "maintenance": 22,
+   "ref_rejected": 19
+  },
+  "metric-global-def|dimhist": {
+   "revoked": 7,
+   "repair_candidate": 5,
+   "repair_promoted": 5,
+   "maintenance": 7,
+   "repair_skipped": 2
+  },
+  "metric-global-def|latekey": {
+   "revoked": 21,
+   "repair_skipped": 21,
+   "maintenance": 21,
+   "ref_rejected": 11
+  },
+  "metric-global-def|unit": {
+   "maintenance": 21
+  },
+  "metric-global-def|mirror": {
+   "revoked": 13,
+   "repair_failed": 6,
+   "maintenance": 13,
+   "repair_skipped": 7,
+   "ref_rejected": 4
+  },
+  "metric-global-revoke|append": {
+   "revoked": 23,
+   "maintenance": 23,
+   "promoted": 23,
+   "corroborated": 6,
+   "ref_rejected": 2
+  },
+  "metric-global-revoke|backfill": {
+   "revoked": 14,
+   "maintenance": 14,
+   "promoted": 15,
+   "corroborated": 5
+  },
+  "metric-global-revoke|correct": {
+   "revoked": 23,
+   "maintenance": 23,
+   "promoted": 24,
+   "corroborated": 6
+  },
+  "metric-global-revoke|addcol": {
+   "revoked": 14,
+   "maintenance": 14,
+   "promoted": 13,
+   "corroborated": 5
+  },
+  "metric-global-revoke|status": {
+   "revoked": 14,
+   "maintenance": 14,
+   "candidate": 5,
+   "promoted": 13,
+   "ref_rejected": 2,
+   "corroborated": 1
+  },
+  "metric-global-revoke|revision": {
+   "revoked": 23,
+   "maintenance": 23,
+   "promoted": 18,
+   "corroborated": 6,
+   "candidate": 6,
+   "ref_rejected": 1
+  },
+  "metric-global-revoke|dupload": {
+   "revoked": 23,
+   "maintenance": 23,
+   "candidate": 28,
+   "ref_rejected": 13
+  },
+  "metric-global-revoke|dimhist": {
+   "revoked": 7,
+   "maintenance": 7,
+   "promoted": 8,
+   "corroborated": 2,
+   "ref_rejected": 1
+  },
+  "metric-global-revoke|latekey": {
+   "revoked": 23,
+   "maintenance": 23,
+   "promoted": 23,
+   "corroborated": 7,
+   "ref_rejected": 1
+  },
+  "metric-global-revoke|unit": {
+   "revoked": 23,
+   "maintenance": 23,
+   "promoted": 22,
+   "corroborated": 7,
+   "ref_rejected": 7
+  },
+  "metric-global-revoke|mirror": {
+   "revoked": 14,
+   "maintenance": 14,
+   "candidate": 20,
+   "ref_rejected": 14
+  },
+  "metric-global-schema|append": {
+   "maintenance": 25
+  },
+  "metric-global-schema|backfill": {
+   "maintenance": 17
+  },
+  "metric-global-schema|correct": {
+   "maintenance": 23
+  },
+  "metric-global-schema|addcol": {
+   "maintenance": 17
+  },
+  "metric-global-schema|status": {
+   "maintenance": 17
+  },
+  "metric-global-schema|revision": {
+   "maintenance": 24
+  },
+  "metric-global-schema|dupload": {
+   "maintenance": 24
+  },
+  "metric-global-schema|dimhist": {
+   "maintenance": 9
+  },
+  "metric-global-schema|latekey": {
+   "maintenance": 23
+  },
+  "metric-global-schema|unit": {
+   "maintenance": 26,
+   "ref_rejected": 1
+  },
+  "metric-global-schema|mirror": {
+   "maintenance": 17,
+   "ref_rejected": 1
+  },
+  "metric-global-exref|append": {
+   "maintenance": 21
+  },
+  "metric-global-exref|backfill": {
+   "maintenance": 14
+  },
+  "metric-global-exref|correct": {
+   "maintenance": 20
+  },
+  "metric-global-exref|addcol": {
+   "maintenance": 14
+  },
+  "metric-global-exref|status": {
+   "revoked": 14,
+   "repair_candidate": 14,
+   "repair_promoted": 13,
+   "maintenance": 14,
+   "repair_rejected": 1
+  },
+  "metric-global-exref|revision": {
+   "revoked": 21,
+   "repair_candidate": 21,
+   "repair_rejected": 15,
+   "maintenance": 21,
+   "repair_promoted": 6,
+   "ref_rejected": 3,
+   "repair_reused": 2
+  },
+  "metric-global-exref|dupload": {
+   "revoked": 22,
+   "repair_failed": 22,
+   "maintenance": 22,
+   "ref_rejected": 14
+  },
+  "metric-global-exref|dimhist": {
+   "revoked": 8,
+   "repair_candidate": 7,
+   "repair_rejected": 7,
+   "maintenance": 8,
+   "repair_skipped": 1
+  },
+  "metric-global-exref|latekey": {
+   "revoked": 22,
+   "repair_skipped": 22,
+   "maintenance": 22,
+   "ref_rejected": 15
+  },
+  "metric-global-exref|unit": {
+   "maintenance": 17
+  },
+  "metric-global-exref|mirror": {
+   "revoked": 11,
+   "repair_failed": 6,
+   "maintenance": 11,
+   "repair_skipped": 5,
+   "ref_rejected": 9
+  },
+  "metric-global|append": {
+   "maintenance": 23
+  },
+  "metric-global|backfill": {
+   "maintenance": 14
+  },
+  "metric-global|correct": {
+   "maintenance": 21
+  },
+  "metric-global|addcol": {
+   "maintenance": 14
+  },
+  "metric-global|status": {
+   "revoked": 14,
+   "repair_candidate": 14,
+   "repair_promoted": 14,
+   "maintenance": 14,
+   "repair_reused": 1
+  },
+  "metric-global|revision": {
+   "revoked": 21,
+   "repair_candidate": 21,
+   "repair_promoted": 21,
+   "maintenance": 21,
+   "repair_reused": 4
+  },
+  "metric-global|dupload": {
+   "revoked": 23,
+   "repair_failed": 23,
+   "maintenance": 23,
+   "ref_rejected": 12
+  },
+  "metric-global|dimhist": {
+   "revoked": 8,
+   "repair_candidate": 8,
+   "repair_promoted": 8,
+   "maintenance": 8
+  },
+  "metric-global|latekey": {
+   "revoked": 23,
+   "repair_skipped": 23,
+   "maintenance": 23,
+   "ref_rejected": 10
+  },
+  "metric-global|unit": {
+   "maintenance": 23
+  },
+  "metric-global|mirror": {
+   "revoked": 14,
+   "repair_failed": 6,
+   "maintenance": 14,
+   "repair_skipped": 8,
+   "ref_rejected": 7
+  },
+  "metric-global-snap|append": {
+   "maintenance": 26
+  },
+  "metric-global-snap|backfill": {
+   "maintenance": 16
+  },
+  "metric-global-snap|correct": {
+   "maintenance": 25
+  },
+  "metric-global-snap|addcol": {
+   "maintenance": 16
+  },
+  "metric-global-snap|status": {
+   "revoked": 16,
+   "repair_candidate": 16,
+   "repair_promoted": 14,
+   "maintenance": 16,
+   "repair_rejected": 2
+  },
+  "metric-global-snap|revision": {
+   "revoked": 25,
+   "repair_candidate": 25,
+   "repair_promoted": 23,
+   "maintenance": 25,
+   "repair_reused": 5,
+   "repair_rejected": 2
+  },
+  "metric-global-snap|dupload": {
+   "revoked": 26,
+   "repair_failed": 26,
+   "maintenance": 26,
+   "ref_rejected": 8
+  },
+  "metric-global-snap|dimhist": {
+   "revoked": 9,
+   "repair_candidate": 9,
+   "repair_promoted": 9,
+   "maintenance": 9
+  },
+  "metric-global-snap|latekey": {
+   "revoked": 26,
+   "repair_skipped": 26,
+   "maintenance": 26,
+   "ref_rejected": 18
+  },
+  "metric-global-snap|unit": {
+   "maintenance": 25
+  },
+  "metric-global-snap|mirror": {
+   "revoked": 16,
+   "repair_failed": 7,
+   "maintenance": 16,
+   "repair_skipped": 9,
+   "ref_rejected": 10
+  },
+  "middle|append": {},
+  "middle|backfill": {},
+  "middle|correct": {},
+  "middle|addcol": {},
+  "middle|status": {},
+  "middle|revision": {},
+  "middle|dupload": {},
+  "middle|dimhist": {},
+  "middle|latekey": {},
+  "middle|unit": {},
+  "middle|mirror": {},
+  "traj-global|append": {},
+  "traj-global|backfill": {},
+  "traj-global|correct": {},
+  "traj-global|addcol": {},
+  "traj-global|status": {},
+  "traj-global|revision": {},
+  "traj-global|dupload": {},
+  "traj-global|dimhist": {},
+  "traj-global|latekey": {},
+  "traj-global|unit": {},
+  "traj-global|mirror": {},
+  "traj-verify|append": {},
+  "traj-verify|backfill": {},
+  "traj-verify|correct": {},
+  "traj-verify|addcol": {},
+  "traj-verify|status": {},
+  "traj-verify|revision": {},
+  "traj-verify|dupload": {},
+  "traj-verify|dimhist": {},
+  "traj-verify|latekey": {},
+  "traj-verify|unit": {},
+  "traj-verify|mirror": {}
+ },
+ "maintenance_db_s_per_cell": {
+  "DeepSeek V4.1 Flash|middle": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|traj-global": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|traj-verify": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|metric-global-def": [
+   520.4158259999994,
+   591.8162189999998,
+   427.415128,
+   683.0929130000003,
+   561.2863639999996
+  ],
+  "DeepSeek V4.1 Flash|metric-global-revoke": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|metric-global-schema": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "DeepSeek V4.1 Flash|metric-global-exref": [
+   371.61421600000006,
+   404.10557599999896,
+   421.33638399999995,
+   371.5661109999992,
+   312.6565639999998
+  ],
+  "DeepSeek V4.1 Flash|metric-global": [
+   391.0749159999997,
+   370.63404300000013,
+   302.3654460000005,
+   303.1242200000011,
+   392.6123009999999
+  ],
+  "DeepSeek V4.1 Flash|metric-global-snap": [
+   362.95339,
+   346.8596679999989,
+   404.427557000001,
+   401.44490700000017,
+   360.47194399999916
+  ]
+ },
+ "maint_ratios": {
+  "condition|staggered": [
+   [
+    4,
+    37.75191414779548
+   ],
+   [
+    8,
+    21.4073523882895
+   ],
+   [
+    15,
+    15.811991161832989
+   ],
+   [
+    19,
+    12.524210615501646
+   ]
+  ],
+  "condition-scope|staggered": [
+   [
+    4,
+    89.2670465929872
+   ],
+   [
+    8,
+    76.14580916004687
+   ],
+   [
+    15,
+    82.68654250288911
+   ],
+   [
+    19,
+    80.65188233546921
+   ]
+  ],
+  "condition|simultaneous": [
+   [
+    4,
+    68.4450001484138
+   ],
+   [
+    8,
+    75.50508655101093
+   ],
+   [
+    15,
+    59.1986581278021
+   ],
+   [
+    19,
+    44.5560501614129
+   ]
+  ],
+  "condition-scope|simultaneous": [
+   [
+    4,
+    84.0281213983887
+   ],
+   [
+    8,
+    78.21892189629726
+   ],
+   [
+    15,
+    87.28941286468567
+   ],
+   [
+    19,
+    90.25311503474104
+   ]
+  ]
+ }
+}

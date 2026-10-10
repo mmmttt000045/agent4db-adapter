@@ -3,13 +3,13 @@
 \toprule
 \bt{Method}{方法} & \bh{Correct\\(\%)}{正确率} & \bh{Stale tasks\\covered / other}{过期使用\\覆盖／其他} & \bh{Maint.\\DB (s)}{维护 DB 秒} & \bh{Input tok.\\(k)}{输入千 token}\\
 \midrule
-\swatch{mNoShare}\ \bhl{No memory}{无记忆} & 32 & 0 / 0 & -- & 15.6\\
-\swatch{mTraj}\ \bhl{Example retrieval}{示例检索} & 76 & 0 / 0 & -- & 11.0\\
-\swatch{mTrajVerify}\ \bhl{Example retrieval\\+ self-verification}{示例检索 + 自行核验} & 77 & 0 / 0 & -- & 13.5\\
-\swatch{mSchema}\ \bhl{Invalidate on schema change}{模式变更时失效} & 75 & 100 / 45 & 0 & 11.7\\
-\swatch{mRevoke}\ \bhl{Invalidate on every write}{每次写入即失效} & 79 & 0 / 0 & 0 & 10.0\\
-\swatch{mDef}\ \bhl{Full recheck per definition}{整定义重查} & 82 & 0 / 27 & 534 & 11.9\\
-\swatch{mCond}\ \bhl{\system\ (ours)}{\system（本文）} & 81 & 0 / 27 & 347 & 10.3\\
-\swatch{mCondCur}\ \bhl{\system, regression\\on current data}{\system，回归测试用当前数据} & 80 & 0 / 27 & 299 & 10.9\\
+\swatch{mNoShare}\ \bhl{No memory}{无记忆} & 41 & 0 / 0 & -- & 17.8\\
+\swatch{mTraj}\ \bhl{Example retrieval}{示例检索} & 73 & 0 / 0 & -- & 13.7\\
+\swatch{mTrajVerify}\ \bhl{Example retrieval\\+ self-verification}{示例检索 + 自行核验} & 78 & 0 / 0 & -- & 16.0\\
+\swatch{mSchema}\ \bhl{Invalidate on schema change}{模式变更时失效} & 76 & 282 / 134 & 0 & 13.2\\
+\swatch{mRevoke}\ \bhl{Invalidate on every write}{每次写入即失效} & 76 & 0 / 0 & 0 & 13.3\\
+\swatch{mDef}\ \bhl{Full recheck per definition}{整定义重查} & 79 & 0 / 90 & 557 & 13.5\\
+\swatch{mCond}\ \bhl{\system\ (ours)}{\system（本文）} & 80 & 0 / 83 & 375 & 13.5\\
+\swatch{mCondCur}\ \bhl{\system, regression\\on current data}{\system，回归测试用当前数据} & 77 & 0 / 65 & 376 & 12.6\\
 \bottomrule
 \end{tabular}

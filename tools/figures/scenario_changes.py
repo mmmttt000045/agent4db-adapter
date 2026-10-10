@@ -3,12 +3,12 @@
 One group per setting, in three classes under the axis: the held-out
 questions and the four benign updates (pooled); the five breaks covered by a
 condition, one by one and pooled; and the two changes outside the guarantee.
-Six methods per group, in the order of Table 2 (the self-verification variant
+Six methods per group, in the order of Table 2, five runs each (the self-verification variant
 of example retrieval and the two MAVRA regression variants are reported in the
-text): the bar is the accuracy pooled over the three independent runs, the
+text): the bar is the accuracy pooled over the five independent runs, the
 line its 95% bootstrap interval over runs, and a hatched bar marks a setting
 in which at least 25% of the tasks used a stale definition. Data:
-exp/2026-10-02-scenarios-ds/scen-stats.json (per-run counts written by
+exp/2026-10-10-scenarios-q5/scen-stats.json (per-run counts written by
 tools/scen-stats.py, with the group intervals the text prints), cross-checked
 against paper-results.json and against every value the text prints
 (\\ScenAcc* in gen/numbers.tex, \\Ds* in gen/scen-ds.tex); the intervals of
@@ -29,8 +29,8 @@ from style import ACC_DK, FIELD, INK, MUTED, RED  # noqa: E402
 
 NAME = 'scenario-changes'
 W, H = style.TEXTWIDTH, 61.0
-STATS = style.ROOT / 'exp/2026-10-02-scenarios-ds/scen-stats.json'
-RESULTS = style.ROOT / 'exp/2026-10-02-scenarios-ds/paper-results.json'
+STATS = style.ROOT / 'exp/2026-10-10-scenarios-q5/scen-stats.json'
+RESULTS = style.ROOT / 'exp/2026-10-10-scenarios-q5/paper-results.json'
 STALE = .25                      # share of tasks that used a stale definition
 REPS, SEED = 4000, 20261002      # as tools/scen-stats.py
 

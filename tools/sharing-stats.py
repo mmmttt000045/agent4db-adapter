@@ -5,7 +5,8 @@ usage: sharing-stats.py --scen results/scen-20261002 --prev results/scen-2026093
            --opt results/scen-20261008-opt/metric-*/cell-r1-metric-global-opt-named.json [--tex-out overleaf/gen]
 
 Publication: what admission does with the learning tasks of every MAVRA-family cell. The funnel (judged, published,
-corroborated, refused) is counted on the cells of the current implementation (the g3fix cells of --scen); refusals by
+corroborated, refused) is counted on the cells of the current implementation (the g3fix cells of --scen when the study
+has such reruns, otherwise all of its cells); refusals by
 the replay checks (G6 example SQL, G7 canonical SQL) and by the provenance chain are counted over both studies, and the
 G7 refusal whose canonical answer is furthest from the learned answer is reported as the example.
 
@@ -51,9 +52,11 @@ def all_cells(root):
 
 def publication(scen, prev):
     funnel = collections.Counter()
-    for job, d in all_cells(scen):
-        if "g3fix" not in job:
-            continue
+    # The funnel counts the cells of the current implementation: in the 10-02 study those are the g3fix reruns;
+    # a study without such reruns (10-10 onwards) was run entirely on the current implementation.
+    cells = list(all_cells(scen))
+    fixed = [(job, d) for job, d in cells if "g3fix" in job]
+    for job, d in fixed or cells:
         for l in d.get("learning", []):
             s = l.get("submit") or {}
             funnel["tasks"] += 1

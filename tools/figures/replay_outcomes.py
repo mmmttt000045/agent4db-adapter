@@ -29,7 +29,7 @@ import style  # noqa: E402
 from style import ACC_PALE, INK, MUTED, RED, WHITE  # noqa: E402
 
 NAME = 'replay-outcomes'
-W, H = style.COLUMN, 86.0
+W, H = style.COLUMN, 76.0
 EXP = style.ROOT / 'exp/2026-10-02-cache-baseline-tpcds'
 GEN = style.ROOT / 'exp/2026-10-11-generality'
 
@@ -113,7 +113,7 @@ def figure(lang):
     panels, T = load(), TEXT[lang]
     fig = mplstyle.figure(W, H)
     heights = [len(rows) for _, rows in panels]
-    gs = GridSpec(len(panels), 1, figure=fig, height_ratios=heights, hspace=.55,
+    gs = GridSpec(len(panels), 1, figure=fig, height_ratios=heights, hspace=.5,
                   left=LEFT, right=RIGHT, top=1 - 10.9 / H, bottom=5.6 / H)
     fig.legend(handles=[Patch(facecolor=fill, label=label) for (_, _, fill, _), label in zip(OUTCOMES, T['outcomes'])],
                loc='upper left', bbox_to_anchor=(.0, 1.0), ncol=4, handlelength=1.0, handleheight=.9,

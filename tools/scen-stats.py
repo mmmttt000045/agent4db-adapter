@@ -34,6 +34,7 @@ NAMES = {"middle": "No memory", "traj-global": "Example retrieval", "traj-verify
          "metric-global": "MAVRA, gold-SQL reference", "metric-global-exref": "MAVRA, regression on current data",
          "metric-global-snap": "MAVRA (ours)"}
 PHASES = ["holdout", "append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"]
+TYPE_WORDS = {"P1": "Period", "T1": "Diff", "T2": "Top", "T3": "Rise", "T4": "Above"}
 GROUPS = {
     "all": PHASES,
     "holdout": ["holdout"],
@@ -148,10 +149,12 @@ def tex(res, out):
         q[f"Ds{k}StaleUnit"] = r["stale_tasks"]["unit"]
         q[f"Ds{k}Revoked"] = f"{r['revoked_per_cell']:.1f}"
         q[f"Ds{k}Repaired"] = f"{r['repaired_per_cell']:.1f}"
+        # 宏名不能含数字：题型用词命名（P1 Period、T1 Diff、T2 Top、T3 Rise、T4 Above）
         for ty, scopes in r.get("by_type", {}).items():
+            word = TYPE_WORDS.get(ty, ty)
             for scope, (c, n) in scopes.items():
                 suffix = "" if scope == "holdout" else "All"
-                q[f"Ds{k}Type{suffix}{ty}"] = pct(c / n) if n else "--"
+                q[f"Ds{k}Type{suffix}{word}"] = pct(c / n) if n else "--"
         q[f"Ds{k}Turns"] = f"{r['turns_per_task']:.1f}" if r["turns_per_task"] else "--"
         q[f"Ds{k}TokK"] = f"{r['input_tokens_per_task'] / 1000:.1f}" if r["input_tokens_per_task"] else "--"
         q[f"Ds{k}MaintS"] = f"{r['maint_db_s_per_cell']:.0f}"

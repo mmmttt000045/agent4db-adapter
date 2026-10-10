@@ -4,6 +4,7 @@
 use crate::catalog;
 use crate::db::{diff, lit, Db, QKind};
 use crate::etl;
+use crate::knowledge::Metric;
 use crate::knowledge::{Basis, Content, Status};
 use crate::llm::{self, AgentRun, Provider};
 use crate::metric::{self, parse_answer, same_value, Ask, Period, Trajectory};
@@ -11,12 +12,13 @@ use crate::middle::{
     tool_specs_with, trajectory_tool_spec, Ctx, GuardMode, Maint, Middle, MiddleConfig, Scope, SqlCall, TaskLog, ToolSpec, TrajMemo,
 };
 use crate::scenario::{self, Change};
+use crate::specchange::{Gen, Spec};
 use anyhow::{ensure, Context, Result};
 use futures::StreamExt;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashMap, HashSet};
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 #[derive(Clone, Debug, clap::Args, Serialize)]
@@ -77,6 +79,14 @@ pub struct Options {
     /// 生命周期评测中每一波使用者同时进行的任务数
     #[arg(long, default_value_t = 2, value_parser = clap::value_parser!(u32).range(1..=8))]
     concurrency: u32,
+    /// 模式描述（exp/2026-10-11-generality/schemas/*.json）：给出时不生成合成数据，从描述里的模板库复制数据，
+    /// 变化由 `specchange` 按描述生成；指标、题目年份与标准答案来自 --defs 与描述
+    #[arg(long, requires = "defs")]
+    spec: Option<String>,
+    /// 模式描述下的指标文件：{"library": 定义库, "defs": [{"id", "name", "definition", "reference": 定义库里的键}]}；
+    /// 标准答案 = 参照定义加描述里的区分列过滤后的规范 SQL（与 replay-bench --spec 相同）
+    #[arg(long)]
+    defs: Option<String>,
 }
 
 // ───────────────────────── 指标与题目 ─────────────────────────
@@ -87,6 +97,50 @@ pub(crate) struct Def {
     definition: &'static str,
     /// 口径读到的表；数据变化场景只重问读到被写入表的指标
     pub(crate) tables: &'static [&'static str],
+    /// 模式描述下的判题定义（参照定义加区分列过滤）；合成数据的指标用手写判题 SQL，为空
+    reference: Option<Metric>,
+}
+
+/// 模式描述下的指标与年份（`--spec`）：进程内只设一次，`defs()` 与 `tasks_with` 读它。
+struct SpecDefs {
+    defs: Vec<Def>,
+    learn: i32,
+    holdout: i32,
+}
+
+static SPEC_DEFS: OnceLock<SpecDefs> = OnceLock::new();
+
+fn defs() -> &'static [Def] {
+    SPEC_DEFS.get().map(|s| s.defs.as_slice()).unwrap_or(&DEFS)
+}
+
+fn leak(s: &str) -> &'static str {
+    Box::leak(s.to_string().into_boxed_str())
+}
+
+/// 读入模式描述下的指标文件：参照定义取自定义库，判题定义加上描述里的区分列过滤。
+fn load_spec_defs(path: &str, spec: &Spec) -> Result<()> {
+    let v: Value = serde_json::from_str(&std::fs::read_to_string(path).with_context(|| format!("读取 {path}"))?)?;
+    let lib_path = v["library"].as_str().context("指标文件缺少 library")?;
+    let lib: Value = serde_json::from_str(&std::fs::read_to_string(lib_path).with_context(|| format!("读取 {lib_path}"))?)?;
+    let entries = lib["metric_report"]["entries"].as_array().context("定义库没有条目")?;
+    let mut out = vec![];
+    for d in v["defs"].as_array().context("指标文件缺少 defs")? {
+        let key = d["reference"].as_str().context("指标缺少 reference")?;
+        let e = entries.iter().find(|e| e["key"] == key).with_context(|| format!("定义库里没有 {key}"))?;
+        let m: Metric = serde_json::from_value(e["metric"].clone())?;
+        let tables: Vec<&'static str> = m.tables().iter().map(|t| leak(t)).collect();
+        out.push(Def {
+            id: leak(d["id"].as_str().context("指标缺少 id")?),
+            name: leak(d["name"].as_str().context("指标缺少 name")?),
+            definition: leak(d["definition"].as_str().context("指标缺少 definition")?),
+            tables: Box::leak(tables.into_boxed_slice()),
+            reference: Some(spec.judge_metric(&m)),
+        });
+    }
+    let s = SpecDefs { defs: out, learn: spec.years.learn, holdout: spec.years.holdout };
+    ensure!(SPEC_DEFS.set(s).is_ok(), "模式描述下的指标只能设置一次");
+    Ok(())
 }
 
 static DEFS: [Def; 5] = [
@@ -95,12 +149,14 @@ static DEFS: [Def; 5] = [
         name: "门店营业额",
         definition: "门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间",
         tables: &["store_sales", "date_dim"],
+        reference: None,
     },
     Def {
         id: "M2",
         name: "门店退货金额",
         definition: "门店退货金额 = 门店退货的退货金额（store_returns.sr_return_amt）之和，按退货日期归属期间；每笔退货只计一次",
         tables: &["store_returns", "date_dim"],
+        reference: None,
     },
     Def {
         id: "M3",
@@ -109,12 +165,14 @@ static DEFS: [Def; 5] = [
             "门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；\
                      按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次",
         tables: &["store_sales", "store_returns", "date_dim"],
+        reference: None,
     },
     Def {
         id: "M4",
         name: "目录渠道营业额",
         definition: "目录渠道营业额 = 目录销售行的净支付额（catalog_sales.cs_net_paid）之和，按销售日期归属期间",
         tables: &["catalog_sales", "date_dim"],
+        reference: None,
     },
     Def {
         id: "M5",
@@ -122,6 +180,7 @@ static DEFS: [Def; 5] = [
         definition: "电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，\
                      按销售日期归属期间；商品按其当前类别计",
         tables: &["store_sales", "item", "date_dim"],
+        reference: None,
     },
 ];
 
@@ -191,13 +250,27 @@ pub(crate) fn tasks_with(ids: &[String], v2: bool) -> Vec<Task> {
             ],
         }
     };
+    // 模式描述下每个指标同一套题：学习期 3 月与上一年 11 月，留出年 9 月、留出年 9 月减学习期 6 月、留出年最高月
+    let spec_plan = |s: &SpecDefs| -> Vec<(Set, Ask)> {
+        vec![
+            (Set::Learn, single(s.learn, 3)),
+            (Set::Learn, single(s.learn - 1, 11)),
+            (Set::Param, single(s.holdout, 9)),
+            (Set::Type, diff((s.holdout, 9), (s.learn, 6))),
+            (Set::Type, Ask::RankMonth { year: s.holdout }),
+        ]
+    };
+    let year2 = SPEC_DEFS.get().map_or(2002, |s| s.holdout);
     let mut out = vec![];
-    for def in DEFS.iter().filter(|d| ids.iter().any(|x| x == d.id)) {
+    for def in defs().iter().filter(|d| ids.iter().any(|x| x == d.id)) {
         let mut n: HashMap<&str, u32> = HashMap::new();
-        let mut plan = plan(def.id);
+        let mut plan = match SPEC_DEFS.get() {
+            Some(s) => spec_plan(s),
+            None => plan(def.id),
+        };
         if v2 {
-            plan.push((Set::Type, Ask::PeakRise { year: 2002 }));
-            plan.push((Set::Type, Ask::AboveMean { year: 2002 }));
+            plan.push((Set::Type, Ask::PeakRise { year: year2 }));
+            plan.push((Set::Type, Ask::AboveMean { year: year2 }));
         }
         for (set, ask) in plan {
             let tag = match set {
@@ -355,6 +428,9 @@ pub(crate) fn gold_above_mean(def: &str, year: i32) -> String {
 }
 
 pub(crate) fn gold_sql(t: &Task) -> String {
+    if let Some(m) = &t.def.reference {
+        return metric::compile(m, &t.ask).unwrap_or_else(|e| format!("select 'ERROR: {}'", e.to_string().replace('\'', "")));
+    }
     match &t.ask {
         Ask::Single { period } => gold_period(t.def.id, period),
         Ask::Diff { a, b } => format!("select ({}) - ({})", gold_period(t.def.id, a), gold_period(t.def.id, b)),
@@ -629,6 +705,41 @@ struct Env<'a> {
     learn: Option<Arc<Db>>,
     /// 本次运行的输出目录（trace 文件写在这里）
     dir: &'a str,
+    /// 模式描述驱动的变化（`--spec`）；为空时用合成数据上的 `scenario::Change`
+    gen: Option<&'a Gen>,
+}
+
+impl Env<'_> {
+    async fn apply_truth(&self, c: Change) -> Result<i64> {
+        match self.gen {
+            Some(g) => g.apply_truth(self.admin, c).await,
+            None => c.apply_truth(self.admin).await,
+        }
+    }
+    async fn apply_hidden(&self, c: Change) -> Result<i64> {
+        match self.gen {
+            Some(g) => g.apply_hidden(self.admin, c).await,
+            None => c.apply_hidden(self.admin).await,
+        }
+    }
+    async fn reset(&self, c: Change) -> Result<()> {
+        match self.gen {
+            Some(g) => g.reset(self.admin, c).await,
+            None => c.reset(self.admin).await,
+        }
+    }
+    fn change_tables(&self, c: Change) -> Vec<String> {
+        match self.gen {
+            Some(g) => g.spec.change_tables(c),
+            None => c.tables().iter().map(|s| s.to_string()).collect(),
+        }
+    }
+    async fn ensure_v1(&self, after: &str) -> Result<()> {
+        match self.gen {
+            Some(g) => g.ensure_same(self.admin, self.v1, after).await,
+            None => scenario::ensure_v1(self.admin, self.v1, after).await,
+        }
+    }
 }
 
 struct Cell<'a> {
@@ -895,7 +1006,7 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     tools.push(llm::clarification_spec());
     let cell = Cell { id: format!("r{repeat}-{mode}-{phrasing}"), mode, phrasing, repeat, system: system_text, tools };
     eprintln!("== {}", cell.id);
-    scenario::ensure_v1(env.admin, env.v1, "上一组").await?;
+    env.ensure_v1("上一组").await?;
     let snapshot_db = cfg.g8_snapshot_db;
     let mut mid = Middle::new(db, cfg).await?;
     if env.o.trace {
@@ -950,9 +1061,9 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
         let gold = match ch {
             None => gold_map(env.admin, env.tasks).await?,
             Some(c) => {
-                let truth = c.apply_truth(env.admin).await?;
+                let truth = env.apply_truth(c).await?;
                 let gold = gold_map(env.admin, env.tasks).await?;
-                let hidden = c.apply_hidden(env.admin).await?;
+                let hidden = env.apply_hidden(c).await?;
                 eprintln!("  场景 {phase}（{}，{}）：写入 {truth} + {hidden} 行", c.label(), c.class());
                 writes.insert(phase.into(), json!({"truth_rows": truth, "hidden_rows": hidden}));
                 gold
@@ -987,7 +1098,7 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
             .tasks
             .iter()
             .filter(|t| t.set != Set::Learn)
-            .filter(|t| ch.is_none_or(|c| t.def.tables.iter().any(|x| c.tables().contains(x))))
+            .filter(|t| ch.is_none_or(|c| t.def.tables.iter().any(|x| env.change_tables(c).iter().any(|y| y == x))))
             .collect();
         for agent in &env.o.holdout_agents {
             for t in &set {
@@ -999,8 +1110,8 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
             None => checkpoint = Some(mid.checkpoint()),
             Some(c) => {
                 audits.insert(format!("{phase}_end"), json!(audit(env, &mid, &gold).await?.0));
-                c.reset(env.admin).await?;
-                scenario::ensure_v1(env.admin, env.v1, phase).await?;
+                env.reset(c).await?;
+                env.ensure_v1(phase).await?;
                 mid.restore(checkpoint.as_ref().context("缺少留出后的经验库快照")?).await?;
             }
         }
@@ -1184,6 +1295,11 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     let changes = o.changes.iter().map(|c| Change::parse(c)).collect::<Result<Vec<_>>>()?;
     let timeline = o.timeline.iter().map(|s| Ok((s.clone(), step_of(s)?))).collect::<Result<Vec<_>>>()?;
     ensure!(!o.lifecycle || (o.modes.len() == 1 && o.repeats == 1), "生命周期评测每个进程只跑一个组、一轮（更新累积，各组要从 v1 开始）");
+    let spec = o.spec.as_deref().map(Spec::load).transpose()?;
+    ensure!(spec.is_none() || !o.lifecycle, "模式描述下暂不支持生命周期评测");
+    if let Some(s) = &spec {
+        load_spec_defs(o.defs.as_deref().context("--spec 需要 --defs")?, s)?;
+    }
     let stamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
     let name = format!("agentdb_metric_{}_{stamp}", std::process::id());
     let directory = format!("{out}/metric-{stamp}");
@@ -1192,32 +1308,63 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     let mut isolated = reqwest::Url::parse(url)?;
     isolated.set_path(&format!("/{name}"));
     let mut learn_url = isolated.clone();
-    root.query(QKind::Meta, &format!("create database {name}")).await.context("创建隔离实验库失败（需要 CREATEDB）")?;
+    let create = match &spec {
+        Some(s) => format!("create database {name} template {}", s.template_db),
+        None => format!("create database {name}"),
+    };
+    root.query(QKind::Meta, &create).await.context("创建隔离实验库失败（需要 CREATEDB；--spec 还需要模板库存在且无人连接）")?;
     let result: Result<Value> = async {
         let admin = Db::connect(isolated.as_str(), 2, false)?;
-        eprintln!("生成合成零售数据：门店销售 {} 行，目录销售 {} 行", o.rows, o.rows / 2);
-        admin.query(QKind::Meta, &fixture(o.rows)).await?;
-        etl::setup(&admin).await?;
-        scenario::setup(&admin).await?;
+        let gen = match &spec {
+            Some(s) => {
+                eprintln!("从模板库 {} 复制 {} 数据", s.template_db, s.label);
+                Some(Gen::setup(&admin, s.clone()).await?)
+            }
+            None => {
+                eprintln!("生成合成零售数据：门店销售 {} 行，目录销售 {} 行", o.rows, o.rows / 2);
+                admin.query(QKind::Meta, &fixture(o.rows)).await?;
+                etl::setup(&admin).await?;
+                scenario::setup(&admin).await?;
+                None
+            }
+        };
+        let tables: Vec<String> = match &spec {
+            Some(s) => s.tables(),
+            None => scenario::TABLES.iter().map(|s| s.to_string()).collect(),
+        };
+        let table_refs: Vec<&str> = tables.iter().map(String::as_str).collect();
         // 同快照执行需要事务性表版本：写入事务内由语句级触发器递增（内部表 mavra_versions，不对智能体暴露）
         if o.modes.iter().any(|m| config(m).0.snapshot_exec) {
-            catalog::install_tx_versions(&admin, &scenario::TABLES).await?;
+            catalog::install_tx_versions(&admin, &table_refs).await?;
         }
-        let v1 = scenario::fingerprint(&admin).await?;
+        let v1 = match &gen {
+            Some(g) => g.fingerprint(&admin).await?,
+            None => scenario::fingerprint(&admin).await?,
+        };
         let mut dataset = serde_json::Map::new();
-        for t in ["store_sales", "store_returns", "catalog_sales", "date_dim", "item"] {
+        for t in &tables {
             let n = admin.query(QKind::Meta, &format!("select count(*) from {t}")).await?.i64(0, 0).unwrap_or(0);
-            dataset.insert(t.into(), json!(n));
+            dataset.insert(t.clone(), json!(n));
         }
-        // 学习时快照库：另建一个库、跑同一套确定性的数据生成，与 v1 的指纹核对一致后只读连接给 G8 用
+        // 学习时快照库：另建一个库、跑同一套确定性的数据准备，与 v1 的指纹核对一致后只读连接给 G8 用
         let learn = if o.modes.iter().any(|m| config(m).0.g8_snapshot_db) {
-            root.query(QKind::Meta, &format!("create database {name}_learn")).await.context("创建学习时快照库失败")?;
+            let create_learn = match &spec {
+                Some(s) => format!("create database {name}_learn template {}", s.template_db),
+                None => format!("create database {name}_learn"),
+            };
+            root.query(QKind::Meta, &create_learn).await.context("创建学习时快照库失败")?;
             learn_url.set_path(&format!("/{name}_learn"));
             let la = Db::connect(learn_url.as_str(), 2, false)?;
-            la.query(QKind::Meta, &fixture(o.rows)).await?;
-            etl::setup(&la).await?;
-            scenario::setup(&la).await?;
-            ensure!(scenario::fingerprint(&la).await? == v1, "学习时快照库与 v1 内容不一致");
+            let same = match &spec {
+                Some(s) => Gen::setup(&la, s.clone()).await?.fingerprint(&la).await? == v1,
+                None => {
+                    la.query(QKind::Meta, &fixture(o.rows)).await?;
+                    etl::setup(&la).await?;
+                    scenario::setup(&la).await?;
+                    scenario::fingerprint(&la).await? == v1
+                }
+            };
+            ensure!(same, "学习时快照库与 v1 内容不一致");
             eprintln!("学习时快照库 {name}_learn 已建，内容与 v1 一致");
             Some(Arc::new(Db::connect_timeout(learn_url.as_str(), 4, true, o.sql_timeout_secs)?))
         } else {
@@ -1226,8 +1373,19 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         let probe = Db::connect(isolated.as_str(), 2, true)?;
         let db = Arc::new(Db::connect_timeout(isolated.as_str(), pool, true, o.sql_timeout_secs)?);
         let tasks = tasks_with(&o.metrics, o.question_set == "v2");
-        let env =
-            Env { o: &o, admin: &admin, probe: &probe, agent: &agent, extractor: &extractor, tasks: &tasks, changes: &changes, v1: &v1, learn, dir: &directory };
+        let env = Env {
+            o: &o,
+            admin: &admin,
+            probe: &probe,
+            agent: &agent,
+            extractor: &extractor,
+            tasks: &tasks,
+            changes: &changes,
+            v1: &v1,
+            learn,
+            dir: &directory,
+            gen: gen.as_ref(),
+        };
         let mut cells = vec![];
         for r in 1..=o.repeats {
             // 每轮轮换组的执行顺序
@@ -1250,8 +1408,9 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                           "agent_config": agent.config(), "extractor_config": extractor.config()},
             "dataset": dataset,
             "tasks": tasks.iter().map(|t| json!({"id": t.id, "metric": t.def.id, "set": t.set, "ask": t.ask, "tables": t.def.tables})).collect::<Vec<_>>(),
-            "changes": changes.iter().map(|c| json!({"name": c.name(), "label": c.label(), "class": c.class(), "tables": c.tables(),
-                                                     "describe": c.describe()})).collect::<Vec<_>>(),
+            "changes": changes.iter().map(|c| json!({"name": c.name(), "label": c.label(), "class": c.class(), "tables": env.change_tables(*c),
+                                                     "describe": gen.as_ref().map_or(c.describe().to_string(), |g| g.spec.describe(*c))})).collect::<Vec<_>>(),
+            "spec": gen.as_ref().map(Gen::report),
             "methodology": {
                 "learning": "学习题由 A 用带口径题面完成；直连组没有跨任务状态，不跑学习",
                 "holdout": "留出题由 holdout_agents 完成；参数留出与题型留出分开统计",

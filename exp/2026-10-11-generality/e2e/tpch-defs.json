@@ -1,0 +1,16 @@
+{
+ "library": "exp/2026-10-11-generality/libs/tpch-kept.json",
+ "note": "端到端（metric-bench --spec）的 TPC-H 指标：参照定义取自由 TPC-H 查询导出的定义库；业务口径照参照定义写成学习题里的说明，计分题只给指标名",
+ "defs": [
+  {"id": "M1", "name": "发货净收入", "reference": "metric:q15_b2_lineitem",
+   "definition": "发货净收入 = 订单明细（lineitem）的成交金额 l_extendedprice × (1 − 折扣 l_discount) 之和，按发货日期（l_shipdate）归属期间；每个订单明细行计一次"},
+  {"id": "M2", "name": "折扣让利额", "reference": "metric:q06_b0_lineitem",
+   "definition": "折扣让利额 = 折扣率（l_discount）在 0.05 到 0.07 之间、数量（l_quantity）小于 24 的订单明细的 l_extendedprice × l_discount 之和，按发货日期（l_shipdate）归属期间；每个订单明细行计一次"},
+  {"id": "M3", "name": "促销商品收入", "reference": "metric:q14_b0_lineitem",
+   "definition": "促销商品收入 = 商品类型（part.p_type）以 PROMO 开头的订单明细的 l_extendedprice × (1 − l_discount) 之和（其余明细计 0），按发货日期（l_shipdate）归属期间；每个订单明细行计一次，商品按其当前信息计"},
+  {"id": "M4", "name": "建筑业客户发货收入", "reference": "metric:q03_b0_lineitem",
+   "definition": "建筑业客户发货收入 = 市场细分（customer.c_mktsegment）为 BUILDING 的客户的订单明细的 l_extendedprice × (1 − l_discount) 之和；明细经订单（orders）关联到客户，按发货日期（l_shipdate）归属期间；每个订单明细行、每个订单各计一次"},
+  {"id": "M5", "name": "订单数", "reference": "metric:q04_b0_orders",
+   "definition": "订单数 = 订单（orders）的个数，按下单日期（o_orderdate）归属期间；每个订单计一次"}
+ ]
+}

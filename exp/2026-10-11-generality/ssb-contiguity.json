@@ -1,0 +1,3 @@
+{"check": "DateKeysContiguous on ssb_sf1.date (d_datekey by d_year, d_monthnuminyear), the SQL of Check::DateKeysContiguous",
+ "n_bad": 83, "n_months": 84, "n_bad_within_month": 0,
+ "note": "yyyymmdd keys are dense within each month but skip numbers between months (e.g. 19920131 -> 19920201), so every month after the first fails the adjacency part"}

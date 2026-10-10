@@ -679,10 +679,13 @@ const EXTRACT_SYSTEM: &str = "你是数据中间层的指标口径提炼器。�
 - aliases：其他常见叫法，可以为空数组\n\
 - definition：用一两句话说明口径\n\
 - fact：事实表\n\
-- measure：一个聚合表达式，如 sum(ss_net_paid)；只能引用 fact 与 joins 中表的列，不得包含子查询\n\
+- measure：一个聚合表达式，如 sum(ss_net_paid)；只能引用 fact 与 joins 中表的列，不得包含子查询；列名在这些表之间重名时写成 表.列\n\
 - grain：fact 上“一行对应一条业务记录”的键列数组\n\
-- time：{\"role\": 时间角色（如“销售日”）, \"fact_col\": 事实表上的日期键列, \"dim\": 日期维度表, \"dim_col\": 维度表键列, \"grain\": \"day\" / \"month\" / \"year\"}；与时间无关时为 null\n\
-- joins：计算口径必需的关联（不含时间维度），每项 {\"left\": 多侧表, \"right\": 一侧表, \"on\": [[左表列, 右表列]], \"kind\": \"inner\" 或 \"left\", \"filters\": {表: 条件}}；必须与已验证关联的方向一致\n\
+- time：{\"role\": 时间角色（如“销售日”）, \"fact_col\": 事实表上的日期键列, \"dim\": 日期维度表, \"dim_col\": 维度表键列, \"grain\": \"day\" / \"month\" / \"year\"}；\
+日期维度的年、月列不叫 d_year、d_moy 时另写 \"year_col\"、\"month_col\"；没有日期维度、期间由 DATE 列决定时写 \
+{\"role\", \"fact_col\": \"表.日期列\", \"strategy\": \"column\", \"grain\"}，dim 与 dim_col 留空；与时间无关时为 null\n\
+- joins：计算口径必需的关联（不含时间维度），每项 {\"left\": 多侧表, \"right\": 一侧表, \"on\": [[左表列, 右表列]], \"kind\": \"inner\" 或 \"left\", \"filters\": {表: 条件}}；\
+left 是事实表或列表中前面已关联的表（雪花型可逐级关联）；必须与已验证关联的方向一致\n\
 - filters：{表: 条件}，只写口径必需的条件（例如每条记录只计一次所需的状态过滤）；不得包含年份、月份、日期范围、排名个数等题目参数\n\
 - empty：题面说明无数据按 0 计写 \"zero\"，说明为空写 \"null\"，未说明写 \"unspecified\"\n\
 - caveats：注意事项数组，如被拦下的写法及原因、关联丢行比例\n\

@@ -1,0 +1,1287 @@
+{
+ "cell": "ssb-queries",
+ "schema": "ssb",
+ "templates": 13,
+ "parse_failures": [],
+ "duplicates": [
+  {
+   "query": "q3_4",
+   "block": 0,
+   "same_as": "q3_3_b0_lineorder"
+  },
+  {
+   "query": "q4_2",
+   "block": 0,
+   "same_as": "q4_1_b0_lineorder"
+  }
+ ],
+ "metric_report": {
+  "entries": [
+   {
+    "key": "metric:q1_1_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q1_1_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q1_1 block 0: sum(lineorder.lo_extendedprice * lineorder.lo_discount) over lineorder",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_extendedprice * lineorder.lo_discount)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [],
+     "filters": {
+      "lineorder": "lineorder.lo_discount BETWEEN 1 AND 3 and lineorder.lo_quantity < 25"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q1_1_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q1_1_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q1_1_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q1_1_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q1_1",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q1_2_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q1_2_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q1_2 block 0: sum(lineorder.lo_extendedprice * lineorder.lo_discount) over lineorder",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_extendedprice * lineorder.lo_discount)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [],
+     "filters": {
+      "lineorder": "lineorder.lo_discount BETWEEN 4 AND 6 and lineorder.lo_quantity BETWEEN 26 AND 35"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q1_2_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q1_2_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q1_2_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q1_2_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q1_2",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q1_3_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q1_3_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q1_3 block 0: sum(lineorder.lo_extendedprice * lineorder.lo_discount) over lineorder",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_extendedprice * lineorder.lo_discount)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [],
+     "filters": {
+      "lineorder": "lineorder.lo_discount BETWEEN 5 AND 7 and lineorder.lo_quantity BETWEEN 26 AND 35"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q1_3_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q1_3_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q1_3_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q1_3_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q1_3",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q2_1_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q2_1_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q2_1 block 0: sum(lineorder.lo_revenue) over lineorder with 2 join(s)",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_revenue)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "part",
+       "on": [
+        [
+         "lo_partkey",
+         "p_partkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "supplier",
+       "on": [
+        [
+         "lo_suppkey",
+         "s_suppkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "part": "part.p_category = 'MFGR#12'",
+      "supplier": "supplier.s_region = 'AMERICA'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q2_1_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q2_1_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q2_1_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q2_1_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q2_1",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q2_2_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q2_2_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q2_2 block 0: sum(lineorder.lo_revenue) over lineorder with 2 join(s)",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_revenue)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "part",
+       "on": [
+        [
+         "lo_partkey",
+         "p_partkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "supplier",
+       "on": [
+        [
+         "lo_suppkey",
+         "s_suppkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "part": "part.p_brand1 BETWEEN 'MFGR#2221' AND 'MFGR#2228'",
+      "supplier": "supplier.s_region = 'ASIA'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q2_2_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q2_2_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q2_2_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q2_2_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q2_2",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q2_3_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q2_3_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q2_3 block 0: sum(lineorder.lo_revenue) over lineorder with 2 join(s)",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_revenue)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "part",
+       "on": [
+        [
+         "lo_partkey",
+         "p_partkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "supplier",
+       "on": [
+        [
+         "lo_suppkey",
+         "s_suppkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "part": "part.p_brand1 = 'MFGR#2239'",
+      "supplier": "supplier.s_region = 'EUROPE'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q2_3_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q2_3_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q2_3_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q2_3_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q2_3",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q3_1_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q3_1_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q3_1 block 0: sum(lineorder.lo_revenue) over lineorder with 2 join(s)",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_revenue)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "customer",
+       "on": [
+        [
+         "lo_custkey",
+         "c_custkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "supplier",
+       "on": [
+        [
+         "lo_suppkey",
+         "s_suppkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "customer": "customer.c_region = 'ASIA'",
+      "supplier": "supplier.s_region = 'ASIA'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q3_1_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q3_1_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q3_1_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q3_1_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q3_1",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q3_2_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q3_2_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q3_2 block 0: sum(lineorder.lo_revenue) over lineorder with 2 join(s)",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_revenue)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "customer",
+       "on": [
+        [
+         "lo_custkey",
+         "c_custkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "supplier",
+       "on": [
+        [
+         "lo_suppkey",
+         "s_suppkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "customer": "customer.c_nation = 'UNITED STATES'",
+      "supplier": "supplier.s_nation = 'UNITED STATES'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q3_2_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q3_2_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q3_2_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q3_2_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q3_2",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q3_3_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q3_3_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q3_3 block 0: sum(lineorder.lo_revenue) over lineorder with 2 join(s)",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_revenue)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "customer",
+       "on": [
+        [
+         "lo_custkey",
+         "c_custkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "supplier",
+       "on": [
+        [
+         "lo_suppkey",
+         "s_suppkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "customer": "(customer.c_city = 'UNITED KI1' OR customer.c_city = 'UNITED KI5')",
+      "supplier": "(supplier.s_city = 'UNITED KI1' OR supplier.s_city = 'UNITED KI5')"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q3_3_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q3_3_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q3_3_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q3_3_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q3_3",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q4_1_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q4_1_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q4_1 block 0: sum(lineorder.lo_revenue - lineorder.lo_supplycost) over lineorder with 3 join(s)",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_revenue - lineorder.lo_supplycost)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "customer",
+       "on": [
+        [
+         "lo_custkey",
+         "c_custkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "supplier",
+       "on": [
+        [
+         "lo_suppkey",
+         "s_suppkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "part",
+       "on": [
+        [
+         "lo_partkey",
+         "p_partkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "customer": "customer.c_region = 'AMERICA'",
+      "supplier": "supplier.s_region = 'AMERICA'",
+      "part": "(part.p_mfgr = 'MFGR#1' OR part.p_mfgr = 'MFGR#2')"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q4_1_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q4_1_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q4_1_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q4_1_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q4_1",
+     "block": 0
+    }
+   },
+   {
+    "key": "metric:q4_3_b0_lineorder",
+    "status": "Valid",
+    "metric": {
+     "name": "q4_3_b0_lineorder",
+     "aliases": [],
+     "definition": "SSB q4_3 block 0: sum(lineorder.lo_revenue - lineorder.lo_supplycost) over lineorder with 3 join(s)",
+     "fact": "lineorder",
+     "measure": "sum(lineorder.lo_revenue - lineorder.lo_supplycost)",
+     "grain": [
+      "lo_orderkey",
+      "lo_linenumber"
+     ],
+     "time": {
+      "role": "order date",
+      "fact_col": "lo_orderdate",
+      "dim": "date",
+      "dim_col": "d_datekey",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "year_col": "d_year",
+      "month_col": "d_monthnuminyear"
+     },
+     "joins": [
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "customer",
+       "on": [
+        [
+         "lo_custkey",
+         "c_custkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "supplier",
+       "on": [
+        [
+         "lo_suppkey",
+         "s_suppkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      },
+      {
+       "key": "",
+       "left": "lineorder",
+       "right": "part",
+       "on": [
+        [
+         "lo_partkey",
+         "p_partkey"
+        ]
+       ],
+       "kind": "inner",
+       "filters": {},
+       "cardinality": "",
+       "loss_ratio": 0.0,
+       "revision": 0
+      }
+     ],
+     "filters": {
+      "customer": "customer.c_region = 'AMERICA'",
+      "supplier": "supplier.s_nation = 'UNITED STATES'",
+      "part": "part.p_category = 'MFGR#14'"
+     },
+     "empty": "unspecified",
+     "caveats": [],
+     "examples": [],
+     "basis": {
+      "kind": "none"
+     }
+    },
+    "evidence": {
+     "task": "q4_3_b0_lineorder-L1",
+     "ask": {
+      "kind": "single",
+      "period": {
+       "year": 1996,
+       "m1": 3,
+       "m2": 3
+      }
+     },
+     "decimals": 2
+    },
+    "holdout": [
+     {
+      "id": "q4_3_b0_lineorder-P1",
+      "ask": {
+       "kind": "single",
+       "period": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       }
+      }
+     },
+     {
+      "id": "q4_3_b0_lineorder-T1",
+      "ask": {
+       "kind": "diff",
+       "a": {
+        "year": 1997,
+        "m1": 9,
+        "m2": 9
+       },
+       "b": {
+        "year": 1996,
+        "m1": 6,
+        "m2": 6
+       }
+      }
+     },
+     {
+      "id": "q4_3_b0_lineorder-T2",
+      "ask": {
+       "kind": "rank_month",
+       "year": 1997
+      }
+     }
+    ],
+    "source": {
+     "query": "q4_3",
+     "block": 0
+    }
+   }
+  ]
+ },
+ "excluded": [],
+ "support_rule": "学习题在初始数据上的答案非空、非零"
+}

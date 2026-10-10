@@ -383,7 +383,7 @@ async fn has_growth(db: &Db) -> Result<bool> {
 }
 
 /// 表的全部列（按定义顺序），可排除若干列。
-async fn cols(db: &Db, table: &str, exclude: &[&str]) -> Result<Vec<String>> {
+pub(crate) async fn cols(db: &Db, table: &str, exclude: &[&str]) -> Result<Vec<String>> {
     let r = db
         .query(
             QKind::Meta,
@@ -409,7 +409,7 @@ async fn money_cols(db: &Db) -> Result<Vec<String>> {
 }
 
 /// 执行一条写入，记批次，刷新统计信息并等待 DML 计数上报。返回影响行数。
-async fn write(db: &Db, table: &str, note: &str, sql: &str) -> Result<i64> {
+pub(crate) async fn write(db: &Db, table: &str, note: &str, sql: &str) -> Result<i64> {
     let before = catalog::versions(db).await?.get(table).map(|v| v.dml).unwrap_or(0);
     let n = db.execute(sql).await?;
     db.query(QKind::Meta, "select pg_stat_force_next_flush()").await?;

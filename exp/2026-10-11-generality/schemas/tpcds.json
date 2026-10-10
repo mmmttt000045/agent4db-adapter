@@ -1,0 +1,37 @@
+{
+  "name": "tpcds",
+  "label": "TPC-DS",
+  "template_db": "tpcds_sf1",
+  "calendar": {"kind": "dim", "table": "date_dim", "key": "d_date_sk", "date_col": "d_date", "year_col": "d_year", "month_col": "d_moy"},
+  "years": {"learn": 2001, "holdout": 2002},
+  "facts": [
+    {"table": "store_sales", "grain": ["ss_item_sk", "ss_ticket_number"], "date": "ss_sold_date_sk", "new_key": "ss_ticket_number",
+     "money": ["ss_wholesale_cost", "ss_list_price", "ss_sales_price", "ss_ext_discount_amt", "ss_ext_sales_price", "ss_ext_wholesale_cost",
+               "ss_ext_list_price", "ss_ext_tax", "ss_coupon_amt", "ss_net_paid", "ss_net_paid_inc_tax", "ss_net_profit"]},
+    {"table": "store_returns", "grain": ["sr_item_sk", "sr_ticket_number"], "date": "sr_returned_date_sk", "new_key": "sr_ticket_number",
+     "money": ["sr_return_amt", "sr_return_tax", "sr_return_amt_inc_tax", "sr_fee", "sr_return_ship_cost", "sr_refunded_cash",
+               "sr_reversed_charge", "sr_store_credit", "sr_net_loss"]},
+    {"table": "catalog_sales", "grain": ["cs_item_sk", "cs_order_number"], "date": "cs_sold_date_sk", "new_key": "cs_order_number",
+     "money": ["cs_wholesale_cost", "cs_list_price", "cs_sales_price", "cs_ext_discount_amt", "cs_ext_sales_price", "cs_ext_wholesale_cost",
+               "cs_ext_list_price", "cs_ext_tax", "cs_coupon_amt", "cs_ext_ship_cost", "cs_net_paid", "cs_net_paid_inc_tax",
+               "cs_net_paid_inc_ship", "cs_net_paid_inc_ship_tax", "cs_net_profit"]},
+    {"table": "catalog_returns", "grain": ["cr_item_sk", "cr_order_number"], "date": "cr_returned_date_sk", "new_key": "cr_order_number",
+     "money": ["cr_return_amount", "cr_return_tax", "cr_return_amt_inc_tax", "cr_fee", "cr_return_ship_cost", "cr_refunded_cash",
+               "cr_reversed_charge", "cr_store_credit", "cr_net_loss"]},
+    {"table": "web_sales", "grain": ["ws_item_sk", "ws_order_number"], "date": "ws_sold_date_sk", "new_key": "ws_order_number",
+     "money": ["ws_wholesale_cost", "ws_list_price", "ws_sales_price", "ws_ext_discount_amt", "ws_ext_sales_price", "ws_ext_wholesale_cost",
+               "ws_ext_list_price", "ws_ext_tax", "ws_coupon_amt", "ws_ext_ship_cost", "ws_net_paid", "ws_net_paid_inc_tax",
+               "ws_net_paid_inc_ship", "ws_net_paid_inc_ship_tax", "ws_net_profit"]},
+    {"table": "web_returns", "grain": ["wr_item_sk", "wr_order_number"], "date": "wr_returned_date_sk", "new_key": "wr_order_number",
+     "money": ["wr_return_amt", "wr_return_tax", "wr_return_amt_inc_tax", "wr_fee", "wr_return_ship_cost", "wr_refunded_cash",
+               "wr_reversed_charge", "wr_account_credit", "wr_net_loss"]}
+  ],
+  "dims": [
+    {"table": "item", "key": ["i_item_sk"], "attr": "i_category",
+     "refs": [["store_sales", "ss_item_sk"], ["store_returns", "sr_item_sk"], ["catalog_sales", "cs_item_sk"],
+              ["catalog_returns", "cr_item_sk"], ["web_sales", "ws_item_sk"], ["web_returns", "wr_item_sk"]]}
+  ],
+  "changes": {"append": "store_sales", "backfill": "store_returns", "correct": "store_sales", "addcol": "store_returns",
+              "status": "store_returns", "revision": "store_sales", "dupload": "store_sales", "dimhist": "item",
+              "latekey": "store_sales", "unit": "store_sales", "mirror": "store_returns"}
+}

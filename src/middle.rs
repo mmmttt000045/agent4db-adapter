@@ -963,7 +963,7 @@ impl Middle {
             _ => (vec![], vec![], 0),
         };
         match verdict {
-            Ok(p) if !paths.iter().any(|x| same_on(&x.on, &p.on)) => paths.push(p.clone()),
+            Ok(p) if !paths.iter().any(|x| same_on(&x.on, &p.on) && x.left == p.left) => paths.push(p.clone()),
             Err(x) if !bad.iter().any(|y| same_on(&y.on, &x.on)) => bad.push(x.clone()),
             _ => {}
         }
@@ -1317,7 +1317,8 @@ impl Middle {
         force: bool,
     ) -> Result<(std::result::Result<JoinPath, BadPath>, &'static str)> {
         let (paths, bad, src) = self.join_entry_with(ctx, a, b, force).await?;
-        if let Some(p) = paths.iter().find(|p| same_on(&p.on, on)) {
+        // 同一组关联列可能以两个方向各存一条路径（定义按自己的方向验证过），优先取调用方的方向
+        if let Some(p) = paths.iter().find(|p| same_on(&p.on, on) && p.left == a).or_else(|| paths.iter().find(|p| same_on(&p.on, on))) {
             return Ok((Ok(p.clone()), src));
         }
         if let Some(x) = bad.iter().find(|x| same_on(&x.on, on)) {

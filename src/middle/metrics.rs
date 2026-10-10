@@ -5,7 +5,7 @@ use super::{inc, join_key, outcome_text, scope_prefix, snap_key, ver_sig, Ctx, M
 use crate::catalog::{self, TableVersion};
 use crate::checks::{same_on, Check, On, Outcome};
 use crate::db::QKind;
-use crate::knowledge::{Basis, Content, Entry, Example, JoinKind, JoinPath, JoinRef, Metric, Status, TimeSpec, TimeStrategy};
+use crate::knowledge::{BadPath, Basis, Content, Entry, Example, JoinKind, JoinPath, JoinRef, Metric, Status, TimeSpec, TimeStrategy};
 use crate::metric::{self, Answer, Ask, Draft, Trajectory};
 use crate::sqlscan;
 use anyhow::Result;
@@ -622,7 +622,7 @@ impl Middle {
                 bad!("维度列 {}.{c} 不存在", t.dim);
             }
             let on = vec![(t.fact_col.clone(), t.dim_col.clone())];
-            match self.verdict(ctx, &m.fact, &t.dim, &on).await?.0 {
+            match self.definition_verdict(ctx, &m.fact, &t.dim, &on, false).await?.0 {
                 Ok(p) => {
                     if let Some(tm) = m.time.as_mut() {
                         tm.loss_ratio = p.loss_ratio;
@@ -646,7 +646,7 @@ impl Middle {
             if self.cat.validate_join(&j.left, &j.right, &j.on).is_err() {
                 bad!("关联 {}⋈{} 的列不存在或重复", j.left, j.right);
             }
-            let p = match self.verdict(ctx, &j.left, &j.right, &j.on).await?.0 {
+            let p = match self.definition_verdict(ctx, &j.left, &j.right, &j.on, false).await?.0 {
                 Ok(p) => p,
                 Err(x) => bad!("关联 {}⋈{} 不是已验证路径：{}", j.left, j.right, x.reason),
             };
@@ -1018,7 +1018,7 @@ impl Middle {
                 conds.push(json!({"cond": label, "tables": ts, "action": "skipped"}));
                 continue;
             }
-            let (r, src) = self.verdict_with(ctx, &j.left, &j.right, &j.on, force).await?;
+            let (r, src) = self.definition_verdict(ctx, &j.left, &j.right, &j.on, force).await?;
             let breach = match r {
                 Ok(p) if p.left == j.left && p.right == j.right => {
                     if covers(&j.filters, &p.filters) {
@@ -1072,7 +1072,7 @@ impl Middle {
             } else if let Some(ts) = untouched(self.join_cond(ctx, &m.fact, &t.dim, &on, None, &BTreeMap::new())) {
                 conds.push(json!({"cond": label, "tables": ts, "action": "skipped"}));
             } else {
-                let (r, src) = self.verdict_with(ctx, &m.fact, &t.dim, &on, force).await?;
+                let (r, src) = self.definition_verdict(ctx, &m.fact, &t.dim, &on, force).await?;
                 conds.push(json!({"cond": label, "action": action, "source": src, "pass": r.is_ok()}));
                 if let Err(x) = r {
                     return Ok(Some(Breach::Time(format!("时间关联不再成立：{}", x.reason))));
@@ -1263,6 +1263,39 @@ impl Middle {
 
     /// 关联条件读到的表：已验证路径的守卫（唯一侧的键唯一性）涉及的表。关联经验不是有效状态、修订号与引用时不同、
     /// 找不到同方向的同一路径，或路径要求的过滤没有被引用覆盖时返回 None，按待验证处理。只读经验库，不访问数据库。
+    /// 定义里的关联有方向：从事实表（或已关联的表）指向至多一行的右侧。表对的关联经验按行数先试“大表在左”，
+    /// 遇到事实表比维表小（如每月只有几笔的贷款表）或一对一的关联，得到的路径或反例可能方向相反：一对一的路径两个方向
+    /// 都成立，直接按定义的方向使用；其余情形按定义的方向重新验证（右侧不唯一时照常尝试粒度修复），结论并入关联经验。
+    pub(super) async fn definition_verdict(
+        &self,
+        ctx: &Ctx,
+        left: &str,
+        right: &str,
+        on: &On,
+        force: bool,
+    ) -> Result<(std::result::Result<JoinPath, BadPath>, &'static str)> {
+        let (r, src) = self.verdict_with(ctx, left, right, on, force).await?;
+        match r {
+            Ok(p) if p.left == left && p.right == right => Ok((Ok(p), src)),
+            Ok(p) if p.left_unique && p.right_unique => {
+                let mut q = p.clone();
+                q.left = left.into();
+                q.right = right.into();
+                q.on = crate::checks::flip(&p.on);
+                q.loss_ratio = 0.0;
+                q.evidence.push(format!("一对一关联，按定义的方向 {left}⋈{right} 使用"));
+                Ok((Ok(q), src))
+            }
+            Err(x) if x.left == left && x.right == right => Ok((Err(x), src)),
+            // 反方向的路径或反例（例如一对一关联在补写后变成一对多）不说明定义方向的关联不成立
+            _ => {
+                let v = self.validate(ctx, left, right, on, BTreeMap::new(), None).await?;
+                self.merge_join(ctx, left, right, &v).await?;
+                Ok((v, "explored"))
+            }
+        }
+    }
+
     fn join_cond(
         &self,
         ctx: &Ctx,
@@ -1343,7 +1376,9 @@ impl Middle {
                 };
                 match found {
                     Some(f) => {
-                        m2.filters.insert(m.fact.clone(), f.clone());
+                        // 与定义原有的事实表过滤合取，不能替换它
+                        let v = m2.filters.entry(m.fact.clone()).or_default();
+                        *v = if v.trim().is_empty() { f.clone() } else { format!("({v}) and {f}") };
                         format!("{} 增加粒度过滤 {f}", m.fact)
                     }
                     None => {

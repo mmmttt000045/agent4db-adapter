@@ -1,21 +1,127 @@
 {
-  "name": "tpch", "label": "TPC-H", "template_db": "tpch_sf1",
-  "calendar": {"kind": "column"},
-  "years": {"learn": 1996, "holdout": 1997},
-  "facts": [
-    {"table": "lineitem", "grain": ["l_orderkey", "l_linenumber"], "date": "l_shipdate",
-     "new_key": "l_orderkey", "money": ["l_extendedprice"]},
-    {"table": "orders", "grain": ["o_orderkey"], "date": "o_orderdate",
-     "new_key": "o_orderkey", "money": ["o_totalprice"], "refs": [["lineitem", "l_orderkey"]]}
-  ],
-  "dims": [
-    {"table": "part", "key": ["p_partkey"], "attr": "p_brand", "refs": [["lineitem", "l_partkey"]]},
-    {"table": "supplier", "key": ["s_suppkey"], "attr": "s_address", "refs": [["lineitem", "l_suppkey"]]},
-    {"table": "customer", "key": ["c_custkey"], "attr": "c_mktsegment", "refs": [["orders", "o_custkey"]]},
-    {"table": "nation", "key": ["n_nationkey"], "attr": "n_comment", "refs": [["supplier", "s_nationkey"], ["customer", "c_nationkey"]]},
-    {"table": "region", "key": ["r_regionkey"], "attr": "r_comment", "refs": [["nation", "n_regionkey"]]}
-  ],
-  "changes": {"append": "lineitem", "backfill": "orders", "correct": "lineitem", "addcol": "orders",
-              "status": "orders", "revision": "lineitem", "dupload": "lineitem", "dimhist": "part",
-              "latekey": "lineitem", "unit": "lineitem", "mirror": "orders"}
+ "name": "tpch",
+ "label": "TPC-H",
+ "template_db": "tpch_sf1",
+ "calendar": {
+  "kind": "column"
+ },
+ "years": {
+  "learn": 1996,
+  "holdout": 1997
+ },
+ "facts": [
+  {
+   "table": "lineitem",
+   "grain": [
+    "l_orderkey",
+    "l_linenumber"
+   ],
+   "date": "l_shipdate",
+   "new_key": "l_linenumber",
+   "money": [
+    "l_extendedprice"
+   ]
+  },
+  {
+   "table": "orders",
+   "grain": [
+    "o_orderkey"
+   ],
+   "date": "o_orderdate",
+   "new_key": "o_orderkey",
+   "money": [
+    "o_totalprice"
+   ],
+   "refs": [
+    [
+     "lineitem",
+     "l_orderkey"
+    ]
+   ]
+  }
+ ],
+ "dims": [
+  {
+   "table": "part",
+   "key": [
+    "p_partkey"
+   ],
+   "attr": "p_brand",
+   "refs": [
+    [
+     "lineitem",
+     "l_partkey"
+    ]
+   ]
+  },
+  {
+   "table": "supplier",
+   "key": [
+    "s_suppkey"
+   ],
+   "attr": "s_address",
+   "refs": [
+    [
+     "lineitem",
+     "l_suppkey"
+    ]
+   ]
+  },
+  {
+   "table": "customer",
+   "key": [
+    "c_custkey"
+   ],
+   "attr": "c_mktsegment",
+   "refs": [
+    [
+     "orders",
+     "o_custkey"
+    ]
+   ]
+  },
+  {
+   "table": "nation",
+   "key": [
+    "n_nationkey"
+   ],
+   "attr": "n_comment",
+   "refs": [
+    [
+     "supplier",
+     "s_nationkey"
+    ],
+    [
+     "customer",
+     "c_nationkey"
+    ]
+   ]
+  },
+  {
+   "table": "region",
+   "key": [
+    "r_regionkey"
+   ],
+   "attr": "r_comment",
+   "refs": [
+    [
+     "nation",
+     "n_regionkey"
+    ]
+   ]
+  }
+ ],
+ "changes": {
+  "append": "lineitem",
+  "backfill": "orders",
+  "correct": "lineitem",
+  "addcol": "orders",
+  "status": "orders",
+  "revision": "lineitem",
+  "dupload": "lineitem",
+  "dimhist": "part",
+  "latekey": "lineitem",
+  "unit": "lineitem",
+  "mirror": "orders"
+ }
 }

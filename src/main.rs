@@ -17,6 +17,7 @@ mod replaybench;
 mod scenario;
 mod server;
 mod sessionbench;
+mod specchange;
 mod sqlscan;
 mod strategybench;
 mod timing;

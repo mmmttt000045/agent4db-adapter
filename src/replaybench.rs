@@ -15,6 +15,7 @@ use crate::metric::{self, parse_answer, same_value, Ask};
 use crate::metricbench::{self, Set};
 use crate::middle::{Checkpoint, Ctx, Maint, Middle, MiddleConfig};
 use crate::scenario::{self, Change};
+use crate::specchange::{Gen, Spec};
 use crate::tpcds;
 use anyhow::{bail, ensure, Context, Result};
 use serde::Serialize;
@@ -46,6 +47,10 @@ pub struct Options {
     /// --schema tpcds 时复制的模板库名
     #[arg(long, default_value = "tpcds_sf1")]
     template_db: String,
+    /// 模式描述（exp/2026-10-11-generality/schemas/*.json）：给出时忽略 --schema 与 --template-db，从描述里的模板库复制数据，
+    /// 变化由 `specchange` 按描述生成，库为 tools/bench-library.py 导出的定义库
+    #[arg(long)]
+    spec: Option<String>,
     #[arg(long, value_delimiter = ',',
           default_value = "append,backfill,correct,addcol,status,revision,dupload,dimhist,latekey,unit,mirror",
           value_parser = ["append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"])]
@@ -70,45 +75,63 @@ pub(crate) struct LibEntry {
     own_gold: bool,
 }
 
-/// 两种负载上的同名变化。
+/// 三种负载上的同名变化：合成数据、TPC-DS（手写）、模式描述驱动（`specchange`）。
 #[derive(Clone, Copy)]
 enum Ch {
     Syn(Change),
     Tp(tpcds::Change),
+    Gen(Change),
 }
 
 impl Ch {
     fn parse(schema: &str, s: &str) -> Result<Ch> {
-        Ok(if schema == "tpcds" { Ch::Tp(tpcds::Change::parse(s)?) } else { Ch::Syn(Change::parse(s)?) })
+        Ok(match schema {
+            "tpcds" => Ch::Tp(tpcds::Change::parse(s)?),
+            "spec" => Ch::Gen(Change::parse(s)?),
+            _ => Ch::Syn(Change::parse(s)?),
+        })
     }
     fn syn(self) -> Change {
         match self {
-            Ch::Syn(c) => c,
+            Ch::Syn(c) | Ch::Gen(c) => c,
             Ch::Tp(c) => c.syn(),
         }
     }
     fn name(self) -> &'static str {
         self.syn().name()
     }
-    fn tables(self) -> &'static [&'static str] {
-        self.syn().tables()
+    /// 变化写入的表（决定哪些定义要重答）。
+    fn tables(self, gen: Option<&Gen>) -> Vec<String> {
+        match (self, gen) {
+            (Ch::Gen(c), Some(g)) => g.spec.change_tables(c),
+            _ => self.syn().tables().iter().map(|s| s.to_string()).collect(),
+        }
     }
-    async fn apply_truth(self, db: &Db) -> Result<i64> {
+    fn describe(self, gen: Option<&Gen>) -> String {
+        match (self, gen) {
+            (Ch::Gen(c), Some(g)) => g.spec.describe(c),
+            _ => self.syn().describe().to_string(),
+        }
+    }
+    async fn apply_truth(self, db: &Db, gen: Option<&Gen>) -> Result<i64> {
         match self {
             Ch::Syn(c) => c.apply_truth(db).await,
             Ch::Tp(c) => c.apply_truth(db).await,
+            Ch::Gen(c) => gen.context("缺少模式描述")?.apply_truth(db, c).await,
         }
     }
-    async fn apply_hidden(self, db: &Db) -> Result<i64> {
+    async fn apply_hidden(self, db: &Db, gen: Option<&Gen>) -> Result<i64> {
         match self {
             Ch::Syn(c) => c.apply_hidden(db).await,
             Ch::Tp(c) => c.apply_hidden(db).await,
+            Ch::Gen(c) => gen.context("缺少模式描述")?.apply_hidden(db, c).await,
         }
     }
-    async fn reset(self, db: &Db) -> Result<()> {
+    async fn reset(self, db: &Db, gen: Option<&Gen>) -> Result<()> {
         match self {
             Ch::Syn(c) => c.reset(db).await,
             Ch::Tp(c) => c.reset(db).await,
+            Ch::Gen(c) => gen.context("缺少模式描述")?.reset(db, c).await,
         }
     }
 }
@@ -164,6 +187,11 @@ fn find_cells(path: &Path, out: &mut Vec<String>) -> Result<()> {
 }
 
 pub(crate) fn load(path: &str) -> Result<Library> {
+    load_with(path, &judge_metric)
+}
+
+/// `judge`：自带留出题的库（TPC-DS 与模式描述的库）由原定义推出判题定义的方式。
+fn load_with(path: &str, judge: &dyn Fn(&Metric) -> Metric) -> Result<Library> {
     let v: Value = serde_json::from_str(&std::fs::read_to_string(path)?).with_context(|| format!("读取 {path}"))?;
     let p = Path::new(path);
     let run = p.parent().and_then(Path::parent).and_then(Path::file_name).and_then(|n| n.to_str()).unwrap_or("run");
@@ -199,7 +227,7 @@ pub(crate) fn load(path: &str) -> Result<Library> {
             };
             let judge = match ev["judge"].as_str() {
                 Some(j) => j.to_string(),
-                None if own_gold => metric::compile(&judge_metric(&metric), &ask)?,
+                None if own_gold => metric::compile(&judge(&metric), &ask)?,
                 None => bail!("缺少判题 SQL"),
             };
             Ok(LibEntry { name, def, metric, ask, decimals: ev["decimals"].as_u64().unwrap_or(2) as u32, judge, example, held, own_gold })
@@ -244,13 +272,13 @@ fn config(policy: &str, oracle: &str) -> MiddleConfig {
     }
 }
 
-/// 条目是否读到了变化的表：合成基准按基准定义的表，TPC-DS 库按结构化实现涉及的表。
-fn affected(e: &LibEntry, ch: Ch) -> bool {
+/// 条目是否读到了变化的表：合成基准按基准定义的表，自带留出题的库按结构化实现涉及的表。
+fn affected(e: &LibEntry, changed: &[String]) -> bool {
     let tables: Vec<String> = match metricbench::tasks(std::slice::from_ref(&e.def)).first() {
         Some(t) if !e.own_gold => t.def.tables.iter().map(|s| s.to_string()).collect(),
         _ => e.metric.tables(),
     };
-    tables.iter().any(|x| ch.tables().contains(&x.as_str()))
+    tables.iter().any(|x| changed.contains(x))
 }
 
 /// 同一变化状态下相同 SQL 的答案只算一次（各实例提供的修订大多相同）。
@@ -290,13 +318,21 @@ const TABLE_TESTS: &[(&str, &str, &str)] = &[
     ("date_dim", "unique(d_date_sk)", "select 1 from date_dim group by d_date_sk having count(*) > 1 limit 1"),
 ];
 
-async fn table_tests(db: &Db) -> Result<Vec<Value>> {
+async fn table_tests(db: &Db, tests: &[(String, String, String)]) -> Result<Vec<Value>> {
     let mut out = vec![];
-    for (table, test, sql) in TABLE_TESTS {
+    for (table, test, sql) in tests {
         let failed = db.query(QKind::Check, sql).await?.cell(0, 0).is_some();
         out.push(json!({"table": table, "test": test, "failed": failed}));
     }
     Ok(out)
+}
+
+/// 回滚核对：模式描述驱动时按描述里的表，否则按合成数据与 TPC-DS 共用的表。
+async fn ensure_v1(admin: &Db, gen: Option<&Gen>, v1: &BTreeMap<String, String>, after: &str) -> Result<()> {
+    match gen {
+        Some(g) => g.ensure_same(admin, v1, after).await,
+        None => scenario::ensure_v1(admin, v1, after).await,
+    }
 }
 
 async fn answer(probe: &Db, sql: &str) -> String {
@@ -312,14 +348,22 @@ fn db_ms(mid: &Middle) -> (f64, u64) {
 }
 
 pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
-    let changes = o.changes.iter().map(|c| Ch::parse(&o.schema, c)).collect::<Result<Vec<_>>>()?;
+    let spec = o.spec.as_deref().map(Spec::load).transpose()?;
+    let schema = if spec.is_some() { "spec" } else { o.schema.as_str() };
+    let changes = o.changes.iter().map(|c| Ch::parse(schema, c)).collect::<Result<Vec<_>>>()?;
     ensure!(!o.oracles.is_empty(), "至少需要一种 G8 参照");
     let primary = o.oracles[0].clone();
     let mut files = vec![];
     for l in &o.libs {
         find_cells(Path::new(l), &mut files)?;
     }
-    let libs: Vec<Library> = files.iter().map(|f| load(f)).collect::<Result<_>>()?;
+    let libs: Vec<Library> = files
+        .iter()
+        .map(|f| match &spec {
+            Some(s) => load_with(f, &|m| s.judge_metric(m)),
+            None => load(f),
+        })
+        .collect::<Result<_>>()?;
     ensure!(!libs.is_empty(), "没有找到指标库");
     eprintln!("指标库 {} 个，条目 {} 条", libs.len(), libs.iter().map(|l| l.entries.len()).sum::<usize>());
     let stamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
@@ -329,28 +373,48 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     let root = Db::connect(url, 1, false)?;
     let mut isolated = reqwest::Url::parse(url)?;
     isolated.set_path(&format!("/{name}"));
-    let create =
-        if o.schema == "tpcds" { format!("create database {name} template {}", o.template_db) } else { format!("create database {name}") };
+    let create = match (&spec, schema) {
+        (Some(s), _) => format!("create database {name} template {}", s.template_db),
+        (None, "tpcds") => format!("create database {name} template {}", o.template_db),
+        _ => format!("create database {name}"),
+    };
     root.query(QKind::Meta, &create).await.context("创建隔离实验库失败（需要 CREATEDB；tpcds 还需要模板库存在且无人连接）")?;
     let result: Result<Value> = async {
         let admin = Db::connect(isolated.as_str(), 2, false)?;
-        if o.schema == "tpcds" {
-            eprintln!("从模板库 {} 复制 TPC-DS 数据", o.template_db);
-            tpcds::setup(&admin).await?;
-        } else {
-            eprintln!("生成合成零售数据：门店销售 {} 行，目录销售 {} 行", o.rows, o.rows / 2);
-            admin.query(QKind::Meta, &metricbench::fixture(o.rows)).await?;
-            etl::setup(&admin).await?;
-            scenario::setup(&admin).await?;
-        }
+        let gen: Option<Gen> = match &spec {
+            Some(s) => {
+                eprintln!("从模板库 {} 复制 {} 数据", s.template_db, s.label);
+                Some(Gen::setup(&admin, s.clone()).await?)
+            }
+            None if schema == "tpcds" => {
+                eprintln!("从模板库 {} 复制 TPC-DS 数据", o.template_db);
+                tpcds::setup(&admin).await?;
+                None
+            }
+            None => {
+                eprintln!("生成合成零售数据：门店销售 {} 行，目录销售 {} 行", o.rows, o.rows / 2);
+                admin.query(QKind::Meta, &metricbench::fixture(o.rows)).await?;
+                etl::setup(&admin).await?;
+                scenario::setup(&admin).await?;
+                None
+            }
+        };
+        let gen = gen.as_ref();
         if o.oracles.iter().any(|x| x == "snapshot") {
             let n = copy_learning_snapshot(&admin).await?;
             eprintln!("学习时快照：{n} 张表复制到模式 {LEARN_SCHEMA}");
         }
-        let v1 = scenario::fingerprint(&admin).await?;
+        let v1 = match gen {
+            Some(g) => g.fingerprint(&admin).await?,
+            None => scenario::fingerprint(&admin).await?,
+        };
+        let tests: Vec<(String, String, String)> = match gen {
+            Some(g) => g.spec.table_tests(),
+            None => TABLE_TESTS.iter().map(|(a, b, c)| (a.to_string(), b.to_string(), c.to_string())).collect(),
+        };
         let table_test = o.policies.iter().any(|p| p == "tabletest");
         if table_test {
-            let failed: Vec<Value> = table_tests(&admin).await?.into_iter().filter(|x| x["failed"] == true).collect();
+            let failed: Vec<Value> = table_tests(&admin, &tests).await?.into_iter().filter(|x| x["failed"] == true).collect();
             ensure!(failed.is_empty(), "表级测试在初始快照上就失败，无法作为校准过的基线：{failed:?}");
         }
         let probe = Db::connect(isolated.as_str(), 2, true)?;
@@ -416,15 +480,20 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
 
         let (mut outcomes, mut maint) = (vec![], vec![]);
         for (ci, &ch) in changes.iter().enumerate() {
-            scenario::ensure_v1(&admin, &v1, "上一个变化").await?;
-            let truth = ch.apply_truth(&admin).await?;
+            ensure_v1(&admin, gen, &v1, "上一个变化").await?;
+            let changed = ch.tables(gen);
+            let truth = ch.apply_truth(&admin, gen).await?;
             let mut gold = metricbench::gold_map(&admin, &tasks).await?;
             // TPC-DS 库的标准答案：原定义加上区分列过滤（当前版本、完成状态、当前商品）的规范 SQL，在业务事实已变、
             // 表示未变的状态上算出——与合成基准手写判题 SQL 预先带这些过滤的做法相同；v1 上这些过滤不起作用
             for lib in &libs {
-                for e in lib.entries.iter().filter(|e| e.own_gold && affected(e, ch)) {
+                for e in lib.entries.iter().filter(|e| e.own_gold && affected(e, &changed)) {
                     for (id, ask) in &e.held {
-                        let v = match metric::compile(&judge_metric(&e.metric), ask) {
+                        let jm = match &spec {
+                            Some(s) => s.judge_metric(&e.metric),
+                            None => judge_metric(&e.metric),
+                        };
+                        let v = match metric::compile(&jm, ask) {
                             Ok(sql) => answer(&probe, &sql).await,
                             Err(err) => format!("ERROR: {err:#}"),
                         };
@@ -432,13 +501,13 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                     }
                 }
             }
-            let hidden = ch.apply_hidden(&admin).await?;
+            let hidden = ch.apply_hidden(&admin, gen).await?;
             eprintln!("变化 {}（{}）：写入 {truth} + {hidden} 行", ch.name(), ch.syn().label());
             let mut memo: HashMap<String, String> = HashMap::new();
             // 不维护时原定义在变化后的数据上是否仍答对：区分必要与不必要的不可用
             let mut orig: BTreeMap<(usize, usize, String), (String, bool)> = BTreeMap::new();
             for (li, lib) in libs.iter().enumerate() {
-                for (ei, e) in lib.entries.iter().enumerate().filter(|(_, e)| affected(e, ch)) {
+                for (ei, e) in lib.entries.iter().enumerate().filter(|(_, e)| affected(e, &changed)) {
                     for (id, ask) in &e.held {
                         let value = match metric::compile(&e.metric, ask) {
                             Ok(sql) => answer_memo(&probe, &sql, &mut memo).await,
@@ -461,7 +530,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 let mut used = 0;
                 for (ei, key, rev) in &r.seeded {
                     let e = &lib.entries[*ei];
-                    if !affected(e, ch) {
+                    if !affected(e, &changed) {
                         continue;
                     }
                     used += 1;
@@ -507,12 +576,12 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 for (li, lib) in libs.iter().enumerate() {
                     let before = db.meter.snap();
                     let t0 = Instant::now();
-                    let tests = table_tests(&db).await?;
+                    let tests = table_tests(&db, &tests).await?;
                     let d = crate::db::diff(&before, &db.meter.snap());
                     let bad: BTreeSet<String> =
                         tests.iter().filter(|x| x["failed"] == true).map(|x| x["table"].as_str().unwrap_or_default().to_string()).collect();
                     let mut used = 0;
-                    for (ei, e) in lib.entries.iter().enumerate().filter(|(ei, e)| admitted[li].contains(ei) && affected(e, ch)) {
+                    for (ei, e) in lib.entries.iter().enumerate().filter(|(ei, e)| admitted[li].contains(ei) && affected(e, &changed)) {
                         used += 1;
                         let quarantined = e.metric.tables().iter().any(|t| bad.contains(t));
                         for (tid, _) in &e.held {
@@ -537,8 +606,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                     }));
                 }
             }
-            ch.reset(&admin).await?;
-            scenario::ensure_v1(&admin, &v1, ch.name()).await?;
+            ch.reset(&admin, gen).await?;
+            ensure_v1(&admin, gen, &v1, ch.name()).await?;
             for r in &runs {
                 r.mid.restore(&r.cp).await?;
             }
@@ -558,10 +627,15 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             .collect();
         Ok(json!({
             "options": o, "pool": pool, "libraries": libraries, "seeds": seeds,
-            "changes": changes.iter().map(|c| json!({"name": c.name(), "label": c.syn().label(), "class": c.syn().class(), "tables": c.tables(),
-                                                     "describe": c.syn().describe()})).collect::<Vec<_>>(),
+            "changes": changes.iter().map(|c| json!({"name": c.name(), "label": c.syn().label(), "class": c.syn().class(), "tables": c.tables(gen),
+                                                     "describe": c.describe(gen)})).collect::<Vec<_>>(),
+            "spec": gen.map(Gen::report),
             "methodology": {
-                "schema": if o.schema == "tpcds" { "真实 TPC-DS 数据（dsdgen）上的同名变化，库为模板导出的定义，标准答案 = 原定义加区分列过滤的规范 SQL 在业务事实变化后、表示变化前的值" } else { "合成零售数据" },
+                "schema": match (gen, schema) {
+                    (Some(_), _) => "模式描述驱动：从描述里的模板库复制数据，变化由 specchange 按描述生成，库为该基准自己的查询导出的定义，标准答案 = 原定义加区分列过滤的规范 SQL 在业务事实变化后、表示变化前的值",
+                    (None, "tpcds") => "真实 TPC-DS 数据（dsdgen）上的同名变化，库为模板导出的定义，标准答案 = 原定义加区分列过滤的规范 SQL 在业务事实变化后、表示变化前的值",
+                    _ => "合成零售数据",
+                },
                 "pairing": "每个库在各维护方式下各有一个中间层实例，准入、变化、留出题完全相同；每个变化从 v1 施加，结束后回滚并恢复各实例的准入快照",
                 "answer": "答案 = 当时提供的修订的规范 SQL 在当前数据上的结果；不提供（撤销或候选）记为不可用",
                 "classes": "correct / served_wrong（提供了但答错：过期使用或错误修复）/ unavailable_needed（原定义已答错）/ unavailable_unneeded（原定义仍答对）",

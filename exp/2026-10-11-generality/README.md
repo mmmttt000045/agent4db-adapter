@@ -48,3 +48,27 @@ TPC-H 有 1 个定义的时间列在直连表上（q10：orders.o_orderdate）�
 SSB 11 个全部为正值；TPC-H 13 个中 11 个为正值，q10（l_returnflag = 'R'）为 NULL、q21（o_orderstatus = 'F'）为 0——TPC-H 只给
 1995 年 6 月前的行设置这两个取值，在 1996/1997 的期间上恒为空；financial 的 loan 每月只有 5–23 笔，12 个定义中
 bird117 / 118 / 136 / 192（学习月为 0 或 NULL）、bird135 / 160 / 191（两个月都为 0）取值退化，loan 上的 bird90 / 137 两个月都为 1，trans 上的 bird145 / 150 / 170 正常。
+
+## 支持度筛选：`tools/bench-support.py SPEC LIB URL OUT` → `libs/<name>-kept.json`
+只保留学习题（学习年 3 月）在初始数据上答案非空、非零的定义：退化的定义在任何变化下都给出同一个常数，各方法都“答对”，不反映维护。
+TPC-H 去掉 q10、q21 两个，保留 11 个；SSB 全部 11 个；financial 去掉 7 个 loan 定义与 bird135，保留 5 个（bird90、bird137、bird145、bird150、bird170）。
+
+## 回放：`replay-bench --spec`（2026-10-10）
+变化由 `src/specchange.rs` 按模式说明生成（与 TPC-DS 的手写变化同一套 11 种、同一种“业务事实 / 表示”两步与回滚核对），区分列
+row_status、is_current、source_system 在准备阶段加入；标准答案 = 原定义加区分列过滤后的规范 SQL，在业务事实改变后、表示改变前计算；
+dbt 式表级测试由模式说明推出（粒度唯一、维表键唯一与非空、参照完整性、日期列非空）。TPC-H 的 lineitem 以 l_linenumber 为新键
+（追加的明细挂在已有订单上，不在 lineitem → orders 上形成孤儿）。
+
+```
+agentdb-mid --pool 16 --out results/generality replay-bench --spec exp/2026-10-11-generality/schemas/<name>.json \
+  --libs exp/2026-10-11-generality/libs/<name>-kept.json --policies condition,schema,revoke,tabletest --oracles snapshot --sql-timeout-secs 1800
+```
+整定义重查与查询缓存不在这三种模式上运行（与 TPC-DS 相同：600 万行上每个受影响定义各做一次修复搜索）。
+
+在新模式上发现、在 TPC-DS 上不出现的两个维护错误（9f92cae 已修，存档的 TPC-DS 与合成数据回放核对过不受影响）：
+- 粒度修复把找到的过滤替换了定义自己在事实表上的过滤（financial：trans.bank = 'AB' 被换成 trans.is_current = '1'），
+  回归测试因此拒绝了正确的修复；现在两者合取。
+- 表对的关联验证先试“大表在左”，一对一关联（loan–account）和比维表小的事实表得到相反方向的路径；现在按定义的方向验证。
+
+SSB 的 yyyymmdd 日期键在月界处跳号：日期键按月连续的检查在 84 个月中 83 个月不成立（`ssb-contiguity.json`），
+键范围改写的前提检查因此在 SSB 上拒绝该改写。

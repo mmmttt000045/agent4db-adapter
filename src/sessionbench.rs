@@ -25,7 +25,7 @@ pub struct Options {
     libs: Vec<String>,
     #[arg(long, default_value_t = 1_000_000, value_parser = clap::value_parser!(u32).range(10_000..=20_000_000))]
     rows: u32,
-    #[arg(long, default_value = "cline", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "anthropic", "claude"])]
+    #[arg(long, default_value = "cline", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "happy", "anthropic", "claude"])]
     agent: String,
     #[arg(long, value_delimiter = ',', default_value = "no-share,definition,definition-cache,condition",
           value_parser = ["no-share", "definition", "definition-cache", "condition"])]

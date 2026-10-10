@@ -27,10 +27,10 @@ pub struct Options {
     #[arg(long, default_value_t = 1_000_000, value_parser = clap::value_parser!(u32).range(10_000..=20_000_000))]
     rows: u32,
     /// 查询 Agent 的模型服务（配置写在 .env，如 deepseek 读 DEEPSEEK_*，zhipu 读 ZHIPU_*，cline 读 CLINE_*）
-    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "anthropic", "claude"])]
+    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "happy", "anthropic", "claude"])]
     agent: String,
     /// 提炼器的模型服务
-    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "anthropic", "claude"])]
+    #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "happy", "anthropic", "claude"])]
     extractor: String,
     /// metric-global 为条件级维护；-schema / -revoke / -def 只改变维护方式（只看结构、逐写入撤销后重新提炼、定义级重验）；
     /// -exref 的修复回归以提炼出的示例 SQL 为参照，-snap 同样的参照但在学习时快照库上比较；traj-verify 在轨迹检索基线上加一句“复用前先核对前提”的提示

@@ -10,6 +10,8 @@ query declares the revision it uses and runs only when the conditions hold on
 its snapshot), maintain and improve (after a write, re-validate; repair into a
 new revision or invalidate; publish equivalent faster SQL as a new revision).
 Writers change the tables; every write raises the table's version.
+Step numbers give the reading order: publish 1-2, use 3-6, a write and its
+maintenance 7-9, with a legend beside the title.
 The example lines (teal 例) are the running example: 门店营业额 learned on March
 (13,570,368.70, judged correct), v2 used in September after the incremental load
 (26,139,303.60, the reference answer); see lifecycle and definition figures for
@@ -21,9 +23,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import style  # noqa: E402
-from vecfig import measure  # noqa: E402
+from vecfig import PT, measure  # noqa: E402
 from parts import (DASH, EXEC, HEAD, LEARN, NOTE, PANEL_EDGE, THICK, THIN, TITLE, USE,  # noqa: E402
-                   baseline, example, llm_badge, person, slab, table_card, tag)
+                   baseline, example, legend_pill, llm_badge, person, slab, step, table_card, tag)
 from style import ACC, ACC_DK, ACC_PALE, EDGE, FIELD, INK, MUTED, SLATE, WHITE  # noqa: E402
 
 NAME = 'structure'
@@ -34,7 +36,7 @@ LABELS = {
     'zh': {
         'learner': ('内置 agent（大模型）', '完成学习任务，提取指标定义'), 'once': '一次学习',
         'users': ('用户 agent A、B、C …', '提问、编写 SQL、复用指标定义'), 'many': '多次复用',
-        'mavra': 'MAVRA 共享记忆层',
+        'mavra': 'MAVRA 共享记忆层', 'duties': ('发布', '使用', '维护与优化'),
         'candidate': '候选定义',
         'publish': ('发布', '发布前校验', ('结果经确认正确；', '按定义重新生成的 SQL 能在', '学习时的数据上复现相同结果；', '通过后连同前提条件一起入库')),
         'publish_ex': '门店营业额 v1：3 月 1357.0 万 ✓',
@@ -96,7 +98,10 @@ def draw(s, lang):
     # MAVRA's area ----------------------------------------------------------------------------
     rect(*FIELD_BOX, FIELD, None, r=2.8)
     rect(FIELD_BOX[0] + 4.0, 34.2, 1.1, 5.4, ACC)
-    text(FIELD_BOX[0] + 7.2, 39.0, L['mavra'], TITLE, ACC_DK, 'bold')
+    tw = text(FIELD_BOX[0] + 7.2, 39.0, L['mavra'], TITLE, ACC_DK, 'bold')
+    x = PUB[0] + PUB[2] - 4.0                      # right of step 1's arrow
+    for label, color, steps in zip(L['duties'], (LEARN, USE, INK), ('1–2', '3–6', '7–9')):
+        x += legend_pill(s, x, 37.2, label, color, steps) + 6.0
 
     def duty(b, label, title, lines, ex):
         x, y, w, h = b
@@ -139,28 +144,41 @@ def draw(s, lang):
     w2 = text(x + 6.0 + tw, baseline(y + 10.6, NOTE), line2, NOTE, INK)
     example(s, x + 10.0 + tw + w2, baseline(y + 10.6, NOTE), L['maint_ex'], width=w - 13.0 - tw - w2)
 
-    # Arrows: learner -> publish -> memory -> rely <-> users; maintenance <-> memory and database ----
+    # Arrows, numbered in reading order: publish 1-2, use 3-6, a write and its maintenance 7-9 -----
+    def numbered(x, y_base, n, color, label, align='left', r=3.0):
+        """A step badge and its label on one baseline; align='right' ends the label at x."""
+        lw = measure(label, NOTE)
+        if align == 'right':
+            step(s, x - lw - 1.6 - r, y_base - .34 * NOTE * PT, n, color, r=r)
+            text(x, y_base, label, NOTE, color, align='right')
+        else:
+            step(s, x + r, y_base - .34 * NOTE * PT, n, color, r=r)
+            text(x + 2 * r + 1.6, y_base, label, NOTE, color)
+
     xa = PUB[0] + PUB[2] - 14.0
     route([(xa, TOP[1] + TOP[3]), (xa, PUB[1])], LEARN, THIN, length=HEAD)
-    text(xa - 2.0, 30.0 - 1.4, L['candidate'], NOTE, LEARN, align='right')
+    numbered(xa - 2.0, 28.6, 1, LEARN, L['candidate'], 'right')
     ym = PUB[1] + 21.0
     route([(PUB[0] + PUB[2], ym), (MEM[0], ym)], LEARN, THICK, length=HEAD)
+    step(s, (PUB[0] + PUB[2] + MEM[0]) / 2, ym - 5.4, 2, LEARN)
     route([(MEM[0] + MEM[2], ym), (RELY[0], ym)], USE, THIN, length=HEAD)
+    step(s, (MEM[0] + MEM[2] + RELY[0]) / 2, ym - 5.4, 4, USE)
     xd, xu = RELY[0] + 12.0, RELY[0] + 20.0
     route([(xd, USERS[1] + USERS[3]), (xd, RELY[1])], USE, THIN, length=HEAD)
     route([(xu, RELY[1]), (xu, USERS[1] + USERS[3])], USE, THIN, length=HEAD)
-    text(xd - 2.0, 30.0 - 1.4, L['ask'], NOTE, USE, align='right')
-    text(xu + 2.0, 30.0 - 1.4, L['answer'], NOTE, USE)
-    xr = MEM[0] + MEM[2] / 2
-    route([(xr, MAINT[1]), (xr, MEM[1] + MEM[3])], INK, THICK, length=HEAD)
-    text(xr + 2.4, baseline((MAINT[1] + MEM[1] + MEM[3]) / 2, NOTE), L['revise'], NOTE, INK)
-    xq = 182.0                                    # onto the table versions
-    route([(xq, MAINT[1] + MAINT[3]), (xq, DB[1] - 2.8)], SLATE, THIN, dash=DASH, length=HEAD)
-    text(xq + 2.4, baseline((MAINT[1] + MAINT[3] + DB[1] - 2.8) / 2, NOTE), L['checks'], NOTE, SLATE)
+    numbered(xd - 2.0, 28.6, 3, USE, L['ask'], 'right')
+    numbered(xu + 2.0, 28.6, 6, USE, L['answer'])
     xe = RELY[0] + RELY[2] / 2 + 14.0
     route([(xe, RELY[1] + RELY[3]), (xe, DB[1] - 2.8)], EXEC, THIN, length=HEAD)
+    step(s, xe + 5.4, 91.4, 5, USE)
     for k, line in enumerate(L['run']):
-        text(xe + 2.4, 97.0 + 5.4 * k, line, NOTE, EXEC)
+        text(xe + 2.4, 99.4 + 5.4 * k, line, NOTE, EXEC)
+    xq = 182.0                                    # onto the table versions
+    route([(xq, MAINT[1] + MAINT[3]), (xq, DB[1] - 2.8)], SLATE, THIN, dash=DASH, length=HEAD)
+    numbered(xq + 2.0, baseline((MAINT[1] + MAINT[3] + DB[1] - 2.8) / 2, NOTE), 8, INK, L['checks'], r=2.6)
+    xr = MEM[0] + MEM[2] / 2
+    route([(xr, MAINT[1]), (xr, MEM[1] + MEM[3])], INK, THICK, length=HEAD)
+    numbered(xr + 2.0, baseline((MAINT[1] + MEM[1] + MEM[3]) / 2, NOTE), 9, INK, L['revise'], r=2.6)
 
     # Database and writers -------------------------------------------------------------------------
     x, y, w, h = DB
@@ -184,6 +202,7 @@ def draw(s, lang):
     for k, line in enumerate(more):
         text(4.0, 121.6 + 4.8 * k, line, NOTE - 1, MUTED)
     route([(26.0, 124.0), (x, 124.0)], INK, THIN, length=HEAD)
+    step(s, 35.0, 119.0, 7, INK)
 
 
 if __name__ == '__main__':

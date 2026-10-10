@@ -195,11 +195,16 @@ def example(s, x, y, label, width=None, size=NOTE):
     return pw + 1.4 + s.text(x + pw + 1.4, y, label, size, EX, width=room)
 
 
-def state(s, b, title, notes=(), ex=(), color=INK, edge=EDGE, sw=.4, fill=WHITE, dash=None, pitch=5.4, ex_size=NOTE):
-    """A box for one step or state: bold title, the method's lines in ink, then example lines."""
+def state(s, b, title, notes=(), ex=(), color=INK, edge=EDGE, sw=.4, fill=WHITE, dash=None, pitch=5.4, ex_size=NOTE,
+          n=None, badge=None):
+    """A box for one step or state: an optional step badge n, bold title, the method's lines in ink, then example lines."""
     x, y, w, h = b
     s.rect(*b, fill, edge, sw, r=1.6, dash=dash)
-    s.text(x + 3.0, y + 7.0, title, TITLE, color, 'bold', width=w - 6.0)
+    tx = x + 3.0
+    if n is not None:
+        step(s, x + 5.6, y + 5.6, n, badge or color)
+        tx = x + 10.6
+    s.text(tx, y + 7.0, title, TITLE, color, 'bold', width=x + w - 3.0 - tx)
     yy = y + 7.0 + 6.4
     for line in notes:
         s.text(x + 3.0, yy, line, NOTE, INK, width=w - 6.0)

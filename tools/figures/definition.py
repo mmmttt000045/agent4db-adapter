@@ -18,6 +18,8 @@ append, revision and dupload phases: the grain check fails with 1,065,915 rows /
 date_dim conditions are skipped because date_dim was not written); answers of
 the definition left as learned from results/scen-20261002
 (dsv41flash-r1-g3fix--schema) with the reference answers of the same records.
+Step numbers 1-7 give the reading order: the three columns of the top, then the
+matrix's label column (writes, checks, the SQL's result, the verdict).
 Drawn at slide size (300 mm, 12-15 pt), Chinese only, standard database terms.
 """
 import sys
@@ -25,8 +27,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import style  # noqa: E402
-from vecfig import measure  # noqa: E402
-from parts import HEAD, NOTE, PANEL_EDGE, THIN, TITLE, USE, baseline, example, mark  # noqa: E402
+from vecfig import PT, measure  # noqa: E402
+from parts import HEAD, NOTE, PANEL_EDGE, THIN, TITLE, USE, baseline, example, mark, step  # noqa: E402
 from style import ACC, ACC_DK, ACC_PALE, AMBER, AMBER_PALE, EDGE, FIELD, INK, MUTED, RED, RULE, WHITE  # noqa: E402
 
 NAME = 'definition'
@@ -48,7 +50,7 @@ LABELS = {
         'bottom': '前提条件能识别出有害的写入', 'bottom_note': '三种写入均基于同一份初始数据，查询 9 月门店营业额',
         'writes': (('增量加载', '+27,095 行，新小票号'), ('数据更正', '+65,915 行，旧行保留、标记为非当前'),
                    ('重复加载', '+110,165 行，同一批数据重复加载')),
-        'grain': '主键唯一',
+        'write_head': '写入类型', 'grain': '主键唯一',
         'grain_cells': (('通过', 'ok'), ('1,065,915 行，1,000,000 个主键', 'fail'), ('1,110,165 行，1,000,000 个主键', 'fail')),
         'others': '其余 3 个前提', 'others_cell': '通过',
         'answer': '原 SQL 的结果', 'answer_sub': '9 月，SQL 不报错',
@@ -75,8 +77,9 @@ def draw(s, lang):
 
     # Top: from the SQL's structure to the conditions ------------------------------------------
     section(6.4, L['top'], L['top_note'])
-    for (x, w), head in zip((C1, C2, C3), L['heads']):
-        text(x + 2.0, 14.0, head, NOTE, MUTED, 'bold')
+    for k, ((x, w), head) in enumerate(zip((C1, C2, C3), L['heads'])):   # reading order 1-3 across the columns
+        step(s, x + 4.6, 14.0 - .34 * NOTE * PT, k + 1, USE, r=2.6)
+        text(x + 8.8, 14.0, head, NOTE, INK, 'bold')
     for k, (part, code, prop, cond, gloss) in enumerate(L['rows']):
         y = ROW0 + ROW_P * k
         v2 = k == 3
@@ -121,11 +124,16 @@ def draw(s, lang):
     for k, (name, what) in enumerate(L['writes']):
         cell_text(k, 0, name, INK, 'bold', -2.6)
         cell_text(k, 0, what, MUTED, dy=3.0, size=NOTE - 1)
-    text(x + 3.0, baseline(tops[1] + heights[1] / 2, NOTE), L['grain'], NOTE, AMBER, 'bold')
-    text(x + 3.0, baseline(tops[2] + heights[2] / 2, NOTE), L['others'], NOTE, INK)
-    text(x + 3.0, baseline(tops[3] + heights[3] / 2 - 2.4, NOTE), L['answer'], NOTE, INK)
-    text(x + 3.0, baseline(tops[3] + heights[3] / 2 + 2.8, NOTE - 1), L['answer_sub'], NOTE - 1, MUTED)
-    text(x + 3.0, baseline(tops[4] + heights[4] / 2, NOTE), L['verdict'], NOTE, INK, 'bold')
+    # Reading order 4-7 down the label column: the writes, the checks, what the SQL returns, the verdict.
+    lx = x + 10.6
+    for n, row in ((4, 0), (5, 1), (6, 3), (7, 4)):
+        step(s, x + 5.6, tops[row] + heights[row] / 2, n, USE, r=2.6)
+    text(lx, baseline(tops[0] + heights[0] / 2, NOTE), L['write_head'], NOTE, INK, 'bold')
+    text(lx, baseline(tops[1] + heights[1] / 2, NOTE), L['grain'], NOTE, AMBER, 'bold')
+    text(lx, baseline(tops[2] + heights[2] / 2, NOTE), L['others'], NOTE, INK)
+    text(lx, baseline(tops[3] + heights[3] / 2 - 2.4, NOTE), L['answer'], NOTE, INK)
+    text(lx, baseline(tops[3] + heights[3] / 2 + 2.8, NOTE - 1), L['answer_sub'], NOTE - 1, MUTED)
+    text(lx, baseline(tops[4] + heights[4] / 2, NOTE), L['verdict'], NOTE, INK, 'bold')
     for k in range(3):
         line, kind = L['grain_cells'][k]
         cell_text(k, 1, line, RED if kind == 'fail' else INK)

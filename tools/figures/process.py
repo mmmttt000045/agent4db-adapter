@@ -1,6 +1,8 @@
 """Deck figure 3 (the process): what happens to a definition as the data changes.
 
-The third of three views of the method, as a state diagram. A definition is
+The third of three views of the method, as a state diagram whose boxes carry
+step numbers 1-10 in reading order (main row, the improvement loop above valid,
+then the repair path right to left and invalidation). A definition is
 learned and published after the admission checks; it is valid and used by
 declaring its revision. A write to a table it reads makes it pending; nothing
 runs until the next use, which validates the conditions on that query's snapshot
@@ -93,16 +95,17 @@ def draw(s, lang):
         text(4.0 + w + 2.4, baseline(y, NOTE), desc, NOTE, MUTED, width=I[0] - 8.0 - w)
 
     # States and steps ----------------------------------------------------------------------------
-    state(s, A, *L['learn'], color=LEARN, edge=LEARN)
-    state(s, B, *L['admit'], color=LEARN, edge=LEARN)
-    state(s, C, *L['valid'], color=USE, edge=USE, sw=.7, fill=ACC_PALE)
-    state(s, D, *L['pending'], color=AMBER, edge=AMBER, fill=AMBER_PALE)
-    state(s, E, *L['check'], color=USE, edge=USE)
-    state(s, I, *L['improve'], edge=MAINT)
-    state(s, R, *L['repair'], edge=MAINT, ex_size=NOTE - 1)
-    state(s, G, *L['regress'], edge=MAINT)
-    state(s, N, *L['publish'], edge=MAINT)
-    state(s, X, *L['retire'], color=RED, edge=RED, dash=(1.6, 1.0))
+    # Step numbers give the reading order: along the main row, up to the improvement loop, then the repair path.
+    state(s, A, *L['learn'], color=LEARN, edge=LEARN, n=1)
+    state(s, B, *L['admit'], color=LEARN, edge=LEARN, n=2)
+    state(s, C, *L['valid'], color=USE, edge=USE, sw=.7, fill=ACC_PALE, n=3)
+    state(s, I, *L['improve'], edge=MAINT, n=4)
+    state(s, D, *L['pending'], color=AMBER, edge=AMBER, fill=AMBER_PALE, n=5)
+    state(s, E, *L['check'], color=USE, edge=USE, n=6)
+    state(s, R, *L['repair'], edge=MAINT, ex_size=NOTE - 1, n=7)
+    state(s, G, *L['regress'], edge=MAINT, n=8)
+    state(s, N, *L['publish'], edge=MAINT, n=9)
+    state(s, X, *L['retire'], color=RED, edge=RED, dash=(1.6, 1.0), n=10)
 
     # Main row: learn -> admit -> valid -> pending -> check ------------------------------------------
     ym = ROW + RH / 2

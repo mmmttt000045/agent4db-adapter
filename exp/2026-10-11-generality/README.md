@@ -72,3 +72,28 @@ agentdb-mid --pool 16 --out results/generality replay-bench --spec exp/2026-10-1
 
 SSB 的 yyyymmdd 日期键在月界处跳号：日期键按月连续的检查在 84 个月中 83 个月不成立（`ssb-contiguity.json`），
 键范围改写的前提检查因此在 SSB 上拒绝该改写。
+
+## TPC-DS 核对（2026-10-10 夜）：`tpcds-check.json`
+- 回归：新代码（f7fae15 起的模式无关实现与两处修复）重跑 TPC-DS 手写变化的回放，与 10-02 存档逐题比较，共同的 3,924 道题结果类别、
+  是否修复与取值全部相同；论文的 \Tr* 数值不受影响。
+- 生成器：同一库在 `schemas/tpcds.json` 上用 `specchange` 生成的变化回放（`tpcds-gen-replay-report.json.gz`），3,924 道题的结果类别与
+  手写变化逐题相同，只有 332 个取值不同（生成器更正、追加的行子集不同）。
+
+## 端到端：TPC-H（`e2e/`，2026-10-10 15:21–22:55）
+`queue-e2e-tpch.sh`：无记忆 / 示例检索 / MAVRA（metric-global-snap）× 3 次独立重复，题集 v2，题面只给指标名，11 种变化，
+指标见 `e2e/tpch-defs.json`（参照定义取自 `libs/tpch-kept.json`）。模型服务为 happycoding 网关的 deepseek-v4.1-flash
+（11,728 次回复全部回报 deepseek/deepseek-v4.1-flash；与 10-02、10-10 的 Cline 研究不是同一网关，token 不跨研究比较）。
+全部 9 次运行无服务端失败。智能体 token 共 68.7 M（另提炼 0.16 M、冒烟 0.28 M）。统计：`tools/scen-stats.py --scen results/e2e-tpch`
+→ `e2e/scen-stats.json`；逐题记录 `e2e/outcomes.json.gz`。
+
+| 方法 | 留出 | 正常 | 覆盖破坏（95%） | 备份 | 单位 | 全部 |
+|---|---|---|---|---|---|---|
+| 无记忆 | 84 | 83 | 60（58–62） | 93 | 47 | 71 |
+| 示例检索 | 96 | 98 | 55（55–56） | 90 | 28 | 74 |
+| MAVRA | 96 | 97 | 75（74–76） | 100 | 35 | 83 |
+
+预先写定的比较：覆盖破坏下 MAVRA − 示例检索 +19 个百分点（18–21）；全部情形 MAVRA − 无记忆 +11（10–12）；留出题 0。
+留出题每题：MAVRA 8.7 秒、1.44 万 token，无记忆 24.7 秒、2.34 万 token，示例检索 9.0 秒、1.35 万 token。
+逐变化：重复加载 75 / 20 / 28（MAVRA / 检索 / 无记忆），更正保留旧行 98 / 57 / 78。
+日期键变化在 TPC-H 上三种方法都是 0：日期列日历下生成器把补录批次的日期写为空，业务日期无法从数据恢复，
+任何方法都答不出（回放里使定义失效仍是正确处理）。TPC-H 的无记忆留出题 84%（合成数据 58%），模型很可能熟悉 TPC-H。

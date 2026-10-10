@@ -22,7 +22,7 @@ March is again 13,570,368.70 on the learning-time data, v3 answers September
 12,932,888.04; after the duplicate load no filter restores the grain.
 Values: trace run (exp/2026-10-08-optimize/trace) for learning; optimization run
 (noctis results/scen-20261008-opt/metric-1791439498065570) for the rewrite, the
-three writes' maintenance events and the September answers. Drawn at slide size
+three writes' maintenance events and the September answers. Colours from deckpal.py. Drawn at slide size
 (300 mm, 12-15 pt), Chinese only, standard database terms.
 """
 import sys
@@ -31,13 +31,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import style  # noqa: E402
 from vecfig import measure  # noqa: E402
-from parts import HEAD, LEARN, NOTE, THICK, THIN, USE, baseline, example, state  # noqa: E402
-from style import ACC_PALE, AMBER, AMBER_PALE, INK, MUTED, RED, WHITE  # noqa: E402
+from parts import HEAD, NOTE, THICK, THIN, baseline, example, state  # noqa: E402
+from style import INK, MUTED, WHITE  # noqa: E402
+import deckpal as P  # noqa: E402
 
 NAME = 'process'
 LANGS = ('zh',)                                  # the report deck is Chinese
 W, H = 300.0, 142.0
-MAINT = INK                                      # maintain and improve
+LEARN, USE, MAINT, RED = P.PUBLISH, P.USE, P.MAINT, P.FAIL   # publish, use, maintain and optimize, invalidation
 
 LABELS = {
     'zh': {
@@ -88,7 +89,7 @@ def draw(s, lang):
         w = measure(label, NOTE - 1, 'bold') + 4.4
         if color == RED:
             rect(4.0, y - 2.9, w, 5.8, WHITE, RED, .4, r=2.9, dash=(1.4, .9))
-            text(6.2, baseline(y, NOTE - 1), label, NOTE - 1, RED, 'bold')
+            text(6.2, baseline(y, NOTE - 1), label, NOTE - 1, P.FAIL_TEXT, 'bold')
         else:
             rect(4.0, y - 2.9, w, 5.8, color, None, r=2.9)
             text(6.2, baseline(y, NOTE - 1), label, NOTE - 1, WHITE, 'bold')
@@ -96,16 +97,18 @@ def draw(s, lang):
 
     # States and steps ----------------------------------------------------------------------------
     # Step numbers give the reading order: along the main row, up to the improvement loop, then the repair path.
-    state(s, A, *L['learn'], color=LEARN, edge=LEARN, n=1)
-    state(s, B, *L['admit'], color=LEARN, edge=LEARN, n=2)
-    state(s, C, *L['valid'], color=USE, edge=USE, sw=.7, fill=ACC_PALE, n=3)
-    state(s, I, *L['improve'], edge=MAINT, n=4)
-    state(s, D, *L['pending'], color=AMBER, edge=AMBER, fill=AMBER_PALE, n=5)
-    state(s, E, *L['check'], color=USE, edge=USE, n=6)
-    state(s, R, *L['repair'], edge=MAINT, ex_size=NOTE - 1, n=7)
-    state(s, G, *L['regress'], edge=MAINT, n=8)
-    state(s, N, *L['publish'], edge=MAINT, n=9)
-    state(s, X, *L['retire'], color=RED, edge=RED, dash=(1.6, 1.0), n=10)
+    ex = P.EXAMPLE
+    state(s, A, *L['learn'], color=P.PUBLISH_TEXT, edge=LEARN, n=1, badge=LEARN, ex_color=ex)
+    state(s, B, *L['admit'], color=P.PUBLISH_TEXT, edge=LEARN, n=2, badge=LEARN, ex_color=ex)
+    state(s, C, *L['valid'], color=P.USE_TEXT, edge=USE, sw=.7, fill=P.USE_PALE, n=3, badge=USE, ex_color=ex)
+    state(s, I, *L['improve'], color=P.MAINT_TEXT, edge=MAINT, n=4, badge=MAINT, ex_color=ex)
+    state(s, D, *L['pending'], color=P.PENDING_TEXT, edge=P.PENDING, fill=P.PENDING_PALE, n=5, badge=P.PENDING_TEXT,
+          ex_color=ex)
+    state(s, E, *L['check'], color=P.USE_TEXT, edge=USE, n=6, badge=USE, ex_color=ex)
+    state(s, R, *L['repair'], color=P.MAINT_TEXT, edge=MAINT, ex_size=NOTE - 1, n=7, badge=MAINT, ex_color=ex)
+    state(s, G, *L['regress'], color=P.MAINT_TEXT, edge=MAINT, n=8, badge=MAINT, ex_color=ex)
+    state(s, N, *L['publish'], color=P.MAINT_TEXT, edge=MAINT, n=9, badge=MAINT, ex_color=ex)
+    state(s, X, *L['retire'], color=P.FAIL_TEXT, edge=RED, dash=(1.6, 1.0), n=10, badge=RED, ex_color=ex)
 
     # Main row: learn -> admit -> valid -> pending -> check ------------------------------------------
     ym = ROW + RH / 2
@@ -117,35 +120,35 @@ def draw(s, lang):
     route([(xu, C[1]), (xu, I[1] + I[3])], MAINT, THIN, length=HEAD)
     route([(xd, I[1] + I[3]), (xd, C[1])], MAINT, THICK, length=HEAD)
     text(xu + 2.4, 40.4, L['candidate'], NOTE, MUTED)
-    text(xd + 2.4, 40.4, L['adopt'], NOTE, INK)
+    text(xd + 2.4, 40.4, L['adopt'], NOTE, P.MAINT_TEXT)
 
     # The check holds: back to valid ---------------------------------------------------------------
     xl, xc = E[0] + 8.0, C[0] + C[2] - 8.0
     route([(xl, ROW + RH), (xl, LOOP_Y), (xc, LOOP_Y), (xc, ROW + RH)], USE, THIN, length=HEAD, radius=1.8)
-    text(D[0] + 2.0, 78.2, L['holds'], NOTE, USE)
-    example(s, D[0] + 2.0, 86.8, L['holds_ex'])
+    text(D[0] + 2.0, 78.2, L['holds'], NOTE, P.USE_TEXT)
+    example(s, D[0] + 2.0, 86.8, L['holds_ex'], color=P.EXAMPLE)
 
     # The check fails: repair search, regression test, new revision ----------------------------------
     xf = E[0] + E[2] - 8.0
     route([(xf, ROW + RH), (xf, LOW)], MAINT, THIN, length=HEAD)
-    text(xf - 2.4, 78.2, L['fails'], NOTE, MAINT, align='right')
+    text(xf - 2.4, 78.2, L['fails'], NOTE, P.MAINT_TEXT, align='right')
     ew = measure('例', NOTE - 1, 'bold') + 2.6 + 1.4 + measure(L['fails_ex'], NOTE)
-    example(s, xf - 2.4 - ew, 93.4, L['fails_ex'])
+    example(s, xf - 2.4 - ew, 93.4, L['fails_ex'], color=P.EXAMPLE)
     yl = LOW + 14.0
     for l, r in ((R, G), (G, N)):
         route([(l[0], yl), (r[0] + r[2], yl)], MAINT, THIN, length=HEAD)
     xn = N[0] + 28.0
     route([(xn, LOW), (xn, ROW + RH)], MAINT, THICK, length=HEAD)
-    text(xn + 2.4, 87.4, L['effective'], NOTE, INK)
+    text(xn + 2.4, 87.4, L['effective'], NOTE, P.MAINT_TEXT)
 
     # No unique repair: invalidate, then learn again ---------------------------------------------------
     xr, yb = R[0] + 24.0, LOW + RH + 7.0
     xx = X[0] + X[2] / 2
     route([(xr, LOW + RH), (xr, yb), (xx, yb), (xx, LOW + RH)], RED, THIN, length=HEAD, radius=1.8)
-    text((xr + xx) / 2, yb + 5.4, L['no_repair'], NOTE, RED, align='center')
+    text((xr + xx) / 2, yb + 5.4, L['no_repair'], NOTE, P.FAIL_TEXT, align='center')
     xa = A[0] + 26.0
     route([(xa, LOW), (xa, ROW + RH)], RED, THIN, length=HEAD)
-    text(xa + 2.4, 87.4, L['relearn'], NOTE, RED)
+    text(xa + 2.4, 87.4, L['relearn'], NOTE, P.FAIL_TEXT)
 
 
 if __name__ == '__main__':

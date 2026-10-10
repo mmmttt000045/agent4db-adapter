@@ -24,15 +24,19 @@ const at = process.argv.indexOf('--out');
 const OUT = at > 0 ? path.resolve(process.argv[at + 1]) : path.join(ROOT, 'docs/mavra-system.pptx');
 
 const FONT = 'Microsoft YaHei';
+// Colours after the Nature (NPG) palette, the same hues as the figures (tools/figures/deckpal.py): navy for use and
+// the deck's accent, green for publish and passed checks, cyan for maintain and optimize, salmon for warnings, red for
+// failures, lavender for the summary; text set in a hue uses a shade dark enough to read on white.
 const C = {
-  ink: '1F2A37', muted: '5B6573', navy: '17233B', ice: 'CADCFC', white: 'FFFFFF', grey: 'F1F3F6',
-  line: 'D5DBE3', blue: '1D5BA6', paleBlue: 'E8F0FA', amber: 'B5671A', paleAmber: 'FBF0E2',
-  violet: '6A58A3', paleViolet: 'EFECF7', red: 'B5392A', green: '2E7D4F', paleGreen: 'E6F2EA', teal: '2F7A70',
+  ink: '1F2A37', muted: '5B6573', navy: '1E2A4A', ice: 'D3DAEB', white: 'FFFFFF', grey: 'F2F4F8',
+  line: 'D5DBE3', blue: '3C5488', paleBlue: 'E9EDF5', amber: 'C4603F', paleAmber: 'FDECE6',
+  violet: '5B6A94', paleViolet: 'EEF0F6', red: 'D23F29', green: '00826D', paleGreen: 'E3F4EF',
+  cyan: '24809A', paleCyan: 'E2F3F7',
 };
 const W = 13.333, M = 0.6;
 const DATA = '数据为仿 TPC-DS 的合成零售数据（store_sales 100 万行），题目中的年份略去。';
 const RECORDED = '实验记录（来源见备注）。' + DATA;
-const FIGURE_NOTE = '按图中编号顺序阅读；绿色“例”为贯穿全文的示例，取自实验记录（来源见备注）；数据为仿 TPC-DS 的合成零售数据。';
+const FIGURE_NOTE = '按图中编号顺序阅读；棕色“例”为贯穿全文的示例，取自实验记录（来源见备注）；数据为仿 TPC-DS 的合成零售数据。';
 const OPT_RUN = 'noctis results/scen-20261008-opt/metric-1791439498065570（metric-global-opt）';
 const TRACE_RUN = 'noctis results/scen-20261008-trace（--trace 逐次记录工具调用，副本 exp/2026-10-08-optimize/trace）';
 
@@ -239,7 +243,7 @@ s = content('视角一 · 系统架构：MAVRA 的位置与三项职责', '方�
   ], { y: y + h + 0.12, h: 0.55, fill: C.paleBlue, size: 14 });
 }
 footnote(s, FIGURE_NOTE);
-notes(s, '下面从三个视角介绍方法。第一个视角是系统架构：MAVRA 处在什么位置，承担哪些职责。图中按编号阅读：1–2 是发布（紫色），3–6 是使用（蓝色），7–9 是数据写入后的维护与优化（黑色）。'
+notes(s, '下面从三个视角介绍方法。第一个视角是系统架构：MAVRA 处在什么位置，承担哪些职责。图中按编号阅读：1–2 是发布（绿色），3–6 是使用（藏青），7–9 是数据写入后的维护与优化（青色）。'
   + '上方是两类 agent：左侧的内置 agent 基于大模型，负责学习；右侧的用户 agent 可以有很多个，负责提问、编写 SQL、复用指标定义。一次学习，多次复用。'
   + '中间是共享记忆：每个指标定义保存口径、SQL、前提条件和版本号（下一页展开），此外按（前提，表版本）缓存校验结果，跨指标、跨 agent 复用。'
   + '第 1 步，内置 agent 完成学习任务，提交候选定义。第 2 步，发布前校验：结果经确认正确（实验中用参考答案判定，生产环境由指标负责人确认一次），并且按定义重新生成的 SQL 能在学习时的数据上复现相同结果，通过后连同前提条件一起入库。例：门店营业额 v1，3 月 1357.0 万。'
@@ -279,7 +283,7 @@ s = content('视角三 · 生命周期：校验、修复、优化与失效', '�
   ], { y: y + h + 0.12, h: 0.55, fill: C.paleBlue, size: 14 });
 }
 footnote(s, FIGURE_NOTE);
-notes(s, '第三个视角是生命周期：一个指标定义随着数据变化会经历哪些状态。图中按编号 1–10 阅读：先沿中间一行从左到右，再看上方的优化，最后沿下方一行从右到左。颜色与第一张图的三项职责对应：紫色是发布，蓝色是使用，黑色是维护与优化，红色虚线是指标失效。'
+notes(s, '第三个视角是生命周期：一个指标定义随着数据变化会经历哪些状态。图中按编号 1–10 阅读：先沿中间一行从左到右，再看上方的优化，最后沿下方一行从右到左。颜色与第一张图的三项职责对应：绿色是发布，藏青是使用，青色是维护与优化，橙粉是待校验，红色虚线是指标失效。'
   + '第 1 步学习：内置 agent 完成学习任务、提取指标定义。第 2 步发布前校验：通过后入库，同时保存前提条件和证据。例：3 月门店营业额 1357.0 万，结果正确，发布 v1，带 3 个前提。'
   + '第 3 步“有效”是指标定义的正常状态：使用方声明指标版本后直接使用。'
   + '第 4 步优化：MAVRA 为已发布的定义寻找更快的 SQL，只有在各期间结果一致、并且在同一快照内配对测量确实更快时，才发布为新版本，新 SQL 依赖的假设也加入前提条件。例：期间过滤改写为日期键范围，14 个期间结果一致，29.1 → 23.3 毫秒，快 19.8%，成为 v2，新增前提“日期键连续”。'
@@ -300,9 +304,9 @@ s = content('实验结果：共享提升效率与准确率，数据变化后 MAV
   [
     { big: '8.9 倍', head: '共享', color: C.blue, pale: C.paleBlue,
       body: '未参与学习的新问题，单题耗时 75.6 秒 → 8.5 秒；准确率 49% → 100%' },
-    { big: '73%', head: '维护', color: C.green, pale: C.paleGreen,
+    { big: '73%', head: '维护', color: C.cyan, pale: C.paleCyan,
       body: '5 类破坏性写入后的准确率；检索历史示例 57%，无共享 19%' },
-    { big: '0', head: '正确性', color: C.violet, pale: C.paleViolet,
+    { big: '0', head: '正确性', color: C.green, pale: C.paleGreen,
       body: '前提可检测的写入下错误结果为 0（仅按表结构变更失效：629 个）；并发写入下 0 次基于违反前提的数据返回结果' },
   ].forEach(({ big, head, color, pale, body }, k) => {
     const x = M + k * (cw + gap);

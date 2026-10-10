@@ -49,13 +49,13 @@ def step(s, x, y, n, color, r=3.0):
     s.text(x, baseline(y, STEP), str(n), STEP, WHITE, 'bold', 'center')
 
 
-def mark(s, x, y, kind):
+def mark(s, x, y, kind, ok=ACC, fail=RED):
     """Result mark centred on (x, y): holds, fails, or not yet known."""
     if kind == 'ok':
-        s.poly([(x - 1.25, y), (x - .3, y + 1.0), (x + 1.3, y - 1.1)], None, ACC, .5, closed=False)
+        s.poly([(x - 1.25, y), (x - .3, y + 1.0), (x + 1.3, y - 1.1)], None, ok, .5, closed=False)
     elif kind == 'fail':
-        s.line(x - 1.0, y - 1.0, x + 1.0, y + 1.0, RED, .5)
-        s.line(x - 1.0, y + 1.0, x + 1.0, y - 1.0, RED, .5)
+        s.line(x - 1.0, y - 1.0, x + 1.0, y + 1.0, fail, .5)
+        s.line(x - 1.0, y + 1.0, x + 1.0, y - 1.0, fail, .5)
     else:
         s.text(x, y + 1.6, '?', NOTE + 1, WAIT, 'bold', 'center')
 
@@ -85,9 +85,9 @@ def sparkle(s, cx, cy, r, color=WHITE):
     s.poly(pts, color, None)
 
 
-def llm_badge(s, cx, cy, r=3.6):
+def llm_badge(s, cx, cy, r=3.6, color=ACC):
     """The built-in agent is an LLM: blue tile with a sparkle."""
-    s.rect(cx - r, cy - r, 2 * r, 2 * r, ACC, None, r=.5 * r)
+    s.rect(cx - r, cy - r, 2 * r, 2 * r, color, None, r=.5 * r)
     sparkle(s, cx, cy, .7 * r)
     sparkle(s, cx + .58 * r, cy - .55 * r, .25 * r)
 
@@ -101,7 +101,8 @@ def slab(s, b, d=2.8):
     s.rect(x, y, w, h, FACE, SOFT, .3, r=1.0)
 
 
-def table_card(s, x0, w, y0, h, label='', changed=(), outline=EDGE, dash=None, size=NOTE - 1):
+def table_card(s, x0, w, y0, h, label='', changed=(), outline=EDGE, dash=None, size=NOTE - 1, hot=AMBER,
+               hot_pale=AMBER_PALE):
     """A table drawn as a card with a header and rows; changed rows are amber."""
     s.rect(x0, y0, w, h, WHITE, outline, .28, r=.7, dash=dash)
     s.rect(x0 + .3, y0 + .3, w - .6, 4.6, '#ECEAE5', None, r=.5)
@@ -110,9 +111,8 @@ def table_card(s, x0, w, y0, h, label='', changed=(), outline=EDGE, dash=None, s
     rows = int((h - 6.2) // 2.6)
     for r_ in range(rows):
         yy = y0 + 6.0 + 2.6 * r_
-        hot = r_ in changed
-        s.rect(x0 + 1.5, yy, w - 3.0, 1.5, AMBER_PALE if hot else '#E4E1DB',
-               AMBER if hot else None, .2, r=.4)
+        s.rect(x0 + 1.5, yy, w - 3.0, 1.5, hot_pale if r_ in changed else '#E4E1DB',
+               hot if r_ in changed else None, .2, r=.4)
 
 
 def legend_pill(s, x, y, label, color, steps='', dashed=False):
@@ -182,21 +182,21 @@ def rows(s, ex, ey, ew, lines, pitch, first=0, colors=None, marks=None, style='s
             mark(s, ex + ew - 1.6, yy - 1.5, marks[k])
 
 
-def example(s, x, y, label, width=None, size=NOTE):
-    """One line of the running example: a teal pill reading 例, then the text in teal.
+def example(s, x, y, label, width=None, size=NOTE, color=EX):
+    """One line of the running example: a pill reading 例, then the text, both in the example colour.
 
     (x, y) is the pill's left edge and the text baseline; width, when given, is the room
     for pill and text together. Returns the width used.
     """
     pw = measure('例', size - 1, 'bold') + 2.6
-    s.rect(x, y - .36 * size * PT - 2.3, pw, 4.6, EX, None, r=1.0)
+    s.rect(x, y - .36 * size * PT - 2.3, pw, 4.6, color, None, r=1.0)
     s.text(x + pw / 2, y - .36 * size * PT + .34 * (size - 1) * PT, '例', size - 1, WHITE, 'bold', 'center')
     room = None if width is None else width - pw - 1.4
-    return pw + 1.4 + s.text(x + pw + 1.4, y, label, size, EX, width=room)
+    return pw + 1.4 + s.text(x + pw + 1.4, y, label, size, color, width=room)
 
 
 def state(s, b, title, notes=(), ex=(), color=INK, edge=EDGE, sw=.4, fill=WHITE, dash=None, pitch=5.4, ex_size=NOTE,
-          n=None, badge=None):
+          n=None, badge=None, ex_color=EX):
     """A box for one step or state: an optional step badge n, bold title, the method's lines in ink, then example lines."""
     x, y, w, h = b
     s.rect(*b, fill, edge, sw, r=1.6, dash=dash)
@@ -210,7 +210,7 @@ def state(s, b, title, notes=(), ex=(), color=INK, edge=EDGE, sw=.4, fill=WHITE,
         s.text(x + 3.0, yy, line, NOTE, INK, width=w - 6.0)
         yy += pitch
     for line in ex:
-        example(s, x + 3.0, yy, line, width=w - 6.0, size=ex_size)
+        example(s, x + 3.0, yy, line, width=w - 6.0, size=ex_size, color=ex_color)
         yy += pitch
     if yy - pitch + 2.2 > y + h:
         raise ValueError(f'{title!r}: rows need {yy - pitch + 2.2 - y:.1f} mm; box is {h:.1f} mm high')

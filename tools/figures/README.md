@@ -23,7 +23,7 @@ pdftoppm -r 400 -png /tmp/x/architecture.pdf /tmp/x/architecture
 
 ## 汇报用的三张图
 
-`structure.py`、`definition.py`、`process.py` 是汇报 PPT 的三张核心图，不进论文，从三个视角讲同一个方法：图 1 系统架构（MAVRA 在 agent 与数据库之间，共享记忆与发布、使用、维护与优化三项职责），图 2 数据模型（指标定义 = 口径 + SQL + 从 SQL 结构推导的前提条件 + 版本号；三种日常写入下前提条件怎样识别有害的写入），图 3 生命周期（指标定义随数据变化的状态图：学习、发布前校验、有效、待校验、执行前校验、自动修复、回归测试、新版本、优化、指标失效）。用词用数据库、数仓行业的常用说法。每张图先用黑色文字讲机制本身，再用绿色“例”（`parts.example`）标出贯穿全场的门店营业额，数值取自实验记录（来源写在各脚本开头）。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`，状态框用 `parts.state`），只出中文版（`LANGS = ('zh',)`），用标准的数据库术语，不用论文符号，也不写年份。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
+`structure.py`、`definition.py`、`process.py` 是汇报 PPT 的三张核心图，不进论文，从三个视角讲同一个方法：图 1 系统架构（MAVRA 在 agent 与数据库之间，共享记忆与发布、使用、维护与优化三项职责），图 2 数据模型（指标定义 = 口径 + SQL + 从 SQL 结构推导的前提条件 + 版本号；三种日常写入下前提条件怎样识别有害的写入），图 3 生命周期（指标定义随数据变化的状态图：学习、发布前校验、有效、待校验、执行前校验、自动修复、回归测试、新版本、优化、指标失效）。用词用数据库、数仓行业的常用说法。每张图先用黑色文字讲机制本身，再用棕色“例”（`parts.example`）标出贯穿全场的门店营业额，数值取自实验记录（来源写在各脚本开头）。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`，状态框用 `parts.state`），只出中文版（`LANGS = ('zh',)`），用标准的数据库术语，不用论文符号，也不写年份。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
 
 ## 数据核对
 

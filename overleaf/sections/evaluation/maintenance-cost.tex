@@ -1,7 +1,7 @@
 \subsection{\bt{Maintenance cost}{维护代价}}
 \label{sec:cost}
 \bi{\emph{Controlled benchmark (Q4).} The benchmark admits $k$ structured definitions, $k\in\{1,2,4,6\}$, from each of four families (sales, returns, return ratios, catalog), 4 to 19 in all, with $k=1$ retaining sharing between the sales and return-ratio families. After each of four updates, three benign appends and the status-change rows, eight scripted agents use every definition in shuffled order, with staggered or simultaneous arrivals, and database time sums the operations during these uses. Besides the full recheck per definition and \system, we run a variant that rechecks changed tables only, reusing no check results, and the query cache, which caches the full recheck's check queries by normalized SQL text and table versions, with no knowledge of condition types.}
-{\emph{受控实验（Q4）。}基准从四个族（销售、退货、退货比率、目录）各准入最多 $k\in\{1,2,4,6\}$ 个结构化定义，共 4 到 19 个，$k=1$ 仍保留销售与退货比率族之间的共享。四次更新（三次正常追加与状态变更行）之后，8 个脚本智能体各按打乱的顺序使用所有定义，错峰或同时到达，数据库时间累计这些使用期间的操作。除整定义重查与 \system\ 外，还运行只重查变化的表的变体（不复用检查结果）与查询缓存（按规范化 SQL 文本与表版本缓存整定义重查的检查查询，不了解条件类型）。}
+{\emph{受控实验（Q4）。}基准从四个族（销售、退货、退货比率、目录）各准入最多 $k\in\{1,2,4,6\}$ 个结构化定义，共 4 到 19 个，$k=1$ 仍保留销售与退货比率族之间的共享。四次更新（三次正常追加，以及退货改为状态流水）之后，8 个脚本智能体各按打乱的顺序使用所有定义，错峰或同时到达，数据库时间累计这些使用期间的操作。除整定义重查与 \system\ 外，还运行只重查变化的表的变体（不复用检查结果）与查询缓存（按规范化 SQL 文本与表版本缓存整定义重查的检查查询，不了解条件类型）。}
 
 \input{figures/maintenance-cost}
 

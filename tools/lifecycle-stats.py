@@ -22,7 +22,7 @@ STEP = {
     "backfill": ("Late returns", "迟到退货"),
     "correct": ("In-place correction", "原地更正"),
     "addcol": ("New column", "新增列"),
-    "status": ("Return status rows", "退货状态行"),
+    "status": ("Return status rows", "退货状态流水"),
     "revision": ("Restated sales", "更正保留旧行"),
     "dimhist": ("Item SCD Type 2", "商品维度 SCD 2"),
     "rekey": ("Date keys re-keyed", "日期键重编号"),

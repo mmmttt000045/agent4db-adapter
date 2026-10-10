@@ -1,9 +1,12 @@
 """Figure: library replay, outcome of every scored question per method.
 
-Two panels share the legend, the bar scale, and the maintenance-time column.
+Three panels share the legend, the bar scale, and the maintenance-time column.
 The upper panel replays the libraries learned by three LLMs on the synthetic
-fixture; the lower one replays the TPC-DS library derived from the query
-templates on TPC-DS SF1. One 100% bar per method splits its questions into
+fixture; the middle one replays the TPC-DS library derived from the query
+templates on TPC-DS SF1; the lower one pools the libraries derived from the
+queries of TPC-H, SSB, and BIRD financial, each replayed on its own schema
+with the changes generated from its schema description
+(exp/2026-10-11-generality, \\Gn* macros from tools/generality-stats.py). One 100% bar per method splits its questions into
 correct, wrong, and invalidated (correctly or falsely); maintenance database
 time sits at the right. All methods use the agent's own SQL as the G8
 reference, compared as of learning time; the last row of each panel repeats
@@ -26,8 +29,9 @@ import style  # noqa: E402
 from style import ACC_PALE, INK, MUTED, RED, WHITE  # noqa: E402
 
 NAME = 'replay-outcomes'
-W, H = style.COLUMN, 66.0
+W, H = style.COLUMN, 86.0
 EXP = style.ROOT / 'exp/2026-10-02-cache-baseline-tpcds'
+GEN = style.ROOT / 'exp/2026-10-11-generality'
 
 # (replay group, method key in style.METHODS, macro key, footnote mark)
 # Invalidation on every write (answers nothing without relearning) and the query
@@ -39,8 +43,11 @@ ROWS = [('schema/snapshot', 'metric-global-schema', 'Schema', ''),
         ('condition/example', 'condition-current', 'Cur', '')]
 # The TPC-DS replay does not run the full recheck per definition.
 TPCDS_ROWS = [r for r in ROWS if r[0] != 'definition/snapshot']
-# (stats file, macro prefix, rows)
-PANELS = [('replay-stats.json', 'Rp', ROWS), ('tpcds-replay-stats.json', 'Tr', TPCDS_ROWS)]
+# The other schemas run the methods that need no learned SQL beyond the snapshot reference.
+GEN_ROWS = [r for r in TPCDS_ROWS if r[0] != 'condition/example']
+# (stats file, macro file, macro prefix, rows)
+PANELS = [(EXP / 'replay-stats.json', 'review', 'Rp', ROWS), (EXP / 'tpcds-replay-stats.json', 'review', 'Tr', TPCDS_ROWS),
+          (GEN / 'generality-stats.json', 'generality', 'Gn', GEN_ROWS)]
 # (field, macro suffix, fill, text color)
 OUTCOMES = [('correct', 'Correct', '#5B5853', WHITE),
             ('served_wrong', 'Wrong', RED, WHITE),
@@ -50,11 +57,13 @@ TEXT = {
     'en': {'outcomes': ('Correct', 'Wrong', 'Correct invalidation', 'False invalidation'),
            'db': 'Maint. DB s',
            'titles': ('Learned libraries: {libs} libraries, {n} questions per method',
-                      'TPC-DS SF1: {defs} admitted definitions, {n} questions')},
+                      'TPC-DS SF1: {defs} admitted definitions, {n} questions',
+                      'TPC-H, SSB, BIRD financial: {defs} definitions, {n} questions')},
     'zh': {'outcomes': ('答对', '答错', '正确失效', '误失效'),
            'db': '维护 DB 秒',
            'titles': ('学到的定义库：{libs} 个库，每种方法 {n} 题',
-                      'TPC-DS SF1：通过准入的 {defs} 个定义，{n} 题')},
+                      'TPC-DS SF1：通过准入的 {defs} 个定义，{n} 题',
+                      'TPC-H、SSB、BIRD financial：{defs} 个定义，{n} 题')},
 }
 LEFT, RIGHT = .40, .85          # axes span in figure fractions: labels left, DB seconds right
 # Labels too long for the margin are broken over two lines here.
@@ -66,10 +75,12 @@ def _int(n):
 
 
 def load():
-    printed = style.macros('review')
     panels = []
-    for file, prefix, spec in PANELS:
-        stats = json.loads((EXP / file).read_text(encoding='utf-8'))
+    for file, macro_file, prefix, spec in PANELS:
+        printed = style.macros(macro_file)
+        stats = json.loads(file.read_text(encoding='utf-8'))
+        if prefix == 'Gn':
+            stats = stats['pooled']
         rows = []
         for group, key, macro, mark in spec:
             cell = stats['task_level_common'][group]
@@ -86,6 +97,8 @@ def load():
         if prefix == 'Rp':
             style.agree('RpLibs', str(stats['libraries']), printed['RpLibs'])
             numbers['libs'] = stats['libraries']
+        elif prefix == 'Gn':
+            numbers['defs'] = printed['GnSeeded']
         else:
             library = json.loads((EXP / 'tpcds-library.json').read_text(encoding='utf-8'))
             style.agree('TrDefs', str(len(library['metric_report']['entries'])), printed['TrDefs'])
@@ -101,12 +114,12 @@ def figure(lang):
     fig = mplstyle.figure(W, H)
     heights = [len(rows) for _, rows in panels]
     gs = GridSpec(len(panels), 1, figure=fig, height_ratios=heights, hspace=.55,
-                  left=LEFT, right=RIGHT, top=.835, bottom=.085)
+                  left=LEFT, right=RIGHT, top=1 - 10.9 / H, bottom=5.6 / H)
     fig.legend(handles=[Patch(facecolor=fill, label=label) for (_, _, fill, _), label in zip(OUTCOMES, T['outcomes'])],
                loc='upper left', bbox_to_anchor=(.0, 1.0), ncol=4, handlelength=1.0, handleheight=.9,
                columnspacing=.9)
     axes_width_pt = (RIGHT - LEFT) * W * 72 / 25.4
-    fig.text(.995, .905, T['db'], ha='right', va='center', fontsize=mplstyle.TICK, color=MUTED)
+    fig.text(.995, 1 - 6.3 / H, T['db'], ha='right', va='center', fontsize=mplstyle.TICK, color=MUTED)
     for k, (ax, (numbers, rows), title) in enumerate(zip([fig.add_subplot(g) for g in gs], panels, T['titles'])):
         n = len(rows)
         ys = list(range(n))[::-1]

@@ -1,0 +1,1883 @@
+{
+ "tpch": {
+  "libraries": 1,
+  "groups": [
+   "condition/snapshot",
+   "revoke/snapshot",
+   "schema/snapshot",
+   "tabletest/snapshot"
+  ],
+  "task_level": {
+   "condition/snapshot": {
+    "n": 228,
+    "correct": 148,
+    "served_wrong": 14,
+    "unavailable_needed": 49,
+    "unavailable_unneeded": 17,
+    "correct_pct": 64.9,
+    "served_wrong_pct": 6.1,
+    "unavailable_needed_pct": 21.5,
+    "unavailable_unneeded_pct": 7.5
+   },
+   "revoke/snapshot": {
+    "n": 228,
+    "correct": 0,
+    "served_wrong": 0,
+    "unavailable_needed": 93,
+    "unavailable_unneeded": 135,
+    "correct_pct": 0.0,
+    "served_wrong_pct": 0.0,
+    "unavailable_needed_pct": 40.8,
+    "unavailable_unneeded_pct": 59.2
+   },
+   "schema/snapshot": {
+    "n": 228,
+    "correct": 135,
+    "served_wrong": 93,
+    "unavailable_needed": 0,
+    "unavailable_unneeded": 0,
+    "correct_pct": 59.2,
+    "served_wrong_pct": 40.8,
+    "unavailable_needed_pct": 0.0,
+    "unavailable_unneeded_pct": 0.0
+   },
+   "tabletest/snapshot": {
+    "n": 228,
+    "correct": 100,
+    "served_wrong": 11,
+    "unavailable_needed": 82,
+    "unavailable_unneeded": 35,
+    "correct_pct": 43.9,
+    "served_wrong_pct": 4.8,
+    "unavailable_needed_pct": 36.0,
+    "unavailable_unneeded_pct": 15.4
+   }
+  },
+  "task_level_common": {
+   "condition/snapshot": {
+    "n": 228,
+    "correct": 148,
+    "served_wrong": 14,
+    "unavailable_needed": 49,
+    "unavailable_unneeded": 17,
+    "correct_pct": 64.9,
+    "served_wrong_pct": 6.1,
+    "unavailable_needed_pct": 21.5,
+    "unavailable_unneeded_pct": 7.5
+   },
+   "revoke/snapshot": {
+    "n": 228,
+    "correct": 0,
+    "served_wrong": 0,
+    "unavailable_needed": 93,
+    "unavailable_unneeded": 135,
+    "correct_pct": 0.0,
+    "served_wrong_pct": 0.0,
+    "unavailable_needed_pct": 40.8,
+    "unavailable_unneeded_pct": 59.2
+   },
+   "schema/snapshot": {
+    "n": 228,
+    "correct": 135,
+    "served_wrong": 93,
+    "unavailable_needed": 0,
+    "unavailable_unneeded": 0,
+    "correct_pct": 59.2,
+    "served_wrong_pct": 40.8,
+    "unavailable_needed_pct": 0.0,
+    "unavailable_unneeded_pct": 0.0
+   },
+   "tabletest/snapshot": {
+    "n": 228,
+    "correct": 100,
+    "served_wrong": 11,
+    "unavailable_needed": 82,
+    "unavailable_unneeded": 35,
+    "correct_pct": 43.9,
+    "served_wrong_pct": 4.8,
+    "unavailable_needed_pct": 36.0,
+    "unavailable_unneeded_pct": 15.4
+   }
+  },
+  "definition_level": {
+   "condition/snapshot": {
+    "needed:served_ok": 15,
+    "needed:served_wrong": 6,
+    "needed:unavailable": 20,
+    "not_needed:served_ok": 33,
+    "not_needed:unavailable": 2
+   },
+   "revoke/snapshot": {
+    "needed:unavailable": 41,
+    "not_needed:unavailable": 35
+   },
+   "schema/snapshot": {
+    "needed:served_wrong": 41,
+    "not_needed:served_ok": 35
+   },
+   "tabletest/snapshot": {
+    "needed:served_wrong": 5,
+    "needed:unavailable": 36,
+    "not_needed:served_ok": 32,
+    "not_needed:unavailable": 3
+   }
+  },
+  "by_change": {
+   "addcol": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 15
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 15
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 15
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 15
+    }
+   },
+   "append": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 27
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 27
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 27
+    }
+   },
+   "backfill": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 15
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 15
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 15
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 15
+    }
+   },
+   "correct": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 27
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 27
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 27
+    }
+   },
+   "dimhist": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 6
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 6
+    },
+    "schema/snapshot": {
+     "correct_pct": 66.7,
+     "n": 6
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 6
+    }
+   },
+   "dupload": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 27
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    }
+   },
+   "latekey": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    },
+    "schema/snapshot": {
+     "correct_pct": 11.1,
+     "n": 27
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    }
+   },
+   "mirror": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 15
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 15
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 15
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 15
+    }
+   },
+   "revision": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 27
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 27
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    }
+   },
+   "status": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 15
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 15
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 15
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 15
+    }
+   },
+   "unit": {
+    "condition/snapshot": {
+     "correct_pct": 59.3,
+     "n": 27
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 27
+    },
+    "schema/snapshot": {
+     "correct_pct": 59.3,
+     "n": 27
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 59.3,
+     "n": 27
+    }
+   }
+  },
+  "by_model": {
+   "results/tpch-queries": {
+    "condition/snapshot": {
+     "correct_pct": 64.9,
+     "n": 228
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 228
+    },
+    "schema/snapshot": {
+     "correct_pct": 59.2,
+     "n": 228
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 43.9,
+     "n": 228
+    }
+   }
+  },
+  "paired": {
+   "condition/snapshot vs revoke/snapshot": {
+    "n": 228,
+    "same_class_pct": 28.9,
+    "cond_only_correct": 148,
+    "other_only_correct": 0,
+    "correct_diff_pp": 64.9,
+    "ci95_pp": [
+     64.9,
+     64.9
+    ],
+    "discordant": {
+     "correct->unavailable_unneeded": 118,
+     "correct->unavailable_needed": 30,
+     "served_wrong->unavailable_needed": 14
+    }
+   },
+   "condition/snapshot vs schema/snapshot": {
+    "n": 228,
+    "same_class_pct": 57.9,
+    "cond_only_correct": 30,
+    "other_only_correct": 17,
+    "correct_diff_pp": 5.7,
+    "ci95_pp": [
+     5.7,
+     5.7
+    ],
+    "discordant": {
+     "correct->served_wrong": 30,
+     "unavailable_needed->served_wrong": 49,
+     "unavailable_unneeded->correct": 17
+    }
+   },
+   "condition/snapshot vs tabletest/snapshot": {
+    "n": 228,
+    "same_class_pct": 77.6,
+    "cond_only_correct": 48,
+    "other_only_correct": 0,
+    "correct_diff_pp": 21.1,
+    "ci95_pp": [
+     21.1,
+     21.1
+    ],
+    "discordant": {
+     "correct->unavailable_needed": 30,
+     "correct->unavailable_unneeded": 18,
+     "served_wrong->unavailable_needed": 3
+    }
+   }
+  },
+  "maintenance_db_s": {
+   "condition/snapshot": {
+    "total": 4607.5,
+    "addcol": 2.86,
+    "append": 44.26,
+    "backfill": 2.98,
+    "correct": 45.52,
+    "dimhist": 7.74,
+    "dupload": 3844.48,
+    "latekey": 10.67,
+    "mirror": 112.95,
+    "revision": 452.1,
+    "status": 29.76,
+    "unit": 54.2,
+    "vs_condition": null
+   },
+   "schema/snapshot": {
+    "total": 0.0,
+    "addcol": 0.0,
+    "append": 0.0,
+    "backfill": 0.0,
+    "correct": 0.0,
+    "dimhist": 0.0,
+    "dupload": 0.01,
+    "latekey": 0.01,
+    "mirror": 0.0,
+    "revision": 0.0,
+    "status": 0.0,
+    "unit": 0.0,
+    "vs_condition": null
+   },
+   "revoke/snapshot": {
+    "total": 0.0,
+    "addcol": 0.0,
+    "append": 0.0,
+    "backfill": 0.0,
+    "correct": 0.0,
+    "dimhist": 0.0,
+    "dupload": 0.01,
+    "latekey": 0.0,
+    "mirror": 0.0,
+    "revision": 0.0,
+    "status": 0.01,
+    "unit": 0.0,
+    "vs_condition": null
+   },
+   "tabletest/snapshot": {
+    "total": 251.2,
+    "addcol": 19.8,
+    "append": 30.8,
+    "backfill": 16.64,
+    "correct": 6.02,
+    "dimhist": 48.87,
+    "dupload": 3.55,
+    "latekey": 28.45,
+    "mirror": 46.83,
+    "revision": 2.29,
+    "status": 18.6,
+    "unit": 29.4,
+    "vs_condition": null
+   }
+  },
+  "maintenance_db_s_base": "condition/judge",
+  "seed_failures": {
+   "condition/snapshot": 0,
+   "schema/snapshot": 0,
+   "revoke/snapshot": 0
+  }
+ },
+ "ssb": {
+  "libraries": 1,
+  "groups": [
+   "condition/snapshot",
+   "revoke/snapshot",
+   "schema/snapshot",
+   "tabletest/snapshot"
+  ],
+  "task_level": {
+   "condition/snapshot": {
+    "n": 345,
+    "correct": 217,
+    "served_wrong": 29,
+    "unavailable_needed": 83,
+    "unavailable_unneeded": 16,
+    "correct_pct": 62.9,
+    "served_wrong_pct": 8.4,
+    "unavailable_needed_pct": 24.1,
+    "unavailable_unneeded_pct": 4.6
+   },
+   "revoke/snapshot": {
+    "n": 345,
+    "correct": 0,
+    "served_wrong": 0,
+    "unavailable_needed": 161,
+    "unavailable_unneeded": 184,
+    "correct_pct": 0.0,
+    "served_wrong_pct": 0.0,
+    "unavailable_needed_pct": 46.7,
+    "unavailable_unneeded_pct": 53.3
+   },
+   "schema/snapshot": {
+    "n": 345,
+    "correct": 184,
+    "served_wrong": 161,
+    "unavailable_needed": 0,
+    "unavailable_unneeded": 0,
+    "correct_pct": 53.3,
+    "served_wrong_pct": 46.7,
+    "unavailable_needed_pct": 0.0,
+    "unavailable_unneeded_pct": 0.0
+   },
+   "tabletest/snapshot": {
+    "n": 345,
+    "correct": 136,
+    "served_wrong": 29,
+    "unavailable_needed": 132,
+    "unavailable_unneeded": 48,
+    "correct_pct": 39.4,
+    "served_wrong_pct": 8.4,
+    "unavailable_needed_pct": 38.3,
+    "unavailable_unneeded_pct": 13.9
+   }
+  },
+  "task_level_common": {
+   "condition/snapshot": {
+    "n": 345,
+    "correct": 217,
+    "served_wrong": 29,
+    "unavailable_needed": 83,
+    "unavailable_unneeded": 16,
+    "correct_pct": 62.9,
+    "served_wrong_pct": 8.4,
+    "unavailable_needed_pct": 24.1,
+    "unavailable_unneeded_pct": 4.6
+   },
+   "revoke/snapshot": {
+    "n": 345,
+    "correct": 0,
+    "served_wrong": 0,
+    "unavailable_needed": 161,
+    "unavailable_unneeded": 184,
+    "correct_pct": 0.0,
+    "served_wrong_pct": 0.0,
+    "unavailable_needed_pct": 46.7,
+    "unavailable_unneeded_pct": 53.3
+   },
+   "schema/snapshot": {
+    "n": 345,
+    "correct": 184,
+    "served_wrong": 161,
+    "unavailable_needed": 0,
+    "unavailable_unneeded": 0,
+    "correct_pct": 53.3,
+    "served_wrong_pct": 46.7,
+    "unavailable_needed_pct": 0.0,
+    "unavailable_unneeded_pct": 0.0
+   },
+   "tabletest/snapshot": {
+    "n": 345,
+    "correct": 136,
+    "served_wrong": 29,
+    "unavailable_needed": 132,
+    "unavailable_unneeded": 48,
+    "correct_pct": 39.4,
+    "served_wrong_pct": 8.4,
+    "unavailable_needed_pct": 38.3,
+    "unavailable_unneeded_pct": 13.9
+   }
+  },
+  "definition_level": {
+   "condition/snapshot": {
+    "needed:served_ok": 23,
+    "needed:served_wrong": 11,
+    "needed:unavailable": 33,
+    "not_needed:served_ok": 48
+   },
+   "revoke/snapshot": {
+    "needed:unavailable": 67,
+    "not_needed:unavailable": 48
+   },
+   "schema/snapshot": {
+    "needed:served_wrong": 67,
+    "not_needed:served_ok": 48
+   },
+   "tabletest/snapshot": {
+    "needed:served_wrong": 11,
+    "needed:unavailable": 56,
+    "not_needed:served_ok": 44,
+    "not_needed:unavailable": 4
+   }
+  },
+  "by_change": {
+   "addcol": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    }
+   },
+   "append": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    }
+   },
+   "backfill": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    }
+   },
+   "correct": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    }
+   },
+   "dimhist": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 15
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 15
+    },
+    "schema/snapshot": {
+     "correct_pct": 60.0,
+     "n": 15
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 15
+    }
+   },
+   "dupload": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 9.1,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    }
+   },
+   "latekey": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 6.1,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    }
+   },
+   "mirror": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    }
+   },
+   "revision": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 36.4,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    }
+   },
+   "status": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    }
+   },
+   "unit": {
+    "condition/snapshot": {
+     "correct_pct": 12.1,
+     "n": 33
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 33
+    },
+    "schema/snapshot": {
+     "correct_pct": 12.1,
+     "n": 33
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 12.1,
+     "n": 33
+    }
+   }
+  },
+  "by_model": {
+   "results/ssb-queries": {
+    "condition/snapshot": {
+     "correct_pct": 62.9,
+     "n": 345
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 345
+    },
+    "schema/snapshot": {
+     "correct_pct": 53.3,
+     "n": 345
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 39.4,
+     "n": 345
+    }
+   }
+  },
+  "paired": {
+   "condition/snapshot vs revoke/snapshot": {
+    "n": 345,
+    "same_class_pct": 28.7,
+    "cond_only_correct": 217,
+    "other_only_correct": 0,
+    "correct_diff_pp": 62.9,
+    "ci95_pp": [
+     62.9,
+     62.9
+    ],
+    "discordant": {
+     "correct->unavailable_unneeded": 168,
+     "correct->unavailable_needed": 49,
+     "served_wrong->unavailable_needed": 29
+    }
+   },
+   "condition/snapshot vs schema/snapshot": {
+    "n": 345,
+    "same_class_pct": 57.1,
+    "cond_only_correct": 49,
+    "other_only_correct": 16,
+    "correct_diff_pp": 9.6,
+    "ci95_pp": [
+     9.6,
+     9.6
+    ],
+    "discordant": {
+     "correct->served_wrong": 49,
+     "unavailable_needed->served_wrong": 83,
+     "unavailable_unneeded->correct": 16
+    }
+   },
+   "condition/snapshot vs tabletest/snapshot": {
+    "n": 345,
+    "same_class_pct": 76.5,
+    "cond_only_correct": 81,
+    "other_only_correct": 0,
+    "correct_diff_pp": 23.5,
+    "ci95_pp": [
+     23.5,
+     23.5
+    ],
+    "discordant": {
+     "correct->unavailable_needed": 49,
+     "correct->unavailable_unneeded": 32
+    }
+   }
+  },
+  "maintenance_db_s": {
+   "condition/snapshot": {
+    "total": 15271.4,
+    "addcol": 47.36,
+    "append": 45.99,
+    "backfill": 45.76,
+    "correct": 50.73,
+    "dimhist": 11.61,
+    "dupload": 4522.79,
+    "latekey": 6.22,
+    "mirror": 9576.63,
+    "revision": 448.21,
+    "status": 461.23,
+    "unit": 54.88,
+    "vs_condition": null
+   },
+   "schema/snapshot": {
+    "total": 0.0,
+    "addcol": 0.0,
+    "append": 0.0,
+    "backfill": 0.0,
+    "correct": 0.0,
+    "dimhist": 0.0,
+    "dupload": 0.0,
+    "latekey": 0.0,
+    "mirror": 0.0,
+    "revision": 0.0,
+    "status": 0.0,
+    "unit": 0.0,
+    "vs_condition": null
+   },
+   "revoke/snapshot": {
+    "total": 0.0,
+    "addcol": 0.0,
+    "append": 0.0,
+    "backfill": 0.0,
+    "correct": 0.0,
+    "dimhist": 0.0,
+    "dupload": 0.0,
+    "latekey": 0.0,
+    "mirror": 0.0,
+    "revision": 0.0,
+    "status": 0.0,
+    "unit": 0.0,
+    "vs_condition": null
+   },
+   "tabletest/snapshot": {
+    "total": 173.4,
+    "addcol": 5.38,
+    "append": 4.34,
+    "backfill": 4.35,
+    "correct": 5.58,
+    "dimhist": 28.81,
+    "dupload": 2.94,
+    "latekey": 25.95,
+    "mirror": 64.41,
+    "revision": 2.08,
+    "status": 2.25,
+    "unit": 27.34,
+    "vs_condition": null
+   }
+  },
+  "maintenance_db_s_base": "condition/judge",
+  "seed_failures": {
+   "condition/snapshot": 0,
+   "schema/snapshot": 0,
+   "revoke/snapshot": 0
+  }
+ },
+ "financial": {
+  "libraries": 1,
+  "groups": [
+   "condition/snapshot",
+   "revoke/snapshot",
+   "schema/snapshot",
+   "tabletest/snapshot"
+  ],
+  "task_level": {
+   "condition/snapshot": {
+    "n": 87,
+    "correct": 60,
+    "served_wrong": 3,
+    "unavailable_needed": 14,
+    "unavailable_unneeded": 10,
+    "correct_pct": 69.0,
+    "served_wrong_pct": 3.4,
+    "unavailable_needed_pct": 16.1,
+    "unavailable_unneeded_pct": 11.5
+   },
+   "revoke/snapshot": {
+    "n": 87,
+    "correct": 0,
+    "served_wrong": 0,
+    "unavailable_needed": 30,
+    "unavailable_unneeded": 57,
+    "correct_pct": 0.0,
+    "served_wrong_pct": 0.0,
+    "unavailable_needed_pct": 34.5,
+    "unavailable_unneeded_pct": 65.5
+   },
+   "schema/snapshot": {
+    "n": 87,
+    "correct": 57,
+    "served_wrong": 30,
+    "unavailable_needed": 0,
+    "unavailable_unneeded": 0,
+    "correct_pct": 65.5,
+    "served_wrong_pct": 34.5,
+    "unavailable_needed_pct": 0.0,
+    "unavailable_unneeded_pct": 0.0
+   },
+   "tabletest/snapshot": {
+    "n": 87,
+    "correct": 36,
+    "served_wrong": 3,
+    "unavailable_needed": 27,
+    "unavailable_unneeded": 21,
+    "correct_pct": 41.4,
+    "served_wrong_pct": 3.4,
+    "unavailable_needed_pct": 31.0,
+    "unavailable_unneeded_pct": 24.1
+   }
+  },
+  "task_level_common": {
+   "condition/snapshot": {
+    "n": 87,
+    "correct": 60,
+    "served_wrong": 3,
+    "unavailable_needed": 14,
+    "unavailable_unneeded": 10,
+    "correct_pct": 69.0,
+    "served_wrong_pct": 3.4,
+    "unavailable_needed_pct": 16.1,
+    "unavailable_unneeded_pct": 11.5
+   },
+   "revoke/snapshot": {
+    "n": 87,
+    "correct": 0,
+    "served_wrong": 0,
+    "unavailable_needed": 30,
+    "unavailable_unneeded": 57,
+    "correct_pct": 0.0,
+    "served_wrong_pct": 0.0,
+    "unavailable_needed_pct": 34.5,
+    "unavailable_unneeded_pct": 65.5
+   },
+   "schema/snapshot": {
+    "n": 87,
+    "correct": 57,
+    "served_wrong": 30,
+    "unavailable_needed": 0,
+    "unavailable_unneeded": 0,
+    "correct_pct": 65.5,
+    "served_wrong_pct": 34.5,
+    "unavailable_needed_pct": 0.0,
+    "unavailable_unneeded_pct": 0.0
+   },
+   "tabletest/snapshot": {
+    "n": 87,
+    "correct": 36,
+    "served_wrong": 3,
+    "unavailable_needed": 27,
+    "unavailable_unneeded": 21,
+    "correct_pct": 41.4,
+    "served_wrong_pct": 3.4,
+    "unavailable_needed_pct": 31.0,
+    "unavailable_unneeded_pct": 24.1
+   }
+  },
+  "definition_level": {
+   "condition/snapshot": {
+    "needed:served_ok": 7,
+    "needed:served_wrong": 1,
+    "needed:unavailable": 6,
+    "not_needed:served_ok": 13,
+    "not_needed:unavailable": 2
+   },
+   "revoke/snapshot": {
+    "needed:unavailable": 14,
+    "not_needed:unavailable": 15
+   },
+   "schema/snapshot": {
+    "needed:served_wrong": 14,
+    "not_needed:served_ok": 15
+   },
+   "tabletest/snapshot": {
+    "needed:served_wrong": 1,
+    "needed:unavailable": 13,
+    "not_needed:served_ok": 12,
+    "not_needed:unavailable": 3
+   }
+  },
+  "by_change": {
+   "addcol": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 6
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 6
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 6
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 6
+    }
+   },
+   "append": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 9
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 9
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 9
+    }
+   },
+   "backfill": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 6
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 6
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 6
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 6
+    }
+   },
+   "correct": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 9
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 9
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 9
+    }
+   },
+   "dimhist": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 9
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    },
+    "schema/snapshot": {
+     "correct_pct": 66.7,
+     "n": 9
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    }
+   },
+   "dupload": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    },
+    "schema/snapshot": {
+     "correct_pct": 44.4,
+     "n": 9
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    }
+   },
+   "latekey": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    },
+    "schema/snapshot": {
+     "correct_pct": 44.4,
+     "n": 9
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    }
+   },
+   "mirror": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 6
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 6
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 6
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 6
+    }
+   },
+   "revision": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 9
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 9
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    }
+   },
+   "status": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 6
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 6
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 6
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 6
+    }
+   },
+   "unit": {
+    "condition/snapshot": {
+     "correct_pct": 66.7,
+     "n": 9
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 9
+    },
+    "schema/snapshot": {
+     "correct_pct": 66.7,
+     "n": 9
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 66.7,
+     "n": 9
+    }
+   }
+  },
+  "by_model": {
+   "results/financial-queries": {
+    "condition/snapshot": {
+     "correct_pct": 69.0,
+     "n": 87
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 87
+    },
+    "schema/snapshot": {
+     "correct_pct": 65.5,
+     "n": 87
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 41.4,
+     "n": 87
+    }
+   }
+  },
+  "paired": {
+   "condition/snapshot vs revoke/snapshot": {
+    "n": 87,
+    "same_class_pct": 27.6,
+    "cond_only_correct": 60,
+    "other_only_correct": 0,
+    "correct_diff_pp": 69.0,
+    "ci95_pp": [
+     69.0,
+     69.0
+    ],
+    "discordant": {
+     "correct->unavailable_unneeded": 47,
+     "correct->unavailable_needed": 13,
+     "served_wrong->unavailable_needed": 3
+    }
+   },
+   "condition/snapshot vs schema/snapshot": {
+    "n": 87,
+    "same_class_pct": 57.5,
+    "cond_only_correct": 13,
+    "other_only_correct": 10,
+    "correct_diff_pp": 3.4,
+    "ci95_pp": [
+     3.4,
+     3.4
+    ],
+    "discordant": {
+     "correct->served_wrong": 13,
+     "unavailable_unneeded->correct": 10,
+     "unavailable_needed->served_wrong": 14
+    }
+   },
+   "condition/snapshot vs tabletest/snapshot": {
+    "n": 87,
+    "same_class_pct": 72.4,
+    "cond_only_correct": 24,
+    "other_only_correct": 0,
+    "correct_diff_pp": 27.6,
+    "ci95_pp": [
+     27.6,
+     27.6
+    ],
+    "discordant": {
+     "correct->unavailable_needed": 13,
+     "correct->unavailable_unneeded": 11
+    }
+   }
+  },
+  "maintenance_db_s": {
+   "condition/snapshot": {
+    "total": 45.0,
+    "addcol": 0.01,
+    "append": 0.51,
+    "backfill": 0.02,
+    "correct": 0.7,
+    "dimhist": 0.69,
+    "dupload": 29.71,
+    "latekey": 0.32,
+    "mirror": 0.05,
+    "revision": 11.53,
+    "status": 0.17,
+    "unit": 1.25,
+    "vs_condition": null
+   },
+   "schema/snapshot": {
+    "total": 0.0,
+    "addcol": 0.0,
+    "append": 0.0,
+    "backfill": 0.0,
+    "correct": 0.0,
+    "dimhist": 0.0,
+    "dupload": 0.0,
+    "latekey": 0.0,
+    "mirror": 0.0,
+    "revision": 0.0,
+    "status": 0.0,
+    "unit": 0.0,
+    "vs_condition": null
+   },
+   "revoke/snapshot": {
+    "total": 0.0,
+    "addcol": 0.0,
+    "append": 0.0,
+    "backfill": 0.0,
+    "correct": 0.0,
+    "dimhist": 0.0,
+    "dupload": 0.0,
+    "latekey": 0.0,
+    "mirror": 0.0,
+    "revision": 0.0,
+    "status": 0.0,
+    "unit": 0.0,
+    "vs_condition": null
+   },
+   "tabletest/snapshot": {
+    "total": 6.4,
+    "addcol": 0.71,
+    "append": 0.41,
+    "backfill": 0.4,
+    "correct": 0.65,
+    "dimhist": 0.43,
+    "dupload": 0.13,
+    "latekey": 0.59,
+    "mirror": 1.23,
+    "revision": 0.13,
+    "status": 0.7,
+    "unit": 1.01,
+    "vs_condition": null
+   }
+  },
+  "maintenance_db_s_base": "condition/judge",
+  "seed_failures": {
+   "condition/snapshot": 0,
+   "schema/snapshot": 0,
+   "revoke/snapshot": 0
+  }
+ },
+ "pooled": {
+  "libraries": 3,
+  "groups": [
+   "condition/snapshot",
+   "revoke/snapshot",
+   "schema/snapshot",
+   "tabletest/snapshot"
+  ],
+  "task_level": {
+   "condition/snapshot": {
+    "n": 660,
+    "correct": 425,
+    "served_wrong": 46,
+    "unavailable_needed": 146,
+    "unavailable_unneeded": 43,
+    "correct_pct": 64.4,
+    "served_wrong_pct": 7.0,
+    "unavailable_needed_pct": 22.1,
+    "unavailable_unneeded_pct": 6.5
+   },
+   "revoke/snapshot": {
+    "n": 660,
+    "correct": 0,
+    "served_wrong": 0,
+    "unavailable_needed": 284,
+    "unavailable_unneeded": 376,
+    "correct_pct": 0.0,
+    "served_wrong_pct": 0.0,
+    "unavailable_needed_pct": 43.0,
+    "unavailable_unneeded_pct": 57.0
+   },
+   "schema/snapshot": {
+    "n": 660,
+    "correct": 376,
+    "served_wrong": 284,
+    "unavailable_needed": 0,
+    "unavailable_unneeded": 0,
+    "correct_pct": 57.0,
+    "served_wrong_pct": 43.0,
+    "unavailable_needed_pct": 0.0,
+    "unavailable_unneeded_pct": 0.0
+   },
+   "tabletest/snapshot": {
+    "n": 660,
+    "correct": 272,
+    "served_wrong": 43,
+    "unavailable_needed": 241,
+    "unavailable_unneeded": 104,
+    "correct_pct": 41.2,
+    "served_wrong_pct": 6.5,
+    "unavailable_needed_pct": 36.5,
+    "unavailable_unneeded_pct": 15.8
+   }
+  },
+  "task_level_common": {
+   "condition/snapshot": {
+    "n": 660,
+    "correct": 425,
+    "served_wrong": 46,
+    "unavailable_needed": 146,
+    "unavailable_unneeded": 43,
+    "correct_pct": 64.4,
+    "served_wrong_pct": 7.0,
+    "unavailable_needed_pct": 22.1,
+    "unavailable_unneeded_pct": 6.5
+   },
+   "revoke/snapshot": {
+    "n": 660,
+    "correct": 0,
+    "served_wrong": 0,
+    "unavailable_needed": 284,
+    "unavailable_unneeded": 376,
+    "correct_pct": 0.0,
+    "served_wrong_pct": 0.0,
+    "unavailable_needed_pct": 43.0,
+    "unavailable_unneeded_pct": 57.0
+   },
+   "schema/snapshot": {
+    "n": 660,
+    "correct": 376,
+    "served_wrong": 284,
+    "unavailable_needed": 0,
+    "unavailable_unneeded": 0,
+    "correct_pct": 57.0,
+    "served_wrong_pct": 43.0,
+    "unavailable_needed_pct": 0.0,
+    "unavailable_unneeded_pct": 0.0
+   },
+   "tabletest/snapshot": {
+    "n": 660,
+    "correct": 272,
+    "served_wrong": 43,
+    "unavailable_needed": 241,
+    "unavailable_unneeded": 104,
+    "correct_pct": 41.2,
+    "served_wrong_pct": 6.5,
+    "unavailable_needed_pct": 36.5,
+    "unavailable_unneeded_pct": 15.8
+   }
+  },
+  "definition_level": {
+   "condition/snapshot": {
+    "needed:served_ok": 45,
+    "needed:served_wrong": 18,
+    "needed:unavailable": 59,
+    "not_needed:served_ok": 94,
+    "not_needed:unavailable": 4
+   },
+   "revoke/snapshot": {
+    "needed:unavailable": 122,
+    "not_needed:unavailable": 98
+   },
+   "schema/snapshot": {
+    "needed:served_wrong": 122,
+    "not_needed:served_ok": 98
+   },
+   "tabletest/snapshot": {
+    "needed:served_wrong": 17,
+    "needed:unavailable": 105,
+    "not_needed:served_ok": 88,
+    "not_needed:unavailable": 10
+   }
+  },
+  "by_change": {
+   "addcol": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 54
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 54
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 54
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 54
+    }
+   },
+   "append": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 69
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 69
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 69
+    }
+   },
+   "backfill": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 54
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 54
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 54
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 54
+    }
+   },
+   "correct": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 69
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    },
+    "schema/snapshot": {
+     "correct_pct": 100.0,
+     "n": 69
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 100.0,
+     "n": 69
+    }
+   },
+   "dimhist": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 30
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 30
+    },
+    "schema/snapshot": {
+     "correct_pct": 63.3,
+     "n": 30
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 30
+    }
+   },
+   "dupload": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    },
+    "schema/snapshot": {
+     "correct_pct": 23.2,
+     "n": 69
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    }
+   },
+   "latekey": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    },
+    "schema/snapshot": {
+     "correct_pct": 13.0,
+     "n": 69
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    }
+   },
+   "mirror": {
+    "condition/snapshot": {
+     "correct_pct": 0.0,
+     "n": 54
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 54
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 54
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 54
+    }
+   },
+   "revision": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 69
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    },
+    "schema/snapshot": {
+     "correct_pct": 34.8,
+     "n": 69
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    }
+   },
+   "status": {
+    "condition/snapshot": {
+     "correct_pct": 100.0,
+     "n": 54
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 54
+    },
+    "schema/snapshot": {
+     "correct_pct": 33.3,
+     "n": 54
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 0.0,
+     "n": 54
+    }
+   },
+   "unit": {
+    "condition/snapshot": {
+     "correct_pct": 37.7,
+     "n": 69
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 69
+    },
+    "schema/snapshot": {
+     "correct_pct": 37.7,
+     "n": 69
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 37.7,
+     "n": 69
+    }
+   }
+  },
+  "by_model": {
+   "results/financial-queries": {
+    "condition/snapshot": {
+     "correct_pct": 69.0,
+     "n": 87
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 87
+    },
+    "schema/snapshot": {
+     "correct_pct": 65.5,
+     "n": 87
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 41.4,
+     "n": 87
+    }
+   },
+   "results/ssb-queries": {
+    "condition/snapshot": {
+     "correct_pct": 62.9,
+     "n": 345
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 345
+    },
+    "schema/snapshot": {
+     "correct_pct": 53.3,
+     "n": 345
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 39.4,
+     "n": 345
+    }
+   },
+   "results/tpch-queries": {
+    "condition/snapshot": {
+     "correct_pct": 64.9,
+     "n": 228
+    },
+    "revoke/snapshot": {
+     "correct_pct": 0.0,
+     "n": 228
+    },
+    "schema/snapshot": {
+     "correct_pct": 59.2,
+     "n": 228
+    },
+    "tabletest/snapshot": {
+     "correct_pct": 43.9,
+     "n": 228
+    }
+   }
+  },
+  "paired": {
+   "condition/snapshot vs revoke/snapshot": {
+    "n": 660,
+    "same_class_pct": 28.6,
+    "cond_only_correct": 425,
+    "other_only_correct": 0,
+    "correct_diff_pp": 64.4,
+    "ci95_pp": [
+     62.9,
+     69.0
+    ],
+    "discordant": {
+     "correct->unavailable_unneeded": 333,
+     "correct->unavailable_needed": 92,
+     "served_wrong->unavailable_needed": 46
+    }
+   },
+   "condition/snapshot vs schema/snapshot": {
+    "n": 660,
+    "same_class_pct": 57.4,
+    "cond_only_correct": 92,
+    "other_only_correct": 43,
+    "correct_diff_pp": 7.4,
+    "ci95_pp": [
+     3.4,
+     9.6
+    ],
+    "discordant": {
+     "correct->served_wrong": 92,
+     "unavailable_needed->served_wrong": 146,
+     "unavailable_unneeded->correct": 43
+    }
+   },
+   "condition/snapshot vs tabletest/snapshot": {
+    "n": 660,
+    "same_class_pct": 76.4,
+    "cond_only_correct": 153,
+    "other_only_correct": 0,
+    "correct_diff_pp": 23.2,
+    "ci95_pp": [
+     21.1,
+     27.6
+    ],
+    "discordant": {
+     "correct->unavailable_needed": 92,
+     "correct->unavailable_unneeded": 61,
+     "served_wrong->unavailable_needed": 3
+    }
+   }
+  },
+  "maintenance_db_s": {
+   "condition/snapshot": {
+    "total": 19923.9,
+    "addcol": 50.23,
+    "append": 90.77,
+    "backfill": 48.76,
+    "correct": 96.96,
+    "dimhist": 20.04,
+    "dupload": 8396.99,
+    "latekey": 17.21,
+    "mirror": 9689.64,
+    "revision": 911.84,
+    "status": 491.17,
+    "unit": 110.33,
+    "vs_condition": null
+   },
+   "schema/snapshot": {
+    "total": 0.1,
+    "addcol": 0.01,
+    "append": 0.01,
+    "backfill": 0.01,
+    "correct": 0.01,
+    "dimhist": 0.01,
+    "dupload": 0.01,
+    "latekey": 0.01,
+    "mirror": 0.01,
+    "revision": 0.01,
+    "status": 0.01,
+    "unit": 0.01,
+    "vs_condition": null
+   },
+   "revoke/snapshot": {
+    "total": 0.1,
+    "addcol": 0.01,
+    "append": 0.01,
+    "backfill": 0.01,
+    "correct": 0.01,
+    "dimhist": 0.01,
+    "dupload": 0.01,
+    "latekey": 0.01,
+    "mirror": 0.01,
+    "revision": 0.01,
+    "status": 0.01,
+    "unit": 0.01,
+    "vs_condition": null
+   },
+   "tabletest/snapshot": {
+    "total": 431.1,
+    "addcol": 25.89,
+    "append": 35.55,
+    "backfill": 21.38,
+    "correct": 12.25,
+    "dimhist": 78.12,
+    "dupload": 6.62,
+    "latekey": 54.98,
+    "mirror": 112.47,
+    "revision": 4.5,
+    "status": 21.55,
+    "unit": 57.75,
+    "vs_condition": null
+   }
+  },
+  "maintenance_db_s_base": "condition/judge",
+  "seed_failures": {
+   "condition/snapshot": 0,
+   "schema/snapshot": 0,
+   "revoke/snapshot": 0
+  }
+ }
+}

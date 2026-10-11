@@ -424,6 +424,14 @@ fn outcome_text(c: &Check, o: &Outcome) -> String {
         Check::DateCoverage { .. } => {
             format!("{} 行中 {} 行有日期（{:.2}%）", o.metrics["n_rows"], o.metrics["n_dated"], metric(o, "join_ratio") * 100.0)
         }
+        Check::PathCoverage { .. } => {
+            format!(
+                "到达的 {} 个事实行中 {} 行关联得上（{:.2}%）",
+                o.metrics["n_left"],
+                o.metrics["n_join"],
+                metric(o, "join_ratio") * 100.0
+            )
+        }
     }
 }
 

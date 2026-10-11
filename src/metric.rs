@@ -670,6 +670,11 @@ pub fn rewrite_candidates(m: &Metric, cat: &Catalog) -> Vec<(String, Metric)> {
     out
 }
 
+/// 候选是否就是某个规则改写（结构相同）：这类改写的等价由受维护的条件蕴含，不依赖抽样测试。
+pub fn is_rule_rewrite(m: &Metric, cand: &Metric, cat: &Catalog) -> bool {
+    rewrite_candidates(m, cat).iter().any(|(_, r)| same_structure(r, cand))
+}
+
 // ───────────────────────── 离线提炼 ─────────────────────────
 
 const EXTRACT_SYSTEM: &str = "你是数据中间层的指标口径提炼器。输入是一次已被独立判定为成功的分析任务：题面、参与最终答案的 SQL 计算链、\
@@ -888,6 +893,20 @@ mod tests {
         let rank = compile(&m, &Ask::RankMonth { year: 2001 }).unwrap();
         assert!(rank.contains("join date_dim"), "按月排名仍需维度列：{rank}");
         assert!(!same_structure(&rate(), &m), "期间谓词的实现方式是结构的一部分");
+    }
+
+    #[test]
+    fn only_rule_forms_count_as_rule_rewrites() {
+        let c = cat();
+        let m = rate();
+        let mut key_range = m.clone();
+        key_range.time.as_mut().unwrap().strategy = TimeStrategy::KeyRange;
+        key_range.definition = "模型写的说明不影响结构".into();
+        assert!(is_rule_rewrite(&m, &key_range, &c), "模型提出的键范围改写与规则候选结构相同");
+        let mut other = m.clone();
+        other.measure = "sum(sr_return_amt) / sum(ss_net_paid) * 100.0".into();
+        assert!(!is_rule_rewrite(&m, &other, &c), "改写了度量表达式的提议不是规则形式");
+        assert!(!is_rule_rewrite(&m, &m, &c), "与当前修订相同不算改写");
     }
 
     #[test]

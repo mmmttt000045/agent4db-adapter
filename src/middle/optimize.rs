@@ -76,6 +76,14 @@ impl Middle {
             self.metric_event(v.clone());
             return Ok(v);
         }
+        // 只发布等价由受维护的条件蕴含的改写：规则候选，以及恰好落在某个规则形式上的模型提议（命题 5.1）。
+        // 其余模型提议通过了抽样测试也只记为建议，不发布
+        if source != "rule" && !metric::is_rule_rewrite(&m, &cand, &self.cat) {
+            let v = json!({"event": "optimize_suggested", "key": key, "revision": old.revision, "candidate": label, "source": source,
+                           "gates": gates, "cost": cost});
+            self.metric_event(v.clone());
+            return Ok(v);
+        }
         if cand.time.as_ref().is_some_and(|t| t.strategy == TimeStrategy::KeyRange)
             && !cand.caveats.iter().any(|c| c.contains("日期键范围"))
         {

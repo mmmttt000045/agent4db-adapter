@@ -5,7 +5,7 @@ use super::{inc, join_key, outcome_text, scope_prefix, snap_key, ver_sig, Ctx, M
 use crate::catalog::{self, TableVersion};
 use crate::checks::{same_on, Check, On, Outcome};
 use crate::db::QKind;
-use crate::knowledge::{BadPath, Basis, Content, Entry, Example, JoinKind, JoinPath, JoinRef, Metric, Status, TimeSpec, TimeStrategy};
+use crate::knowledge::{BadPath, Basis, Content, Entry, Example, JoinKind, JoinPath, Metric, Status, TimeSpec, TimeStrategy};
 use crate::metric::{self, Answer, Ask, Draft, Trajectory};
 use crate::sqlscan;
 use anyhow::Result;
@@ -201,9 +201,24 @@ fn coverage_check(m: &Metric) -> Option<Check> {
     })
 }
 
-/// 内连接的完整性条件：左表关联不上右表任何行的行占比（两侧都不带过滤；过滤排除的行属于口径本身）。
-fn join_coverage_check(j: &JoinRef) -> Check {
-    Check::RowConservation { left: j.left.clone(), right: j.right.clone(), on: j.on.clone(), lf: None, rf: None }
+/// 第 `idx` 个连接（内连接）的完整性条件，按事实行计（两侧都不带过滤；过滤排除的行属于口径本身）。左表是事实表时比较
+/// 事实表与关联后的行数；雪花型连接的左表是此前关联到的维表，这时取从事实表沿路径到达左表的事实行中关联不上右表的占比——
+/// 只数维表的行会把“一个热门商品失去类别”算成很小的比例，而它可能是大半事实。
+fn join_coverage(m: &Metric, idx: usize) -> Check {
+    let j = &m.joins[idx];
+    let star = || Check::RowConservation { left: j.left.clone(), right: j.right.clone(), on: j.on.clone(), lf: None, rf: None };
+    if j.left == m.fact {
+        return star();
+    }
+    let mut path = vec![(j.left.clone(), j.right.clone(), j.on.clone())];
+    let mut cur = j.left.clone();
+    while cur != m.fact {
+        let Some(p) = m.joins[..idx].iter().find(|x| x.right == cur) else { return star() };
+        path.push((p.left.clone(), p.right.clone(), p.on.clone()));
+        cur = p.left.clone();
+    }
+    path.reverse();
+    Check::PathCoverage { fact: m.fact.clone(), path }
 }
 
 /// 关联不上的行占比（空键或孤儿键）。
@@ -243,12 +258,12 @@ pub(super) fn time_contiguity_check(t: &TimeSpec) -> Check {
 /// 返回条件与覆盖基线（只有完整性条件有）。
 fn bound_conditions(m: &Metric) -> Vec<(Check, Option<f64>)> {
     let mut out = vec![];
-    for j in &m.joins {
+    for (i, j) in m.joins.iter().enumerate() {
         let mut cols: Vec<String> = j.on.iter().map(|(_, r)| r.clone()).collect();
         cols.sort();
         out.push((Check::KeyUnique { table: j.right.clone(), cols, filter: j.filters.get(&j.right).cloned() }, None));
         if j.kind == JoinKind::Inner {
-            out.push((join_coverage_check(j), Some(j.orphan_ratio + COVERAGE_TOLERANCE)));
+            out.push((join_coverage(m, i), Some(j.orphan_ratio + COVERAGE_TOLERANCE)));
         }
     }
     if let Some(t) = &m.time {
@@ -642,7 +657,8 @@ impl Middle {
             bad!("{e}");
         }
         let mut allowed: BTreeSet<String> = [m.fact.clone()].into_iter().collect();
-        for j in m.joins.iter_mut() {
+        let coverage: Vec<Check> = (0..m.joins.len()).map(|i| join_coverage(m, i)).collect();
+        for (i, j) in m.joins.iter_mut().enumerate() {
             if self.cat.validate_join(&j.left, &j.right, &j.on).is_err() {
                 bad!("关联 {}⋈{} 的列不存在或重复", j.left, j.right);
             }
@@ -671,7 +687,7 @@ impl Middle {
             j.loss_ratio = p.loss_ratio;
             // 内连接排除关联不上的行：记下准入时的比例，作为完整性条件的基线
             if j.kind == JoinKind::Inner {
-                let (o, _) = self.cond_outcome(ctx, &join_coverage_check(j), false).await?;
+                let (o, _) = self.cond_outcome(ctx, &coverage[i], false).await?;
                 j.orphan_ratio = loss_of(&o);
             }
             allowed.insert(j.left.clone());
@@ -1041,8 +1057,8 @@ impl Middle {
             }
         }
         // 内连接的完整性：关联不上右表任何行的左表行会被内连接排除；比例超过准入基线即不成立（不在受限修复范围）
-        for j in m.joins.iter().filter(|j| j.kind == JoinKind::Inner) {
-            let c = join_coverage_check(j);
+        for (i, j) in m.joins.iter().enumerate().filter(|(_, j)| j.kind == JoinKind::Inner) {
+            let c = join_coverage(m, i);
             let label = format!("关联完整 {}⋈{}", j.left, j.right);
             if !force && !c.tables().iter().any(|x| changed.contains(x)) {
                 conds.push(json!({"cond": label, "tables": c.tables(), "action": "skipped"}));
@@ -1501,8 +1517,14 @@ impl Middle {
             let prev = self.opt_prev.lock().get(&fk).filter(|p| p.revision == *rev).cloned();
             let Some(e) = prev.or_else(|| self.store.get(&fk)) else { continue };
             for c in metric_of(&e).map(bound_conditions).unwrap_or_default() {
-                if !conds.iter().any(|(k, _)| same_cond(k, &c.0) || k.key() == c.0.key()) {
-                    conds.push(c);
+                // 几个声明的修订共用一个检查时只执行一次；完整性阈值取最严的，因为每个修订的条件都要成立
+                match conds.iter_mut().find(|(k, _)| same_cond(k, &c.0) || k.key() == c.0.key()) {
+                    Some((_, b)) => {
+                        if let (Some(x), Some(y)) = (b.as_mut(), c.1) {
+                            *x = x.min(y);
+                        }
+                    }
+                    None => conds.push(c),
                 }
             }
         }

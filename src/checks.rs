@@ -21,6 +21,10 @@ pub enum Check {
     DateKeysContiguous { dim: String, key: String, year_col: String, month_col: String },
     /// 日期列完整性：没有日期维度时，日期列为空的行归不到任何期间；返回有日期的行占比，由调用方与准入基线比较。
     DateCoverage { table: String, col: String },
+    /// 雪花型连接的完整性，按事实行计：从事实表出发、沿路径 `path`（每段为 左表, 右表, 关联列）的前几段内连接到达最后一段的
+    /// 左表的事实行中，关联不上最后一段右表的行所占比例。只看中间维表的行会低估遗漏：一个热门商品失去类别，只占商品表一行，
+    /// 却可能是大半事实。返回到达的事实行数与其中关联得上的行数，由调用方与准入基线比较。
+    PathCoverage { fact: String, path: Vec<(String, String, On)> },
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -38,6 +42,7 @@ impl Check {
             Check::RowConservation { .. } => "RowConservation",
             Check::DateKeysContiguous { .. } => "DateKeysContiguous",
             Check::DateCoverage { .. } => "DateCoverage",
+            Check::PathCoverage { .. } => "PathCoverage",
         }
     }
 
@@ -50,6 +55,13 @@ impl Check {
             Check::KeyUnique { table, .. } => vec![table.clone()],
             Check::DateKeysContiguous { dim, .. } => vec![dim.clone()],
             Check::DateCoverage { table, .. } => vec![table.clone()],
+            Check::PathCoverage { fact, path } => {
+                let mut t = vec![fact.clone()];
+                for (_, r, _) in path {
+                    t.push(r.clone());
+                }
+                t
+            }
             Check::SampleFanout { left, right, .. } | Check::RowConservation { left, right, .. } => {
                 vec![left.clone(), right.clone()]
             }
@@ -62,6 +74,9 @@ impl Check {
             Check::KeyUnique { table, cols, .. } => format!("{table}({})", cols.join(",")),
             Check::DateKeysContiguous { dim, key, .. } => format!("{dim}({key})"),
             Check::DateCoverage { table, col } => format!("{table}({col})"),
+            Check::PathCoverage { fact, path } => {
+                format!("{fact}>{}", path.iter().map(|(_, r, on)| format!("{r}:{}", fmt_on(on))).collect::<Vec<_>>().join(">"))
+            }
             Check::SampleFanout { left, right, on, .. } | Check::RowConservation { left, right, on, .. } => {
                 format!("{left}>{right}:{}", fmt_on(on))
             }
@@ -74,6 +89,7 @@ impl Check {
             Check::KeyUnique { table, cols, .. } => rows(table) * (1.0 + 0.5 * (cols.len() as f64 - 1.0)),
             Check::DateKeysContiguous { dim, .. } => rows(dim),
             Check::DateCoverage { table, .. } => rows(table),
+            Check::PathCoverage { fact, path } => rows(fact) * (1.0 + path.len() as f64),
             Check::SampleFanout { right, .. } => rows(right),
             Check::RowConservation { left, right, .. } => rows(left) * 2.0 + rows(right),
         }
@@ -86,6 +102,9 @@ impl Check {
             }
             Check::DateKeysContiguous { dim, key, .. } => format!("{dim}({key}) 日期键是否按月连续"),
             Check::DateCoverage { table, col } => format!("{table}.{col} 有日期的行占比"),
+            Check::PathCoverage { fact, path } => {
+                format!("{fact} 的行经 {} 关联得上的占比", path.iter().map(|(_, r, _)| r.as_str()).collect::<Vec<_>>().join(" → "))
+            }
             Check::SampleFanout { left, right, on, .. } => format!("抽样：{left}→{right} 按 {} 是否一对多", fmt_on(on)),
             Check::RowConservation { left, right, on, .. } => {
                 format!("行数守恒：{left}⋈{right} 按 {} 后行数是否超过 {left}", fmt_on(on))
@@ -111,6 +130,18 @@ impl Check {
                         count(*) as n_months from s"
             ),
             Check::DateCoverage { table, col } => format!("select count(*) as n_rows, count({col}) as n_dated from {table}"),
+            Check::PathCoverage { fact, path } => {
+                // 前几段内连接到达最后一段的左表，最后一段左连接；右表在关联列上唯一（连接基数条件），每个事实行至多一行
+                let mut from = fact.clone();
+                for (k, (l, r, on)) in path.iter().enumerate() {
+                    let kw = if k + 1 == path.len() { "left join" } else { "join" };
+                    let conds: Vec<String> = on.iter().map(|(a, b)| format!("{l}.{a} = {r}.{b}")).collect();
+                    from.push_str(&format!(" {kw} {r} on {}", conds.join(" and ")));
+                }
+                let (_, last, on) = path.last().expect("路径至少一段");
+                let probe = on.first().map(|(_, b)| format!("{last}.{b}")).unwrap_or_else(|| "null".into());
+                format!("select count(*) as n_left, count({probe}) as n_join from {from}")
+            }
             Check::SampleFanout { left, right, on, lf, rf, n } => {
                 let lcols: Vec<&str> = on.iter().map(|(l, _)| l.as_str()).collect();
                 let mut lconds: Vec<String> = lcols.iter().map(|c| format!("{c} is not null")).collect();
@@ -158,6 +189,11 @@ impl Check {
             Check::DateKeysContiguous { .. } => {
                 let (n_bad, n_months) = (rows.i64(0, 0).unwrap_or(0), rows.i64(0, 1).unwrap_or(0));
                 Outcome { pass: n_bad == 0, metrics: json!({"n_bad": n_bad, "n_months": n_months}), ms }
+            }
+            Check::PathCoverage { .. } => {
+                let (n_left, n_join) = (rows.i64(0, 0).unwrap_or(0), rows.i64(0, 1).unwrap_or(0));
+                let ratio = if n_left > 0 { n_join as f64 / n_left as f64 } else { 1.0 };
+                Outcome { pass: true, metrics: json!({"n_left": n_left, "n_join": n_join, "join_ratio": ratio}), ms }
             }
             Check::DateCoverage { .. } => {
                 let (n_rows, n_dated) = (rows.i64(0, 0).unwrap_or(0), rows.i64(0, 1).unwrap_or(0));
@@ -208,4 +244,27 @@ pub fn same_on(a: &On, b: &On) -> bool {
 
 pub fn flip(on: &On) -> On {
     on.iter().map(|(l, r)| (r.clone(), l.clone())).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn path_coverage_counts_fact_rows_along_the_chain() {
+        let c = Check::PathCoverage {
+            fact: "lineitem".into(),
+            path: vec![
+                ("lineitem".into(), "orders".into(), vec![("l_orderkey".into(), "o_orderkey".into())]),
+                ("orders".into(), "customer".into(), vec![("o_custkey".into(), "c_custkey".into())]),
+            ],
+        };
+        let sql = c.sql();
+        assert_eq!(
+            sql,
+            "select count(*) as n_left, count(customer.c_custkey) as n_join from lineitem \
+             join orders on lineitem.l_orderkey = orders.o_orderkey left join customer on orders.o_custkey = customer.c_custkey"
+        );
+        assert_eq!(c.tables(), vec!["lineitem".to_string(), "orders".to_string(), "customer".to_string()]);
+    }
 }

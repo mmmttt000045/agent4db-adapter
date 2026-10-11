@@ -18,8 +18,8 @@
 \bi{The fact's date key joins the date dimension many-to-one through the declared date column, as in a role-playing date dimension~\cite{kimball2013toolkit}; without a date dimension, a date column of the fact, or of a table it joins many-to-one, supplies the fact's date.}
 {事实表的日期键按声明的日期列与日期维度多对一关联，即角色扮演维度~\cite{kimball2013toolkit}；没有日期维度时，由事实表（或它多对一连接到的表）上的日期列给出事实的日期。}
 \item[\bt{Join completeness}{连接完整性}]
-\bi{For the date join and every inner join $L\to R$, the fraction of $L$ rows that match no $R$ row stays within the fraction recorded at publication plus a tolerance of 0.1 percentage points, so that facts are not silently dropped; for the date join we call it date-key completeness, and for a date column it bounds the fraction of facts without a date.}
-{对日期连接和每个内连接 $L\to R$，匹配不到 $R$ 中任何行的 $L$ 记录比例不超过发布时记录的比例加 0.1 个百分点的容差，使事实不会被静默排除；对日期连接，我们称之为日期键完整性，对日期列，它约束没有日期的事实所占比例。}
+\bi{For the date join and every inner join $L\to R$, the fraction of fact rows reaching $L$ that match no $R$ row stays within the fraction the revision recorded at publication plus a tolerance of 0.1 percentage points; on a snowflake it counts fact rows along the path, not rows of $L$, so that facts are not silently dropped; for the date join we call it date-key completeness, and for a date column it bounds the fraction of facts without a date.}
+{对日期连接和每个内连接 $L\to R$，到达 $L$ 的事实行中匹配不到 $R$ 中任何行的比例不超过该版本发布时记录的比例加 0.1 个百分点的容差；在雪花型连接上它按沿路径到达的事实行计，而不是按 $L$ 的行计，使事实不会被静默排除；对日期连接，我们称之为日期键完整性，对日期列，它约束没有日期的事实所占比例。}
 \end{description}
 \bi{Since the derivation reads only $I$, calendar columns, column names, and key formats come from the definition, not from one benchmark's conventions.}
 {推导只读取 $I$，日历列、列名和键的格式都取自定义本身，而不是某个基准的约定。}
@@ -30,8 +30,8 @@
 {对期间 $p$，$I$ 的生成的 SQL 在 $\sigma_\varphi(F)\bowtie R_1\bowtie\cdots\bowtie R_k$ 中、按日期连接 $\rho$ 从日期维度或日期列得到的日期落在 $p$ 内的行上计算 $\mathrm{AGG}(e)$。业务含义 $B$ 提供两条任何查询都无法检查的前提：（B1）该指标的业务事件与 $\sigma_\varphi(F)$ 中 $K$ 的取值一一对应，其中 $\varphi$ 也包括被连接维度上的定义过滤，按事实行所连接的维度行求值；（B2）在事件对应的行上，$e$ 求值得到该事件的度量值。条件把这两条前提转化为对计算结果的保证。}
 \begin{proposition}[\bt{Sufficiency}{充分性}]
 \label{prop:sufficiency}
-\bi{If B1 and B2 hold on $D_s$ and every condition in $C(m^r)$ holds on $D_s$, then for every period $p$ the generated SQL of $m^r$ returns $\mathrm{AGG}$ over the measurements of the events whose date lies in $p$, each event contributing exactly once; the events it omits are those whose date key or inner-join key matches no row of the joined table or whose date is missing, and the completeness conditions bound their fraction.}
-{若 B1、B2 在 $D_s$ 上成立，且 $C(m^r)$ 中每个条件都在 $D_s$ 上成立，则对每个期间 $p$，$m^r$ 的生成的 SQL 返回的是日期落在 $p$ 内的事件度量值的 $\mathrm{AGG}$，每个事件恰好贡献一次；被遗漏的只有日期键或内连接键匹配不到被连接表任何行、或没有日期的事件，其比例受完整性条件约束。}
+\bi{If B1 and B2 hold on $D_s$ and every condition in $C(m^r)$ holds on $D_s$, then for every period $p$ the generated SQL of $m^r$ returns $\mathrm{AGG}$ over the measurements of the events whose date lies in $p$, each event contributing exactly once; the events it omits are those whose date key or inner-join key matches no row of the joined table or whose date is missing, and the completeness conditions bound their fraction over the whole fact table, not per period.}
+{若 B1、B2 在 $D_s$ 上成立，且 $C(m^r)$ 中每个条件都在 $D_s$ 上成立，则对每个期间 $p$，$m^r$ 的生成的 SQL 返回的是日期落在 $p$ 内的事件度量值的 $\mathrm{AGG}$，每个事件恰好贡献一次；被遗漏的只有日期键或内连接键匹配不到被连接表任何行、或没有日期的事件，其占整个事实表的比例受完整性条件约束（不是逐期间的比例）。}
 \end{proposition}
 \begin{proof}[\bt{Proof sketch}{证明概要}]
 \bi{By B1 and filtered key uniqueness, $\sigma_\varphi(F)$ holds exactly one row per event. Join cardinality bounds the matches of each row in every $R_i$ by the permitted number, one for the dimension joins of $I$, so no join duplicates a row, and join completeness bounds the rows that an inner join drops for lack of a match; the date join gives each row at most one date, from one date-dimension row or one column value, and hence at most one period. Every surviving row therefore contributes its measurement (B2) exactly once, to the period of its date.}
@@ -46,8 +46,8 @@
 \[
 \bigl(\operatorname{id}(c),\,V(\operatorname{dep}(c))\bigr).
 \]
-\bi{A check result serves every definition that requires the same condition at the same table versions. The normalized form is semantic rather than textual: the order of key columns and the formatting of filters do not change it, so a grain condition and a join cardinality check that state the same key in different orders share one check result.}
-{一个检查结果服务于所有在相同表版本上需要同一条件的定义。规范化形式按语义而非文本确定：键列顺序与过滤的书写格式不影响它，因此以不同顺序写出同一键的粒度条件与连接基数检查共享一个检查结果。}
+\bi{A check result serves every definition that requires the same condition at the same table versions. For completeness it records the counts, and each revision compares them with its own recorded fraction, so revisions with different thresholds share the scan, not the verdict. The normalized form is semantic rather than textual: the order of key columns and the formatting of filters do not change it, so a grain condition and a join cardinality check that state the same key in different orders share one check result.}
+{一个检查结果服务于所有在相同表版本上需要同一条件的定义。完整性条件的检查结果记录计数，由每个版本与自己记录的比例比较，因此阈值不同的版本共享扫描、不共享结论。规范化形式按语义而非文本确定：键列顺序与过滤的书写格式不影响它，因此以不同顺序写出同一键的粒度条件与连接基数检查共享一个检查结果。}
 
 \subsection{\bt{States and the execution guarantee}{状态与执行时的保证}}
 \bi{A revision is \emph{valid} when its conditions hold at the current versions of the tables they read. A version change of one of those tables makes it \emph{pending}, a state derived by version comparison that triggers a recheck. The recheck either refreshes the check results or \emph{invalidates} the revision when a required condition fails. Repair produces a new \emph{candidate} revision, which becomes valid after passing the checks in Section~\ref{sec:maintenance} and replaces the invalidated one. An optimization publishes a revision that \emph{replaces} a valid previous revision (Section~\ref{sec:optimization}); the previous revision stays usable while its own conditions hold, and it becomes current again if its newer revision fails only an assumption that the previous revision does not need. An invalidated revision is never accepted again, and revision numbers are never reused. For a query $q$ that declares $m^r$ and executes on snapshot $s$, the execution guarantee is}

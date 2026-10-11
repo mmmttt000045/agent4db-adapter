@@ -29,11 +29,17 @@ PAPER_COLORS = _palette()
 # Drawing inks shared by all figures.
 INK, MUTED, RULE = '#2B2A28', '#6B6A66', '#D3D0CA'
 EDGE, FACE, SIDE, TOP = '#8E8B85', '#F6F5F2', '#DCD9D3', '#ECEAE5'
-ACC, ACC_DK, ACC_PALE, FIELD = PAPER_COLORS['mCond'], '#1D5BA6', '#E3EEFB', '#F1F6FC'
+# Schematic figures (1, 2) keep their own MAVRA blue; the experiment figures use the method colours of the preamble.
+ACC, ACC_DK, ACC_PALE, FIELD = '#2A78D6', '#1D5BA6', '#E3EEFB', '#F1F6FC'
 SLATE, AMBER, AMBER_PALE = '#5E6E82', '#C98600', '#FBEFD3'
 RED, WHITE = '#C2412E', '#FFFFFF'
-ORANGE, ORANGE_PALE = PAPER_COLORS['mDef'], '#FCE8DF'
+ORANGE, ORANGE_PALE = '#EB6834', '#FCE8DF'
 GRID = PAPER_COLORS['gridline']
+
+# Experiment figures (3-7), besides the method colours: one dark red for wrong answers and stale definitions, one light
+# navy tint behind MAVRA's row and the emphasized setting groups, and neutral grays for the other outcomes.
+WRONG, FOCUS = '#B2182B', '#EBEEF6'
+OUT_CORRECT, OUT_NEEDED, OUT_UNNEEDED = '#4A4A4A', '#A6A6A6', '#D9D9D9'
 
 # Experiment method key -> (English, Chinese, color name), as in Table 2.
 METHODS = {

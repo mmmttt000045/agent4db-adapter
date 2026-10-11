@@ -25,19 +25,21 @@
 % method order so neighbouring methods are validated pairs; scope-only (controlled benchmark only)
 % uses violet. Blue is reserved for MAVRA (its gold-SQL variant takes a tint); accuracy shading uses a neutral ramp. The generic
 % version-keyed cache (cost figure and replay only) uses a neutral gray with its own marker and dash.
-\definecolor{mCond}{HTML}{2A78D6}
-\definecolor{mDef}{HTML}{EB6834}
-\definecolor{mRevoke}{HTML}{1BAF7A}
-\definecolor{mSchema}{HTML}{EDA100}
+% Method colours of the experiment figures (Figures 3-7): hues of the Nature (NPG) palette, darkened or saturated where
+% needed to pass colour-vision and contrast checks; MAVRA navy, its ablations lighter blues, reference recheck family in grays.
+\definecolor{mCond}{HTML}{2F4F9F}
+\definecolor{mDef}{HTML}{B8B8B8}
+\definecolor{mRevoke}{HTML}{1F8FB0}
+\definecolor{mSchema}{HTML}{E3643A}
 \definecolor{mUnguarded}{HTML}{E87BA4}
-\definecolor{mNoShare}{HTML}{008300}
-\definecolor{mScope}{HTML}{4A3AA7}
-\definecolor{mCache}{HTML}{6B6A66}
-\definecolor{mTraj}{HTML}{8E44AD} % trajectory-retrieval baseline; CVD-validated between no-sharing green and unguarded pink
-\definecolor{mTrajVerify}{HTML}{C39BD3} % trajectory retrieval plus a self-check instruction: tint of the trajectory violet
-\definecolor{mCondGold}{HTML}{7FB2EA} % MAVRA (gold SQL): the benchmark's gold SQL as the G8 reference; tint of the MAVRA blue
-\definecolor{mCondCur}{HTML}{9DB4CC} % MAVRA with G8 on current data (replay ablation): grayish tint of the MAVRA blue
-\definecolor{mTable}{HTML}{A0522D} % dbt-style table-test baseline (library replay only)
+\definecolor{mNoShare}{HTML}{9C5A26}
+\definecolor{mScope}{HTML}{A9740A}
+\definecolor{mCache}{HTML}{3A3A3A}
+\definecolor{mTraj}{HTML}{00A087} % example retrieval
+\definecolor{mTrajVerify}{HTML}{66C2AE} % example retrieval with self-verification: tint of the retrieval teal
+\definecolor{mCondGold}{HTML}{9DB3E4} % MAVRA, gold-SQL reference: tint of the MAVRA navy
+\definecolor{mCondCur}{HTML}{5F86D6} % MAVRA, regression on current data: lighter blue of the MAVRA family
+\definecolor{mTable}{HTML}{8E5BB0} % dbt-style table tests
 \definecolor{inkmuted}{HTML}{52514E}
 \definecolor{gridline}{HTML}{DDDCD8}
 \newcommand{\swatch}[1]{\textcolor{#1}{\rule[-0.1ex]{0.8em}{0.8em}}}

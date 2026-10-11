@@ -90,8 +90,13 @@ def figure(lang):
         label, color = style.method(mode, lang)
         handles.append(Line2D([], [], ls='', color=color, marker=marker, ms=4.2, mfc=color, mec=WHITE, mew=.35,
                               label=label))
-    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.545, 1.0), ncol=3, handlelength=1.0,
+    legend = fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.545, 1.0), ncol=3, handlelength=1.0,
                columnspacing=1.0)
+    # MAVRA's entry is set as in Figures 4 and 5: bold, in its colour
+    for entry in legend.get_texts():
+        if entry.get_text().startswith('MAVRA'):
+            entry.set_color(style.method('metric-global-snap', lang)[1])
+            entry.set_fontweight('bold')
     for k, (ax, (runs, data), (speed, save)) in enumerate(zip(axes, panels, gains)):
         ax.set_title(T['panels'][k].format(runs=runs), pad=3)
         for mode, marker in METHODS:

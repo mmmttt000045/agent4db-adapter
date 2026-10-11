@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import mplstyle  # noqa: E402
 import style  # noqa: E402
-from style import INK, MUTED, ORANGE, WHITE  # noqa: E402
+from style import INK, MUTED, WHITE  # noqa: E402
 
 NAME = 'maintenance-cost'
 W, H = style.COLUMN, 44.0
@@ -22,9 +22,11 @@ DATA = style.ROOT / 'exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json'
 ARRIVALS = [('staggered', 'Stag'), ('burst', 'Burst')]
 # policy -> (macro key, line style, marker, filled), in drawing order: the cache comes last with
 # hollow triangles, so it stays visible where it coincides with MAVRA.
-SERIES = {'condition-scope': ('Scope', (0, (1.0, 1.6)), 's', True),
+# Markers follow the other figures: MAVRA a circle; the triangle and square belong to no memory and retrieval there,
+# so the two recheck variants take a downward triangle and a hollow diamond.
+SERIES = {'condition-scope': ('Scope', (0, (1.0, 1.6)), 'v', True),
           'condition': ('Cond', 'solid', 'o', True),
-          'definition-cache': ('Cache', (0, (3.0, 1.6)), '^', False)}
+          'definition-cache': ('Cache', (0, (3.0, 1.6)), 'D', False)}
 SHARES = (1, 2, 4, 6)
 TEXT = {
     'en': {'y': 'DB time, % of full recheck per definition', 'x': 'Definitions',
@@ -57,7 +59,7 @@ def figure(lang):
     axes = fig.subplots(1, 2, sharey=True, gridspec_kw=dict(left=.115, right=.99, top=.80, bottom=.20, wspace=.12))
     for k, (ax, (arrival, _)) in enumerate(zip(axes, ARRIVALS)):
         ax.set_title(T['panels'][k], pad=3)
-        ax.axhline(100, color=ORANGE, lw=.9, ls=(0, (1.0, 1.4)), zorder=2)
+        ax.axhline(100, color=style.method('definition', lang)[1], lw=.9, ls=(0, (1.0, 1.4)), zorder=2)
         for policy, (_, ls, marker, filled) in SERIES.items():
             label, color = style.method(policy, lang)
             xs, ys = zip(*series[arrival, policy])
@@ -78,7 +80,7 @@ def figure(lang):
         scope, scope_color = style.method('condition-scope', lang)
         if k == 0:
             # Labels sit where the staggered lines are far apart.
-            ax.text(2.4, 103, style.method('definition', lang)[0], color=ORANGE, fontsize=mplstyle.LABEL,
+            ax.text(2.4, 103, style.method('definition', lang)[0], color=MUTED, fontsize=mplstyle.LABEL,
                     ha='left', va='bottom')
             ax.text(20.6, 89.5, scope, color=scope_color, fontsize=mplstyle.LABEL, ha='right', va='bottom')
             cache, cache_color = style.method('definition-cache', lang)

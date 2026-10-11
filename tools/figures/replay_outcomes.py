@@ -26,7 +26,7 @@ from matplotlib.gridspec import GridSpec  # noqa: E402
 from matplotlib.patches import Patch  # noqa: E402
 import mplstyle  # noqa: E402
 import style  # noqa: E402
-from style import ACC_PALE, INK, MUTED, RED, WHITE  # noqa: E402
+from style import FOCUS, INK, MUTED, OUT_CORRECT, OUT_NEEDED, OUT_UNNEEDED, WHITE, WRONG  # noqa: E402
 
 NAME = 'replay-outcomes'
 W, H = style.COLUMN, 76.0
@@ -49,10 +49,10 @@ GEN_ROWS = [r for r in TPCDS_ROWS if r[0] != 'condition/example']
 PANELS = [(EXP / 'replay-stats.json', 'review', 'Rp', ROWS), (EXP / 'tpcds-replay-stats.json', 'review', 'Tr', TPCDS_ROWS),
           (GEN / 'generality-stats.json', 'generality', 'Gn', GEN_ROWS)]
 # (field, macro suffix, fill, text color)
-OUTCOMES = [('correct', 'Correct', '#5B5853', WHITE),
-            ('served_wrong', 'Wrong', RED, WHITE),
-            ('unavailable_needed', 'Needed', '#B4B0A9', INK),
-            ('unavailable_unneeded', 'Unneeded', '#E2DFD9', INK)]
+OUTCOMES = [('correct', 'Correct', OUT_CORRECT, WHITE),
+            ('served_wrong', 'Wrong', WRONG, WHITE),
+            ('unavailable_needed', 'Needed', OUT_NEEDED, INK),
+            ('unavailable_unneeded', 'Unneeded', OUT_UNNEEDED, INK)]
 TEXT = {
     'en': {'outcomes': ('Correct', 'Wrong', 'Correct invalidation', 'False invalidation'),
            'db': 'Maint. DB s',
@@ -130,7 +130,7 @@ def figure(lang):
             label, color = style.method(key, lang)
             label = LABELS.get(key, {}).get(lang, label)
             if key == 'condition':
-                ax.axhspan(y - .5, y + .5, xmin=-1.0, xmax=1.6, color=ACC_PALE, lw=0, zorder=0, clip_on=False)
+                ax.axhspan(y - .5, y + .5, xmin=-1.0, xmax=1.6, color=FOCUS, lw=0, zorder=0, clip_on=False)
             ax.scatter([-.015], [y], marker='s', s=11, color=color, transform=swatch, clip_on=False, zorder=3)
             mplstyle.label_with_mark(ax, -.035, y, label, mark, swatch)
             total, done = sum(counts), 0

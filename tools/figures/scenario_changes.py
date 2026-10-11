@@ -30,7 +30,7 @@ from matplotlib.lines import Line2D  # noqa: E402
 from matplotlib.patches import Rectangle  # noqa: E402
 import mplstyle  # noqa: E402
 import style  # noqa: E402
-from style import ACC_DK, FIELD, INK, MUTED, RED  # noqa: E402
+from style import ACC_DK, FOCUS, INK, MUTED, WRONG  # noqa: E402
 
 NAME = 'scenario-changes'
 W, H = style.TEXTWIDTH, 65.0
@@ -126,7 +126,7 @@ def legend(fig, lang, T):
         w = max([width_mm(T['roles'][role], mplstyle.SMALL)]
                 + [SWATCH + 1.2 + width_mm(label, mplstyle.LABEL) for _, label, _ in entries])
         blocks.append((T['roles'][role], entries, w))
-    blocks.append(('', [(('#E9E7E2', RED), T['stale'], False)], SWATCH + 1.2 + width_mm(T['stale'], mplstyle.LABEL)))
+    blocks.append(('', [(('#E9E7E2', WRONG), T['stale'], False)], SWATCH + 1.2 + width_mm(T['stale'], mplstyle.LABEL)))
     total = sum(w for *_, w in blocks) + LEGEND_GAP * (len(blocks) - 1)
     if total > W - 2:
         raise SystemExit(f'{NAME}: legend is {total:.1f} mm wide, the figure {W} mm')
@@ -211,14 +211,14 @@ def figure(lang):
     for group, _, cls, _ in GROUPS:
         x0, width, bw = xs[group], widths[group], bar_width(group)
         if group in POOLED:
-            ax.axvspan(x0 - GAP_IN / 2 + .3, x0 + width + GAP_IN / 2 - .3, color=FIELD, lw=0, zorder=0)
+            ax.axvspan(x0 - GAP_IN / 2 + .3, x0 + width + GAP_IN / 2 - .3, color=FOCUS, lw=0, zorder=0)
         for i, mode in enumerate(METHODS):
             acc, lo, hi, stale = cells[mode, group]
             _, color = style.method(mode, lang)
             bx = x0 + i * bw
             ax.bar(bx, acc, width=bw * .9, align='edge', color=color, lw=0, zorder=3)
             if stale:
-                ax.bar(bx, acc, width=bw * .9, align='edge', facecolor='none', edgecolor=RED, hatch='///',
+                ax.bar(bx, acc, width=bw * .9, align='edge', facecolor='none', edgecolor=WRONG, hatch='///',
                        lw=0, zorder=4)
             if hi > lo + .05:
                 ax.plot([bx + bw * .45] * 2, [lo, hi], color=INK, lw=.5, solid_capstyle='butt', zorder=5)

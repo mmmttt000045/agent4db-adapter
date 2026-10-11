@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from matplotlib.lines import Line2D  # noqa: E402
 import mplstyle  # noqa: E402
 import style  # noqa: E402
-from style import ACC_PALE, INK, MUTED, WHITE  # noqa: E402
+from style import FOCUS, INK, MUTED, WHITE  # noqa: E402
 
 NAME = 'two-schemas'
 W, H = style.COLUMN, 42.0
@@ -83,11 +83,16 @@ def figure(lang):
         label, color = style.method(mode, lang)
         handles.append(Line2D([], [], color=color, marker=marker, ms=3.6, mfc=color, mec=WHITE, mew=.35, lw=.9,
                               label=label))
-    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.54, 1.0), ncol=3, handlelength=1.4,
+    legend = fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.54, 1.0), ncol=3, handlelength=1.4,
                columnspacing=1.0)
+    # MAVRA's entry is set as in Figures 4 and 5: bold, in its colour
+    for entry in legend.get_texts():
+        if entry.get_text().startswith('MAVRA'):
+            entry.set_color(style.method('metric-global-snap', lang)[1])
+            entry.set_fontweight('bold')
     for k, (ax, (runs, rows)) in enumerate(zip(axes, panels)):
         ax.set_title(T['panels'][k].format(runs=runs), pad=3)
-        ax.axvspan(1.5, 2.5, color=ACC_PALE, lw=0, zorder=0)
+        ax.axvspan(1.5, 2.5, color=FOCUS, lw=0, zorder=0)
         for gi, g in enumerate(GROUPS):
             for mi, (mode, _, _, marker) in enumerate(METHODS):
                 _, color = style.method(mode, lang)

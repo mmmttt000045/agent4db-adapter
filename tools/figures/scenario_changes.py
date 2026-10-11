@@ -1,266 +1,270 @@
-"""Figure: accuracy of the user agent by data change, as grouped bars.
+"""Figure: accuracy of the user agent by data change, as a result matrix.
 
-One group per setting, in three classes under the axis: the held-out
-questions and the four non-breaking updates (pooled); the five breaks covered by a
-condition, one by one and pooled; and the two changes outside the guarantee.
-Five methods per group, in the order of Table 2 and grouped in the legend by
-role (no sharing; shared but not maintained, the existing approaches; shared
-and maintained), five runs each. The full recheck per definition, MAVRA
-without check-result reuse, answers within a point of MAVRA on every setting
-and stays in the text and the cost figure; the self-verification variant of
-example retrieval and the two MAVRA regression variants are reported in the
-text. The bar is the accuracy pooled over the five independent runs, the
-line its 95% bootstrap interval over runs, and a hatched bar marks a setting
-in which at least 25% of the tasks used a stale definition. Data:
+One row per method of the end-to-end study, in the order and sets of Table 2,
+each led by a swatch of its colour in Figures 3-7; one column per setting in
+the order of tools/paper-results.py, grouped under the header by what the
+change does (no change, non-breaking updates, breaks covered by a condition,
+changes outside the guarantee). Each cell prints the accuracy pooled over the
+five independent runs, shades it on one navy scale, and adds the range of the
+five runs underneath when the runs differ; a dark red frame marks a cell in
+which at least 25% of the tasks used a stale definition. The right block
+repeats, per method, the accuracy over the covered breaks with its 95%
+bootstrap interval over runs and, for the methods that keep definitions,
+invalidations and published repairs per run. Data:
 exp/2026-10-10-scenarios-q5/scen-stats.json (per-run counts written by
-tools/scen-stats.py, with the group intervals the text prints), cross-checked
-against paper-results.json and against every value the text prints
-(\\ScenAcc* in gen/numbers.tex, \\Ds* in gen/scen-ds.tex); the intervals of
-single settings are bootstrapped here with the same resampling of runs.
+tools/scen-stats.py), cross-checked against paper-results.json and against
+every value the text prints (\\ScenAcc* in gen/numbers.tex, \\Ds* in
+gen/scen-ds.tex).
 """
 import importlib.util
 import json
-import random
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from matplotlib import pyplot as plt, transforms  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
-from matplotlib.patches import Rectangle  # noqa: E402
+from matplotlib.colors import LinearSegmentedColormap, to_rgb  # noqa: E402
+from matplotlib.patches import FancyBboxPatch, Rectangle  # noqa: E402
 import mplstyle  # noqa: E402
 import style  # noqa: E402
-from style import ACC_DK, FOCUS, INK, MUTED, WRONG  # noqa: E402
+from style import FACE, INK, MUTED, RULE, WHITE, WRONG  # noqa: E402
 
 NAME = 'scenario-changes'
-W, H = style.TEXTWIDTH, 65.0
+W = style.TEXTWIDTH
 STATS = style.ROOT / 'exp/2026-10-10-scenarios-q5/scen-stats.json'
 RESULTS = style.ROOT / 'exp/2026-10-10-scenarios-q5/paper-results.json'
 STALE = .25                      # share of tasks that used a stale definition
-REPS, SEED = 4000, 20261002      # as tools/scen-stats.py
 
-
-def _load(name, path):
-    spec = importlib.util.spec_from_file_location(name, style.ROOT / path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-paper_results = _load('paper_results', 'tools/paper-results.py')
-scen_stats = _load('scen_stats', 'tools/scen-stats.py')
+_spec = importlib.util.spec_from_file_location('paper_results', style.ROOT / 'tools/paper-results.py')
+paper_results = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(paper_results)
 PHASES = paper_results.PHASES
 
-# Bars of every group, in the order of Table 2, and their roles for the legend: the lower bound without
-# sharing; the existing ways to share, which do not check what they serve; and maintained sharing. The
-# full recheck per definition (MAVRA without check-result reuse) answers within a point of MAVRA on every
-# setting and is left to the text and to the cost figure.
-METHODS = ['middle', 'traj-global', 'metric-global-schema', 'metric-global-revoke', 'metric-global-snap']
-ROLES = [('none', ['middle']), ('unmaintained', ['traj-global', 'metric-global-schema']),
-         ('maintained', ['metric-global-revoke', 'metric-global-snap'])]
+# Rows in the sets of Table 2: nothing shared; past sessions shared; definitions shared; definitions with
+# validity conditions and automatic repair.
+ROWS = [['middle'], ['traj-global', 'traj-verify'], ['metric-global-schema', 'metric-global-revoke'],
+        ['metric-global-def', 'metric-global-snap', 'metric-global-exref', 'metric-global']]
 OURS = 'metric-global-snap'
+KEEPERS = {'metric-global-schema', 'metric-global-revoke', 'metric-global-def', 'metric-global-snap',
+           'metric-global-exref', 'metric-global'}
 # Macro keys of tools/scen-stats.py and tools/paper-results.py: \Ds<key>*, \ScenAcc<key>*.
-KEY = {'middle': 'NoShare', 'traj-global': 'Traj', 'metric-global-schema': 'Schema',
-       'metric-global-revoke': 'Revoke', 'metric-global-def': 'Def', 'metric-global-snap': 'Cond'}
-# (group, phases, class, macro group whose interval the text prints, or None)
-GROUPS = [('holdout', ['holdout'], 'none', 'Holdout'),
-          ('benign', ['append', 'backfill', 'correct', 'addcol'], 'none', 'Benign'),
-          ('status', ['status'], 'covered', None),
-          ('revision', ['revision'], 'covered', None),
-          ('dupload', ['dupload'], 'covered', None),
-          ('dimhist', ['dimhist'], 'covered', None),
-          ('latekey', ['latekey'], 'covered', None),
-          ('covered', ['status', 'revision', 'dupload', 'dimhist', 'latekey'], 'covered', 'Modeled'),
-          ('unit', ['unit'], 'outside', 'Unit'),
-          ('mirror', ['mirror'], 'outside', 'Mirror')]
-POOLED = {'benign', 'covered'}
+KEY = {'middle': 'NoShare', 'traj-global': 'Traj', 'traj-verify': 'TrajVerify',
+       'metric-global-schema': 'Schema', 'metric-global-revoke': 'Revoke', 'metric-global-def': 'Def',
+       'metric-global-snap': 'Cond', 'metric-global-exref': 'CondCur', 'metric-global': 'CondGold'}
+# Header groups: what the change does to a learned definition.
+GROUP = {'holdout': 'none', 'append': 'benign', 'backfill': 'benign', 'correct': 'benign',
+         'addcol': 'benign', 'status': 'covered', 'revision': 'covered', 'dupload': 'covered',
+         'dimhist': 'covered', 'latekey': 'covered', 'unit': 'outside', 'mirror': 'outside'}
 TEXT = {
-    'en': {'groups': {'holdout': 'Held-out', 'benign': 'Non-breaking\nupdates (4)', 'status': 'Status\nrows',
-                      'revision': 'Restated\nsales', 'dupload': 'Duplicate\nload', 'dimhist': 'SCD\nType 2',
-                      'latekey': 'Date-key\nformat', 'covered': 'All covered\nbreaks', 'unit': 'Unit\nchange',
-                      'mirror': 'Backup\ncopy'},
-           'classes': {'none': 'Unchanged or non-breaking', 'covered': 'Breaks covered by a condition',
-                       'outside': 'Outside the guarantee'},
-           'roles': {'none': 'No shared memory', 'unmaintained': 'Shared, not maintained: existing approaches',
-                     'maintained': 'Shared and maintained'},
-           'names': {'middle': 'No memory',
-                     'traj-global': 'Example retrieval (agent memory)',
-                     'metric-global-schema': 'Invalidate on schema change (metric layers)',
-                     'metric-global-revoke': 'Invalidate on every write (relearns)',
-                     'metric-global-snap': 'MAVRA (ours)'},
-           'y': 'Accuracy (%)', 'stale': 'stale definition in ≥25% of tasks'},
-    'zh': {'groups': {'holdout': '留出题', 'benign': '正常更新\n（4 种）', 'status': '状态\n流水',
-                      'revision': '更正保留\n旧行', 'dupload': '重复\n加载', 'dimhist': '缓慢\n变化维',
-                      'latekey': '日期键\n格式', 'covered': '全部覆盖\n的破坏', 'unit': '金额\n单位',
-                      'mirror': '备份\n副本'},
-           'classes': {'none': '无变化与正常更新', 'covered': '条件覆盖的破坏性变化', 'outside': '保证范围之外'},
-           'roles': {'none': '不共享', 'unmaintained': '共享但不维护（现有做法）', 'maintained': '共享并维护'},
-           'names': {'middle': '无记忆', 'traj-global': '示例检索（智能体记忆）',
-                     'metric-global-schema': '模式变更时失效（指标层的保护手段）',
-                     'metric-global-revoke': '每次写入即失效（重新学习）', 'metric-global-snap': 'MAVRA（本文）'},
-           'y': '正确率（%）', 'stale': '≥25% 的题用了过期定义'},
+    'en': {'groups': {'none': 'No\nchange', 'benign': 'Non-breaking updates',
+                      'covered': 'Breaks covered by a condition', 'outside': 'Outside the\nguarantee',
+                      'run': 'Per run'},
+           'settings': {'holdout': 'Held-out', 'append': 'Append', 'backfill': 'Late\narriving',
+                        'correct': 'In-place\nfix', 'addcol': 'New\ncolumn', 'status': 'Status\nrows',
+                        'revision': 'Restated\nsales', 'dupload': 'Duplicate\nload', 'dimhist': 'SCD\nType 2',
+                        'latekey': 'Date-key\nformat', 'unit': 'Unit\nchange', 'mirror': 'Backup\ncopy',
+                        'covered': 'All covered\nbreaks', 'inval': 'Invalidated', 'repair': 'Repaired'},
+           'rows': {'middle': 'No memory', 'traj-global': 'Example retrieval',
+                    'traj-verify': 'Example retrieval\n+ self-verification',
+                    'metric-global-schema': 'Invalidate on\nschema change',
+                    'metric-global-revoke': 'Invalidate on\nevery write',
+                    'metric-global-def': 'Full recheck\nper definition', 'metric-global-snap': 'MAVRA (ours)',
+                    'metric-global-exref': 'MAVRA, regression\non current data',
+                    'metric-global': 'MAVRA, gold-SQL\nreference'},
+           'key_cell': 'accuracy (%);\nrange of 5 runs', 'key_stale': 'stale definition\nin ≥25% of tasks'},
+    'zh': {'groups': {'none': '无变化', 'benign': '正常更新', 'covered': '条件覆盖的破坏性变化',
+                      'outside': '保证范围之外', 'run': '每次运行'},
+           'settings': {'holdout': '留出题', 'append': '正常\n追加', 'backfill': '迟到\n事实',
+                        'correct': '原地\n更正', 'addcol': '新增\n无关列', 'status': '状态\n流水',
+                        'revision': '更正保留\n旧行', 'dupload': '重复\n加载', 'dimhist': '缓慢\n变化维',
+                        'latekey': '日期键\n格式', 'unit': '金额\n单位', 'mirror': '备份\n副本',
+                        'covered': '全部覆盖\n的破坏', 'inval': '失效', 'repair': '修复'},
+           'rows': {'middle': '无记忆', 'traj-global': '示例检索', 'traj-verify': '示例检索\n+ 自行核验',
+                    'metric-global-schema': '模式变更时失效', 'metric-global-revoke': '每次写入即失效',
+                    'metric-global-def': '整定义重查', 'metric-global-snap': 'MAVRA（本文）',
+                    'metric-global-exref': 'MAVRA，回归\n测试用当前数据',
+                    'metric-global': 'MAVRA，标准\n答案作参照'},
+           'key_cell': '正确率（%）；\n5 次运行的范围', 'key_stale': '≥25% 的题用\n了过期定义'},
 }
 
-# Geometry: data units along x; one group is len(METHODS) bars of width BW, and the pooled
-# summary of the covered breaks, the group the text compares, has wider bars with printed values.
-BW, SUMMARY_BW = 1.0, 1.7
-GAP_IN, GAP_CLASS = 2.2, 4.4      # between groups of one class / between classes
-LEFT, RIGHT, BOTTOM, TOP = .048, .005, .235, .755   # axes box, figure fractions
-LEGEND_GAP, SWATCH = 4.5, 2.6                       # mm between legend blocks; swatch side
-
-
-def legend(fig, lang, T):
-    """Legend in blocks by role: a muted title with a rule, then one entry per method, stacked."""
-    renderer = fig.canvas.get_renderer()
-    fx, fy = 1 / W, 1 / H                           # figure fraction per mm
-
-    def width_mm(s, size):
-        t = fig.text(0, 0, s, fontsize=size)
-        w = t.get_window_extent(renderer).width / fig.bbox.width * W
-        t.remove()
-        return w
-
-    blocks = []                                     # (title, [(swatch spec, label, bold)], width mm)
-    for role, modes in ROLES:
-        entries = [((style.method(m, lang)[1], None), T['names'][m], m == OURS) for m in modes]
-        w = max([width_mm(T['roles'][role], mplstyle.SMALL)]
-                + [SWATCH + 1.2 + width_mm(label, mplstyle.LABEL) for _, label, _ in entries])
-        blocks.append((T['roles'][role], entries, w))
-    blocks.append(('', [(('#E9E7E2', WRONG), T['stale'], False)], SWATCH + 1.2 + width_mm(T['stale'], mplstyle.LABEL)))
-    total = sum(w for *_, w in blocks) + LEGEND_GAP * (len(blocks) - 1)
-    if total > W - 2:
-        raise SystemExit(f'{NAME}: legend is {total:.1f} mm wide, the figure {W} mm')
-    x = (W - total) / 2
-    y_title, y_rule, rows = H - 1.2, H - 4.4, (H - 7.2, H - 10.6)
-    for title, entries, w in blocks:
-        if title:
-            fig.text(x * fx, y_title * fy, title, fontsize=mplstyle.SMALL, color=MUTED, ha='left', va='top')
-            fig.add_artist(Line2D([x * fx, (x + w) * fx], [y_rule * fy] * 2, color=MUTED, lw=.4,
-                                  transform=fig.transFigure))
-        for ((face, edge), label, bold), y in zip(entries, rows):
-            fig.patches.append(Rectangle((x * fx, (y - SWATCH / 2) * fy), SWATCH * fx, SWATCH * fy,
-                                         facecolor=face, edgecolor=edge or 'none', hatch='////' if edge else None,
-                                         lw=0, transform=fig.transFigure, figure=fig))
-            fig.text((x + SWATCH + 1.2) * fx, y * fy, label, fontsize=mplstyle.LABEL,
-                     color=ACC_DK if bold else INK, fontweight='bold' if bold else 'normal', ha='left', va='center')
-        x += w + LEGEND_GAP
+# Geometry, mm.
+SWATCH = 2.0                      # method colour before each row label
+LABEL_W = 25.2                    # swatch and row labels
+CELL_W, CELL_H = 9.0, 5.2
+GAP_IN, GAP_GROUP = .4, 1.4       # between columns of one group / between groups
+GAP_ROWS, GAP_SET = .4, 1.3       # between rows / between the sets of rows
+RIGHT_GAP = 2.6                   # before the right block
+COV_W, INV_W, REP_W = 11.0, 11.0, 9.4
+HEAD1, HEAD2 = 6.4, 6.2           # group header, setting header
+# One navy scale for accuracy, from the page to a lighter step of MAVRA's navy.
+SCALE = LinearSegmentedColormap.from_list('acc', ['#F7F8FC', '#D7DFF1', '#9AAEDB', '#4F6CB5'])
 
 
 def load():
-    """Per (method, group): accuracy, 95% interval (all in %), stale flag."""
+    """Per (method, phase): run accuracies, pooled accuracy, stale flag; per method: summary values."""
     methods = json.loads(STATS.read_text(encoding='utf-8'))['methods']
     results = json.loads(RESULTS.read_text(encoding='utf-8'))
     numbers, intervals = style.macros('numbers'), style.macros('scen-ds')
     models = sorted({key.split('|')[0] for key in results['accuracy']})
-    rnd = random.Random(SEED)
-    cells = {}
-    for mode in METHODS:
+    cells, summary = {}, {}
+    for mode in [m for rows in ROWS for m in rows]:
         runs = methods[mode]['runs']
         for phase, *_ in PHASES:
-            k = sum(r['acc'].get(phase, [0, 0])[0] for r in runs)
-            n = sum(r['acc'].get(phase, [0, 0])[1] for r in runs)
+            counts = [r['acc'].get(phase, [0, 0]) for r in runs]
+            k, n = sum(c[0] for c in counts), sum(c[1] for c in counts)
+            stale = sum(r['stale'].get(phase, 0) for r in runs)
+            per_run = [100 * c[0] / c[1] for c in counts if c[1]]
+            mean = 100 * k / n if n else None
             # The same pooled accuracy from the other archive (tools/paper-results.py).
             k2, n2 = (sum(x) for x in zip(*(results['accuracy'].get(f'{m}|{mode}|{phase}', (0, 0)) for m in models)))
             style.agree(f'{mode}/{phase} accuracy', f'{k}/{n}', f'{k2}/{n2}')
             name = f'ScenAcc{KEY[mode]}{phase.capitalize()}'
-            if name in numbers and n:
-                style.agree(name, f'{100 * k / n:.0f}', numbers[name])
-        for group, phases, _, macro in GROUPS:
-            acc = scen_stats.rate(runs, phases)
-            if macro:
-                printed = methods[mode][macro.lower()]
-                style.agree(f'{mode}/{group} accuracy', f'{acc:.6f}', f'{printed["acc"]:.6f}')
-                lo, hi = printed['ci95']
-                for suffix, v in (('', acc), ('Lo', lo), ('Hi', hi)):
-                    style.agree(f'Ds{KEY[mode]}{macro}{suffix}', f'{100 * v:.0f}',
-                                intervals[f'Ds{KEY[mode]}{macro}{suffix}'])
-            else:
-                lo, hi = scen_stats.ci(scen_stats.boot(runs, phases, REPS, rnd))
-            n = sum(r['acc'].get(p, [0, 0])[1] for r in runs for p in phases)
-            stale = sum(r['stale'].get(p, 0) for r in runs for p in phases)
-            cells[mode, group] = (100 * acc, 100 * lo, 100 * hi, n > 0 and stale / n >= STALE)
-    return cells
+            if name in numbers and mean is not None:
+                style.agree(name, f'{mean:.0f}', numbers[name])
+            cells[mode, phase] = (per_run, mean, n > 0 and stale / n >= STALE)
+        covered = methods[mode]['modeled']
+        acc, lo, hi = (f'{100 * v:.0f}' for v in (covered['acc'], *covered['ci95']))
+        for suffix, v in (('', acc), ('Lo', lo), ('Hi', hi)):
+            name = f'Ds{KEY[mode]}Modeled{suffix}'
+            if name in intervals:
+                style.agree(name, v, intervals[name])
+        row = methods[mode]
+        rev, rep = f'{row["revoked_per_cell"]:.1f}', f'{row["repaired_per_cell"]:.1f}'
+        style.agree(f'Ds{KEY[mode]}Revoked', rev, intervals[f'Ds{KEY[mode]}Revoked'])
+        style.agree(f'Ds{KEY[mode]}Repaired', rep, intervals[f'Ds{KEY[mode]}Repaired'])
+        summary[mode] = (float(acc), f'{lo}–{hi}' if lo != hi else '', rev, rep)
+    return cells, summary
 
 
-def bar_width(group):
-    return SUMMARY_BW if group == 'covered' else BW
+def columns():
+    """x of every setting column and of the right block, with the group spans for the header."""
+    xs, spans, x = {}, [], LABEL_W
+    for i, (phase, *_) in enumerate(PHASES):
+        group = GROUP[phase]
+        if i:
+            x += GAP_IN if GROUP[PHASES[i - 1][0]] == group else GAP_GROUP
+        xs[phase] = x
+        if spans and spans[-1][0] == group:
+            spans[-1][2] = x + CELL_W
+        else:
+            spans.append([group, x, x + CELL_W])
+        x += CELL_W
+    x += RIGHT_GAP
+    xs['covered'] = x
+    x += COV_W + GAP_GROUP
+    xs['inval'] = x
+    xs['repair'] = x + INV_W + GAP_IN
+    spans.append(['run', xs['inval'], xs['repair'] + REP_W])
+    return xs, spans, xs['repair'] + REP_W
 
 
-def positions():
-    """Left x and width of every group, and the x span of every class."""
-    xs, widths, spans, x, previous = {}, {}, {}, 0.0, None
-    for group, _, cls, _ in GROUPS:
-        if previous is not None:
-            x += GAP_IN if cls == previous else GAP_CLASS
-        width = len(METHODS) * bar_width(group)
-        xs[group], widths[group] = x, width
-        spans.setdefault(cls, [x, x])[1] = x + width
-        x += width
-        previous = cls
-    return xs, widths, spans
+def ink_on(value):
+    r, g, b = to_rgb(SCALE(value / 100))
+    return WHITE if .299 * r + .587 * g + .114 * b < .55 else INK
 
 
 def figure(lang):
-    cells, T = load(), TEXT[lang]
-    plt.rcParams['hatch.linewidth'] = .6
-    xs, widths, spans = positions()
+    cells, summary = load()
+    T = TEXT[lang]
+    xs, spans, right = columns()
+    if right > W + .01:
+        raise SystemExit(f'{NAME}: the matrix is {right:.1f} mm wide, the page {W} mm')
+    top = HEAD1 + HEAD2
+    ys, y = {}, top
+    for s, rows in enumerate(ROWS):
+        for r, mode in enumerate(rows):
+            if s or r:
+                y += GAP_SET if r == 0 else GAP_ROWS
+            ys[mode] = y
+            y += CELL_H
+    H = y + .6
     fig = mplstyle.figure(W, H)
-    ax = fig.add_axes([LEFT, BOTTOM, 1 - LEFT - RIGHT, TOP - BOTTOM])
-    below = transforms.blended_transform_factory(ax.transData, ax.transAxes)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, W)
+    ax.set_ylim(H, 0)
+    ax.axis('off')
 
-    for group, _, cls, _ in GROUPS:
-        x0, width, bw = xs[group], widths[group], bar_width(group)
-        if group in POOLED:
-            ax.axvspan(x0 - GAP_IN / 2 + .3, x0 + width + GAP_IN / 2 - .3, color=FOCUS, lw=0, zorder=0)
-        for i, mode in enumerate(METHODS):
-            acc, lo, hi, stale = cells[mode, group]
-            _, color = style.method(mode, lang)
-            bx = x0 + i * bw
-            ax.bar(bx, acc, width=bw * .9, align='edge', color=color, lw=0, zorder=3)
+    def text(x, y, s, **kw):
+        kw.setdefault('fontsize', mplstyle.LABEL)
+        kw.setdefault('color', INK)
+        kw.setdefault('linespacing', .95)
+        return ax.text(x, y, s, **kw)
+
+    widths = {p: CELL_W for p, *_ in PHASES}
+    widths.update(covered=COV_W, inval=INV_W, repair=REP_W)
+
+    # Header: groups with a rule under each span, then one label per column.
+    fitted = []                                   # (header label, mm available)
+    for group, x0, x1 in spans:
+        fitted.append((text((x0 + x1) / 2, HEAD1 - 1.3, T['groups'][group], ha='center', va='bottom',
+                            fontweight='bold'), x1 - x0))
+        ax.plot([x0 + .2, x1 - .2], [HEAD1 - .55] * 2, color=MUTED, lw=.5, solid_capstyle='butt')
+    for key, x in xs.items():
+        fitted.append((text(x + widths[key] / 2, top - .9, T['settings'][key], ha='center', va='bottom',
+                            fontsize=mplstyle.TICK), widths[key]))
+
+    # Key, in the free corner above the row labels: one cell as it reads, one stale cell.
+    for y0, stale, caption in ((.3, False, T['key_cell']), (6.1, True, T['key_stale'])):
+        ax.add_patch(Rectangle((.3, y0), 6.6, 5.0, facecolor=SCALE(.93), lw=0))
+        if stale:
+            ax.add_patch(Rectangle((.75, y0 + .45), 5.7, 4.1, facecolor='none', edgecolor=WRONG, lw=1.0))
+        ink = ink_on(93)
+        text(3.6, y0 + 1.55 if not stale else y0 + 2.5, '93' if not stale else '50', ha='center', va='center',
+             color=ink)
+        if not stale:
+            text(3.6, y0 + 3.75, '89–100', ha='center', va='center', fontsize=mplstyle.TICK, color=ink)
+        text(7.7, y0 + 2.5, caption, va='center', fontsize=mplstyle.TICK, color=MUTED)
+
+    for mode, y in ys.items():
+        ours = mode == OURS
+        label, color = style.method(mode, lang)
+        ax.add_patch(FancyBboxPatch((.4, y + (CELL_H - SWATCH) / 2), SWATCH, SWATCH,
+                                    boxstyle='round,pad=0,rounding_size=.3', facecolor=color, lw=0))
+        text(LABEL_W - 1.2, y + CELL_H / 2, T['rows'][mode], ha='right', va='center',
+             fontweight='bold' if ours else 'normal', color=color if ours else INK)
+        weight = 'bold' if ours else 'normal'
+        for phase, *_ in PHASES:
+            runs, mean, stale = cells[mode, phase]
+            x = xs[phase]
+            ax.add_patch(Rectangle((x, y), CELL_W, CELL_H, facecolor=SCALE(mean / 100), lw=0))
             if stale:
-                ax.bar(bx, acc, width=bw * .9, align='edge', facecolor='none', edgecolor=WRONG, hatch='///',
-                       lw=0, zorder=4)
-            if hi > lo + .05:
-                ax.plot([bx + bw * .45] * 2, [lo, hi], color=INK, lw=.5, solid_capstyle='butt', zorder=5)
-            if group == 'covered':
-                ax.text(bx + bw * .45, hi + 1.5, f'{acc:.0f}', ha='center', va='bottom',
-                        fontsize=mplstyle.SMALL, color=ACC_DK if mode == OURS else INK,
-                        fontweight='bold' if mode == OURS else 'normal', zorder=6)
+                ax.add_patch(Rectangle((x + .45, y + .45), CELL_W - .9, CELL_H - .9, facecolor='none',
+                                       edgecolor=WRONG, lw=1.0))
+            ink = ink_on(mean)
+            spread = len(runs) > 1 and max(runs) - min(runs) > .5
+            cy = y + CELL_H / 2 - (.95 if spread else 0)
+            text(x + CELL_W / 2, cy, f'{mean:.0f}', ha='center', va='center', color=ink, fontweight=weight)
+            if spread:
+                text(x + CELL_W / 2, y + CELL_H / 2 + 1.2, f'{min(runs):.0f}–{max(runs):.0f}', ha='center',
+                     va='center', fontsize=mplstyle.SMALL, color=ink, alpha=.85)
+        acc, ci, rev, rep = summary[mode]
+        x = xs['covered']
+        ax.add_patch(Rectangle((x, y), COV_W, CELL_H, facecolor=SCALE(acc / 100), lw=0))
+        ink = ink_on(acc)
+        text(x + COV_W / 2, y + CELL_H / 2 - (.95 if ci else 0), f'{acc:.0f}', ha='center', va='center',
+             color=ink, fontweight=weight)
+        if ci:
+            text(x + COV_W / 2, y + CELL_H / 2 + 1.2, ci, ha='center', va='center', fontsize=mplstyle.SMALL,
+                 color=ink, alpha=.85)
+        keeps = mode in KEEPERS
+        for key, value, width in (('inval', rev, INV_W), ('repair', rep, REP_W)):
+            x = xs[key]
+            ax.add_patch(Rectangle((x, y), width, CELL_H, facecolor=FACE, edgecolor=RULE, lw=.3))
+            shown = ('0' if float(value) == 0 else value) if keeps or float(value) else '–'
+            text(x + width / 2, y + CELL_H / 2, shown, ha='center', va='center',
+                 color=INK if keeps else MUTED, fontweight=weight)
+    # Outline the row of the method this paper proposes, in its colour.
+    y = ys[OURS]
+    ax.add_patch(Rectangle((xs['holdout'] - .15, y - .15), right - xs['holdout'] + .3, CELL_H + .3,
+                           facecolor='none', edgecolor=style.method(OURS, lang)[1], lw=.8, zorder=5))
 
-    last = GROUPS[-1][0]
-    ax.set_xlim(-GAP_IN / 2, xs[last] + widths[last] + GAP_IN / 2)
-    ax.set_ylim(0, 104)
-    ax.set_yticks([0, 25, 50, 75, 100])
-    ax.set_yticklabels(['0', '25', '50', '75', '100'])
-    ax.yaxis.grid(True)
-    ax.set_axisbelow(True)
-    ax.spines['bottom'].set_visible(False)
-    ax.set_xticks([xs[g] + widths[g] / 2 for g, *_ in GROUPS])
-    ax.set_xticklabels([T['groups'][g] for g, *_ in GROUPS], linespacing=.95)
-    ax.tick_params(axis='x', length=0, pad=2.5)
-    fig.text(.003, TOP + .015, T['y'], color=MUTED, fontsize=mplstyle.LABEL, ha='left', va='bottom')
-
-    # The second level of the axis: one bracket per class.
-    for cls, (x0, x1) in spans.items():
-        ax.plot([x0 + .2, x0 + .2, x1 - .2, x1 - .2], [-.215, -.235, -.235, -.215], color=MUTED, lw=.5,
-                transform=below, clip_on=False, solid_capstyle='butt')
-        ax.text((x0 + x1) / 2, -.265, T['classes'][cls], transform=below, ha='center', va='top',
-                fontsize=mplstyle.LABEL, color=MUTED)
-
-    fig.canvas.draw()
-    legend(fig, lang, T)
-
-    # Every group label must fit between its neighbours.
+    # Every header label must fit its column or group; a wider one would run into the next.
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     mm_per_px = W / fig.bbox.width
-    mm_per_unit = (1 - LEFT - RIGHT) * W / (ax.get_xlim()[1] - ax.get_xlim()[0])
-    tight = [f'{t.get_text()!r} {need:.1f} mm in {room:.1f} mm'
-             for t, (g, *_) in zip(ax.get_xticklabels(), GROUPS)
-             for room in [(widths[g] + GAP_IN) * mm_per_unit]
-             for need in [t.get_window_extent(renderer).width * mm_per_px] if need > room - .4]
+    tight = [f'{t.get_text()!r} {need:.1f} mm in {room:.1f} mm' for t, room in fitted
+             for need in [t.get_window_extent(renderer).width * mm_per_px] if need > room + .6]
     if tight:
-        raise SystemExit(f'{NAME}: group labels too wide: ' + '; '.join(tight))
+        raise SystemExit(f'{NAME}: header labels too wide: ' + '; '.join(tight))
     return fig
 
 

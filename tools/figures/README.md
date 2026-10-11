@@ -8,7 +8,7 @@
 | 图 2 系统架构 | `architecture.py` | `architecture.pdf` | 无 |
 | 图 3 定义库回放（三个面板：学到的定义库、TPC-DS、另外三种模式合并） | `replay_outcomes.py` | `replay-outcomes.pdf` | `exp/2026-10-02-cache-baseline-tpcds/replay-stats.json`、`tpcds-replay-stats.json`、`tpcds-library.json`（定义数）；`exp/2026-10-11-generality/generality-stats.json` 的 `pooled`（TPC-H、SSB、BIRD financial，与 `generality.tex` 的 `\Gn*` 核对） |
 | 图 4 维护代价 | `maintenance_cost.py` | `maintenance-cost.pdf` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
-| 图 5 逐情形正确率分组柱状图（通栏；每组一种情形、每柱一种方法，柱为 3 次运行合并的正确率，竖线为按运行重抽样的 95% 区间，斜线为过期定义，底色组为合并的同类情形，“全部覆盖的破坏”组加宽并印出数值；只画 6 种方法，自行核验与两个回归测试变体在正文） | `scenario_changes.py` | `scenario-changes.pdf` | `exp/2026-10-10-scenarios-q5/scen-stats.json`（每种方法 `runs` 里逐次运行的计数、各组的 95% 区间），与 `paper-results.json` 交叉核对；情形顺序取自 `tools/paper-results.py` 的 `PHASES` |
+| 图 5 逐情形正确率结果矩阵（通栏；9 种方法为行，按表 2 分组，行首为方法色块；12 种情形为列，按变化性质分组；每格为 5 次运行合并的正确率、其下为 5 次运行的范围，底色为一种藏青色阶；深红框为 ≥25% 的题用了过期定义；MAVRA 行加框；右侧为全部覆盖的破坏上的正确率与 95% 区间、每次运行的失效数与修复数） | `scenario_changes.py` | `scenario-changes.pdf` | `exp/2026-10-10-scenarios-q5/scen-stats.json`（每种方法 `runs` 里逐次运行的计数、各组的 95% 区间），与 `paper-results.json` 交叉核对；情形顺序取自 `tools/paper-results.py` 的 `PHASES` |
 
 每幅图生成两份：`<名称>.pdf` 用于英文稿（`main-en.tex`），`<名称>-zh.pdf` 用于双语稿（`main.tex`），标签为中文。`overleaf/figures/<名称>.tex` 按 `\ifbilingual` 选用其中一份，标题、标签和 `\Description` 仍写在 tex 文件里。
 
@@ -76,5 +76,5 @@ MAVRA 藏青 `#2F4F9F`，其消融（回归测试用当前数据）浅蓝 `#5F86
 模式变更时失效 珊瑚 `#E3643A`；每次写入即失效 青蓝 `#1F8FB0`；dbt 式表级测试 紫 `#8E5BB0`；只重查变化的表 赭 `#A9740A`；
 整定义重查 浅灰 `#B8B8B8`（参照线，带直接标注）、整定义重查 + 查询缓存 深灰 `#3A3A3A`。颜色定义在 `overleaf/latex/preamble.tex`，
 `style.method()` 读取。非方法颜色在 `style.py`：答错与过期定义一律深红 `WRONG`，强调区域（MAVRA 所在行、底色组）一律浅藏青 `FOCUS`，
-其余结果用中性灰。点线图的标记按方法固定：MAVRA 圆、示例检索 方、无记忆 正三角、只重查变化的表 倒三角、查询缓存 空心菱形；
+其余结果用中性灰。图 5 的正确率底色是一种藏青色阶（`#F7F8FC`→`#4F6CB5`），过期仍用深红框，MAVRA 行用藏青框。点线图的标记按方法固定：MAVRA 圆、示例检索 方、无记忆 正三角、只重查变化的表 倒三角、查询缓存 空心菱形；
 图例里 MAVRA 一律加粗、用藏青。示意图（图 1、2）保留自己的颜色（`ACC` 等常量），不随方法颜色变化。

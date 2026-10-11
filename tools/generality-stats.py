@@ -69,6 +69,57 @@ def macros(m, prefix, report, stats):
                                              if x["class"].startswith("unavailable") and x["change"] != "unit"})
 
 
+COVERED = ["status", "revision", "dupload", "dimhist", "latekey"]
+E2E_MODES = [("Cond", "metric-global-snap"), ("Traj", "traj-global"), ("NoShare", "middle")]
+
+
+def e2e_macros(m, exp):
+    """TPC-H 端到端（e2e/）：各方法逐次运行的正确率区间（最小–最大）与合并值、留出题每次运行的提速与 token 节省区间、
+    MAVRA 每次运行的修复与失效数。合并值与区间口径同 tools/scen-stats.py（每种变化等权；覆盖破坏 = 五种已建模变化）。"""
+    recs = json.load(gzip.open(os.path.join(exp, "e2e", "outcomes.json.gz"), "rt", encoding="utf-8"))["records"]
+    stats = json.load(open(os.path.join(exp, "e2e", "scen-stats.json"), encoding="utf-8"))
+    scored = [x for x in recs if x["phase"] != "learn" and not x["phase"].endswith("relearn") and x["outcome"] != "error"]
+    runs = sorted({x["run"].split("-")[0] for x in scored})
+    m["GeRuns"] = len(runs)
+    m["GeTasks"] = sum(1 for x in scored if x["mode"] == "metric-global-snap")
+
+    def acc(xs, phases):
+        per = []
+        for p in phases:
+            ps = [x for x in xs if x["phase"] == p]
+            if ps:
+                per.append(sum(x["outcome"] == "correct" for x in ps) / len(ps))
+        return 100 * sum(per) / len(per)
+
+    for key, mode in E2E_MODES:
+        v = stats["methods"][mode]
+        for g, name in (("modeled", "Modeled"), ("holdout", "Holdout"), ("all", "All"), ("mirror", "Mirror")):
+            m[f"Ge{key}{name}"] = round(100 * v[g]["acc"])
+        for g, name, phases in (("modeled", "Modeled", COVERED), ("holdout", "Holdout", ["holdout"])):
+            vals = [acc([x for x in scored if x["mode"] == mode and x["run"].startswith(r + "-")], phases) for r in runs]
+            m[f"Ge{key}{name}Min"], m[f"Ge{key}{name}Max"] = round(min(vals)), round(max(vals))
+        for ch in ("dupload", "revision"):
+            m[f"Ge{key}{ch.capitalize()}"] = round(acc([x for x in scored if x["mode"] == mode], [ch]))
+    g1 = stats["comparisons"]["g1 modeled: MAVRA - trajectory"]
+    m["GeCmpModeledTraj"], m["GeCmpModeledTrajLo"], m["GeCmpModeledTrajHi"] = (round(100 * g1["diff"]), round(100 * g1["ci95"][0]),
+                                                                               round(100 * g1["ci95"][1]))
+    # 留出题：同一轮次里 MAVRA 与独自探索的每题平均秒数与 token 之比
+    speed, save = [], []
+    for r in runs:
+        def mean(mode, f):
+            xs = [f(x) for x in scored if x["mode"] == mode and x["run"].startswith(r + "-") and x["phase"] == "holdout"]
+            return sum(xs) / len(xs)
+        speed.append(mean("middle", lambda x: x["seconds"]) / mean("metric-global-snap", lambda x: x["seconds"]))
+        tok = lambda x: x["input_tokens"] + x["output_tokens"]
+        save.append(100 * (1 - mean("metric-global-snap", tok) / mean("middle", tok)))
+    m["GeHoldSpeedupMin"], m["GeHoldSpeedupMax"] = round(min(speed), 1), round(max(speed), 1)
+    m["GeHoldTokSaveMin"], m["GeHoldTokSaveMax"] = round(min(save)), round(max(save))
+    v = stats["methods"]["metric-global-snap"]
+    reps = [c["repaired"] for c in v["runs"]] if v.get("runs") and "repaired" in v["runs"][0] else None
+    m["GeRepairedPerRun"] = round(v["repaired_per_cell"], 1)
+    m["GeRevokedPerRun"] = round(v["revoked_per_cell"], 1)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--exp", default="exp/2026-10-11-generality")
@@ -100,6 +151,11 @@ def main():
     pooled = replay_stats(merged)
     per["pooled"] = pooled
     macros(m, "Gn", merged, pooled)
+    e2e_macros(m, o.exp)
+    check = json.load(open(os.path.join(o.exp, "tpcds-check.json"), encoding="utf-8"))
+    gen = check["generator_on_tpcds"]
+    assert gen["differing_outcome_class_vs_hand_written"] == 0 and check["regression_check"]["differing_class_repaired_or_value"] == 0
+    m["GnDsGenQuestions"] = gen["questions"]
     contig = json.load(open(os.path.join(o.exp, "ssb-contiguity.json"), encoding="utf-8"))
     m["GnSsbContigBad"] = contig["n_bad"]
     m["GnSsbMonths"] = contig["n_months"]
@@ -109,7 +165,8 @@ def main():
         v = m[k]
         lines.append(f"\\newcommand{{\\{k}}}{{{fmt(v)}}}")
     open(os.path.join(o.out, "generality.tex"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
-    print(json.dumps({k: m[k] for k in sorted(m) if k.startswith("Gn") and not k[2:4] in ("Th", "Sb", "Fi")}, ensure_ascii=False, indent=1))
+    print(json.dumps({k: m[k] for k in sorted(m) if (k.startswith("Gn") and not k[2:4] in ("Th", "Sb", "Fi")) or k.startswith("Ge")},
+                     ensure_ascii=False, indent=1))
 
 
 if __name__ == "__main__":

@@ -41,8 +41,8 @@
 {命题同时确定了检测的边界。B2 关乎取值：把度量列整体改变量纲的更新不违反任何条件（第~\ref{sec:scenarios} 节的单位变化）。B1 可能同时被多个总体满足：主表与追加的整份备份副本各自都是每键一行，结构上无从判断哪一份是业务总体（第~\ref{sec:repair-eval} 节）。B1 还取决于过滤读到的取值：清空只用于过滤的列会使事件从 $\sigma_\varphi(F)$ 中消失，却不触及任何条件（第~\ref{sec:validity} 节）。日期键合法但错误的事实会被归入某个期间，而不会被发现。反过来，只要 B1、B2 成立，凡是使规范 SQL 把一个事件计数两次、或使超过准入比例的事实被排除的纯数据更新，都会违反某个条件，并在下一次维护或声明使用时被发现。}
 
 \subsection{\bt{Versions, check results, and reuse}{版本、检查结果与复用}}
-\bi{The version $V(T)$ of a table identifies the state of $T$ that a check read. \system\ supports two sources. The default combines the schema fingerprint, DML counters, and the ETL batch identifier; it is cheap but neither transactional nor immediate. \emph{Transactional versions} are maintained by a statement-level trigger that increments a per-table counter inside every writing transaction; the counter is sharded by backend process so that concurrent writers do not contend on one row, and the version is the sum of the shards. A check result is the outcome of $Q_c$ at the versions it read and is indexed by}
-{表的版本 $V(T)$ 标识检查读到的 $T$ 的状态。\system\ 支持两种版本来源。默认来源组合结构指纹、DML 计数和 ETL 批次号，代价很低，但既不随事务提交也不即时可见。\emph{事务性版本}由语句级触发器维护：每个写事务内把对应表的计数加一；计数按后端进程分片，使并发写入者不争同一行，版本取各分片之和。检查结果是 $Q_c$ 在其所读版本上的执行结果，以如下键索引：}
+\bi{The version $V(T)$ of a table identifies the state of $T$ that a check read. \system\ supports two sources. The default combines the schema fingerprint, DML counters, and the ETL batch identifier; it is cheap but neither transactional nor immediate. \emph{Transactional versions} are maintained by a statement-level trigger that increments a per-table counter inside every writing transaction. A check result is the outcome of $Q_c$ at the versions it read and is indexed by}
+{表的版本 $V(T)$ 标识检查读到的 $T$ 的状态。\system\ 支持两种版本来源。默认来源组合结构指纹、DML 计数和 ETL 批次号，代价很低，但既不随事务提交也不即时可见。\emph{事务性版本}由语句级触发器维护：每个写事务内把对应表的计数加一。检查结果是 $Q_c$ 在其所读版本上的执行结果，以如下键索引：}
 \[
 \bigl(\operatorname{id}(c),\,V(\operatorname{dep}(c))\bigr).
 \]

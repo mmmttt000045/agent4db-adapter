@@ -89,8 +89,10 @@ def load():
                 raise SystemExit(f'{file} {group}: outcomes add up to {sum(counts)}, not {cell["n"]}')
             for (field, suffix, *_), count in zip(OUTCOMES, counts):
                 style.agree(f'{prefix}{macro}{suffix}', _int(count), printed[f'{prefix}{macro}{suffix}'])
-            db = stats['maintenance_db_s'][group]['total']
-            style.agree(f'{prefix}{macro}DB', f'{db:.1f}', printed[f'{prefix}{macro}DB'])
+            # The pooled panel shows no maintenance time: its replays shared the machine with other runs.
+            db = None if prefix == 'Gn' else stats['maintenance_db_s'][group]['total']
+            if db is not None:
+                style.agree(f'{prefix}{macro}DB', f'{db:.1f}', printed[f'{prefix}{macro}DB'])
             style.agree(f'{prefix}{macro}N', _int(cell['n']), printed[f'{prefix}{macro}N'])
             rows.append((key, mark, counts, db))
         numbers = {'n': f'{sum(rows[0][2]):,}'}
@@ -141,8 +143,9 @@ def figure(lang):
                         ax.text(100 * (done + count / 2) / total, y, text, ha='center', va='center',
                                 fontsize=mplstyle.TICK, color=ink, zorder=4)
                 done += count
-            ax.text(1.17, y, f'{db:,.1f}', transform=swatch, ha='right', va='center',
-                    fontsize=mplstyle.TICK, color=INK, clip_on=False)
+            if db is not None:
+                ax.text(1.17, y, f'{db:,.1f}', transform=swatch, ha='right', va='center',
+                        fontsize=mplstyle.TICK, color=INK, clip_on=False)
         ax.set_title(title.format(**numbers), loc='left', pad=3, x=-.47)
         ax.set_xlim(0, 100)
         ax.set_ylim(-.5, n - .5)

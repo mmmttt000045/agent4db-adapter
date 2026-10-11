@@ -491,7 +491,8 @@ def draw(s, lang):
         if new:
             rect(sx_ + .6, yy - 1.0, sw_ - 1.2, 2.3, AMBER_PALE, AMBER, .14, r=.45)
         text(sx_ + 1.4, yy + .75, f'$V(T_{k + 1})$', NOTE, INK)
-        value = f'${old}\\to{new}$' if new else f'${old}$'
+        # Versions read as labels, v13 → v14, in the text face rather than as math
+        value = f'v{old} → v{new}' if new else f'v{old}'
         text(sx_ + sw_ - 1.4, yy + .75, value, NOTE, '#9A6500' if new else INK, align='right')
 
     # Snapshot D_s: a frozen copy of the tables, framed like D_s above.

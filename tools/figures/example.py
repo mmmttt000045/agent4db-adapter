@@ -132,7 +132,7 @@ def draw(s, lang):
     ex, ey, ew = stage(s, BREAK, 5, USE, *L['break'])
     rect(ex - 1.2, ey - 4.3, ew + 2.4, 5.8, AMBER_PALE, AMBER, .25, r=.8)
     text(ex, ey, L['table'], NOTE, INK)
-    text(ex + ew, ey, '13 → 14', NOTE, WAIT, align='right')
+    text(ex + ew, ey, 'v13 → v14', NOTE, WAIT, align='right')
     rows(s, ex, ey, ew, L['k_rows'], PITCH, first=1, colors={0: RED, 1: RED, 2: MUTED},
          marks={0: 'fail', 2: 'fail'})
 

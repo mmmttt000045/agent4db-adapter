@@ -1,17 +1,17 @@
 """Paper figure 1 (running example): one shared definition through its lifecycle.
 
 Store revenue on the synthetic retail data (one million sales rows). Top row:
-the analysis optimizer, an LLM agent, answers a learning question whose
-meaning is given (March, 13,570,368.70) and admission publishes revision 0
+the learning agent, an LLM agent, answers a learning question whose
+meaning is given (March, 13,570,368.70) and the publication checks publish revision 0
 with the conditions derived from its structure; an optimization rewrites the
 period predicate as a date-key range, equal on 14 periods and 20% faster
 (29.1 -> 23.3 ms, -19.8% on the unrounded times), published as revision 1 with
 date-key contiguity as a new condition (the admitted join-completeness loss is
 1.03%, bounded with the 0.1-point tolerance at 1.13%); user agents that know
-only the metric name rely on revision 1.
+only the metric name use revision 1.
 Bottom row: a restatement keeps old sales as non-current rows, key uniqueness
 fails and revision 1 is invalid (run unmaintained it returns 14,300,525.64
-for September); bounded repair finds exactly one filter, ss_is_current = '1', the
+for September); repair finds exactly one filter, ss_is_current = '1', the
 regression test as of learning time reproduces the March answer, and revision
 2 serves the correct September value, 12,932,888.04. The dashed box is the
 other outcome (duplicate load: no filter restores the grain, the definition is
@@ -37,23 +37,23 @@ W, H = 300.0, 112.0
 
 LABELS = {
     'en': {
-        'legend': (('1–2', 'publish', LEARN), ('4', 'rely', EXEC), ('3, 5–7', 'maintain and improve', USE)),
+        'legend': (('1–2', 'publish', LEARN), ('4', 'use', EXEC), ('3, 5–7', 'maintain and optimize', USE)),
         'other': 'no unique repair', 'table': '`store_sales`', 'write': 'a later write',
-        'learn': ('Learn', 'analysis optimizer, an LLM agent'),
+        'learn': ('Learn', 'built-in learning agent (LLM)'),
         'l_rows': ('question: March store revenue', '`SUM(ss_net_paid) … d_moy = 3`',
-                   '13,570,368.70, judged correct', 'answer provenance extracted'),
-        'pub': ('Publish revision 0', 'after the admission checks'),
-        'p_rows': ('key uniqueness: one row per sale', 'date role: `d_date_sk` unique',
-                   'join completeness: loss ≤ 1.13%', 'evidence: learning SQL, snapshot'),
+                   '13,570,368.70, verified correct', 'answer record extracted'),
+        'pub': ('Publish revision 0', 'after the publication checks'),
+        'p_rows': ('key uniqueness: one row per sale', 'date join: `d_date_sk` unique',
+                   'join completeness: loss ≤ 1.13%', 'record: learning SQL, snapshot'),
         'opt': ('Optimize: revision 1', 'period as a date-key range'),
         'o_rows': ('equal on 14 periods', '29.1 → 23.3 ms, −20%', 'adds date-key contiguity',
                    'revision 0 stays usable'),
-        'use': ('User agents rely on it', 'given only the metric name'),
+        'use': ('User agents use it', 'given only the metric name'),
         'u_rows': ('September store revenue?', 'lookup: revision 1, valid', 'declared, run on one snapshot',
                    '13,069,651.80, correct'),
         'break': ('Restatement', 'old sales kept as non-current rows'),
         'k_rows': ('key uniqueness fails', 'revision 1 invalid', 'September: 14,300,525.64'),
-        'repair': ('Bounded repair', 'filters on low-cardinality columns'),
+        'repair': ('Automatic repair', 'filters on low-cardinality columns'),
         'r_rows': ("`ss_is_current='1'`", "`ss_is_current='0'`", 'exactly one restores the grain'),
         'regress': ('Publish revision 2', 'regression test as of learning time'),
         'g_rows': ('March, learning SQL', 'March, repaired SQL', 'equal: repair accepted',
@@ -65,23 +65,23 @@ LABELS = {
         'several': 'none or several',
     },
     'zh': {
-        'legend': (('1–2', '发布', LEARN), ('4', '依赖', EXEC), ('3, 5–7', '维护与改进', USE)),
+        'legend': (('1–2', '发布', LEARN), ('4', '使用', EXEC), ('3, 5–7', '维护与优化', USE)),
         'other': '无唯一修复', 'table': '`store_sales`', 'write': '之后的一次写入',
-        'learn': ('学习', '内置分析优化器（大模型）'),
+        'learn': ('学习', '内置学习智能体（大模型）'),
         'l_rows': ('3 月门店营业额（给定口径）', '`SUM(ss_net_paid) … d_moy = 3`',
-                   '13,570,368.70，判定正确', '提取答案来源'),
-        'pub': ('发布修订 0', '通过准入检查之后'),
-        'p_rows': ('键唯一：每笔销售一行', '日期角色：`d_date_sk` 唯一', '连接完整性：损失 ≤ 1.13%',
-                   '证据：学习时的 SQL 与快照'),
-        'opt': ('优化：修订 1', '期间谓词改为日期键范围'),
-        'o_rows': ('14 个期间结果相等', '29.1 → 23.3 ms，−20%', '新条件：日期键连续', '修订 0 仍可使用'),
-        'use': ('用户端智能体依赖它', '只给出指标名'),
-        'u_rows': ('9 月门店营业额？', '查找：修订 1，有效', '声明后在同一快照上执行', '13,069,651.80，正确'),
+                   '13,570,368.70，核对正确', '提取答案记录'),
+        'pub': ('发布版本 0', '通过发布前检查之后'),
+        'p_rows': ('键唯一：每笔销售一行', '日期连接：`d_date_sk` 唯一', '连接完整性：损失 ≤ 1.13%',
+                   '记录：学习时的 SQL 与快照'),
+        'opt': ('优化：版本 1', '期间谓词改为日期键范围'),
+        'o_rows': ('14 个期间结果相等', '29.1 → 23.3 ms，−20%', '新条件：日期键连续', '版本 0 仍可使用'),
+        'use': ('用户端智能体使用它', '只给出指标名'),
+        'u_rows': ('9 月门店营业额？', '查找：版本 1，有效', '声明后在同一快照上执行', '13,069,651.80，正确'),
         'break': ('更正保留旧行', '旧销售标为非当前行'),
-        'k_rows': ('键唯一：不成立', '修订 1 失效', '9 月：14,300,525.64'),
-        'repair': ('有界修复', '在低基数列上枚举过滤'),
+        'k_rows': ('键唯一：不成立', '版本 1 失效', '9 月：14,300,525.64'),
+        'repair': ('自动修复', '在低基数列上枚举过滤'),
         'r_rows': ("`ss_is_current='1'`", "`ss_is_current='0'`", '恰好一个过滤能恢复粒度'),
-        'regress': ('发布修订 2', '按学习时刻做回归测试'),
+        'regress': ('发布版本 2', '按学习时刻做回归测试'),
         'g_rows': ('3 月，学习时 SQL', '3 月，修复后 SQL', '相等：接受修复', '9 月：12,932,888.04'),
         'value': '13,570,368.70',
         'nofix': ('无唯一修复', '例：重复加载'),
@@ -111,12 +111,12 @@ def draw(s, lang):
         x += legend_pill(s, x, 4.6, label, color, steps) + 7.0
     legend_pill(s, x, 4.6, L['other'], RED, dashed=True)
 
-    # 1 Learn: the analysis optimizer answers a question whose meaning is given.
+    # 1 Learn: the learning agent answers a question whose meaning is given.
     ex, ey, ew = stage(s, LEARN_B, 1, LEARN, *L['learn'])
     llm_badge(s, LEARN_B[0] + LEARN_B[2] - 6.0, LEARN_B[1] + 5.8, 3.2)
     rows(s, ex, ey, ew, L['l_rows'], PITCH, marks={2: 'ok'})
 
-    # 2 Admission publishes revision 0 with the conditions derived from its structure.
+    # 2 The publication checks publish revision 0 with the conditions derived from its structure.
     ex, ey, ew = stage(s, PUB, 2, LEARN, *L['pub'])
     rows(s, ex, ey, ew, L['p_rows'], PITCH, colors={3: MUTED})
 
@@ -124,7 +124,7 @@ def draw(s, lang):
     ex, ey, ew = stage(s, OPT, 3, USE, *L['opt'])
     rows(s, ex, ey, ew, L['o_rows'], PITCH, colors={2: ACC_DK, 3: MUTED}, marks={0: 'ok', 1: 'ok'})
 
-    # 4 User agents rely on the valid revision.
+    # 4 User agents use the valid revision.
     ex, ey, ew = stage(s, USE_B, 4, EXEC, *L['use'])
     rows(s, ex, ey, ew, L['u_rows'], PITCH, marks={1: 'ok', 2: 'ok', 3: 'ok'})
 
@@ -136,7 +136,7 @@ def draw(s, lang):
     rows(s, ex, ey, ew, L['k_rows'], PITCH, first=1, colors={0: RED, 1: RED, 2: MUTED},
          marks={0: 'fail', 2: 'fail'})
 
-    # 6 Bounded repair: exactly one filter restores the grain.
+    # 6 Automatic repair: exactly one filter restores the grain.
     ex, ey, ew = stage(s, REPAIR, 6, USE, *L['repair'])
     rows(s, ex, ey, ew, L['r_rows'], PITCH, colors={2: ACC_DK}, marks={0: 'ok', 1: 'fail', 2: 'ok'})
 

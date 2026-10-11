@@ -11,7 +11,7 @@
 \multicolumn{6}{@{}l}{\bt{\emph{Nothing shared}}{\emph{不共享任何内容}}}\\
 \bt{No memory}{无记忆} & \bt{explores the database again in every session}{每个会话重新探索数据库} & \bt{how accurate are agents without shared knowledge?}{没有共享知识时智能体有多准确？} & & & \usedin\\
 \addlinespace
-\multicolumn{6}{@{}l}{\bt{\emph{Past trajectories shared (question, SQL, derivation)}}{\emph{共享过去的轨迹（题面、SQL、算式）}}}\\
+\multicolumn{6}{@{}l}{\bt{\emph{Past sessions shared (question, SQL, calculation)}}{\emph{共享过去的会话（题面、SQL、算式）}}}\\
 \bt{Example retrieval}{示例检索} & \bt{reuses the SQL of up to three similar examples}{原样复用最多三条相似示例的 SQL} & \bt{does existing agent memory suffice?}{现有的智能体记忆是否够用？} & & & \usedin\\
 \bt{Example retrieval + self-verification}{示例检索 + 自行核验} & \bt{also verifies grain, joins, and date keys first}{先核对粒度、连接与日期键} & \bt{can the agent check validity itself?}{智能体能否自己核对有效性？} & & & \usedin\\
 \addlinespace
@@ -20,7 +20,7 @@
 \bt{Invalidate on every write}{每次写入即失效} & \bt{invalidates on any write; agents relearn}{任何写入都失效，智能体重新学习} & \bt{what does safety without conditions cost?}{不用条件而求安全的代价是什么？} & & & \usedin\\
 \bt{dbt-style table tests}{dbt 式表级测试} & \bt{tests keys per table; a failing table invalidates its definitions}{按表测试键；测试失败的表使其定义失效} & \bt{does data-validation practice suffice?}{数据验证实践是否够用？} & \usedin & & \\
 \addlinespace
-\multicolumn{6}{@{}l}{\bt{\emph{Metric definitions shared, with validity conditions and bounded repair}}{\emph{共享指标定义，附有效性条件与有界修复}}}\\
+\multicolumn{6}{@{}l}{\bt{\emph{Metric definitions shared, with validity conditions and automatic repair}}{\emph{共享指标定义，附有效性条件与自动修复}}}\\
 \bt{Full recheck per definition}{整定义重查} & \bt{rechecks all of a definition's conditions on use}{使用时重查该定义的全部条件} & \bt{what does check-result reuse save?}{复用检查结果省下多少？} & \usedin & \usedin & \usedin\\
 \bt{Full recheck + query cache}{整定义重查 + 查询缓存} & \bt{caches check queries by SQL text and table versions}{检查查询按 SQL 文本与表版本缓存} & \bt{do the savings need typed conditions?}{节省是否需要类型化条件？} & \usedin & \usedin & \\
 \bt{Recheck changed tables only}{只重查变化的表} & \bt{rechecks the conditions of changed tables, no reuse}{只重查变化表上的条件，不复用} & \bt{does narrowing the scope alone save work?}{只缩小范围能否省工作？} & & \usedin & \\

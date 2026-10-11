@@ -1,9 +1,9 @@
 """Figure 2: the MAVRA architecture as a vector drawing.
 
 The layout reads left to right: the learning side (MAVRA's built-in analysis
-optimizer, an LLM agent drawn in MAVRA's blue inside MAVRA's area, the LLM
-extractor, then admission) writes
-into the shared store in the centre; condition maintenance and bounded repair
+learning agent, an LLM agent drawn in MAVRA's blue inside MAVRA's area, the LLM
+extractor, then the publication checks) writes
+into the shared store in the centre; condition maintenance and repair
 sit under the store, so their write-backs go up into it; the use side
 (lookup) and the execution side (same-snapshot validation) read from it on
 the right for the user agents (3D, outside MAVRA), and the revision
@@ -39,18 +39,18 @@ THIN, THICK = .22, .5                            # call or response; write to th
 
 LABELS = {
     'en': {
-        'opt': ('Analysis', 'optimizer'), 'opt_kind': 'LLM agent', 'ext': ('LLM', 'extractor'),
+        'opt': ('Learning', 'agent'), 'opt_kind': 'built-in', 'ext': ('LLM', 'extractor'),
         'agents': 'User agents', 'agents_note': 'questions with metric names only',
         'middleware': 'MAVRA middleware',
-        'admission': 'Admission', 'candidate': 'candidate',
+        'admission': 'Publication', 'candidate': 'candidate',
         'defs': 'Definitions', 'valid': 'valid', 'pending': 'pending', 'revoked': 'invalid',
         'results': 'Check results', 'results_key': 'key',
         'no_result': '? no result at current $V$', 'qc_result': '$Q_c$ result',
         'valid_mr': 'valid $m^r$', 'q_decl': '$q$ + declared $m^r$',
-        'available': '$m^r$ available · SQL review', 'prov': 'provenance',
+        'available': '$m^r$ available · SQL check', 'prov': 'task record',
         'shared': 'shared by all user agents', 'from_a': 'learned',
         'maint': 'Condition maintenance', 'maint_note': 'reuse result, else run $Q_c$',
-        'repair': 'Bounded repair', 'repair_note': 'unique filter', 'checks': 'checks', 'regression': 'regression',
+        'repair': 'Repair', 'repair_note': 'unique filter', 'checks': 'checks', 'regression': 'regression',
         'lookup': 'Lookup', 'lookup_note': 'compare versions $V(T)$',
         'tracker': 'Version tracker', 'tracker_note': 'per-table versions',
         'exec': ('Same-snapshot', 'validation'), 'declares': '$q$ declares $m^r$',
@@ -66,18 +66,18 @@ LABELS = {
         'lines': ('call / response', 'shared-store write', 'read of database state'),
     },
     'zh': {
-        'opt': ('分析', '优化器'), 'opt_kind': 'LLM 智能体', 'ext': ('大模型', '提取器'),
+        'opt': ('学习', '智能体'), 'opt_kind': '内置大模型', 'ext': ('大模型', '提取器'),
         'agents': '用户端智能体', 'agents_note': '只给指标名的问题',
         'middleware': 'MAVRA 中间件',
-        'admission': '准入', 'candidate': '候选',
+        'admission': '发布前检查', 'candidate': '候选',
         'defs': '定义', 'valid': '有效', 'pending': '待验证', 'revoked': '已失效',
         'results': '检查结果', 'results_key': '键',
         'no_result': '? 当前版本尚无结果', 'qc_result': '$Q_c$ 结果',
         'valid_mr': '有效 $m^r$', 'q_decl': '$q$ + 声明的 $m^r$',
-        'available': '$m^r$ 可用 · SQL 审查', 'prov': '答案溯源',
+        'available': '$m^r$ 可用 · SQL 检查', 'prov': '答案记录',
         'shared': '所有用户端智能体共享', 'from_a': '学到',
         'maint': '条件维护', 'maint_note': '复用结果，否则执行 $Q_c$',
-        'repair': '有界修复', 'repair_note': '唯一过滤', 'checks': '检查', 'regression': '回归测试',
+        'repair': '修复', 'repair_note': '唯一过滤', 'checks': '检查', 'regression': '回归测试',
         'lookup': '查找', 'lookup_note': '比较版本 $V(T)$',
         'tracker': '版本跟踪', 'tracker_note': '每张表的版本',
         'exec': ('同快照验证', None), 'declares': '$q$ 声明 $m^r$',
@@ -105,7 +105,7 @@ TRACK = (109, 43.2, 27, 8)
 EXEC = (144, 24, 31, 27.2)
 FIELD_BOX = (1.5, 20, 175.5, 34.2)
 NODE_Y, NODE_H = 6, 8.4                  # front faces of the user agents
-OPT = (2.6, 6.0, 18.2, 10.4)             # MAVRA's built-in analysis optimizer (an LLM agent)
+OPT = (2.6, 6.0, 18.2, 10.4)             # MAVRA's built-in learning agent (an LLM agent)
 EXT = (22.2, 6.0, 24.8, 10.4)            # LLM extractor
 INNER = (1.5, .2, 47.0, 20.8)            # MAVRA's field reaches up around both
 PG = (31, 59.7, 144, 11.0)               # the database slab
@@ -152,7 +152,7 @@ def draw(s, lang):
             text(x_text, y + h / 2 + 1.2, first, TITLE, INK, 'bold', width=room)
 
     def optimizer(b):
-        """MAVRA's built-in analysis optimizer: an LLM agent, so it has an agent's 3D
+        """MAVRA's built-in learning agent: an LLM agent, so it has an agent's 3D
         form like the user agents, but in MAVRA's blue, inside MAVRA, with an LLM mark."""
         x, y, w, h = b
         d = 1.2
@@ -211,7 +211,7 @@ def draw(s, lang):
         text(x + w / 2, y + 1.85, '$m_1^3$', 5.6, ACC_DK, align='center')
 
     def gate(cx, cy, r=2.0):
-        """Admission check: candidates pass only between its two bars."""
+        """Publication check: candidates pass only between its two bars."""
         s.poly([(cx - r, cy), (cx, cy - r), (cx + r, cy), (cx, cy + r)], WHITE, ACC, .2)
         for dx in (-.42 * r, .42 * r):
             s.line(cx + dx, cy - .55 * r, cx + dx, cy + .55 * r, ACC, .24)
@@ -285,7 +285,7 @@ def draw(s, lang):
         route([(kx, y), (kx + 6.5, y)], color, sw, dash=dash, length=1.1)
         text(kx + 8.0, baseline(y, NOTE), label, NOTE, MUTED, width=b_xs[0] - kx - 10)
 
-    # Learning path: optimizer -> extractor -> admission -> store -------------------------
+    # Learning path: learning agent -> extractor -> publication checks -> store -------------------------
     ax, ay, aw, ah = ADM
     box(ADM)
     a1, a2 = 7.5, EXT[0] + 1.6                 # optimizer and extractor arrows
@@ -297,7 +297,7 @@ def draw(s, lang):
     text(a2 - 2.3, 19.3, L['prov'], NOTE, MUTED, align='right', width=a2 - 2.3 - a1 - 1.0)
     text(a2 + 2.3, 19.3, L['candidate'], NOTE, MUTED, width=INNER[0] + INNER[2] - a2 - 3.0)
     step(a2 + 3.1, 21.9, 2, LEARN)
-    # Candidate (answer provenance: queries and arithmetic) through the checks.
+    # Candidate (task record: queries and arithmetic) through the checks.
     cx, cy = ax + 2.0, ay + 2.2
     rect(cx + .9, cy - .9, 8.6, 9.2, FACE, EDGE, .12, r=.4)
     rect(cx, cy, 8.6, 9.2, WHITE, EDGE, .15, r=.4)

@@ -57,12 +57,12 @@ TEXT = {
     'en': {'outcomes': ('Correct', 'Wrong', 'Correct invalidation', 'False invalidation'),
            'db': 'Maint. DB s',
            'titles': ('Learned libraries: {libs} libraries, {n} questions per method',
-                      'TPC-DS SF1: {defs} admitted definitions, {n} questions',
+                      'TPC-DS SF1: {defs} published definitions, {n} questions',
                       'TPC-H, SSB, BIRD financial: {defs} definitions, {n} questions')},
     'zh': {'outcomes': ('答对', '答错', '正确失效', '误失效'),
            'db': '维护 DB 秒',
            'titles': ('学到的定义库：{libs} 个库，每种方法 {n} 题',
-                      'TPC-DS SF1：通过准入的 {defs} 个定义，{n} 题',
+                      'TPC-DS SF1：已发布的 {defs} 个定义，{n} 题',
                       'TPC-H、SSB、BIRD financial：{defs} 个定义，{n} 题')},
 }
 LEFT, RIGHT = .40, .85          # axes span in figure fractions: labels left, DB seconds right
@@ -104,7 +104,7 @@ def load():
         else:
             library = json.loads((EXP / 'tpcds-library.json').read_text(encoding='utf-8'))
             style.agree('TrDefs', str(len(library['metric_report']['entries'])), printed['TrDefs'])
-            # The panel names the definitions that passed admission (\TrSeeded), the ones the replay
+            # The panel names the definitions that passed the publication checks (\TrSeeded), the ones the replay
             # serves; the two that failed are counted by tools/review-results.py from the replay report.
             numbers['defs'] = printed['TrSeeded']
         panels.append((numbers, rows))

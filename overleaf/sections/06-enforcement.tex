@@ -1,13 +1,13 @@
-\section{\bt{Use-Time Enforcement}{使用时的强制保证}}
+\section{\bt{Checks at Query Execution}{执行时检查}}
 \label{sec:execution}
 \subsection{\bt{Version checks}{版本校验}}
-\bi{Agents declare the metric keys and revisions used by a query; the middleware checks those references at execution. It rejects absent, inaccessible, and invalidated revisions, including those that a repair replaced, naming the failed condition; it accepts a revision superseded by an optimization, with a notice that names its successor, after checking the revision's own conditions. SQL review checks the supported grain and join requirements.}
-{智能体声明查询所用的指标键和修订号，中间件在执行时核对这些引用。它拒绝不存在、不可访问和已失效的修订（包括被修复替代的修订），并指明失败的条件；对被优化取代的修订，它先核对该修订自身的条件，然后接受，并附上指明后继修订的通知。SQL 审查检查支持的粒度与连接要求。}
+\bi{Agents declare the metric keys and revisions used by a query; the middleware checks those references at execution. It rejects absent, inaccessible, and invalidated revisions, including those that a repair replaced, naming the failed condition; it accepts a revision replaced by an optimized revision, with a notice that names its newer revision, after checking the revision's own conditions. The SQL check rejects joins known to fan out and SQL that lacks a filter the grain now requires.}
+{智能体声明查询所用的指标键和版本号，中间件在执行时核对这些引用。它拒绝不存在、不可访问和已失效的版本（包括被修复所替代的版本），并指明失败的条件；对被优化取代的版本，它先核对该版本自身的条件，然后接受，并附上指明新版本的通知。SQL 检查拒绝已知会放大行数的连接，以及缺少粒度所需过滤的 SQL。}
 
 \subsection{\bt{Same-snapshot validation}{同快照验证}}
 \label{sec:snapshot}
-\bi{Version checks ensure that a declared revision was valid when it was last maintained, not that its conditions hold on the data the query reads. Between the two, a writer may commit, and the default version source may not yet show the write. Same-snapshot validation closes this gap. For a \code{run\_sql} call that declares revisions, \system\ (1) opens a repeatable-read, read-only transaction and reads the transactional versions; (2) collects the conditions of the declared revisions; (3) for each condition, looks up a check result at its canonical form and the snapshot's versions of its tables, and otherwise runs $Q_c$ inside the transaction; (4) rejects the call if any condition fails, which also hands the definition to regular maintenance; and (5) otherwise executes the business SQL in the same transaction.}
-{版本校验只能保证声明的修订在最近一次维护时有效，不能保证其条件在查询读取的数据上成立。两者之间可能有写入提交，而默认版本来源可能还没反映这次写入。同快照验证填补了这一空隙。对声明了修订的 \code{run\_sql} 调用，\system{}（1）开启一个可重复读的只读事务并读取事务性版本；（2）收集所声明修订的条件；（3）对每个条件，按其规范形式及快照中其依赖表的版本查找检查结果，没有就在该事务内执行 $Q_c$；（4）任一条件不成立即拒绝调用，并把定义交给常规维护；（5）否则在同一事务中执行业务 SQL。}
+\bi{Version checks ensure that a declared revision was valid when it was last maintained, not that its conditions hold on the data the query reads. Between the two, a writer may commit, and the default version source may not yet show the write. Same-snapshot validation, which checks the conditions inside the query's own transaction, closes this gap. For a \code{run\_sql} call that declares revisions, \system\ (1) opens a repeatable-read, read-only transaction and reads the transactional versions; (2) collects the conditions of the declared revisions; (3) for each condition, looks up a check result at its normalized form and the snapshot's versions of its tables, and otherwise runs $Q_c$ inside the transaction; (4) rejects the call if any condition fails, which also hands the definition to regular maintenance; and (5) otherwise executes the business SQL in the same transaction.}
+{版本校验只能保证声明的版本在最近一次维护时有效，不能保证其条件在查询读取的数据上成立。两者之间可能有写入提交，而默认版本来源可能还没反映这次写入。同快照验证在查询自己的事务内检查条件，填补了这一空隙。对声明了版本的 \code{run\_sql} 调用，\system{}（1）开启一个可重复读的只读事务并读取事务性版本；（2）收集所声明版本的条件；（3）对每个条件，按其规范化形式及快照中其依赖表的版本查找检查结果，没有就在该事务内执行 $Q_c$；（4）任一条件不成立即拒绝调用，并把定义交给常规维护；（5）否则在同一事务中执行业务 SQL。}
 
 \bi{Reuse in step~(3) rests on the following property of transactional versions.}
 {第（3）步的复用依据事务性版本的如下性质。}
@@ -24,6 +24,6 @@
 {一次检查作为一条语句执行，因而只读一个快照 $s_c$。维护在同快照验证的事务之外运行，它在检查前后各用一条语句读取版本；由嵌套性 $s_{\mathrm{before}}\subseteq s_c\subseteq s_{\mathrm{after}}$，版本相等时由引理可把检查结果按这些版本索引，不相等则丢弃。引理需要事务性版本：默认来源在提交后异步上报 DML 统计，取值相等并不蕴含状态相等，这正是第~\ref{sec:enforce-eval} 节测量的空隙。代价是每条写语句多一次计数更新（第~\ref{sec:enforce-eval} 节）。}
 
 \subsection{\bt{Scope of the guarantee}{保证的范围}}
-\bi{The guarantee covers declared uses: a query that declares a revision runs only on data on which the revision's conditions hold. It does not make undeclared SQL follow a definition or certify that an agent's own SQL matches the canonical calculation; Section~\ref{sec:scenarios} reports how often agents declare and follow definitions.}
-{这一保证覆盖声明了修订的使用：声明某个修订的查询只在该修订条件成立的数据上执行。它不能使未声明的 SQL 遵循定义，也不能证明智能体自己写的 SQL 与规范计算一致；第~\ref{sec:scenarios} 节报告智能体声明并遵循定义的频率。}
+\bi{The guarantee covers declared uses: a query that declares a revision runs only on data on which the revision's conditions hold. It does not make undeclared SQL follow a definition or certify that an agent's own SQL matches the definition's calculation; Section~\ref{sec:scenarios} reports how often agents declare and follow definitions.}
+{这一保证覆盖声明了版本的使用：声明某个版本的查询只在该版本条件成立的数据上执行。它不能使未声明的 SQL 遵循定义，也不能证明智能体自己写的 SQL 与定义的计算一致；第~\ref{sec:scenarios} 节报告智能体声明并遵循定义的频率。}
 

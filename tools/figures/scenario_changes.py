@@ -1,7 +1,7 @@
 """Figure: accuracy of the user agent by data change, as grouped bars.
 
 One group per setting, in three classes under the axis: the held-out
-questions and the four benign updates (pooled); the five breaks covered by a
+questions and the four non-breaking updates (pooled); the five breaks covered by a
 condition, one by one and pooled; and the two changes outside the guarantee.
 Five methods per group, in the order of Table 2 and grouped in the legend by
 role (no sharing; shared but not maintained, the existing approaches; shared
@@ -75,11 +75,11 @@ GROUPS = [('holdout', ['holdout'], 'none', 'Holdout'),
           ('mirror', ['mirror'], 'outside', 'Mirror')]
 POOLED = {'benign', 'covered'}
 TEXT = {
-    'en': {'groups': {'holdout': 'Held-out', 'benign': 'Benign\nupdates (4)', 'status': 'Status\nrows',
+    'en': {'groups': {'holdout': 'Held-out', 'benign': 'Non-breaking\nupdates (4)', 'status': 'Status\nrows',
                       'revision': 'Restated\nsales', 'dupload': 'Duplicate\nload', 'dimhist': 'SCD\nType 2',
                       'latekey': 'Date-key\nformat', 'covered': 'All covered\nbreaks', 'unit': 'Unit\nchange',
                       'mirror': 'Backup\ncopy'},
-           'classes': {'none': 'No change, benign updates', 'covered': 'Breaks covered by a condition',
+           'classes': {'none': 'Unchanged or non-breaking', 'covered': 'Breaks covered by a condition',
                        'outside': 'Outside the guarantee'},
            'roles': {'none': 'No shared memory', 'unmaintained': 'Shared, not maintained: existing approaches',
                      'maintained': 'Shared and maintained'},

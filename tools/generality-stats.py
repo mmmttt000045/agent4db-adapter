@@ -113,11 +113,33 @@ def e2e_macros(m, exp):
         tok = lambda x: x["input_tokens"] + x["output_tokens"]
         save.append(100 * (1 - mean("metric-global-snap", tok) / mean("middle", tok)))
     m["GeHoldSpeedupMin"], m["GeHoldSpeedupMax"] = round(min(speed), 1), round(max(speed), 1)
+    # 合并的留出题每题耗时与 token（全部轮次的题放在一起平均，与 tools/sharing-stats.py 对合成数据的口径相同）
+    def pooled(mode, f):
+        xs = [f(x) for x in scored if x["mode"] == mode and x["phase"] == "holdout"]
+        return sum(xs) / len(xs)
+    tok_of = lambda x: x["input_tokens"] + x["output_tokens"]
+    for key, mode in E2E_MODES:
+        m[f"GeHoldS{key}"] = round(pooled(mode, lambda x: x["seconds"]), 1)
+        m[f"GeHoldTok{key}K"] = round(pooled(mode, tok_of) / 1000, 1)
+    m["GeHoldSpeedup"] = round(pooled("middle", lambda x: x["seconds"]) / pooled("metric-global-snap", lambda x: x["seconds"]), 1)
+    m["GeHoldTokSave"] = round(100 * (1 - pooled("metric-global-snap", tok_of) / pooled("middle", tok_of)))
     m["GeHoldTokSaveMin"], m["GeHoldTokSaveMax"] = round(min(save)), round(max(save))
     v = stats["methods"]["metric-global-snap"]
     reps = [c["repaired"] for c in v["runs"]] if v.get("runs") and "repaired" in v["runs"][0] else None
     m["GeRepairedPerRun"] = round(v["repaired_per_cell"], 1)
     m["GeRevokedPerRun"] = round(v["revoked_per_cell"], 1)
+
+
+def synthetic_hold_macros(m, path):
+    """合成数据场景研究（exp/2026-10-10-scenarios-q5/holdout-cost.json）的留出题：同一轮次 MAVRA 相对独自探索的提速与 token 节省区间。"""
+    d = json.load(open(path, encoding="utf-8"))["methods"]
+    run_of = lambda r: r["run"].rsplit("-", 1)[0]
+    cond = {run_of(r): r for r in d["metric-global-snap"]}
+    alone = {run_of(r): r for r in d["middle"]}
+    speed = [(alone[k]["s_sum"] / alone[k]["n"]) / (cond[k]["s_sum"] / cond[k]["n"]) for k in sorted(cond)]
+    save = [100 * (1 - (cond[k]["tok_sum"] / cond[k]["n"]) / (alone[k]["tok_sum"] / alone[k]["n"])) for k in sorted(cond)]
+    m["GsHoldSpeedupMin"], m["GsHoldSpeedupMax"] = round(min(speed), 1), round(max(speed), 1)
+    m["GsHoldTokSaveMin"], m["GsHoldTokSaveMax"] = round(min(save)), round(max(save))
 
 
 def main():
@@ -152,6 +174,7 @@ def main():
     per["pooled"] = pooled
     macros(m, "Gn", merged, pooled)
     e2e_macros(m, o.exp)
+    synthetic_hold_macros(m, os.path.join(os.path.dirname(o.exp.rstrip("/")), "2026-10-10-scenarios-q5", "holdout-cost.json"))
     check = json.load(open(os.path.join(o.exp, "tpcds-check.json"), encoding="utf-8"))
     gen = check["generator_on_tpcds"]
     assert gen["differing_outcome_class_vs_hand_written"] == 0 and check["regression_check"]["differing_class_repaired_or_value"] == 0
@@ -165,7 +188,7 @@ def main():
         v = m[k]
         lines.append(f"\\newcommand{{\\{k}}}{{{fmt(v)}}}")
     open(os.path.join(o.out, "generality.tex"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
-    print(json.dumps({k: m[k] for k in sorted(m) if (k.startswith("Gn") and not k[2:4] in ("Th", "Sb", "Fi")) or k.startswith("Ge")},
+    print(json.dumps({k: m[k] for k in sorted(m) if (k.startswith("Gn") and not k[2:4] in ("Th", "Sb", "Fi")) or k.startswith("Ge") or k.startswith("Gs")},
                      ensure_ascii=False, indent=1))
 
 

@@ -1,0 +1,116 @@
+{
+ "source": "noctis results/scen-20261010 (cell-*.json), held-out phase, outcome != error; per run = one cell",
+ "methods": {
+  "middle": [
+   {
+    "run": "dsv41flash-r1-a",
+    "n": 25,
+    "s_sum": 563.594560556,
+    "tok_sum": 456134,
+    "correct": 15
+   },
+   {
+    "run": "dsv41flash-r2-c",
+    "n": 25,
+    "s_sum": 1692.2940105679997,
+    "tok_sum": 697840,
+    "correct": 15
+   },
+   {
+    "run": "dsv41flash-r3-b",
+    "n": 25,
+    "s_sum": 579.0461430429999,
+    "tok_sum": 459909,
+    "correct": 14
+   },
+   {
+    "run": "dsv41flash-r4-b",
+    "n": 25,
+    "s_sum": 922.383374468,
+    "tok_sum": 504171,
+    "correct": 15
+   },
+   {
+    "run": "dsv41flash-r5-a",
+    "n": 25,
+    "s_sum": 419.33955901100006,
+    "tok_sum": 443671,
+    "correct": 13
+   }
+  ],
+  "traj-global": [
+   {
+    "run": "dsv41flash-r1-a",
+    "n": 25,
+    "s_sum": 438.96472613200007,
+    "tok_sum": 361580,
+    "correct": 24
+   },
+   {
+    "run": "dsv41flash-r2-c",
+    "n": 25,
+    "s_sum": 312.75456779800004,
+    "tok_sum": 348585,
+    "correct": 25
+   },
+   {
+    "run": "dsv41flash-r3-c",
+    "n": 25,
+    "s_sum": 397.3459826940001,
+    "tok_sum": 396988,
+    "correct": 23
+   },
+   {
+    "run": "dsv41flash-r4-b",
+    "n": 25,
+    "s_sum": 460.26654031199996,
+    "tok_sum": 386123,
+    "correct": 25
+   },
+   {
+    "run": "dsv41flash-r5-a",
+    "n": 25,
+    "s_sum": 250.298950756,
+    "tok_sum": 357139,
+    "correct": 25
+   }
+  ],
+  "metric-global-snap": [
+   {
+    "run": "dsv41flash-r1-c",
+    "n": 25,
+    "s_sum": 449.88622825799996,
+    "tok_sum": 342937,
+    "correct": 25
+   },
+   {
+    "run": "dsv41flash-r2-b",
+    "n": 25,
+    "s_sum": 308.27990214700003,
+    "tok_sum": 381363,
+    "correct": 25
+   },
+   {
+    "run": "dsv41flash-r3-a",
+    "n": 25,
+    "s_sum": 334.85363214499995,
+    "tok_sum": 356002,
+    "correct": 25
+   },
+   {
+    "run": "dsv41flash-r4-a",
+    "n": 25,
+    "s_sum": 303.53140728200003,
+    "tok_sum": 382615,
+    "correct": 25
+   },
+   {
+    "run": "dsv41flash-r5-c",
+    "n": 25,
+    "s_sum": 256.511730044,
+    "tok_sum": 336332,
+    "correct": 25
+   }
+  ]
+ }
+}

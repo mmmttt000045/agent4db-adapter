@@ -17,7 +17,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import style  # noqa: E402
 
 FIGURES = {'running-example': 'example', 'architecture': 'architecture', 'replay-outcomes': 'replay_outcomes',
-           'maintenance-cost': 'maintenance_cost', 'scenario-changes': 'scenario_changes'}
+           'maintenance-cost': 'maintenance_cost', 'scenario-changes': 'scenario_changes',
+           'two-schemas': 'two_schemas', 'consumer-cost': 'consumer_cost'}
 DECK = {'structure': 'structure', 'definition': 'definition', 'process': 'process'}   # report deck only
 DECK_OUT = style.ROOT / 'tools/deck/figures'
 

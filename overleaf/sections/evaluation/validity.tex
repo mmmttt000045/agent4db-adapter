@@ -5,8 +5,8 @@
 
 \input{figures/replay-outcomes}
 
-\bi{Every recheck method serves wrong answers only under the unit change, which no condition covers, whereas invalidation on schema change serves \RpSchemaWrongModeled\ wrong answers under the covered changes (Figure~\ref{fig:replay}). \system, the full recheck per definition, and the query cache give the same outcome on every question (\RpSameCondDef\%), so their end-to-end differences come from what agents learned. False invalidations are conservative: they arise mostly for return rate, whose ratio can stay right while its grain is broken.}
-{各重查方法只在任何条件都不覆盖的单位变化下给出错误答案，而只在模式变更时失效在条件覆盖的变化下给出 \RpSchemaWrongModeled\ 个错误答案（图~\ref{fig:replay}）。\system、整定义重查与查询缓存在每道题上的结果都相同（\RpSameCondDef\%），因此它们在端到端上的差别来自智能体学到的内容。误失效是保守的：它主要出现在退货率上，粒度已被破坏而比率碰巧仍然正确。}
+\bi{Every recheck method serves wrong answers only under the unit change, which no condition covers, whereas invalidation on schema change serves \RpSchemaWrongModeled\ wrong answers under the covered changes (Figure~\ref{fig:replay}). \system, the full recheck per definition, and the query cache give the same outcome on every question (\RpSameCondDef\%), so their end-to-end differences come from what agents learned.}
+{各重查方法只在任何条件都不覆盖的单位变化下给出错误答案，而只在模式变更时失效在条件覆盖的变化下给出 \RpSchemaWrongModeled\ 个错误答案（图~\ref{fig:replay}）。\system、整定义重查与查询缓存在每道题上的结果都相同（\RpSameCondDef\%），因此它们在端到端上的差别来自智能体学到的内容。}
 
 \bi{\emph{dbt-style table tests} (key uniqueness per table, referential tests on date and item keys, every definition on a failing table invalidated) serve no wrong answer under the covered changes (\RpTableWrongModeled) but cannot repair: they answer \RpTableCorrect\ questions against \RpCondCorrect, and acting on tables rather than definitions gives \RpTableUnneeded\ false invalidations against \RpCondUnneeded.}
 {\emph{dbt 式表级测试}（每张表的键唯一性、日期键与商品键的引用测试，测试失败的表上的定义全部失效）在条件覆盖的变化下不给出错误答案（\RpTableWrongModeled），但不能修复：它答对 \RpTableCorrect\ 题，\system\ 答对 \RpCondCorrect\ 题；按表而不是按定义行动带来 \RpTableUnneeded\ 次误失效，\system\ 为 \RpCondUnneeded\ 次。}

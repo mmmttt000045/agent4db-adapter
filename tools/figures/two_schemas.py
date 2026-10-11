@@ -23,7 +23,7 @@ import style  # noqa: E402
 from style import ACC_PALE, INK, MUTED, WHITE  # noqa: E402
 
 NAME = 'two-schemas'
-W, H = style.COLUMN, 46.0
+W, H = style.COLUMN, 42.0
 PHASES = {'holdout': ['holdout'], 'benign': ['append', 'backfill', 'correct', 'addcol'],
           'modeled': ['status', 'revision', 'dupload', 'dimhist', 'latekey'],
           'all': ['holdout', 'append', 'backfill', 'correct', 'addcol', 'status', 'revision', 'dupload', 'dimhist',

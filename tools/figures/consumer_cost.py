@@ -22,7 +22,7 @@ import style  # noqa: E402
 from style import INK, MUTED, WHITE  # noqa: E402
 
 NAME = 'consumer-cost'
-W, H = style.COLUMN, 42.0
+W, H = style.COLUMN, 38.0
 SYN = style.ROOT / 'exp/2026-10-10-scenarios-q5/holdout-cost.json'
 TPCH = style.ROOT / 'exp/2026-10-11-generality/e2e/outcomes.json.gz'
 METHODS = [('middle', '^'), ('traj-global', 's'), ('metric-global-snap', 'o')]

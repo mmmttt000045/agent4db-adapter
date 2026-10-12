@@ -1,0 +1,16 @@
+{
+ "library": "exp/2026-10-02-cache-baseline-tpcds/tpcds-library.json",
+ "note": "群体评测（metric-bench --population --spec）的 TPC-DS SF1 指标：参照定义取自由 TPC-DS 查询模板导出的定义库；业务口径照参照定义写成学习题里的说明，其余题只给指标名",
+ "defs": [
+  {"id": "M1", "name": "一号经理商品门店销售额", "reference": "metric:query42_b0_store_sales",
+   "definition": "一号经理商品门店销售额 = 品类经理编号为 1（item.i_manager_id = 1）的商品的门店销售行的扩展售价（store_sales.ss_ext_sales_price）之和；销售行经商品键（ss_item_sk）关联商品表，按销售日期（ss_sold_date_sk）归属期间；每个销售行计一次"},
+  {"id": "M2", "name": "登记顾客门店销售额", "reference": "metric:query19_b0_store_sales",
+   "definition": "登记顾客门店销售额 = 门店销售行的扩展售价（store_sales.ss_ext_sales_price）之和，只计顾客（customer）、商品（item）和门店（store）都关联得上的销售行；按销售日期（ss_sold_date_sk）归属期间；每个销售行计一次"},
+  {"id": "M3", "name": "中型门店优惠券金额", "reference": "metric:query79_b1_store_sales",
+   "definition": "中型门店优惠券金额 = 员工数（store.s_number_employees）在 200 到 295 之间的门店上、关联得上家庭人口信息（household_demographics）且 hd_dep_count = 0 或 hd_vehicle_count > -1 的门店销售行的优惠券金额（store_sales.ss_coupon_amt）之和；按销售日期（ss_sold_date_sk）归属期间；每个销售行计一次"},
+  {"id": "M4", "name": "门店退货金额", "reference": "metric:query77_b5_store_returns",
+   "definition": "门店退货金额 = 关联得上门店（store）的门店退货行的退货金额（store_returns.sr_return_amt）之和，按退货日期（sr_returned_date_sk）归属期间；每个退货行计一次"},
+  {"id": "M5", "name": "门店综合销售额", "reference": "metric:query4_b1_store_sales",
+   "definition": "门店综合销售额 = 门店销售行的 ((ss_ext_list_price − ss_ext_wholesale_cost − ss_ext_discount_amt) + ss_ext_sales_price) / 2 之和，只计关联得上顾客（customer）的销售行；按销售日期（ss_sold_date_sk）归属期间；每个销售行计一次"}
+ ]
+}

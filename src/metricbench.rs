@@ -58,6 +58,9 @@ pub struct Options {
     question_set: String,
     #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=10))]
     repeats: u32,
+    /// 第一轮的编号（分进程跑多轮时各进程给不同编号；群体评测按轮次编号抽题，同一轮各组抽到的题相同）
+    #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=100))]
+    first_repeat: u32,
     #[arg(long, default_value_t = 20, value_parser = clap::value_parser!(u32).range(1..=100))]
     max_steps: u32,
     #[arg(long, default_value_t = 2, value_parser = clap::value_parser!(u32).range(1..=5))]
@@ -1663,7 +1666,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             url: isolated.as_str(),
         };
         let mut cells = vec![];
-        for r in 1..=o.repeats {
+        for r in o.first_repeat..o.first_repeat + o.repeats {
             // 每轮轮换组的执行顺序
             for k in 0..o.modes.len() {
                 let mode = &o.modes[(k + r as usize - 1) % o.modes.len()];

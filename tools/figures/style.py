@@ -44,6 +44,7 @@ OUT_CORRECT, OUT_NEEDED, OUT_UNNEEDED = '#4A4A4A', '#A6A6A6', '#D9D9D9'
 # Experiment method key -> (English, Chinese, color name), as in Table 2.
 METHODS = {
     'middle': ('No memory', '无记忆', 'mNoShare'),
+    'middle-alone': ('No memory', '无记忆', 'mNoShare'),
     'traj-global': ('Example retrieval', '示例检索', 'mTraj'),
     'traj-verify': ('Example retrieval + self-verification', '示例检索 + 自行核验', 'mTrajVerify'),
     'metric-global-noguard': ('Never revalidated', '从不重验证', 'mUnguarded'),   # not in the paper
@@ -51,6 +52,7 @@ METHODS = {
     'metric-global-revoke': ('Invalidate on every write', '每次写入即失效', 'mRevoke'),
     'metric-global-def': ('Full recheck per definition', '整定义重查', 'mDef'),
     'metric-global-snap': ('MAVRA (ours)', 'MAVRA（本文）', 'mCond'),
+    'metric-private': ('Single-agent memory', '单智能体记忆', 'mPrivate'),
     'metric-global-exref': ('MAVRA, regression on current data', 'MAVRA，回归测试用当前数据', 'mCondCur'),
     'metric-global': ('MAVRA, gold-SQL reference', 'MAVRA，标准答案作参照', 'mCondGold'),
     'tabletest': ('dbt-style table tests', 'dbt 式表级测试', 'mTable'),

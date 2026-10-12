@@ -4,8 +4,9 @@ memory starts empty and learns from use.
 
 usage: population-stats.py --runs results/pop-20261012 [--json-out FILE] [--tex-out overleaf/gen]
 
-Methods: no memory (middle), single-agent memory (metric-private: same learning, checks and maintenance as MAVRA, but
-each agent sees only what it learned itself), example retrieval (traj-global, shared), MAVRA (metric-global-snap).
+Methods: no memory (middle-alone: table profiles, join paths and query results kept per question), single-agent memory
+(metric-private: same learning, checks and maintenance as MAVRA, but each agent sees only the definitions and schema
+knowledge it learned itself), example retrieval (traj-global, shared), MAVRA (metric-global-snap).
 
 Cost of a task: tokens = the agent session's tokens (input + output) plus, when the memory learned from that session,
 the extraction's tokens (learning is charged to the session that triggered it); seconds = the agent session's wall time
@@ -25,10 +26,10 @@ import json
 import os
 import statistics
 
-METHODS = ["middle", "metric-private", "traj-global", "metric-global-snap"]
-NAMES = {"middle": "No memory", "metric-private": "Single-agent memory", "traj-global": "Example retrieval (shared)",
+METHODS = ["middle-alone", "metric-private", "traj-global", "metric-global-snap"]
+NAMES = {"middle-alone": "No memory", "metric-private": "Single-agent memory", "traj-global": "Example retrieval (shared)",
          "metric-global-snap": "MAVRA"}
-KEY = {"middle": "None", "metric-private": "Private", "traj-global": "Traj", "metric-global-snap": "Mavra"}
+KEY = {"middle-alone": "None", "metric-private": "Private", "traj-global": "Traj", "metric-global-snap": "Mavra"}
 STEPS = [1, 2, 4, 8, 16]
 
 
@@ -171,9 +172,31 @@ def main():
             if r["change"]["acc"]:
                 mac(f"{k}ChangeAcc", f"{r['change']['acc']['mean'] * 100:.0f}")
                 mac(f"{k}ChangeStale", f"{r['change']['stale']['mean']:.0f}")
+                mac(f"{k}ChangeTokK", f"{r['change']['tok']['mean'] / 1e3:.1f}")
+                mac(f"{k}ChangeS", f"{r['change']['s']['mean']:.1f}")
+            mac(f"{k}AccMin", f"{r['v1']['acc']['min'] * 100:.0f}")
+            mac(f"{k}AccMax", f"{r['v1']['acc']['max'] * 100:.0f}")
+            mac(f"{k}Learns", f"{r['v1']['learns']['mean']:.0f}")
+            mac(f"{k}Reused", f"{r['v1']['reused']['mean'] / r['v1']['n']['mean'] * 100:.0f}")
+            maint = [v["mean"] for p, v in r["maint_db_s"].items() if p != "pop-v1" and v]
+            if maint:
+                mac(f"{k}MaintS", f"{maint[0]:.1f}")
+            mac(f"{k}TotalTokMin", f"{min(c['cum'][max(c['cum'])]['tok'] for c in r['cells']) / 1e6:.2f}")
+            mac(f"{k}TotalTokMax", f"{max(c['cum'][max(c['cum'])]['tok'] for c in r['cells']) / 1e6:.2f}")
         for m, s in savings.items():
             mac(f"MavraTokSave{KEY[m]}", f"{s['tok_save'] * 100:.0f}")
             mac(f"MavraSpeedup{KEY[m]}", f"{s['speedup']:.1f}")
+        # per-run range of the savings against each method (paired: the same draw of questions per run)
+        for m in savings:
+            ref_c = {c["repeat"]: c for c in out["methods"][ref]["cells"]}
+            pairs = [(ref_c[c["repeat"]], c) for c in out["methods"][m]["cells"] if c["repeat"] in ref_c]
+            last = lambda c, k: c["cum"][max(c["cum"])][k]
+            saves = [1 - last(a, "tok") / last(b, "tok") for a, b in pairs]
+            speeds = [last(b, "s") / last(a, "s") for a, b in pairs]
+            mac(f"MavraTokSave{KEY[m]}Min", f"{min(saves) * 100:.0f}")
+            mac(f"MavraTokSave{KEY[m]}Max", f"{max(saves) * 100:.0f}")
+            mac(f"MavraSpeedup{KEY[m]}Min", f"{min(speeds):.1f}")
+            mac(f"MavraSpeedup{KEY[m]}Max", f"{max(speeds):.1f}")
         open(os.path.join(a.tex_out, "population.tex"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
 
 

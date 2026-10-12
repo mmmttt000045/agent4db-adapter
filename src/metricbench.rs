@@ -39,7 +39,7 @@ pub struct Options {
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",
           value_parser = ["direct", "middle", "metric-local", "metric-global", "metric-global-noguard",
                           "metric-global-schema", "metric-global-revoke", "metric-global-def", "metric-global-exref",
-                          "metric-global-snap", "metric-global-opt", "metric-global-full", "traj-global", "traj-verify",
+                          "metric-global-snap", "metric-global-opt", "metric-global-full", "metric-private", "traj-global", "traj-verify",
                           "reforce", "reforce-traj", "reforce-static", "reforce-mavra"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
@@ -79,9 +79,23 @@ pub struct Options {
     #[arg(long, value_delimiter = ',', default_value = "none,append,status,revision,dimhist,rekey,dupload,cleanup,correct",
           value_parser = ["none", "append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "rekey", "cleanup"])]
     timeline: Vec<String>,
-    /// 生命周期评测中每一波使用者同时进行的任务数
+    /// 生命周期评测中每一波使用者同时进行的任务数；群体评测中同时在场的智能体数
     #[arg(long, default_value_t = 2, value_parser = clap::value_parser!(u32).range(1..=8))]
     concurrency: u32,
+    /// 群体评测：`agents` 个智能体依次到来，各答 `per_agent` 道抽样题（学习题给出口径，其余题只给指标名），
+    /// 记忆只从答对的学习题学习：共享的组任何智能体学到的所有智能体都能用，metric-private 每个智能体只用自己学到的。
+    /// 之后施加 `pop_change`，同一批智能体再各答 `returning` 道读到被写入表的题。见 `population_cell`
+    #[arg(long)]
+    population: bool,
+    #[arg(long, default_value_t = 16, value_parser = clap::value_parser!(u32).range(1..=64))]
+    agents: u32,
+    #[arg(long, default_value_t = 7, value_parser = clap::value_parser!(u32).range(1..=64))]
+    per_agent: u32,
+    #[arg(long, default_value_t = 4, value_parser = clap::value_parser!(u32).range(0..=64))]
+    returning: u32,
+    #[arg(long, default_value = "revision",
+          value_parser = ["append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"])]
+    pop_change: String,
     /// 模式描述（exp/2026-10-11-generality/schemas/*.json）：给出时不生成合成数据，从描述里的模板库复制数据，
     /// 变化由 `specchange` 按描述生成；指标、题目年份与标准答案来自 --defs 与描述
     #[arg(long, requires = "defs")]
@@ -652,6 +666,19 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
             true,
             true,
         ),
+        // 单智能体记忆：同 -snap 的学习、检查与维护，但每个智能体只看得到自己学到的定义
+        "metric-private" => (
+            MiddleConfig {
+                metric_scope: Scope::Agent,
+                metric_maint: Maint::Condition,
+                cond_reuse: true,
+                g8_example: true,
+                g8_snapshot_db: true,
+                ..base
+            },
+            true,
+            true,
+        ),
         // 同 -snap，并在学习之后对每条已发布定义尝试优化修订（规则改写与模型提议；验证等价与代价后发布）
         "metric-global-opt" => (
             MiddleConfig {
@@ -1112,9 +1139,8 @@ async fn audit(env: &Env<'_>, mid: &Middle, gold: &HashMap<String, String>) -> R
     Ok((rows, bad))
 }
 
-async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u32) -> Result<Value> {
-    let (cfg, middle_tools, metric_tools) = config(mode);
-    let traj = cfg.traj_memory;
+/// 一个组的工具与系统提示。
+fn tools_and_system(mode: &str, traj: bool, middle_tools: bool, metric_tools: bool) -> (Vec<ToolSpec>, String) {
     let mut tools = tool_specs_with(middle_tools, metric_tools);
     let mut system_text = system(middle_tools, metric_tools);
     if traj {
@@ -1128,6 +1154,13 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     }
     tools.push(llm::final_answer_spec(true));
     tools.push(llm::clarification_spec());
+    (tools, system_text)
+}
+
+async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u32) -> Result<Value> {
+    let (cfg, middle_tools, metric_tools) = config(mode);
+    let traj = cfg.traj_memory;
+    let (tools, system_text) = tools_and_system(mode, traj, middle_tools, metric_tools);
     let cell = Cell { id: format!("r{repeat}-{mode}-{phrasing}"), mode, phrasing, repeat, system: system_text, tools };
     eprintln!("== {}", cell.id);
     env.ensure_v1("上一组").await?;
@@ -1292,19 +1325,7 @@ fn unavailable_metrics(mid: &Middle) -> HashSet<String> {
 async fn lifecycle_cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u32, timeline: &[(String, Step)]) -> Result<Value> {
     let (cfg, middle_tools, metric_tools) = config(mode);
     let traj = cfg.traj_memory;
-    let mut tools = tool_specs_with(middle_tools, metric_tools);
-    let mut system_text = system(middle_tools, metric_tools);
-    if traj {
-        tools.push(trajectory_tool_spec());
-        system_text.push('\n');
-        system_text.push_str(SYSTEM_TRAJ);
-        if mode == "traj-verify" {
-            system_text.push('\n');
-            system_text.push_str(SYSTEM_TRAJ_VERIFY);
-        }
-    }
-    tools.push(llm::final_answer_spec(true));
-    tools.push(llm::clarification_spec());
+    let (tools, system_text) = tools_and_system(mode, traj, middle_tools, metric_tools);
     let cell = Cell { id: format!("life-r{repeat}-{mode}-{phrasing}"), mode, phrasing, repeat, system: system_text, tools };
     eprintln!("== {}", cell.id);
     scenario::ensure_v1(env.admin, env.v1, "开始").await?;
@@ -1418,6 +1439,123 @@ async fn lifecycle_cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, 
     }))
 }
 
+// ───────────────────────── 群体 ─────────────────────────
+
+/// 群体评测的抽题：每个智能体从满足 `keep` 的题中不放回地抽 `per` 道，顺序随机。同一 `seed` 在各组相同（配对比较）。
+fn population_plan<'a>(tasks: &'a [Task], agents: u32, per: u32, seed: u64, keep: impl Fn(&Task) -> bool) -> Vec<Vec<&'a Task>> {
+    use rand::{seq::SliceRandom, SeedableRng};
+    let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+    (0..agents)
+        .map(|_| {
+            let mut pool: Vec<&Task> = tasks.iter().filter(|t| keep(t)).collect();
+            pool.shuffle(&mut rng);
+            pool.truncate(per as usize);
+            pool
+        })
+        .collect()
+}
+
+/// 一个智能体按顺序答完自己的题。学习题给出口径，答对且没有用到已有定义时就从这次会话学习：
+/// 指标组提炼并提交发布前检查（定义归这个智能体的范围：共享组为全局，metric-private 只属于它自己），
+/// 示例检索组保存这次会话（同一道学习题只保存一次）。学习的代价记在触发它的任务上。
+async fn population_agent(ph: &Phase<'_>, agent: &str, tasks: &[&Task], metric_tools: bool, traj: bool) -> Result<Vec<Value>> {
+    let mut out = vec![];
+    for (i, t) in tasks.iter().enumerate() {
+        let defined = t.set == Set::Learn;
+        let rec = run_task(ph, agent, t, defined).await?;
+        let reused = rec.log.calls.iter().any(|c| !c.metrics.is_empty());
+        let learning = if !(defined && rec.correct) {
+            Value::Null
+        } else if metric_tools && !reused {
+            learn_step(ph.env, ph.mid, &rec, t).await?
+        } else if traj && !ph.mid.trajectories().iter().any(|m| m.task == t.id) {
+            remember_step(ph.mid, &rec, t)
+        } else {
+            Value::Null
+        };
+        let mut json = rec.json;
+        json["order"] = json!(i);
+        json["learning"] = learning;
+        out.push(json);
+    }
+    Ok(out)
+}
+
+/// 群体评测：同一组智能体先在 v1 上各答一批题（记忆从空开始、边用边学），施加 `pop_change` 后再各答一批读到被写入表的题。
+/// 智能体依次到来，`concurrency` 个同时在场；每个智能体自己的题顺序进行。
+async fn population_cell(env: &Env<'_>, db: Arc<Db>, mode: &str, repeat: u32) -> Result<Value> {
+    let (cfg, middle_tools, metric_tools) = config(mode);
+    let traj = cfg.traj_memory;
+    let (tools, system_text) = tools_and_system(mode, traj, middle_tools, metric_tools);
+    let cell = Cell { id: format!("pop-r{repeat}-{mode}"), mode, phrasing: "mixed", repeat, system: system_text, tools };
+    eprintln!("== {}", cell.id);
+    env.ensure_v1("上一组").await?;
+    let snapshot_db = cfg.g8_snapshot_db;
+    let mut mid = Middle::new(db, cfg).await?;
+    if env.o.trace {
+        mid.trace = Some(llm::Trace::create(&format!("{}/trace-{}.jsonl", env.dir, cell.id))?);
+    }
+    if snapshot_db {
+        mid.learn_db = Some(env.learn.clone().context("没有建学习时快照库")?);
+    }
+    let o = env.o;
+    let names: Vec<String> = (1..=o.agents).map(|j| format!("U{j}")).collect();
+    let change = Change::parse(&o.pop_change)?;
+    let changed = env.change_tables(change);
+    let seed = u64::from(repeat);
+    let plans = [
+        ("pop-v1".to_string(), population_plan(env.tasks, o.agents, o.per_agent, seed, |_| true)),
+        (
+            format!("pop-{}", change.name()),
+            population_plan(env.tasks, o.agents, o.returning, seed + 1000, |t| t.def.tables.iter().any(|x| changed.iter().any(|y| y == x))),
+        ),
+    ];
+    let t0 = Instant::now();
+    let (mut records, mut phases, mut applied) = (vec![], vec![], false);
+    for (k, (phase, plan)) in plans.iter().enumerate() {
+        if plan.iter().all(Vec::is_empty) {
+            continue;
+        }
+        let t1 = Instant::now();
+        let (gold, writes) = if k == 0 {
+            (gold_map(env.admin, env.tasks).await?, Value::Null)
+        } else {
+            applied = true;
+            let truth = env.apply_truth(change).await?;
+            let gold = gold_map(env.admin, env.tasks).await?;
+            let hidden = env.apply_hidden(change).await?;
+            eprintln!("  {phase}（{}，{}）：写入 {truth} + {hidden} 行", change.label(), change.class());
+            (gold, json!({"truth_rows": truth, "hidden_rows": hidden}))
+        };
+        mid.invalidate_versions();
+        let (rows, bad) = audit(env, &mid, &gold).await?;
+        let ph = Phase { env, mid: &mid, cell: &cell, name: phase.as_str(), gold: &gold, bad: &bad };
+        let done: Vec<Result<Vec<Value>>> = futures::stream::iter(names.iter().zip(plan))
+            .map(|(a, ts)| population_agent(&ph, a, ts, metric_tools, traj))
+            .buffered(o.concurrency as usize)
+            .collect()
+            .await;
+        for r in done {
+            records.extend(r?);
+        }
+        phases.push(json!({
+            "phase": phase, "writes": writes, "audit": rows, "audit_end": audit(env, &mid, &gold).await?.0,
+            "plan": plan.iter().map(|ts| ts.iter().map(|t| t.id.clone()).collect::<Vec<_>>()).collect::<Vec<_>>(),
+            "events": mid.take_metric_events(), "seconds": t1.elapsed().as_secs_f64(),
+        }));
+    }
+    if applied {
+        env.reset(change).await?;
+        env.ensure_v1("群体评测").await?;
+    }
+    Ok(json!({
+        "cell": cell.id, "mode": mode, "repeat": repeat, "population": true, "agents": o.agents, "per_agent": o.per_agent,
+        "returning": o.returning, "change": change.name(), "concurrency": o.concurrency, "seconds": t0.elapsed().as_secs_f64(),
+        "phases": phases, "metric_report": mid.metric_report(), "trajectories": mid.trajectories(), "stats": mid.stats_json(),
+        "records": records,
+    }))
+}
+
 pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     ensure!(
         !o.holdout_agents.is_empty() && o.holdout_agents.iter().all(|a| !a.trim().is_empty() && !a.contains(['/', '|'])),
@@ -1431,6 +1569,9 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     ensure!(!o.lifecycle || !o.modes.iter().any(|m| is_reforce(m)), "reforce* 组只用于场景评测");
     let spec = o.spec.as_deref().map(Spec::load).transpose()?;
     ensure!(spec.is_none() || !o.lifecycle, "模式描述下暂不支持生命周期评测");
+    ensure!(!o.population || !o.lifecycle, "群体评测与生命周期评测不能同时开");
+    ensure!(!o.population || o.phrasings.len() == 1, "群体评测的题面由题型决定（学习题给口径，其余只给名称），--phrasings 只给一个");
+    ensure!(!o.population || !o.modes.iter().any(|m| is_reforce(m)), "reforce* 组只用于场景评测");
     if let Some(s) = &spec {
         load_spec_defs(o.defs.as_deref().context("--spec 需要 --defs")?, s)?;
     }
@@ -1529,6 +1670,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
                 for phrasing in &o.phrasings {
                     let c = if o.lifecycle {
                         lifecycle_cell(&env, db.clone(), mode, phrasing, r, &timeline).await?
+                    } else if o.population {
+                        population_cell(&env, db.clone(), mode, r).await?
                     } else {
                         cell(&env, db.clone(), mode, phrasing, r).await?
                     };
@@ -1573,6 +1716,8 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             std::fs::write(format!("{directory}/report.json"), serde_json::to_string_pretty(&report)?)?;
             let md = if report["options"]["lifecycle"] == true {
                 "生命周期评测：逐步结果见 report.json 与 cell-*.json，汇总用 tools/lifecycle-stats.py。\n".to_string()
+            } else if report["options"]["population"] == true {
+                "群体评测：逐题结果见 report.json 与 cell-*.json，汇总用 tools/population-stats.py。\n".to_string()
             } else {
                 markdown(&report)
             };

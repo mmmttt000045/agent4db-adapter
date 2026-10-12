@@ -1,7 +1,7 @@
 //! 指标经验的生命周期：提炼输入、晋升门槛（G1–G7）、查找与守护、执行端引用检查、受限修复与学习题回归（G8）。
 //! 依赖表有写入后的维护方式见 `Maint`：逐写入撤销、只看结构、定义级重验、条件级重验。
 
-use super::{inc, join_key, outcome_text, scope_prefix, snap_key, ver_sig, Ctx, Maint, Middle, SqlCall, TaskLog};
+use super::{inc, join_key, outcome_text, scope_prefix, snap_key, task_key, ver_sig, Ctx, Maint, Middle, SqlCall, TaskLog};
 use crate::catalog::{self, TableVersion};
 use crate::checks::{same_on, Check, On, Outcome};
 use crate::db::QKind;
@@ -836,6 +836,8 @@ impl Middle {
         let q = query.trim().to_lowercase();
         let prefix = format!("{}|metric:", scope_prefix(self.cfg.metric_scope, ctx));
         let (mut hits, mut unavailable, mut found) = (vec![], vec![], vec![]);
+        // 本任务里已经完整返回过的条目只给出键与版本，不再重复整段口径
+        let shown: Vec<(String, u32)> = self.tasks.lock().get(&task_key(ctx)).map(|l| l.found.clone()).unwrap_or_default();
         for (fk, e) in self.store.scan(&prefix) {
             let Some(m) = metric_of(&e) else { continue };
             // 从未晋升的候选不对外提供，也不暴露
@@ -858,8 +860,14 @@ impl Middle {
                         x.hits += 1;
                         x.consumers.insert(ctx.agent.clone());
                     });
+                    if shown.contains(&(e.key.clone(), e.revision)) {
+                        hits.push(
+                            json!({"key": e.key, "revision": e.revision, "name": m.name, "note": "本任务中已返回过这条口径的完整内容"}),
+                        );
+                    } else {
+                        hits.push(view(&e));
+                    }
                     found.push((e.key.clone(), e.revision));
-                    hits.push(view(&e));
                 }
                 Checked::Unavailable(e, r) => unavailable.push(json!({"key": e.key, "revision": e.revision, "status": r})),
                 Checked::Missing => {}
@@ -871,7 +879,11 @@ impl Middle {
             v["unavailable"] = json!(unavailable);
         }
         if hits.is_empty() {
-            v["note"] = json!("没有匹配的已验证指标口径");
+            v["note"] = json!(if unavailable.is_empty() {
+                "没有匹配的已验证指标口径；请直接查看表结构与数据计算"
+            } else {
+                "匹配的口径当前不可用：数据变化后其条件不成立，且没有唯一的自动修复。请直接查看表结构与数据计算，不必再查找口径"
+            });
         }
         Ok(v)
     }

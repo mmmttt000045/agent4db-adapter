@@ -39,7 +39,7 @@ pub struct Options {
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",
           value_parser = ["direct", "middle", "metric-local", "metric-global", "metric-global-noguard",
                           "metric-global-schema", "metric-global-revoke", "metric-global-def", "metric-global-exref",
-                          "metric-global-snap", "metric-global-opt", "metric-global-full", "metric-private", "traj-global", "traj-verify",
+                          "metric-global-snap", "metric-global-opt", "metric-global-full", "metric-private", "middle-alone", "traj-global", "traj-verify",
                           "reforce", "reforce-traj", "reforce-static", "reforce-mavra"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
@@ -642,6 +642,8 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
             false,
         ),
         "middle" | "reforce" => (base, true, false),
+        // 无记忆：同 middle 的工具，但表结构知识（表描述、关联路径与守卫依据）只在一道题内有效，每题从零开始
+        "middle-alone" => (MiddleConfig { scope: Scope::Task, metric_scope: Scope::Task, ..base }, true, false),
         "metric-local" => {
             (MiddleConfig { metric_scope: Scope::Agent, metric_maint: Maint::Condition, cond_reuse: true, ..base }, true, true)
         }
@@ -669,9 +671,10 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
             true,
             true,
         ),
-        // 单智能体记忆：同 -snap 的学习、检查与维护，但每个智能体只看得到自己学到的定义
+        // 单智能体记忆：同 -snap 的学习、检查与维护，但每个智能体只看得到自己学到的定义和表结构知识
         "metric-private" => (
             MiddleConfig {
+                scope: Scope::Agent,
                 metric_scope: Scope::Agent,
                 metric_maint: Maint::Condition,
                 cond_reuse: true,

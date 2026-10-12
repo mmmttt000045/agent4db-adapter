@@ -33,11 +33,14 @@ pub struct Options {
     #[arg(long, default_value = "openai", value_parser = ["openai", "deepseek", "zhipu", "cline", "kunyou", "happy", "anthropic", "claude"])]
     extractor: String,
     /// metric-global 为条件级维护；-schema / -revoke / -def 只改变维护方式（只看结构、逐写入撤销后重新提炼、定义级重验）；
-    /// -exref 的修复回归以提炼出的示例 SQL 为参照，-snap 同样的参照但在学习时快照库上比较；traj-verify 在轨迹检索基线上加一句“复用前先核对前提”的提示
+    /// -exref 的修复回归以提炼出的示例 SQL 为参照，-snap 同样的参照但在学习时快照库上比较；traj-verify 在轨迹检索基线上加一句“复用前先核对前提”的提示。
+    /// reforce* 的使用者换成 ReFoRCE（`tools/reforce/mavra_reforce.py`）：reforce 不带知识，-traj 带检索到的示例，
+    /// -static 带一次发布、不再维护的定义，-mavra 带 MAVRA 维护的定义；学习仍由 A 完成，与 traj-global / metric-global-snap 相同
     #[arg(long, value_delimiter = ',', default_value = "direct,middle,metric-local,metric-global,metric-global-noguard",
           value_parser = ["direct", "middle", "metric-local", "metric-global", "metric-global-noguard",
                           "metric-global-schema", "metric-global-revoke", "metric-global-def", "metric-global-exref",
-                          "metric-global-snap", "metric-global-opt", "metric-global-full", "traj-global", "traj-verify"])]
+                          "metric-global-snap", "metric-global-opt", "metric-global-full", "traj-global", "traj-verify",
+                          "reforce", "reforce-traj", "reforce-static", "reforce-mavra"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
     phrasings: Vec<String>,
@@ -87,6 +90,15 @@ pub struct Options {
     /// 标准答案 = 参照定义加描述里的区分列过滤后的规范 SQL（与 replay-bench --spec 相同）
     #[arg(long)]
     defs: Option<String>,
+    /// reforce* 组：ReFoRCE 每道题的候选数（官方脚本为 8）
+    #[arg(long, default_value_t = 8, value_parser = clap::value_parser!(u32).range(1..=16))]
+    reforce_votes: u32,
+    /// reforce* 组：使用阶段同时进行的题数（每道题本身并发 reforce_votes 个候选）
+    #[arg(long, default_value_t = 3, value_parser = clap::value_parser!(u32).range(1..=16))]
+    reforce_concurrency: u32,
+    /// reforce* 组：运行 ReFoRCE 适配脚本的 Python（依赖装在 .pydeps-reforce）
+    #[arg(long, default_value = "python3")]
+    reforce_python: String,
 }
 
 // ───────────────────────── 指标与题目 ─────────────────────────
@@ -612,7 +624,7 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
             false,
             false,
         ),
-        "middle" => (base, true, false),
+        "middle" | "reforce" => (base, true, false),
         "metric-local" => {
             (MiddleConfig { metric_scope: Scope::Agent, metric_maint: Maint::Condition, cond_reuse: true, ..base }, true, true)
         }
@@ -623,7 +635,7 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         // 条件级维护，但修复回归以提炼出的示例 SQL 为参照（部署中真正可得的参照），而不是基准的判题 SQL
         "metric-global-exref" => (MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, ..base }, true, true),
         // 同上，但 G8 在学习时快照上比较：快照是单独建的、与 v1 内容相同的库，智能体的连接看不到它
-        "metric-global-snap" => {
+        "metric-global-snap" | "reforce-mavra" => {
             (MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, g8_example: true, g8_snapshot_db: true, ..base }, true, true)
         }
         // 完整配置：同 -opt，并在同一快照中核对所声明修订的条件后执行（事务性版本，见 `catalog::install_tx_versions`）
@@ -655,7 +667,11 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         ),
         // 匹配的轨迹检索基线：同样的中间层工具与学习题，学习成功的轨迹原样保存、按题面检索，不提炼、不维护；
         // traj-verify 只多一句提示：复用前先在当前数据上核对 SQL 依赖的前提
-        "traj-global" | "traj-verify" => (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false),
+        "traj-global" | "traj-verify" | "reforce-traj" => {
+            (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false)
+        }
+        // 与 metric-global-snap 同样的学习与发布前检查，但发布后不再检查、不修复（一次写好的知识，如 BIRD 的 evidence）
+        "reforce-static" => (MiddleConfig { metric_maint: Maint::Off, g8_example: true, g8_snapshot_db: true, ..base }, true, true),
         _ => (MiddleConfig { metric_maint: Maint::Off, ..base }, true, true),
     }
 }
@@ -707,6 +723,8 @@ struct Env<'a> {
     dir: &'a str,
     /// 模式描述驱动的变化（`--spec`）；为空时用合成数据上的 `scenario::Change`
     gen: Option<&'a Gen>,
+    /// 实验库的连接串（reforce* 组的 ReFoRCE 自己以只读方式连接）
+    url: &'a str,
 }
 
 impl Env<'_> {
@@ -827,7 +845,15 @@ async fn run_task(ph: &Phase<'_>, agent: &str, t: &Task, defined: bool) -> Resul
     let ctx = Ctx::new(agent, &format!("{}-{}", cell.id, ph.name), &t.id);
     let gold = ph.gold.get(&t.id).cloned().unwrap_or_default();
     let before = mid.db.meter.snap();
-    let r = llm::run_agent_with(env.agent, mid, &ctx, &question, &cell.system, &cell.tools, env.o.max_steps as usize).await;
+    let reforce = is_reforce(cell.mode) && agent != "A";
+    let (r, reforce_info) = if reforce {
+        match reforce_run(ph, &ctx, t, &question).await {
+            Ok((run, info)) => (Ok(run), info),
+            Err(e) => (Err(e), Value::Null),
+        }
+    } else {
+        (llm::run_agent_with(env.agent, mid, &ctx, &question, &cell.system, &cell.tools, env.o.max_steps as usize).await, Value::Null)
+    };
     let d = diff(&before, &mid.db.meter.snap());
     let log = mid.take_task_log(&ctx);
     let (run, error) = match r {
@@ -844,7 +870,7 @@ async fn run_task(ph: &Phase<'_>, agent: &str, t: &Task, defined: bool) -> Resul
     } else {
         "wrong"
     };
-    let plan = if env.o.no_explain { Value::Null } else { explain(env.probe, &run, &log).await };
+    let plan = if env.o.no_explain || reforce { Value::Null } else { explain(env.probe, &run, &log).await };
     let rejected_refs =
         log.rejections.iter().flat_map(|r| serde_json::from_value::<Vec<(String, u32)>>(r["metrics"].clone()).unwrap_or_default());
     let declared: Vec<(String, u32)> = log.calls.iter().flat_map(|c| c.metrics.iter().cloned()).chain(rejected_refs).collect();
@@ -875,9 +901,107 @@ async fn run_task(ph: &Phase<'_>, agent: &str, t: &Task, defined: bool) -> Resul
         "task": t.id, "metric": t.def.id, "set": t.set, "ask": t.ask, "defined": defined, "question": question,
         "gold": gold, "answer": run.answer, "outcome": outcome, "error": error, "run": run,
         "db": {"queries": d.queries, "ms": d.db_ms, "by_kind": d.by_kind}, "explain": plan, "metric_use": usage,
-        "sql_calls": log.calls.len(), "rejections": log.rejections,
+        "sql_calls": log.calls.len(), "rejections": log.rejections, "reforce": reforce_info,
     });
     Ok(TaskRec { json, run, log, ctx, question, correct })
+}
+
+fn is_reforce(mode: &str) -> bool {
+    mode == "reforce" || mode.starts_with("reforce-")
+}
+
+const REFORCE_SCRIPT: &str = "tools/reforce/mavra_reforce.py";
+const REFORCE_DEPS: &str = ".pydeps-reforce";
+
+/// ReFoRCE 作为使用者（reforce* 组）：按组从共享记忆取知识（都按题面里的指标名查），放进 ReFoRCE 的外部知识输入
+/// （Spider 2.0 的 external knowledge 位置），由 `tools/reforce/mavra_reforce.py` 跑完官方四步；答案为所选结果的第一格。
+/// 记忆返回的内容原样交给 ReFoRCE（与智能体从 find_trajectory / find_metric 得到的相同），没有可用内容时为 None。
+async fn reforce_run(ph: &Phase<'_>, ctx: &Ctx, t: &Task, question: &str) -> Result<(AgentRun, Value)> {
+    use tokio::io::AsyncWriteExt;
+    let (env, mid, cell) = (ph.env, ph.mid, ph.cell);
+    let knowledge = match cell.mode {
+        "reforce-traj" => {
+            let v = mid.find_trajectory(ctx, t.def.name);
+            v["trajectories"].as_array().is_some_and(|a| !a.is_empty()).then(|| {
+                format!(
+                    "Solved similar questions from earlier sessions (question, the SQL that produced the answer, and the derivation):\n{}",
+                    serde_json::to_string_pretty(&v["trajectories"]).unwrap_or_default()
+                )
+            })
+        }
+        "reforce-static" | "reforce-mavra" => {
+            let v = mid.find_metric(ctx, t.def.name, &[]).await?;
+            let any = |k: &str| v[k].as_array().is_some_and(|a| !a.is_empty());
+            (any("metrics") || any("unavailable")).then(|| {
+                format!(
+                    "Shared metric definitions (definition, fact table, measure, time role, required joins and filters, notes, example SQL):\n{}",
+                    serde_json::to_string_pretty(&v).unwrap_or_default()
+                )
+            })
+        }
+        _ => None,
+    };
+    let tables: Vec<String> =
+        mid.list_tables(ctx)["tables"].as_array().into_iter().flatten().filter_map(|x| x["table"].as_str().map(str::to_string)).collect();
+    let work = format!("{}/reforce/{}/{}/{}-{}", env.dir, cell.id, ph.name, t.id, ctx.agent);
+    std::fs::create_dir_all(&work)?;
+    let req = json!({
+        "ex_id": format!("pg_{}_{}", t.id, ctx.agent), "question": question, "knowledge": knowledge, "tables": tables, "dsn": env.url,
+        "work_dir": work, "provider": env.o.agent, "votes": env.o.reforce_votes, "max_iter": 5, "sql_timeout_secs": env.o.sql_timeout_secs,
+    });
+    let t0 = Instant::now();
+    let log = std::fs::File::create(format!("{work}/stderr.log"))?;
+    let mut child = tokio::process::Command::new(&env.o.reforce_python)
+        .arg(REFORCE_SCRIPT)
+        .env("PYTHONPATH", REFORCE_DEPS)
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(log)
+        .kill_on_drop(true)
+        .spawn()
+        .with_context(|| format!("启动 {REFORCE_SCRIPT} 失败"))?;
+    let mut stdin = child.stdin.take().context("ReFoRCE 进程没有 stdin")?;
+    stdin.write_all(req.to_string().as_bytes()).await?;
+    drop(stdin);
+    let out = tokio::time::timeout(std::time::Duration::from_secs(3600), child.wait_with_output())
+        .await
+        .context("ReFoRCE 一道题超过 1 小时")??;
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    let line = stdout.lines().rev().find(|l| !l.trim().is_empty()).unwrap_or_default();
+    let v: Value = serde_json::from_str(line)
+        .with_context(|| format!("ReFoRCE 输出无法解析（退出码 {:?}），见 {work}/stderr.log", out.status.code()))?;
+    let n = |k: &str| v[k].as_u64().unwrap_or(0);
+    let answer = v["answer"].as_str().map(str::to_string);
+    // 模型服务失败（不是 ReFoRCE 没答出来）按服务端失败处理，与智能体组相同：不计分
+    if let Some(e) = v["error"].as_str() {
+        anyhow::bail!("ReFoRCE 失败：{e}");
+    }
+    if answer.is_none() && (n("llm_errors") > 0 || n("llm_calls") == 0) {
+        anyhow::bail!("ReFoRCE 没有答案，模型调用失败 {} 次、成功 {} 次", n("llm_errors"), n("llm_calls"));
+    }
+    let run = AgentRun {
+        answer,
+        sql: v["sql"].as_str().map(str::to_string),
+        steps: n("llm_calls") as usize,
+        tool_calls: n("sql_runs") as usize,
+        tool_errors: n("sql_errors") as usize,
+        input_tokens: n("input_tokens"),
+        output_tokens: n("output_tokens"),
+        seconds: t0.elapsed().as_secs_f64(),
+        served_models: v["served_models"]
+            .as_object()
+            .into_iter()
+            .flatten()
+            .map(|(k, c)| (k.clone(), c.as_u64().unwrap_or(0) as u32))
+            .collect(),
+        discarded_replies: n("discarded") as u32,
+        discarded_tokens: n("discarded_tokens"),
+        ..Default::default()
+    };
+    let mut info = v;
+    info["knowledge"] = json!(knowledge);
+    info["tables"] = json!(tables);
+    Ok((run, info))
 }
 
 /// 学习任务的后续：判题成功且计算链通过后，离线提炼并提交晋升门槛。
@@ -1024,8 +1148,8 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     let mut writes = serde_json::Map::new();
     let t0 = Instant::now();
 
-    // 学习：A 用带口径的题面完成；直连组没有跨任务状态，跳过
-    if mode != "direct" {
+    // 学习：A 用带口径的题面完成；直连组与不带知识的 ReFoRCE 组没有跨任务状态，跳过
+    if mode != "direct" && mode != "reforce" {
         let gold = gold_map(env.admin, env.tasks).await?;
         let none = HashSet::new();
         let ph = Phase { env, mid: &mid, cell: &cell, name: "learn", gold: &gold, bad: &none };
@@ -1101,8 +1225,17 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
             .filter(|t| ch.is_none_or(|c| t.def.tables.iter().any(|x| env.change_tables(c).iter().any(|y| y == x))))
             .collect();
         for agent in &env.o.holdout_agents {
-            for t in &set {
-                records.push(run_task(&ph, agent, t, defined).await?.json);
+            if is_reforce(mode) {
+                let k = env.o.reforce_concurrency as usize;
+                let recs: Vec<Result<TaskRec>> =
+                    futures::stream::iter(set.iter()).map(|t| run_task(&ph, agent, t, defined)).buffered(k).collect().await;
+                for r in recs {
+                    records.push(r?.json);
+                }
+            } else {
+                for t in &set {
+                    records.push(run_task(&ph, agent, t, defined).await?.json);
+                }
             }
         }
         events.insert(phase.into(), json!(mid.take_metric_events()));
@@ -1295,6 +1428,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     let changes = o.changes.iter().map(|c| Change::parse(c)).collect::<Result<Vec<_>>>()?;
     let timeline = o.timeline.iter().map(|s| Ok((s.clone(), step_of(s)?))).collect::<Result<Vec<_>>>()?;
     ensure!(!o.lifecycle || (o.modes.len() == 1 && o.repeats == 1), "生命周期评测每个进程只跑一个组、一轮（更新累积，各组要从 v1 开始）");
+    ensure!(!o.lifecycle || !o.modes.iter().any(|m| is_reforce(m)), "reforce* 组只用于场景评测");
     let spec = o.spec.as_deref().map(Spec::load).transpose()?;
     ensure!(spec.is_none() || !o.lifecycle, "模式描述下暂不支持生命周期评测");
     if let Some(s) = &spec {
@@ -1385,6 +1519,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
             learn,
             dir: &directory,
             gen: gen.as_ref(),
+            url: isolated.as_str(),
         };
         let mut cells = vec![];
         for r in 1..=o.repeats {

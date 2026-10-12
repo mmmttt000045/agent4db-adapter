@@ -15,9 +15,19 @@ for r in 1 2 3; do
     JOBS+=("r$r-$m|$m")
   done
 done
+# 网关可用性：一次最小请求（10-12 11:47 起 happycoding 额度耗尽，403 insufficient_user_quota，进行中的组全部作废）
+probe() {
+  ( set -a; . ./.env; set +a
+    curl -s -m 120 "$HAPPY_BASE_URL/chat/completions" -H "Authorization: Bearer $HAPPY_API_KEY" -H "Content-Type: application/json" \
+      -d "{\"model\":\"$HAPPY_MODEL\",\"messages\":[{\"role\":\"user\",\"content\":\"Reply with exactly OK.\"}],\"max_tokens\":512}" ) \
+    | grep -q '"choices"'
+}
 for j in "${JOBS[@]}"; do
   IFS="|" read -r tag mode <<< "$j"
+  # 已完成的组（有 report.json）跳过；作废的组已移到 results/reforce-20261012-aborted/
+  ls $OUT/$tag/metric-*/report.json > /dev/null 2>&1 && continue
   while [ "$(jobs -rp | wc -l)" -ge "$(cat $OUT/concurrency)" ]; do sleep 30; done
+  if ! probe; then echo "$(date "+%F %T") probe failed before $tag; queue stopped" >> $OUT/queue.log; break; fi
   mkdir -p $OUT/$tag
   echo "$(date "+%F %T") start $tag" >> $OUT/queue.log
   ( ./target/release/agentdb-mid --pool 8 --out $OUT/$tag metric-bench \

@@ -51,3 +51,8 @@
   留出 5 道：ReFoRCE 3/5（换参数与跨期差值用错金额列），示例 5/5，一次写好的定义 5/5，MAVRA 5/5；重复加载下 MAVRA 撤销定义、
   ReFoRCE 拿到"已撤销"的说明后自己探索，0/5。一道题一般 8 次调用、约 1 分钟；网关对超过约 100 秒的回复返回 524，
   ReFoRCE 自己重试（计为一次失败调用，题目照常计分）。管道、计分、统计脚本都正常。
+- 10-12 10:54 正式启动（`queue-reforce.sh`，`results/reforce-20261012`，同时 4 个进程）。11:43 `r1-reforce-static` 完成（49 分钟，
+  每组约 530 万输入 + 200 万输出 token）。11:47:55 起 happycoding 额度耗尽（403 `insufficient_user_quota`），进行中的
+  `r1-reforce-mavra`、`r1-reforce-traj`、`r1-reforce`、`r2-reforce-static` 之后的题全部服务端失败（`r2-reforce-static` 学习阶段即失败）。
+  按方案整组重跑：这 4 组移到 `results/reforce-20261012-aborted/`，不进统计。队列脚本改为跳过已完成的组，每次启动前先发一次
+  最小请求，网关不可用就停。用户充值后重启。

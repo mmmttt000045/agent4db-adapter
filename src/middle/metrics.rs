@@ -1,7 +1,7 @@
 //! 指标经验的生命周期：提炼输入、晋升门槛（G1–G7）、查找与守护、执行端引用检查、受限修复与学习题回归（G8）。
 //! 依赖表有写入后的维护方式见 `Maint`：逐写入撤销、只看结构、定义级重验、条件级重验。
 
-use super::{inc, join_key, outcome_text, scope_prefix, snap_key, task_key, ver_sig, Ctx, Maint, Middle, SqlCall, TaskLog};
+use super::{inc, join_key, outcome_text, scope_prefix, snap_key, task_key, ver_sig, Ctx, Maint, Middle, SqlCall, TaskLog, LOOKUP_NOTE};
 use crate::catalog::{self, TableVersion};
 use crate::checks::{same_on, Check, On, Outcome};
 use crate::db::QKind;
@@ -833,6 +833,10 @@ impl Middle {
 
     /// 工具 find_metric：按名称或别名匹配本范围内的指标经验，经守护后返回有效条目。
     pub async fn find_metric(&self, ctx: &Ctx, query: &str, tables: &[String]) -> Result<Value> {
+        if self.lookup_exhausted(ctx) {
+            self.note_find(ctx, &[]);
+            return Ok(json!({"metrics": [], "note": LOOKUP_NOTE}));
+        }
         let q = query.trim().to_lowercase();
         let prefix = format!("{}|metric:", scope_prefix(self.cfg.metric_scope, ctx));
         let (mut hits, mut unavailable, mut found) = (vec![], vec![], vec![]);

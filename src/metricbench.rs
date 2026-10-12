@@ -714,14 +714,14 @@ const SYSTEM: &str = "你是一个数据分析 Agent，通过工具查询 Postgr
 derivation 用这些编号写出最终答案的算式（如 \"r2 - r3\"；答案直接来自一条查询时写 \"r2\"）。\
 如果题目的业务口径不明确，且无法从数据或工具得到可靠的定义，可以调用 ask_clarification 说明需要澄清的内容；调用后任务结束。";
 
-const SYSTEM_TRAJ: &str = "find_trajectory 返回以往相似问题的成功解题过程（题面、参与答案的 SQL 与算式）。检索到与题目相符的过程时，直接据此写 SQL，不必再查看表结构。";
+const SYSTEM_TRAJ: &str = "find_trajectory 返回以往相似问题的成功解题过程（题面、参与答案的 SQL 与算式）。检索到与题目相符的过程时，直接据此写 SQL，不必再查看表结构；最多查找三次，仍没有相符的过程时直接查看表结构计算。";
 
 /// 自验证基线：把 MAVRA 维护的四类条件直接告诉智能体，让它在复用检索到的 SQL 之前自己核对
 const SYSTEM_TRAJ_VERIFY: &str = "检索到的 SQL 写于以往的数据，数据可能已经变化。复用之前先在当前数据上核对它依赖的前提：\
 事实表在业务键上是否仍然每键一行（例如比较 count(*) 与 count(distinct 键列)），所关联的维表在关联键上是否唯一、关联是否丢行，\
 日期键是否都能关联到日期维度。前提不成立时先查看表结构与取值，补上需要的过滤之后再计算，不要照搬。";
 
-const SYSTEM_METRIC: &str = "find_metric 返回中间层已验证的业务指标口径（含示例 SQL）。找到题目所问指标的可用口径时，直接据此写 SQL，不必再查看表结构。用某个口径写的 SQL，\
+const SYSTEM_METRIC: &str = "find_metric 返回中间层已验证的业务指标口径（含示例 SQL）。找到题目所问指标的可用口径时，直接据此写 SQL，不必再查看表结构；最多查找三次，仍没有相符的口径时直接查看表结构计算。用某个口径写的 SQL，\
 请在 run_sql 的 metrics 参数中声明 [{\"key\": ..., \"revision\": ...}]；中间层会在执行前核对该口径是否仍然有效。";
 
 pub(crate) fn system(middle_tools: bool, metric_tools: bool) -> String {

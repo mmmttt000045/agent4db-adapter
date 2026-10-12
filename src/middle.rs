@@ -287,6 +287,10 @@ pub struct SqlCall {
     pub source: String,
 }
 
+/// 每个任务最多查找记忆几次。超过之后查找只返回提示：没有相符的条目时，反复换词查找只会让上下文越来越长
+pub(crate) const LOOKUP_LIMIT: u32 = 3;
+pub(crate) const LOOKUP_NOTE: &str = "本任务已查找 3 次，没有与题目相符的条目；请直接查看表结构与数据计算，不要再查找";
+
 fn task_key(ctx: &Ctx) -> String {
     format!("{}/{}/{}", ctx.agent, ctx.session, ctx.task)
 }
@@ -342,6 +346,8 @@ pub struct Middle {
     /// 绑定快照执行的条件结论：条件身份 + 读到的表的事务性版本 → 是否成立
     snap_verdicts: Mutex<HashMap<String, Outcome>>,
     trajs: Mutex<Vec<TrajMemo>>,
+    /// 每个任务调用记忆查找（find_metric / find_trajectory）的次数，超过 `LOOKUP_LIMIT` 后不再返回条目
+    lookups: Mutex<HashMap<String, u32>>,
     /// 最近一次粒度修复因候选不唯一而放弃时的候选（表 → 过滤），供修复事件说明原因
     ambiguous: Mutex<HashMap<String, Vec<String>>>,
     /// 进行中的指标维护：完整键 → 在途合并的键（供修复期间到达的使用加入等待）
@@ -456,6 +462,7 @@ impl Middle {
             vcache: Mutex::new(HashMap::new()),
             snap_verdicts: Mutex::new(HashMap::new()),
             trajs: Mutex::new(vec![]),
+            lookups: Mutex::new(HashMap::new()),
             ambiguous: Mutex::new(HashMap::new()),
             maint_inflight: Mutex::new(HashMap::new()),
             trace: None,
@@ -473,6 +480,7 @@ impl Middle {
 
     /// 取出并清空该任务的计算链记录。
     pub fn take_task_log(&self, ctx: &Ctx) -> TaskLog {
+        self.lookups.lock().remove(&task_key(ctx));
         self.tasks.lock().remove(&task_key(ctx)).unwrap_or_default()
     }
 
@@ -512,6 +520,14 @@ impl Middle {
                 .rejections
                 .push(json!({"sql": sql, "reason": rej["reason"], "metrics": refs}));
         }
+    }
+
+    /// 记下一次记忆查找；本任务的查找次数超过上限时返回 true，调用方不再返回条目，让智能体直接探索
+    fn lookup_exhausted(&self, ctx: &Ctx) -> bool {
+        let mut m = self.lookups.lock();
+        let n = m.entry(task_key(ctx)).or_default();
+        *n += 1;
+        *n > LOOKUP_LIMIT
     }
 
     fn note_find(&self, ctx: &Ctx, found: &[(String, u32)]) {
@@ -581,6 +597,12 @@ impl Middle {
 
     /// 工具 find_trajectory：按题面相似度返回最多 3 条以往的成功轨迹。不检查数据是否已经变化。
     pub fn find_trajectory(&self, ctx: &Ctx, query: &str) -> Value {
+        if self.lookup_exhausted(ctx) {
+            if self.cfg.record {
+                self.tasks.lock().entry(task_key(ctx)).or_default().finds += 1;
+            }
+            return json!({"trajectories": [], "note": LOOKUP_NOTE});
+        }
         let mut scored: Vec<(f64, TrajMemo)> =
             self.trajs.lock().iter().map(|t| (bigram_containment(query, &t.question), t.clone())).filter(|(s, _)| *s >= 0.3).collect();
         scored.sort_by(|a, b| b.0.total_cmp(&a.0));

@@ -70,3 +70,14 @@ TPC-DS 试跑（`results/pilot-pop-tpcds`，1 次，8 个智能体 × 7 题，�
 
 - 正式：`queue-pop-tpcds.sh` → noctis `results/pop-tpcds-20261012/r{1..5}-<mode>/`；
   统计 `tools/population-stats.py --runs results/pop-tpcds-20261012`。
+
+### 第二版运行记录
+- 10-12 21:06 起 `queue-pop-tpcds.sh`。r1、r2 四组完成；10-13 00:20 前后 happycoding 网关额度用完（`insufficient_user_quota`），
+  r3 三组之后全部是服务端失败，已停止并移到 `results/pop-tpcds-20261012-r3-quota/`（不用）。单智能体记忆 r1/r2 的回访阶段末尾各有 8/16 题因此失败（按方案不计分）。
+- r1–r2 结果（`population-stats.json` 暂存于 noctis，未提交）：16 个智能体累计 token 无记忆 6.47M、单智能体记忆 7.15M、示例检索 1.40M、MAVRA 2.19M
+  （r1 1.55M，r2 2.83M）；后一半智能体每题 无记忆 51.7k token / 39.1 秒，MAVRA 9.3k / 6.6 秒；正确率 74% / 75% / 97% / 96%；
+  更正之后 55% / 77% / 59% / 100%；维护数据库时间 MAVRA 233 秒，单智能体记忆 1311 秒。
+- 查出的问题：没有相符口径时，智能体反复换词调用 find_metric（单个会话最多 79 次）。单智能体记忆 78 个会话查找 12 次以上，占其 token 的 75–78%；
+  MAVRA r2 在登记顾客指标学会之前的 7 个这类会话占其 token 的 49%（同一道题无记忆 33k token，MAVRA 357k 且没有答案）。
+  示例检索的查找最多 10 次。修改（提交 eaee4f1）：每道题最多查找 3 次记忆，之后工具只返回“直接查看表结构计算”的提示；
+  两种记忆的提示都加上“最多查找三次”。这使 r1–r2 的 MAVRA、单智能体记忆与示例检索作废（提示或工具变了），无记忆组 r1–r2 不受影响。

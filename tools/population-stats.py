@@ -228,10 +228,10 @@ def main():
         if ref in pooled and "middle-alone" in pooled:
             tx, sx = [], []
             for met, word in WORD.items():
-                a, b = pooled[ref].get(met), pooled["middle-alone"].get(met)
-                if a and b:
-                    t = statistics.mean(x[0] for x in b) / statistics.mean(x[0] for x in a)
-                    v = statistics.mean(x[1] for x in b) / statistics.mean(x[1] for x in a)
+                pm, pn = pooled[ref].get(met), pooled["middle-alone"].get(met)
+                if pm and pn:
+                    t = statistics.mean(x[0] for x in pn) / statistics.mean(x[0] for x in pm)
+                    v = statistics.mean(x[1] for x in pn) / statistics.mean(x[1] for x in pm)
                     tx.append(t)
                     sx.append(v)
                     mac(f"MavraM{word}TokX", f"{t:.1f}")

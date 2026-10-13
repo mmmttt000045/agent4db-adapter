@@ -188,7 +188,7 @@ def main():
             mac(f"{k}Reused", f"{r['v1']['reused']['mean'] / r['v1']['n']['mean'] * 100:.0f}")
             maint = [v["mean"] for p, v in r["maint_db_s"].items() if p != "pop-v1" and v]
             if maint:
-                mac(f"{k}MaintS", f"{maint[0]:.1f}")
+                mac(f"{k}MaintS", f"{maint[0]:,.0f}")
             over = [x for c in r["cells"] for x in c["change_over"]]
             if over:
                 mac(f"{k}ChangeOverMin", f"{min(over) * 100:.0f}")

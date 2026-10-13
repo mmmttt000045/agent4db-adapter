@@ -1,0 +1,69 @@
+\section{\bt{Keeping Shared Knowledge Correct}{让共享的知识保持正确}}
+\label{sec:model}
+\bi{Sharing saves work only if what one agent learned answers other agents' questions and stays correct for them. This section describes what agents share (Section~\ref{sec:shared-object}), when it is correct (Section~\ref{sec:sufficiency}), and how \system\ keeps it correct and makes it cheaper once for all agents (Sections~\ref{sec:maintenance} and~\ref{sec:optimization}).}
+{共享只有在一个智能体学到的东西能回答其他智能体的问题、并且对它们保持正确时才能省下工作。本节说明智能体共享什么（第~\ref{sec:shared-object} 节）、它何时正确（第~\ref{sec:sufficiency} 节），以及 \system\ 如何为所有智能体一次性地保持它正确并让它更省（第~\ref{sec:maintenance} 与~\ref{sec:optimization} 节）。}
+
+\subsection{\bt{What agents share}{智能体共享什么}}
+\label{sec:shared-object}
+\bi{A definition revision is $m^r=(B,I,C,E,r)$, where $B$ is its business meaning, $I$ its structured implementation, $C$ its set of executable conditions, $E$ its learning record, and $r$ its revision number. The implementation records the fact table, aggregate expression, grain, date join, joins, and definition filters; its joins form a many-to-one tree rooted at the fact table (a star or snowflake). Question parameters such as the month are not part of it: the generated SQL is compiled from $I$ for any period, difference, or ranking, so one learning session serves questions that no agent has asked yet.}
+{定义的一个版本记为 $m^r=(B,I,C,E,r)$，其中 $B$ 为业务含义，$I$ 为结构化实现，$C$ 为可执行条件集，$E$ 为学习记录，$r$ 为版本号。实现记录事实表、聚合表达式、粒度、日期连接、连接和定义过滤；连接构成以事实表为根的多对一连接树（星型或雪花型）。月份等题目参数不属于实现：生成的 SQL 由 $I$ 针对任意期间、差值或排名编译得到，因此一次学习会话可以服务尚无智能体问过的问题。}
+
+\bi{Candidates come only from sessions whose question states the business definition and whose answer matches the reference answer, which a hand-written reference query computes on the same snapshot. An extractor turns the session's SQL and arithmetic into a candidate without seeing business rows, and seven publication checks follow: a stated business definition; the match with the reference answer, with a recorded calculation that reproduces it; static checks; key uniqueness on the current snapshot; the SQL check (no join known to fan out, no missing grain filter); replay of the example SQL; and replay of the generated SQL. The last check tests what other agents will read rather than what the producer ran, so a candidate that drops a filter or hard-codes a parameter is rejected before it reaches anyone. No agent writes to the memory directly, and a published revision is never edited in place.}
+{候选只来自题目给出业务定义、且答案与参考答案一致的会话，参考答案由人工编写的参考查询在同一快照上算出。提取器把会话的 SQL 与算式转成候选，看不到业务数据行；随后是七项发布前检查：给出的业务定义；与参考答案一致，且记录的算式能复现该答案；静态检查；当前快照上的键唯一性；SQL 检查（不含已知会放大行数的连接，不缺粒度所需的过滤）；示例 SQL 重放；生成的 SQL 重放。最后一项检查的是其他智能体将要读到的内容，而不是生产者当时执行的内容，因此丢掉过滤或写死参数的候选在到达任何人之前就被拒绝。任何智能体都不直接写记忆，已发布的版本从不原地修改。}
+
+\subsection{\bt{When shared knowledge is correct}{共享的知识何时正确}}
+\label{sec:sufficiency}
+\bi{A condition $c$ is a predicate over the tables $\operatorname{dep}(c)$ with a check query $Q_c$ that returns violating rows or nothing; its normalized form $\operatorname{id}(c)$ consists of its type, tables, keys, join direction, normalized filters, and null policy. \system\ derives four kinds from $I$. \emph{Filtered key uniqueness} $\operatorname{KeyUnique}(T,K,\varphi)$: no two rows of $\sigma_\varphi(T)$ agree on $K$, from the grain and the fact table's filters. \emph{Join cardinality}: each row of $L$ in a join $L\to R$ matches at most the permitted number of $R$ rows. \emph{Date join}: the fact's date key joins the date dimension many-to-one, or a date column supplies the date. \emph{Join completeness}: for the date join and every inner join, the fraction of fact rows that match no row stays within the fraction recorded at publication plus 0.1 percentage points.}
+{条件 $c$ 是表集合 $\operatorname{dep}(c)$ 上的谓词，附带一个检查查询 $Q_c$，返回违例行或空；其规范化形式 $\operatorname{id}(c)$ 由类型、表、键、连接方向、规范化的过滤和空值规则组成。\system\ 从 $I$ 推导四类条件。\emph{过滤后键唯一性} $\operatorname{KeyUnique}(T,K,\varphi)$：$\sigma_\varphi(T)$ 中没有两行在 $K$ 上取值相同，由粒度和事实表上的过滤推出。\emph{连接基数}：连接 $L\to R$ 中每条 $L$ 记录匹配的 $R$ 记录数不超过允许值。\emph{日期连接}：事实的日期键与日期维度多对一连接，或由日期列给出日期。\emph{连接完整性}：对日期连接和每个内连接，匹配不到任何行的事实行比例不超过发布时记录的比例加 0.1 个百分点。}
+
+\bi{For a period $p$, the generated SQL evaluates $\mathrm{AGG}(e)$ over the rows of $\sigma_\varphi(F)\bowtie R_1\bowtie\cdots\bowtie R_k$ whose date falls in $p$. The business meaning contributes two assumptions that no query can check: (B1) the metric's business events correspond one-to-one to the values of $K$ in $\sigma_\varphi(F)$, and (B2) $e$ evaluates on an event's row to that event's measurement.}
+{对期间 $p$，生成的 SQL 在 $\sigma_\varphi(F)\bowtie R_1\bowtie\cdots\bowtie R_k$ 中日期落在 $p$ 内的行上计算 $\mathrm{AGG}(e)$。业务含义提供两条任何查询都无法检查的前提：（B1）指标的业务事件与 $\sigma_\varphi(F)$ 中 $K$ 的取值一一对应；（B2）在事件对应的行上，$e$ 求值得到该事件的度量值。}
+\begin{proposition}[\bt{Sufficiency}{充分性}]
+\label{prop:sufficiency}
+\bi{If B1 and B2 hold on $D_s$ and every condition in $C(m^r)$ holds on $D_s$, then for every period $p$ the generated SQL of $m^r$ returns $\mathrm{AGG}$ over the measurements of the events whose date lies in $p$, each event contributing exactly once; the events it omits are those whose date or join key matches no row, and the completeness conditions bound their fraction.}
+{若 B1、B2 在 $D_s$ 上成立，且 $C(m^r)$ 中每个条件都在 $D_s$ 上成立，则对每个期间 $p$，$m^r$ 的生成的 SQL 返回日期落在 $p$ 内的事件度量值的 $\mathrm{AGG}$，每个事件恰好贡献一次；被遗漏的只有日期键或连接键匹配不到任何行的事件，其比例受完整性条件约束。}
+\end{proposition}
+\begin{proof}[\bt{Proof sketch}{证明概要}]
+\bi{By B1 and filtered key uniqueness, $\sigma_\varphi(F)$ holds one row per event. Join cardinality keeps every join from duplicating a row, join completeness bounds the rows that inner joins drop, and the date join gives each row at most one date and hence at most one period. Every remaining row contributes its measurement (B2) once, to the period of its date.}
+{由 B1 和过滤后键唯一性，$\sigma_\varphi(F)$ 中每个事件恰有一行。连接基数保证连接不复制任何行，连接完整性约束内连接排除的行，日期连接给每行至多一个日期，因而至多一个期间。于是每个保留下来的行把其度量值（B2）恰好贡献一次，归入其日期所在的期间。}
+\end{proof}
+\bi{Conversely, while B1 and B2 hold, every data-only update that makes the generated SQL count an event twice or drop facts beyond the recorded fraction violates a condition. The conditions cannot see changes to the values themselves, such as a rescaled measure column, or tell apart two complete copies of the data, such as a table and an appended backup, which both satisfy the grain.}
+{反过来，只要 B1、B2 成立，凡是使生成的 SQL 把一个事件计数两次、或排除超过记录比例的事实的纯数据更新，都会违反某个条件。条件看不到取值本身的变化（例如度量列整体换了量纲），也分不清两份完整的数据（例如一张表和追加进来的整份备份），二者都满足粒度。}
+
+\subsection{\bt{Maintenance once for all agents}{为所有智能体一次性维护}}
+\label{sec:maintenance}
+\label{sec:execution}
+\bi{\emph{Shared check results.} The version $V(T)$ of a table identifies the state that a check read: either the schema fingerprint, DML counters, and ETL batch identifier, or a \emph{transactional version} that a statement-level trigger increments inside every writing transaction. A check result is keyed by $\bigl(\operatorname{id}(c),V(\operatorname{dep}(c))\bigr)$, so it serves every definition and every agent that needs the same condition on the same table versions. When an agent looks up a definition, \system\ rechecks only the conditions whose tables changed, and concurrent requests for the same check share one execution. A failed condition invalidates the revision; consumers then learn that the definition is unavailable and explore on their own, and the next successful learning session publishes it again.}
+{\emph{共享的检查结果。}表的版本 $V(T)$ 标识检查读到的状态：或者组合结构指纹、DML 计数与 ETL 批次号，或者使用\emph{事务性版本}，由语句级触发器在每个写事务内递增。检查结果以 $\bigl(\operatorname{id}(c),V(\operatorname{dep}(c))\bigr)$ 为键，因此服务于所有在相同表版本上需要同一条件的定义和智能体。智能体查找定义时，\system\ 只重查所读表发生变化的条件，同一检查的并发请求共享一次执行。条件失败使版本失效；使用者随即得知定义不可用、自行探索，下一次成功的学习会话会重新发布它。}
+
+\bi{\emph{Automatic repair.} When a fact-table grain fails, repair searches equality filters on low-cardinality columns that restore one row per business key without losing keys, and publishes a fix only if it is \emph{unique}: a table and an appended backup both pass, and nothing structural tells which holds the business truth. The fix must also pass a regression test that runs it and the agent's learning SQL as \emph{as-of queries} (time-travel queries) at learning time and requires equal results, because the agent's SQL was verified only on that data. A repair is done once and serves every agent; requests that arrive while it runs wait for it.}
+{\emph{自动修复。}事实表粒度失败时，修复在低基数列的等值过滤中搜索能恢复每个业务键一行、且不丢键的过滤，只在修复\emph{唯一}时发布：表和追加的备份都能通过，结构上无从判断哪一份是业务真相。修复还必须通过回归测试：把它与智能体的学习 SQL 按学习时刻作为 \emph{as-of 查询}（时间旅行查询）执行，要求结果相同，因为智能体的 SQL 只在那份数据上核对过。修复只做一次、服务所有智能体；修复进行中到达的请求等待它完成。}
+
+\bi{\emph{Checks at query execution.} An agent declares the revisions a query uses, and \code{run\_sql} rejects absent and invalidated ones. A passed check describes one snapshot, and a writer may commit between the check and the query. \emph{Same-snapshot validation} closes this gap: \system\ opens a repeatable-read transaction, looks up or runs the conditions of the declared revisions at the snapshot's transactional versions, and executes the query in the same transaction only if they hold.}
+{\emph{执行时检查。}智能体声明查询所用的版本，\code{run\_sql} 拒绝不存在或已失效的版本。一次通过的检查只描述一个快照，检查与查询之间可能有写入提交。\emph{同快照验证}消除这一间隙：\system\ 开启可重复读事务，按快照的事务性版本查找或执行所声明版本的条件，仅当条件成立时在同一事务中执行查询。}
+\label{sec:snapshot}
+\begin{lemma}[\bt{Check-result reuse}{检查结果复用}]
+\label{lem:reuse}
+\bi{Let $v_s(T)$ be the transactional version of $T$ visible in snapshot $s$. If $v_{s_1}(T)=v_{s_2}(T)$ for every $T\in\operatorname{dep}(c)$, then $c(D_{s_1})=c(D_{s_2})$.}
+{设 $v_s(T)$ 为快照 $s$ 中可见的 $T$ 的事务性版本。若对每个 $T\in\operatorname{dep}(c)$ 都有 $v_{s_1}(T)=v_{s_2}(T)$，则 $c(D_{s_1})=c(D_{s_2})$。}
+\end{lemma}
+\begin{proof}
+\bi{PostgreSQL snapshots are nested, say $s_1\subseteq s_2$. A transaction that writes $T$ increments $T$'s counter in the same transaction, so equal versions leave no transaction in $s_2\setminus s_1$ that writes $T$, and both snapshots see the same state of every table that $Q_c$ reads.}
+{PostgreSQL 的快照是嵌套的，不妨设 $s_1\subseteq s_2$。写 $T$ 的事务在同一事务内递增 $T$ 的计数，因此版本相等意味着 $s_2\setminus s_1$ 中没有写 $T$ 的事务，两个快照看到 $Q_c$ 所读各表的同一状态。}
+\end{proof}
+
+\subsection{\bt{Optimization once for all agents}{为所有智能体一次性优化}}
+\label{sec:optimization}
+\bi{Agents copy a definition's generated SQL, so a cheaper equivalent speeds up every consumer. \system\ runs an optimization pass over valid definitions with two rules: \emph{key range} replaces the period join with a range predicate on the fact's date key, whose bounds subqueries read from the date dimension, and \emph{left-join removal} drops a left join that contributes no column and no filter. An LLM may propose further rewrites, which are published only if they coincide with a rule. A candidate is published as a new revision after the static, grain, and SQL checks, an equivalence test against the current revision on one repeatable-read snapshot, and a cost test: the paired execution times of at least eight periods must save at least 10\% with a 95\% confidence interval below zero.}
+{智能体照抄定义的生成的 SQL，因此更省的等价写法会让每个使用者都更快。\system\ 对有效定义做一轮优化，有两条规则：\emph{键区间}把期间连接换成事实表日期键上的区间谓词，区间边界由子查询从日期维度读出；\emph{左连接消除}去掉不提供任何列和过滤的左连接。大模型可以提出更多改写，但只有与规则改写一致的才会发布。候选在通过静态检查、粒度检查和 SQL 检查、在同一可重复读快照上与当前版本的等价测试，以及代价测试（至少八个期间的成对执行时间平均至少省 10\%，且 95\% 置信区间低于零）后，作为新版本发布。}
+\begin{proposition}[\bt{Rule equivalence}{规则等价}]
+\label{prop:rewrite}
+\bi{Let the date dimension's key be unique on $D$. (a) If \emph{date-key contiguity} holds on $D$, i.e., the keys of every month form an integer interval that begins one above the previous month's last key, then for every period of consecutive months the generated SQL of a key-range revision returns on $D$ what that of its previous revision returns. (b) If the right side of a removed left join is unique on the join key on $D$, removing the join does not change the result.}
+{设日期维度的键在 $D$ 上唯一。（a）若\emph{日期键连续性}在 $D$ 上成立，即每个月的键构成一个整数区间、且从上个月最后一个键加一开始，则对由连续月份组成的每个期间，键区间版本的生成的 SQL 在 $D$ 上返回与其前一版本相同的结果。（b）若被消除的左连接右侧在连接键上唯一，消除该连接不改变结果。}
+\end{proposition}
+\begin{proof}[\bt{Proof sketch}{证明概要}]
+\bi{(a) By contiguity, the keys of a period's months are exactly the integer interval between the bounds, so a fact row's key lies in the interval if and only if it joins one date row of the period. (b) A left join with at most one match keeps each left row once and supplies nothing that is read.}
+{（a）由连续性，一个期间各月的键恰好是边界之间的整数区间，因此事实行的键落在区间内当且仅当它连接到该期间的一行日期。（b）至多一个匹配的左连接使每个左侧行恰好保留一次，且不提供任何被读取的内容。}
+\end{proof}
+\bi{Date-key contiguity becomes a condition of the new revision and is maintained like any other. When it alone fails, \system\ invalidates the optimized revision and makes its previous revision current again, so an optimization never trades correctness for speed.}
+{日期键连续性成为新版本的一个条件，像其他条件一样受到维护。只有它失败时，\system\ 使优化版本失效，并让前一版本重新成为当前版本，因此优化从不以正确性换取速度。}

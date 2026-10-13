@@ -36,6 +36,8 @@ def load():
     pp = style.macros('population')
     out = {}
     for mode, key, _ in METHODS:
+        if mode not in d:
+            continue
         cells = d[mode]['cells']
         curves = []
         for c in cells:
@@ -63,7 +65,8 @@ def figure(lang):
     fig = mplstyle.figure(W, H)
     axes = fig.subplots(1, 2, sharex=True, gridspec_kw=dict(left=.085, right=.985, top=.70, bottom=.17, wspace=.28))
     handles = []
-    for mode, _, marker in METHODS:
+    methods = [m for m in METHODS if m[0] in data]
+    for mode, _, marker in methods:
         label, color = style.method(mode, lang)
         handles.append(Line2D([], [], color=color, marker=marker, ms=3.4, mfc=color, mec=WHITE, mew=.35, lw=1.0,
                               label=T['acc'].format(name=label, acc=data[mode]['acc'])))
@@ -76,7 +79,7 @@ def figure(lang):
     n = len(data['middle-alone']['tok'])
     xs = list(range(1, n + 1))
     for k, ax in enumerate(axes):
-        for mode, _, marker in METHODS:
+        for mode, _, marker in methods:
             _, color = style.method(mode, lang)
             d = data[mode]
             ys = d['tok'] if k == 0 else d['s']

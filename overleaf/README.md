@@ -15,10 +15,10 @@
 | `latex/preamble.tex` | 宏包、语言宏、颜色、图表样式和数值宏加载 |
 | `latex/acmart/acmart.dtx` | 官方文档类的对应源码，保留版权及 LPPL 许可说明 |
 | `sections/abstract.tex` | 中英文摘要、关键词与 `\maketitle` |
-| `sections/01-*.tex` 至 `10-*.tex` | 正文各章（讨论已并入第 10 个文件的“讨论与结论”） |
-| `sections/evaluation/` | 实验设置、有效性、并发、修复、维护代价、场景、发布与使用者性能、优化修订、生命周期九个小节 |
-| `figures/` | 五幅图：`*.tex` 写标题、标签与描述，图本身是 [`tools/figures/build.py`](../tools/figures/README.md) 生成的矢量 PDF（`<名称>.pdf` 用于英文稿，`<名称>-zh.pdf` 用于双语稿），不要手改；另有算法 1 |
-| `tables/` | 四张表，包括标题和生成数据的加载位置 |
+| `sections/01-*.tex` 至 `10-*.tex` | 正文各章：引言、背景与动机、系统概览、`04-sharing.tex`（共享的定义、条件、维护与优化，10-12 由原第 4–6 章合并）、实验、相关工作、讨论与结论 |
+| `sections/evaluation/` | 实验设置、群体实验（共享 vs 单智能体记忆）、每道题的代价、数据变化时的正确性、维护与优化五个小节 |
+| `figures/` | 正文用六幅图（运行示例、架构、群体代价、使用者代价、两种模式、回放）：`*.tex` 写标题、标签与描述，图本身是 [`tools/figures/build.py`](../tools/figures/README.md) 生成的矢量 PDF（`<名称>.pdf` 用于英文稿，`<名称>-zh.pdf` 用于双语稿），不要手改；维护代价、结果矩阵与算法 1 的文件保留但不再引用 |
+| `tables/` | 正文用两张表（负载、方法），包括标题和生成数据的加载位置；并发与生命周期表保留但不再引用 |
 | `references.tex` | 原样保留的 `thebibliography`，引用键与条目顺序不变 |
 | `gen/` | 实验统计脚本生成的数值宏、表格数据和绘图坐标；不要手改 |
 | `build.sh` | 编译或生成 Overleaf 上传包 |

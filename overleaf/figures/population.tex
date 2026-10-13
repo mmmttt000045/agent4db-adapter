@@ -1,0 +1,11 @@
+\begin{figure}[t]
+\centering
+\ifbilingual
+\includegraphics[width=\linewidth]{figures/population-zh}
+\else
+\includegraphics[width=\linewidth]{figures/population}
+\fi
+\caption{\bt{What \PpAgents\ agents arriving at one database pay, by memory design: total tokens (including learning) and total agent time of the first $N$ agents on unchanged data. Lines are means over \PpRuns\ runs, bands span the runs; the legend gives each method's accuracy.}{\PpAgents\ 个智能体陆续使用同一数据库时，不同记忆设计下的代价：数据不变时前 $N$ 个智能体的累计 token（含学习）与累计智能体时间。线为 \PpRuns\ 次运行的均值，色带覆盖各次运行；图例给出各方法的正确率。}}
+\label{fig:population}
+\Description{Two line charts against the number of agents that have arrived, from 1 to 16, for no memory, single-agent memory, example retrieval, and MAVRA. Left: total tokens in millions. Right: total agent time in minutes. Values are filled in from the population study.}
+\end{figure}

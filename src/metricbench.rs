@@ -41,7 +41,8 @@ pub struct Options {
                           "metric-global-schema", "metric-global-revoke", "metric-global-def", "metric-global-exref",
                           "metric-global-snap", "metric-global-opt", "metric-global-full", "metric-private", "middle-alone", "traj-global", "traj-verify",
                           "reforce", "reforce-traj", "reforce-static", "reforce-mavra",
-                          "mem-awm", "mem-ace", "mem-mem0", "mem-agentsm", "mem-ace-shared", "mem-agentsm-shared"])]
+                          "mem-awm", "mem-ace", "mem-mem0", "mem-agentsm", "mem-ace-shared", "mem-agentsm-shared",
+                          "mem-reasoningbank", "mem-apc", "mem-reasoningbank-shared", "mem-apc-shared"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
     phrasings: Vec<String>,
@@ -705,7 +706,7 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
             (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false)
         }
         // 单智能体记忆的对照基线（`agentmem`）：工具与无记忆相同（表结构知识只在一道题内有效），跨会话的状态只有各自的记忆
-        "mem-awm" | "mem-ace" | "mem-mem0" | "mem-agentsm" | "mem-ace-shared" | "mem-agentsm-shared" => {
+        m if m.starts_with("mem-") => {
             (MiddleConfig { scope: Scope::Task, metric_scope: Scope::Task, metric_maint: Maint::Off, ..base }, true, false)
         }
         // 与 metric-global-snap 同样的学习与发布前检查，但发布后不再检查、不修复（一次写好的知识，如 BIRD 的 evidence）
@@ -884,15 +885,25 @@ async fn run_task(ph: &Phase<'_>, agent: &str, t: &Task, defined: bool) -> Resul
     let gold = ph.gold.get(&t.id).cloned().unwrap_or_default();
     let before = mid.db.meter.snap();
     let reforce = is_reforce(cell.mode) && agent != "A";
+    let mut lookup = Value::Null;
     let (r, reforce_info) = if reforce {
         match reforce_run(ph, &ctx, t, &question).await {
             Ok((run, info)) => (Ok(run), info),
             Err(e) => (Err(e), Value::Null),
         }
     } else {
-        // 记忆基线（AWM、ACE、Mem0）把记忆放进系统提示；其他组没有这一段
-        let system = format!("{}{}", cell.system, mid.amem.prompt(agent, &question));
-        (llm::run_agent_with(env.agent, mid, &ctx, &question, &system, &cell.tools, env.o.max_steps as usize).await, Value::Null)
+        // 记忆基线（AWM、ACE、Mem0、ReasoningBank、APC）把记忆放进系统提示；其他组没有这一段
+        let (memory, cost) = mid.amem.lookup(env.extractor, agent, &question).await;
+        lookup = cost;
+        let system = format!("{}{}", cell.system, memory);
+        let mut r = llm::run_agent_with(env.agent, mid, &ctx, &question, &system, &cell.tools, env.o.max_steps as usize).await;
+        // 作答前取记忆的模型调用（APC 提取关键词）在这道题的关键路径上，计入它的 token 与时间
+        if let (Ok(run), false) = (r.as_mut(), lookup.is_null()) {
+            run.input_tokens += lookup["input_tokens"].as_u64().unwrap_or(0);
+            run.output_tokens += lookup["output_tokens"].as_u64().unwrap_or(0);
+            run.seconds += lookup["seconds"].as_f64().unwrap_or(0.0);
+        }
+        (r, Value::Null)
     };
     let d = diff(&before, &mid.db.meter.snap());
     let log = mid.take_task_log(&ctx);
@@ -941,7 +952,7 @@ async fn run_task(ph: &Phase<'_>, agent: &str, t: &Task, defined: bool) -> Resul
         "task": t.id, "metric": t.def.id, "set": t.set, "ask": t.ask, "defined": defined, "question": question,
         "gold": gold, "answer": run.answer, "outcome": outcome, "error": error, "run": run,
         "db": {"queries": d.queries, "ms": d.db_ms, "by_kind": d.by_kind}, "explain": plan, "metric_use": usage,
-        "sql_calls": log.calls.len(), "rejections": log.rejections, "reforce": reforce_info,
+        "sql_calls": log.calls.len(), "rejections": log.rejections, "reforce": reforce_info, "memory_lookup": lookup,
     });
     Ok(TaskRec { json, run, log, ctx, question, correct })
 }

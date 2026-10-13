@@ -7,6 +7,11 @@
 //!   作答前按题面检索最相关的事实放进提示；
 //! - AgentSM（Biswal et al.）：保存判定成功的任务轨迹，按阶段分成探索段与执行段，写成带小标题的 Markdown；
 //!   智能体用工具取回最相似题目的探索段。原文的组合工具与离线合成题不在实现之内（前者是智能体架构，后者不是边用边学）。
+//! - ReasoningBank（Ouyang et al.）：从每次会话提炼至多 3 条推理策略（成功的提炼做法，失败的提炼教训），
+//!   作答前取最相似的一次以往任务的条目放进提示（原文 top-k = 1）；成败用与其他组相同的判定，代替原文的自我评判；
+//! - APC（Agentic Plan Caching，Zhang et al.）：作答前用模型从题面提取关键词，与缓存中的关键词精确匹配；
+//!   命中时把缓存的计划模板放进提示，未命中且答对时从这次过程生成计划模板写入缓存。原文用小模型把模板改写成本题的计划，
+//!   这里由智能体自己按模板代入取值。提取关键词的调用计入这道题的 token 与时间。
 //! 默认每个智能体一份记忆（与原设计相同）；`-shared` 变体所有智能体共用一份。
 //! 检索相似度用字符二元组包含度（与示例检索相同），代替原文的向量检索。
 //! 写记忆的模型调用与提炼一样计入触发它的会话（token 与秒数）。
@@ -23,6 +28,8 @@ pub enum Kind {
     Ace,
     Mem0,
     AgentSm,
+    ReasoningBank,
+    Apc,
 }
 
 #[derive(Clone, Debug)]
@@ -41,6 +48,8 @@ pub struct Store {
     shared: bool,
     items: Mutex<HashMap<String, Vec<Item>>>,
     next: Mutex<u32>,
+    /// APC：每道题作答前提取的关键词与是否命中（记忆范围 + 题面 → (关键词, 命中)），写缓存时用
+    lookups: Mutex<HashMap<String, (String, bool)>>,
 }
 
 /// 一次会话的结果，写记忆时用。
@@ -117,6 +126,29 @@ const MEM0_UPDATE: &str = "你负责更新一个记忆库（Mem0 的更新阶段
 NONE（已有记忆已覆盖）。只输出一个 JSON 数组：[{\"op\": \"ADD\", \"text\": \"...\"}, {\"op\": \"UPDATE\", \"id\": 3, \"text\": \"...\"}, \
 {\"op\": \"DELETE\", \"id\": 5}, {\"op\": \"NONE\"}]。";
 
+const RB_SUCCESS: &str = "你负责从一个数据分析智能体成功完成的任务中提炼可泛化的推理策略（ReasoningBank）。输入是题目和按顺序的工具调用与结果。\
+先想清楚这条轨迹为什么成功，再提炼最多 3 条对以后同类任务有用的记忆条目：标题（策略名）、一句话描述、内容（一到三句具体可操作的做法，\
+涉及表、列、关联、过滤条件、SQL 写法或业务口径）。不要写本题的具体取值和答案。\
+只输出一个 JSON 数组：[{\"title\": \"...\", \"description\": \"...\", \"content\": \"...\"}]。";
+
+const RB_FAILURE: &str = "你负责从一个数据分析智能体没有答对的任务中提炼可泛化的教训（ReasoningBank）。输入是题目、按顺序的工具调用与结果，以及它给出的答案（已判定错误）。\
+先反思失败的原因（哪一步出错、遗漏了什么条件、口径哪里理解错），再提炼最多 3 条防止以后再犯的记忆条目：标题（策略名）、一句话描述、\
+内容（一到三句具体可操作的做法）。不要写本题的具体取值。\
+只输出一个 JSON 数组：[{\"title\": \"...\", \"description\": \"...\", \"content\": \"...\"}]。";
+
+const APC_KEYWORD: &str = "你负责为一个数据分析智能体的计划缓存提取关键词（Agentic Plan Caching 的关键词提取）。\
+关键词概括任务的高层意图，用来在缓存里精确匹配同类任务：只描述要算什么，不含年份、月份、季度等具体取值，同一类任务必须得到完全相同的关键词。\
+写成“指标名称｜问法”，指标名称用题面中的原文，问法用简短概括（如“某期取值”“两期差值”“最高月份”）。只输出关键词本身。";
+
+const APC_PLAN: &str = "你负责为一个数据分析智能体的计划缓存生成计划模板（Agentic Plan Caching）。输入是它成功完成的一次任务：题目和按顺序的工具调用与结果。\
+请从过程中整理出可复用于同类任务的计划模板：按顺序的步骤，写清用到的表、关联、过滤条件和 SQL 写法，把题目里的具体取值换成占位符，\
+如 {year}、{month}；去掉走错的弯路和与本题取值有关的细节。只输出一个 JSON 对象：{\"plan\": [\"...\", \"...\"]}。";
+
+/// APC 的缓存键：去掉空白与标点、统一小写后精确匹配。
+fn cache_key(keyword: &str) -> String {
+    keyword.chars().filter(|c| c.is_alphanumeric()).flat_map(char::to_lowercase).collect()
+}
+
 pub const AGENTSM_TOOL: &str = "find_past_exploration";
 pub const AGENTSM_SYSTEM: &str = "find_past_exploration 返回以往最相似问题的探索过程（看过哪些表与列、怎样关联、查到哪些取值）。\
 开始探索前先调用它，据此省去重复的探索；最多查找三次，没有相符的过程时直接查看表结构计算。";
@@ -128,6 +160,8 @@ impl Store {
             "mem-ace" => Some(Kind::Ace),
             "mem-mem0" => Some(Kind::Mem0),
             "mem-agentsm" => Some(Kind::AgentSm),
+            "mem-reasoningbank" => Some(Kind::ReasoningBank),
+            "mem-apc" => Some(Kind::Apc),
             _ => None,
         };
         Store { kind, shared: mode.ends_with("-shared"), ..Default::default() }
@@ -186,8 +220,35 @@ impl Store {
                 let body: Vec<String> = scored.iter().take(MEM0_TOPK).map(|(_, i)| format!("- {}", i.text)).collect();
                 format!("\n以下是与本题相关的记忆：\n{}", body.join("\n"))
             }
+            Some(Kind::ReasoningBank) => {
+                // 最相似的一次以往任务（按题面），取它的全部条目
+                let best = items.iter().map(|i| (containment(question, &i.title), &i.title)).max_by(|a, b| a.0.total_cmp(&b.0));
+                let Some((_, source)) = best else { return String::new() };
+                let body: Vec<String> = items.iter().filter(|i| &i.title == source).map(|i| i.text.clone()).collect();
+                format!("\n以下是从以往相似任务中提炼的推理策略，作答时参考：\n{}", body.join("\n"))
+            }
             _ => String::new(),
         }
+    }
+
+    /// 作答前取记忆：返回放进系统提示的内容，以及这一步自己的模型调用代价（只有 APC 有：提取关键词），计入这道题。
+    pub async fn lookup(&self, p: &Provider, agent: &str, question: &str) -> (String, Value) {
+        if self.kind != Some(Kind::Apc) {
+            return (self.prompt(agent, question), Value::Null);
+        }
+        let t0 = Instant::now();
+        let (keyword, tin, tout) = match p.chat(APC_KEYWORD, &[Turn::User(format!("题目：{question}"))], &[]).await {
+            Ok(r) => (r.text.lines().map(str::trim).find(|l| !l.is_empty()).unwrap_or_default().to_string(), r.input_tokens, r.output_tokens),
+            Err(_) => (String::new(), 0, 0),
+        };
+        let key = cache_key(&keyword);
+        let plan = (!key.is_empty()).then(|| self.items(agent).into_iter().find(|i| i.title == key)).flatten();
+        let hit = plan.is_some();
+        self.lookups.lock().insert(format!("{}\u{1}{question}", self.scope(agent)), (key, hit));
+        let text = plan.map_or(String::new(), |i| {
+            format!("\n以下是同类任务的计划模板（按关键词“{keyword}”从缓存取得），按其步骤完成，把占位符换成本题的取值：\n{}", i.text)
+        });
+        (text, json!({"keyword": keyword, "hit": hit, "input_tokens": tin, "output_tokens": tout, "seconds": t0.elapsed().as_secs_f64()}))
     }
 
     /// AgentSM 的检索工具：最相似题目的探索段。
@@ -374,6 +435,49 @@ impl Store {
                 });
                 changes += 1;
             }
+            Kind::ReasoningBank => {
+                let input = format!("题目：{}\n\n过程：\n{}\n\n最终答案：{}", s.question, transcript(s.run, 900), s.run.answer.clone().unwrap_or_default());
+                let (i, o, v) = ask(if s.correct { RB_SUCCESS } else { RB_FAILURE }, input).await;
+                (tin, tout) = (tin + i, tout + o);
+                for m in v.and_then(|v| v.as_array().cloned()).unwrap_or_default().into_iter().take(3) {
+                    let (title, desc, content) = (m["title"].as_str().unwrap_or_default(), m["description"].as_str().unwrap_or_default(),
+                                                  m["content"].as_str().unwrap_or_default());
+                    if content.trim().is_empty() {
+                        continue;
+                    }
+                    let id = self.id();
+                    // 条目的标题字段记来源题面（按题面检索），策略名写进正文
+                    let text = format!("## {}\n{}\n{}", title.trim(), desc.trim(), content.trim());
+                    self.items.lock().entry(scope.clone()).or_default().push(Item { id, title: s.question.to_string(), text, helpful: 0, harmful: 0 });
+                    changes += 1;
+                }
+            }
+            Kind::Apc => {
+                if !s.correct {
+                    return json!({"kind": "apc", "skipped": "not judged correct"});
+                }
+                let Some((key, hit)) = self.lookups.lock().get(&format!("{scope}\u{1}{}", s.question)).cloned() else {
+                    return json!({"kind": "apc", "skipped": "no keyword"});
+                };
+                // 命中时用的是缓存里的计划，不再生成；未命中才从这次过程生成模板
+                if hit || key.is_empty() {
+                    return json!({"kind": "apc", "skipped": if hit { "cache hit" } else { "no keyword" }});
+                }
+                let input = format!("题目：{}\n\n过程：\n{}\n\n最终答案：{}", s.question, transcript(s.run, 900), s.run.answer.clone().unwrap_or_default());
+                let (i, o, v) = ask(APC_PLAN, input).await;
+                (tin, tout) = (tin + i, tout + o);
+                let steps: Vec<String> = v.as_ref().and_then(|v| v["plan"].as_array()).map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect()).unwrap_or_default();
+                if !steps.is_empty() {
+                    let text = steps.iter().enumerate().map(|(k, x)| format!("{}. {x}", k + 1)).collect::<Vec<_>>().join("\n");
+                    let id = self.id();
+                    let mut all = self.items.lock();
+                    let list = all.entry(scope.clone()).or_default();
+                    if !list.iter().any(|x| x.title == key) {
+                        list.push(Item { id, title: key, text, helpful: 0, harmful: 0 });
+                        changes += 1;
+                    }
+                }
+            }
         }
         let size = self.items.lock().get(&scope).map_or(0, Vec::len);
         json!({"kind": format!("{kind:?}").to_lowercase(), "extraction": {"input_tokens": tin, "output_tokens": tout,
@@ -396,6 +500,9 @@ mod tests {
     fn modes() {
         assert_eq!(Store::for_mode("mem-ace").kind(), Some(Kind::Ace));
         assert!(Store::for_mode("mem-agentsm-shared").shared);
+        assert_eq!(Store::for_mode("mem-apc-shared").kind(), Some(Kind::Apc));
+        assert_eq!(Store::for_mode("mem-reasoningbank").kind(), Some(Kind::ReasoningBank));
+        assert_eq!(cache_key("登记顾客门店销售额｜最高月份 "), cache_key("登记顾客门店销售额 | 最高月份"));
         assert_eq!(Store::for_mode("metric-global-snap").kind(), None);
     }
 }

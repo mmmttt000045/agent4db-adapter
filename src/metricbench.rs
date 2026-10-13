@@ -9,7 +9,8 @@ use crate::knowledge::{Basis, Content, Status};
 use crate::llm::{self, AgentRun, Provider};
 use crate::metric::{self, parse_answer, same_value, Ask, Period, Trajectory};
 use crate::middle::{
-    exploration_tool_spec, tool_specs_with, trajectory_tool_spec, Ctx, GuardMode, Maint, Middle, MiddleConfig, Scope, SqlCall, TaskLog, ToolSpec, TrajMemo,
+    exploration_tool_spec, tool_specs_with, trajectory_tool_spec, Ctx, GuardMode, Maint, Middle, MiddleConfig, Scope, SqlCall, TaskLog,
+    ToolSpec, TrajMemo,
 };
 use crate::scenario::{self, Change};
 use crate::specchange::{Gen, Spec};

@@ -106,7 +106,8 @@ fn first_json(text: &str) -> Option<Value> {
     (end > start).then(|| serde_json::from_str(&text[start..=end]).ok()).flatten()
 }
 
-const AWM_SYSTEM: &str = "你负责为一个数据分析智能体归纳可复用的工作流（Agent Workflow Memory）。输入是它成功完成的一次任务：题目和按顺序的工具调用与结果。\
+const AWM_SYSTEM: &str =
+    "你负责为一个数据分析智能体归纳可复用的工作流（Agent Workflow Memory）。输入是它成功完成的一次任务：题目和按顺序的工具调用与结果。\
 请归纳出能复用到同类问题的工作流：每个工作流有一个标题（描述它解决的一类问题）和若干步骤，步骤写清用到的表、关联、过滤条件和 SQL 写法，\
 把题目里的具体取值（年份、月份、季度等）换成占位符，如 {year}、{month}。只保留对完成任务必要的步骤，去掉走错的弯路。\
 只输出一个 JSON 数组，最多 2 项：[{\"title\": \"...\", \"steps\": [\"...\", \"...\"]}]。";
@@ -126,7 +127,8 @@ const MEM0_UPDATE: &str = "你负责更新一个记忆库（Mem0 的更新阶段
 NONE（已有记忆已覆盖）。只输出一个 JSON 数组：[{\"op\": \"ADD\", \"text\": \"...\"}, {\"op\": \"UPDATE\", \"id\": 3, \"text\": \"...\"}, \
 {\"op\": \"DELETE\", \"id\": 5}, {\"op\": \"NONE\"}]。";
 
-const RB_SUCCESS: &str = "你负责从一个数据分析智能体成功完成的任务中提炼可泛化的推理策略（ReasoningBank）。输入是题目和按顺序的工具调用与结果。\
+const RB_SUCCESS: &str =
+    "你负责从一个数据分析智能体成功完成的任务中提炼可泛化的推理策略（ReasoningBank）。输入是题目和按顺序的工具调用与结果。\
 先想清楚这条轨迹为什么成功，再提炼最多 3 条对以后同类任务有用的记忆条目：标题（策略名）、一句话描述、内容（一到三句具体可操作的做法，\
 涉及表、列、关联、过滤条件、SQL 写法或业务口径）。不要写本题的具体取值和答案。\
 只输出一个 JSON 数组：[{\"title\": \"...\", \"description\": \"...\", \"content\": \"...\"}]。";
@@ -140,7 +142,8 @@ const APC_KEYWORD: &str = "你负责为一个数据分析智能体的计划缓�
 关键词概括任务的高层意图，用来在缓存里精确匹配同类任务：只描述要算什么，不含年份、月份、季度等具体取值，同一类任务必须得到完全相同的关键词。\
 写成“指标名称｜问法”，指标名称用题面中的原文，问法用简短概括（如“某期取值”“两期差值”“最高月份”）。只输出关键词本身。";
 
-const APC_PLAN: &str = "你负责为一个数据分析智能体的计划缓存生成计划模板（Agentic Plan Caching）。输入是它成功完成的一次任务：题目和按顺序的工具调用与结果。\
+const APC_PLAN: &str =
+    "你负责为一个数据分析智能体的计划缓存生成计划模板（Agentic Plan Caching）。输入是它成功完成的一次任务：题目和按顺序的工具调用与结果。\
 请从过程中整理出可复用于同类任务的计划模板：按顺序的步骤，写清用到的表、关联、过滤条件和 SQL 写法，把题目里的具体取值换成占位符，\
 如 {year}、{month}；去掉走错的弯路和与本题取值有关的细节。只输出一个 JSON 对象：{\"plan\": [\"...\", \"...\"]}。";
 
@@ -194,8 +197,14 @@ impl Store {
         let items = self.items.lock();
         json!(items
             .iter()
-            .map(|(k, v)| (k.clone(), json!(v.iter().map(|i| json!({"id": i.id, "title": i.title, "text": i.text,
-                "helpful": i.helpful, "harmful": i.harmful})).collect::<Vec<_>>())))
+            .map(|(k, v)| (
+                k.clone(),
+                json!(v
+                    .iter()
+                    .map(|i| json!({"id": i.id, "title": i.title, "text": i.text,
+                "helpful": i.helpful, "harmful": i.harmful}))
+                    .collect::<Vec<_>>())
+            ))
             .collect::<serde_json::Map<_, _>>())
     }
 
@@ -238,7 +247,9 @@ impl Store {
         }
         let t0 = Instant::now();
         let (keyword, tin, tout) = match p.chat(APC_KEYWORD, &[Turn::User(format!("题目：{question}"))], &[]).await {
-            Ok(r) => (r.text.lines().map(str::trim).find(|l| !l.is_empty()).unwrap_or_default().to_string(), r.input_tokens, r.output_tokens),
+            Ok(r) => {
+                (r.text.lines().map(str::trim).find(|l| !l.is_empty()).unwrap_or_default().to_string(), r.input_tokens, r.output_tokens)
+            }
             Err(_) => (String::new(), 0, 0),
         };
         let key = cache_key(&keyword);
@@ -282,12 +293,20 @@ impl Store {
                 if !s.correct {
                     return json!({"kind": "awm", "skipped": "not judged correct"});
                 }
-                let input = format!("题目：{}\n\n过程：\n{}\n\n最终答案：{}", s.question, transcript(s.run, 900), s.run.answer.clone().unwrap_or_default());
+                let input = format!(
+                    "题目：{}\n\n过程：\n{}\n\n最终答案：{}",
+                    s.question,
+                    transcript(s.run, 900),
+                    s.run.answer.clone().unwrap_or_default()
+                );
                 let (i, o, v) = ask(AWM_SYSTEM, input).await;
                 (tin, tout) = (tin + i, tout + o);
                 for w in v.and_then(|v| v.as_array().cloned()).unwrap_or_default() {
                     let title = w["title"].as_str().unwrap_or_default().trim().to_string();
-                    let steps: Vec<String> = w["steps"].as_array().map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect()).unwrap_or_default();
+                    let steps: Vec<String> = w["steps"]
+                        .as_array()
+                        .map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect())
+                        .unwrap_or_default();
                     if title.is_empty() || steps.is_empty() {
                         continue;
                     }
@@ -314,13 +333,17 @@ impl Store {
                 let (i, o, v) = ask(ACE_SYSTEM, input).await;
                 (tin, tout) = (tin + i, tout + o);
                 let v = v.unwrap_or(Value::Null);
-                let ids = |k: &str| -> Vec<u32> { v[k].as_array().map(|a| a.iter().filter_map(|x| x.as_u64().map(|n| n as u32)).collect()).unwrap_or_default() };
+                let ids = |k: &str| -> Vec<u32> {
+                    v[k].as_array().map(|a| a.iter().filter_map(|x| x.as_u64().map(|n| n as u32)).collect()).unwrap_or_default()
+                };
                 let (good, bad) = (ids("helpful"), ids("harmful"));
                 let adds: Vec<(String, String)> = v["add"]
                     .as_array()
                     .map(|a| {
                         a.iter()
-                            .filter_map(|x| Some((x["section"].as_str().unwrap_or("sql").to_string(), x["content"].as_str()?.trim().to_string())))
+                            .filter_map(|x| {
+                                Some((x["section"].as_str().unwrap_or("sql").to_string(), x["content"].as_str()?.trim().to_string()))
+                            })
                             .filter(|(_, c)| !c.is_empty())
                             .collect()
                     })
@@ -348,10 +371,20 @@ impl Store {
                 }
             }
             Kind::Mem0 => {
-                let input = format!("题目：{}\n\n过程：\n{}\n\n最终答案：{}", s.question, transcript(s.run, 900), s.run.answer.clone().unwrap_or_default());
+                let input = format!(
+                    "题目：{}\n\n过程：\n{}\n\n最终答案：{}",
+                    s.question,
+                    transcript(s.run, 900),
+                    s.run.answer.clone().unwrap_or_default()
+                );
                 let (i, o, v) = ask(MEM0_EXTRACT, input).await;
                 (tin, tout) = (tin + i, tout + o);
-                let facts: Vec<String> = v.and_then(|v| v.as_array().cloned()).unwrap_or_default().iter().filter_map(|x| x.as_str().map(str::to_string)).collect();
+                let facts: Vec<String> = v
+                    .and_then(|v| v.as_array().cloned())
+                    .unwrap_or_default()
+                    .iter()
+                    .filter_map(|x| x.as_str().map(str::to_string))
+                    .collect();
                 if !facts.is_empty() {
                     let existing = self.items(agent);
                     let mut near: Vec<&Item> = vec![];
@@ -408,8 +441,16 @@ impl Store {
                     let header = match tool {
                         "list_tables" => "### 列出表".to_string(),
                         "describe_table" => format!("### 查看表 {}", input["table"].as_str().unwrap_or_default()),
-                        "join_path" => format!("### 关联路径 {} → {}", input["table_a"].as_str().unwrap_or_default(), input["table_b"].as_str().unwrap_or_default()),
-                        "check_join" => format!("### 检验关联 {} ⋈ {}", input["left"].as_str().unwrap_or_default(), input["right"].as_str().unwrap_or_default()),
+                        "join_path" => format!(
+                            "### 关联路径 {} → {}",
+                            input["table_a"].as_str().unwrap_or_default(),
+                            input["table_b"].as_str().unwrap_or_default()
+                        ),
+                        "check_join" => format!(
+                            "### 检验关联 {} ⋈ {}",
+                            input["left"].as_str().unwrap_or_default(),
+                            input["right"].as_str().unwrap_or_default()
+                        ),
                         "run_sql" => {
                             let sql = input["sql"].as_str().unwrap_or_default();
                             if s.used_sqls.iter().any(|u| u.trim() == sql.trim()) {
@@ -436,19 +477,33 @@ impl Store {
                 changes += 1;
             }
             Kind::ReasoningBank => {
-                let input = format!("题目：{}\n\n过程：\n{}\n\n最终答案：{}", s.question, transcript(s.run, 900), s.run.answer.clone().unwrap_or_default());
+                let input = format!(
+                    "题目：{}\n\n过程：\n{}\n\n最终答案：{}",
+                    s.question,
+                    transcript(s.run, 900),
+                    s.run.answer.clone().unwrap_or_default()
+                );
                 let (i, o, v) = ask(if s.correct { RB_SUCCESS } else { RB_FAILURE }, input).await;
                 (tin, tout) = (tin + i, tout + o);
                 for m in v.and_then(|v| v.as_array().cloned()).unwrap_or_default().into_iter().take(3) {
-                    let (title, desc, content) = (m["title"].as_str().unwrap_or_default(), m["description"].as_str().unwrap_or_default(),
-                                                  m["content"].as_str().unwrap_or_default());
+                    let (title, desc, content) = (
+                        m["title"].as_str().unwrap_or_default(),
+                        m["description"].as_str().unwrap_or_default(),
+                        m["content"].as_str().unwrap_or_default(),
+                    );
                     if content.trim().is_empty() {
                         continue;
                     }
                     let id = self.id();
                     // 条目的标题字段记来源题面（按题面检索），策略名写进正文
                     let text = format!("## {}\n{}\n{}", title.trim(), desc.trim(), content.trim());
-                    self.items.lock().entry(scope.clone()).or_default().push(Item { id, title: s.question.to_string(), text, helpful: 0, harmful: 0 });
+                    self.items.lock().entry(scope.clone()).or_default().push(Item {
+                        id,
+                        title: s.question.to_string(),
+                        text,
+                        helpful: 0,
+                        harmful: 0,
+                    });
                     changes += 1;
                 }
             }
@@ -463,10 +518,19 @@ impl Store {
                 if hit || key.is_empty() {
                     return json!({"kind": "apc", "skipped": if hit { "cache hit" } else { "no keyword" }});
                 }
-                let input = format!("题目：{}\n\n过程：\n{}\n\n最终答案：{}", s.question, transcript(s.run, 900), s.run.answer.clone().unwrap_or_default());
+                let input = format!(
+                    "题目：{}\n\n过程：\n{}\n\n最终答案：{}",
+                    s.question,
+                    transcript(s.run, 900),
+                    s.run.answer.clone().unwrap_or_default()
+                );
                 let (i, o, v) = ask(APC_PLAN, input).await;
                 (tin, tout) = (tin + i, tout + o);
-                let steps: Vec<String> = v.as_ref().and_then(|v| v["plan"].as_array()).map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect()).unwrap_or_default();
+                let steps: Vec<String> = v
+                    .as_ref()
+                    .and_then(|v| v["plan"].as_array())
+                    .map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect())
+                    .unwrap_or_default();
                 if !steps.is_empty() {
                     let text = steps.iter().enumerate().map(|(k, x)| format!("{}. {x}", k + 1)).collect::<Vec<_>>().join("\n");
                     let id = self.id();

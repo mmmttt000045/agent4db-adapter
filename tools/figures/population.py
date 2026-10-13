@@ -19,14 +19,16 @@ import style  # noqa: E402
 from style import INK, MUTED, WHITE  # noqa: E402
 
 NAME = 'population'
-W, H = style.COLUMN, 46.0
+W, H = style.TEXTWIDTH, 50.0
 DATA = style.ROOT / 'exp/2026-10-12-population/population-stats.json'
 METHODS = [('middle-alone', 'None', '^'), ('metric-private', 'Private', 'D'), ('traj-global', 'Traj', 's'),
            ('metric-global-snap', 'Mavra', 'o')]
 TEXT = {
-    'en': {'panels': ['Total tokens (M)', 'Total agent time (min)'], 'x': 'Agents arrived',
+    'en': {'panels': ['Total tokens (M)', 'Total agent time (min)', 'Tokens per question (k), by agent'],
+           'x': 'Agents arrived', 'x3': 'Agent in arrival order',
            'acc': '{name} · {acc}% correct', 'save': '−{t}% tokens\n{s}× faster'},
-    'zh': {'panels': ['累计 token（百万）', '累计智能体时间（分钟）'], 'x': '已到来的智能体数',
+    'zh': {'panels': ['累计 token（百万）', '累计智能体时间（分钟）', '每题 token（千），按智能体'],
+           'x': '已到来的智能体数', 'x3': '按到来顺序的智能体',
            'acc': '{name} · 正确率 {acc}%', 'save': 'token 少 {t}%\n快 {s} 倍'},
 }
 
@@ -41,20 +43,22 @@ def load():
         cells = d[mode]['cells']
         curves = []
         for c in cells:
-            tok, s, ct, cs = [], [], 0.0, 0.0
+            tok, s, per, ct, cs = [], [], [], 0.0, 0.0
             for a in c['per_agent']:
                 ct += a['tok']
                 cs += a['s']
                 tok.append(ct / 1e6)
                 s.append(cs / 60)
-            curves.append((tok, s))
+                per.append(a['tok'] / max(a['tasks'], 1) / 1e3)
+            curves.append((tok, s, per))
         n = len(curves[0][0])
         mean_tok = [sum(c[0][i] for c in curves) / len(curves) for i in range(n)]
         mean_s = [sum(c[1][i] for c in curves) / len(curves) for i in range(n)]
         acc = d[mode]['v1']['acc']['mean'] * 100
         style.agree(f'Pp{key}TotalTokM', f'{mean_tok[-1]:.2f}', pp[f'Pp{key}TotalTokM'])
         style.agree(f'Pp{key}Acc', f'{acc:.0f}', pp[f'Pp{key}Acc'])
-        out[mode] = dict(curves=curves, tok=mean_tok, s=mean_s, acc=f'{acc:.0f}')
+        mean_per = [sum(c[2][i] for c in curves) / len(curves) for i in range(n)]
+        out[mode] = dict(curves=curves, tok=mean_tok, s=mean_s, per=mean_per, acc=f'{acc:.0f}')
     gain = (pp['PpMavraTokSaveNone'], pp['PpMavraSpeedupNone'])
     return out, gain
 
@@ -63,15 +67,15 @@ def figure(lang):
     data, (save, speed) = load()
     T = TEXT[lang]
     fig = mplstyle.figure(W, H)
-    axes = fig.subplots(1, 2, sharex=True, gridspec_kw=dict(left=.085, right=.985, top=.70, bottom=.17, wspace=.28))
+    axes = fig.subplots(1, 3, gridspec_kw=dict(left=.045, right=.99, top=.74, bottom=.17, wspace=.22))
     handles = []
     methods = [m for m in METHODS if m[0] in data]
     for mode, _, marker in methods:
         label, color = style.method(mode, lang)
         handles.append(Line2D([], [], color=color, marker=marker, ms=3.4, mfc=color, mec=WHITE, mew=.35, lw=1.0,
                               label=T['acc'].format(name=label, acc=data[mode]['acc'])))
-    legend = fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.53, 1.0), ncol=2, handlelength=1.6,
-                        columnspacing=1.2)
+    legend = fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.52, 1.0), ncol=4, handlelength=1.6,
+                        columnspacing=1.6)
     for entry in legend.get_texts():
         if entry.get_text().startswith('MAVRA'):
             entry.set_color(style.method('metric-global-snap', lang)[1])
@@ -82,16 +86,23 @@ def figure(lang):
         for mode, _, marker in methods:
             _, color = style.method(mode, lang)
             d = data[mode]
-            ys = d['tok'] if k == 0 else d['s']
+            ys = (d['tok'], d['s'], d['per'])[k]
             lo = [min(c[k][i] for c in d['curves']) for i in range(n)]
             hi = [max(c[k][i] for c in d['curves']) for i in range(n)]
             ax.fill_between(xs, lo, hi, color=color, alpha=.16, lw=0, zorder=1)
             ax.plot(xs, ys, color=color, lw=1.0, zorder=3)
             ax.plot(xs[3::4], ys[3::4], ls='', marker=marker, ms=3.0, mfc=color, mec=WHITE, mew=.35, zorder=4)
         ax.set_title(T['panels'][k], pad=3, loc='left')
+        if k == 2:
+            ax.set_yscale('log')
+            ax.set_ylim(4, 200)
+            ax.set_yticks([5, 10, 20, 50, 100])
+            ax.set_yticklabels(['5', '10', '20', '50', '100'])
+            ax.minorticks_off()
         ax.set_xlim(1, n)
         ax.set_xticks([1, 4, 8, 12, 16] if n == 16 else xs[::max(1, n // 4)])
-        ax.set_ylim(0, None)
+        if k < 2:
+            ax.set_ylim(0, None)
         ax.grid(True)
         ax.set_axisbelow(True)
     # The saving at the last agent, against exploring alone
@@ -106,7 +117,8 @@ def figure(lang):
     above = min(min(data[m]['tok'][tail]) for m in ('metric-private', 'middle-alone') if m in data)
     ax.text(n - .9, (below + above) / 2, T['save'].format(t=save, s=speed), ha='right', va='center',
             fontsize=mplstyle.SMALL, color=INK, linespacing=1.15)
-    fig.text((.085 + .985) / 2, .02, T['x'], color=MUTED, fontsize=mplstyle.LABEL, ha='center', va='bottom')
+    fig.text((.045 + .66) / 2, .02, T['x'], color=MUTED, fontsize=mplstyle.LABEL, ha='center', va='bottom')
+    fig.text(.835, .02, T['x3'], color=MUTED, fontsize=mplstyle.LABEL, ha='center', va='bottom')
     return fig
 
 

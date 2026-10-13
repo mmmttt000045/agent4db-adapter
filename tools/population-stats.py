@@ -96,12 +96,17 @@ def cell_stats(d):
             except (TypeError, ValueError, ZeroDivisionError):
                 pass
     late = [r for r in v1 if agent_index(r) > agents // 2]
+    by_metric = collections.defaultdict(list)
+    for r in late:
+        tok, sec, _, _ = cost(r)
+        by_metric[r["metric"]].append((tok, sec, r["outcome"] == "correct"))
     maint = {}
     for p in d["phases"]:
         maint[p["phase"]] = sum((e.get("db") or {}).get("ms", 0.0) for e in p["events"] if e.get("event") == "maintenance") / 1000
     return {"mode": d["mode"], "repeat": d["repeat"], "agents": agents, "per_agent": per_agent, "cum": cum,
             "v1": summary(v1), "late": summary(late), "change": summary(ch), "maint_db_s": maint,
-            "errors": sum(r["outcome"] == "error" for r in d["records"]), "change_over": over}
+            "errors": sum(r["outcome"] == "error" for r in d["records"]), "change_over": over,
+            "by_metric_late": dict(by_metric)}
 
 
 def agg(vals):
@@ -206,6 +211,35 @@ def main():
                 mac(f"{k}ChangeOverMax", f"{max(over) * 100:.0f}")
             mac(f"{k}TotalTokMin", f"{min(c['cum'][max(c['cum'])]['tok'] for c in r['cells']) / 1e6:.2f}")
             mac(f"{k}TotalTokMax", f"{max(c['cum'][max(c['cum'])]['tok'] for c in r['cells']) / 1e6:.2f}")
+        # second half of the agents, per question and metric, pooled over runs (the saving is largest where exploring is hardest)
+        WORD = {"M1": "One", "M2": "Two", "M3": "Three", "M4": "Four", "M5": "Five"}
+        pooled = {}
+        for m, r in out["methods"].items():
+            acc = collections.defaultdict(list)
+            for c in r["cells"]:
+                for met, xs in c["by_metric_late"].items():
+                    acc[met].extend(xs)
+            pooled[m] = acc
+            for met, xs in sorted(acc.items()):
+                if met in WORD and xs:
+                    mac(f"{KEY[m]}M{WORD[met]}TokK", f"{statistics.mean(x[0] for x in xs) / 1e3:.0f}")
+                    mac(f"{KEY[m]}M{WORD[met]}S", f"{statistics.mean(x[1] for x in xs):.0f}")
+                    mac(f"{KEY[m]}M{WORD[met]}Acc", f"{100 * sum(x[2] for x in xs) / len(xs):.0f}")
+        if ref in pooled and "middle-alone" in pooled:
+            tx, sx = [], []
+            for met, word in WORD.items():
+                a, b = pooled[ref].get(met), pooled["middle-alone"].get(met)
+                if a and b:
+                    t = statistics.mean(x[0] for x in b) / statistics.mean(x[0] for x in a)
+                    v = statistics.mean(x[1] for x in b) / statistics.mean(x[1] for x in a)
+                    tx.append(t)
+                    sx.append(v)
+                    mac(f"MavraM{word}TokX", f"{t:.1f}")
+                    mac(f"MavraM{word}SpeedX", f"{v:.1f}")
+            mac("MavraMetricTokXMin", f"{min(tx):.1f}")
+            mac("MavraMetricTokXMax", f"{max(tx):.1f}")
+            mac("MavraMetricSpeedXMin", f"{min(sx):.1f}")
+            mac("MavraMetricSpeedXMax", f"{max(sx):.1f}")
         for m, s in savings.items():
             # second half of the agents, per question: how many times the tokens and time of MAVRA
             lr, lm = out["methods"][ref]["late"], out["methods"][m]["late"]

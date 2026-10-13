@@ -1,0 +1,18 @@
+\begin{table}[t]
+\caption{\bt{Per question and metric, second half of the agents: without memory (left of each arrow) the cost follows how hard a metric is to explore; with \system\ (right) every metric costs about the same. Pooled over \PpRuns\ runs.}{按题、按指标（后一半智能体）：没有记忆时（箭头左侧）代价取决于指标有多难探索；使用 \system\ 时（右侧）每个指标的代价都差不多。合并 \PpRuns\ 次运行。}}
+\label{tab:popmetrics}
+\footnotesize
+\setlength{\tabcolsep}{2.6pt}
+\newcommand{\arr}{$\to$}
+\begin{tabularx}{\linewidth}{@{}Lrrr@{}}
+\toprule
+\bt{Metric (TPC-DS template)}{指标（TPC-DS 模板）} & \bt{Tokens (k)}{token（千）} & \bt{Time (s)}{时间（秒）} & \bt{Correct (\%)}{正确（\%）}\\
+\midrule
+\bt{Items of one category manager}{一位品类经理的商品} & \PpNoneMOneTokK\,\arr\,\PpMavraMOneTokK & \PpNoneMOneS\,\arr\,\PpMavraMOneS & \PpNoneMOneAcc\,\arr\,\PpMavraMOneAcc\\
+\bt{Registered customers}{登记顾客} & \PpNoneMTwoTokK\,\arr\,\PpMavraMTwoTokK & \PpNoneMTwoS\,\arr\,\PpMavraMTwoS & \PpNoneMTwoAcc\,\arr\,\PpMavraMTwoAcc\\
+\bt{Coupons at mid-sized stores}{中型门店的优惠券} & \PpNoneMThreeTokK\,\arr\,\PpMavraMThreeTokK & \PpNoneMThreeS\,\arr\,\PpMavraMThreeS & \PpNoneMThreeAcc\,\arr\,\PpMavraMThreeAcc\\
+\bt{Returns at known stores}{关联得上门店的退货} & \PpNoneMFourTokK\,\arr\,\PpMavraMFourTokK & \PpNoneMFourS\,\arr\,\PpMavraMFourS & \PpNoneMFourAcc\,\arr\,\PpMavraMFourAcc\\
+\bt{Yearly total}{年度汇总口径} & \PpNoneMFiveTokK\,\arr\,\PpMavraMFiveTokK & \PpNoneMFiveS\,\arr\,\PpMavraMFiveS & \PpNoneMFiveAcc\,\arr\,\PpMavraMFiveAcc\\
+\bottomrule
+\end{tabularx}
+\end{table}

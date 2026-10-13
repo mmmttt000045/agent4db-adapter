@@ -1,25 +1,35 @@
-\begin{table}[t]
-\caption{\bt{Compared methods, grouped by what a session shares with later sessions. P: population study (\S\ref{sec:population-eval}); E: end-to-end scenarios (\S\ref{sec:scenarios}); R: library replay (\S\ref{sec:validity}).}{本文比较的方法，按会话之间共享什么分组。P：群体实验（\S\ref{sec:population-eval}）；E：端到端情形（\S\ref{sec:scenarios}）；R：定义库回放（\S\ref{sec:validity}）。}}
+\begin{table*}[t]
+\caption{\bt{Compared methods, grouped by what a session shares with later sessions, with the question each comparison answers and the studies in which it appears. P: population study (\S\ref{sec:population-eval}); R: library replay (\S\ref{sec:validity}, \S\ref{sec:repair-eval}); C: controlled cost benchmark (\S\ref{sec:cost}); E: end-to-end scenarios (\S\ref{sec:scenarios}).}{本文比较的方法，按会话之间共享什么分组，并给出每个比较回答的问题与所在实验。P：群体实验（\S\ref{sec:population-eval}）；R：定义库回放（\S\ref{sec:validity}、\S\ref{sec:repair-eval}）；C：受控代价实验（\S\ref{sec:cost}）；E：端到端情形（\S\ref{sec:scenarios}）。}}
 \label{tab:ladder}
 \footnotesize
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{4pt}
 \newcommand{\usedin}{$\bullet$}
-\begin{tabularx}{\linewidth}{@{}P{0.30\linewidth}Lccc@{}}
+\begin{tabularx}{\textwidth}{@{}P{0.21\textwidth}LLcccc@{}}
 \toprule
-\bt{Method}{方法} & \bt{What later sessions get}{之后的会话得到什么} & P & E & R\\
+\bt{Method}{方法} & \bt{After a data change}{数据变化后} & \bt{Question it answers}{回答的问题} & P & R & C & E\\
 \midrule
-\bt{No memory}{无记忆} & \bt{nothing; every session explores}{什么也没有，每个会话都探索} & \usedin & \usedin & \\
-\bt{Single-agent memory}{单智能体记忆} & \bt{\system's definitions, but only those the same agent learned}{\system\ 的定义，但只限同一智能体自己学到的} & \usedin & & \\
+\multicolumn{7}{@{}l}{\bt{\emph{Nothing shared}}{\emph{不共享任何内容}}}\\
+\bt{No memory}{无记忆} & \bt{explores the database again in every session}{每个会话重新探索数据库} & \bt{how accurate are agents without shared knowledge?}{没有共享知识时智能体有多准确？} & \usedin & & & \usedin\\
 \addlinespace
-\bt{Example retrieval}{示例检索} & \bt{up to three similar past sessions (question, SQL, calculation)}{最多三条相似的过去会话（题面、SQL、算式）} & \usedin & \usedin & \\
-\bt{\quad + self-verification}{\quad + 自行核验} & \bt{the same, told to verify grain, joins, and date keys}{同上，并被要求先核对粒度、连接与日期键} & & \usedin & \\
+\multicolumn{7}{@{}l}{\bt{\emph{Metric definitions kept per agent}}{\emph{按智能体保存指标定义}}}\\
+\bt{Single-agent memory}{单智能体记忆} & \bt{\system's learning, checks, and maintenance, but each agent sees only what it learned}{\system\ 的学习、检查与维护，但每个智能体只看得到自己学到的} & \bt{does memory need to be shared?}{记忆是否需要共享？} & \usedin & & & \\
 \addlinespace
-\bt{Invalidate on schema change}{模式变更时失效} & \bt{definitions, invalidated on DDL only}{定义，只在 DDL 时失效} & & \usedin & \usedin\\
-\bt{dbt-style table tests}{dbt 式表级测试} & \bt{definitions, invalidated when a key test on their tables fails}{定义，所读表的键测试失败即失效} & & & \usedin\\
-\bt{Full recheck per definition}{整定义重查} & \bt{definitions, all conditions rechecked on use, no shared results}{定义，使用时重查全部条件、不共享结果} & & \usedin & \usedin\\
+\multicolumn{7}{@{}l}{\bt{\emph{Past sessions shared (question, SQL, calculation)}}{\emph{共享过去的会话（题面、SQL、算式）}}}\\
+\bt{Example retrieval}{示例检索} & \bt{reuses the SQL of up to three similar examples}{原样复用最多三条相似示例的 SQL} & \bt{does existing agent memory suffice?}{现有的智能体记忆是否够用？} & \usedin & & & \usedin\\
+\bt{Example retrieval + self-verification}{示例检索 + 自行核验} & \bt{also verifies grain, joins, and date keys first}{先核对粒度、连接与日期键} & \bt{can the agent check validity itself?}{智能体能否自己核对有效性？} &  & & & \usedin\\
 \addlinespace
-\bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \bt{shared definitions, conditions, repair, optimization}{共享的定义、条件、修复与优化} & \usedin & \usedin & \usedin\\
-\bt{\system, regression on current data}{\system，回归测试用当前数据} & \bt{repair tested on current data, not as of learning time}{修复在当前数据上而非按学习时刻测试} & & \usedin & \usedin\\
+\multicolumn{7}{@{}l}{\bt{\emph{Metric definitions shared}}{\emph{共享指标定义}}}\\
+\bt{Invalidate on schema change}{模式变更时失效} & \bt{invalidates definitions on DDL only}{只有 DDL 使定义失效} & \bt{what does today's safeguard miss?}{现有保障手段漏掉什么？} &  & \usedin & & \usedin\\
+\bt{Invalidate on every write}{每次写入即失效} & \bt{invalidates on any write; agents relearn}{任何写入都失效，智能体重新学习} & \bt{what does safety without conditions cost?}{不用条件而求安全的代价是什么？} &  & & & \usedin\\
+\bt{dbt-style table tests}{dbt 式表级测试} & \bt{tests keys per table; a failing table invalidates its definitions}{按表测试键；测试失败的表使其定义失效} & \bt{does data-validation practice suffice?}{数据验证实践是否够用？} &  & \usedin & & \\
+\addlinespace
+\multicolumn{7}{@{}l}{\bt{\emph{Metric definitions shared, with validity conditions and automatic repair}}{\emph{共享指标定义，附有效性条件与自动修复}}}\\
+\bt{Full recheck per definition}{整定义重查} & \bt{rechecks all of a definition's conditions on use}{使用时重查该定义的全部条件} & \bt{what does check-result reuse save?}{复用检查结果省下多少？} &  & \usedin & \usedin & \usedin\\
+\bt{Full recheck + query cache}{整定义重查 + 查询缓存} & \bt{caches check queries by SQL text and table versions}{检查查询按 SQL 文本与表版本缓存} & \bt{do the savings need typed conditions?}{节省是否需要类型化条件？} &  & \usedin & \usedin & \\
+\bt{Recheck changed tables only}{只重查变化的表} & \bt{rechecks the conditions of changed tables, no reuse}{只重查变化表上的条件，不复用} & \bt{does narrowing the scope alone save work?}{只缩小范围能否省工作？} &  & & \usedin & \\
+\bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \bt{reuses checks by condition; same snapshot; as-of repair}{按条件复用检查；同快照；按学习时刻修复} & \bt{the system of this paper}{本文系统} & \usedin & \usedin & \usedin & \usedin\\
+\bt{\system, regression on current data}{\system，回归测试用当前数据} & \bt{runs the regression test on current data}{回归测试在当前数据上比较} & \bt{what does the as-of comparison add?}{按学习时刻比较带来什么？} &  & \usedin & & \usedin\\
+\bt{\system, gold-SQL reference}{\system，标准答案作参照} & \bt{regression against the benchmark's gold SQL}{回归测试以基准的标准答案 SQL 为参照} & \bt{is the agent's SQL as good a reference?}{智能体自己的 SQL 作参照是否够好？} &  & \usedin & & \usedin\\
 \bottomrule
 \end{tabularx}
-\end{table}
+\end{table*}

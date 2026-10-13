@@ -168,6 +168,9 @@ def main():
         any_r = next(iter(out["methods"].values()))
         mac("Agents", any_r["cells"][0]["agents"])
         mac("Runs", min(r["runs"] for r in out["methods"].values()))
+        # agent sessions answered (unchanged data and after the change), all methods and runs; server failures excluded
+        sessions = sum(c["v1"]["n"] + (c["change"]["n"] if c["change"] else 0) for r in out["methods"].values() for c in r["cells"])
+        mac("Sessions", f"{sessions:,}")
         for m, r in out["methods"].items():
             k = KEY[m]
             mac(f"{k}Acc", f"{r['v1']['acc']['mean'] * 100:.0f}")

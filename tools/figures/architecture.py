@@ -1,523 +1,390 @@
-"""Figure 2: the MAVRA architecture as a vector drawing.
+"""Paper figure 2 (architecture): one agent explores, MAVRA shares, every agent reuses.
 
-The layout reads left to right: the learning side (MAVRA's built-in analysis
-learning agent, an LLM agent drawn in MAVRA's blue inside MAVRA's area, the LLM
-extractor, then the publication checks) writes
-into the shared store in the centre; condition maintenance and repair
-sit under the store, so their write-backs go up into it; the use side
-(lookup) and the execution side (same-snapshot validation) read from it on
-the right for the user agents (3D, outside MAVRA), and the revision
-m^r a lookup returns is the one a query declares.
-The database is one storage slab at the bottom: tables, their versions
-V(T), and the snapshot D_s a query runs on. No engine-specific names appear;
-the figure explains the model, not the implementation.
-
-Step numbers and arrows are coloured by path (learning 1-3, use 4-7,
-execution 8-9, as in the caption of overleaf/figures/architecture.tex); line
-weight says what an arrow does: thin = call or response, thick = write to the
-shared store, dashed = read of database state.
-Coordinates are millimetres from the top-left at printed size: the figure
-spans \\textwidth (178 mm). Every label is checked against the room it has.
+Drawn with the deck kit at 300 mm and scaled to the text width by LaTeX (12 pt
+prints at 7.1 pt, 11 pt at 6.5 pt), like figure 1. Few words, more picture:
+- top: agent windows. Agent A explores (table, value, join and SQL tools) and its
+  answer is verified; agents B-D ask other questions about the same metric and each
+  holds the same shared definition card, answering with one SQL;
+- middle, MAVRA: publication checks, the shared memory (definition cards with
+  version and state, and the check results shared by all definitions), maintenance
+  (repair and optimization, once for all agents), and execution on one snapshot;
+- bottom: the SQL database and the updates that change its tables.
+Paths and colours follow figure 1: publish violet (1-2), use amber (3-5),
+maintain and optimize blue (6-8). Thick arrows write the shared memory, dashed
+ones read database state.
 """
 import math
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from vecfig import PT, measure  # noqa: E402
 import style  # noqa: E402
-from style import (ACC, ACC_DK, ACC_PALE, AMBER, AMBER_PALE, EDGE, FACE, FIELD, INK, MUTED,  # noqa: E402
-                   RED, RULE, SIDE, SLATE, TOP, WHITE)
+from vecfig import measure  # noqa: E402
+from parts import (DASH, EXEC, HEAD, LEARN, NOTE, SOFT, STEP, THICK, THIN, TITLE, USE, WAIT, baseline,  # noqa: E402
+                   legend_pill, mark, node, person, slab, sparkle, step, table_card)
+from style import ACC_DK, AMBER, AMBER_PALE, INK, MUTED, RED, WHITE  # noqa: E402
+import deckpal as P  # noqa: E402
+
+SMALL = NOTE - 1                                             # 11 pt, prints at 6.5 pt
+
+
+def pill(s, x, yc, label, fill, color=WHITE, size=SMALL, h=5.8):
+    """A rounded label; (x, yc) its left edge and vertical centre. Returns its width."""
+    w = measure(label, size, 'bold') + 4.4
+    s.rect(x, yc - h / 2, w, h, fill, None, r=h / 2)
+    s.text(x + 2.2, baseline(yc, size), label, size, color, 'bold')
+    return w
+
+
+def pill_width(label, size=SMALL):
+    return measure(label, size, 'bold') + 4.4
+
+
+def panel(s, b, edge=P.PANEL, fill=WHITE, sw=.45):
+    s.rect(*b, fill, edge, sw, r=1.6)
+
+
+def bubble(s, b, fill, edge):
+    """A speech bubble with a small tail on the left of its top edge."""
+    x, y, w, h = b
+    s.rect(*b, fill, edge, .35, r=1.6)
+    tx = x + 6.0
+    s.poly([(tx - 2.0, y + .2), (tx, y - 2.2), (tx + 2.0, y + .2)], fill, None)
+    s.line(tx - 2.0, y, tx, y - 2.2, edge, .35)
+    s.line(tx, y - 2.2, tx + 2.0, y, edge, .35)
+
+
+def window(s, b, title, fill=WHITE, edge='#C9CED6', bar='#EEF0F4'):
+    """An app window: a title bar with three dots."""
+    x, y, w, h = b
+    s.rect(*b, fill, edge, .4, r=1.6)
+    s.rect(x + .2, y + .2, w - .4, 7.0, bar, None, r=1.4)
+    s.rect(x + .2, y + 4.0, w - .4, 3.2, bar, None)
+    for k, c in enumerate(('#E8796B', '#E9B949', '#6CBF7A')):
+        s.circle(x + 4.0 + 3.6 * k, y + 3.7, 1.05, c)
+    s.text(x + 16.6, baseline(y + 3.7, SMALL), title, SMALL, INK, 'bold')
 
 NAME = 'architecture'
-W, H = style.TEXTWIDTH, 71.3
-LOW = 2.7                                # how far the lower half moved for the taller store
+W, H = 300.0, 138.0
+OK = P.OK
+LEARN_PALE, USE_PALE, EXEC_PALE = '#EFECF7', '#E8F0FB', '#FBF1E6'
 
-TITLE, BODY, NOTE, STEP = 7.0, 6.4, 6.0, 5.6    # font sizes, pt (acmart \scriptsize is 6, \footnotesize 7)
-LEARN, USE, EXEC_C = '#7A68B0', ACC, '#C97A1E'  # path colours: learning, use, execution
-THIN, THICK = .22, .5                            # call or response; write to the shared store
+A = (4.0, 12.0, 74.0, 40.0)                                   # agent A, who explores
+AGENTS = [(146.0 + 47.0 * k, 12.0, 44.0, 40.0) for k in range(3)]   # agents B, C, D, who reuse
+FIELD = (4.0, 64.0, 292.0, 44.0)                             # MAVRA
+PUB = (9.0, 70.0, 50.0, 32.0)
+MEM = (70.0, 70.0, 122.0, 32.0)
+MAINT = (202.0, 70.0, 42.0, 32.0)
+RUN = (250.0, 70.0, 41.0, 32.0)
+DB = (42.0, 116.0, 254.0, 18.0)
+ETL = (6.0, 116.0, 26.0, 18.0)
 
 LABELS = {
     'en': {
-        'opt': ('Learning', 'agent'), 'opt_kind': 'built-in', 'ext': ('LLM', 'extractor'),
-        'agents': 'User agents', 'agents_note': 'questions with metric names only',
-        'middleware': 'MAVRA middleware',
-        'admission': 'Publication', 'candidate': 'candidate',
-        'defs': 'Definitions', 'valid': 'valid', 'pending': 'pending', 'revoked': 'invalid',
-        'results': 'Check results', 'results_key': 'key',
-        'no_result': '? no result at current $V$', 'qc_result': '$Q_c$ result',
-        'valid_mr': 'valid $m^r$', 'q_decl': '$q$ + declared $m^r$',
-        'available': '$m^r$ available · SQL check', 'prov': 'task record',
-        'shared': 'shared by all user agents', 'from_a': 'learned',
-        'maint': 'Condition maintenance', 'maint_note': 'reuse result, else run $Q_c$',
-        'repair': 'Repair', 'repair_note': 'unique filter', 'checks': 'checks', 'regression': 'regression',
-        'lookup': 'Lookup', 'lookup_note': 'compare versions $V(T)$',
-        'tracker': 'Version tracker', 'tracker_note': 'per-table versions',
-        'exec': ('Same-snapshot', 'validation'), 'declares': '$q$ declares $m^r$',
-        'run': 'run $q$ on $D_s$', 'db': 'Database',
-        'db_note': 'tables $T$ · versions $V(T)$ · snapshots $D_s$',
-
-        'db_snapshot': 'snapshot',
-        'etl': 'ETL and writers', 'updates': 'updates', 'publish': 'publish',
-        'reuse': 'reuse', 'to_maint': 'pending', 'failed': 'failed $c$',
-        'versions': '$V(T)$',
-        'tracker_read': '$V(T)$', 'snapshot': 'snapshot $s$',
-        'paths': ('learning path', 'use path', 'execution path'),
-        'lines': ('call / response', 'shared-store write', 'read of database state'),
+        'legend': (('1–2', 'publish', LEARN), ('3–5', 'use', EXEC), ('6–8', 'maintain and optimize', USE)),
+        'agent': 'Agent', 'explores': 'explores once', 'reuses': 'every other agent reuses',
+        'qa': 'Store revenue in March?', 'given': 'definition given', 'verified': 'verified',
+        'qs': ('September?', 'Best month?', 'Q3 vs. Q2?'),
+        'chip': 'Store revenue', 'one_sql': 'one SQL',
+        'mavra': 'MAVRA', 'pub': 'Publish', 'pub_checks': ('answer matches', 'SQL replays', 'key unique'),
+        'mem': 'Shared memory', 'all': 'all agents',
+        'defs': (('Store revenue', 'v2', 'valid'), ('Return rate', 'v1', 'valid'), ('Catalog sales', 'v1', 'checking')),
+        'checks': 'check results, shared',
+        'maint': 'Maintain', 'maint_note': 'repair · optimize', 'once': 'once for all',
+        'run': 'Run', 'run_note': 'on one snapshot', 'run_checks': ('version valid', 'conditions hold'),
+        'db': 'SQL database', 'etl': 'Updates',
+        'a3': 'definition', 'a4': 'SQL + version', 'a5': 'snapshot', 'a7': 'table versions', 'a8': 'new version',
     },
     'zh': {
-        'opt': ('学习', '智能体'), 'opt_kind': '内置大模型', 'ext': ('大模型', '提取器'),
-        'agents': '用户端智能体', 'agents_note': '只给指标名的问题',
-        'middleware': 'MAVRA 中间件',
-        'admission': '发布前检查', 'candidate': '候选',
-        'defs': '定义', 'valid': '有效', 'pending': '待验证', 'revoked': '已失效',
-        'results': '检查结果', 'results_key': '键',
-        'no_result': '? 当前版本尚无结果', 'qc_result': '$Q_c$ 结果',
-        'valid_mr': '有效 $m^r$', 'q_decl': '$q$ + 声明的 $m^r$',
-        'available': '$m^r$ 可用 · SQL 检查', 'prov': '答案记录',
-        'shared': '所有用户端智能体共享', 'from_a': '学到',
-        'maint': '条件维护', 'maint_note': '复用结果，否则执行 $Q_c$',
-        'repair': '修复', 'repair_note': '唯一过滤', 'checks': '检查', 'regression': '回归测试',
-        'lookup': '查找', 'lookup_note': '比较版本 $V(T)$',
-        'tracker': '版本跟踪', 'tracker_note': '每张表的版本',
-        'exec': ('同快照验证', None), 'declares': '$q$ 声明 $m^r$',
-        'run': '在 $D_s$ 上执行 $q$', 'db': '数据库',
-        'db_note': '表 $T$ · 版本 $V(T)$ · 快照 $D_s$',
-
-        'db_snapshot': '快照',
-        'etl': 'ETL 与写入方', 'updates': '更新', 'publish': '发布',
-        'reuse': '复用', 'to_maint': '待验证', 'failed': '条件失败',
-        'versions': '$V(T)$',
-        'tracker_read': '$V(T)$', 'snapshot': '快照 $s$',
-        'paths': ('学习路径', '使用路径', '执行路径'),
-        'lines': ('调用／返回', '写入共享库', '读取数据库状态'),
+        'legend': (('1–2', '发布', LEARN), ('3–5', '使用', EXEC), ('6–8', '维护与优化', USE)),
+        'agent': '智能体', 'explores': '只探索一次', 'reuses': '其他智能体都复用',
+        'qa': '3 月门店营业额？', 'given': '给出口径', 'verified': '核对正确',
+        'qs': ('9 月营业额？', '哪个月最高？', '季度环比？'),
+        'chip': '门店营业额', 'one_sql': '一条 SQL',
+        'mavra': 'MAVRA', 'pub': '发布', 'pub_checks': ('答案一致', 'SQL 重放', '主键唯一'),
+        'mem': '共享记忆', 'all': '所有智能体',
+        'defs': (('门店营业额', 'v2', '有效'), ('退货率', 'v1', '有效'), ('目录营业额', 'v1', '待校验')),
+        'checks': '共享的检查结果',
+        'maint': '维护', 'maint_note': '修复 · 优化', 'once': '一次服务所有',
+        'run': '执行', 'run_note': '在同一快照上', 'run_checks': ('版本有效', '前提成立'),
+        'db': 'SQL 数据库', 'etl': '数据更新',
+        'a3': '定义', 'a4': 'SQL + 版本', 'a5': '快照', 'a7': '表版本', 'a8': '新版本',
     },
 }
 
-# Boxes (x, y, w, h).
-ADM = (4, 24, 21, 27.2)
-STORE = (33, 24, 68, 16.0)
-SPLIT = 69                               # definitions | check results inside the store
-REPAIR = (33, 43.2, 28, 8)
-MAINT = (70.4, 43.2, 30.6, 8)
-LOOKUP = (109, 24, 27, 9.5)
-TRACK = (109, 43.2, 27, 8)
-EXEC = (144, 24, 31, 27.2)
-FIELD_BOX = (1.5, 20, 175.5, 34.2)
-NODE_Y, NODE_H = 6, 8.4                  # front faces of the user agents
-OPT = (2.6, 6.0, 18.2, 10.4)             # MAVRA's built-in learning agent (an LLM agent)
-EXT = (22.2, 6.0, 24.8, 10.4)            # LLM extractor
-INNER = (1.5, .2, 47.0, 20.8)            # MAVRA's field reaches up around both
-PG = (31, 59.7, 144, 11.0)               # the database slab
-DB_TABLES, DB_STATS, DB_SNAP = (76, 32), (110.5, 27), (143.5, 30)   # (x, w) of its three regions
-# One worked example, kept consistent across the figure: each condition reads one
-# table; only T2 is written, so c3 has no check result at the current version
-# and m_2^1, which needs c3, is pending. (condition, table, result)
-CONDS = ((1, 1, 'ok'), (2, 3, 'ok'), (3, 2, 'wait'), (4, 4, 'fail'))
+
+# Icons ------------------------------------------------------------------------------------------------------
+
+def icon_table(s, x, y, color=MUTED):
+    """A small table: header and two rows; (x, y) top-left of a 6 x 5 mm glyph."""
+    s.rect(x, y, 6.0, 5.0, WHITE, color, .3, r=.5)
+    s.rect(x + .15, y + .15, 5.7, 1.4, color, None, r=.4)
+    s.line(x, y + 3.2, x + 6.0, y + 3.2, color, .25)
+    s.line(x + 3.0, y + 1.6, x + 3.0, y + 5.0, color, .25)
 
 
-def mid(box):
-    x, y, w, h = box
-    return x + w / 2, y + h / 2
+def icon_search(s, x, y, color=MUTED):
+    s.circle(x + 2.3, y + 2.2, 1.7, None, color, .45)
+    s.line(x + 3.5, y + 3.4, x + 5.3, y + 5.2, color, .6)
 
 
-def baseline(y_center, size):
-    """Baseline that centres capitals and digits on y_center."""
-    return y_center + .34 * size * PT
+def icon_join(s, x, y, color=MUTED):
+    s.circle(x + 1.4, y + 2.5, 1.3, None, color, .4)
+    s.circle(x + 4.6, y + 2.5, 1.3, None, color, .4)
+    s.line(x + 2.7, y + 2.5, x + 3.3, y + 2.5, color, .4)
+
+
+def icon_sql(s, x, y, color=MUTED):
+    s.rect(x, y, 7.2, 5.0, WHITE, color, .3, r=.6)
+    s.text(x + 3.6, y + 3.6, 'SQL', 7.5, color, 'bold', 'center')
+
+
+def icon_shield(s, cx, cy, color):
+    """Shield with a tick: the publication checks."""
+    r = 4.2
+    s.poly([(cx, cy - r), (cx + r * .85, cy - r * .62), (cx + r * .78, cy + r * .2), (cx, cy + r),
+            (cx - r * .78, cy + r * .2), (cx - r * .85, cy - r * .62)], color, None)
+    s.poly([(cx - 1.7, cy), (cx - .4, cy + 1.3), (cx + 1.9, cy - 1.3)], None, WHITE, .7, closed=False)
+
+
+def icon_cycle(s, cx, cy, color, r=3.4):
+    """Two arcs with heads: recheck when the data changes."""
+    for a0 in (math.radians(200), math.radians(20)):
+        pts = [(cx + r * math.cos(a0 + t * math.radians(130)), cy + r * math.sin(a0 + t * math.radians(130)))
+               for t in (0, 1 / 3, 2 / 3, 1)]
+        s.curve(*pts, stroke=color, sw=.7)
+        a = a0 + math.radians(130)
+        s.head(cx + r * math.cos(a), cy + r * math.sin(a), a + math.pi / 2, color, 1.6)
+
+
+def icon_gauge(s, cx, cy, color, r=3.4):
+    """Speed gauge: optimization."""
+    pts = [(cx + r * math.cos(math.radians(a)), cy - r * math.sin(math.radians(a))) for a in range(0, 181, 15)]
+    s.poly(pts, None, color, .7, closed=False)
+    a = math.radians(40)
+    s.line(cx, cy, cx + .85 * r * math.cos(a), cy - .85 * r * math.sin(a), color, .7)
+    s.circle(cx, cy, .7, color)
+
+
+def icon_snapshot(s, cx, cy, color):
+    """Camera: one snapshot."""
+    s.rect(cx - 4.0, cy - 2.4, 8.0, 5.4, color, None, r=.9)
+    s.rect(cx - 1.6, cy - 3.5, 3.2, 1.4, color, None, r=.4)
+    s.circle(cx, cy + .3, 1.8, WHITE)
+    s.circle(cx, cy + .3, 1.0, color)
+
+
+def icon_bolt(s, x, y, color):
+    s.poly([(x + 2.2, y), (x, y + 3.0), (x + 1.6, y + 3.0), (x + .9, y + 5.4), (x + 3.4, y + 2.0),
+            (x + 1.8, y + 2.0), (x + 2.9, y)], color, None)
+
+
+def icon_updates(s, x, y, color=MUTED):
+    """A stack of update batches."""
+    for k in (2, 1, 0):
+        s.rect(x + 1.4 * k, y + 1.4 * (2 - k), 11.0, 8.0, WHITE, SOFT, .3, r=.8)
+    for r_ in range(3):
+        s.circle(x + 2.4, y + 4.9 + 1.9 * r_, .45, AMBER)
+        s.rect(x + 3.6, y + 4.5 + 1.9 * r_, 5.6, .8, '#D9D5CE', None, r=.3)
+
+
+# Pieces -----------------------------------------------------------------------------------------------------
+
+def agent_window(s, b, title):
+    x, y, w, h = b
+    window(s, b, title)
+
+
+def group(s, x0, x1, y, label, color):
+    """A header over a group of agents: a pill and a bracket line under it."""
+    pw = pill_width(label)
+    s.line(x0, y + 3.4, x1, y + 3.4, color, .45)
+    s.line(x0, y + 3.4, x0, y + 5.0, color, .45)
+    s.line(x1, y + 3.4, x1, y + 5.0, color, .45)
+    s.rect((x0 + x1 - pw) / 2 - 1.0, y - 3.0, pw + 2.0, 6.6, WHITE, None)
+    pill(s, (x0 + x1 - pw) / 2, y, label, color)
+
+
+def def_card(s, x, y, w, name, ver, state):
+    """One definition in the shared memory: name, then state dot and version pill."""
+    colour = {'valid': OK, '有效': OK}.get(state, P.PENDING)
+    s.rect(x, y, w, 12.6, WHITE, '#C9D3E6', .35, r=1.0)
+    s.rect(x, y, 1.3, 12.6, colour, None, r=.6)
+    s.text(x + 3.2, y + 5.0, name, SMALL, INK, 'bold', width=w - 4.4)
+    s.circle(x + 4.4, y + 9.2, 1.0, colour)
+    s.text(x + 6.4, y + 10.4, state, SMALL, MUTED)
+    pill(s, x + w - 2.0 - pill_width(ver), y + 9.2, ver, USE, h=4.4)
+
+
+def check_row(s, x, y, label, size=SMALL):
+    mark(s, x + 1.4, y - 1.2, 'ok', OK)
+    return s.text(x + 4.2, y, label, size, INK)
+
+
+def module(s, b, title, note, color, pale):
+    """A MAVRA module: tinted header with the title and a muted note."""
+    x, y, w, h = b
+    panel(s, b, color, WHITE, .5)
+    s.rect(x + .25, y + .25, w - .5, 9.0, pale, None, r=1.4)
+    s.rect(x + .25, y + 5.0, w - .5, 4.25, pale, None)
+    s.text(x + 3.0, baseline(y + 4.9, TITLE - 1), title, TITLE - 1, INK, 'bold')
+    if note:
+        s.text(x + w - 3.0, baseline(y + 4.9, SMALL), note, SMALL, MUTED, align='right')
+
+
+def arrow_label(s, x, y, label, color, align='left'):
+    s.text(x, y, label, SMALL, color, align=align)
 
 
 def draw(s, lang):
     L = LABELS[lang]
-    text, rect, route = s.text, s.rect, s.route
+    text, route = s.text, s.route
 
-    def node(x, w, y=NODE_Y, d=1.5, own=False):
-        """Front face with a top and a right face behind it; MAVRA's own parts are blue."""
-        h = NODE_H
-        top, side, edge, face = ('#E6EFFA', '#D3E2F4', '#9DBBE2', '#F7FAFE') if own else \
-            ('#F2F0EC', '#E7E4DF', '#BDB9B2', WHITE)
-        s.poly([(x, y), (x + d, y - d), (x + w + d, y - d), (x + w, y)], top, edge, .12)
-        s.poly([(x + w, y), (x + w + d, y - d), (x + w + d, y + h - d), (x + w, y + h)],
-               side, edge, .12)
-        rect(x, y, w, h, face, edge, .16, r=.35)
+    # Agents ---------------------------------------------------------------------------------------------
+    x, y, w, h = A
+    group(s, x, x + w, y - 6.0, L['explores'], LEARN)
+    agent_window(s, A, f"{L['agent']} A")
+    bubble(s, (x + 3.0, y + 10.0, w - 6.0, 13.0), '#F7F6FB', '#D5CFE8')
+    text(x + 5.4, baseline(y + 14.6, NOTE), L['qa'], NOTE, INK, 'bold', width=w - 11.0)
+    text(x + 5.4, baseline(y + 19.6, SMALL), L['given'], SMALL, LEARN)
+    ix = x + 4.0
+    for draw_icon, adv in ((icon_table, 8.4), (icon_search, 7.4), (icon_join, 8.2), (icon_sql, 9.6)):
+        draw_icon(s, ix, y + 27.4)
+        ix += adv
+    route([(ix - .4, y + 29.9), (ix + 3.4, y + 29.9)], MUTED, THIN, length=1.6)
+    check_row(s, ix + 4.2, y + 31.4, L['verified'])
 
-    def two_lines(b, lines, x_text):
-        """Bold one- or two-line title of a component box, centred vertically."""
-        x, y, w, h = b
-        first, second = lines
-        room = x + w - x_text - .8
-        if second:
-            text(x_text, y + h / 2 - .35, first, TITLE, INK, 'bold', width=room)
-            text(x_text, y + h / 2 + 2.65, second, TITLE, INK, 'bold', width=room)
-        else:
-            text(x_text, y + h / 2 + 1.2, first, TITLE, INK, 'bold', width=room)
+    group(s, AGENTS[0][0], AGENTS[-1][0] + AGENTS[-1][2], y - 6.0, L['reuses'], EXEC)
+    for k, b in enumerate(AGENTS):
+        bx, by, bw, bh = b
+        agent_window(s, b, f"{L['agent']} {'BCD'[k]}")
+        bubble(s, (bx + 3.0, by + 10.0, bw - 6.0, 8.0), '#FBF7F1', '#EBD9C2')
+        text(bx + 5.0, baseline(by + 14.0, SMALL), L['qs'][k], SMALL, INK, 'bold', width=bw - 10.0)
+        s.rect(bx + 3.0, by + 21.0, bw - 6.0, 8.6, USE_PALE, '#B9CBEA', .35, r=1.0)
+        text(bx + 5.0, baseline(by + 25.3, SMALL), L['chip'], SMALL, ACC_DK, width=bw - 11.0 - pill_width('v2'))
+        pill(s, bx + bw - 5.0 - pill_width('v2'), by + 25.3, 'v2', USE, h=4.6)
+    # more agents
+    for k in range(3):
+        s.circle(AGENTS[-1][0] + AGENTS[-1][2] + 1.6 + 1.5 * k, 32.0, .45, MUTED)
+    # one SQL each
+    for b in AGENTS:
+        icon_bolt(s, b[0] + 4.0, b[1] + 32.0, EXEC)
+        text(b[0] + 8.4, b[1] + 36.4, L['one_sql'], SMALL, EXEC)
+        mark(s, b[0] + b[2] - 6.0, b[1] + 35.2, 'ok', OK)
 
-    def optimizer(b):
-        """MAVRA's built-in learning agent: an LLM agent, so it has an agent's 3D
-        form like the user agents, but in MAVRA's blue, inside MAVRA, with an LLM mark."""
-        x, y, w, h = b
-        d = 1.2
-        s.poly([(x, y), (x + d, y - d), (x + w + d, y - d), (x + w, y)], '#E6EFFA', '#9DBBE2', .12)
-        s.poly([(x + w, y), (x + w + d, y - d), (x + w + d, y + h - d), (x + w, y + h)],
-               '#D3E2F4', '#9DBBE2', .12)
-        rect(x, y, w, h, '#F7FAFE', ACC, .2, r=.5)
-        cx, cy, r = x + 3.0, y + h / 2, 1.8
-        rect(cx - r, cy - r, 2 * r, 2 * r, ACC, None, r=.9)
-        sparkle(cx, cy, 1.25)
-        sparkle(cx + 1.05, cy - 1.0, .45)
-        tx, room = x + 5.8, w - 5.8 - .8
-        first, second = L['opt']
-        text(tx, y + 3.5, first, TITLE, INK, 'bold', width=room)
-        text(tx, y + 6.3, second, TITLE, INK, 'bold', width=room)
-        text(tx, y + 9.0, L['opt_kind'], NOTE, ACC_DK, 'bold', width=room)
+    # Legend between the agents ------------------------------------------------------------------------
+    lx, ly = 88.0, 18.0
+    for steps, label, color in L['legend']:
+        legend_pill(s, lx, ly, label, color, steps)
+        ly += 8.6
+    route([(lx, ly + 1.0), (lx + 13.0, ly + 1.0)], INK, THICK, length=HEAD)
+    text(lx + 15.4, baseline(ly + 1.0, SMALL), {'en': 'writes shared memory', 'zh': '写入共享记忆'}[lang], SMALL, MUTED)
 
-    def sparkle(cx, cy, r):
-        """Four-pointed star, the usual mark for an LLM."""
-        pts = []
-        for k in range(8):
-            a = math.pi / 4 * k - math.pi / 2
-            rr = r if k % 2 == 0 else .28 * r
-            pts.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
-        s.poly(pts, WHITE, None)
+    # MAVRA field --------------------------------------------------------------------------------------
+    fx, fy, fw, fh = FIELD
+    s.rect(*FIELD, P.FIELD, '#C9D3E6', .45, r=2.4)
+    s.rect(fx + 3.0, fy - 2.6, 1.1, 5.2, ACC_DK)
+    text(fx + 5.6, baseline(fy, TITLE), L['mavra'], TITLE, ACC_DK, 'bold')
 
-    def extractor(b):
-        x, y, w, h = b
-        box(b)
-        two_lines(b, L['ext'], x + 1.8)
-        gx, gy = x + w - 12.4, y + h / 2
-        cols = [(gx + 1.6, (-2.0, 2.0)), (gx + 6.0, (-2.6, 0, 2.6)), (gx + 10.4, (-1.3, 1.3))]
-        for (xa, ya), (xb, yb) in zip(cols, cols[1:]):
-            for y1 in ya:
-                for y2 in yb:
-                    s.line(xa, gy + y1, xb, gy + y2, RULE, .14)
-        for xc, ys in cols:
-            for yc in ys:
-                s.circle(xc, gy + yc, .62, WHITE, ACC, .2)
+    # Publish
+    module(s, PUB, L['pub'], None, LEARN, LEARN_PALE)
+    px, py, pw, ph = PUB
+    icon_shield(s, px + pw - 7.5, py + 4.9, LEARN)
+    for k, lab in enumerate(L['pub_checks']):
+        check_row(s, px + 4.0, py + 16.6 + 6.4 * k, lab)
 
-    def agent(x, w=9.5):
-        """A user agent: a person asking in natural language, holding the shared m_1^3."""
-        node(x, w)
-        y = NODE_Y
-        s.circle(x + 2.25, y + 2.1, .85, '#8E8B85')
-        rect(x + 1.0, y + 3.15, 2.5, 1.5, '#8E8B85', None, r=.75)
-        bx, bw = x + 4.3, w - 5.6               # speech bubble with two lines
-        rect(bx, y + 1.0, bw, 3.4, ACC_PALE, ACC, .12, r=.7)
-        for k, length in enumerate((bw - 1.4, bw - 2.3)):
-            s.line(bx + .7, y + 2.15 + 1.15 * k, bx + .7 + length, y + 2.15 + 1.15 * k, ACC, .22)
-        shared_def(x + 1.2, y + 5.3, w - 2.4)
-
-    def shared_def(x, y, w):
-        """The definition m_1^3, the same one every user agent receives."""
-        rect(x, y, w, 2.5, ACC_PALE, ACC, .16, r=.5)
-        text(x + w / 2, y + 1.85, '$m_1^3$', 5.6, ACC_DK, align='center')
-
-    def gate(cx, cy, r=2.0):
-        """Publication check: candidates pass only between its two bars."""
-        s.poly([(cx - r, cy), (cx, cy - r), (cx + r, cy), (cx, cy + r)], WHITE, ACC, .2)
-        for dx in (-.42 * r, .42 * r):
-            s.line(cx + dx, cy - .55 * r, cx + dx, cy + .55 * r, ACC, .24)
-
-    def mark(x, y, kind):
-        """Check-result mark centred on (x, y): holds, fails, or not yet known."""
+    # Shared memory
+    mx, my, mw, mh = MEM
+    node(s, MEM, 2.6)
+    s.rect(mx + .25, my + .25, mw - .5, 9.0, USE_PALE, None, r=.8)
+    text(mx + 3.0, baseline(my + 4.9, TITLE - 1), L['mem'], TITLE - 1, INK, 'bold')
+    pill(s, mx + mw - 3.0 - pill_width(L['all']), my + 4.9, L['all'], USE, h=5.0)
+    cw = (mw - 6.0 - 2 * 3.0) / 3
+    for k, (name, ver, state) in enumerate(L['defs']):
+        def_card(s, mx + 3.0 + k * (cw + 3.0), my + 12.0, cw, name, ver, state)
+    # shared check results: one strip of results under the cards
+    sy = my + 28.0
+    text(mx + 3.0, sy + 1.0, L['checks'], SMALL, MUTED)
+    cx0 = mx + 6.0 + measure(L['checks'], SMALL)
+    for k, kind in enumerate(('ok', 'ok', 'ok', 'ok', 'wait', 'ok')):
+        bx = cx0 + 6.2 * k
+        s.rect(bx, sy - 2.6, 5.0, 4.4, AMBER_PALE if kind == 'wait' else WHITE,
+               AMBER if kind == 'wait' else '#C9D3E6', .3, r=.7)
         if kind == 'ok':
-            s.poly([(x - .62, y), (x - .15, y + .5), (x + .65, y - .55)], None, ACC, .24,
-                   closed=False)
-        elif kind == 'fail':
-            s.line(x - .5, y - .5, x + .5, y + .5, RED, .24)
-            s.line(x - .5, y + .5, x + .5, y - .5, RED, .24)
+            mark(s, bx + 2.5, sy - .4, 'ok', OK)
         else:
-            text(x, y + .8, '?', NOTE + .6, '#9A6500', 'bold', 'center')
+            text(bx + 2.5, sy + 1.0, '?', SMALL, WAIT, 'bold', 'center')
 
-    def chip(x, y, cond, kind):
-        rect(x, y, 4.4, 2.3, FACE, EDGE, .1, r=.45)
-        text(x + .5, y + 1.7, f'$c_{cond}$', 5.4, INK)
-        mark(x + 3.35, y + 1.15, kind)
+    # Maintain
+    module(s, MAINT, L['maint'], None, USE, USE_PALE)
+    ax, ay, aw, ah = MAINT
+    icon_cycle(s, ax + 12.0, ay + 16.6, USE)
+    icon_gauge(s, ax + 29.0, ay + 18.2, USE)
+    text(ax + aw / 2, ay + 25.4, L['maint_note'], SMALL, MUTED, align='center')
+    text(ax + aw / 2, ay + 30.4, L['once'], SMALL, USE, 'bold', align='center')
 
-    def step(x, y, n, color):
-        s.circle(x, y, 1.45, color)
-        text(x, baseline(y, STEP), str(n), STEP, WHITE, 'bold', 'center')
+    # Run on one snapshot
+    module(s, RUN, L['run'], None, EXEC, EXEC_PALE)
+    rx, ry, rw, rh = RUN
+    icon_snapshot(s, rx + rw - 8.0, ry + 5.0, EXEC)
+    text(rx + 3.0, ry + 15.0, L['run_note'], SMALL, MUTED)
+    for k, lab in enumerate(L['run_checks']):
+        check_row(s, rx + 3.0, ry + 22.0 + 6.0 * k, lab)
 
-    def box(b, fill=WHITE):
-        rect(*b, fill, EDGE, .16, r=.6)
+    # Database -----------------------------------------------------------------------------------------
+    dx, dy, dw, dh = DB
+    slab(s, DB)
+    text(dx + 4.0, baseline(dy + dh / 2, TITLE - 1), L['db'], TITLE - 1, INK, 'bold')
+    tables = (('`store_sales`', (1, 2)), ('`date_dim`', ()), ('`item`', ()), ('`store`', ()), ('`customer`', ()))
+    tx = dx + 52.0
+    for label, changed in tables:
+        tw = 30.0
+        table_card(s, tx, tw, dy + 2.4, dh - 4.8, label, changed, size=SMALL)
+        tx += tw + 6.0
+    ex_, ey_, ew_, eh_ = ETL
+    icon_updates(s, ex_ + 2.0, ey_ + 1.0)
+    text(ex_ + ew_ / 2 - 3.0, ey_ + eh_ + .2, L['etl'], SMALL, MUTED, align='center')
 
-    def titled(b, title, note, pad=1.8, reserve=0):
-        """Box with a bold title and a note; reserve keeps room on the right."""
-        x, y, w, h = b
-        box(b)
-        text(x + pad, y + 3.6, title, TITLE, INK, 'bold', width=w - 2 * pad - reserve)
-        if note:
-            text(x + pad, y + 6.8, note, NOTE, MUTED, width=w - 2 * pad)
+    # Arrows -------------------------------------------------------------------------------------------
+    wb = A[1] + A[3]                                   # bottom of the agent windows
+    bus = wb + 7.0
+    # 1 the verified session becomes a candidate; 2 the checks publish it
+    ax1 = PUB[0] + 24.0
+    route([(ax1, wb), (ax1, PUB[1])], LEARN, THIN, length=HEAD)
+    step(s, ax1 + 4.6, (wb + PUB[1]) / 2, 1, LEARN, r=2.6)
+    route([(PUB[0] + PUB[2], my + 18.0), (mx, my + 18.0)], LEARN, THICK, length=HEAD)
+    step(s, (PUB[0] + PUB[2] + mx) / 2, my + 13.0, 2, LEARN, r=2.6)
 
-    def gap_label(x0, x1, y, label, color=MUTED):
-        """Label centred over an arrow that crosses the gap from x0 to x1."""
-        text((x0 + x1) / 2, y, label, NOTE, color, 'sans', 'center', width=x1 - x0 - .6)
+    # 3 the definition goes to every agent; 4 their SQL with the declared version; 5 run on a snapshot
+    xs = [b[0] + 10.0 for b in AGENTS]
+    route([(xs[0], my - 2.6), (xs[0], wb)], EXEC, THIN, length=HEAD)
+    route([(xs[0], bus), (xs[-1], bus)], EXEC, THIN, heads=None)
+    for xb in xs[1:]:
+        route([(xb, bus), (xb, wb)], EXEC, THIN, length=HEAD)
+    y3 = (wb + bus) / 2
+    step(s, xs[0] - 4.6, y3, 3, EXEC, r=2.6)
+    arrow_label(s, xs[0] + 2.0, baseline(y3, SMALL), L['a3'], EXEC)
 
-    # Field: MAVRA's area reaches up around its built-in optimizer and extractor
-    rect(*INNER, FIELD, None, r=1.4)
-    rect(*FIELD_BOX, FIELD, None, r=1.4)
-    rect(3.0, 1.2, .55, 2.6, ACC)
-    text(4.5, 3.3, L['middleware'], TITLE - .4, ACC_DK, 'bold')
+    x4 = RUN[0] + RUN[2] / 2 + 6.0
+    route([(x4, wb), (x4, RUN[1])], EXEC, THIN, length=HEAD)
+    step(s, x4 + 4.6, y3, 4, EXEC, r=2.6)
+    arrow_label(s, x4 - 2.0, baseline(y3, SMALL), L['a4'], EXEC, align='right')
 
-    # Built-in optimizer and extractor; user agents outside MAVRA ---------
-    optimizer(OPT)
-    extractor(EXT)
+    x5 = RUN[0] + RUN[2] / 2
+    y57 = (RUN[1] + RUN[3] + DB[1] - 2.8) / 2
+    route([(x5, RUN[1] + RUN[3]), (x5, DB[1] - 2.8)], EXEC, THIN, dash=DASH, length=HEAD)
+    step(s, x5 + 4.6, y57, 5, EXEC, r=2.6)
+    arrow_label(s, x5 + 8.4, baseline(y57, SMALL), L['a5'], EXEC)
 
-    b4, b8 = mid(LOOKUP)[0], mid(EXEC)[0]
-    b_xs = (b4 - 4.75, b4 + 9.25, b4 + 23.25)
-    for x in b_xs:
-        agent(x)
-    for k in range(3):
-        s.circle(b_xs[-1] + 13.2 + 1.6 * k, NODE_Y + NODE_H / 2, .32, EDGE)
-    w = text(b_xs[0], 3.2, L['agents'], TITLE, INK, 'bold')
-    text(b_xs[0] + w + 1.6, 3.2, L['agents_note'], NOTE, MUTED, width=W - b_xs[0] - w - 2.5)
-
-    # Legend: step colours by path, line kinds -----------------------------
-    lx = 50
-    for k, (label, color, steps) in enumerate(zip(L['paths'], (LEARN, USE, EXEC_C),
-                                                  ('1–3', '4–7', '8–9'))):
-        y = 4.6 + 3.8 * k
-        rect(lx, y - 1.4, 6.6, 2.8, color, None, r=1.4)
-        text(lx + 3.3, baseline(y, STEP), steps, STEP, WHITE, 'bold', 'center')
-        text(lx + 7.8, baseline(y, NOTE), label, NOTE, INK)
-    kx = 77
-    for k, (label, sw, color, dash) in enumerate(zip(L['lines'], (THIN, THICK, THIN),
-                                                     (INK, INK, SLATE), (None, None, (.9, .6)))):
-        y = 4.6 + 3.8 * k
-        route([(kx, y), (kx + 6.5, y)], color, sw, dash=dash, length=1.1)
-        text(kx + 8.0, baseline(y, NOTE), label, NOTE, MUTED, width=b_xs[0] - kx - 10)
-
-    # Learning path: learning agent -> extractor -> publication checks -> store -------------------------
-    ax, ay, aw, ah = ADM
-    box(ADM)
-    a1, a2 = 7.5, EXT[0] + 1.6                 # optimizer and extractor arrows
-    ob, eb = OPT[1] + OPT[3], EXT[1] + EXT[3]
-    route([(a1, ob), (a1, ay)], LEARN, THIN)
-    step(a1 - 2.8, 21.8, 1, LEARN)
-    route([(a2 - .9, ay), (a2 - .9, eb)], LEARN, THIN, length=1.0)
-    route([(a2 + .9, eb), (a2 + .9, ay)], LEARN, THIN, length=1.0)
-    text(a2 - 2.3, 19.3, L['prov'], NOTE, MUTED, align='right', width=a2 - 2.3 - a1 - 1.0)
-    text(a2 + 2.3, 19.3, L['candidate'], NOTE, MUTED, width=INNER[0] + INNER[2] - a2 - 3.0)
-    step(a2 + 3.1, 21.9, 2, LEARN)
-    # Candidate (task record: queries and arithmetic) through the checks.
-    cx, cy = ax + 2.0, ay + 2.2
-    rect(cx + .9, cy - .9, 8.6, 9.2, FACE, EDGE, .12, r=.4)
-    rect(cx, cy, 8.6, 9.2, WHITE, EDGE, .15, r=.4)
-    s.line(cx + 2, cy + 2.2, cx + 2, cy + 6.8, LEARN, .2)
-    for k in range(3):
-        yy = cy + 2.2 + 2.3 * k
-        s.circle(cx + 2, yy, .55, LEARN)
-        s.line(cx + 3.6, yy, cx + 7.2 - .9 * (k == 2), yy, RULE, .32)
-    text(cx + 4.3, cy + 12.6, L['candidate'], NOTE, MUTED, 'sans', 'center')
-    gx, gy = ax + aw - 4.6, cy + 4.6
-    route([(cx + 8.6, gy), (gx - 2.0, gy)], LEARN, .18, length=1.0)
-    gate(gx, gy)
-    text(gx, cy + 12.6, L['checks'], NOTE, ACC_DK, 'sans', 'center', width=8.5)
-    text(ax + aw / 2, ay + ah - 2.4, L['admission'], TITLE, INK, 'bold', 'center', width=aw - 2)
-    sx = STORE[0]
-    route([(gx + 2.0, gy), (sx, gy)], LEARN, THICK)
-    gap_label(ax + aw, sx, gy - 1.2, L['publish'])
-    step((ax + aw + sx) / 2, gy + 2.7, 3, LEARN)
-
-    # Shared store: definitions | check results ---------------------------
-    x, y, w, h = STORE
-    rect(x + 1, y + 1, w, h, SIDE, EDGE, .12, r=.6)
-    box(STORE)
-    rect(x, y, w, 4.4, ACC_PALE, None, r=.6)
-    rect(x, y + 2.2, w, 2.2, ACC_PALE, None)
-    s.line(x, y + 4.4, x + w, y + 4.4, RULE, .14)
-    s.line(SPLIT, y, SPLIT, y + h, RULE, .14)
-    pw_ = measure(L['shared'], NOTE, 'bold') + 3.0
-    rect(x + w - pw_, 20.95, pw_, 2.5, ACC, None, r=1.25)
-    text(x + w - pw_ / 2, 22.75, L['shared'], NOTE, WHITE, 'bold', 'center')
-    tw = text(x + 1.8, y + 3.2, L['defs'], TITLE, INK, 'bold')
-    text(SPLIT - 1.6, y + 3.2, '$m^r=(B,I,C,E,r)$', BODY, INK, align='right',
-         width=SPLIT - x - 5 - tw)
-    rows = [('$m_1^{3}$', L['valid'], ACC_DK, ((1, 'ok'), (2, 'ok'))),
-            ('$m_2^{1}$', L['pending'], AMBER, ((2, 'ok'), (3, 'wait'))),
-            ('$m_3^{2}$', L['revoked'], RED, ((4, 'fail'),))]
-    for k, (name, state, col, conds) in enumerate(rows):
-        yy = y + 5.4 + 3.2 * k
-        if k == 0:                       # the shared definition, as held by every user agent
-            rect(x + .9, yy - .25, SPLIT - x - 1.8, 2.6, ACC_PALE, None, r=.4)
-        elif k == 1:                     # pending because c3 has no result at V(T2)
-            rect(x + .9, yy - .25, SPLIT - x - 1.8, 2.6, AMBER_PALE, None, r=.4)
-        rect(x + 1.8, yy + .1, .6, 2.1, col)
-        text(x + 3.2, yy + 1.75, name, BODY, INK)
-        text(x + 9.0, yy + 1.75, state, NOTE, col)
-        if k == 0:
-            text(x + 17.0, yy + 1.75, L['from_a'], NOTE, LEARN, 'bold', width=8.5)
-        for j, (cond, kind) in enumerate(conds):
-            chip(SPLIT - 1.6 - 4.4 * (len(conds) - j) - .6 * (len(conds) - 1 - j), yy, cond, kind)
-    text(SPLIT + 1.6, y + 3.2, L['results'], TITLE, INK, 'bold', width=x + w - SPLIT - 3.2)
-    kw = text(SPLIT + 1.6, y + 7.3, L['results_key'], NOTE, MUTED)
-    text(SPLIT + 2.6 + kw, y + 7.3, r'$(\mathrm{id}(c),\,V(\mathrm{dep}(c)))$', NOTE, INK,
-         width=x + w - SPLIT - 4.2 - kw)
-    cw_ = (x + w - SPLIT - 3.2 - 1.0) / 2
-    for j, (cond, table, kind) in enumerate(CONDS):
-        cx_, cy_ = SPLIT + 1.6 + (j % 2) * (cw_ + 1.0), y + 8.1 + (j // 2) * 2.55
-        missing = kind == 'wait'
-        rect(cx_, cy_, cw_, 2.2, AMBER_PALE if missing else FACE, AMBER if missing else EDGE,
-             .14 if missing else .1, r=.45)
-        text(cx_ + .6, cy_ + 1.65, f'$c_{cond}$', NOTE, INK)
-        text(cx_ + 4.4, cy_ + 1.65, f'$T_{table}$', NOTE, MUTED)
-        mark(cx_ + cw_ - 1.3, cy_ + 1.1, kind)
-    text(SPLIT + 1.6, y + h - 1.0, L['no_result'], NOTE, '#9A6500', width=x + w - SPLIT - 3.2)
-
-    # Use path: lookup, maintenance, repair --------------------------------
-    titled(MAINT, L['maint'], L['maint_note'])
-    titled(REPAIR, L['repair'], L['repair_note'], reserve=6)
-    rx, ry, rw, rh = REPAIR
-    gate(rx + rw - 3.6, ry + 3.0, 1.6)
-    text(rx + rw - .8, ry + 6.8, L['regression'], NOTE, ACC_DK, 'sans', 'right', width=11.5)
-
-    lx_, ly, lw, lh = LOOKUP
-    box(LOOKUP)
-    text(lx_ + 1.8, ly + 3.9, L['lookup'], TITLE, INK, 'bold')
-    text(lx_ + 1.8, ly + 7.3, L['lookup_note'], NOTE, MUTED, width=lw - 3.6)
-    titled(TRACK, L['tracker'], L['tracker_note'])
-
-    # Agents: one bus to both entry points.
-    bus_y = 17.2
-    for xc in (bx + 4.75 for bx in b_xs):
-        route([(xc, NODE_Y + NODE_H), (xc, bus_y)], INK, .2, heads=None)
-    route([(b4 - .9, bus_y), (b8, bus_y)], INK, .2, heads=None)
-    route([(b4 - .9, bus_y), (b4 - .9, ly)], USE, THIN, length=1.0)        # call
-    route([(b4 + .9, ly), (b4 + .9, bus_y)], USE, THIN, length=1.0)        # response
-    text(b4 + 2.3, 21.6, L['valid_mr'], NOTE, USE)
-    step(b4 - 3.7, 21.6, 4, USE)
-
-    store_right = STORE[0] + STORE[2]
-    route([(store_right, ly + 3.5), (lx_, ly + 3.5)], USE, THIN)
-    gap_label(store_right, lx_, ly + 2.4, '$m^r$')
-    mx, my, mw, mh = MAINT
-    lane = 105
-    route([(lx_, ly + 7.5), (lane, ly + 7.5), (lane, my + 4.0), (mx + mw, my + 4.0)], USE, THIN,
-          radius=.8)
-    step(store_right + 1.85, (STORE[1] + STORE[3] + my) / 2, 5, USE)
-    text(lane + 1.3, (STORE[1] + STORE[3] + my) / 2 + .9, L['to_maint'], NOTE, MUTED)
-
-    vx = SPLIT + 15
-    route([(vx, my), (vx, STORE[1] + STORE[3])], USE, THICK, heads='both', length=1.0)
-    step(vx - 2.9, (STORE[1] + STORE[3] + my) / 2, 6, USE)
-    text(vx + 1.4, (STORE[1] + STORE[3] + my) / 2 + .9, L['reuse'], NOTE, MUTED)
-    route([(mx, my + 4.0), (rx + rw, my + 4.0)], USE, THIN, length=1.0)
-    gap_label(rx + rw, mx, my + 2.9, L['failed'], RED)
-    step((rx + rw + mx) / 2, my + 6.6, 7, USE)
-    fx = rx + 14
-    route([(fx, ry), (fx, STORE[1] + STORE[3])], USE, THICK, length=1.0)
-    text(fx + 1.4, (STORE[1] + STORE[3] + ry) / 2 + .9, '$m^{r+1}$', NOTE, MUTED)
-
-    tx, ty, tw_, th = TRACK
-    vt = tx + 18
-    route([(vt, ty), (vt, ly + lh)], SLATE, THIN, dash=(.9, .6), length=1.0)
-    text(vt + 1.3, (ly + lh + ty) / 2 + .9, L['versions'], NOTE, SLATE)
-
-    # Execution path: same-snapshot validation -----------------------------
-    ex, ey, ew, eh = EXEC
-    box(EXEC)
-    route([(b8, bus_y), (b8, ey)], EXEC_C, THIN)
-    step(b8 + 2.8, 21.6, 8, EXEC_C)
-    text(b8 - 1.4, 21.6, L['q_decl'], NOTE, EXEC_C, align='right', width=b8 - 1.4 - b4 - 16)
-    first, second = L['exec']
-    text(ex + 1.8, ey + 3.9, first, TITLE, INK, 'bold', width=ew - 3.6)
-    top = ey + 3.9
-    if second:
-        top += 3.0
-        text(ex + 1.8, top, second, TITLE, INK, 'bold', width=ew - 3.6)
-    text(ex + 1.8, top + 3.3, L['declares'], BODY, INK, width=ew - 3.6)
-    mark(ex + 3.2, top + 5.75, 'ok')
-    text(ex + 4.6, top + 6.3, L['available'], NOTE, INK, width=ew - 6.4)
-    fx, fy, fw, fh = ex + 1.8, top + 8.6, ew - 3.6, 7.0
-    rect(fx, fy, fw, fh, None, EXEC_C, .18, r=.6, dash=(.8, .5))
-    dw = 4.4
-    rect(fx + fw - dw - 1.2, fy - 1.1, dw, 2.2, WHITE, None)
-    text(fx + fw - 1.2 - dw / 2, fy + .8, '$D_s$', BODY, EXEC_C, align='center')
-    for k, label in enumerate((r'$\forall c \in C(m^r){:}\ c(D_s)$', L['run'])):
-        yy = fy + 2.9 + 2.7 * k
-        mark(fx + 1.4, yy - .55, 'ok')
-        text(fx + 2.8, yy, label, NOTE, INK, width=fw - 3.4)
-    px, py, pw, ph = PG
-    route([(b8, ey + eh), (b8, py - 1.3)], EXEC_C, THIN)
-    step(b8 - 2.8, 52.2 + LOW, 9, EXEC_C)
-    text(b8 - 4.8, baseline(52.2 + LOW, NOTE), L['snapshot'], NOTE, MUTED, align='right')
-
-    # Database reads -------------------------------------------------------
-    t_cw = (DB_TABLES[1] - 3 * .9) / 4
-    qx = DB_TABLES[0] + (t_cw + .9) + t_cw / 2       # over T2, the table c3 reads
-    route([(qx, py - 1.3), (qx, my + mh)], SLATE, THIN, dash=(.9, .6), length=1.0)
-    text(qx + 1.3, 53.6 + LOW, L['qc_result'], NOTE, SLATE)
-    vr = tx + 5
-    route([(vr, py - 1.3), (vr, ty + th)], SLATE, THIN, dash=(.9, .6), length=1.0)
-    text(vr + 1.3, 53.6 + LOW, L['tracker_read'], NOTE, SLATE, width=b8 - 4.8 - 18 - vr)
-
-    # Database: one storage slab. Its three regions sit under the arrows that
-    # reach them: check queries read tables, the tracker reads statistics and
-    # versions, same-snapshot validation runs on a snapshot.
-    d = 1.4
-    soft = '#BDB9B2'
-    s.poly([(px, py), (px + d, py - d), (px + pw + d, py - d), (px + pw, py)], '#F2F0EC', soft, .12)
-    s.poly([(px + pw, py), (px + pw + d, py - d), (px + pw + d, py + ph - d), (px + pw, py + ph)],
-           '#E7E4DF', soft, .12)
-    rect(px, py, pw, ph, FACE, soft, .16, r=.5)
-    room = DB_TABLES[0] - px - 4.0
-    text(px + 2.4, py + 4.4, L['db'], TITLE, INK, 'bold', width=room)
-    text(px + 2.4, py + 7.8, L['db_note'], NOTE, MUTED, width=room)
-    top, inner = py + 1.2, ph - 2.4
-    row_fill = '#E4E1DB'
-
-    def table_card(x0, w, y0, h, label, changed=(), outline=EDGE, dash=None):
-        rect(x0, y0, w, h, WHITE, outline, .14, r=.35, dash=dash)
-        rect(x0 + .15, y0 + .15, w - .3, 2.0, TOP, None, r=.25)
-        text(x0 + w / 2, y0 + 1.75, label, NOTE, INK, align='center', width=w - .6)
-        rows = int((h - 2.9) // 1.35)
-        for r_ in range(rows):
-            yy = y0 + 2.75 + 1.35 * r_
-            hot = r_ in changed
-            rect(x0 + .8, yy, w - 1.6, .78, AMBER_PALE if hot else row_fill,
-                 AMBER if hot else None, .1, r=.2)
-
-    # Tables: rows changed by the writers are amber.
-    tx, tw_all = DB_TABLES
-    cw = (tw_all - 3 * .9) / 4
-    for k, changed in enumerate(((), (1, 2), (), ())):
-        table_card(tx + k * (cw + .9), cw, top, inner, f'$T_{k + 1}$', changed,
-                   outline=AMBER if changed else EDGE)
-
-    # Version of each table.
-    sx_, sw_ = DB_STATS
-    rect(sx_, top, sw_, inner, WHITE, EDGE, .14, r=.35)
-    # The write to T2 (amber rows) moves its version; T1 and T3 keep theirs.
-    for k, (old, new) in enumerate(((7, None), (13, 14), (4, None))):
-        yy = top + 1.9 + 2.35 * k
-        if new:
-            rect(sx_ + .6, yy - 1.0, sw_ - 1.2, 2.3, AMBER_PALE, AMBER, .14, r=.45)
-        text(sx_ + 1.4, yy + .75, f'$V(T_{k + 1})$', NOTE, INK)
-        # Versions read as labels, v13 → v14, in the text face rather than as math
-        value = f'v{old} → v{new}' if new else f'v{old}'
-        text(sx_ + sw_ - 1.4, yy + .75, value, NOTE, '#9A6500' if new else INK, align='right')
-
-    # Snapshot D_s: a frozen copy of the tables, framed like D_s above.
-    nx, nw = DB_SNAP
-    rect(nx + 1.0, top - .6, nw - 1.0, inner, '#EFEDE8', None, r=.35)
-    rect(nx, top, nw - 1.0, inner, WHITE, EXEC_C, .18, r=.35, dash=(.8, .5))
-    lw_ = text(nx + 1.2, top + 3.4, L['db_snapshot'], NOTE, MUTED, 'bold')
-    text(nx + 1.2, top + 6.6, '$D_s$', BODY, EXEC_C)
-    m0 = nx + 1.2 + lw_ + 1.2
-    mini = (nx + nw - 1.0 - 1.0 - m0 - 2 * .6) / 3
-    for k in range(3):
-        table_card(m0 + k * (mini + .6), mini, top + .8, inner - 1.6, f'$T_{k + 1}$')
-
-    # Writers --------------------------------------------------------------
-    dx0, dy0 = 4, 60.0 + LOW
-    for off in (1.6, .8, 0):
-        rect(dx0 + off, dy0 - off, 11.5, 7.0, WHITE, EDGE, .13, r=.4)
-    for k in range(3):
-        s.circle(dx0 + 1.8, dy0 + 1.7 + 1.8 * k, .4, AMBER)
-        s.line(dx0 + 3.0, dy0 + 1.7 + 1.8 * k, dx0 + 9.6, dy0 + 1.7 + 1.8 * k, RULE, .3)
-    text(dx0, 55.6 + LOW, L['etl'], TITLE - .4, INK, 'bold')
-    yy = dy0 + 3.2
-    route([(dx0 + 13.6, yy), (px, yy)], INK, THIN)
-    gap_label(dx0 + 13.6, px, yy - 1.1, L['updates'])
-
+    # 6 updates change tables; 7 maintenance reads table versions; 8 it writes the new version
+    route([(ETL[0] + ETL[2] - 2.0, dy + dh / 2), (dx, dy + dh / 2)], USE, THIN, length=HEAD)
+    step(s, (ETL[0] + ETL[2] + dx) / 2 - 1.0, dy + dh / 2 - 4.6, 6, USE, r=2.6)
+    x7 = MAINT[0] + MAINT[2] / 2
+    route([(x7, DB[1] - 2.8), (x7, MAINT[1] + MAINT[3])], USE, THIN, dash=DASH, length=HEAD)
+    step(s, x7 + 4.6, y57, 7, USE, r=2.6)
+    arrow_label(s, x7 - 2.0, baseline(y57, SMALL), L['a7'], USE, align='right')
+    route([(MAINT[0], my + 18.0), (mx + mw + 2.6, my + 18.0)], USE, THICK, length=HEAD)
+    step(s, (MAINT[0] + mx + mw + 2.6) / 2, my + 13.0, 8, USE, r=2.6)
 
 if __name__ == '__main__':
     for path in style.build(sys.modules[__name__]):

@@ -104,3 +104,7 @@ ACE 与 AgentSM 另有所有智能体共享一份记忆的版本（`mem-ace-shar
   作答前取最相似的一次以往任务的条目，top-k = 1）；APC（Agentic Plan Caching，NeurIPS 2025，以降低智能体的代价与延迟为目标：作答前提取关键词、
   精确匹配缓存的计划模板，命中则放进提示，未命中且答对则生成模板写入缓存；关键词提取计入这道题的 token 与时间）。APC 另有共享版本（`mem-apc-shared`）。
   试跑 `results/pilot-mem2/`（同前一次试跑的设置）。r3 的 AWM、ACE、Mem0、共享 ACE 由第二个队列进程启动（同时运行的组数按整台机器计）。
+- 试跑 `results/pilot-mem2/` 正常：ReasoningBank 每次会话写 3 条策略，每题 23–59k token；APC 私有每题 30–60k，共享版关键词命中 15/28 题，
+  第 2 个智能体起每题 27–30k（同一抽题 MAVRA 8–22k）。
+- 10-13 23:46 网关额度用完（`insufficient_user_quota`）。正在运行的 8 组用 SIGSTOP 暂停（进程内的记忆状态保留），充值后 SIGCONT 继续；
+  暂停前各组有 0–5 道题因此失败（按方案不计分、也不写记忆）。刚启动的 r3 Mem0 前 4 道全部失败，已终止并移到 `results/pop-mem-20261013-quota/`（不用），之后重跑。

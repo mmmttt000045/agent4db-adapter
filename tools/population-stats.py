@@ -82,7 +82,10 @@ def cell_stats(d):
                 "tok": statistics.mean(x[0] for x in c), "s": statistics.mean(x[1] for x in c),
                 "learn_tok": sum(x[2] for x in c), "learns": sum(1 for r in rs if (r.get("learning") or {}).get("extraction")),
                 "stale": sum(1 for r in rs if r["metric_use"]["bad_executed"] > 0),
-                "reused": sum(1 for r in rs if r["metric_use"]["declared"])}
+                "reused": sum(1 for r in rs if r["metric_use"]["declared"]),
+                "steps": statistics.mean(r["run"].get("steps", 0) for r in rs),
+                "tools": statistics.mean(r["run"].get("tool_calls", 0) for r in rs),
+                "db_s": statistics.mean((r.get("db") or {}).get("ms", 0.0) / 1000 for r in rs)}
 
     # wrong numeric answers after the change: how far above or below the correct value (answer / gold - 1)
     over = []
@@ -125,7 +128,8 @@ def main():
         n_agents = cs[0]["agents"]
         res = {"name": NAMES[m], "runs": len(cs), "errors": sum(c["errors"] for c in cs)}
         for part in ("v1", "late", "change"):
-            res[part] = {k: agg([c[part][k] if c[part] else None for c in cs]) for k in ("acc", "tok", "s", "n", "learns", "stale", "reused")}
+            res[part] = {k: agg([c[part][k] if c[part] else None for c in cs])
+                         for k in ("acc", "tok", "s", "n", "learns", "stale", "reused", "steps", "tools", "db_s")}
         res["cum"] = {n: {k: agg([c["cum"][n][k] for c in cs if n in c["cum"]]) for k in ("tok", "s", "tasks", "correct")}
                       for n in cs[0]["cum"]}
         res["per_agent"] = [{k: agg([c["per_agent"][j][k] for c in cs]) for k in ("tok", "s", "correct", "tasks", "learn_tok")}
@@ -178,6 +182,10 @@ def main():
             mac(f"{k}S", f"{r['v1']['s']['mean']:.1f}")
             mac(f"{k}LateTokK", f"{r['late']['tok']['mean'] / 1e3:.1f}")
             mac(f"{k}LateS", f"{r['late']['s']['mean']:.1f}")
+            mac(f"{k}LateSteps", f"{r['late']['steps']['mean']:.1f}")
+            mac(f"{k}LateTools", f"{r['late']['tools']['mean']:.1f}")
+            mac(f"{k}LateDbS", f"{r['late']['db_s']['mean']:.2f}")
+            mac(f"{k}LateAcc", f"{r['late']['acc']['mean'] * 100:.0f}")
             mac(f"{k}TotalTokM", f"{total(m, 'tok') / 1e6:.2f}")
             mac(f"{k}TotalH", f"{total(m, 's') / 3600:.1f}")
             if r["change"]["acc"]:
@@ -205,6 +213,13 @@ def main():
             mac(f"MavraLateSpeedup{KEY[m]}", f"{lm['s']['mean'] / lr['s']['mean']:.1f}")
             mac(f"MavraTokSave{KEY[m]}", f"{s['tok_save'] * 100:.0f}")
             mac(f"MavraSpeedup{KEY[m]}", f"{s['speedup']:.1f}")
+        # savings after the first N agents (mean over runs of the cumulative totals): they grow with N
+        for m in savings:
+            for n, word in ((4, "Four"), (8, "Eight")):
+                a_t, b_t = out["methods"][ref]["cum"][n]["tok"]["mean"], out["methods"][m]["cum"][n]["tok"]["mean"]
+                a_s, b_s = out["methods"][ref]["cum"][n]["s"]["mean"], out["methods"][m]["cum"][n]["s"]["mean"]
+                mac(f"MavraTokSave{KEY[m]}N{word}", f"{(1 - a_t / b_t) * 100:.0f}")
+                mac(f"MavraSpeedup{KEY[m]}N{word}", f"{b_s / a_s:.1f}")
         # per-run range of the savings against each method (paired: the same draw of questions per run)
         for m in savings:
             ref_c = {c["repeat"]: c for c in out["methods"][ref]["cells"]}

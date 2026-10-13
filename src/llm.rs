@@ -495,6 +495,9 @@ pub struct AgentRun {
     /// 因回报模型不符而丢弃的回复数与 token（中转站的额外代价，不进入轨迹）
     pub discarded_replies: u32,
     pub discarded_tokens: u64,
+    /// 工具调用与结果（结果截断），供记忆基线在会话结束后写记忆；不进报告
+    #[serde(skip)]
+    pub transcript: Vec<Value>,
 }
 
 /// JSON Lines 记录（一行一个对象，每行写完即落盘）。`Middle::trace` 设置后，Agent 循环逐次记录工具调用。
@@ -595,6 +598,13 @@ pub async fn run_agent_with(
                     }
                 }
             };
+            if c.name != "final_answer" && c.name != "ask_clarification" {
+                let shown = match &out {
+                    Value::String(m) => m.clone(),
+                    v => v.to_string(),
+                };
+                run.transcript.push(json!({"tool": c.name, "input": c.input, "output": shown.chars().take(2000).collect::<String>()}));
+            }
             if let Some(trace) = &mid.trace {
                 let result = if out.is_null() { Value::Null } else { Value::String(out.to_string().chars().take(600).collect()) };
                 trace.write(&json!({

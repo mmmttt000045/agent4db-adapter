@@ -9,7 +9,7 @@ use crate::knowledge::{Basis, Content, Status};
 use crate::llm::{self, AgentRun, Provider};
 use crate::metric::{self, parse_answer, same_value, Ask, Period, Trajectory};
 use crate::middle::{
-    tool_specs_with, trajectory_tool_spec, Ctx, GuardMode, Maint, Middle, MiddleConfig, Scope, SqlCall, TaskLog, ToolSpec, TrajMemo,
+    exploration_tool_spec, tool_specs_with, trajectory_tool_spec, Ctx, GuardMode, Maint, Middle, MiddleConfig, Scope, SqlCall, TaskLog, ToolSpec, TrajMemo,
 };
 use crate::scenario::{self, Change};
 use crate::specchange::{Gen, Spec};
@@ -40,7 +40,8 @@ pub struct Options {
           value_parser = ["direct", "middle", "metric-local", "metric-global", "metric-global-noguard",
                           "metric-global-schema", "metric-global-revoke", "metric-global-def", "metric-global-exref",
                           "metric-global-snap", "metric-global-opt", "metric-global-full", "metric-private", "middle-alone", "traj-global", "traj-verify",
-                          "reforce", "reforce-traj", "reforce-static", "reforce-mavra"])]
+                          "reforce", "reforce-traj", "reforce-static", "reforce-mavra",
+                          "mem-awm", "mem-ace", "mem-mem0", "mem-agentsm", "mem-ace-shared", "mem-agentsm-shared"])]
     modes: Vec<String>,
     #[arg(long, value_delimiter = ',', default_value = "defined,named", value_parser = ["defined", "named"])]
     phrasings: Vec<String>,
@@ -703,6 +704,10 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         "traj-global" | "traj-verify" | "reforce-traj" => {
             (MiddleConfig { traj_memory: true, metric_maint: Maint::Off, ..base }, true, false)
         }
+        // 单智能体记忆的对照基线（`agentmem`）：工具与无记忆相同（表结构知识只在一道题内有效），跨会话的状态只有各自的记忆
+        "mem-awm" | "mem-ace" | "mem-mem0" | "mem-agentsm" | "mem-ace-shared" | "mem-agentsm-shared" => {
+            (MiddleConfig { scope: Scope::Task, metric_scope: Scope::Task, metric_maint: Maint::Off, ..base }, true, false)
+        }
         // 与 metric-global-snap 同样的学习与发布前检查，但发布后不再检查、不修复（一次写好的知识，如 BIRD 的 evidence）
         "reforce-static" => (MiddleConfig { metric_maint: Maint::Off, g8_example: true, g8_snapshot_db: true, ..base }, true, true),
         _ => (MiddleConfig { metric_maint: Maint::Off, ..base }, true, true),
@@ -885,7 +890,9 @@ async fn run_task(ph: &Phase<'_>, agent: &str, t: &Task, defined: bool) -> Resul
             Err(e) => (Err(e), Value::Null),
         }
     } else {
-        (llm::run_agent_with(env.agent, mid, &ctx, &question, &cell.system, &cell.tools, env.o.max_steps as usize).await, Value::Null)
+        // 记忆基线（AWM、ACE、Mem0）把记忆放进系统提示；其他组没有这一段
+        let system = format!("{}{}", cell.system, mid.amem.prompt(agent, &question));
+        (llm::run_agent_with(env.agent, mid, &ctx, &question, &system, &cell.tools, env.o.max_steps as usize).await, Value::Null)
     };
     let d = diff(&before, &mid.db.meter.snap());
     let log = mid.take_task_log(&ctx);
@@ -1157,6 +1164,11 @@ fn tools_and_system(mode: &str, traj: bool, middle_tools: bool, metric_tools: bo
             system_text.push('\n');
             system_text.push_str(SYSTEM_TRAJ_VERIFY);
         }
+    }
+    if mode.starts_with("mem-agentsm") {
+        tools.push(exploration_tool_spec());
+        system_text.push('\n');
+        system_text.push_str(crate::agentmem::AGENTSM_SYSTEM);
     }
     tools.push(llm::final_answer_spec(true));
     tools.push(llm::clarification_spec());
@@ -1479,6 +1491,15 @@ async fn population_agent(ph: &Phase<'_>, agent: &str, tasks: &[&Task], metric_t
         } else {
             Value::Null
         };
+        // 记忆基线按各自的设计从每次会话写记忆（是否只用判定成功的会话由各设计决定），代价记在这次会话上
+        let learning = if ph.mid.amem.kind().is_some() && rec.json["outcome"] != "error" {
+            let used = used_refs(&rec.run);
+            let used_sqls: Vec<String> = rec.log.calls.iter().filter(|c| used.contains(&c.index)).map(|c| c.sql.clone()).collect();
+            let session = crate::agentmem::Session { question: &rec.question, run: &rec.run, correct: rec.correct, used_sqls: &used_sqls };
+            ph.mid.amem.write(ph.env.extractor, agent, &session).await
+        } else {
+            learning
+        };
         let mut json = rec.json;
         json["order"] = json!(i);
         json["learning"] = learning;
@@ -1498,6 +1519,7 @@ async fn population_cell(env: &Env<'_>, db: Arc<Db>, mode: &str, repeat: u32) ->
     env.ensure_v1("上一组").await?;
     let snapshot_db = cfg.g8_snapshot_db;
     let mut mid = Middle::new(db, cfg).await?;
+    mid.amem = crate::agentmem::Store::for_mode(mode);
     if env.o.trace {
         mid.trace = Some(llm::Trace::create(&format!("{}/trace-{}.jsonl", env.dir, cell.id))?);
     }
@@ -1558,7 +1580,7 @@ async fn population_cell(env: &Env<'_>, db: Arc<Db>, mode: &str, repeat: u32) ->
         "cell": cell.id, "mode": mode, "repeat": repeat, "population": true, "agents": o.agents, "per_agent": o.per_agent,
         "returning": o.returning, "change": change.name(), "concurrency": o.concurrency, "seconds": t0.elapsed().as_secs_f64(),
         "phases": phases, "metric_report": mid.metric_report(), "trajectories": mid.trajectories(), "stats": mid.stats_json(),
-        "records": records,
+        "agent_memory": mid.amem.dump(), "records": records,
     }))
 }
 

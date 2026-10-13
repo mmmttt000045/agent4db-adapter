@@ -1,3 +1,4 @@
+mod agentmem;
 mod catalog;
 mod checks;
 mod db;

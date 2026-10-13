@@ -348,6 +348,8 @@ pub struct Middle {
     trajs: Mutex<Vec<TrajMemo>>,
     /// 每个任务调用记忆查找（find_metric / find_trajectory）的次数，超过 `LOOKUP_LIMIT` 后不再返回条目
     lookups: Mutex<HashMap<String, u32>>,
+    /// 单智能体记忆的对照基线（AWM、ACE、Mem0、AgentSM），见 `agentmem`
+    pub amem: crate::agentmem::Store,
     /// 最近一次粒度修复因候选不唯一而放弃时的候选（表 → 过滤），供修复事件说明原因
     ambiguous: Mutex<HashMap<String, Vec<String>>>,
     /// 进行中的指标维护：完整键 → 在途合并的键（供修复期间到达的使用加入等待）
@@ -463,6 +465,7 @@ impl Middle {
             snap_verdicts: Mutex::new(HashMap::new()),
             trajs: Mutex::new(vec![]),
             lookups: Mutex::new(HashMap::new()),
+            amem: crate::agentmem::Store::default(),
             ambiguous: Mutex::new(HashMap::new()),
             maint_inflight: Mutex::new(HashMap::new()),
             trace: None,
@@ -1510,6 +1513,16 @@ impl Middle {
             }
             "run_sql" => self.run_sql_with(ctx, s("sql")?, &metric_refs(args)?).await?,
             "find_trajectory" if self.cfg.traj_memory => self.find_trajectory(ctx, s("query")?),
+            crate::agentmem::AGENTSM_TOOL if self.amem.kind() == Some(crate::agentmem::Kind::AgentSm) => {
+                if self.lookup_exhausted(ctx) {
+                    json!({"note": LOOKUP_NOTE})
+                } else {
+                    if self.cfg.record {
+                        self.tasks.lock().entry(task_key(ctx)).or_default().finds += 1;
+                    }
+                    self.amem.find_exploration(&ctx.agent, s("query")?)
+                }
+            }
             "find_metric" => {
                 let tables: Vec<String> = args
                     .get("tables")
@@ -1525,6 +1538,17 @@ impl Middle {
             v["notices"] = json!(notes);
         }
         Ok(v)
+    }
+}
+
+/// AgentSM 基线的检索工具：最相似题目的探索段。
+pub fn exploration_tool_spec() -> ToolSpec {
+    ToolSpec {
+        name: crate::agentmem::AGENTSM_TOOL,
+        description: "检索以往最相似问题的探索过程：看过哪些表与列、怎样关联、查到哪些取值。按题面相似度返回 1 条。",
+        schema: json!({"type": "object", "properties": {
+            "query": {"type": "string", "description": "题面"}
+        }, "required": ["query"]}),
     }
 }
 

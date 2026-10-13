@@ -76,7 +76,7 @@ def rows(data, T):
 def figure(lang):
     data, T = load(), TEXT[lang]
     fig = mplstyle.figure(W, H)
-    axes = fig.subplots(1, 3, sharey=True, gridspec_kw=dict(left=.12, right=.985, top=.88, bottom=.05, wspace=.10))
+    axes = fig.subplots(1, 3, sharey=True, gridspec_kw=dict(left=.105, right=.985, top=.90, bottom=.11, wspace=.08))
     layout = rows(data, T)
     for k, ax in enumerate(axes):
         vals = [data[m][k] for _, _, m in layout if m and data[m][k] is not None]
@@ -90,7 +90,8 @@ def figure(lang):
             ax.barh(y, v, height=.68, color=color, lw=0, zorder=3)
             text = f'{v:.2f}' if k == 0 else f'{v:.0f}'
             ax.text(v + top * .012, y, text, va='center', ha='left', fontsize=mplstyle.SMALL,
-                    color=color if mine else INK, fontweight='bold' if mine else 'normal', zorder=4)
+                    color=color if mine else INK, fontweight='bold' if mine else 'normal', zorder=4,
+                    bbox=dict(boxstyle='square,pad=0.15', fc='white', ec='none'))
         if REF in data and data[REF][k] is not None:
             ax.axvline(data[REF][k], color=style.method(REF, lang)[1], lw=.6, ls=(0, (1.0, 1.4)), zorder=2)
         ax.set_xlim(0, top)
@@ -102,12 +103,14 @@ def figure(lang):
     ax = axes[0]
     ax.set_ylim(layout[-1][0] + .6, -.6)
     ax.set_yticks([y for y, _, _ in layout])
-    ax.set_yticklabels([label if m is None else style.method(m, lang)[0] for _, label, m in layout])
-    for tick, (_, _, m) in zip(ax.get_yticklabels(), layout):
+    ax.set_yticklabels(['' if m is None else style.method(m, lang)[0] for _, _, m in layout])
+    # group headers sit in their own row, over the bars of the first panel
+    for y, label, m in layout:
         if m is None:
-            tick.set_color(MUTED)
-            tick.set_fontstyle('italic')
-        elif m == REF:
+            ax.text(0, y + .1, label, color=MUTED, fontsize=mplstyle.LABEL, fontstyle='italic', ha='left', va='center',
+                    bbox=dict(boxstyle='square,pad=0.15', fc='white', ec='none'), zorder=4)
+    for tick, (_, _, m) in zip(ax.get_yticklabels(), layout):
+        if m == REF:
             tick.set_color(style.method(REF, lang)[1])
             tick.set_fontweight('bold')
     return fig

@@ -1,5 +1,6 @@
 #!/bin/bash
-# 2026-10-13 已发表的单智能体记忆作为基线（提交 81a4ebd）：AWM、ACE、Mem0、AgentSM 各自按智能体私有，ACE 与 AgentSM 另各有一个共享版本。
+# 2026-10-13 已发表的单智能体记忆作为基线：AWM、ACE、Mem0、ReasoningBank、APC 各自按智能体私有，ACE 与 APC 另各有一个共享版本
+# （AgentSM 只是预印本，10-13 23:20 起不再运行；结果移到 results/pop-mem-20261013-agentsm/，不用）。
 # 设置与 queue-pop-tpcds2.sh 相同（16 个智能体 × 7 题，更正后各回答 4 道，同一抽题配对），每组 3 次重复。
 # 用法：queue-pop-mem.sh r1-mem-awm r1-mem-ace ...（标签 = r<重复>-<组>）；
 # MIN_FREE（默认 12）：剩余磁盘低于这么多 GB 时不启动新组（每组复制一份 2.4 GB 的模板库）。WAIT_QUOTA=1 时先等网关额度恢复。
@@ -21,7 +22,8 @@ fi
 for tag in "$@"; do
   r=${tag%%-*}; r=${r#r}; mode=${tag#*-}
   ls $OUT/$tag/metric-*/report.json > /dev/null 2>&1 && continue
-  while [ "$(jobs -rp | wc -l)" -ge "$(cat $OUT/concurrency)" ] || [ "$(free_gb)" -lt "${MIN_FREE:-12}" ]; do sleep 30; done
+  # 同时运行的组数按整台机器计（几个队列与试跑共用上限）
+  while [ "$(pgrep -fc "[a]gentdb-mid --pool")" -ge "$(cat $OUT/concurrency)" ] || [ "$(free_gb)" -lt "${MIN_FREE:-12}" ]; do sleep 30; done
   if ! probe; then echo "$(date "+%F %T") probe failed before $tag; queue stopped" >> $OUT/queue.log; break; fi
   mkdir -p $OUT/$tag
   echo "$(date "+%F %T") start $tag (free $(free_gb) GB)" >> $OUT/queue.log

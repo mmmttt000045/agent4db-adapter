@@ -26,14 +26,14 @@ import json
 import os
 import statistics
 
-METHODS = ["middle-alone", "metric-private", "mem-awm", "mem-ace", "mem-mem0", "mem-agentsm", "mem-ace-shared",
-           "mem-agentsm-shared", "traj-global", "metric-global-snap"]
+METHODS = ["middle-alone", "metric-private", "mem-awm", "mem-ace", "mem-mem0", "mem-reasoningbank", "mem-apc",
+           "mem-ace-shared", "mem-apc-shared", "traj-global", "metric-global-snap"]
 NAMES = {"middle-alone": "No memory", "metric-private": "Single-agent memory", "traj-global": "Example retrieval (shared)",
-         "metric-global-snap": "MAVRA", "mem-awm": "AWM", "mem-ace": "ACE", "mem-mem0": "Mem0", "mem-agentsm": "AgentSM",
-         "mem-ace-shared": "ACE (shared)", "mem-agentsm-shared": "AgentSM (shared)"}
+         "metric-global-snap": "MAVRA", "mem-awm": "AWM", "mem-ace": "ACE", "mem-mem0": "Mem0", "mem-reasoningbank": "ReasoningBank",
+         "mem-apc": "APC", "mem-ace-shared": "ACE (shared)", "mem-apc-shared": "APC (shared)"}
 KEY = {"middle-alone": "None", "metric-private": "Private", "traj-global": "Traj", "metric-global-snap": "Mavra",
-       "mem-awm": "Awm", "mem-ace": "Ace", "mem-mem0": "Memzero", "mem-agentsm": "Agentsm", "mem-ace-shared": "AceShared",
-       "mem-agentsm-shared": "AgentsmShared"}
+       "mem-awm": "Awm", "mem-ace": "Ace", "mem-mem0": "Memzero", "mem-reasoningbank": "Reasoningbank", "mem-apc": "Apc",
+       "mem-ace-shared": "AceShared", "mem-apc-shared": "ApcShared"}
 STEPS = [1, 2, 4, 8, 16]
 
 

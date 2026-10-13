@@ -2,8 +2,8 @@
 
 Three panels share the rows, one per method, grouped into no memory, memories
 each agent keeps for itself (the paper's single-agent memory and the published
-AWM, ACE, Mem0, and AgentSM), and memories all agents share (example retrieval,
-ACE and AgentSM shared, MAVRA): total tokens of the 16 agents (including
+AWM, ACE, Mem0, ReasoningBank, and APC), and memories all agents share (example
+retrieval, ACE and APC shared, MAVRA): total tokens of the 16 agents (including
 learning), and the tokens and agent time of one question once the metrics are
 learned (the second half of the agents). A dotted line marks MAVRA's value. Data:
 exp/2026-10-12-population/population-stats.json (tools/population-stats.py),
@@ -22,11 +22,11 @@ NAME = 'baselines'
 W, H = style.TEXTWIDTH, 52.0
 DATA = style.ROOT / 'exp/2026-10-12-population/population-stats.json'
 KEY = {'middle-alone': 'None', 'metric-private': 'Private', 'traj-global': 'Traj', 'metric-global-snap': 'Mavra',
-       'mem-awm': 'Awm', 'mem-ace': 'Ace', 'mem-mem0': 'Memzero', 'mem-agentsm': 'Agentsm',
-       'mem-ace-shared': 'AceShared', 'mem-agentsm-shared': 'AgentsmShared'}
+       'mem-awm': 'Awm', 'mem-ace': 'Ace', 'mem-mem0': 'Memzero', 'mem-reasoningbank': 'Reasoningbank', 'mem-apc': 'Apc',
+       'mem-ace-shared': 'AceShared', 'mem-apc-shared': 'ApcShared'}
 GROUPS = [(None, ['middle-alone']),
-          ('per', ['metric-private', 'mem-awm', 'mem-ace', 'mem-mem0', 'mem-agentsm']),
-          ('shared', ['traj-global', 'mem-ace-shared', 'mem-agentsm-shared', 'metric-global-snap'])]
+          ('per', ['metric-private', 'mem-awm', 'mem-ace', 'mem-mem0', 'mem-reasoningbank', 'mem-apc']),
+          ('shared', ['traj-global', 'mem-ace-shared', 'mem-apc-shared', 'metric-global-snap'])]
 TEXT = {
     'en': {'panels': ['Total tokens of 16 agents (M)', 'Tokens per question, later agents (k)',
                       'Time per question, later agents (s)'],

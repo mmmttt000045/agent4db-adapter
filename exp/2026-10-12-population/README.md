@@ -98,3 +98,9 @@ ACE 与 AgentSM 另有所有智能体共享一份记忆的版本（`mem-ace-shar
   对照 r1 无记忆 62/44/26/43k、单智能体记忆 32/30/28/25k、MAVRA 53/22/10/8k。每题学习时间 ACE 106 秒、Mem0 83 秒、AWM 9 秒（后台，不计入作答时间）。
 - 正式：`queue-pop-mem.sh` → noctis `results/pop-mem-20261013/r{1..3}-<mode>/`，同时 6 组；
   统计 `tools/population-stats.py --runs results/pop-tpcds-20261013 results/pop-mem-20261013`。
+- 10-13 21:21 起正式队列；23:20 起不再运行 AgentSM：它只是预印本（arXiv 2026-01），不作为已发表基线。已完成的 r1（私有与共享）与中止的 r2 移到
+  noctis `results/pop-mem-20261013-agentsm/`（不用）。r1 参考：16 个智能体累计 token 私有 5.04M、共享 2.64M（同一抽题 MAVRA 1.54M、无记忆 5.84M）。
+- 改为加入两种已发表的记忆（提交见 `src/agentmem.rs`）：ReasoningBank（ICLR 2026，每次会话提炼至多 3 条推理策略，成功提炼做法、失败提炼教训，
+  作答前取最相似的一次以往任务的条目，top-k = 1）；APC（Agentic Plan Caching，NeurIPS 2025，以降低智能体的代价与延迟为目标：作答前提取关键词、
+  精确匹配缓存的计划模板，命中则放进提示，未命中且答对则生成模板写入缓存；关键词提取计入这道题的 token 与时间）。APC 另有共享版本（`mem-apc-shared`）。
+  试跑 `results/pilot-mem2/`（同前一次试跑的设置）。r3 的 AWM、ACE、Mem0、共享 ACE 由第二个队列进程启动（同时运行的组数按整台机器计）。

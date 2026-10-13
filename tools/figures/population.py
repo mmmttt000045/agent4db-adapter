@@ -100,7 +100,11 @@ def figure(lang):
     ax.annotate('', xy=(n - .4, low), xytext=(n - .4, top),
                 arrowprops=dict(arrowstyle='-|>', color=MUTED, lw=.6, mutation_scale=5, shrinkA=0, shrinkB=0),
                 zorder=5)
-    ax.text(n - .9, (top + low) / 2, T['save'].format(t=save, s=speed), ha='right', va='center',
+    # The note sits in the gap between the shared-memory lines and the next line above them, over the last agents
+    tail = slice(n * 2 // 3, n)
+    below = max(max(data[m]['tok'][tail]) for m in ('metric-global-snap', 'traj-global') if m in data)
+    above = min(min(data[m]['tok'][tail]) for m in ('metric-private', 'middle-alone') if m in data)
+    ax.text(n - .9, (below + above) / 2, T['save'].format(t=save, s=speed), ha='right', va='center',
             fontsize=mplstyle.SMALL, color=INK, linespacing=1.15)
     fig.text((.085 + .985) / 2, .02, T['x'], color=MUTED, fontsize=mplstyle.LABEL, ha='center', va='bottom')
     return fig

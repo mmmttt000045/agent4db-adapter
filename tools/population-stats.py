@@ -84,13 +84,21 @@ def cell_stats(d):
                 "stale": sum(1 for r in rs if r["metric_use"]["bad_executed"] > 0),
                 "reused": sum(1 for r in rs if r["metric_use"]["declared"])}
 
+    # wrong numeric answers after the change: how far above or below the correct value (answer / gold - 1)
+    over = []
+    for r in ch:
+        if r["outcome"] == "wrong":
+            try:
+                over.append(float(r["answer"]) / float(r["gold"]) - 1)
+            except (TypeError, ValueError, ZeroDivisionError):
+                pass
     late = [r for r in v1 if agent_index(r) > agents // 2]
     maint = {}
     for p in d["phases"]:
         maint[p["phase"]] = sum((e.get("db") or {}).get("ms", 0.0) for e in p["events"] if e.get("event") == "maintenance") / 1000
     return {"mode": d["mode"], "repeat": d["repeat"], "agents": agents, "per_agent": per_agent, "cum": cum,
             "v1": summary(v1), "late": summary(late), "change": summary(ch), "maint_db_s": maint,
-            "errors": sum(r["outcome"] == "error" for r in d["records"])}
+            "errors": sum(r["outcome"] == "error" for r in d["records"]), "change_over": over}
 
 
 def agg(vals):
@@ -181,9 +189,17 @@ def main():
             maint = [v["mean"] for p, v in r["maint_db_s"].items() if p != "pop-v1" and v]
             if maint:
                 mac(f"{k}MaintS", f"{maint[0]:.1f}")
+            over = [x for c in r["cells"] for x in c["change_over"]]
+            if over:
+                mac(f"{k}ChangeOverMin", f"{min(over) * 100:.0f}")
+                mac(f"{k}ChangeOverMax", f"{max(over) * 100:.0f}")
             mac(f"{k}TotalTokMin", f"{min(c['cum'][max(c['cum'])]['tok'] for c in r['cells']) / 1e6:.2f}")
             mac(f"{k}TotalTokMax", f"{max(c['cum'][max(c['cum'])]['tok'] for c in r['cells']) / 1e6:.2f}")
         for m, s in savings.items():
+            # second half of the agents, per question: how many times the tokens and time of MAVRA
+            lr, lm = out["methods"][ref]["late"], out["methods"][m]["late"]
+            mac(f"MavraLateTokX{KEY[m]}", f"{lm['tok']['mean'] / lr['tok']['mean']:.1f}")
+            mac(f"MavraLateSpeedup{KEY[m]}", f"{lm['s']['mean'] / lr['s']['mean']:.1f}")
             mac(f"MavraTokSave{KEY[m]}", f"{s['tok_save'] * 100:.0f}")
             mac(f"MavraSpeedup{KEY[m]}", f"{s['speedup']:.1f}")
         # per-run range of the savings against each method (paired: the same draw of questions per run)

@@ -53,6 +53,13 @@ METHODS = {
     'metric-global-def': ('Full recheck per definition', '整定义重查', 'mDef'),
     'metric-global-snap': ('MAVRA (ours)', 'MAVRA（本文）', 'mCond'),
     'metric-private': ('Single-agent memory', '单智能体记忆', 'mPrivate'),
+    # published agent memories (population study): per agent in the single-agent colour, shared in the retrieval colour
+    'mem-awm': ('AWM', 'AWM', 'mPrivate'),
+    'mem-ace': ('ACE', 'ACE', 'mPrivate'),
+    'mem-mem0': ('Mem0', 'Mem0', 'mPrivate'),
+    'mem-agentsm': ('AgentSM', 'AgentSM', 'mPrivate'),
+    'mem-ace-shared': ('ACE, shared', 'ACE（共享）', 'mTraj'),
+    'mem-agentsm-shared': ('AgentSM, shared', 'AgentSM（共享）', 'mTraj'),
     'metric-global-exref': ('MAVRA, regression on current data', 'MAVRA，回归测试用当前数据', 'mCondCur'),
     'metric-global': ('MAVRA, gold-SQL reference', 'MAVRA，标准答案作参照', 'mCondGold'),
     'tabletest': ('dbt-style table tests', 'dbt 式表级测试', 'mTable'),

@@ -157,6 +157,14 @@ def main():
         if m == ref or m not in out["methods"] or ref not in out["methods"]:
             continue
         savings[m] = {"tok_save": 1 - total(ref, "tok") / total(m, "tok"), "speedup": total(m, "s") / total(ref, "s")}
+        if m.startswith("mem-"):
+            # the memory baselines run fewer repeats: compare with MAVRA on the same draws only
+            reps = {c["repeat"] for c in out["methods"][m]["cells"]}
+            last = lambda c, k: c["cum"][max(c["cum"])][k]
+            ra = [c for c in out["methods"][ref]["cells"] if c["repeat"] in reps]
+            if ra:
+                rt, rs = statistics.mean(last(c, "tok") for c in ra), statistics.mean(last(c, "s") for c in ra)
+                savings[m] = {"tok_save": 1 - rt / total(m, "tok"), "speedup": total(m, "s") / rs}
     out["savings_vs"] = savings
 
     print("| Method | runs | acc v1 | k tok/task | s/task | late k tok | late s | acc after change | stale | total M tok | total h |")

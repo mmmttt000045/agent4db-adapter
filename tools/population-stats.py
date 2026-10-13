@@ -26,10 +26,14 @@ import json
 import os
 import statistics
 
-METHODS = ["middle-alone", "metric-private", "traj-global", "metric-global-snap"]
+METHODS = ["middle-alone", "metric-private", "mem-awm", "mem-ace", "mem-mem0", "mem-agentsm", "mem-ace-shared",
+           "mem-agentsm-shared", "traj-global", "metric-global-snap"]
 NAMES = {"middle-alone": "No memory", "metric-private": "Single-agent memory", "traj-global": "Example retrieval (shared)",
-         "metric-global-snap": "MAVRA"}
-KEY = {"middle-alone": "None", "metric-private": "Private", "traj-global": "Traj", "metric-global-snap": "Mavra"}
+         "metric-global-snap": "MAVRA", "mem-awm": "AWM", "mem-ace": "ACE", "mem-mem0": "Mem0", "mem-agentsm": "AgentSM",
+         "mem-ace-shared": "ACE (shared)", "mem-agentsm-shared": "AgentSM (shared)"}
+KEY = {"middle-alone": "None", "metric-private": "Private", "traj-global": "Traj", "metric-global-snap": "Mavra",
+       "mem-awm": "Awm", "mem-ace": "Ace", "mem-mem0": "Memzero", "mem-agentsm": "Agentsm", "mem-ace-shared": "AceShared",
+       "mem-agentsm-shared": "AgentsmShared"}
 STEPS = [1, 2, 4, 8, 16]
 
 
@@ -118,12 +122,12 @@ def agg(vals):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", required=True)
+    ap.add_argument("--runs", required=True, nargs="+", help="one or more result directories (main arms, memory baselines)")
     ap.add_argument("--json-out")
     ap.add_argument("--tex-out")
     a = ap.parse_args()
     by = collections.defaultdict(list)
-    for d in load(a.runs):
+    for d in (d for root in a.runs for d in load(root)):
         by[d["mode"]].append(cell_stats(d))
     out = {"methods": {}}
     for m in METHODS:
@@ -176,7 +180,11 @@ def main():
 
         any_r = next(iter(out["methods"].values()))
         mac("Agents", any_r["cells"][0]["agents"])
-        mac("Runs", min(r["runs"] for r in out["methods"].values()))
+        main_arms = [m for m in ("middle-alone", "metric-private", "traj-global", "metric-global-snap") if m in out["methods"]]
+        mac("Runs", min(out["methods"][m]["runs"] for m in main_arms))
+        base_arms = [m for m in out["methods"] if m.startswith("mem-")]
+        if base_arms:
+            mac("BaseRuns", min(out["methods"][m]["runs"] for m in base_arms))
         # agent sessions answered (unchanged data and after the change), all methods and runs; server failures excluded
         sessions = sum(c["v1"]["n"] + (c["change"]["n"] if c["change"] else 0) for r in out["methods"].values() for c in r["cells"])
         mac("Sessions", f"{sessions:,}")

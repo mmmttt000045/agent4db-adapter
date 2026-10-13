@@ -1,0 +1,18 @@
+\begin{table}[t]
+\caption{\bt{What one question costs once the metrics are learned: the second half of the \PpAgents\ agents on TPC-DS, means over \PpRuns\ runs. Tokens include extraction; database time is part of agent time.}{指标学会之后一道题的代价：TPC-DS 上 \PpAgents\ 个智能体中的后一半，\PpRuns\ 次运行的均值。token 包括提取；数据库时间包含在智能体时间之内。}}
+\label{tab:popcost}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}Lrrrrrr@{}}
+\toprule
+& \bt{Turns}{轮数} & \bt{Tools}{工具} & \bt{Tokens}{token} & \bt{Time}{时间} & \bt{DB}{数据库} & \bt{Correct}{正确}\\
+\midrule
+\bt{No memory}{无记忆} & \PpNoneLateSteps & \PpNoneLateTools & \PpNoneLateTokK\,k & \PpNoneLateS\,s & \PpNoneLateDbS\,s & \PpNoneLateAcc\%\\
+\bt{Single-agent memory}{单智能体记忆} & \PpPrivateLateSteps & \PpPrivateLateTools & \PpPrivateLateTokK\,k & \PpPrivateLateS\,s & \PpPrivateLateDbS\,s & \PpPrivateLateAcc\%\\
+\bt{Example retrieval}{示例检索} & \PpTrajLateSteps & \PpTrajLateTools & \PpTrajLateTokK\,k & \PpTrajLateS\,s & \PpTrajLateDbS\,s & \PpTrajLateAcc\%\\
+\bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \textbf{\PpMavraLateSteps} & \textbf{\PpMavraLateTools} & \textbf{\PpMavraLateTokK\,k} & \textbf{\PpMavraLateS\,s} & \textbf{\PpMavraLateDbS\,s} & \textbf{\PpMavraLateAcc\%}\\
+\midrule
+\bt{\system\ vs.\ no memory}{\system\ 对无记忆} & & & \PpMavraLateTokXNone$\times$ & \PpMavraLateSpeedupNone$\times$ & & \\
+\bottomrule
+\end{tabularx}
+\end{table}

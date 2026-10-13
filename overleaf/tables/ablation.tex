@@ -1,22 +1,20 @@
 \begin{table}[t]
-\caption{\bt{What each part of \system\ prevents, measured by replacing it with the alternative in the middle column.}{\system\ 的每个部分防止了什么：把它换成中间一列的替代做法后测得的结果。}}
+\caption{\bt{What each part of \system\ saves, measured by replacing it with the alternative in the middle column.}{\system\ 的每个部分省下了什么：把它换成中间一列的替代做法后测得的结果。}}
 \label{tab:ablation}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\linewidth}{@{}P{0.25\linewidth}P{0.23\linewidth}L@{}}
+\begin{tabularx}{\linewidth}{@{}P{0.24\linewidth}P{0.24\linewidth}L@{}}
 \toprule
-\bt{Part of \system}{\system\ 的部分} & \bt{Replaced by}{替换为} & \bt{Effect}{结果}\\
+\bt{Part of \system}{\system\ 的部分} & \bt{Replaced by}{替换为} & \bt{Cost without it}{没有它的代价}\\
 \midrule
+\bt{Shared definitions}{共享的定义} & \bt{no memory}{无记忆} & \bt{\PpNoneLateTokK\,k tokens and \PpNoneLateS\,s per question instead of \PpMavraLateTokK\,k and \PpMavraLateS\,s (\S\ref{sec:population-eval})}{每题 \PpNoneLateTokK\,k token、\PpNoneLateS\ 秒，而非 \PpMavraLateTokK\,k、\PpMavraLateS\ 秒（\S\ref{sec:population-eval}）}\\
 \bt{Sharing across agents}{跨智能体共享} & \bt{single-agent memory}{单智能体记忆} & \bt{\PpPrivateTotalTokM\,M instead of \PpMavraTotalTokM\,M tokens for \PpAgents\ agents (\S\ref{sec:population-eval})}{\PpAgents\ 个智能体用 \PpPrivateTotalTokM\,M 而非 \PpMavraTotalTokM\,M token（\S\ref{sec:population-eval}）}\\
-\bt{Replay of the generated SQL}{重放生成的 SQL} & \bt{publish what extraction returns}{直接发布提取结果} & \bt{\PubReplayRefused\ faulty definitions shared, the worst \PubExRatio$\times$ the true value (\S\ref{sec:sharing-eval})}{\PubReplayRefused\ 个有错的定义被共享，最严重的是真值的 \PubExRatio\ 倍（\S\ref{sec:sharing-eval}）}\\
-\bt{Definitions with conditions}{带条件的定义} & \bt{shared examples}{共享示例} & \bt{\DsTrajModeled\% instead of \DsCondModeled\% correct under covered breaking changes (\S\ref{sec:scenarios})}{条件覆盖的破坏性变化下答对 \DsTrajModeled\% 而非 \DsCondModeled\%（\S\ref{sec:scenarios}）}\\
-\bt{Maintenance once}{一次性维护} & \bt{each agent verifies}{每个智能体自行核验} & \bt{\AmVerifyExtraS\,s and \AmVerifyExtraTokK\,k tokens more per question, \DsTrajVerifyModeled\% correct (\S\ref{sec:scenarios})}{每题多 \AmVerifyExtraS\ 秒、\AmVerifyExtraTokK\,k token，答对 \DsTrajVerifyModeled\%（\S\ref{sec:scenarios}）}\\
-\bt{Checks on data changes}{数据变化时检查} & \bt{invalidate on DDL}{只在 DDL 时失效} & \bt{\RpSchemaWrongModeled\ wrong answers in the replay (\S\ref{sec:validity})}{回放中 \RpSchemaWrongModeled\ 个错误答案（\S\ref{sec:validity}）}\\
-\bt{Repair}{修复} & \bt{table tests that invalidate}{只会失效的表级测试} & \bt{\RpTableCorrect\ instead of \RpCondCorrect\ questions answered (\S\ref{sec:validity})}{只回答 \RpTableCorrect\ 而非 \RpCondCorrect\ 道题（\S\ref{sec:validity}）}\\
-\bt{Unique fix}{唯一修复} & \bt{first passing filter}{第一个通过的过滤} & \bt{the backup copy is published as the repair (\S\ref{sec:repair-eval})}{备份副本被当作修复发布（\S\ref{sec:repair-eval}）}\\
-\bt{Regression as of learning}{按学习时刻回归} & \bt{regression on current data}{在当前数据上回归} & \bt{\RpCurPairOther\ instead of \RpCurPairCond\ of \RpCurPairN\ questions answered (\S\ref{sec:repair-eval})}{\RpCurPairN\ 道题只回答 \RpCurPairOther\ 而非 \RpCurPairCond\ 道（\S\ref{sec:repair-eval}）}\\
-\bt{Same-snapshot validation}{同快照验证} & \bt{check, then execute}{先检查后执行} & \bt{up to \SnPreUnannMax\% of answers on data that breaks the grain (\S\ref{sec:enforce-eval})}{最多 \SnPreUnannMax\% 的答案基于破坏粒度的数据（\S\ref{sec:enforce-eval}）}\\
+\bt{Repair once}{只修复一次} & \bt{per-agent copies}{按智能体的副本} & \bt{\PpPrivateMaintS\,s instead of \PpMavraMaintS\,s of database time after a restatement (\S\ref{sec:cost})}{更正之后数据库时间为 \PpPrivateMaintS\ 秒而非 \PpMavraMaintS\ 秒（\S\ref{sec:cost}）}\\
+\bt{Maintenance once}{一次性维护} & \bt{each agent verifies}{每个智能体自行核验} & \bt{\AmVerifyExtraS\,s and \AmVerifyExtraTokK\,k tokens more per question (\S\ref{sec:cost})}{每题多 \AmVerifyExtraS\ 秒、\AmVerifyExtraTokK\,k token（\S\ref{sec:cost}）}\\
+\bt{Maintained conditions}{受维护的条件} & \bt{drop on every write}{每次写入即丢弃} & \bt{\ScenRelearnTok\,M tokens of relearning per run (\S\ref{sec:cost})}{每次运行重新学习 \ScenRelearnTok\,M token（\S\ref{sec:cost}）}\\
 \bt{Shared check results}{共享检查结果} & \bt{full recheck per definition}{整定义重查} & \bt{database time rises from \CbStagCondSix\% to 100\% at 19 definitions (\S\ref{sec:cost})}{19 个定义时数据库时间从 \CbStagCondSix\% 升到 100\%（\S\ref{sec:cost}）}\\
+\bt{Optimization revisions}{优化版本} & \bt{no optimization}{不优化} & \bt{every agent runs SQL that is \OptSaveMean\% slower on average (\S\ref{sec:cost})}{每个智能体执行的 SQL 平均慢 \OptSaveMean\%（\S\ref{sec:cost}）}\\
+\bt{Definitions with conditions}{带条件的定义} & \bt{shared examples}{共享示例} & \bt{\PpTrajChangeAcc\% instead of \PpMavraChangeAcc\% correct after a restatement (\S\ref{sec:changes-eval})}{更正之后答对 \PpTrajChangeAcc\% 而非 \PpMavraChangeAcc\%（\S\ref{sec:changes-eval}）}\\
 \bottomrule
 \end{tabularx}
 \end{table}

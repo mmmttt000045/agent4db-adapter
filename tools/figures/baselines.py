@@ -4,8 +4,8 @@ Three panels share the rows, one per method, grouped into no memory, memories
 each agent keeps for itself (the paper's single-agent memory and the published
 AWM, ACE, Mem0, and AgentSM), and memories all agents share (example retrieval,
 ACE and AgentSM shared, MAVRA): total tokens of the 16 agents (including
-learning), their total agent time, and the share of questions answered
-correctly after the restatement. A dotted line marks MAVRA's value. Data:
+learning), and the tokens and agent time of one question once the metrics are
+learned (the second half of the agents). A dotted line marks MAVRA's value. Data:
 exp/2026-10-12-population/population-stats.json (tools/population-stats.py),
 checked against the \\Pp* macros the text prints.
 """
@@ -28,9 +28,10 @@ GROUPS = [(None, ['middle-alone']),
           ('per', ['metric-private', 'mem-awm', 'mem-ace', 'mem-mem0', 'mem-agentsm']),
           ('shared', ['traj-global', 'mem-ace-shared', 'mem-agentsm-shared', 'metric-global-snap'])]
 TEXT = {
-    'en': {'panels': ['Total tokens of 16 agents (M)', 'Total agent time (min)', 'Correct after the restatement (%)'],
+    'en': {'panels': ['Total tokens of 16 agents (M)', 'Tokens per question, later agents (k)',
+                      'Time per question, later agents (s)'],
            'per': 'Each agent its own memory', 'shared': 'One memory for all agents'},
-    'zh': {'panels': ['16 个智能体的累计 token（百万）', '累计智能体时间（分钟）', '更正之后的正确率（%）'],
+    'zh': {'panels': ['16 个智能体的累计 token（百万）', '后来的智能体每题 token（千）', '后来的智能体每题时间（秒）'],
            'per': '每个智能体各自的记忆', 'shared': '所有智能体共享一份记忆'},
 }
 REF = 'metric-global-snap'
@@ -47,12 +48,11 @@ def load():
             r = d[mode]
             last = str(max(int(n) for n in r['cum']))
             tok = r['cum'][last]['tok']['mean'] / 1e6
-            s = r['cum'][last]['s']['mean'] / 60
-            ch = r['change']['acc']['mean'] * 100 if r['change']['acc'] else None
+            late_tok, late_s = r['late']['tok']['mean'] / 1e3, r['late']['s']['mean']
             style.agree(f'Pp{KEY[mode]}TotalTokM', f'{tok:.2f}', pp[f'Pp{KEY[mode]}TotalTokM'])
-            if ch is not None:
-                style.agree(f'Pp{KEY[mode]}ChangeAcc', f'{ch:.0f}', pp[f'Pp{KEY[mode]}ChangeAcc'])
-            out[mode] = (tok, s, ch)
+            style.agree(f'Pp{KEY[mode]}LateTokK', f'{late_tok:.1f}', pp[f'Pp{KEY[mode]}LateTokK'])
+            style.agree(f'Pp{KEY[mode]}LateS', f'{late_s:.1f}', pp[f'Pp{KEY[mode]}LateS'])
+            out[mode] = (tok, late_tok, late_s)
     return out
 
 
@@ -76,11 +76,11 @@ def rows(data, T):
 def figure(lang):
     data, T = load(), TEXT[lang]
     fig = mplstyle.figure(W, H)
-    axes = fig.subplots(1, 3, sharey=True, gridspec_kw=dict(left=.105, right=.985, top=.90, bottom=.11, wspace=.08))
+    axes = fig.subplots(1, 3, sharey=True, gridspec_kw=dict(left=.118, right=.985, top=.90, bottom=.11, wspace=.08))
     layout = rows(data, T)
     for k, ax in enumerate(axes):
         vals = [data[m][k] for _, _, m in layout if m and data[m][k] is not None]
-        top = max(vals) * 1.22 if k < 2 else 118
+        top = max(vals) * 1.22
         for y, _, m in layout:
             if m is None or data[m][k] is None:
                 continue
@@ -88,7 +88,7 @@ def figure(lang):
             _, color = style.method(m, lang)
             mine = m == REF
             ax.barh(y, v, height=.68, color=color, lw=0, zorder=3)
-            text = f'{v:.2f}' if k == 0 else f'{v:.0f}'
+            text = f'{v:.2f}' if k == 0 else f'{v:.1f}'
             ax.text(v + top * .012, y, text, va='center', ha='left', fontsize=mplstyle.SMALL,
                     color=color if mine else INK, fontweight='bold' if mine else 'normal', zorder=4,
                     bbox=dict(boxstyle='square,pad=0.15', fc='white', ec='none'))

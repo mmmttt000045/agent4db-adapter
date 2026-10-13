@@ -244,6 +244,9 @@ def main():
             # second half of the agents, per question: how many times the tokens and time of MAVRA
             lr, lm = out["methods"][ref]["late"], out["methods"][m]["late"]
             mac(f"MavraLateTokX{KEY[m]}", f"{lm['tok']['mean'] / lr['tok']['mean']:.1f}")
+            # the cost model's limit: the saving approaches 1 - c_reuse / c_explore as agents accumulate
+            mac(f"MavraAsymTokSave{KEY[m]}", f"{(1 - lr['tok']['mean'] / lm['tok']['mean']) * 100:.0f}")
+            mac(f"MavraAsymTimeSave{KEY[m]}", f"{(1 - lr['s']['mean'] / lm['s']['mean']) * 100:.0f}")
             mac(f"MavraLateSpeedup{KEY[m]}", f"{lm['s']['mean'] / lr['s']['mean']:.1f}")
             mac(f"MavraTokSave{KEY[m]}", f"{s['tok_save'] * 100:.0f}")
             mac(f"MavraSpeedup{KEY[m]}", f"{s['speedup']:.1f}")

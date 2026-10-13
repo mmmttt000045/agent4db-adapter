@@ -1,15 +1,13 @@
 \begin{table}[t]
-\caption{\bt{What existing designs offer agents that share one database. $\bullet$: yes; $\circ$: partly; --: no.}{现有设计能为共享同一数据库的智能体提供什么。$\bullet$：是；$\circ$：部分；--：否。}}
+\caption{\bt{What existing designs offer agents that share one database: (1) shared by all agents; (2) answers questions no agent has asked; (3) learned from the agents' use; (4) stays correct after data updates; (5) repaired and optimized once for all agents. $\bullet$: yes; $\circ$: partly; --: no.}{现有设计能为共享同一数据库的智能体提供什么：(1) 由所有智能体共享；(2) 能回答尚无智能体问过的问题；(3) 从智能体的使用中学到；(4) 数据更新后仍然正确；(5) 为所有智能体一次性修复与优化。$\bullet$：是；$\circ$：部分；--：否。}}
 \label{tab:capabilities}
 \footnotesize
-\setlength{\tabcolsep}{2.6pt}
+\setlength{\tabcolsep}{3pt}
 \newcommand{\capyes}{$\bullet$}
 \newcommand{\cappart}{$\circ$}
 \begin{tabularx}{\linewidth}{@{}Lccccc@{}}
 \toprule
-& \bt{Shared}{共享} & \bt{New}{新} & \bt{Learned}{从使用} & \bt{Correct}{变化后} & \bt{Fixed}{一次}\\
-& \bt{by all}{给所有} & \bt{questions}{问题} & \bt{from use}{中学到} & \bt{after}{仍然} & \bt{once}{修复与}\\
-& \bt{agents}{智能体} & & & \bt{updates}{正确} & \bt{for all}{优化}\\
+\bt{Design}{设计} & (1) & (2) & (3) & (4) & (5)\\
 \midrule
 \bt{Per-agent memory~\cite{chhikara2025mem0,wang2025awm,ouyang2026reasoningbank}}{单智能体记忆~\cite{chhikara2025mem0,wang2025awm,ouyang2026reasoningbank}} & -- & \capyes & \capyes & -- & --\\
 \bt{Shared examples~\cite{biswal2026agentsm}}{共享示例~\cite{biswal2026agentsm}} & \capyes & \cappart & \capyes & -- & --\\

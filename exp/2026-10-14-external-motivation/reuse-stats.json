@@ -1,0 +1,308 @@
+{
+  "bird_dev": {
+    "all": {
+      "tasks": 1534,
+      "tasks_with_knowledge": 1386,
+      "tasks_with_knowledge_pct": 90.4,
+      "knowledge_uses": 2681,
+      "distinct_items": 2078,
+      "uses_repeating_pct": 22.5,
+      "uses_per_item": 1.29,
+      "tasks_sharing_pct_of_with_knowledge": 40.9,
+      "databases": 11
+    },
+    "calculations": {
+      "tasks": 1534,
+      "tasks_with_knowledge": 558,
+      "tasks_with_knowledge_pct": 36.4,
+      "knowledge_uses": 628,
+      "distinct_items": 549,
+      "uses_repeating_pct": 12.6,
+      "uses_per_item": 1.14,
+      "tasks_sharing_pct_of_with_knowledge": 19.0,
+      "databases": 11
+    }
+  },
+  "bird_dev_terms": {
+    "all": {
+      "tasks": 1534,
+      "tasks_with_knowledge": 1279,
+      "tasks_with_knowledge_pct": 83.4,
+      "knowledge_uses": 2224,
+      "distinct_items": 1598,
+      "uses_repeating_pct": 28.1,
+      "uses_per_item": 1.39,
+      "tasks_sharing_pct_of_with_knowledge": 50.7,
+      "databases": 11
+    },
+    "calculations": {
+      "tasks": 1534,
+      "tasks_with_knowledge": 539,
+      "tasks_with_knowledge_pct": 35.1,
+      "knowledge_uses": 603,
+      "distinct_items": 445,
+      "uses_repeating_pct": 26.2,
+      "uses_per_item": 1.36,
+      "tasks_sharing_pct_of_with_knowledge": 36.2,
+      "databases": 11
+    },
+    "growth": {
+      "2": {
+        "repeating_pct": 3.0,
+        "databases": 11
+      },
+      "5": {
+        "repeating_pct": 8.9,
+        "databases": 11
+      },
+      "10": {
+        "repeating_pct": 14.8,
+        "databases": 11
+      },
+      "20": {
+        "repeating_pct": 23.5,
+        "databases": 11
+      },
+      "50": {
+        "repeating_pct": 31.0,
+        "databases": 9
+      },
+      "100": {
+        "repeating_pct": 32.9,
+        "databases": 8
+      }
+    }
+  },
+  "livesqlbench_full": {
+    "all": {
+      "tasks": 600,
+      "tasks_with_knowledge": 491,
+      "tasks_with_knowledge_pct": 81.8,
+      "knowledge_uses": 1365,
+      "distinct_items": 689,
+      "uses_repeating_pct": 49.5,
+      "uses_per_item": 1.98,
+      "tasks_sharing_pct_of_with_knowledge": 78.2,
+      "databases": 22
+    },
+    "calculations": {
+      "tasks": 600,
+      "tasks_with_knowledge": 385,
+      "tasks_with_knowledge_pct": 64.2,
+      "knowledge_uses": 748,
+      "distinct_items": 348,
+      "uses_repeating_pct": 53.5,
+      "uses_per_item": 2.15,
+      "tasks_sharing_pct_of_with_knowledge": 78.7,
+      "databases": 22
+    },
+    "all|Management": {
+      "tasks": 189,
+      "tasks_with_knowledge": 138,
+      "tasks_with_knowledge_pct": 73.0,
+      "knowledge_uses": 309,
+      "distinct_items": 249,
+      "uses_repeating_pct": 19.4,
+      "uses_per_item": 1.24,
+      "tasks_sharing_pct_of_with_knowledge": 39.1,
+      "databases": 22
+    },
+    "calculations|Management": {
+      "tasks": 189,
+      "tasks_with_knowledge": 87,
+      "tasks_with_knowledge_pct": 46.0,
+      "knowledge_uses": 143,
+      "distinct_items": 108,
+      "uses_repeating_pct": 24.5,
+      "uses_per_item": 1.32,
+      "tasks_sharing_pct_of_with_knowledge": 42.5,
+      "databases": 22
+    },
+    "all|Query": {
+      "tasks": 411,
+      "tasks_with_knowledge": 353,
+      "tasks_with_knowledge_pct": 85.9,
+      "knowledge_uses": 1056,
+      "distinct_items": 609,
+      "uses_repeating_pct": 42.3,
+      "uses_per_item": 1.73,
+      "tasks_sharing_pct_of_with_knowledge": 76.5,
+      "databases": 22
+    },
+    "calculations|Query": {
+      "tasks": 411,
+      "tasks_with_knowledge": 298,
+      "tasks_with_knowledge_pct": 72.5,
+      "knowledge_uses": 605,
+      "distinct_items": 326,
+      "uses_repeating_pct": 46.1,
+      "uses_per_item": 1.86,
+      "tasks_sharing_pct_of_with_knowledge": 72.8,
+      "databases": 22
+    },
+    "meta": {
+      "kb_entries": 1369,
+      "kb_types": {
+        "calculation_knowledge": 544,
+        "domain_knowledge": 577,
+        "value_illustration": 248
+      },
+      "matched_in": "normal_query"
+    },
+    "direct_only": {
+      "tasks": 600,
+      "tasks_with_knowledge": 491,
+      "tasks_with_knowledge_pct": 81.8,
+      "knowledge_uses": 767,
+      "distinct_items": 552,
+      "uses_repeating_pct": 28.0,
+      "uses_per_item": 1.39,
+      "tasks_sharing_pct_of_with_knowledge": 54.0,
+      "databases": 22
+    },
+    "growth": {
+      "2": {
+        "repeating_pct": 9.8,
+        "databases": 22
+      },
+      "5": {
+        "repeating_pct": 29.8,
+        "databases": 22
+      },
+      "10": {
+        "repeating_pct": 48.4,
+        "databases": 22
+      },
+      "20": {
+        "repeating_pct": 65.2,
+        "databases": 16
+      }
+    }
+  },
+  "livesqlbench_lite": {
+    "all": {
+      "tasks": 270,
+      "tasks_with_knowledge": 261,
+      "tasks_with_knowledge_pct": 96.7,
+      "knowledge_uses": 758,
+      "distinct_items": 458,
+      "uses_repeating_pct": 39.6,
+      "uses_per_item": 1.66,
+      "tasks_sharing_pct_of_with_knowledge": 78.2,
+      "databases": 18
+    },
+    "calculations": {
+      "tasks": 270,
+      "tasks_with_knowledge": 235,
+      "tasks_with_knowledge_pct": 87.0,
+      "knowledge_uses": 466,
+      "distinct_items": 245,
+      "uses_repeating_pct": 47.4,
+      "uses_per_item": 1.9,
+      "tasks_sharing_pct_of_with_knowledge": 80.0,
+      "databases": 18
+    },
+    "all|Management": {
+      "tasks": 90,
+      "tasks_with_knowledge": 83,
+      "tasks_with_knowledge_pct": 92.2,
+      "knowledge_uses": 174,
+      "distinct_items": 153,
+      "uses_repeating_pct": 12.1,
+      "uses_per_item": 1.14,
+      "tasks_sharing_pct_of_with_knowledge": 34.9,
+      "databases": 18
+    },
+    "calculations|Management": {
+      "tasks": 90,
+      "tasks_with_knowledge": 71,
+      "tasks_with_knowledge_pct": 78.9,
+      "knowledge_uses": 104,
+      "distinct_items": 90,
+      "uses_repeating_pct": 13.5,
+      "uses_per_item": 1.16,
+      "tasks_sharing_pct_of_with_knowledge": 36.6,
+      "databases": 18
+    },
+    "all|Query": {
+      "tasks": 180,
+      "tasks_with_knowledge": 178,
+      "tasks_with_knowledge_pct": 98.9,
+      "knowledge_uses": 584,
+      "distinct_items": 414,
+      "uses_repeating_pct": 29.1,
+      "uses_per_item": 1.41,
+      "tasks_sharing_pct_of_with_knowledge": 64.0,
+      "databases": 18
+    },
+    "calculations|Query": {
+      "tasks": 180,
+      "tasks_with_knowledge": 164,
+      "tasks_with_knowledge_pct": 91.1,
+      "knowledge_uses": 362,
+      "distinct_items": 225,
+      "uses_repeating_pct": 37.8,
+      "uses_per_item": 1.61,
+      "tasks_sharing_pct_of_with_knowledge": 64.6,
+      "databases": 18
+    },
+    "meta": {
+      "kb_entries": 1082,
+      "kb_types": {
+        "calculation_knowledge": 432,
+        "domain_knowledge": 463,
+        "value_illustration": 187
+      },
+      "matched_in": "query"
+    },
+    "direct_only": {
+      "tasks": 270,
+      "tasks_with_knowledge": 261,
+      "tasks_with_knowledge_pct": 96.7,
+      "knowledge_uses": 510,
+      "distinct_items": 371,
+      "uses_repeating_pct": 27.3,
+      "uses_per_item": 1.37,
+      "tasks_sharing_pct_of_with_knowledge": 60.9,
+      "databases": 18
+    },
+    "growth": {
+      "2": {
+        "repeating_pct": 8.7,
+        "databases": 18
+      },
+      "5": {
+        "repeating_pct": 29.5,
+        "databases": 18
+      },
+      "10": {
+        "repeating_pct": 47.3,
+        "databases": 18
+      }
+    }
+  },
+  "spider2_lite": {
+    "all": {
+      "tasks": 547,
+      "tasks_with_knowledge": 107,
+      "tasks_with_knowledge_pct": 19.6,
+      "knowledge_uses": 107,
+      "distinct_items": 70,
+      "uses_repeating_pct": 34.6,
+      "uses_per_item": 1.53,
+      "tasks_sharing_pct_of_with_knowledge": 52.3,
+      "databases": 158
+    },
+    "calculations": {
+      "tasks": 547,
+      "tasks_with_knowledge": 107,
+      "tasks_with_knowledge_pct": 19.6,
+      "knowledge_uses": 107,
+      "distinct_items": 70,
+      "uses_repeating_pct": 34.6,
+      "uses_per_item": 1.53,
+      "tasks_sharing_pct_of_with_knowledge": 52.3,
+      "databases": 158
+    }
+  }
+}

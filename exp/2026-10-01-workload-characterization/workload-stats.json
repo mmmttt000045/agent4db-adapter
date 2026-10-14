@@ -48,6 +48,14 @@
         "pct_with_validate": 16.0,
         "mean_explore_share_pct": 70.4
       },
+      "llm": {
+        "llm_calls": 459,
+        "lookup_only_calls": 262,
+        "lookup_only_pct": 57.1,
+        "mean_calls_per_session": 4.59,
+        "mean_calls_before_answer_sql": 2.48,
+        "mean_time_before_answer_sql_pct": 70.7
+      },
       "overlapping_session_pairs": 197,
       "redundancy": {
         "knowledge_calls": 379,
@@ -110,6 +118,14 @@
       "pct_with_error": 2.0,
       "pct_with_validate": 16.0,
       "mean_explore_share_pct": 70.4
+    },
+    "llm": {
+      "llm_calls": 459,
+      "lookup_only_calls": 262,
+      "lookup_only_pct": 57.1,
+      "mean_calls_per_session": 4.59,
+      "mean_calls_before_answer_sql": 2.48,
+      "mean_time_before_answer_sql_pct": 70.7
     },
     "overlapping_session_pairs": 197,
     "redundancy": {

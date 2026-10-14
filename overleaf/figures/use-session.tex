@@ -1,0 +1,44 @@
+\begin{figure}[t]
+\centering
+\footnotesize
+\setlength{\fboxsep}{4pt}
+\fbox{\begin{minipage}{0.95\linewidth}
+\raggedright
+\ifbilingual
+\textbf{题目。}2002 年哪个月的登记顾客门店销售额比上一个月增加最多？\par\smallskip
+\textbf{第 1 次大模型调用。}\code{find\_metric("登记顾客门店销售额")} 返回当前版本：\par
+{\leftskip=1em
+定义：顾客、商品、门店都关联得上的门店销售行的扩展售价之和，每个销售行计一次，按销售日期归属期间\par
+事实表 \code{store\_sales}；度量 \code{SUM(ss\_ext\_sales\_price)}；粒度（\code{ss\_ticket\_number}, \code{ss\_item\_sk}）\par
+内连接 \code{customer}、\code{item}、\code{store}；日期连接 \code{ss\_sold\_date\_sk} $\to$ \code{date\_dim}\par
+另有学习题的生成的 SQL、版本号与关于连接的说明\par}
+\smallskip
+\textbf{第 2 次大模型调用。}\code{run\_sql} 声明该版本，对 2002 年每个月执行生成的 SQL，并算出与上月之差：\par
+\else
+\textbf{Question.} In 2002, in which month did registered-customer store sales rise most over the previous month?\par\smallskip
+\textbf{LLM call 1.} \code{find\_metric("registered-customer store sales")} returns the current revision:\par
+{\leftskip=1em
+definition: the extended sales price of the store sales lines whose customer, item, and store all join, each line counted once, by sales date\par
+fact \code{store\_sales}; measure \code{SUM(ss\_ext\_sales\_price)}; grain (\code{ss\_ticket\_number}, \code{ss\_item\_sk})\par
+inner joins to \code{customer}, \code{item}, \code{store}; date join \code{ss\_sold\_date\_sk} $\to$ \code{date\_dim}\par
+with the generated SQL of the learning question, the revision number, and notes on the joins\par}
+\smallskip
+\textbf{LLM call 2.} \code{run\_sql}, declaring the revision, runs the generated SQL for every month of 2002 with the change over the previous month:\par
+\fi
+{\ttfamily\scriptsize\leftskip=1em
+WITH m AS (SELECT d.d\_moy AS moy, SUM(ss.ss\_ext\_sales\_price) AS amt\par
+\ \ FROM store\_sales ss\par
+\ \ JOIN date\_dim d ON ss.ss\_sold\_date\_sk = d.d\_date\_sk\par
+\ \ JOIN customer c ON ss.ss\_customer\_sk = c.c\_customer\_sk\par
+\ \ JOIN item i ON ss.ss\_item\_sk = i.i\_item\_sk\par
+\ \ JOIN store s ON ss.ss\_store\_sk = s.s\_store\_sk\par
+\ \ WHERE d.d\_year = 2002 GROUP BY d.d\_moy)\par
+SELECT moy, amt, amt - LAG(amt) OVER (ORDER BY moy) AS diff\par
+FROM m ORDER BY moy\par}
+\smallskip
+\ifbilingual\textbf{第 3 次大模型调用。}最终答案：8。\else\textbf{LLM call 3.} Final answer: 8.\fi
+\end{minipage}}
+\caption{\bt{One question answered from a shared definition (an agent's session, abridged). The lookup replaces finding the fact table, the measure, three inner joins, and the date join. On questions about this metric, agents without memory spend \PpNoneMTwoSteps\ LLM calls, \PpNoneMTwoTokK\,k tokens, and \PpNoneMTwoS\,s, and \system's agents \PpMavraMTwoSteps\ calls, \PpMavraMTwoTokK\,k tokens, and \PpMavraMTwoS\,s (second half of the agents, Section~\ref{sec:population-eval}).}{用共享的定义回答一道题（一个智能体的会话，有删节）。一次查找取代了找事实表、度量、三个内连接和日期连接。在关于这个指标的题上，无记忆的智能体花 \PpNoneMTwoSteps\ 次大模型调用、\PpNoneMTwoTokK\,k token 和 \PpNoneMTwoS\ 秒，\system\ 的智能体花 \PpMavraMTwoSteps\ 次调用、\PpMavraMTwoTokK\,k token 和 \PpMavraMTwoS\ 秒（后一半智能体，第~\ref{sec:population-eval} 节）。}}
+\label{fig:use}
+\Description{A boxed agent session. The question asks in which month of 2002 registered-customer store sales rose most over the previous month. In the first LLM call the agent calls find_metric and receives the definition: fact table store_sales, measure SUM of ss_ext_sales_price, grain ticket number and item, inner joins to customer, item, and store, and a date join to date_dim. In the second call it runs one SQL that aggregates the measure per month of 2002 and computes the change over the previous month. In the third call it answers 8.}
+\end{figure}

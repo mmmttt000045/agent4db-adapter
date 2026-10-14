@@ -5,6 +5,10 @@
 | SQL templates per 100 SQL | 75.6 | 75.6 |
 | SQL whose template seen before % | 24.4 | 24.4 |
 | distinct templates per 100-SQL block | 83 | 83 |
+| LLM calls / session (mean) | 4.59 | 4.59 |
+| LLM calls issuing only lookups, probes, or checks % | 57.1 | 57.1 |
+| LLM calls before the answer SQL (mean) | 2.48 | 2.48 |
+| session time before the answer SQL % (mean) | 70.7 | 70.7 |
 | exploration calls % (schema+data) | 67.9 | 67.9 |
 |   schema % | 66.6 | 66.6 |
 |   data explore % | 1.3 | 1.3 |

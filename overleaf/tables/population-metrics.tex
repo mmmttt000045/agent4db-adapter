@@ -4,15 +4,15 @@
 \footnotesize
 \setlength{\tabcolsep}{2.6pt}
 \newcommand{\arr}{$\to$}
-\begin{tabularx}{\linewidth}{@{}Lrrr@{}}
+\begin{tabularx}{\linewidth}{@{}Lrrrr@{}}
 \toprule
-\bt{Metric (TPC-DS template)}{指标（TPC-DS 模板）} & \bt{Tokens (k)}{token（千）} & \bt{Time (s)}{时间（秒）} & \bt{Correct (\%)}{正确（\%）}\\
+\bt{Metric (TPC-DS template)}{指标（TPC-DS 模板）} & \bt{LLM calls}{大模型调用} & \bt{Tokens (k)}{token（千）} & \bt{Time (s)}{时间（秒）} & \bt{Correct (\%)}{正确（\%）}\\
 \midrule
-\bt{Items of one category manager}{一位品类经理的商品} & \PpNoneMOneTokK\,\arr\,\PpMavraMOneTokK & \PpNoneMOneS\,\arr\,\PpMavraMOneS & \PpNoneMOneAcc\,\arr\,\PpMavraMOneAcc\\
-\bt{Registered customers}{登记顾客} & \PpNoneMTwoTokK\,\arr\,\PpMavraMTwoTokK & \PpNoneMTwoS\,\arr\,\PpMavraMTwoS & \PpNoneMTwoAcc\,\arr\,\PpMavraMTwoAcc\\
-\bt{Coupons at mid-sized stores}{中型门店的优惠券} & \PpNoneMThreeTokK\,\arr\,\PpMavraMThreeTokK & \PpNoneMThreeS\,\arr\,\PpMavraMThreeS & \PpNoneMThreeAcc\,\arr\,\PpMavraMThreeAcc\\
-\bt{Returns at known stores}{关联得上门店的退货} & \PpNoneMFourTokK\,\arr\,\PpMavraMFourTokK & \PpNoneMFourS\,\arr\,\PpMavraMFourS & \PpNoneMFourAcc\,\arr\,\PpMavraMFourAcc\\
-\bt{Yearly total}{年度汇总口径} & \PpNoneMFiveTokK\,\arr\,\PpMavraMFiveTokK & \PpNoneMFiveS\,\arr\,\PpMavraMFiveS & \PpNoneMFiveAcc\,\arr\,\PpMavraMFiveAcc\\
+\bt{Items of one category manager}{一位品类经理的商品} & \PpNoneMOneSteps\,\arr\,\PpMavraMOneSteps & \PpNoneMOneTokK\,\arr\,\PpMavraMOneTokK & \PpNoneMOneS\,\arr\,\PpMavraMOneS & \PpNoneMOneAcc\,\arr\,\PpMavraMOneAcc\\
+\bt{Registered customers}{登记顾客} & \PpNoneMTwoSteps\,\arr\,\PpMavraMTwoSteps & \PpNoneMTwoTokK\,\arr\,\PpMavraMTwoTokK & \PpNoneMTwoS\,\arr\,\PpMavraMTwoS & \PpNoneMTwoAcc\,\arr\,\PpMavraMTwoAcc\\
+\bt{Coupons at mid-sized stores}{中型门店的优惠券} & \PpNoneMThreeSteps\,\arr\,\PpMavraMThreeSteps & \PpNoneMThreeTokK\,\arr\,\PpMavraMThreeTokK & \PpNoneMThreeS\,\arr\,\PpMavraMThreeS & \PpNoneMThreeAcc\,\arr\,\PpMavraMThreeAcc\\
+\bt{Returns at known stores}{关联得上门店的退货} & \PpNoneMFourSteps\,\arr\,\PpMavraMFourSteps & \PpNoneMFourTokK\,\arr\,\PpMavraMFourTokK & \PpNoneMFourS\,\arr\,\PpMavraMFourS & \PpNoneMFourAcc\,\arr\,\PpMavraMFourAcc\\
+\bt{Yearly total}{年度汇总口径} & \PpNoneMFiveSteps\,\arr\,\PpMavraMFiveSteps & \PpNoneMFiveTokK\,\arr\,\PpMavraMFiveTokK & \PpNoneMFiveS\,\arr\,\PpMavraMFiveS & \PpNoneMFiveAcc\,\arr\,\PpMavraMFiveAcc\\
 \bottomrule
 \end{tabularx}
 \end{table}

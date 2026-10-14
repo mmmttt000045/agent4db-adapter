@@ -14,6 +14,7 @@ DIR 为 workload-bench 的输出目录（含 trace.jsonl、sessions.jsonl、app.
   attempt   在最终答案查询之前对度量列做聚合、但未被采用的查询（中间尝试或被放弃的写法）
   compute   不读任何表的 SQL（把 SQL 当计算器，如 SELECT ROUND(2893408.04 / 12179532.00 * 100, 2)）
   explore   其余成功的 SQL（取样、取值分布、范围、计数等数据探查）
+大模型调用（step）按它发出的工具调用归类：含最终答案查询或 final_answer 的为作答，其余只做查找、探查或检查。
 """
 
 import argparse
@@ -225,6 +226,32 @@ def overlap_pairs(sessions):
     return k
 
 
+def llm_calls(sessions, by_sess):
+    """大模型调用（会话的 step）按其发出的工具调用归类：发出最终答案查询或 final_answer 的为作答，其余只做查找、探查或检查。
+    另计会话开始到第一条被采用的查询开始所占的时间比例。"""
+    total = lookup = 0
+    pre_time, pre_calls = [], []
+    for a, s in sessions.items():
+        total += s["run"]["steps"]
+        cats = collections.defaultdict(set)
+        for c in by_sess.get(a, []):
+            cats[c["step"]].add("final" if c["tool"] in ("final_answer", "ask_clarification") else c["cat"])
+        lookup += sum(1 for cs in cats.values() if not cs & {"answer", "final"})
+        ans = [c for c in by_sess.get(a, []) if c["cat"] == "answer"]
+        if ans:
+            pre_time.append((min(c["t0_ms"] for c in ans) - s["t0_ms"]) / (s["t1_ms"] - s["t0_ms"]))
+            first = min(c["step"] for c in ans)
+            pre_calls.append(sum(1 for st in cats if st < first))
+    return {
+        "llm_calls": total,
+        "lookup_only_calls": lookup,
+        "lookup_only_pct": pct(lookup, total),
+        "mean_calls_per_session": round(total / len(sessions), 2) if sessions else None,
+        "mean_calls_before_answer_sql": round(statistics.mean(pre_calls), 2) if pre_calls else None,
+        "mean_time_before_answer_sql_pct": round(100.0 * statistics.mean(pre_time), 1) if pre_time else None,
+    }
+
+
 def stats_for(model, sessions, by_sess, data):
     cats = collections.Counter(c["cat"] for c in data)
     n = len(data)
@@ -279,6 +306,7 @@ def stats_for(model, sessions, by_sess, data):
             "pct_with_validate": pct(sum(p["validate"] > 0 for p in per), len(per)),
             "mean_explore_share_pct": round(100.0 * statistics.mean(xs), 1) if (xs := [p["explore"] / p["calls"] for p in per if p["calls"]]) else None,
         },
+        "llm": llm_calls(sessions, by_sess),
         "overlapping_session_pairs": overlap_pairs(sessions),
         "redundancy": redundancy(data),
     }
@@ -354,6 +382,10 @@ def table(res):
         row("SQL templates per 100 SQL", lambda m: m["sql_templates_per_100"]),
         row("SQL whose template seen before %", lambda m: m["sql_template_repeat_pct"]),
         row("distinct templates per 100-SQL block", lambda m: m["sql_templates_per_100_block"]),
+        row("LLM calls / session (mean)", lambda m: m["llm"]["mean_calls_per_session"]),
+        row("LLM calls issuing only lookups, probes, or checks %", lambda m: m["llm"]["lookup_only_pct"]),
+        row("LLM calls before the answer SQL (mean)", lambda m: m["llm"]["mean_calls_before_answer_sql"]),
+        row("session time before the answer SQL % (mean)", lambda m: m["llm"]["mean_time_before_answer_sql_pct"]),
         row("exploration calls % (schema+data)", lambda m: m["exploration_pct"]),
         row("  schema %", lambda m: m["category_pct"]["schema"]),
         row("  data explore %", lambda m: m["category_pct"]["explore"]),

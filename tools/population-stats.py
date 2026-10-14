@@ -103,7 +103,7 @@ def cell_stats(d):
     by_metric = collections.defaultdict(list)
     for r in late:
         tok, sec, _, _ = cost(r)
-        by_metric[r["metric"]].append((tok, sec, r["outcome"] == "correct"))
+        by_metric[r["metric"]].append((tok, sec, r["outcome"] == "correct", r["run"]["steps"]))
     maint = {}
     for p in d["phases"]:
         maint[p["phase"]] = sum((e.get("db") or {}).get("ms", 0.0) for e in p["events"] if e.get("event") == "maintenance") / 1000
@@ -241,6 +241,8 @@ def main():
                     mac(f"{KEY[m]}M{WORD[met]}TokK", f"{statistics.mean(x[0] for x in xs) / 1e3:.0f}")
                     mac(f"{KEY[m]}M{WORD[met]}S", f"{statistics.mean(x[1] for x in xs):.0f}")
                     mac(f"{KEY[m]}M{WORD[met]}Acc", f"{100 * sum(x[2] for x in xs) / len(xs):.0f}")
+                    if len(xs[0]) > 3:
+                        mac(f"{KEY[m]}M{WORD[met]}Steps", f"{statistics.mean(x[3] for x in xs):.1f}")
         if ref in pooled and "middle-alone" in pooled:
             tx, sx = [], []
             for met, word in WORD.items():

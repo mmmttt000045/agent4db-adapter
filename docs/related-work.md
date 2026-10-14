@@ -39,6 +39,7 @@
 |---|---|---|---|---|
 | Sequeda24 | GRADES-NDA 2024（SIGMOD workshop） | 出处 | 业务语义显著提高 LLM 在企业库上的正确率：GPT-4 零样本 16% → 54% | 知识图谱人工构建，静态 |
 | BIRD | NeurIPS 2023 D&B | 出处 | 每题附外部知识（业务定义），说明口径是 Text-to-SQL 的独立难点 | 知识随题给出，不学、不维护 |
+| LiveSQLBench | BIRD Team 数据集（GitHub，base-lite 2025-05-30、base-full-v1 2025-09-04） | 原文 | 每库附知识库（计算、领域知识、取值说明）；同库任务共用知识：点名知识的任务 78% 与同库另一任务共用，第 20 个任务所需知识 65% 已被需要过（`exp/2026-10-14-external-motivation/`） | 任务到知识条目的 id 不公开（需发邮件申请），我们按名称匹配，是下界；BIRD-Interact 原文："We build our benchmark on the text-to-SQL tasks and infrastructure of LiveSQLBench" |
 | BIRD-Interact | ICLR 2026 | 出处 | 删去或打断知识库条目制造歧义，把缺失的业务知识作为交互难点 | 是否在修改后的数据上继续提问未确认 |
 | Spider 2.0 | ICLR 2025 | 出处 | 企业级工作流，需要文档与代码库；可作真实 schema 来源 | 数据静态 |
 | DataLab | ICDE 2025 | 出处 | 从脚本历史与血缘中用 LLM 生成领域知识，含派生列的计算逻辑——“从历史学口径”不是新意 | 只经 LLM 自评与 JSON Schema 检查，不在数据上验证，不维护 |
@@ -178,6 +179,7 @@
 | CollabMem | Alireza Rezazadeh et al. Collaborative Memory: Multi-User Memory Sharing in LLM Agents with Dynamic Access Control. ICML 2025 Workshop on Multi-Agent Systems |
 | Sequeda24 | Juan Sequeda, Dean Allemang, Bryon Jacob. A Benchmark to Understand the Role of Knowledge Graphs on Large Language Model's Accuracy for Question Answering on Enterprise SQL Databases. GRADES-NDA 2024. doi:10.1145/3661304.3661901 |
 | BIRD | Jinyang Li et al. Can LLM Already Serve as a Database Interface? A BIg Bench for Large-Scale Database Grounded Text-to-SQLs. NeurIPS 2023 Datasets and Benchmarks |
+| LiveSQLBench | BIRD Team. LiveSQLBench: A Dynamic and Contamination-Free Benchmark for Evaluating LLMs on Real-World Text-to-SQL Tasks. https://github.com/bird-bench/livesqlbench |
 | BIRD-Interact | Nan Huo et al. BIRD-Interact. ICLR 2026 |
 | Spider 2.0 | Fangyu Lei et al. Spider 2.0: Evaluating Language Models on Real-World Enterprise Text-to-SQL Workflows. ICLR 2025 |
 | DataLab | Luoxuan Weng et al. DataLab: A Unified Platform for LLM-Powered Business Intelligence. ICDE 2025 |
@@ -200,6 +202,7 @@
 | 说法 | 依据 |
 |---|---|
 | 探索高度重复 | Liu26 §2：“Across queries, the number of distinct sub-plans of each size is often a small fraction of less than 10-20% of the total”（图 2：BIRD 每题 GPT-4o-mini 50 次尝试）。原文说的是“persistent, queryable agentic memory store”，不是“shared memory store” |
+| 探索占 SQL 的一半以上，提示能省掉一部分 | Liu26 表 1（o3，22 个任务各两次共 44 条轨迹，每条平均）：查看表 3.44、查看特定列 3.56、尝试部分查询 4.28、尝试完整查询 1.26，共 12.67；给出 “human expert-provided hints”（“background information useful for the task”，如 “which column contains information pertinent to the task”）后分别为 2.95、2.57、2.71、1.05，共 10.38（−18.1%，查看列 −27.7%） |
 | 过期记忆是开放问题 | Liu26 §6.1 “Updates to the Store”；Luo26（SIGMOD'26 教程，pp. 571–579）§2.4.4 “difficulty adapting to dynamic environments with changing data”；Li26（PVLDB 19(12):4888–4892，题为 Data Management for Agentic Memory）§2.1 “redundant, outdated, or conflicting information” |
 | 业务知识决定正确率 | BIRD 表 2：GPT-4 无证据 34.88 → 有证据 54.89；Spider 2.0：o1-preview 智能体只完成 21.3%；Sequeda24 §5.1：SQL 16.7% → 知识图谱 54.2%（43 题，GPT-4 零样本）；Floratou24 §2：632 张表、4000 多列，“custom terminology” |
 | 纯数据变化静默出错 | Auto-Validate（SIGMOD'21）摘要：“upstream data feeds can change in unexpected ways, causing downstream applications to break silently”；Breck19 例 1.1：“the data looks perfectly fine for the training code” |

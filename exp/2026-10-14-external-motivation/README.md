@@ -29,3 +29,11 @@
 ## 外部文献中的探索代价
 - Liu et al., CIDR 2026（liu2026agents）表 1（已对照 PDF 核实）：OpenAI o3 对 22 个多数据库任务各做两次，共 44 条轨迹；平均每条 12.67 条 SQL，
   其中查看表 3.44、查看特定列 3.56（合计 7.00，约 55%），尝试部分查询 4.28、尝试完整查询 1.26；给出人工提示后 SQL 降到 10.38（−18.1%）。
+
+## 进论文（2026-10-14）
+- 引言第一段与 §2.1 以这些外部数字开头；新表 `overleaf/tables/external.tex`（表 2）；我们自己的 100 个会话改为测量“会话代价”，93% 注明是自建题目上的数字。
+- 宏：`overleaf/gen/external.tex`（`\Ex*`），由 `tools/external-reuse-stats.py --tex-out` 生成；也可只从存档 JSON 重新生成：
+  `python3 -I tools/external-reuse-stats.py --from-json exp/2026-10-14-external-motivation/reuse-stats.json --population exp/2026-10-12-population/population-stats.json --tex-out overleaf/gen`
+- 代价模型（§2.2）：节省 = 1 − (1−r)(c_e+c_ℓ)/c_e − r·c_r/c_e，c_e、c_r 取人群实验后一半智能体每题 token（无记忆 55.8k、MAVRA 10.0k），
+  c_ℓ 为每学一个定义的提取 token（5.8k）。r = 89%（MAVRA 实测从共享定义作答的比例）时模型给出 72%，与实测一致；
+  r 取 LiveSQLBench 知识使用的重复率 50% 时为 35%，取第 20 个任务的 65% 时为 50%。

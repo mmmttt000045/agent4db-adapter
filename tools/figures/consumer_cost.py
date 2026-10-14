@@ -25,7 +25,7 @@ NAME = 'consumer-cost'
 W, H = style.COLUMN, 38.0
 SYN = style.ROOT / 'exp/2026-10-10-scenarios-q5/holdout-cost.json'
 TPCH = style.ROOT / 'exp/2026-10-11-generality/e2e/outcomes.json.gz'
-METHODS = [('middle', '^'), ('traj-global', 's'), ('metric-global-snap', 'o')]
+METHODS = [('middle', '^'), ('metric-global-snap', 'o')]
 TEXT = {
     'en': {'panels': ['Synthetic retail, {runs} runs', 'TPC-H SF1, {runs} runs'],
            'x': 'Seconds per held-out question', 'y': 'k tokens per question',
@@ -90,8 +90,8 @@ def figure(lang):
         label, color = style.method(mode, lang)
         handles.append(Line2D([], [], ls='', color=color, marker=marker, ms=4.2, mfc=color, mec=WHITE, mew=.35,
                               label=label))
-    legend = fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.545, 1.0), ncol=3, handlelength=1.0,
-               columnspacing=1.0)
+    legend = fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.545, 1.0), ncol=len(handles),
+                        handlelength=1.0, columnspacing=1.0)
     # MAVRA's entry is set as in Figures 4 and 5: bold, in its colour
     for entry in legend.get_texts():
         if entry.get_text().startswith('MAVRA'):

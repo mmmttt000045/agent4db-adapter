@@ -21,8 +21,7 @@ from style import INK, MUTED, WHITE  # noqa: E402
 NAME = 'population'
 W, H = style.TEXTWIDTH, 50.0
 DATA = style.ROOT / 'exp/2026-10-12-population/population-stats.json'
-METHODS = [('middle-alone', 'None', '^'), ('metric-private', 'Private', 'D'), ('traj-global', 'Traj', 's'),
-           ('metric-global-snap', 'Mavra', 'o')]
+METHODS = [('middle-alone', 'None', '^'), ('metric-private', 'Private', 'D'), ('metric-global-snap', 'Mavra', 'o')]
 TEXT = {
     'en': {'panels': ['Total tokens (M)', 'Total agent time (min)', 'Tokens per question (k), by agent'],
            'x': 'Agents arrived', 'x3': 'Agent in arrival order',
@@ -74,8 +73,8 @@ def figure(lang):
         label, color = style.method(mode, lang)
         handles.append(Line2D([], [], color=color, marker=marker, ms=3.4, mfc=color, mec=WHITE, mew=.35, lw=1.0,
                               label=T['acc'].format(name=label, acc=data[mode]['acc'])))
-    legend = fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.52, 1.0), ncol=4, handlelength=1.6,
-                        columnspacing=1.6)
+    legend = fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.52, 1.0), ncol=len(handles),
+                        handlelength=1.6, columnspacing=1.6)
     for entry in legend.get_texts():
         if entry.get_text().startswith('MAVRA'):
             entry.set_color(style.method('metric-global-snap', lang)[1])
@@ -111,9 +110,9 @@ def figure(lang):
     ax.annotate('', xy=(n - .4, low), xytext=(n - .4, top),
                 arrowprops=dict(arrowstyle='-|>', color=MUTED, lw=.6, mutation_scale=5, shrinkA=0, shrinkB=0),
                 zorder=5)
-    # The note sits in the gap between the shared-memory lines and the next line above them, over the last agents
+    # The note sits in the gap between the shared-memory line and the next line above it, over the last agents
     tail = slice(n * 2 // 3, n)
-    below = max(max(data[m]['tok'][tail]) for m in ('metric-global-snap', 'traj-global') if m in data)
+    below = max(data['metric-global-snap']['tok'][tail])
     above = min(min(data[m]['tok'][tail]) for m in ('metric-private', 'middle-alone') if m in data)
     ax.text(n - .9, (below + above) / 2, T['save'].format(t=save, s=speed), ha='right', va='center',
             fontsize=mplstyle.SMALL, color=INK, linespacing=1.15)

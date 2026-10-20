@@ -435,9 +435,9 @@ class Run:
         tr = seeds["train_sample"]
         tstar = tr["seed_time"].max()
         sub = tr[tr["seed_time"] == tstar].sort_values(ec).head(AUDIT_SEEDS).reset_index(drop=True)
-        if re.search(r"\bpublic\s*\.", sql, re.I):
-            return {"result": "unauditable", "why": "SQL names schema public explicitly"}
         schema = f"audit_{tname(t)}_k{k}"
+        # tables named as public.x read the audit views too
+        hidden_sql = re.sub(r"\bpublic\s*\.", f"{schema}.", sql, flags=re.I)
         with psycopg.connect(self.url, autocommit=True) as con:
             con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
             con.execute(f"CREATE SCHEMA {schema}")
@@ -449,7 +449,7 @@ class Run:
             copy_rows(con, f"{schema}.seeds", sub[[c for c in sub.columns]])
         try:
             normal, _ = features(self.url, sql, f"{schema}.seeds", sub, ec)
-            hidden, _ = features(self.url, sql, f"{schema}.seeds", sub, ec, search_path=f"{schema}, public")
+            hidden, _ = features(self.url, hidden_sql, f"{schema}.seeds", sub, ec, search_path=f"{schema}, public")
         except FeatureError as err:
             return {"result": "error", "why": str(err)[:300]}
         finally:

@@ -727,18 +727,20 @@ Shared memory: find_features lists verified feature definitions that agents on t
         return rec
 
     def learn(self, t, k, rec, seeds, middle, agent, sid):
-        """Learning after a session (README §1.6): only when the submission beats the reference and its audit is clean."""
+        """Learning after a session (README §1.6, amended before any P2 result): when the submission beats the reference.
+        Columns the audit found leaking are left out of the extractor's input; every definition still has to pass F1-F4,
+        and a leaking column cannot pass F3 (the compiled SQL is bounded by seed_time) or F4."""
         e = self.tasks[t]
         ec = e["entity_col"].lower()
         ref = self.refs.get((t, k)) or {}
         best, higher = rec["best_val"], rec["higher_is_better"]
         beats = best is not None and ref.get("val") is not None and (best > ref["val"] if higher else best < ref["val"])
-        audit = (rec.get("audit") or {}).get("result")
+        audit = rec.get("audit") or {}
         if not beats:
             return {"skipped": "validation score not better than the reference"}
-        if audit != "clean":
-            return {"skipped": f"audit {audit}"}
+        leaking = {c.lower() for c in audit.get("columns_differing") or []}
         imp = next((v.get("importance") for v in reversed(rec["validations"]) if v.get("sql") == rec["final_sql"] and v.get("importance")), [])
+        imp = [c for c in imp if c.lower() not in leaking]
         tstar = seeds["train_sample"]["seed_time"].max()
         sub = seeds["train_sample"][seeds["train_sample"]["seed_time"] == tstar].sort_values(ec).head(AUDIT_SEEDS)
         schema = f"learn_{tname(t)}_k{k}"
@@ -766,7 +768,8 @@ Shared memory: find_features lists verified feature definitions that agents on t
         events = [{k2: f.get(k2) for k2 in ("event", "key", "revision", "failed_gate", "reason")} for f in r.get("features") or []]
         log(f"{t} k{k}: learning {len(events)} drafts -> {sum(1 for x in events if x['event'] in ('promoted', 'corroborated'))} published")
         return {"seconds": time.time() - t0, "input_tokens": ex.get("input_tokens", 0), "output_tokens": ex.get("output_tokens", 0),
-                "events": events, "program": r.get("program"), "error": r.get("error"), "raw": r}
+                "events": events, "program": r.get("program"), "error": r.get("error"), "audit": audit.get("result"),
+                "excluded_leaking_columns": sorted(leaking), "raw": r}
 
     def ace_update(self, t, k, rec, msgs, agent):
         """ACE after a session (online, no ground truth): Reflector (REFLECTOR_PROMPT_NO_GT), counters, Curator

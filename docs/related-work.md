@@ -15,7 +15,7 @@
 | Liu26 | CIDR 2026 | 原文 | ① 数据 Agent 的探索高度重复：BIRD 上每题 50 次独立尝试，“the number of distinct sub-plans of each size is often a small fraction of less than 10-20% of the total”（§2）。② 提出跨 Agent 的 agentic memory store，数据或元数据更新 “necessitating updates to any related information in the agentic memory”；让记忆与数据不一致、等新探查发现过期，缺点是 “the stale information may lead a new probe to make a mistake”（§6.1）。 | 愿景论文，没有系统与有效性模型；举例是表结构更新和新增表，没有讨论只改数据的变化；建议 “draw inspiration from work on knowledge bases as well as schema evolution”。**我们是这个开放问题在指标口径上的具体回答，不主张问题是新的。** |
 | Luo26 | SIGMOD 2026 教程 | 出处 | 数据 Agent 的分级与开放问题，引言定位用 | 综述 |
 | Li26 | PVLDB 19(12) 2026 教程 | 出处（作者主页的定稿 PDF，未在 vldb.org 交叉核对） | 把多 Agent 协作记忆列为开放问题 | 综述 |
-| AgentSM | arXiv 2601.15709 | 预印本 | 执行轨迹组织成结构化语义记忆，目标是减少重复探索、提高一致性；原文把共享记忆留作后续工作：“shared memory introduces nontrivial challenges in retrieval efficiency, consistency management, and error propagation, which we leave as future work.” | 按问题相似度检索，复用前不在数据库上验证，不讨论数据变化。是“共享轨迹检索”基线的原型 |
+| AgentSM | arXiv 2601.15709 | 原文（2026-10-20 重读 v1） | 以往的或合成的轨迹（摘要：“captures prior execution traces—or synthesizes curated ones”）按探索、构造与执行、验证三个阶段存为 Markdown 语义记忆，供规划智能体按问题相似度检索（限同一数据库）；目标是减少重复探索。§3.1 的 “introducing additional agents would necessitate a shared memory … which we leave as future work” 说的是在它自己的规划 + 模式链接两智能体设计中再加智能体，**不是**独立智能体之间共享记忆 | 单智能体；复用前不在数据库上验证，不讨论数据变化。所有智能体共用一份轨迹库是我们的扩展，原文没有 |
 
 ## 2. Agent 经验与记忆
 
@@ -127,7 +127,7 @@
 2. 修复要恢复含义，而不只是恢复约束。例：只取“申请”也能让退货表每键一行，但“申请”行只在变更日之后存在、不覆盖全部键，按覆盖条件（Lenz97 的完备性）排除，只有 `sr_status = '完成'` 成立；再经学习题回归确认。
 3. 什么时候不修：模式变化、关联不再成立时保持不可用。
 
-并发一致性（AgentSM 留作后续工作，Liu26 列为开放问题）可写成可检验的不变量：
+并发一致性（Liu26 列为开放问题；AgentSM §3.1 只说在它自己的两智能体设计中加智能体需要共享记忆，不是同一问题）可写成可检验的不变量：
 
 - 安全：声明引用了已撤销修订的 SQL 不会执行。
 - 可用：满足假设的正常变化不撤销。定义级重验同样满足，不能作为区别。
@@ -151,6 +151,7 @@
 - “首次对 LLM 生成的 SQL 做指标、粒度、关联检查”（GROUND 预印本、语义层产品）。
 - “首次用数据版本使 Agent 记忆失效”（Invalidation Contracts 预印本）。能写的是：在 SQL 数据库上，把学到的口径落到可执行数据条件、按数据版本共享结论、执行端按修订强制、失效后受限修复，检索没有找到把这些合在一起的工作。
 - “语义层不做验证”；“增量检查是新意”；“快照绑定是新意”。
+- 把 AgentSM 写成“把共享记忆留作未来工作”而不说明它指的是其自身两智能体设计；把“所有智能体共用的 AgentSM 轨迹库”叫作 AgentSM（那是我们的扩展）；不核对其 Table 2 就引用摘要的“token 少 25%、轨迹短 35%”。
 - 把 AgentSM、Tk-Boost、EvoOntology、GATE 等写成已发表；把 CollabMem 写成 ICML 主会；把 Patel et al. 写成 CIDR 论文。
 - 把 5/15 vs 15/15 写成超出“15 题的动机例子”的结论。
 

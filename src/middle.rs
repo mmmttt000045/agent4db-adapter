@@ -1538,7 +1538,8 @@ impl Middle {
                 self.find_metric(ctx, s("query")?, &tables).await?
             }
             "find_features" if self.cfg.feature_memory => {
-                self.find_features(ctx, s("entity")?, args.get("query").and_then(Value::as_str).unwrap_or_default()).await?
+                let query = args.get("query").and_then(Value::as_str).unwrap_or_default();
+                self.find_features(ctx, s("entity")?, query, args.get("seed_key").and_then(Value::as_str)).await?
             }
             "compose_features" if self.cfg.feature_memory => {
                 let keys: Vec<String> = args

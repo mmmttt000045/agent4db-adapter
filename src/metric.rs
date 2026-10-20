@@ -469,8 +469,15 @@ pub fn feature_lateral(m: &Metric, alias: &str, seed_key: &str) -> Result<String
     if let Some(d) = e.window_days {
         wheres.push(format!("{tt}.{tc} > s.seed_time - interval '{d} days'"));
     }
-    let expr = if m.empty == EmptyRule::Zero { format!("coalesce({}, 0)", m.measure) } else { m.measure.clone() };
+    // 度量里未限定的 seed_time 是这个种子的时间
+    let measure = seed_time_re().replace_all(&m.measure, "${1}s.seed_time").to_string();
+    let expr = if m.empty == EmptyRule::Zero { format!("coalesce({measure}, 0)") } else { measure };
     Ok(format!("left join lateral (select ({expr})::double precision as v from {from} where {}) {alias} on true", wheres.join(" and ")))
+}
+
+fn seed_time_re() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| Regex::new(r"(^|[^.\w])seed_time\b").unwrap())
 }
 
 /// 一组特征定义编译成交给 validate_features 的特征 SQL：以 `{seeds}` 为种子表，前两列为实体键与 seed_time，
@@ -558,7 +565,37 @@ pub fn qualify_aliases(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog) ->
 }
 
 /// 表达式只能引用 `allowed` 中表的列与少量函数、关键字；不允许子查询与多语句。
+/// 特征定义的度量另外允许的词：常用的标量函数，以及代表种子时间的 `seed_time`（编译时换成 `s.seed_time`，用于“距上次多少天”这类特征）。
+pub const FEATURE_WORDS: &[&str] = &[
+    "seed_time",
+    "extract",
+    "epoch",
+    "date_part",
+    "date_trunc",
+    "date",
+    "length",
+    "char_length",
+    "greatest",
+    "least",
+    "ln",
+    "log",
+    "sqrt",
+    "power",
+    "floor",
+    "ceil",
+    "interval",
+    "day",
+    "days",
+    "hour",
+    "hours",
+];
+
 pub fn check_expr(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog) -> std::result::Result<(), String> {
+    check_expr_with(expr, allowed, cat, &[])
+}
+
+/// `check_expr`，另外允许 `extra` 里的词（特征定义用 `FEATURE_WORDS`）。
+pub fn check_expr_with(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog, extra: &[&str]) -> std::result::Result<(), String> {
     if expr.contains(';') || expr.contains("/*") || expr.contains("--") {
         return Err("表达式不能包含分号或注释".into());
     }
@@ -567,7 +604,7 @@ pub fn check_expr(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog) -> std:
             return Err("表达式不能包含子查询".into());
         }
         // 口径内的表名只作列的限定前缀（store_returns.sr_return_amt）；规范 SQL 不给表起别名，这样写照样能执行
-        if SQL_WORDS.contains(&w.as_str()) || allowed.contains(&w) {
+        if SQL_WORDS.contains(&w.as_str()) || extra.contains(&w.as_str()) || allowed.contains(&w) {
             continue;
         }
         let owners = cat.owners(&w);
@@ -869,8 +906,9 @@ const FEATURE_EXTRACT_SYSTEM: &str = "你是数据中间层的特征定义提炼
 - name：特征名称，英文小写加下划线，说明实体、度量与窗口，如 user_upvotes_received_91d\n\
 - definition：一句话说明\n\
 - fact：被聚合的表\n\
-- measure：一个聚合表达式，如 count(*)、count(distinct votes.postid)、sum(posts.score)；只能引用 fact 与 joins 中表的列，不得包含子查询或窗口函数；\
-列名在这些表之间重名时写成 表.列\n\
+- measure：一个聚合表达式，如 count(*)、count(distinct votes.postid)、sum(posts.score)、avg(length(posts.body))；只能引用 fact 与 joins 中表的列，\
+不得包含子查询或窗口函数；列名在这些表之间重名时写成 表.列；可以用 seed_time 表示这个种子的时间，例如距上一条评论的天数写成 \
+extract(epoch from (seed_time - max(comments.creationdate))) / 86400；结果必须是数值（不能是时间戳）\n\
 - grain：fact 上一行对应一条记录的键列数组（通常是主键），只写列名、不带表名\n\
 - time：{\"role\": 时间角色, \"fact_col\": \"表.列\"（决定这行是否在种子时间之前的时间列，在 fact 或 joins 中的表上）, \"strategy\": \"column\", \"grain\": \"day\"}\n\
 - joins：从 fact 到实体列所在表必需的多对一关联，每项 {\"left\": 多侧表, \"right\": 一侧表, \"on\": [[左表列, 右表列]], \"kind\": \"inner\"}；\
@@ -1121,6 +1159,11 @@ mod tests {
         let mut period = m.clone();
         period.entity = None;
         assert!(feature_lateral(&period, "f0", "owneruserid").is_err());
+        let mut recency = m.clone();
+        recency.measure = "extract(epoch from (seed_time - max(votes.creationdate))) / 86400".into();
+        let sql = feature_lateral(&recency, "f0", "owneruserid").unwrap();
+        assert!(sql.contains("(s.seed_time - max(votes.creationdate))"), "{sql}");
+        assert!(!sql.contains("s.s.seed_time"), "{sql}");
     }
 
     #[test]

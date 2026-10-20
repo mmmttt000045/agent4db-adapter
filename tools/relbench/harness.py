@@ -573,7 +573,7 @@ Feature SQL contract: one SELECT statement that uses {{seeds}} as the seed table
 Tools: list_tables, describe_table, join_path, check_join and run_sql explore the database; the first four cover the tables in schema public, and the seed tables are read with run_sql (read-only, at most 50 rows returned). validate_features(sql) computes your features on a {SAMPLE_SIZE}-row training sample and on the validation seeds, trains the model and returns the validation {metric}. submit(sql) ends the session with your final features.
 Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; the session also ends after {PATIENCE} validations in a row without improvement. If you do not submit, your best validated features are used.""" + (f"""
 
-Shared memory: find_features lists verified feature definitions that agents on this database have published for an entity table; compose_features compiles chosen definitions (by key) into a feature SQL for these seed tables that you can validate as is or extend; find_program returns the latest verified feature program for this task. Using them is optional.""" if self.arm.get("feature_memory") else "") + (
+Shared memory: find_features lists verified feature definitions that agents on this database have published for an entity table, with a feature SQL of them for these seed tables; compose_features compiles chosen definitions (by key) into such a feature SQL; find_program returns the latest verified feature program for this task with its feature SQL. You can validate these SQL as they are or extend them. Using them is optional.""" if self.arm.get("feature_memory") else "") + (
             "\n\nMemory: retrieve_trajectory returns how the most similar earlier task on this database was explored; call it before you start. "
             "schema_linking asks a schema linking agent to map a task to tables, columns and joins. The other extra tools run tool sequences "
             "that agents often call together." if self.arm.get("agentsm") else "") + (
@@ -598,12 +598,12 @@ Shared memory: find_features lists verified feature definitions that agents on t
             fn("submit", "Finish the session with this feature SQL (must use {seeds}). Omit sql to submit your best validated features.",
                {"sql": s, **({"bullet_ids": {"type": "array", "items": s, "description": "ids of the playbook bullets you used"}} if self.arm.get("ace") else {})}, []),
         ] + ([
-            fn("find_features", "List verified feature definitions shared by all agents for an entity table: key, name, meaning, aggregated table, measure, look-back window.",
+            fn("find_features", "List verified feature definitions shared by all agents for an entity table (key, name, meaning, aggregated table, measure, look-back window), with a feature SQL of them for this task's seed tables, ready for validate_features.",
                {"entity": s, "query": {"type": "string", "description": "words describing the features you want"}}, ["entity"]),
             fn("compose_features", "Compile verified feature definitions (keys from find_features or find_program) into one feature SQL that uses {seeds}.",
                {"keys": {"type": "array", "items": s}}, ["keys"]),
-            fn("find_program", "The latest verified feature program for a task: cutoff, validation score, and its still-valid definitions compiled into one feature SQL.",
-               {"task": s}, ["task"]),
+            fn("find_program", "The latest verified feature program for this task (from an earlier cutoff): its validation score and its still-valid definitions compiled into one feature SQL, ready for validate_features.",
+               {}, []),
         ] if self.arm.get("feature_memory") else []) + (self.asm.tool_specs() if self.asm else [])
 
     def session(self, t, k, seeds, middle):
@@ -666,8 +666,11 @@ Shared memory: find_features lists verified feature definitions that agents on t
                 if stop:
                     out = {"error": "session already ended"}
                 elif name in FEATURE_TOOLS and self.arm.get("feature_memory"):
-                    if name == "compose_features":
-                        args.setdefault("seed_key", ec)
+                    # the harness fills in what the agent cannot know: the seed table's entity column and this task's id
+                    if name in ("compose_features", "find_features"):
+                        args["seed_key"] = ec
+                    if name == "find_program":
+                        args["task"] = t
                     try:
                         out = middle.call(name, agent, sid, sid, args)
                     except Exception as err:

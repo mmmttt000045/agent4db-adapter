@@ -322,7 +322,8 @@ impl Middle {
     }
 
     /// 工具 find_features：某实体上已发布的特征定义，按查询词与名称、含义的重合排序；经守护（依赖表有写入时条件级重验）后返回。
-    pub async fn find_features(&self, ctx: &Ctx, entity: &str, query: &str) -> Result<Value> {
+    /// 给了种子表的实体列时，同时返回由这些定义编译、可直接交给 validate_features 的特征 SQL。
+    pub async fn find_features(&self, ctx: &Ctx, entity: &str, query: &str, seed_key: Option<&str>) -> Result<Value> {
         if self.lookup_exhausted(ctx) {
             return Ok(json!({"features": [], "note": LOOKUP_NOTE}));
         }
@@ -355,7 +356,13 @@ impl Middle {
                 Checked::Missing => {}
             }
         }
+        let keys: Vec<String> = hits.iter().filter_map(|h| h["key"].as_str().map(String::from)).collect();
         let mut v = json!({"features": hits});
+        if let (Some(sk), false) = (seed_key, keys.is_empty()) {
+            let c = self.compose_feature_sql(ctx, &keys, sk).await?;
+            v["sql"] = c["sql"].clone();
+            v["columns"] = c["columns"].clone();
+        }
         if !unavailable.is_empty() {
             v["unavailable"] = json!(unavailable);
         }
@@ -444,7 +451,8 @@ pub fn feature_tool_specs() -> Vec<ToolSpec> {
             description: "List verified feature definitions shared by all agents for an entity table (name, meaning, aggregated table, measure, look-back window).",
             schema: json!({"type": "object", "properties": {
                 "entity": {"type": "string", "description": "entity table, e.g. users"},
-                "query": {"type": "string", "description": "words describing the features you want"}
+                "query": {"type": "string", "description": "words describing the features you want"},
+                "seed_key": {"type": "string", "description": "entity column of the seed table; when given, a feature SQL of the listed definitions is returned"}
             }, "required": ["entity"]}),
         },
         ToolSpec {

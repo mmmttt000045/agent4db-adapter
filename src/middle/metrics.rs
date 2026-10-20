@@ -698,7 +698,8 @@ impl Middle {
         for (t, f) in m.filters.iter_mut() {
             *f = metric::qualify_aliases(f, &[t.clone()].into_iter().collect(), &self.cat);
         }
-        if let Err(e) = metric::check_expr(&m.measure, &allowed, &self.cat) {
+        let extra = if m.entity.is_some() { metric::FEATURE_WORDS } else { &[] };
+        if let Err(e) = metric::check_expr_with(&m.measure, &allowed, &self.cat, extra) {
             bad!("聚合表达式：{e}");
         }
         for (t, f) in &m.filters {

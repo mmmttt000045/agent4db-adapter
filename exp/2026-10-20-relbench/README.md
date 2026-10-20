@@ -166,6 +166,12 @@ AgentSM 离线建库每库 100 个合成会话；rel-stack 附录约 135 个会�
   每条定义都要过 F3（编译出的 SQL 自带 `<= seed_time` 上界，必须逐值重现提交的列，泄漏列重现不了）与 F4（隐去 t* 之后的行重算，值必须不变）。
   修订：只要提交在验证集上优于参照就学习；审计判为泄漏的列不进提炼器的输入（`columns_by_importance` 中去掉），其余照旧由 F1–F4 逐条把关。
   停掉的部分运行移到 `results/relbench-pilot/aborted/mavra-r1-cleanonly/`（不计）；P2 用同一抽签从头重跑。
+- **P2 第二次启动后再次停止（22:00，仍未看到任何节省数据）**：第 1 个截点第 2 个会话（user-engagement）调用了 `find_features`、拿到了 user-badge 学到的 8 条定义，
+  却没有调用 `compose_features`，而是自己写 SQL（330k token）；`find_program` 被传入任务说明而不是任务名，什么也没找到。提炼出的 6 条定义有 5 条被拒：
+  度量里用了 `length(...)`（不在表达式白名单里），以及“距上次发帖/评论/徽章多少天”这类特征写不成定义（度量不能引用种子时间，编译后是时间戳转数值失败）。
+  修订（工具可用性与定义覆盖面，不涉及任何得分）：`find_features` 同时返回由所列定义编译好的特征 SQL；`find_program` 与 `find_features` 的任务名、种子实体列由框架填写；
+  特征定义的度量可以用 `seed_time`（编译为该种子的时间）与少量常用标量函数（`FEATURE_WORDS`：extract、length、greatest 等）；提炼器提示说明这两点。
+  停掉的运行移到 `results/relbench-pilot/aborted/mavra-r1-v2-nocompose/`（不计）；P2 用同一抽签第三次从头重跑。
 - **P1 结果（21:23，`p1-gates.json`，15 个会话 = `none-r1` 9 个 + `none-r1-k45` 6 个；user-engagement k1 的审计经 `reaudit.py` 补做为 clean）：五条门槛全部通过。**
   (a) 15/15 正常结束；(b) 每会话 LLM 调用中位数 16；(c) 看结构 + 探查占工具调用 86%；(d) 15/15 验证分数优于参照；
   (e) 第 2 个起的会话里 97% 的看结构调用在更早的会话中出现过。代价：每会话 token 中位数 19.6 万（均值 27.8 万，合计 416 万），

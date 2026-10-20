@@ -114,6 +114,20 @@ AgentSM 离线建库每库 100 个合成会话；rel-stack 附录约 135 个会�
 
 （按时间追加）
 
+- 10-20 下午：noctis 的本地代理（127.0.0.1:7890）已停，下载、pip 与网关请求一律去掉代理变量直连（hf-mirror.com、PyPI、api.river.ai 均可达）。
+  rel-stack 7 个表与 3 个任务的官方文件经 hf-mirror 下载，大小与 Hugging Face 列表一致；依赖装在 `.pydeps-relbench`
+  （relbench 3.0.2 不带依赖、huggingface_hub 2.2.0、psycopg 3.2.10、lightgbm 4.6.0；numpy 与 scipy 用系统的 1.26.4 / 1.15.3）。
+- river 试探（Python 客户端）：回报模型 `deepseek-ai/DeepSeek-V4.1-Flash`，“Reply with exactly OK.” 35 个 prompt token（与 Cline 上 35–37 相同，无隐藏提示），工具调用不需回传推理内容。
+- `prepare.py`（noctis `results/relbench-data/rel-stack-prep/`）：3 个任务 × 5 个截点的标签由 RelBench 自己的 `_get_table` 生成；
+  **k = 5 的训练/验证/测试表与官方 parquet 逐行一致**（post-votes 2,454,038 / 156,230 / 160,903 行，user-badge 3,386,276 / 247,398 / 255,360，
+  user-engagement 1,360,850 / 85,838 / 88,137）。截点 test_k：2020-01-03、2020-04-03、2020-07-03、2020-10-02、2021-01-01。
+  模板库 `relbench_stack_t1`（截至 2020-01-03，时间列为空的行 0 条）；外键列与时间列 25 个索引，1.6 GB。
+- 冒烟（`--smoke`，8 次调用、不计入结果）：第一次所有中间层工具因缺 `etl_batch_log` 报错，补上（模板与追加都记批次）；
+  第二次工具正常，智能体 8 次调用里做了 19–23 次工具调用、约 6 万 token，尚未到验证。直接测试验证与审计：
+  手写的干净特征验证 AUC 0.813 / 测试 0.809、审计 clean；故意读未来评论的特征验证 0.867 / 测试 0.500、审计判为 leak；
+  无索引时按种子的相关子查询 600 s 超时，加索引后 13 s。
+- 17:20 启动 P1：`harness.py --arm none --run 1 --parallel 3`，输出 noctis `results/relbench-pilot/none-r1/`。
+
 ## 5. 待定
 
 - APC 的小模型（网关上比 Flash 便宜约 10 倍的模型，或计划模型用 V4.1 Pro、小模型用 Flash）。

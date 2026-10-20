@@ -75,6 +75,8 @@ ARMS = {
     "ace": {"middle_mode": "middle-alone", "parallel_ok": True, "ace": True},
     # G-Memory (NeurIPS 2025) as published: one store shared by all agents, tasks one at a time (README §1.3)
     "gmemory": {"middle_mode": "middle-alone", "parallel_ok": False, "gmemory": True},
+    # AgentSM (preprint) as described: read-only memory of this database built offline (tools/relbench/agentsm.py build)
+    "agentsm": {"middle_mode": "middle-alone", "parallel_ok": True, "agentsm": True},
 }
 GMEMORY_REPO = "results/ext/GMemory"
 GMEMORY_PYTHON = "results/ext/venv-gmem/bin/python"
@@ -413,6 +415,7 @@ class Run:
         self.playbooks = {}  # ACE: agent -> playbook text
         self.ace_steps = {}
         self.gmem = None
+        self.asm = None
         os.makedirs(os.path.join(a.out, "sessions"), exist_ok=True)
 
     # data changes and seed tables
@@ -571,6 +574,9 @@ Tools: list_tables, describe_table, join_path, check_join and run_sql explore th
 Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; the session also ends after {PATIENCE} validations in a row without improvement. If you do not submit, your best validated features are used.""" + (f"""
 
 Shared memory: find_features lists verified feature definitions that agents on this database have published for an entity table; compose_features compiles chosen definitions (by key) into a feature SQL for these seed tables that you can validate as is or extend; find_program returns the latest verified feature program for this task. Using them is optional.""" if self.arm.get("feature_memory") else "") + (
+            "\n\nMemory: retrieve_trajectory returns how the most similar earlier task on this database was explored; call it before you start. "
+            "schema_linking asks a schema linking agent to map a task to tables, columns and joins. The other extra tools run tool sequences "
+            "that agents often call together." if self.arm.get("agentsm") else "") + (
             "\n\n" + open(os.path.join(ACE_DIR, "appworld_playbook_block.txt")).read().replace(
                 "{{ playbook }}", self.playbooks.get(f"{tname(t)}-agent", ACE_EMPTY_PLAYBOOK)).rstrip()
             + "\nWhen you call submit, list in bullet_ids the playbook bullets you used." if self.arm.get("ace") else "")
@@ -598,7 +604,7 @@ Shared memory: find_features lists verified feature definitions that agents on t
                {"keys": {"type": "array", "items": s}}, ["keys"]),
             fn("find_program", "The latest verified feature program for a task: cutoff, validation score, and its still-valid definitions compiled into one feature SQL.",
                {"task": s}, ["task"]),
-        ] if self.arm.get("feature_memory") else [])
+        ] if self.arm.get("feature_memory") else []) + (self.asm.tool_specs() if self.asm else [])
 
     def session(self, t, k, seeds, middle):
         e = self.tasks[t]
@@ -667,11 +673,32 @@ Shared memory: find_features lists verified feature definitions that agents on t
                     except Exception as err:
                         out = {"error": f"{err}"}
                     entry["category"] = "memory"
-                elif name in ("list_tables", "describe_table", "join_path", "check_join", "run_sql"):
+                elif self.asm and name in self.asm.names():
+                    sub = []
                     try:
-                        out = middle.call(name, agent, sid, sid, args)
+                        if name == "retrieve_trajectory":
+                            out = self.asm.retrieve(args.get("query") or self.task_desc[t]["description"], args.get("phase") or "exploration")
+                            entry["category"] = "memory"
+                        elif name == "schema_linking":
+                            out = self.asm.schema_linking(args.get("question") or self.task_desc[t]["description"], middle, agent, sid, self.llm, sub)
+                            entry["category"] = "schema"
+                        else:
+                            out = self.asm.composite(name, args, middle, agent, sid, lambda a2: self.agentsm_sql(middle, agent, sid, a2, rec))
+                            entry["category"] = "schema"
                     except Exception as err:
                         out = {"error": f"{err}"}
+                        entry.setdefault("category", "memory")
+                    rec.setdefault("llm_sub", []).extend({**x, "role": name} for x in sub)
+                    if isinstance(out, dict) and "_sub_tool_calls" in out:
+                        entry["sub_tool_calls"] = out.pop("_sub_tool_calls")
+                elif name in ("list_tables", "describe_table", "join_path", "check_join", "run_sql"):
+                    if self.asm and name == "run_sql":
+                        out = self.agentsm_sql(middle, agent, sid, args, rec)
+                    else:
+                        try:
+                            out = middle.call(name, agent, sid, sid, args)
+                        except Exception as err:
+                            out = {"error": f"{err}"}
                     entry["category"] = "probe" if name == "run_sql" else "schema"
                 elif name == "validate_features":
                     entry["category"] = "validate"
@@ -759,13 +786,16 @@ Shared memory: find_features lists verified feature definitions that agents on t
             gmem_tokens = [gmem_tokens[0] + g.get("prompt_tokens", 0), gmem_tokens[1] + g.get("completion_tokens", 0)]
             rec["learning"] = {"seconds": time.time() - t0, "input_tokens": gmem_tokens[0], "output_tokens": gmem_tokens[1],
                                "label": label, "memory_size": g.get("memory_size"), "error": g.get("error")}
+        sub_calls = rec.get("llm_sub") or []
         rec["totals"] = {
-            "llm_calls": len(rec["llm"]),
-            "tool_calls": len(rec["tools"]),
+            # AgentSM's schema-linking sub-agent and SQL repair calls are counted here (they are not in the planner budget)
+            "llm_calls": len(rec["llm"]) + len(sub_calls),
+            "planner_llm_calls": len(rec["llm"]),
+            "tool_calls": len(rec["tools"]) + sum(x.get("sub_tool_calls", 0) for x in rec["tools"]),
             "tool_calls_by_category": {c: sum(1 for x in rec["tools"] if x.get("category") == c) for c in ("schema", "probe", "validate", "memory", "submit")},
-            "input_tokens": sum(x["input_tokens"] for x in rec["llm"]),
-            "output_tokens": sum(x["output_tokens"] for x in rec["llm"]),
-            "llm_seconds": sum(x["seconds"] for x in rec["llm"]),
+            "input_tokens": sum(x["input_tokens"] for x in rec["llm"] + sub_calls),
+            "output_tokens": sum(x["output_tokens"] for x in rec["llm"] + sub_calls),
+            "llm_seconds": sum(x["seconds"] for x in rec["llm"] + sub_calls),
             "tool_seconds": sum(x["seconds"] for x in rec["tools"]),
             "validation_sql_seconds": sum(x.get("sql_seconds", 0) for x in rec["validations"]),
             "validation_train_seconds": sum(x.get("train_seconds", 0) for x in rec["validations"]),
@@ -832,6 +862,25 @@ Shared memory: find_features lists verified feature definitions that agents on t
                 "events": events, "program": r.get("program"), "error": r.get("error"), "audit": audit.get("result"),
                 "excluded_leaking_columns": sorted(leaking), "raw": r}
 
+    def agentsm_sql(self, middle, agent, sid, args, rec):
+        """AgentSM's SQL tool: a failing statement is repaired once by the model and run again."""
+        import agentsm
+
+        try:
+            out = middle.call("run_sql", agent, sid, sid, args)
+        except Exception as err:
+            out = {"error": f"{err}"}
+        if isinstance(out, dict) and out.get("error") and args.get("sql"):
+            sub = []
+            fixed = agentsm.repair_sql(self.llm, args["sql"], out["error"], sub)
+            rec.setdefault("llm_sub", []).extend({**x, "role": "sql_repair"} for x in sub)
+            try:
+                out2 = middle.call("run_sql", agent, sid, sid, {**args, "sql": fixed})
+            except Exception as err:
+                out2 = {"error": f"{err}"}
+            out = {**out2, "repaired_sql": fixed, "original_error": out["error"]}
+        return out
+
     def ace_update(self, t, k, rec, msgs, agent):
         """ACE after a session (online, no ground truth): Reflector (REFLECTOR_PROMPT_NO_GT), counters, Curator
         (CURATOR_PROMPT_NO_GT, ADD operations), each one call to the agent's model at temperature 0."""
@@ -895,6 +944,10 @@ Shared memory: find_features lists verified feature definitions that agents on t
             middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), arm.get("extractor"))
             if arm.get("gmemory"):
                 self.gmem = GMemoryService(self.env, a.out)
+            if arm.get("agentsm"):
+                import agentsm
+
+                self.asm = agentsm.Memory(a.agentsm_memory, self, a.out)
             ks = range(1, self.timeline["K"] + 1) if not a.cutoffs else [int(x) for x in a.cutoffs]
             prev = None
             for k in ks:
@@ -939,6 +992,8 @@ Shared memory: find_features lists verified feature definitions that agents on t
                 json.dump(summary, f, indent=1, default=str)
             if self.gmem:
                 self.gmem.close()
+            if self.asm:
+                self.asm.close()
             if middle:
                 if arm.get("feature_memory"):
                     try:
@@ -965,6 +1020,7 @@ def main():
     ap.add_argument("--parallel", type=int, default=3)
     ap.add_argument("--port", type=int)
     ap.add_argument("--keep-db", action="store_true")
+    ap.add_argument("--agentsm-memory", help="memory.json from tools/relbench/agentsm.py build (arm agentsm)")
     ap.add_argument("--smoke", action="store_true", help="pipeline check only: 8 LLM calls, 2 validations; results are not used")
     a = ap.parse_args()
     if a.smoke:

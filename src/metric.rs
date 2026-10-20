@@ -871,7 +871,7 @@ const FEATURE_EXTRACT_SYSTEM: &str = "你是数据中间层的特征定义提炼
 - fact：被聚合的表\n\
 - measure：一个聚合表达式，如 count(*)、count(distinct votes.postid)、sum(posts.score)；只能引用 fact 与 joins 中表的列，不得包含子查询或窗口函数；\
 列名在这些表之间重名时写成 表.列\n\
-- grain：fact 上一行对应一条记录的键列数组（通常是主键）\n\
+- grain：fact 上一行对应一条记录的键列数组（通常是主键），只写列名、不带表名\n\
 - time：{\"role\": 时间角色, \"fact_col\": \"表.列\"（决定这行是否在种子时间之前的时间列，在 fact 或 joins 中的表上）, \"strategy\": \"column\", \"grain\": \"day\"}\n\
 - joins：从 fact 到实体列所在表必需的多对一关联，每项 {\"left\": 多侧表, \"right\": 一侧表, \"on\": [[左表列, 右表列]], \"kind\": \"inner\"}；\
 left 是 fact 或列表中前面已关联的表；必须与已验证关联的方向一致；不需要时为空数组\n\
@@ -924,6 +924,13 @@ pub fn parse_feature_drafts(text: &str) -> std::result::Result<(Vec<FeatureDraft
             Ok(r) => {
                 let mut m = r.metric;
                 scrub(&mut m);
+                // 粒度键是事实表上的列：去掉事实表自己的表名前缀
+                let prefix = format!("{}.", m.fact.trim());
+                for c in &mut m.grain {
+                    if let Some(rest) = c.trim().strip_prefix(&prefix) {
+                        *c = rest.to_string();
+                    }
+                }
                 if m.name.trim().is_empty() || m.fact.trim().is_empty() || m.measure.trim().is_empty() || m.entity.is_none() {
                     skipped.push(format!("第 {} 项：name、fact、measure、entity 不能为空", i + 1));
                     continue;
@@ -1085,7 +1092,7 @@ mod tests {
     #[test]
     fn feature_sql_bounds_every_row_by_the_seed_time_and_window() {
         let text = r#"{"features": [{"column": "up_91", "name": "User upvotes received 91d", "definition": "upvotes on the user's posts",
-            "fact": "votes", "measure": "count(*)", "grain": ["id"],
+            "fact": "votes", "measure": "count(*)", "grain": ["votes.id"],
             "time": {"role": "vote time", "fact_col": "votes.creationdate", "strategy": "column", "grain": "day"},
             "joins": [{"left": "votes", "right": "posts", "on": [["postid", "id"]], "kind": "inner"}],
             "filters": {"votes": "votetypeid = 2"},
@@ -1095,6 +1102,7 @@ mod tests {
         assert_eq!((drafts.len(), skipped.len()), (1, 1), "{skipped:?}");
         let m = &drafts[0].metric;
         assert_eq!(drafts[0].column, "up_91");
+        assert_eq!(m.grain, vec!["id"]);
         let (sql, cols) = compose_features(&[m, m], "owneruserid").unwrap();
         assert_eq!(cols, vec!["user_upvotes_received_91d", "user_upvotes_received_91d_2"]);
         assert!(sql.starts_with("select s.owneruserid, s.seed_time, f0.v as user_upvotes_received_91d"), "{sql}");

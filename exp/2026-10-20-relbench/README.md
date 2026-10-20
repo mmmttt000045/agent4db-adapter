@@ -108,7 +108,7 @@ AgentSM 离线建库每库 100 个合成会话；rel-stack 附录约 135 个会�
 - **使用。** 新增工具：`find_features(entity, query)` 返回该实体上已发布的定义（名称、含义、窗口、修订、最近一次使用的增益）；
   `compose_features(ids)` 返回由这些定义编译、可直接交给 `validate_features` 的特征 SQL（含 `{seeds}`）；
   `find_program(task)` 返回该任务最近的已验证方案及其截点与验证分数。智能体仍须自己验证与提交；预算与停止规则不变。
-  提示词只说明这些工具，不要求必须使用。
+  提示词说明这些工具并给出用法（先查方案与定义，返回特征 SQL 时先验证它，只在需要改进时再探索、扩展；10-20 修订，见运行记录），与各基线原文的用法说明对应。
 - **维护。** 截点之间追加数据后，定义按现有的条件级维护重查（实体与维度键唯一、连接基数、完整性以发布时为基线）；
   条件不再成立的定义撤下（受限修复的回归以单个答案值为准，特征没有这样的参照，所以特征定义不做受限修复；实现时改定，见运行记录）。
 - **P2 门槛不变（第 2 节）。** 若不过，停下分析原因，不调到过为止。
@@ -172,6 +172,12 @@ AgentSM 离线建库每库 100 个合成会话；rel-stack 附录约 135 个会�
   修订（工具可用性与定义覆盖面，不涉及任何得分）：`find_features` 同时返回由所列定义编译好的特征 SQL；`find_program` 与 `find_features` 的任务名、种子实体列由框架填写；
   特征定义的度量可以用 `seed_time`（编译为该种子的时间）与少量常用标量函数（`FEATURE_WORDS`：extract、length、greatest 等）；提炼器提示说明这两点。
   停掉的运行移到 `results/relbench-pilot/aborted/mavra-r1-v2-nocompose/`（不计）；P2 用同一抽签第三次从头重跑。
+- **P2 第三次启动后又停止（22:15，仍未看到节省数据）**：第 1 个截点第 2 个会话拿到了 `find_features` 返回的特征 SQL，却仍然逐张描述 7 张表、自己写 SQL，
+  没有验证共享的 SQL。与 TPC-DS 研究中“可以作为参考”的提示导致智能体照样探索相同（aac6549 当时改为“有匹配条目时直接据此写 SQL”）。
+  各基线的原文都给出自己记忆的用法（ACE：“Read the Playbook first, then execute the task by explicitly leveraging each relevant section”；
+  G-Memory：“Use the above examples and insights as a foundation”；AgentSM：规划智能体开始前先检索），MAVRA 的提示原先只写“Using them is optional”。
+  修订：MAVRA 的提示写明用法——先调 `find_program` 与 `find_features`，返回特征 SQL 时先验证它，只在需要改进时再探索、扩展。
+  停掉的运行移到 `results/relbench-pilot/aborted/mavra-r1-v3-optional/`（不计）；P2 第四次从头重跑。
 - **P1 结果（21:23，`p1-gates.json`，15 个会话 = `none-r1` 9 个 + `none-r1-k45` 6 个；user-engagement k1 的审计经 `reaudit.py` 补做为 clean）：五条门槛全部通过。**
   (a) 15/15 正常结束；(b) 每会话 LLM 调用中位数 16；(c) 看结构 + 探查占工具调用 86%；(d) 15/15 验证分数优于参照；
   (e) 第 2 个起的会话里 97% 的看结构调用在更早的会话中出现过。代价：每会话 token 中位数 19.6 万（均值 27.8 万，合计 416 万），

@@ -61,3 +61,36 @@ the paper's reproduction appendix.
      G-Memory's calls go without a reasoning setting, as its code sends none.
 - **Checked (10-20):** two fake sessions: the first stores the trajectory and its extracted key steps (557 tokens);
   the second retrieves it (one relevance-scoring call) and the agent prompt shows it in G-Memory's format.
+
+## AgentSM (Biswal et al., arXiv 2601.15709, preprint)
+
+- **Code:** no official code (the paper's anonymous repository has expired; two files survive on the Wayback Machine:
+  the question generator and the trajectory parser). Reimplemented from the paper in `tools/relbench/agentsm.py`
+  (offline build and online memory) and `Run.agentsm_sql` in the harness; embeddings from
+  `tools/relbench/embed_service.py` (all-MiniLM-L6-v2 in the Python 3.12 environment).
+- **As in the paper:** memory per database, built offline once before evaluation and read-only during it (§3.2,
+  Eq. 1); Algorithm 1: GenQ(S, K, Q) from the schema description, external knowledge and up to 5 of the database's
+  own tasks (the archived generator passes 5 exemplars from the evaluation set), global budget n = 100 (the archived
+  `TOTAL_QUESTIONS`) split over the databases in proportion to their share of evaluation tasks (rel-stack: 15 of 46
+  sessions → n = 33); synthetic tasks run by an agent with only schema and SQL tools, answers not checked; each step
+  classified into exploration / execution / validation by rules, saved as markdown with model-written headers, outputs
+  cut at 1,000 characters (archived parser); retrieval of the single most similar stored task of the same database by
+  MiniLM similarity of the task text, returning the requested phase (exploration by default), called by the planner
+  before it starts; a schema-linking sub-agent with vector search over columns and a 5-step budget; SQL self-repair on
+  failure; composite tools from consecutive tool sequences within one phase (support ≥ τ, at most size 3, tools seen in
+  several phases excluded), named and summarised by the model.
+- **Choices the paper leaves open:** τ = 0.5, composite size ≤ 3; the synthesis agent's budget 20 model calls;
+  the headers come from the study's model (the paper names a lightweight model, the archived parser uses fixed names);
+  exact inner-product search over normalised MiniLM vectors (what a FAISS flat index computes) instead of a FAISS
+  index object; the schema linker returns the mapping as text.
+- **Changes and why:**
+  1. A "question" is a prediction task: GenQ's prompt is the archived one with "Text2SQL questions" read as the
+     benchmark's prediction tasks, and the database's own task descriptions as exemplars.
+  2. The phase rules follow our tools: list/describe/join-path/check-join and LIMIT probes are exploration; other
+     SQL and validate_features are execution; steps after the last execution step are validation.
+  3. The paper's agents write Python code that calls tools; ours call the same tools as JSON function calls, the
+     interface every method shares.
+  4. The planner's step limit is the shared 40 model calls; the schema linker's and the SQL repair's model calls are
+     counted in the session's cost but not in the planner's budget, so the architecture is not cut short.
+- **Not cited:** the abstract's "25% fewer tokens, 35% shorter trajectories": the paper's Table 2 shows AgentSM's
+  input tokens above the baselines'.

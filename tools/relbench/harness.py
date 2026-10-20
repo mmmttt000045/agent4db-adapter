@@ -579,7 +579,7 @@ Shared memory: agents on this database publish verified feature definitions. Sta
             "that agents often call together." if self.arm.get("agentsm") else "") + (
             "\n\n" + open(os.path.join(ACE_DIR, "appworld_playbook_block.txt")).read().replace(
                 "{{ playbook }}", self.playbooks.get(f"{tname(t)}-agent", ACE_EMPTY_PLAYBOOK)).rstrip()
-            + "\nWhen you call submit, list in bullet_ids the playbook bullets you used." if self.arm.get("ace") else "")
+            + "\nWhen you call validate_features or submit, list in bullet_ids the playbook bullets you used." if self.arm.get("ace") else "")
 
     def tool_specs(self):
         def fn(name, desc, props, req):
@@ -594,7 +594,8 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                {"left": s, "right": s, "on": {"type": "array", "items": {"type": "array", "items": s}, "description": "[[left_col, right_col], ...]"}},
                ["left", "right", "on"]),
             fn("run_sql", "Run one read-only SQL query on PostgreSQL; returns at most 50 rows.", {"sql": s}, ["sql"]),
-            fn("validate_features", "Compute the features of a feature SQL (must use {seeds}) on the training sample and validation seeds, train the fixed model, return the validation score.", {"sql": s}, ["sql"]),
+            fn("validate_features", "Compute the features of a feature SQL (must use {seeds}) on the training sample and validation seeds, train the fixed model, return the validation score.",
+               {"sql": s, **({"bullet_ids": {"type": "array", "items": s, "description": "ids of the playbook bullets you used"}} if self.arm.get("ace") else {})}, ["sql"]),
             fn("submit", "Finish the session with this feature SQL (must use {seeds}). Omit sql to submit your best validated features.",
                {"sql": s, **({"bullet_ids": {"type": "array", "items": s, "description": "ids of the playbook bullets you used"}} if self.arm.get("ace") else {})}, []),
         ] + ([
@@ -706,6 +707,8 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                 elif name == "validate_features":
                     entry["category"] = "validate"
                     sql = args.get("sql", "")
+                    if args.get("bullet_ids"):
+                        rec["bullet_ids"] = [str(b) for b in args["bullet_ids"]]
                     try:
                         xtr, s1 = features(self.url, sql, f"task.{tname(t)}_train_sample", seeds["train_sample"], ec)
                         xva, s2 = features(self.url, sql, f"task.{tname(t)}_val", seeds["val"], ec)
@@ -739,7 +742,8 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                         out = {"error": "nothing validated yet; validate features first or pass sql"}
                     else:
                         submitted, stop = sql, "submitted"
-                        rec["bullet_ids"] = [str(b) for b in (args.get("bullet_ids") or [])]
+                        if args.get("bullet_ids"):
+                            rec["bullet_ids"] = [str(b) for b in args["bullet_ids"]]
                         out = {"ok": True}
                 else:
                     out = {"error": f"unknown tool {name}"}

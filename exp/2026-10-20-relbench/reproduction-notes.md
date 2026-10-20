@@ -19,8 +19,10 @@ the paper's reproduction appendix.
 - **Scope:** one playbook per agent, updated online after each of its sessions (one pass over the cutoffs in time
   order), as ACE adapts one agent's context.
 - **Changes and why:**
-  1. The Generator is our tool-using agent instead of a single JSON answer; `submit` takes an optional `bullet_ids` so
-     that the Reflector can tag the bullets used (ACE's Generator reports bullet ids).
+  1. The Generator is our tool-using agent instead of a single JSON answer; `validate_features` and `submit` take an
+     optional `bullet_ids`, and the last list reported goes to the Reflector, so that it can tag the bullets used
+     (ACE's Generator reports bullet ids with every answer; our sessions often end by the stopping rule without a
+     submission, so in the first P3 check with `submit` only, no bullet was ever tagged).
   2. Reflector inputs: question = task description and cutoff; reasoning trace = the session transcript (tool outputs
      cut at 20,000 characters, as the released code cuts outputs); predicted answer = the submitted feature SQL;
      environment feedback = the validation scores (or errors) of the session and its stop reason. RelBench has no

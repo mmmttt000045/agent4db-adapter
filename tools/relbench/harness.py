@@ -348,6 +348,9 @@ class Run:
                 part = df[(df[tc] > prev) & (df[tc] <= cur)]
                 if len(part):
                     copy_rows(con, name.lower(), part)
+                    # one ETL batch per appended table, as metric-bench logs its data changes
+                    con.execute("INSERT INTO etl_batch_log (table_name, batch_id, note) SELECT %s, coalesce(max(batch_id), 0) + 1, %s "
+                                "FROM etl_batch_log WHERE table_name = %s", (name.lower(), f"append ({prev}, {cur}]", name.lower()))
                 n[name.lower()] = len(part)
             con.commit()
         with psycopg.connect(self.url, autocommit=True) as con:

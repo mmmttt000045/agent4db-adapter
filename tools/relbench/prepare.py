@@ -9,7 +9,7 @@ the script checks that the k = K tables equal the hosted official parquet files 
 Outputs under --out:
   tasks/<task>/k<k>/{train,val,test}.parquet   labels for every cutoff (test labels never enter the database)
   timeline.json                                cutoffs, row counts, check results
-and, with --pg, a PostgreSQL database holding every row with time <= test_1 (RelBench's Database.upto: rows whose
+and, with --pg, a PostgreSQL database (plus the middle layer's internal etl_batch_log) holding every row with time <= test_1 (RelBench's Database.upto: rows whose
 time column is null are dropped, as pandas' query drops NaT). Identifiers are lower-cased because PostgreSQL folds
 unquoted names. Primary keys come from the manifest; foreign keys and time columns are recorded as column comments.
 
@@ -102,6 +102,8 @@ def build_pg(url, dbname, ds, db, upto):
     counts = {}
     with psycopg.connect(f"{base}/{dbname}", autocommit=True) as con:
         cur = con.cursor()
+        # the middle layer's table versions read this internal batch log (same DDL as src/specchange.rs)
+        cur.execute("CREATE TABLE IF NOT EXISTS etl_batch_log (table_name text, batch_id int, note text, applied_at timestamptz default now())")
         for name, spec in ds.manifest.tables.items():
             t = db.table_dict[name]
             df = t.df

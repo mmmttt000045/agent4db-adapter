@@ -636,7 +636,7 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
         log(f"run {a.arm} r{a.run}: database {self.db_name} from {a.template}")
         create_run_db(self.url_admin, a.template, self.db_name)
         middle = None
-        summary = {"arm": a.arm, "run": a.run, "db": self.db_name, "template": a.template, "settings": {
+        summary = {"arm": a.arm, "run": a.run, "db": self.db_name, "template": a.template, "smoke": a.smoke, "settings": {
             "MAX_LLM_CALLS": MAX_LLM_CALLS, "MAX_VALIDATIONS": MAX_VALIDATIONS, "PATIENCE": PATIENCE, "SAMPLE_SIZE": SAMPLE_SIZE,
             "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "reasoning_effort": self.llm.effort}, "cutoffs": []}
         try:
@@ -702,7 +702,11 @@ def main():
     ap.add_argument("--parallel", type=int, default=3)
     ap.add_argument("--port", type=int)
     ap.add_argument("--keep-db", action="store_true")
+    ap.add_argument("--smoke", action="store_true", help="pipeline check only: 8 LLM calls, 2 validations; results are not used")
     a = ap.parse_args()
+    if a.smoke:
+        global MAX_LLM_CALLS, MAX_VALIDATIONS
+        MAX_LLM_CALLS, MAX_VALIDATIONS = 8, 2
     os.makedirs(a.out, exist_ok=True)
     Run(a).main()
 

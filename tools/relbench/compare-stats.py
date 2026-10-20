@@ -5,7 +5,8 @@ Per session: tokens including learning (charged to the triggering session), LLM 
 seconds, test score. Gate: from cutoff 2 on, tokens per session <= 1/3 of no memory (total over those sessions), and
 the test score not worse (classification AUC within 0.01, regression MAE within 2%), per task averaged over cutoffs.
 
-  python3 tools/relbench/compare-stats.py results/relbench-pilot/none-r1 results/relbench-pilot/mavra-r1
+  python3 tools/relbench/compare-stats.py results/relbench-pilot/none-r1,results/relbench-pilot/none-r1-k45 results/relbench-pilot/mavra-r1
+(a comma joins the folders of one run, e.g. a run resumed at a later cutoff)
 """
 import glob
 import json
@@ -14,9 +15,10 @@ import statistics
 import sys
 
 
-def load(run):
+def load(runs):
     out = {}
-    for f in glob.glob(os.path.join(run, "sessions", "*.json")):
+    files = [f for run in runs.split(",") for f in glob.glob(os.path.join(run, "sessions", "*.json")) if not f.endswith(".partial.json")]
+    for f in files:
         s = json.load(open(f))
         tot = s["totals"]
         out[(s["task"], s["k"])] = {

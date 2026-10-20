@@ -11,7 +11,7 @@ Outputs under --out:
   timeline.json                                cutoffs, row counts, check results
 and, with --pg, a PostgreSQL database (plus the middle layer's internal etl_batch_log) holding every row with time <= test_1 (RelBench's Database.upto: rows whose
 time column is null are dropped, as pandas' query drops NaT). Identifiers are lower-cased because PostgreSQL folds
-unquoted names. Primary keys come from the manifest; foreign keys and time columns are recorded as column comments.
+unquoted names. Primary keys come from the manifest; foreign-key and time columns are indexed and recorded as column comments.
 
 Run on noctis:  PYTHONPATH=.pydeps-relbench python3 tools/relbench/prepare.py --data results/relbench-data/rel-stack \
     --out results/relbench-data/rel-stack-prep --cutoffs 5 --pg "$AGENTDB_URL" --dbname relbench_stack_t1
@@ -92,6 +92,12 @@ def copy_frame(cur, table, df):
             cp.write(buf.getvalue())
 
 
+def add_indexes(cur, tname, spec):
+    """B-tree indexes on every foreign-key column and on the time column, as a production database would have."""
+    for c in [*dict(spec.fkeys), *([spec.time_col] if spec.time_col else [])]:
+        cur.execute(f"CREATE INDEX IF NOT EXISTS {tname}_{c.lower()}_idx ON {tname} ({c.lower()})")
+
+
 def build_pg(url, dbname, ds, db, upto):
     import psycopg
 
@@ -123,6 +129,7 @@ def build_pg(url, dbname, ds, db, upto):
                 cur.execute(f"COMMENT ON COLUMN {tname}.{fk.lower()} IS 'foreign key to {ref.lower()}.{ref_pk.lower()}'")
             if spec.time_col:
                 cur.execute(f"COMMENT ON COLUMN {tname}.{spec.time_col.lower()} IS 'time column of the row'")
+            add_indexes(cur, tname, spec)
             cur.execute(f"ANALYZE {tname}")
             counts[tname] = {"rows": len(df), "total_rows": len(t.df), "null_time_dropped": dropped_null}
             log(f"  {tname}: {len(df)} of {len(t.df)} rows (null time {dropped_null})")

@@ -231,6 +231,7 @@ def read_sql(url, sql, timeout_s=FEATURE_SQL_TIMEOUT_S, search_path=None):
     with psycopg.connect(url, autocommit=False) as con:
         with con.cursor() as cur:
             cur.execute("SET TRANSACTION READ ONLY")
+            cur.execute("SET LOCAL lc_messages = 'C'")
             cur.execute(f"SET LOCAL statement_timeout = {timeout_s * 1000}")
             if search_path:
                 cur.execute(f"SET LOCAL search_path = {search_path}")

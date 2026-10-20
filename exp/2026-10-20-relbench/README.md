@@ -105,7 +105,7 @@ AgentSM 离线建库每库 100 个合成会话；rel-stack 附录约 135 个会�
 
 ## 3. 实现
 
-- 数据准备 `tools/relbench/prepare.py`（下载文件 → 截点与标签 → 官方表一致性检查 → PostgreSQL 模板库）。
+- 数据准备 `tools/relbench/prepare.py`（下载文件 → 截点与标签 → 官方表一致性检查 → PostgreSQL 模板库：主键来自清单，外键列与时间列建 B 树索引并写注释，另有中间层内部的 `etl_batch_log`）。
 - 会话框架 `tools/relbench/harness.py`（LLM 循环、工具、`validate_features`、测试评估、泄漏审计、逐次调用记录）。
 - 中间层 `serve` 增加 `--mode`（复用 metric-bench 的分组配置）与 `--no-etl`（RelBench 库没有零售表）。
 - Python 依赖装在 noctis `.pydeps-relbench`（psycopg 3.2.10、lightgbm 4.6.0；pandas、pyarrow、duckdb 系统已有）。

@@ -33,9 +33,8 @@ the paper's reproduction appendix.
 
 ## G-Memory (Zhang et al., NeurIPS 2025)
 
-- **Code:** the official repository bingreeky/GMemory @ 7b581c5, used unchanged from a local copy that is not
-  committed (the repository has no license; the authors are asked for permission before the code or a diff of it is
-  published). It runs in its own Python 3.12 environment (`results/ext/venv-gmem`, the versions pinned in its
+- **Code:** the official repository bingreeky/GMemory @ 7b581c5, used unchanged from a local copy (not committed here;
+  the repository ships no license file). It runs in its own Python 3.12 environment (`results/ext/venv-gmem`, the versions pinned in its
   `requirements.txt`, CPU torch), because its code needs Python ≥ 3.12. Adapter: `tools/relbench/gmemory_service.py`
   (JSON lines), harness class `GMemoryService`.
 - **Verbatim:** the GMemory class (insight, query and interaction layers, retrieval with LLM relevance scoring, key-step

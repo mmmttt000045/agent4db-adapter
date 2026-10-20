@@ -417,6 +417,81 @@ pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
     })
 }
 
+// ───────────────────────── 特征定义（RelBench） ─────────────────────────
+
+/// 特征的输出列名：小写字母、数字与下划线，不以数字开头。
+pub fn feature_ident(name: &str) -> String {
+    let mut s: String = name.trim().to_lowercase().chars().map(|c| if c.is_ascii_alphanumeric() { c } else { '_' }).collect();
+    while s.contains("__") {
+        s = s.replace("__", "_");
+    }
+    let s = s.trim_matches('_').to_string();
+    if s.is_empty() || s.starts_with(|c: char| c.is_ascii_digit()) {
+        format!("f_{s}")
+    } else {
+        s
+    }
+}
+
+/// 特征定义编译为对种子表 `s`（列：实体键 `seed_key`、`seed_time`）逐行的 LATERAL 聚合，别名 `alias`，值列为 `v`。
+/// 关联与过滤的写法与 `compile` 相同；`时间列 <= s.seed_time` 与窗口下界写在 SQL 里，所以按定义执行不会读到种子时间之后的行；
+/// LATERAL 里的聚合对每个种子恰好返回一行。
+pub fn feature_lateral(m: &Metric, alias: &str, seed_key: &str) -> Result<String> {
+    check_join_orientation(m)?;
+    let e = m.entity.as_ref().ok_or_else(|| anyhow!("不是特征定义：没有 entity"))?;
+    let time = m.time.as_ref().filter(|t| t.is_column()).ok_or_else(|| anyhow!("特征定义的时间须为日期列方式"))?;
+    let (tt, tc) = time.column_of(&m.fact);
+    let (vt, vc) = e.via_of(&m.fact);
+    let mut from = m.fact.clone();
+    let mut wheres = vec![];
+    let mut seen = BTreeSet::new();
+    for j in &m.joins {
+        let other = &j.right;
+        let mut conds: Vec<String> = j.on.iter().map(|(l, r)| format!("{}.{l} = {other}.{r}", j.left)).collect();
+        let mut seen_on = BTreeSet::new();
+        for f in j.filters.get(other).into_iter().chain(m.filters.get(other)) {
+            match j.kind {
+                JoinKind::Left => push_unique(&mut conds, &mut seen_on, f),
+                JoinKind::Inner => push_unique(&mut wheres, &mut seen, f),
+            }
+        }
+        if let Some(f) = j.filters.get(&j.left) {
+            push_unique(&mut wheres, &mut seen, f);
+        }
+        let kw = if j.kind == JoinKind::Left { "left join" } else { "join" };
+        from.push_str(&format!(" {kw} {other} on {}", conds.join(" and ")));
+    }
+    if let Some(f) = m.filters.get(&m.fact) {
+        push_unique(&mut wheres, &mut seen, f);
+    }
+    wheres.push(format!("{vt}.{vc} = s.{seed_key}"));
+    wheres.push(format!("{tt}.{tc} <= s.seed_time"));
+    if let Some(d) = e.window_days {
+        wheres.push(format!("{tt}.{tc} > s.seed_time - interval '{d} days'"));
+    }
+    let expr = if m.empty == EmptyRule::Zero { format!("coalesce({}, 0)", m.measure) } else { m.measure.clone() };
+    Ok(format!("left join lateral (select ({expr})::double precision as v from {from} where {}) {alias} on true", wheres.join(" and ")))
+}
+
+/// 一组特征定义编译成交给 validate_features 的特征 SQL：以 `{seeds}` 为种子表，前两列为实体键与 seed_time，
+/// 其后每个定义一列（列名为 `feature_ident(名称)`）。返回 SQL 与各定义的列名。
+pub fn compose_features(defs: &[&Metric], seed_key: &str) -> Result<(String, Vec<String>)> {
+    let mut sel = vec![format!("s.{seed_key}"), "s.seed_time".to_string()];
+    let mut joins = vec![];
+    let mut names = vec![];
+    for (i, m) in defs.iter().enumerate() {
+        let mut col = feature_ident(&m.name);
+        while names.contains(&col) {
+            col.push_str("_2");
+        }
+        let a = format!("f{i}");
+        joins.push(feature_lateral(m, &a, seed_key)?);
+        sel.push(format!("{a}.v as {col}"));
+        names.push(col);
+    }
+    Ok((format!("select {} from {{seeds}} s {}", sel.join(", "), joins.join(" ")), names))
+}
+
 // ───────────────────────── 静态检查（G3 的纯逻辑部分） ─────────────────────────
 
 const SQL_WORDS: &[&str] = &[
@@ -616,6 +691,7 @@ pub fn same_structure(a: &Metric, b: &Metric) -> bool {
         && joins(a) == joins(b)
         && filters(a) == filters(b)
         && a.empty == b.empty
+        && a.entity == b.entity
 }
 
 /// 优化候选：在结构化定义上做保持语义的改写，由中间层逐一验证等价与代价后决定是否发布。
@@ -782,6 +858,117 @@ pub async fn extract(p: &Provider, input: &Value, max_attempts: u32) -> Extracti
     ex
 }
 
+// ───────────────────────── 特征定义的提炼（RelBench） ─────────────────────────
+
+const FEATURE_EXTRACT_SYSTEM: &str = "你是数据中间层的特征定义提炼器。输入是一次预测任务会话的结果：任务说明、种子表的实体列、\
+提交的特征 SQL（以 {seeds} 为种子表，列为实体键与 seed_time）、按重要性排序的特征列，以及相关表的元数据与已验证关联。这次提交的验证分数优于参照，\
+且没有读种子时间之后的数据。请把重要性靠前、形如“某个实体在种子时间之前（某个回看窗口内）的一个聚合”的特征列，各写成一条结构化的特征定义；\
+不是这种形式的列（多个聚合的比值或组合、种子表或实体表本身的列、窗口函数）跳过。只输出一个 JSON 对象 {\"features\": [...]}，不要输出其他文字；\
+最多 12 项，每项字段：\n\
+- column：该特征在提交 SQL 输出中的列名\n\
+- name：特征名称，英文小写加下划线，说明实体、度量与窗口，如 user_upvotes_received_91d\n\
+- definition：一句话说明\n\
+- fact：被聚合的表\n\
+- measure：一个聚合表达式，如 count(*)、count(distinct votes.postid)、sum(posts.score)；只能引用 fact 与 joins 中表的列，不得包含子查询或窗口函数；\
+列名在这些表之间重名时写成 表.列\n\
+- grain：fact 上一行对应一条记录的键列数组（通常是主键）\n\
+- time：{\"role\": 时间角色, \"fact_col\": \"表.列\"（决定这行是否在种子时间之前的时间列，在 fact 或 joins 中的表上）, \"strategy\": \"column\", \"grain\": \"day\"}\n\
+- joins：从 fact 到实体列所在表必需的多对一关联，每项 {\"left\": 多侧表, \"right\": 一侧表, \"on\": [[左表列, 右表列]], \"kind\": \"inner\"}；\
+left 是 fact 或列表中前面已关联的表；必须与已验证关联的方向一致；不需要时为空数组\n\
+- filters：{表: 条件}，口径必需的行过滤，如 {\"votes\": \"votetypeid = 2\"}；不得包含日期、时间或种子相关的条件\n\
+- entity：{\"table\": 实体表, \"key\": 实体主键, \"via\": \"表.列\"（等于实体键的列，在 fact 或 joins 到达的表上）, \"window_days\": 回看天数或 null（全部历史）}\n\
+- empty：计数类写 \"zero\"，其余写 \"null\"";
+
+#[derive(Debug)]
+pub struct FeatureDraft {
+    pub metric: Metric,
+    /// 提交 SQL 输出里对应的列
+    pub column: String,
+}
+
+#[derive(Deserialize)]
+struct RawFeature {
+    #[serde(flatten)]
+    metric: Metric,
+    column: String,
+}
+
+#[derive(Deserialize)]
+struct RawFeatures {
+    features: Vec<Value>,
+}
+
+#[derive(Debug, Default, Serialize)]
+pub struct FeatureExtraction {
+    #[serde(skip)]
+    pub drafts: Vec<FeatureDraft>,
+    /// 解析不了的单项（字段缺失或类型不对），不影响其他项
+    pub skipped: Vec<String>,
+    pub attempts: u32,
+    pub input_tokens: u64,
+    pub output_tokens: u64,
+    pub seconds: f64,
+    pub errors: Vec<String>,
+}
+
+/// 解析特征提炼器的输出；单项不合格时跳过并记下原因，整体不是 JSON 时报错。
+pub fn parse_feature_drafts(text: &str) -> std::result::Result<(Vec<FeatureDraft>, Vec<String>), String> {
+    let (Some(a), Some(b)) = (text.find('{'), text.rfind('}')) else { return Err("输出中没有 JSON 对象".into()) };
+    if b < a {
+        return Err("输出中没有 JSON 对象".into());
+    }
+    let raw: RawFeatures = serde_json::from_str(&text[a..=b]).map_err(|e| format!("JSON 不符合格式：{e}"))?;
+    let (mut out, mut skipped) = (vec![], vec![]);
+    for (i, v) in raw.features.into_iter().take(12).enumerate() {
+        match serde_json::from_value::<RawFeature>(v) {
+            Ok(r) => {
+                let mut m = r.metric;
+                scrub(&mut m);
+                if m.name.trim().is_empty() || m.fact.trim().is_empty() || m.measure.trim().is_empty() || m.entity.is_none() {
+                    skipped.push(format!("第 {} 项：name、fact、measure、entity 不能为空", i + 1));
+                    continue;
+                }
+                out.push(FeatureDraft { metric: m, column: r.column.trim().to_lowercase() });
+            }
+            Err(e) => skipped.push(format!("第 {} 项：{e}", i + 1)),
+        }
+    }
+    Ok((out, skipped))
+}
+
+/// 调用模型提炼一次特征定义，格式错误时按固定次数重试；所有尝试的 token 与耗时都计入。
+pub async fn extract_features(p: &Provider, input: &Value, max_attempts: u32) -> FeatureExtraction {
+    let mut ex = FeatureExtraction::default();
+    let t0 = Instant::now();
+    let mut turns = vec![Turn::User(serde_json::to_string_pretty(input).unwrap_or_default())];
+    for _ in 0..max_attempts.max(1) {
+        ex.attempts += 1;
+        let r = match p.chat(FEATURE_EXTRACT_SYSTEM, &turns, &[]).await {
+            Ok(r) => r,
+            Err(e) => {
+                ex.errors.push(format!("{e:#}"));
+                break;
+            }
+        };
+        ex.input_tokens += r.input_tokens;
+        ex.output_tokens += r.output_tokens;
+        match parse_feature_drafts(&r.text) {
+            Ok((d, s)) => {
+                ex.drafts = d;
+                ex.skipped = s;
+                break;
+            }
+            Err(e) => {
+                ex.errors.push(e.clone());
+                turns.push(Turn::Assistant { raw: r.raw });
+                turns.push(Turn::User(format!("上一次输出无法解析：{e}。请只输出一个符合要求的 JSON 对象。")));
+            }
+        }
+    }
+    ex.seconds = t0.elapsed().as_secs_f64();
+    ex
+}
+
 // ───────────────────────── 优化提议 ─────────────────────────
 
 const OPTIMIZE_SYSTEM: &str = "你是数据中间层的指标口径优化器。输入是一条已发布的指标口径（结构化字段）、它的规范 SQL 与执行计划、\
@@ -896,6 +1083,39 @@ mod tests {
     }
 
     #[test]
+    fn feature_sql_bounds_every_row_by_the_seed_time_and_window() {
+        let text = r#"{"features": [{"column": "up_91", "name": "User upvotes received 91d", "definition": "upvotes on the user's posts",
+            "fact": "votes", "measure": "count(*)", "grain": ["id"],
+            "time": {"role": "vote time", "fact_col": "votes.creationdate", "strategy": "column", "grain": "day"},
+            "joins": [{"left": "votes", "right": "posts", "on": [["postid", "id"]], "kind": "inner"}],
+            "filters": {"votes": "votetypeid = 2"},
+            "entity": {"table": "users", "key": "id", "via": "posts.owneruserid", "window_days": 91}, "empty": "zero"},
+            {"column": "bad", "name": "no entity", "definition": "", "fact": "votes", "measure": "count(*)", "grain": ["id"]}]}"#;
+        let (drafts, skipped) = parse_feature_drafts(text).unwrap();
+        assert_eq!((drafts.len(), skipped.len()), (1, 1), "{skipped:?}");
+        let m = &drafts[0].metric;
+        assert_eq!(drafts[0].column, "up_91");
+        let (sql, cols) = compose_features(&[m, m], "owneruserid").unwrap();
+        assert_eq!(cols, vec!["user_upvotes_received_91d", "user_upvotes_received_91d_2"]);
+        assert!(sql.starts_with("select s.owneruserid, s.seed_time, f0.v as user_upvotes_received_91d"), "{sql}");
+        assert!(sql.contains("from {seeds} s left join lateral (select (coalesce(count(*), 0))::double precision as v from votes join posts on votes.postid = posts.id"), "{sql}");
+        for part in [
+            "posts.owneruserid = s.owneruserid",
+            "votes.creationdate <= s.seed_time",
+            "votes.creationdate > s.seed_time - interval '91 days'",
+            "votetypeid = 2",
+        ] {
+            assert!(sql.contains(part), "{part} missing: {sql}");
+        }
+        let mut no_window = m.clone();
+        no_window.entity.as_mut().unwrap().window_days = None;
+        assert!(!feature_lateral(&no_window, "f0", "owneruserid").unwrap().contains("interval"));
+        let mut period = m.clone();
+        period.entity = None;
+        assert!(feature_lateral(&period, "f0", "owneruserid").is_err());
+    }
+
+    #[test]
     fn only_rule_forms_count_as_rule_rewrites() {
         let c = cat();
         let m = rate();
@@ -984,6 +1204,7 @@ mod tests {
             caveats: vec![],
             examples: vec![],
             basis: Basis::None,
+            entity: None,
         }
     }
 

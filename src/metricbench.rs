@@ -712,6 +712,8 @@ pub(crate) fn config(mode: &str) -> (MiddleConfig, bool, bool) {
         }
         // 与 metric-global-snap 同样的学习与发布前检查，但发布后不再检查、不修复（一次写好的知识，如 BIRD 的 evidence）
         "reforce-static" => (MiddleConfig { metric_maint: Maint::Off, g8_example: true, g8_snapshot_db: true, ..base }, true, true),
+        // RelBench 研究的 MAVRA（exp/2026-10-20-relbench）：特征定义由所有智能体共用，条件级维护，表描述、连接路径与检查结果全局共享
+        "relbench-mavra" => (MiddleConfig { metric_maint: Maint::Condition, cond_reuse: true, feature_memory: true, ..base }, true, false),
         _ => (MiddleConfig { metric_maint: Maint::Off, ..base }, true, true),
     }
 }

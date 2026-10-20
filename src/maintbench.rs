@@ -184,6 +184,7 @@ fn metric(s: &Spec) -> Metric {
         caveats: vec![],
         examples: vec![],
         basis: Basis::None,
+        entity: None,
     }
 }
 

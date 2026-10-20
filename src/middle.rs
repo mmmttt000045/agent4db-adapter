@@ -7,8 +7,11 @@
 //!   被证伪的关联写法不再重试，Agent 提交的 SQL 用到时直接拦下。
 //! - 指标经验：从成功轨迹提炼的业务口径，经门槛晋升后共享，见子模块 `metrics`。
 
+mod features;
 mod metrics;
 mod optimize;
+
+pub use features::LearnReq;
 
 pub use metrics::MetricEvidence;
 
@@ -134,6 +137,8 @@ pub struct MiddleConfig {
     pub optimize: bool,
     /// 优化修订要求的最小平均节省比例（样本期间的执行时间）
     pub optimize_min_saving: f64,
+    /// 特征定义（RelBench）：find_features、compose_features 与 find_program 工具，学习接口 /v1/learn_features
+    pub feature_memory: bool,
 }
 
 impl Default for MiddleConfig {
@@ -165,6 +170,7 @@ impl Default for MiddleConfig {
             g8_snapshot_db: false,
             optimize: false,
             optimize_min_saving: 0.10,
+            feature_memory: false,
         }
     }
 }
@@ -1531,6 +1537,18 @@ impl Middle {
                     .unwrap_or_default();
                 self.find_metric(ctx, s("query")?, &tables).await?
             }
+            "find_features" if self.cfg.feature_memory => {
+                self.find_features(ctx, s("entity")?, args.get("query").and_then(Value::as_str).unwrap_or_default()).await?
+            }
+            "compose_features" if self.cfg.feature_memory => {
+                let keys: Vec<String> = args
+                    .get("keys")
+                    .and_then(Value::as_array)
+                    .map(|a| a.iter().filter_map(|x| x.as_str().map(str::to_string)).collect())
+                    .unwrap_or_default();
+                self.compose_feature_sql(ctx, &keys, s("seed_key")?).await?
+            }
+            "find_program" if self.cfg.feature_memory => self.find_program(ctx, s("task")?).await?,
             _ => bail!("未知工具：{name}"),
         };
         let notes = self.take_notices(&ctx.agent);
@@ -1577,6 +1595,9 @@ pub fn served_tool_specs(cfg: &MiddleConfig) -> Vec<ToolSpec> {
     let mut v = tool_specs_with(true, true);
     if cfg.traj_memory {
         v.push(trajectory_tool_spec());
+    }
+    if cfg.feature_memory {
+        v.extend(features::feature_tool_specs());
     }
     v
 }

@@ -80,6 +80,9 @@ enum Cmd {
         /// 不做零售库的 ETL 初始化（RelBench 等其他库没有 store_returns）
         #[arg(long)]
         no_etl: bool,
+        /// /v1/learn_features 用的提炼模型（provider 名，如 river）
+        #[arg(long)]
+        extractor: Option<String>,
     },
 }
 
@@ -117,7 +120,7 @@ async fn main() -> Result<()> {
                 _ => anyhow::bail!("未知动作 {action}（apply-v2 / reset / status）"),
             }
         }
-        Cmd::Serve { addr, mode, no_etl } => {
+        Cmd::Serve { addr, mode, no_etl, extractor } => {
             if !no_etl {
                 etl::setup(&admin).await?;
             }
@@ -126,7 +129,8 @@ async fn main() -> Result<()> {
                 None => MiddleConfig::default(),
             };
             let mid = Arc::new(Middle::new(db, MiddleConfig { verbose: true, ..cfg }).await?);
-            server::serve(mid, &addr).await?;
+            let extractor = extractor.map(|k| llm::Provider::from_env(&k)).transpose()?;
+            server::serve(mid, extractor, &addr).await?;
         }
     }
     Ok(())

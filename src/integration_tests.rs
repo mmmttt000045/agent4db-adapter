@@ -36,7 +36,7 @@ async fn exercise(url: &str) -> Result<Value> {
     let addr = listener.local_addr()?;
     drop(listener);
     let server_mid = mid.clone();
-    let server_task = tokio::spawn(async move { server::serve(server_mid, &addr.to_string()).await });
+    let server_task = tokio::spawn(async move { server::serve(server_mid, None, &addr.to_string()).await });
     let base = format!("http://{addr}");
     let http = reqwest::Client::builder().no_proxy().timeout(Duration::from_secs(10)).build()?;
     let result = async {
@@ -588,6 +588,7 @@ fn seeded_metrics() -> Vec<(&'static str, Metric)> {
         caveats: vec![],
         examples: vec![],
         basis: Basis::None,
+        entity: None,
     };
     let sales = ["ss_ticket_number", "ss_item_sk"];
     let mut m1 = base("门店营业额", "store_sales", "sum(ss_net_paid)", &sales);

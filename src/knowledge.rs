@@ -92,6 +92,32 @@ pub struct Metric {
     pub examples: Vec<Example>,
     #[serde(default)]
     pub basis: Basis,
+    /// 特征定义（RelBench）：按实体、相对种子时间逐种子聚合；为空时是按期间提问的指标
+    #[serde(default)]
+    pub entity: Option<EntityRef>,
+}
+
+/// 特征定义的实体与回看窗口。编译出的 SQL 按种子表逐行聚合，`时间列 <= seed_time` 与窗口下界写在 SQL 里。
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct EntityRef {
+    /// 实体表与主键，如 users、id
+    pub table: String,
+    pub key: String,
+    /// 等于实体键的列，写成 `表.列`：事实表上的外键，或经 joins 到达的表上的列（如 posts.owneruserid）
+    pub via: String,
+    /// 只聚合种子时间之前这么多天内的行；为空时聚合全部历史
+    #[serde(default)]
+    pub window_days: Option<u32>,
+}
+
+impl EntityRef {
+    /// `via` 拆成表与列，未限定时在事实表上。
+    pub fn via_of(&self, fact: &str) -> (String, String) {
+        match self.via.split_once('.') {
+            Some((t, c)) => (t.to_string(), c.to_string()),
+            None => (fact.to_string(), self.via.clone()),
+        }
+    }
 }
 
 impl Metric {

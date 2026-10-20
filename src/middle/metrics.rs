@@ -40,7 +40,7 @@ pub struct MetricEvidence {
     pub optimized: u32,
 }
 
-enum Checked {
+pub(super) enum Checked {
     Valid(Entry),
     /// 附带给 Agent 看的原因
     Unavailable(Entry, String),
@@ -175,7 +175,7 @@ pub(super) fn metric_of(e: &Entry) -> Option<&Metric> {
     }
 }
 
-fn view(e: &Entry) -> Value {
+pub(super) fn view(e: &Entry) -> Value {
     let Some(m) = metric_of(e) else { return Value::Null };
     let mut v = serde_json::to_value(m).unwrap_or_default();
     v["key"] = json!(e.key);
@@ -894,7 +894,7 @@ impl Middle {
 
     /// 查找时的守护。依赖表没有变化直接返回；有变化时按 `metric_maint` 维护一次。
     /// 同一定义、同一依赖版本的维护在途合并：并发的使用者等同一个结论，不重复撤销与修复。
-    async fn metric_check(&self, ctx: &Ctx, fk: &str) -> Result<Checked> {
+    pub(super) async fn metric_check(&self, ctx: &Ctx, fk: &str) -> Result<Checked> {
         let Some(e) = self.store.get(fk) else { return Ok(Checked::Missing) };
         if metric_of(&e).is_none() || !e.deps.keys().all(|t| ctx.role.allows(t)) {
             return Ok(Checked::Missing);
@@ -1003,6 +1003,9 @@ impl Middle {
                     } else {
                         "revoked"
                     }
+                } else if m.entity.is_some() {
+                    // 特征定义失效即撤下：受限修复的回归以单个答案值为准，特征没有这样的参照
+                    "revoked"
                 } else {
                     crate::timing::measure("repair", self.restricted_repair(ctx, fk, e, &m, b)).await?;
                     if self.store.get(fk).is_some_and(|x| x.status == Status::Valid) {

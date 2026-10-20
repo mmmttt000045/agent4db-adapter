@@ -283,6 +283,14 @@ class Memory:
 
     def __init__(self, path, run, out):
         self.m = json.load(open(path))
+        # composite tools named alike by the model get distinct names (a tool list must not repeat a name)
+        seen = set()
+        for c in self.m["composites"]:
+            base, i = c["name"], 2
+            while c["name"] in seen:
+                c["name"] = f"{base}_{i}"
+                i += 1
+            seen.add(c["name"])
         self.vecs = np.array(self.m["vectors"]) if self.m["vectors"] else np.zeros((0, 384))
         self.run = run
         self.emb = Embedder(out)

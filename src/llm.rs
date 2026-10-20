@@ -58,7 +58,7 @@ pub enum Provider {
 
 /// OpenAI 兼容服务的内置配置：(provider 名, 环境变量前缀, 默认 base URL)。
 /// 各服务的 key 与模型分别写在 .env（如 DEEPSEEK_API_KEY、ZHIPU_MODEL），切换或对照时只改 provider 名。
-const OPENAI_PROFILES: [(&str, &str, &str); 6] = [
+const OPENAI_PROFILES: [(&str, &str, &str); 7] = [
     ("openai", "OPENAI", "https://api.openai.com/v1"),
     ("deepseek", "DEEPSEEK", "https://api.deepseek.com"),
     ("zhipu", "ZHIPU", "https://open.bigmodel.cn/api/paas/v4"),
@@ -69,6 +69,9 @@ const OPENAI_PROFILES: [(&str, &str, &str); 6] = [
     // happycoding 网关（2026-10-10 起的实验模型服务）：回报的模型名带厂商前缀（deepseek/deepseek-v4.1-flash），
     // 不回传 reasoning_content；HAPPY_REQUIRE_MODEL 设为该名字，回报模型不符的回复丢弃
     ("happy", "HAPPY", "https://happycoding.xyz/v1"),
+    // river 网关（2026-10-20 接入）：模型名带组织前缀（deepseek-ai/DeepSeek-V4.1-Flash），回报名与请求一致；
+    // 试探请求只有 11 个 prompt token，无隐藏提示；RIVER_REQUIRE_MODEL 设为该名字
+    ("river", "RIVER", "https://api.river.ai/v1"),
 ];
 
 /// 单次请求超时 300 秒：网关偶尔挂起不返回，超时后由 `post_json` 重试（最多 4 次）。
@@ -120,7 +123,7 @@ impl Provider {
                 model: env("ANTHROPIC_MODEL").ok_or_else(|| anyhow!("缺少 ANTHROPIC_MODEL"))?,
                 http: http(),
             },
-            _ => bail!("未知 provider：{kind}（可选 openai / deepseek / zhipu / cline / kunyou / happy / claude）"),
+            _ => bail!("未知 provider：{kind}（可选 openai / deepseek / zhipu / cline / kunyou / happy / river / claude）"),
         })
     }
 

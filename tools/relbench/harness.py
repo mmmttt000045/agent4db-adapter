@@ -29,6 +29,30 @@ import pandas as pd
 import psycopg
 import requests
 
+# ACE's official prompts and playbook helpers (Apache-2.0), see third_party/ace/README.md
+ACE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "third_party", "ace")
+sys.path.insert(0, ACE_DIR)
+import curator_prompts as ace_curator  # noqa: E402
+import playbook_utils as ace_pb  # noqa: E402
+import reflector_prompts as ace_reflector  # noqa: E402
+
+sys.path.pop(0)
+# ACE._initialize_empty_playbook (ace/ace.py)
+ACE_EMPTY_PLAYBOOK = """## STRATEGIES & INSIGHTS
+
+## FORMULAS & CALCULATIONS
+
+## CODE SNIPPETS & TEMPLATES
+
+## COMMON MISTAKES TO AVOID
+
+## PROBLEM-SOLVING HEURISTICS
+
+## CONTEXT CLUES & INDICATORS
+
+## OTHERS"""
+ACE_TOKEN_BUDGET = 80_000  # the official Curator prompt's default token_budget
+
 # ───────────────────────── fixed settings (README §1.2) ─────────────────────────
 
 MAX_LLM_CALLS = 40
@@ -47,6 +71,8 @@ ARMS = {
     "none": {"middle_mode": "middle-alone", "parallel_ok": True},
     # README §1.6: feature definitions shared by all agents; sessions of one cutoff run one after another
     "mavra": {"middle_mode": "relbench-mavra", "parallel_ok": False, "feature_memory": True, "extractor": "river"},
+    # ACE (ICLR 2026) as published: one playbook per agent, online, no ground-truth labels (README §1.3)
+    "ace": {"middle_mode": "middle-alone", "parallel_ok": True, "ace": True},
 }
 FEATURE_TOOLS = ("find_features", "compose_features", "find_program")
 
@@ -346,6 +372,8 @@ class Run:
         self.llm = Llm(self.env)
         self.arm = ARMS[a.arm]
         self.refs = {}
+        self.playbooks = {}  # ACE: agent -> playbook text
+        self.ace_steps = {}
         os.makedirs(os.path.join(a.out, "sessions"), exist_ok=True)
 
     # data changes and seed tables
@@ -503,7 +531,10 @@ Feature SQL contract: one SELECT statement that uses {{seeds}} as the seed table
 Tools: list_tables, describe_table, join_path, check_join and run_sql explore the database; the first four cover the tables in schema public, and the seed tables are read with run_sql (read-only, at most 50 rows returned). validate_features(sql) computes your features on a {SAMPLE_SIZE}-row training sample and on the validation seeds, trains the model and returns the validation {metric}. submit(sql) ends the session with your final features.
 Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; the session also ends after {PATIENCE} validations in a row without improvement. If you do not submit, your best validated features are used.""" + (f"""
 
-Shared memory: find_features lists verified feature definitions that agents on this database have published for an entity table; compose_features compiles chosen definitions (by key) into a feature SQL for these seed tables that you can validate as is or extend; find_program returns the latest verified feature program for this task. Using them is optional.""" if self.arm.get("feature_memory") else "")
+Shared memory: find_features lists verified feature definitions that agents on this database have published for an entity table; compose_features compiles chosen definitions (by key) into a feature SQL for these seed tables that you can validate as is or extend; find_program returns the latest verified feature program for this task. Using them is optional.""" if self.arm.get("feature_memory") else "") + (
+            "\n\n" + open(os.path.join(ACE_DIR, "appworld_playbook_block.txt")).read().replace(
+                "{{ playbook }}", self.playbooks.get(f"{tname(t)}-agent", ACE_EMPTY_PLAYBOOK)).rstrip()
+            + "\nWhen you call submit, list in bullet_ids the playbook bullets you used." if self.arm.get("ace") else "")
 
     def tool_specs(self):
         def fn(name, desc, props, req):
@@ -519,7 +550,8 @@ Shared memory: find_features lists verified feature definitions that agents on t
                ["left", "right", "on"]),
             fn("run_sql", "Run one read-only SQL query on PostgreSQL; returns at most 50 rows.", {"sql": s}, ["sql"]),
             fn("validate_features", "Compute the features of a feature SQL (must use {seeds}) on the training sample and validation seeds, train the fixed model, return the validation score.", {"sql": s}, ["sql"]),
-            fn("submit", "Finish the session with this feature SQL (must use {seeds}). Omit sql to submit your best validated features.", {"sql": s}, []),
+            fn("submit", "Finish the session with this feature SQL (must use {seeds}). Omit sql to submit your best validated features.",
+               {"sql": s, **({"bullet_ids": {"type": "array", "items": s, "description": "ids of the playbook bullets you used"}} if self.arm.get("ace") else {})}, []),
         ] + ([
             fn("find_features", "List verified feature definitions shared by all agents for an entity table: key, name, meaning, aggregated table, measure, look-back window.",
                {"entity": s, "query": {"type": "string", "description": "words describing the features you want"}}, ["entity"]),
@@ -630,6 +662,7 @@ Shared memory: find_features lists verified feature definitions that agents on t
                         out = {"error": "nothing validated yet; validate features first or pass sql"}
                     else:
                         submitted, stop = sql, "submitted"
+                        rec["bullet_ids"] = [str(b) for b in (args.get("bullet_ids") or [])]
                         out = {"ok": True}
                 else:
                     out = {"error": f"unknown tool {name}"}
@@ -658,6 +691,11 @@ Shared memory: find_features lists verified feature definitions that agents on t
         if self.arm.get("feature_memory") and rec["final_sql"]:
             try:
                 rec["learning"] = self.learn(t, k, rec, seeds, middle, agent, sid)
+            except Exception as err:
+                rec["learning"] = {"error": str(err)[:500]}
+        if self.arm.get("ace"):
+            try:
+                rec["learning"] = self.ace_update(t, k, rec, msgs, agent)
             except Exception as err:
                 rec["learning"] = {"error": str(err)[:500]}
         rec["totals"] = {
@@ -729,6 +767,56 @@ Shared memory: find_features lists verified feature definitions that agents on t
         log(f"{t} k{k}: learning {len(events)} drafts -> {sum(1 for x in events if x['event'] in ('promoted', 'corroborated'))} published")
         return {"seconds": time.time() - t0, "input_tokens": ex.get("input_tokens", 0), "output_tokens": ex.get("output_tokens", 0),
                 "events": events, "program": r.get("program"), "error": r.get("error"), "raw": r}
+
+    def ace_update(self, t, k, rec, msgs, agent):
+        """ACE after a session (online, no ground truth): Reflector (REFLECTOR_PROMPT_NO_GT), counters, Curator
+        (CURATOR_PROMPT_NO_GT, ADD operations), each one call to the agent's model at temperature 0."""
+        playbook = self.playbooks.get(agent, ACE_EMPTY_PLAYBOOK)
+        self.ace_steps[agent] = self.ace_steps.get(agent, 0) + 1
+        e = self.tasks[t]
+        question = f"{self.task_desc[t]['description']} (task {t}, cutoff {e['cutoffs'][k - 1]['test_timestamp'][:10]})"
+        parts = []
+        for m in msgs[1:]:
+            if m["role"] == "assistant":
+                if m.get("content"):
+                    parts.append(f"ASSISTANT: {m['content']}")
+                for c in m.get("tool_calls") or []:
+                    parts.append(f"TOOL CALL {c['function']['name']}: {c['function'].get('arguments', '')}")
+            elif m["role"] == "tool":
+                parts.append(f"TOOL OUTPUT: {m['content'][:TOOL_OUTPUT_CHARS]}")
+            else:
+                parts.append(f"{m['role'].upper()}: {m['content']}")
+        trace = "\n".join(parts)
+        vals = [f"validation {i + 1}: " + (f"{rec['metric']} = {v['val']:.5f}" if "val" in v else f"error: {v.get('error')}")
+                for i, v in enumerate(rec["validations"])]
+        feedback = "\n".join(vals + [f"best validation {rec['metric']}: {rec['best_val']}", f"session ended by: {rec['stop']}"])
+        bullets = ace_pb.extract_playbook_bullets(playbook, rec.get("bullet_ids") or [])
+        t0, tok_in, tok_out = time.time(), 0, 0
+        r = self.llm.chat([{"role": "user", "content": ace_reflector.REFLECTOR_PROMPT_NO_GT.format(
+            question, trace, rec.get("final_sql") or "(no features submitted)", feedback, bullets)}], temperature=0)
+        tok_in, tok_out = tok_in + r["input_tokens"], tok_out + r["output_tokens"]
+        reflection = r["message"].get("content") or ""
+        parsed = ace_pb.extract_json_from_text(reflection) or {}
+        tags = parsed.get("bullet_tags") or [] if isinstance(parsed, dict) else []
+        if tags:
+            playbook = ace_pb.update_bullet_counts(playbook, tags)
+        r = self.llm.chat([{"role": "user", "content": ace_curator.CURATOR_PROMPT_NO_GT.format(
+            current_step=self.ace_steps[agent], total_samples=self.timeline["K"], token_budget=ACE_TOKEN_BUDGET,
+            playbook_stats=json.dumps(ace_pb.get_playbook_stats(playbook), indent=2), recent_reflection=reflection,
+            current_playbook=playbook, question_context=question)}], temperature=0)
+        tok_in, tok_out = tok_in + r["input_tokens"], tok_out + r["output_tokens"]
+        cur = ace_pb.extract_json_from_text(r["message"].get("content") or "") or {}
+        ops = [o for o in (cur.get("operations") or []) if isinstance(o, dict) and o.get("type") == "ADD"] if isinstance(cur, dict) else []
+        if ops:
+            playbook, _ = ace_pb.apply_curator_operations(playbook, ops, ace_pb.get_next_global_id(playbook))
+        self.playbooks[agent] = playbook
+        os.makedirs(os.path.join(self.a.out, "playbooks"), exist_ok=True)
+        with open(os.path.join(self.a.out, "playbooks", f"{agent}-k{k}.txt"), "w") as f:
+            f.write(playbook)
+        n = ace_pb.get_playbook_stats(playbook)["total_bullets"]
+        log(f"{t} k{k}: ACE {len(tags)} tags, {len(ops)} additions, playbook {n} bullets")
+        return {"seconds": time.time() - t0, "input_tokens": tok_in, "output_tokens": tok_out, "bullet_tags": tags,
+                "operations": ops, "playbook_bullets": n}
 
     def main(self):
         a = self.a

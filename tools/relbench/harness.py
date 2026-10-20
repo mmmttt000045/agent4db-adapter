@@ -73,7 +73,12 @@ ARMS = {
     "mavra": {"middle_mode": "relbench-mavra", "parallel_ok": False, "feature_memory": True, "extractor": "river"},
     # ACE (ICLR 2026) as published: one playbook per agent, online, no ground-truth labels (README §1.3)
     "ace": {"middle_mode": "middle-alone", "parallel_ok": True, "ace": True},
+    # G-Memory (NeurIPS 2025) as published: one store shared by all agents, tasks one at a time (README §1.3)
+    "gmemory": {"middle_mode": "middle-alone", "parallel_ok": False, "gmemory": True},
 }
+GMEMORY_REPO = "results/ext/GMemory"
+GMEMORY_PYTHON = "results/ext/venv-gmem/bin/python"
+GMEMORY_OBS_CHARS = 2000
 FEATURE_TOOLS = ("find_features", "compose_features", "find_program")
 
 LOCK = threading.Lock()
@@ -183,6 +188,39 @@ class Llm:
 
 
 # ───────────────────────── middle layer ─────────────────────────
+
+class GMemoryService:
+    """tools/relbench/gmemory_service.py in G-Memory's own Python 3.12 environment, one JSON line per request."""
+
+    def __init__(self, env, out):
+        self.err = open(os.path.join(out, "gmemory.log"), "w")
+        # its own environment: no proxies, and none of the harness's packages (PYTHONPATH)
+        e = {k: v for k, v in os.environ.items() if "proxy" not in k.lower() and k != "PYTHONPATH"}
+        e.update(OPENAI_API_BASE=env.get("RIVER_BASE_URL", "https://api.river.ai/v1"), OPENAI_API_KEY=env["RIVER_API_KEY"],
+                 HF_ENDPOINT="https://hf-mirror.com", TOKENIZERS_PARALLELISM="false")
+        here = os.path.dirname(os.path.abspath(__file__))
+        self.proc = subprocess.Popen([GMEMORY_PYTHON, os.path.join(here, "gmemory_service.py"), "--repo", GMEMORY_REPO,
+                                      "--working-dir", os.path.join(out, "gmemory"), "--model", env["RIVER_MODEL"]],
+                                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self.err, env=e, text=True, bufsize=1)
+        first = json.loads(self.proc.stdout.readline() or "{}")
+        if not first.get("ready"):
+            raise RuntimeError("G-Memory service did not start; see gmemory.log")
+
+    def send(self, req):
+        self.proc.stdin.write(json.dumps(req, ensure_ascii=False) + "\n")
+        self.proc.stdin.flush()
+        line = self.proc.stdout.readline()
+        if not line:
+            raise RuntimeError("G-Memory service exited; see gmemory.log")
+        return json.loads(line)
+
+    def close(self):
+        self.proc.stdin.close()
+        try:
+            self.proc.wait(30)
+        except subprocess.TimeoutExpired:
+            self.proc.kill()
+
 
 class Middle:
     def __init__(self, url, mode, out, port, extractor=None):
@@ -374,6 +412,7 @@ class Run:
         self.refs = {}
         self.playbooks = {}  # ACE: agent -> playbook text
         self.ace_steps = {}
+        self.gmem = None
         os.makedirs(os.path.join(a.out, "sessions"), exist_ok=True)
 
     # data changes and seed tables
@@ -569,8 +608,16 @@ Shared memory: find_features lists verified feature definitions that agents on t
         ec, yc = e["entity_col"].lower(), e["target_col"].lower()
         rec = {"arm": self.a.arm, "run": self.a.run, "task": t, "k": k, "agent": agent, "session": sid, "metric": metric,
                "higher_is_better": higher, "llm": [], "tools": [], "validations": [], "stop": None, "error": None}
-        msgs = [{"role": "system", "content": self.system_prompt(t, k, seeds)},
-                {"role": "user", "content": f"Build features for {t} at cutoff {e['cutoffs'][k - 1]['test_timestamp'][:10]}."}]
+        task_line = f"Build features for {t} at cutoff {e['cutoffs'][k - 1]['test_timestamp'][:10]}."
+        msgs = [{"role": "system", "content": self.system_prompt(t, k, seeds)}, {"role": "user", "content": task_line}]
+        gmem_tokens = [0, 0]
+        if self.gmem:
+            g = self.gmem.send({"op": "begin", "task_main": f"{self.task_desc[t]['description']} (task {t}, cutoff {e['cutoffs'][k - 1]['test_timestamp'][:10]})",
+                                "task_description": task_line})
+            gmem_tokens = [g.get("prompt_tokens", 0), g.get("completion_tokens", 0)]
+            if g.get("prompt"):
+                msgs[1]["content"] = g["prompt"]
+            rec["gmemory_begin"] = {k2: g.get(k2) for k2 in ("n_success", "n_insights", "error")}
         best, best_sql, streak, idle, submitted = None, None, 0, 0, None
         t_start = time.time()
 
@@ -671,6 +718,10 @@ Shared memory: find_features lists verified feature definitions that agents on t
                 entry["output_chars"] = len(text)
                 entry["error"] = bool(isinstance(out, dict) and out.get("error"))
                 rec["tools"].append(entry)
+                if self.gmem:
+                    g = self.gmem.send({"op": "step", "agent": agent, "action": f"{name}: {json.dumps(args, ensure_ascii=False)[:GMEMORY_OBS_CHARS]}",
+                                        "observation": text[:GMEMORY_OBS_CHARS], "reward": -1 if entry["error"] else 0})
+                    gmem_tokens = [gmem_tokens[0] + g.get("prompt_tokens", 0), gmem_tokens[1] + g.get("completion_tokens", 0)]
                 msgs.append({"role": "tool", "tool_call_id": c["id"], "content": text[:TOOL_OUTPUT_CHARS]})
             if stop:
                 rec["stop"] = stop
@@ -698,6 +749,16 @@ Shared memory: find_features lists verified feature definitions that agents on t
                 rec["learning"] = self.ace_update(t, k, rec, msgs, agent)
             except Exception as err:
                 rec["learning"] = {"error": str(err)[:500]}
+        if self.gmem:
+            ref = self.refs.get((t, k)) or {}
+            best = rec["best_val"]
+            label = best is not None and ref.get("val") is not None and (best > ref["val"] if higher else best < ref["val"])
+            t0 = time.time()
+            g = self.gmem.send({"op": "end", "label": label, "feedback": f"best validation {metric} {best}; reference {ref.get('val')}; "
+                                f"session ended by {rec['stop']}"})
+            gmem_tokens = [gmem_tokens[0] + g.get("prompt_tokens", 0), gmem_tokens[1] + g.get("completion_tokens", 0)]
+            rec["learning"] = {"seconds": time.time() - t0, "input_tokens": gmem_tokens[0], "output_tokens": gmem_tokens[1],
+                               "label": label, "memory_size": g.get("memory_size"), "error": g.get("error")}
         rec["totals"] = {
             "llm_calls": len(rec["llm"]),
             "tool_calls": len(rec["tools"]),
@@ -832,6 +893,8 @@ Shared memory: find_features lists verified feature definitions that agents on t
             "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "reasoning_effort": self.llm.effort}, "cutoffs": []}
         try:
             middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), arm.get("extractor"))
+            if arm.get("gmemory"):
+                self.gmem = GMemoryService(self.env, a.out)
             ks = range(1, self.timeline["K"] + 1) if not a.cutoffs else [int(x) for x in a.cutoffs]
             prev = None
             for k in ks:
@@ -874,6 +937,8 @@ Shared memory: find_features lists verified feature definitions that agents on t
         finally:
             with open(os.path.join(a.out, "run.json"), "w") as f:
                 json.dump(summary, f, indent=1, default=str)
+            if self.gmem:
+                self.gmem.close()
             if middle:
                 if arm.get("feature_memory"):
                     try:

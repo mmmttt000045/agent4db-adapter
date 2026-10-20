@@ -501,8 +501,8 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
         sid = f"{self.a.arm}-r{self.a.run}-{tname(t)}-k{k}"
         metric, higher = metric_of(e["task_type"])
         ec, yc = e["entity_col"].lower(), e["target_col"].lower()
-        rec = {"arm": self.a.arm, "run": self.a.run, "task": t, "k": k, "agent": agent, "session": sid,
-               "llm": [], "tools": [], "validations": [], "stop": None, "error": None}
+        rec = {"arm": self.a.arm, "run": self.a.run, "task": t, "k": k, "agent": agent, "session": sid, "metric": metric,
+               "higher_is_better": higher, "llm": [], "tools": [], "validations": [], "stop": None, "error": None}
         msgs = [{"role": "system", "content": self.system_prompt(t, k, seeds)},
                 {"role": "user", "content": f"Build features for {t} at cutoff {e['cutoffs'][k - 1]['test_timestamp'][:10]}."}]
         best, best_sql, streak, idle, submitted = None, None, 0, 0, None

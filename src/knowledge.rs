@@ -108,6 +108,10 @@ pub struct EntityRef {
     /// 只聚合种子时间之前这么多天内的行；为空时聚合全部历史
     #[serde(default)]
     pub window_days: Option<u32>,
+    /// 关联实体的特征：实体表上的一列（如 posts.owneruserid），via 等于种子所指那一行的这一列（帖子作者的徽章数）；
+    /// 为空时 via 直接等于种子的实体键
+    #[serde(default)]
+    pub anchor: Option<String>,
 }
 
 impl EntityRef {

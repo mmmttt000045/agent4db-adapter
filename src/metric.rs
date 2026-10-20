@@ -464,7 +464,11 @@ pub fn feature_lateral(m: &Metric, alias: &str, seed_key: &str) -> Result<String
     if let Some(f) = m.filters.get(&m.fact) {
         push_unique(&mut wheres, &mut seen, f);
     }
-    wheres.push(format!("{vt}.{vc} = s.{seed_key}"));
+    match &e.anchor {
+        // 关联实体：via 等于种子所指实体行上的 anchor 列
+        Some(a) => wheres.push(format!("{vt}.{vc} = (select ent.{a} from {} ent where ent.{} = s.{seed_key})", e.table, e.key)),
+        None => wheres.push(format!("{vt}.{vc} = s.{seed_key}")),
+    }
     wheres.push(format!("{tt}.{tc} <= s.seed_time"));
     if let Some(d) = e.window_days {
         wheres.push(format!("{tt}.{tc} > s.seed_time - interval '{d} days'"));
@@ -583,6 +587,10 @@ pub const FEATURE_WORDS: &[&str] = &[
     "power",
     "floor",
     "ceil",
+    "exp",
+    "sign",
+    "mod",
+    "trunc",
     "interval",
     "day",
     "days",
@@ -599,6 +607,8 @@ pub fn check_expr_with(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog, ex
     if expr.contains(';') || expr.contains("/*") || expr.contains("--") {
         return Err("表达式不能包含分号或注释".into());
     }
+    // EXTRACT(field FROM x) 里的 FROM 不是子查询
+    let expr = &extract_from_re().replace_all(expr, "extract(").to_string();
     for w in sqlscan::words(expr) {
         if w == "select" || w == "from" {
             return Err("表达式不能包含子查询".into());
@@ -617,6 +627,11 @@ pub fn check_expr_with(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog, ex
         }
     }
     Ok(())
+}
+
+fn extract_from_re() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| Regex::new(r"(?i)extract\s*\(\s*\w+\s+from\b").unwrap())
 }
 
 fn year_re() -> &'static Regex {
@@ -898,9 +913,9 @@ pub async fn extract(p: &Provider, input: &Value, max_attempts: u32) -> Extracti
 // ───────────────────────── 特征定义的提炼（RelBench） ─────────────────────────
 
 const FEATURE_EXTRACT_SYSTEM: &str = "你是数据中间层的特征定义提炼器。输入是一次预测任务会话的结果：任务说明、种子表的实体列、\
-提交的特征 SQL（以 {seeds} 为种子表，列为实体键与 seed_time）、按重要性排序的特征列，以及相关表的元数据与已验证关联。这次提交的验证分数优于参照，\
-且没有读种子时间之后的数据。请把重要性靠前、形如“某个实体在种子时间之前（某个回看窗口内）的一个聚合”的特征列，各写成一条结构化的特征定义；\
-不是这种形式的列（多个聚合的比值或组合、种子表或实体表本身的列、窗口函数）跳过。只输出一个 JSON 对象 {\"features\": [...]}，不要输出其他文字；\
+提交的特征 SQL（以 {seeds} 为种子表，列为实体键与 seed_time）、按重要性排序的特征列，以及相关表的元数据与已验证关联。这次提交的验证分数优于参照。\
+请把重要性靠前、形如“某个实体（或与它直接关联的实体，如帖子的作者）在种子时间之前（某个回看窗口内）对一张表的聚合”的特征列，各写成一条结构化的特征定义；\
+同一张表上几个聚合的组合（如 sum(...) / nullif(count(*), 0)）也算一个聚合；跨不同表的聚合组合、种子表或实体表本身的列、窗口函数跳过。只输出一个 JSON 对象 {\"features\": [...]}，不要输出其他文字；\
 最多 12 项，每项字段：\n\
 - column：该特征在提交 SQL 输出中的列名\n\
 - name：特征名称，英文小写加下划线，说明实体、度量与窗口，如 user_upvotes_received_91d\n\
@@ -908,13 +923,15 @@ const FEATURE_EXTRACT_SYSTEM: &str = "你是数据中间层的特征定义提炼
 - fact：被聚合的表\n\
 - measure：一个聚合表达式，如 count(*)、count(distinct votes.postid)、sum(posts.score)、avg(length(posts.body))；只能引用 fact 与 joins 中表的列，\
 不得包含子查询或窗口函数；列名在这些表之间重名时写成 表.列；可以用 seed_time 表示这个种子的时间，例如距上一条评论的天数写成 \
-extract(epoch from (seed_time - max(comments.creationdate))) / 86400；结果必须是数值（不能是时间戳）\n\
+extract(epoch from (seed_time - max(comments.creationdate))) / 86400；可用 exp、ln、greatest 等标量函数；结果必须是数值（不能是时间戳）\n\
 - grain：fact 上一行对应一条记录的键列数组（通常是主键），只写列名、不带表名\n\
 - time：{\"role\": 时间角色, \"fact_col\": \"表.列\"（决定这行是否在种子时间之前的时间列，在 fact 或 joins 中的表上）, \"strategy\": \"column\", \"grain\": \"day\"}\n\
 - joins：从 fact 到实体列所在表必需的多对一关联，每项 {\"left\": 多侧表, \"right\": 一侧表, \"on\": [[左表列, 右表列]], \"kind\": \"inner\"}；\
 left 是 fact 或列表中前面已关联的表；必须与已验证关联的方向一致；不需要时为空数组\n\
 - filters：{表: 条件}，口径必需的行过滤，如 {\"votes\": \"votetypeid = 2\"}；不得包含日期、时间或种子相关的条件\n\
-- entity：{\"table\": 实体表, \"key\": 实体主键, \"via\": \"表.列\"（等于实体键的列，在 fact 或 joins 到达的表上）, \"window_days\": 回看天数或 null（全部历史）}\n\
+- entity：{\"table\": 任务的实体表, \"key\": 实体主键, \"via\": \"表.列\"（在 fact 或 joins 到达的表上）, \"window_days\": 回看天数或 null（全部历史）, \
+\"anchor\": null 或实体表上的一列}；via 等于实体键时 anchor 为 null；聚合的是关联实体时（如帖子作者的徽章：实体表 posts，fact badges，via badges.userid），\
+anchor 写实体表上指向它的列（owneruserid），表示 via 等于种子那一行实体的这一列\n\
 - empty：计数类写 \"zero\"，其余写 \"null\"";
 
 #[derive(Debug)]
@@ -1164,6 +1181,20 @@ mod tests {
         let sql = feature_lateral(&recency, "f0", "owneruserid").unwrap();
         assert!(sql.contains("(s.seed_time - max(votes.creationdate))"), "{sql}");
         assert!(!sql.contains("s.s.seed_time"), "{sql}");
+        // a related entity: votes on the seed post's owner's posts, keyed through posts.owneruserid of the seed post
+        let mut owner = m.clone();
+        owner.entity.as_mut().unwrap().table = "posts".into();
+        owner.entity.as_mut().unwrap().anchor = Some("owneruserid".into());
+        let sql = feature_lateral(&owner, "f0", "postid").unwrap();
+        assert!(sql.contains("posts.owneruserid = (select ent.owneruserid from posts ent where ent.id = s.postid)"), "{sql}");
+    }
+
+    #[test]
+    fn extract_from_is_not_a_subquery() {
+        let allowed: BTreeSet<String> = ["store_sales".to_string()].into_iter().collect();
+        let e = "extract(epoch from (seed_time - max(store_sales.ss_sold_date_sk))) / 86400";
+        assert!(check_expr_with(e, &allowed, &cat(), FEATURE_WORDS).is_ok());
+        assert!(check_expr_with("sum((select 1 from store_sales))", &allowed, &cat(), FEATURE_WORDS).is_err());
     }
 
     #[test]

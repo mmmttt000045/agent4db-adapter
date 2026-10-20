@@ -268,6 +268,11 @@ impl Middle {
                 return Ok(Err(format!("回看窗口 {d} 天不在 1–3650")));
             }
         }
+        if let Some(a) = &e.anchor {
+            if et.col(a).is_none() {
+                return Ok(Err(format!("anchor 列 {}.{a} 不存在", e.table)));
+            }
+        }
         let c = Check::KeyUnique { table: e.table.clone(), cols: vec![e.key.clone()], filter: None };
         let (o, _) = self.cond_check(ctx, &c, QKind::Metric).await?;
         Ok(if o.pass { Ok(()) } else { Err(format!("实体键 {}.{} 不唯一", e.table, e.key)) })

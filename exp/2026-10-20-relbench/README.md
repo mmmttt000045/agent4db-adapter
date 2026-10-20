@@ -178,6 +178,12 @@ AgentSM 离线建库每库 100 个合成会话；rel-stack 附录约 135 个会�
   G-Memory：“Use the above examples and insights as a foundation”；AgentSM：规划智能体开始前先检索），MAVRA 的提示原先只写“Using them is optional”。
   修订：MAVRA 的提示写明用法——先调 `find_program` 与 `find_features`，返回特征 SQL 时先验证它，只在需要改进时再探索、扩展。
   停掉的运行移到 `results/relbench-pilot/aborted/mavra-r1-v3-optional/`（不计）；P2 第四次从头重跑。
+- **P2 第四次启动，截点 1 与截点 2 的 post-votes（23:30，节省数据只有这一个截点 2 会话）**：智能体按说明先取上一截点的方案并验证，
+  但方案只有 3 条定义（验证 MAE 0.0696，上一截点 72 个特征为 0.0655），于是重新探索（48.6 万 token，无记忆为 80.6 万）。方案薄的原因是学习时大部分特征被拒：
+  “距上次……多少天”被当成子查询（`extract(epoch from …)` 里的 FROM）；`exp(...)` 衰减不在白名单；帖子作者的徽章等关联实体特征写不成定义（实体表与任务实体不同）；
+  提炼器提示要求跳过一切聚合的比值。修订（定义模型的覆盖面，不涉及得分）：表达式检查不把 EXTRACT 的 FROM 当子查询；白名单加 exp、sign、mod、trunc；
+  实体可带 `anchor`（实体表上的一列，via 等于种子那一行的这一列，编译为对实体表的单行查找），表示关联实体的特征；提炼器提示允许同一张表上几个聚合的组合。
+  等截点 2 当时在跑的 user-badge 会话结束后停掉、第五次从头重跑。
 - **P1 结果（21:23，`p1-gates.json`，15 个会话 = `none-r1` 9 个 + `none-r1-k45` 6 个；user-engagement k1 的审计经 `reaudit.py` 补做为 clean）：五条门槛全部通过。**
   (a) 15/15 正常结束；(b) 每会话 LLM 调用中位数 16；(c) 看结构 + 探查占工具调用 86%；(d) 15/15 验证分数优于参照；
   (e) 第 2 个起的会话里 97% 的看结构调用在更早的会话中出现过。代价：每会话 token 中位数 19.6 万（均值 27.8 万，合计 416 万），

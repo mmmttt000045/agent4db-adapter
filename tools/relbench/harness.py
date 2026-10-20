@@ -43,7 +43,12 @@ AUDIT_SEEDS = 2000
 LGB_PARAMS = dict(n_estimators=300, learning_rate=0.05, num_leaves=63, min_child_samples=20, colsample_bytree=0.8,
                   subsample=0.8, subsample_freq=1, random_state=42, deterministic=True, force_row_wise=True,
                   n_jobs=8, verbose=-1)
-ARMS = {"none": {"middle_mode": "middle-alone", "parallel_ok": True}}
+ARMS = {
+    "none": {"middle_mode": "middle-alone", "parallel_ok": True},
+    # README §1.6: feature definitions shared by all agents; sessions of one cutoff run one after another
+    "mavra": {"middle_mode": "relbench-mavra", "parallel_ok": False, "feature_memory": True, "extractor": "river"},
+}
+FEATURE_TOOLS = ("find_features", "compose_features", "find_program")
 
 LOCK = threading.Lock()
 
@@ -154,13 +159,13 @@ class Llm:
 # ───────────────────────── middle layer ─────────────────────────
 
 class Middle:
-    def __init__(self, url, mode, out, port):
+    def __init__(self, url, mode, out, port, extractor=None):
         self.base = f"http://127.0.0.1:{port}"
         self.log = open(os.path.join(out, "middle.log"), "w")
         env = {k: v for k, v in os.environ.items() if "proxy" not in k.lower()}
         self.proc = subprocess.Popen(
             ["./target/release/agentdb-mid", "--db", url, "--pool", "8", "--out", os.path.join(out, "middle"),
-             "serve", "--addr", f"127.0.0.1:{port}", "--mode", mode, "--no-etl"],
+             "serve", "--addr", f"127.0.0.1:{port}", "--mode", mode, "--no-etl", *(["--extractor", extractor] if extractor else [])],
             stdout=self.log, stderr=subprocess.STDOUT, env=env)
         self.local = threading.local()
         for _ in range(120):
@@ -185,6 +190,12 @@ class Middle:
         r = self.http.post(f"{self.base}/v1/tools/{name}", json={"agent": agent, "session": session, "task": task, "args": args},
                            timeout=FEATURE_SQL_TIMEOUT_S)
         return r.json()
+
+    def post(self, path, body, timeout=1800):
+        return self.http.post(f"{self.base}{path}", json=body, timeout=timeout).json()
+
+    def get(self, path):
+        return self.http.get(f"{self.base}{path}", timeout=120).json()
 
     def close(self):
         self.proc.terminate()
@@ -283,10 +294,14 @@ def features(url, sql, seeds_table, seeds, ec, search_path=None):
     if "{seeds}" not in sql:
         raise FeatureError("the SQL must use {seeds} as the seed table")
     q = sql.strip().rstrip(";").replace("{seeds}", seeds_table)
+    # one row per seed is the contract: more rows are an error, so the database stops after len(seeds) + 1 rows
+    q = f"SELECT * FROM ({q}) AS feature_rows LIMIT {len(seeds) + 1}"
     try:
         df, secs = read_sql(url, q, search_path=search_path)
     except psycopg.Error as e:
         raise FeatureError(f"SQL error: {str(e).strip()[:1500]}")
+    if len(df) > len(seeds):
+        raise FeatureError(f"more than {len(seeds)} rows for {len(seeds)} seeds; return one row per seed (check joins that multiply rows)")
     if df.shape[1] < 3:
         raise FeatureError("need the entity key, seed_time and at least one feature column")
     if df.shape[1] - 2 > MAX_FEATURES:
@@ -329,14 +344,21 @@ class Run:
         self.db_name = f"relbench_{a.arm.replace('-', '_')}_r{a.run}_{os.getpid()}"
         self.url = f"{base_url(self.url_admin)}/{self.db_name}"
         self.llm = Llm(self.env)
+        self.arm = ARMS[a.arm]
+        self.refs = {}
         os.makedirs(os.path.join(a.out, "sessions"), exist_ok=True)
-        self.full = None
 
     # data changes and seed tables
-    def full_tables(self):
-        if self.full is None:
-            self.full = {name: pd.read_parquet(os.path.join(self.a.data, "db", f"{name}.parquet")) for name in self.manifest["tables"]}
-        return self.full
+    def table(self, name, rows=None):
+        """One database table from the dataset files; with `rows`, only rows whose time column is in (rows[0], rows[1]]."""
+        import pyarrow.parquet as pq
+
+        path = os.path.join(self.a.data, "db", f"{name}.parquet")
+        tc = self.manifest["tables"][name].get("time_col")
+        if rows is None or not tc:
+            return pd.read_parquet(path)
+        lo, hi = rows
+        return pq.read_table(path, filters=[(tc, ">", lo), (tc, "<=", hi)]).to_pandas()
 
     def append(self, prev, cur):
         t0, n = time.time(), {}
@@ -345,8 +367,7 @@ class Run:
                 tc = spec.get("time_col")
                 if not tc:
                     continue
-                df = self.full_tables()[name]
-                part = df[(df[tc] > prev) & (df[tc] <= cur)]
+                part = self.table(name, (prev, cur))
                 if len(part):
                     copy_rows(con, name.lower(), part)
                     # one ETL batch per appended table, as metric-bench logs its data changes
@@ -395,7 +416,7 @@ class Run:
         et = e["entity_table"]
         spec = self.manifest["tables"][et]
         pk = spec["pkey"].lower()
-        df = self.full_tables()[et]
+        df = self.table(et)
         fk = {c.lower() for c in (spec.get("fkeys") or {})}
         cols = []
         for c in df.columns:
@@ -480,7 +501,9 @@ Seed tables: task.{tname(t)}_train (labelled training seeds, {len(seeds['train']
 Feature SQL contract: one SELECT statement that uses {{seeds}} as the seed table (columns {ec}, seed_time) and returns exactly one row per seed row, with {ec} and seed_time as the first two columns followed by numeric feature columns (at most {MAX_FEATURES}). A feature may only use rows whose time is at or before the seed row's seed_time; using later rows is leakage and makes the features invalid.
 
 Tools: list_tables, describe_table, join_path, check_join and run_sql explore the database; the first four cover the tables in schema public, and the seed tables are read with run_sql (read-only, at most 50 rows returned). validate_features(sql) computes your features on a {SAMPLE_SIZE}-row training sample and on the validation seeds, trains the model and returns the validation {metric}. submit(sql) ends the session with your final features.
-Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; the session also ends after {PATIENCE} validations in a row without improvement. If you do not submit, your best validated features are used."""
+Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; the session also ends after {PATIENCE} validations in a row without improvement. If you do not submit, your best validated features are used.""" + (f"""
+
+Shared memory: find_features lists verified feature definitions that agents on this database have published for an entity table; compose_features compiles chosen definitions (by key) into a feature SQL for these seed tables that you can validate as is or extend; find_program returns the latest verified feature program for this task. Using them is optional.""" if self.arm.get("feature_memory") else "")
 
     def tool_specs(self):
         def fn(name, desc, props, req):
@@ -497,7 +520,14 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
             fn("run_sql", "Run one read-only SQL query on PostgreSQL; returns at most 50 rows.", {"sql": s}, ["sql"]),
             fn("validate_features", "Compute the features of a feature SQL (must use {seeds}) on the training sample and validation seeds, train the fixed model, return the validation score.", {"sql": s}, ["sql"]),
             fn("submit", "Finish the session with this feature SQL (must use {seeds}). Omit sql to submit your best validated features.", {"sql": s}, []),
-        ]
+        ] + ([
+            fn("find_features", "List verified feature definitions shared by all agents for an entity table: key, name, meaning, aggregated table, measure, look-back window.",
+               {"entity": s, "query": {"type": "string", "description": "words describing the features you want"}}, ["entity"]),
+            fn("compose_features", "Compile verified feature definitions (keys from find_features or find_program) into one feature SQL that uses {seeds}.",
+               {"keys": {"type": "array", "items": s}}, ["keys"]),
+            fn("find_program", "The latest verified feature program for a task: cutoff, validation score, and its still-valid definitions compiled into one feature SQL.",
+               {"task": s}, ["task"]),
+        ] if self.arm.get("feature_memory") else [])
 
     def session(self, t, k, seeds, middle):
         e = self.tasks[t]
@@ -527,6 +557,8 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
                 break
             m = r.pop("message")
             rec["llm"].append({**r, "tool_calls": len(m.get("tool_calls") or []), "content_chars": len(m.get("content") or "")})
+            with open(os.path.join(self.a.out, "sessions", f"{tname(t)}-k{k}.partial.json"), "w") as f:
+                json.dump({**rec, "messages": msgs}, f, ensure_ascii=False, default=str)
             msgs.append({k2: v for k2, v in m.items() if k2 in ("role", "content", "tool_calls")} | {"role": "assistant"})
             calls = m.get("tool_calls") or []
             if not calls:
@@ -548,6 +580,14 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
                 entry = {"i": len(rec["tools"]), "llm_i": len(rec["llm"]) - 1, "name": name, "args": args}
                 if stop:
                     out = {"error": "session already ended"}
+                elif name in FEATURE_TOOLS and self.arm.get("feature_memory"):
+                    if name == "compose_features":
+                        args.setdefault("seed_key", ec)
+                    try:
+                        out = middle.call(name, agent, sid, sid, args)
+                    except Exception as err:
+                        out = {"error": f"{err}"}
+                    entry["category"] = "memory"
                 elif name in ("list_tables", "describe_table", "join_path", "check_join", "run_sql"):
                     try:
                         out = middle.call(name, agent, sid, sid, args)
@@ -568,7 +608,8 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
                         else:
                             streak += 1
                         rec["validations"].append({"tool_i": entry["i"], "val": val, "improved": improved, "sql_seconds": s1 + s2,
-                                                   "train_seconds": tt, "n_features": xtr.shape[1], "sql": sql})
+                                                   "train_seconds": tt, "n_features": xtr.shape[1], "sql": sql,
+                                                   "importance": [c for c, _ in imp[:30]]})
                         out = {f"validation_{metric}": round(val, 5), "best_so_far": round(best, 5), "improved": improved,
                                "n_features": xtr.shape[1], "train_rows": len(xtr), "val_rows": len(xva),
                                "top_features_by_gain": imp[:15],
@@ -614,6 +655,11 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
                 rec["audit"] = self.audit(t, k, rec["final_sql"], seeds)
             except Exception as err:
                 rec["audit"] = {"result": "error", "why": str(err)[:300]}
+        if self.arm.get("feature_memory") and rec["final_sql"]:
+            try:
+                rec["learning"] = self.learn(t, k, rec, seeds, middle, agent, sid)
+            except Exception as err:
+                rec["learning"] = {"error": str(err)[:500]}
         rec["totals"] = {
             "llm_calls": len(rec["llm"]),
             "tool_calls": len(rec["tools"]),
@@ -626,13 +672,63 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
             "validation_train_seconds": sum(x.get("train_seconds", 0) for x in rec["validations"]),
         }
         rec["totals"]["tokens"] = rec["totals"]["input_tokens"] + rec["totals"]["output_tokens"]
+        lr = rec.get("learning") or {}
+        # learning is charged to the session that triggered it (README §1.4); its time is background work, reported apart
+        rec["totals"]["learn_tokens"] = lr.get("input_tokens", 0) + lr.get("output_tokens", 0)
+        rec["totals"]["learn_seconds"] = lr.get("seconds", 0)
+        rec["totals"]["tokens_with_learning"] = rec["totals"]["tokens"] + rec["totals"]["learn_tokens"]
         rec["messages"] = msgs
         with open(os.path.join(self.a.out, "sessions", f"{tname(t)}-k{k}.json"), "w") as f:
             json.dump(rec, f, ensure_ascii=False, indent=1, default=str)
+        partial = os.path.join(self.a.out, "sessions", f"{tname(t)}-k{k}.partial.json")
+        if os.path.exists(partial):
+            os.remove(partial)
         ev = rec.get("eval") or {}
         log(f"{t} k{k}: stop={rec['stop']} llm={rec['totals']['llm_calls']} tools={rec['totals']['tool_calls']} "
             f"tok={rec['totals']['tokens']} t={rec['agent_seconds']:.0f}s val={best} test={ev.get('test')} audit={(rec.get('audit') or {}).get('result')}")
         return rec
+
+    def learn(self, t, k, rec, seeds, middle, agent, sid):
+        """Learning after a session (README §1.6): only when the submission beats the reference and its audit is clean."""
+        e = self.tasks[t]
+        ec = e["entity_col"].lower()
+        ref = self.refs.get((t, k)) or {}
+        best, higher = rec["best_val"], rec["higher_is_better"]
+        beats = best is not None and ref.get("val") is not None and (best > ref["val"] if higher else best < ref["val"])
+        audit = (rec.get("audit") or {}).get("result")
+        if not beats:
+            return {"skipped": "validation score not better than the reference"}
+        if audit != "clean":
+            return {"skipped": f"audit {audit}"}
+        imp = next((v.get("importance") for v in reversed(rec["validations"]) if v.get("sql") == rec["final_sql"] and v.get("importance")), [])
+        tstar = seeds["train_sample"]["seed_time"].max()
+        sub = seeds["train_sample"][seeds["train_sample"]["seed_time"] == tstar].sort_values(ec).head(AUDIT_SEEDS)
+        schema = f"learn_{tname(t)}_k{k}"
+        with psycopg.connect(self.url, autocommit=True) as con:
+            con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+            con.execute(f"CREATE SCHEMA {schema}")
+            for name, spec in self.manifest["tables"].items():
+                tc = spec.get("time_col")
+                cond = f" WHERE {tc.lower()} <= '{tstar}'" if tc else ""
+                con.execute(f"CREATE VIEW {schema}.{name.lower()} AS SELECT * FROM public.{name.lower()}{cond}")
+            con.execute(f"CREATE TABLE {schema}.seeds AS SELECT * FROM task.{tname(t)}_train_sample WHERE false")
+            copy_rows(con, f"{schema}.seeds", sub)
+        body = {"agent": agent, "session": sid, "task": t, "description": self.task_desc[t]["description"],
+                "cutoff": e["cutoffs"][k - 1]["test_timestamp"], "seed_key": ec, "entity_table": e["entity_table"].lower(),
+                "entity_key": self.manifest["tables"][e["entity_table"]]["pkey"].lower(), "sql": rec["final_sql"], "importance": imp,
+                "seeds": f"(select * from task.{tname(t)}_train_sample order by {ec}, seed_time limit {AUDIT_SEEDS})",
+                "audit_schema": schema, "audit_seeds": f"(select * from {schema}.seeds)", "val_score": best, "metric": rec["metric"]}
+        t0 = time.time()
+        try:
+            r = middle.post("/v1/learn_features", body)
+        finally:
+            with psycopg.connect(self.url, autocommit=True) as con:
+                con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+        ex = r.get("extraction") or {}
+        events = [{k2: f.get(k2) for k2 in ("event", "key", "revision", "failed_gate", "reason")} for f in r.get("features") or []]
+        log(f"{t} k{k}: learning {len(events)} drafts -> {sum(1 for x in events if x['event'] in ('promoted', 'corroborated'))} published")
+        return {"seconds": time.time() - t0, "input_tokens": ex.get("input_tokens", 0), "output_tokens": ex.get("output_tokens", 0),
+                "events": events, "program": r.get("program"), "error": r.get("error"), "raw": r}
 
     def main(self):
         a = self.a
@@ -644,7 +740,7 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
             "MAX_LLM_CALLS": MAX_LLM_CALLS, "MAX_VALIDATIONS": MAX_VALIDATIONS, "PATIENCE": PATIENCE, "SAMPLE_SIZE": SAMPLE_SIZE,
             "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "reasoning_effort": self.llm.effort}, "cutoffs": []}
         try:
-            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800))
+            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), arm.get("extractor"))
             ks = range(1, self.timeline["K"] + 1) if not a.cutoffs else [int(x) for x in a.cutoffs]
             prev = None
             for k in ks:
@@ -665,6 +761,7 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
                     except Exception as err:
                         rec["reference"][t] = {"error": str(err)[:300]}
                 log(f"k{k}: reference {json.dumps({t: (v.get('val'), v.get('test')) for t, v in rec['reference'].items()})}")
+                self.refs.update({(t, k): v for t, v in rec["reference"].items()})
                 order = list(self.tasks)
                 random.Random(a.run * 1000 + k).shuffle(order)
                 rec["order"] = order
@@ -687,6 +784,12 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
             with open(os.path.join(a.out, "run.json"), "w") as f:
                 json.dump(summary, f, indent=1, default=str)
             if middle:
+                if arm.get("feature_memory"):
+                    try:
+                        with open(os.path.join(a.out, "features.json"), "w") as f:
+                            json.dump(middle.get("/v1/features"), f, ensure_ascii=False, indent=1)
+                    except Exception as err:
+                        log(f"could not export features: {err}")
                 middle.close()
             if not a.keep_db:
                 drop_db(self.url_admin, self.db_name)

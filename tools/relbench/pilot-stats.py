@@ -6,7 +6,7 @@
 validation score beats the entity-table reference; (e) in sessions after the first, the share of schema calls
 (same tool, same arguments) already made in an earlier session on the same database (order: cutoff, then arrival).
 
-  python3 tools/relbench/pilot-stats.py results/relbench-pilot/none-r1 [--json out.json]
+  python3 tools/relbench/pilot-stats.py results/relbench-pilot/none-r1 [more run folders of the same run] [--json out.json]
 """
 import argparse
 import glob
@@ -28,13 +28,13 @@ def key(t):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("run")
+    ap.add_argument("run", nargs="+", help="run folders of one run (e.g. a run resumed at a later cutoff)")
     ap.add_argument("--json")
     a = ap.parse_args()
-    run = json.load(open(os.path.join(a.run, "run.json")))
-    order = {(t, c["k"]): i for c in run["cutoffs"] for i, t in enumerate(c["order"])}
-    ref = {(t, c["k"]): v for c in run["cutoffs"] for t, v in c["reference"].items()}
-    sess = [json.load(open(f)) for f in glob.glob(os.path.join(a.run, "sessions", "*.json"))]
+    cutoffs = [c for d in a.run for c in json.load(open(os.path.join(d, "run.json")))["cutoffs"]]
+    order = {(t, c["k"]): i for c in cutoffs for i, t in enumerate(c["order"])}
+    ref = {(t, c["k"]): v for c in cutoffs for t, v in c["reference"].items()}
+    sess = [json.load(open(f)) for d in a.run for f in glob.glob(os.path.join(d, "sessions", "*.json")) if not f.endswith(".partial.json")]
     sess.sort(key=lambda s: (s["k"], order.get((s["task"], s["k"]), 0)))
 
     rows, seen, rep_num, rep_den = [], set(), 0, 0

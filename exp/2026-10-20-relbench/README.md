@@ -1,0 +1,120 @@
+# RelBench 主实验：共享记忆省下的 token、调用次数与延迟（2026-10-20 起）
+
+10-20 导师建议主实验改用通用基准 RelBench，体现智能体的工作负载、与纯 Text-to-SQL 区分；用户要求 3–4 个最相关的已发表基线，
+核心指标为 token 大幅减少、加速、工具调用次数减少、延迟降低，并要求**充分尊重每个基线的原文**（否则可能直接被拒稿）。
+TPC-DS 群体实验（`exp/2026-10-12-population/`）降为受控实验。
+
+## 0. 已停止的运行（10-20）
+
+`results/pop-mem-20261013/` 的 8 组（AWM、ACE、Mem0、共享 ACE）自 10-13 额度用完后一直暂停，10-20 按用户决定终止，
+对应的 8 个 `agentdb_metric_*` 数据库已删除，目录里写了 `STOPPED.txt`。原因：10-20 逐篇核对原文与官方代码后，
+`src/agentmem.rs` 里的 AWM、ACE、Mem0、ReasoningBank、APC、AgentSM 都与原文有实质出入（自写提示词、用标准答案判对错、
+词二元组检索、自创的条数上限与合并规则、APC 缺小模型改写、AgentSM 缺离线合成与两智能体结构）。这些运行（含已完成的
+r1-mem-awm 与 `results/pop-mem-20261013-agentsm/`）**一律不报告**。
+
+## 1. 设计（写于看到任何 RelBench 结果之前）
+
+### 1.1 基准
+
+- RelBench v1（NeurIPS 2024 D&B）的数据库、任务定义与官方训练/验证/测试表取自 Hugging Face `stanford-star/relbench-v1`
+  （仓库已迁到 `stanford-star/relbench`；noctis 经 hf-mirror.com 下载，原始文件在 noctis `results/relbench-data/`）。
+  官方任务、评价指标（分类 ROC-AUC，回归 MAE）与已知问题（如 user-engagement 的 issue #402）一律原样保留。
+- 只用实体分类与回归任务（推荐类任务后放）：
+
+  | 库 | 表 | 任务（窗口 Δ） | 截点数 K | 会话数 |
+  |---|---|---|---|---|
+  | rel-stack | 7 | user-engagement、user-badge、post-votes（91 天） | 5 | 15 |
+  | rel-amazon | 3 | user-churn、user-ltv、item-churn、item-ltv（91 天） | 4 | 16 |
+  | rel-trial | 15 | study-outcome、study-adverse、site-success（365 天） | 5 | 15 |
+
+- **截点时间线（定期重训）。** 第 k 个截点（k = 1..K）：test_k = 官方 test_timestamp − (K−k)·Δ，
+  val_k = 官方 val_timestamp − (K−k)·Δ，训练种子时间从 val_k − Δ 起按 Δ 向前直到库内最早时间（与 RelBench `_get_table` 相同）。
+  k = K 即官方划分。标签用任务清单里的 DuckDB SQL（`timestamps` 关系 + `{timedelta}`）在全量数据上生成，
+  并按 RelBench 的 `filter_dangling_entities`（以 upto(test_k) 的实体表为准）过滤。**检查：k = K 生成的训练/验证/测试表必须与官方
+  parquet 逐行一致，否则不开始实验。**
+- **数据变化是真实追加。** 截点 k 的数据库只含时间列 ≤ test_k 的行（与 RelBench 的 `Database.upto` 相同，时间列为空的行不进库）；
+  进入截点 k+1 前，把 (test_k, test_{k+1}] 的行追加进去。测试标签不进数据库。
+- **智能体身份。** 每个任务由一个智能体负责（如 user-engagement 智能体），每个截点开一个全新会话（不带对话历史）。
+  单智能体记忆在它自己的各截点会话之间积累——这是对单智能体记忆最有利的设置。同一截点内各任务的到达顺序按种子随机，
+  同一次运行中所有方法顺序相同（配对）。
+
+### 1.2 会话（所有方法相同）
+
+- 模型：river 网关 `deepseek-ai/DeepSeek-V4.1-Flash`，推理强度 high（`RIVER_*`，回报模型名不符的回复丢弃）。
+  智能体与各方法的记忆操作用同一模型，除非原文要求不同的模型（APC 的小模型，见 1.3）。
+- 工具：`list_tables`、`describe_table`、`join_path`、`check_join`、`run_sql`（中间层 HTTP 接口 `/v1/tools`；
+  除 MAVRA 外都用 `middle-alone` 配置，表描述、连接路径与查询结果只在一个会话内有效），`validate_features`、`submit`
+  （Python 框架实现），各方法另加自己的记忆工具。提示词与工具说明用英文（各基线的官方提示词都是英文）。
+- 特征 SQL 约定：一条 SELECT，以 `{seeds}` 代表种子表（列：实体键、`timestamp`），每个种子恰好返回一行、
+  前两列为实体键与 `timestamp`，其余列为数值特征（≤ 100 列）；只能使用时间 ≤ 种子时间的数据。
+  `validate_features` 在训练抽样与验证种子上执行 SQL（每次 600 s 超时），训练 LightGBM，返回验证分数、特征重要性与行数检查；
+  违反约定时返回错误、不计分。
+- 学习器（固定，所有方法与参照相同）：LightGBM 4.6.0，训练种子按 RelBench 默认随机抽 50,000 行（种子 42）；
+  分类 objective=binary，回归 objective=l1；n_estimators 300、learning_rate 0.05、num_leaves 63、min_child_samples 20、
+  feature_fraction 0.8、bagging_fraction 0.8、bagging_freq 1、seed 42、deterministic、n_jobs 8。
+  RelBench 自带的 LightGBM 基线另做 10 轮调参，这里为可重复性不调参，论文写明。
+- **参照特征**：实体表本身的列（与 RelBench LightGBM 基线的输入相同），用同一学习器得到每个（任务, 截点）的参照验证分数。
+  原文需要“成功”信号的方法，统一用“验证分数优于参照”判定；任何方法都不接触测试标签。
+- 停止规则（由框架执行）：智能体提交；或连续 2 次验证没有严格提升（出错的验证不算“没有提升”）；或已验证 8 次（出错的也计入）；或已调用 LLM 40 次
+  （不低于各原文的步数上限：ACE 40、APC 10、AWM 10）。未提交时取验证分数最好的一次作为提交。
+- 测试评估：会话结束后，用提交的特征 SQL 在测试种子上算特征、同一学习器训练，按官方指标打分。
+- 泄漏审计（所有方法）：对每个提交，在最晚的训练种子时间 t* 上，用“只含时间 ≤ t* 的行”的视图重算一次特征并与正常结果比较，
+  不一致记为泄漏。
+
+### 1.3 方法（每个基线按原文的记忆归属、内容、构建、检索、反馈与超参数；改动逐条进论文附录的复现说明）
+
+| 方法 | 原文的记忆归属 → 本实验 | 原样保留 | 不得不改 |
+|---|---|---|---|
+| 无记忆 | — | — | — |
+| AgentSM（arXiv 2601.15709，预印本） | 每个库一份，离线一次建好，评估时只读 → 每个库建一次，所有智能体读同一份；离线开销单列 | Algorithm 1 合成探索任务（n = 100，取自其存档代码），合成会话只带 SQL 与读表工具、不检查答案；按探索、构造执行、验证三段存 Markdown，标题由轻量模型生成；MiniLM-L6-v2 + FAISS 取最相似 1 条、只返回相关阶段；规划智能体 + 模式链接智能体（5 步）；组合工具；SQL 自动纠错 | “问题”换成预测任务描述；按本框架的工具重写阶段划分规则；`validate_features`/`submit` 对应原文的输出验证与保存结果；τ = 0.5、组合工具最长 3（原文未给） |
+| ACE（ICLR 2026） | 一个智能体一本手册，在线一遍 → 每个智能体一本 | 官方 `REFLECTOR_PROMPT_NO_GT`、`CURATOR_PROMPT_NO_GT` 原文；三个角色同一模型、温度 0；条目格式与计数、只增、80,000 预算；整本手册进提示 | 反馈 = 验证分数记录（原文无标签时用执行反馈）；`submit` 附用到的条目编号；一轮反思；不做多轮 epoch（会泄漏未来标签）；去重默认关（官方 AppWorld 配置同） |
+| APC（NeurIPS 2025） | 一个应用一份缓存，服务全部请求 → 所有智能体共用一份（原文如此） | 附录 B.4.3–B.4.5 提示词原文；关键词精确匹配；未命中且成功才写入；命中时由小模型逐轮改写模板；LRU 100；温度 0、max_tokens 4096；关键词与模板生成计入成本 | 搭“计划—执行”两级结构；需要比计划模型便宜约 10 倍的小模型（待定，见第 5 节）；“输出正确”= 验证分数优于参照；另跑 APC 自己的无缓存对照（原文的 Accuracy-Optimal） |
+| G-Memory（NeurIPS 2025） | 一个多智能体系统一份，所有智能体共用 → 所有智能体共用（原文如此） | 官方代码 `bingreeky/GMemory` 的记忆模块原样调用（需作者同意，仓库无 LICENSE），阈值与日程照其发布的设置（successful_topk 1、insights_topk 5 等） | 智能体之间不对话，交互图退化为工具调用链（官方运行中该层不被读回、角色定制默认关）；Resolved = 提交且验证分数优于参照；失败的工具调用 reward −1；只改写 ALFWorld 专用文字并公开差异 |
+| **MAVRA（本文）** | 所有智能体共用 | — | 共享对象扩展为按实体、相对种子时间窗口的特征定义，新增“不读种子时间之后的数据”条件（开工前另写增补方案） |
+
+附录（只在 rel-stack 上）：AWM（ICML 2025，每个智能体每个库一份，官方 `instruction.txt`）、ReasoningBank（ICLR 2026），
+以及敏感性实验“一个 ACE 智能体承担一个库上的全部会话”（仍是原文的单智能体用法）。
+原文本来就共享的只有 APC 与 G-Memory；“共享现有记忆仍要探索、会过期”由它们检验，不做任何单智能体方法的共享扩展。
+
+### 1.4 指标与分析方案
+
+1. token：每次 LLM 调用回报的输入 + 输出 token；记忆操作的 token 记在触发它的会话上；AgentSM 离线建库单列。
+2. 金额：按公开价格折算（APC 的节省来自换小模型，只看 token 对它不公平）。
+3. LLM 调用次数；工具调用次数，按类别：看结构（list/describe/join_path/check_join）、探查（run_sql）、验证、记忆查找、提交。
+4. 延迟：会话时间（第一次 LLM 调用到会话结束），拆为 LLM、SQL（探查与特征计算）、训练三部分。
+5. 质量：官方指标的测试分数，要求不劣于无记忆（分类 AUC 容差 0.01，回归 MAE 容差 2%，事先写定）；泄漏提交数；成功率（优于参照）。
+6. 节省来源：冷启动（库上第一个会话）/ 跨任务（某任务第一个截点、此前已有别的任务的会话）/ 跨截点（同一任务、数据追加之后）。
+7. 预先声明的比较：MAVRA 与每个基线在一个库全部会话的累计 token、累计会话时间上的差别；后几个截点每会话的 LLM 调用、
+   工具调用、token 与时间；质量不劣。每次运行的值都报告，给出 3 次的范围。
+
+### 1.5 规模
+
+主实验 7 组（无记忆、AgentSM、ACE、APC、APC 无缓存对照、G-Memory、MAVRA）× 3 个库 × 约 15 个会话 × 3 次 ≈ 950 个会话；
+AgentSM 离线建库每库 100 个合成会话；rel-stack 附录约 135 个会话。总 token 在 pilot 之后核算。
+
+## 2. Pilot 与门槛（先于全量；任何一条不过就停下分析、改设计，不排全量）
+
+- **P1：无记忆，rel-stack，1 次运行，15 个会话**（同一截点的 3 个会话并行，截点依次推进）。
+  门槛：(a) ≥ 13/15 个会话正常结束；(b) 每会话 LLM 调用中位数 ≥ 15（否则工作量不足以与 Text-to-SQL 区分）；
+  (c) 看结构 + 探查占工具调用 ≥ 30%；(d) ≥ 2/3 的会话验证分数优于参照；(e) 第 2 个起的会话里，看结构的调用
+  （同一工具、同一参数）有 ≥ 50% 在同一库更早的会话里出现过（共享的前提）。同时记录每会话 token、时间，用来核算预算。
+  k = K 的标签与官方 parquet 一致是 P1 的前置检查。
+- **P2：MAVRA，同一抽签**（实现 RelBench 扩展后，另写增补方案再跑）。门槛：从第 2 个截点起每会话 token ≤ 无记忆的 1/3，测试分数不劣。
+- **P3：每个基线 4 个会话的忠实性检查**：逐项核对行为与原文一致（ACE 手册按条目增长、APC 命中与未命中路径、
+  G-Memory 产生规则、AgentSM 检索返回探索段），记入复现说明。
+
+## 3. 实现
+
+- 数据准备 `tools/relbench/prepare.py`（下载文件 → 截点与标签 → 官方表一致性检查 → PostgreSQL 模板库）。
+- 会话框架 `tools/relbench/harness.py`（LLM 循环、工具、`validate_features`、测试评估、泄漏审计、逐次调用记录）。
+- 中间层 `serve` 增加 `--mode`（复用 metric-bench 的分组配置）与 `--no-etl`（RelBench 库没有零售表）。
+- Python 依赖装在 noctis `.pydeps-relbench`（psycopg 3.2.10、lightgbm 4.6.0；pandas、pyarrow、duckdb 系统已有）。
+
+## 4. 运行记录
+
+（按时间追加）
+
+## 5. 待定
+
+- APC 的小模型（网关上比 Flash 便宜约 10 倍的模型，或计划模型用 V4.1 Pro、小模型用 Flash）。
+- 用户发信：向 AgentSM 作者要代码（并问 n）；向 G-Memory 作者确认代码许可。

@@ -74,6 +74,12 @@ enum Cmd {
     Serve {
         #[arg(long, default_value = "127.0.0.1:8088")]
         addr: String,
+        /// 按 metric-bench 的分组名配置中间层（如 middle-alone）；不给时用默认配置
+        #[arg(long)]
+        mode: Option<String>,
+        /// 不做零售库的 ETL 初始化（RelBench 等其他库没有 store_returns）
+        #[arg(long)]
+        no_etl: bool,
     },
 }
 
@@ -111,9 +117,15 @@ async fn main() -> Result<()> {
                 _ => anyhow::bail!("未知动作 {action}（apply-v2 / reset / status）"),
             }
         }
-        Cmd::Serve { addr } => {
-            etl::setup(&admin).await?;
-            let mid = Arc::new(Middle::new(db, MiddleConfig { verbose: true, ..Default::default() }).await?);
+        Cmd::Serve { addr, mode, no_etl } => {
+            if !no_etl {
+                etl::setup(&admin).await?;
+            }
+            let cfg = match mode {
+                Some(m) => metricbench::config(&m).0,
+                None => MiddleConfig::default(),
+            };
+            let mid = Arc::new(Middle::new(db, MiddleConfig { verbose: true, ..cfg }).await?);
             server::serve(mid, &addr).await?;
         }
     }

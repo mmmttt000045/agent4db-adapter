@@ -15,9 +15,10 @@ Per task and cutoff, from scratch (nothing is kept across tasks or cutoffs):
   which the reference leaves out, are candidates of the empty path;
   integration quality IQ = share of training seeds with a non-null feature value (Definition 8);
   feature importance FI = utility gain of the fixed LightGBM on the rows the feature augments (Definition 7 with
-  Lemma 3): trained on 80% of the 50k training sample, scored on the other 20%, both restricted to those rows,
-  against the base table on the same rows; FI <= 0 is pruned and a min-heap keeps the H pairs with the largest
-  FI x IQ (Pruning Principle 2);
+  Lemma 3): trained on the seeds of 80% of the entities of the 50k training sample, scored on the seeds of the other
+  20%, both restricted to those rows, against the base table on the same rows; FI <= 0 is pruned and a min-heap keeps
+  the H pairs with the largest FI x IQ (Pruning Principle 2); only the H paths of a hop with the highest IQ are
+  extended (the released code's beam);
   exploitation: up to B features chosen greedily by FI x IQ with FeatPilot's weight decay on similar features.
 The chosen features and the reference columns form one feature SQL, scored once with Run.evaluate (validation and
 test) and audited with Run.audit. Validation seeds are used only for the reported validation score.
@@ -55,12 +56,14 @@ HEAP = 30  # heap size H: larger than the budget and a multiple of it (paper: "w
 BUDGET = 10  # feature budget B: the paper's largest (1, 5, 10)
 CAT_MAX_DISTINCT = 50  # text or integer columns with at most this many distinct values are categorical
 ONEHOT_TOP = 10  # one-hot over the most common values of a categorical column
-HOLDOUT = 0.2  # share of the training sample held out for FI
+HOLDOUT = 0.2  # share of the training sample's entities held out for FI
 SPLIT_SEED = 42
 SIM_EPS = 0.5  # weight decay: chosen features at least this similar (|Spearman|) count as neighbours
 MIN_TRAIN, MIN_HOLDOUT = 200, 50  # fewer augmented rows than this: FI not measurable (treated as no gain)
 PATH_TIMEOUT_S = 300  # statement timeout of one path's candidate query on the training sample
-FINAL_COST_S = 200  # estimated seconds of the final SQL on the larger of the validation and test seed tables
+# estimated seconds of the final SQL on the larger of the validation and test seed tables (the path query's time on the
+# training sample, measured with SQL_WORKERS queries side by side, scaled by the seed count; 4x the real time in the test)
+FINAL_COST_S = 400
 SQL_WORKERS = 4  # path queries of one hop run side by side
 NUMERIC = ("double precision", "real", "numeric")
 INTEGER = ("bigint", "integer", "smallint")
@@ -166,10 +169,13 @@ class Session:
         tr = seeds["train_sample"]
         self.keys = tr[[self.ec, "seed_time"]].copy()
         self.y = tr[self.yc].to_numpy()
-        n = len(tr)
-        perm = np.random.RandomState(SPLIT_SEED).permutation(n)
-        self.ho = np.zeros(n, dtype=bool)
-        self.ho[perm[:int(round(HOLDOUT * n))]] = True
+        # holdout = the seeds of a random 20% of the entities: the released code splits the base table by its id column
+        # (Dataset_splitter.new_map_split); a seed table repeats an entity at several seed times, and a random split of
+        # seeds would credit features that identify the entity
+        ents = np.sort(tr[self.ec].unique())
+        perm = np.random.RandomState(SPLIT_SEED).permutation(len(ents))
+        held = set(ents[perm[:int(round(HOLDOUT * len(ents)))]].tolist())
+        self.ho = tr[self.ec].isin(held).to_numpy()
         self.tr = ~self.ho
         self.base_cache = {}
         self.fi_trainings, self.fi_train_seconds = 0, 0.0
@@ -371,7 +377,7 @@ class Session:
                     p["pruned"] = "iq"  # Pruning Principle 1: the path and every extension of it
                     continue
                 if hop > 0:
-                    nxt.append(p["steps"])
+                    nxt.append((iq_path, pi))
                 for name in p["candidates"]:
                     v = vals[name]
                     cand = self.cands[name]
@@ -400,6 +406,11 @@ class Session:
                     else:
                         cand["pruned"] = "heap"
                     seq += 1
+            # the released code extends only the K paths of this hop with the highest IQ (K = the heap size)
+            nxt = sorted(nxt, key=lambda x: -x[0])
+            for _, pi in nxt[HEAP:]:
+                self.paths[pi]["pruned"] = "beam"
+            nxt = [self.paths[pi]["steps"] for _, pi in nxt[:HEAP]]
             self.hops.append({"hop": hop, "paths": len(todo), "kept_paths": len(nxt) if hop else 1,
                               "pruned_iq": sum(1 for pi in todo if self.paths[pi].get("pruned") == "iq"),
                               "errors": sum(1 for pi in todo if self.paths[pi].get("pruned") == "error"),
@@ -416,13 +427,14 @@ class Session:
 
     def exploit(self, pool):
         """Greedy choice of up to B features by FI x IQ, with FeatPilot's weight decay on similar chosen features."""
+        self.final_cost_estimate, self.cost_skipped = 0.0, []
         if not pool:
             self.decay = []
             return []
         vals = pd.DataFrame({n: self.vals[n] for n in pool})
         sim = vals.corr(method="spearman", min_periods=30).abs().fillna(0.0)
         scale = max(len(self.seeds["val"]), len(self.seeds["test"])) / len(self.seeds["train_sample"])
-        chosen, paths_in, cost, self.decay = [], set(), 0.0, []
+        chosen, paths_in, cost, self.decay, self.cost_skipped = [], set(), 0.0, [], []
         pool = list(pool)
         while len(chosen) < BUDGET and pool:
             best, best_sc, best_fi = None, 0.0, None
@@ -440,6 +452,7 @@ class Session:
             extra = 0.0 if pi in paths_in else (self.paths[pi].get("seconds") or 0.0) * scale
             if cost + extra > FINAL_COST_S:
                 self.cands[best]["pruned"] = "cost"  # the final SQL would not run within the statement limit
+                self.cost_skipped.append(best)
                 continue
             cost += extra
             paths_in.add(pi)
@@ -516,7 +529,7 @@ def session(run, c, graph_fn, t, k, seeds):
                       for p in s.paths],
             "heap": [{"name": n, "path": s.paths[s.cands[n]["path"]]["label"], "agg": s.cands[n]["agg"], "col": s.cands[n]["col"],
                       "value": s.cands[n]["value"], "fi": s.cands[n]["fi"], "iq": s.cands[n]["iq"], "score": sc} for sc, _, n in s.heap],
-            "selected": s.decay, "chosen": chosen,
+            "selected": s.decay, "chosen": chosen, "cost_skipped": s.cost_skipped,
         }
     except Exception as err:  # noqa: BLE001 - the session is saved with its error; the run goes on and is not "finished"
         rec["error"] = f"{type(err).__name__}: {str(err)[:1000]}"

@@ -124,8 +124,11 @@ class Llm:
         return self.local.s
 
     def _post(self, body):
+        """One reply; also the number of failed attempts and the seconds they took (gateway stalls, reported apart)."""
         failures = limited = 0
+        lost = 0.0
         while True:
+            t0 = time.time()
             try:
                 r = self.http.post(f"{self.base}/chat/completions", json=body, timeout=300,
                                    headers={"Authorization": f"Bearer {self.key}"})
@@ -134,27 +137,31 @@ class Llm:
                 if failures > 3:
                     raise RuntimeError(f"request failed: {e}")
                 time.sleep(2 ** failures)
+                lost += time.time() - t0
                 continue
             if r.status_code == 200:
                 try:
-                    return r.json()
+                    return r.json(), failures + limited, lost
                 except ValueError:
                     failures += 1
                     if failures > 3:
                         raise RuntimeError(f"non-JSON 200: {r.text[:300]}")
                     time.sleep(2 ** failures)
+                    lost += time.time() - t0
                     continue
             if r.status_code == 429:
                 limited += 1
                 if limited > 8:
                     raise RuntimeError(f"HTTP 429 after 8 retries: {r.text[:300]}")
                 time.sleep(min(120, int(r.headers.get("retry-after", 5 * 2 ** (limited - 1)))) + random.random() * 2)
+                lost += time.time() - t0
                 continue
             if r.status_code >= 500:
                 failures += 1
                 if failures > 3:
                     raise RuntimeError(f"HTTP {r.status_code}: {r.text[:300]}")
                 time.sleep(2 ** failures)
+                lost += time.time() - t0
                 continue
             raise RuntimeError(f"HTTP {r.status_code}: {r.text[:500]}")
 
@@ -166,13 +173,16 @@ class Llm:
             body["tools"] = tools
         if temperature is not None:
             body["temperature"] = temperature
-        discarded, wasted = 0, 0
+        discarded, wasted, retries, lost = 0, 0, 0, 0.0
         t0 = time.time()
         for _ in range(15):
-            v = self._post(body)
+            t1 = time.time()
+            v, n, secs = self._post(body)
+            retries, lost = retries + n, lost + secs
             if self.require and v.get("model") != self.require:
                 discarded += 1
                 wasted += (v.get("usage") or {}).get("total_tokens", 0)
+                lost += time.time() - t1 - secs
                 continue
             u = v.get("usage") or {}
             msg = v["choices"][0]["message"]
@@ -187,6 +197,9 @@ class Llm:
                 "seconds": time.time() - t0,
                 "discarded": discarded,
                 "discarded_tokens": wasted,
+                # failed attempts and replies from another model: time the gateway lost, included in "seconds"
+                "retries": retries,
+                "retry_seconds": lost,
             }
         raise RuntimeError(f"no reply from {self.require} in 15 rounds ({discarded} discarded)")
 
@@ -879,6 +892,7 @@ Shared memory: agents on this database publish verified feature definitions and 
             "input_tokens": sum(x["input_tokens"] for x in rec["llm"] + sub_calls),
             "output_tokens": sum(x["output_tokens"] for x in rec["llm"] + sub_calls),
             "llm_seconds": sum(x["seconds"] for x in rec["llm"] + sub_calls),
+            "llm_retry_seconds": sum(x.get("retry_seconds", 0) for x in rec["llm"] + sub_calls),
             "tool_seconds": sum(x["seconds"] for x in rec["tools"]),
             "validation_sql_seconds": sum(x.get("sql_seconds", 0) for x in rec["validations"]),
             "validation_train_seconds": sum(x.get("train_seconds", 0) for x in rec["validations"]),

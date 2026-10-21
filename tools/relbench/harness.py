@@ -732,19 +732,31 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                         xva, s2 = features(self.url, sql, f"task.{tname(t)}_val", seeds["val"], ec)
                         p, imp, tt = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xva)
                         val = score(e["task_type"], seeds["val"][yc], p)
-                        improved = better(val)
+                        # leak check at validation time (README §1.2, 10-21): a leaking validation does not count, so that
+                        # neither the goal nor the best score can be reached with data after seed_time
+                        ta = time.time()
+                        leak = self.audit(t, k, sql, seeds)
+                        audit_s = time.time() - ta
+                        leaking = leak.get("result") == "leak"
+                        improved = (not leaking) and better(val)
                         if improved:
                             best, best_sql, streak = val, sql, 0
-                        else:
+                        elif not leaking:
                             streak += 1
                         rec["validations"].append({"tool_i": entry["i"], "val": val, "improved": improved, "sql_seconds": s1 + s2,
-                                                   "train_seconds": tt, "n_features": xtr.shape[1], "sql": sql,
-                                                   "importance": [c for c, _ in imp[:30]]})
-                        out = {f"validation_{metric}": round(val, 5), "best_so_far": round(best, 5), "improved": improved,
+                                                   "train_seconds": tt, "audit_seconds": audit_s, "leak": leaking,
+                                                   "leaking_columns": leak.get("columns_differing"), "n_features": xtr.shape[1],
+                                                   "sql": sql, "importance": [c for c, _ in imp[:30]]})
+                        out = {f"validation_{metric}": round(val, 5), "improved": improved,
                                "n_features": xtr.shape[1], "train_rows": len(xtr), "val_rows": len(xva),
                                "top_features_by_gain": imp[:15],
                                "validations_left": MAX_VALIDATIONS - len(rec["validations"])}
-                        entry.update(sql_seconds=s1 + s2, train_seconds=tt)
+                        if best is not None:
+                            out["best_so_far"] = round(best, 5)
+                        if leaking:
+                            out["leak"] = {"counted": False, "columns_reading_data_after_seed_time": leak.get("columns_differing"),
+                                           "note": "these columns change when rows after seed_time are hidden; this validation does not count"}
+                        entry.update(sql_seconds=s1 + s2, train_seconds=tt, audit_seconds=audit_s)
                     except FeatureError as err:
                         # a failed validation uses one of the validations but does not count as "no improvement"
                         out = {"error": str(err), "validations_left": MAX_VALIDATIONS - len(rec["validations"]) - 1}
@@ -759,8 +771,12 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                 elif name == "submit":
                     entry["category"] = "submit"
                     sql = args.get("sql") or best_sql
+                    leak = self.audit(t, k, sql, seeds) if sql and sql != best_sql else {}
                     if not sql:
                         out = {"error": "nothing validated yet; validate features first or pass sql"}
+                    elif leak.get("result") == "leak":
+                        out = {"error": "not submitted: these features read rows after seed_time",
+                               "columns_reading_data_after_seed_time": leak.get("columns_differing")}
                     else:
                         submitted, stop = sql, "submitted"
                         if args.get("bullet_ids"):

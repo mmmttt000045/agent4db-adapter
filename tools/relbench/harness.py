@@ -14,6 +14,7 @@ Run on noctis (repo root), without the dead local proxy:
 """
 import argparse
 import concurrent.futures as cf
+import glob
 import json
 import os
 import random
@@ -412,6 +413,16 @@ class Run:
         self.llm = Llm(self.env)
         self.arm = ARMS[a.arm]
         self.refs = {}
+        # retraining goal (README §1.2, 10-21): task -> (cutoff, best validation score) of this run's latest session
+        self.prev_best = {}
+        if a.targets_from:
+            first = min(int(x) for x in a.cutoffs) if a.cutoffs else 1
+            for f in glob.glob(os.path.join(a.targets_from, "sessions", "*.json")):
+                if f.endswith(".partial.json"):
+                    continue
+                r0 = json.load(open(f))
+                if r0["k"] == first - 1 and r0.get("best_val") is not None:
+                    self.prev_best[r0["task"]] = (r0["k"], r0["best_val"])
         self.playbooks = {}  # ACE: agent -> playbook text
         self.ace_steps = {}
         self.gmem = None
@@ -571,7 +582,9 @@ Seed tables: task.{tname(t)}_train (labelled training seeds, {len(seeds['train']
 Feature SQL contract: one SELECT statement that uses {{seeds}} as the seed table (columns {ec}, seed_time) and returns exactly one row per seed row, with {ec} and seed_time as the first two columns followed by numeric feature columns (at most {MAX_FEATURES}). A feature may only use rows whose time is at or before the seed row's seed_time; using later rows is leakage and makes the features invalid.
 
 Tools: list_tables, describe_table, join_path, check_join and run_sql explore the database; the first four cover the tables in schema public, and the seed tables are read with run_sql (read-only, at most 50 rows returned). validate_features(sql) computes your features on a {SAMPLE_SIZE}-row training sample and on the validation seeds, trains the model and returns the validation {metric}. submit(sql) ends the session with your final features.
-Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; the session also ends after {PATIENCE} validations in a row without improvement. If you do not submit, your best validated features are used.""" + (f"""
+Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; the session also ends after {PATIENCE} validations in a row without improvement. If you do not submit, your best validated features are used.""" + (
+            f"\n\nRetraining goal: at the previous cutoff ({e['cutoffs'][k - 2]['test_timestamp'][:10]}) this task's model reached validation {metric} "
+            f"{self.target(t, k):.5f}; the session ends as soon as your features reach that score." if self.target(t, k) is not None else "") + (f"""
 
 Shared memory: agents on this database publish verified feature definitions. Start with find_program (this task's verified program from an earlier cutoff, with its feature SQL) and find_features (definitions for the entity table, with a feature SQL of them for these seed tables). If they return a feature SQL, validate it first; explore the tables and extend the SQL only to improve on it. compose_features compiles chosen definitions (by key) into a feature SQL.""" if self.arm.get("feature_memory") else "") + (
             "\n\nMemory: retrieve_trajectory returns how the most similar earlier task on this database was explored; call it before you start. "
@@ -580,6 +593,11 @@ Shared memory: agents on this database publish verified feature definitions. Sta
             "\n\n" + open(os.path.join(ACE_DIR, "appworld_playbook_block.txt")).read().replace(
                 "{{ playbook }}", self.playbooks.get(f"{tname(t)}-agent", ACE_EMPTY_PLAYBOOK)).rstrip()
             + "\nWhen you call validate_features or submit, list in bullet_ids the playbook bullets you used." if self.arm.get("ace") else "")
+
+    def target(self, t, k):
+        """The previous cutoff's best validation score of this task in this run (none at the first cutoff)."""
+        prev = self.prev_best.get(t)
+        return prev[1] if prev and prev[0] == k - 1 else None
 
     def tool_specs(self):
         def fn(name, desc, props, req):
@@ -613,7 +631,7 @@ Shared memory: agents on this database publish verified feature definitions. Sta
         sid = f"{self.a.arm}-r{self.a.run}-{tname(t)}-k{k}"
         metric, higher = metric_of(e["task_type"])
         ec, yc = e["entity_col"].lower(), e["target_col"].lower()
-        rec = {"arm": self.a.arm, "run": self.a.run, "task": t, "k": k, "agent": agent, "session": sid, "metric": metric,
+        rec = {"arm": self.a.arm, "run": self.a.run, "task": t, "k": k, "agent": agent, "session": sid, "metric": metric, "target": self.target(t, k),
                "higher_is_better": higher, "llm": [], "tools": [], "validations": [], "stop": None, "error": None}
         task_line = f"Build features for {t} at cutoff {e['cutoffs'][k - 1]['test_timestamp'][:10]}."
         msgs = [{"role": "system", "content": self.system_prompt(t, k, seeds)}, {"role": "user", "content": task_line}]
@@ -731,7 +749,10 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                         # a failed validation uses one of the validations but does not count as "no improvement"
                         out = {"error": str(err), "validations_left": MAX_VALIDATIONS - len(rec["validations"]) - 1}
                         rec["validations"].append({"tool_i": entry["i"], "error": str(err)[:500], "sql": sql})
-                    if len(rec["validations"]) >= MAX_VALIDATIONS:
+                    goal = self.target(t, k)
+                    if goal is not None and best is not None and (best >= goal if higher else best <= goal):
+                        stop = "reached_previous"
+                    elif len(rec["validations"]) >= MAX_VALIDATIONS:
                         stop = "validation_budget"
                     elif streak >= PATIENCE and best is not None:
                         stop = "patience"
@@ -761,6 +782,8 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                 rec["stop"] = stop
                 break
         rec["agent_seconds"] = time.time() - t_start
+        if best is not None:
+            self.prev_best[t] = (k, best)
         rec["final_sql"] = submitted or best_sql
         rec["final_source"] = "submitted" if submitted else ("best_validated" if best_sql else None)
         rec["best_val"] = best
@@ -1028,6 +1051,7 @@ def main():
     ap.add_argument("--port", type=int)
     ap.add_argument("--keep-db", action="store_true")
     ap.add_argument("--agentsm-memory", help="memory.json from tools/relbench/agentsm.py build (arm agentsm)")
+    ap.add_argument("--targets-from", help="run folder whose sessions at the cutoff before the first one give the retraining goals")
     ap.add_argument("--smoke", action="store_true", help="pipeline check only: 8 LLM calls, 2 validations; results are not used")
     a = ap.parse_args()
     if a.smoke:

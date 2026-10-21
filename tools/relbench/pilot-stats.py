@@ -14,7 +14,7 @@ import json
 import os
 import statistics
 
-NORMAL = {"submitted", "patience", "validation_budget", "llm_budget"}
+NORMAL = {"submitted", "patience", "validation_budget", "llm_budget", "reached_previous"}
 
 
 def key(t):

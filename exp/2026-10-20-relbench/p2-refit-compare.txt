@@ -1,0 +1,54 @@
+task              k |  tok none   tok mem     x |     llm |   tools |         sec | test none  test mem | pub
+post-votes        1 |    218037    132439   1.6 |  17/11  |  35/31  |  1014/281   |    0.0650    0.0643 | 8
+user-badge        1 |    192830    424564   0.5 |  12/18  |  25/33  |   346/1291  |    0.8442    0.8271 | 3
+user-engagement   1 |     95320    443283   0.2 |   9/23  |  26/44  |   219/1153  |    0.8786    0.8802 | 12
+post-votes        2 |    470398     27808  16.9 |  26/2   |  56/4   |   812/26    |    0.0709    0.0693 | 8
+user-badge        2 |    167384     45799   3.7 |  16/2   |  27/6   |   367/213   |    0.8507    0.8308 | 5
+user-engagement   2 |    100813     30394   3.3 |  11/2   |  35/3   |   168/454   |    0.8682    0.8712 | 10
+post-votes        3 |    103626     18592   5.6 |  11/2   |  32/4   |   287/27    |    0.0622    0.0615 | 8
+user-badge        3 |    212325     43027   4.9 |  16/2   |  32/5   |   330/519   |    0.8574    0.8351 | 7
+user-engagement   3 |    111662     33004   3.4 |  13/2   |  31/4   |   182/158   |    0.8900    0.8898 | 10
+post-votes        4 |    139996     84126   1.7 |  18/6   |  35/17  |   238/37    |    0.0610    0.0606 | 7
+user-badge        4 |    249442     39394   6.3 |  13/2   |  29/6   |   595/217   |    0.8633    0.8588 | 4
+user-engagement   4 |    500947     31659  15.8 |  23/2   |  42/4   |   850/465   |    0.8926    0.8925 | 10
+post-votes        5 |    473390     25347  18.7 |  30/2   |  54/4   |   386/328   |    0.0656    0.0660 | 8
+user-badge        5 |    298100     89000   3.3 |  22/5   |  36/9   |   500/536   |    0.8525    0.8263 | 4
+user-engagement   5 |    260965    647445   0.4 |  16/16  |  30/29  |  1153/1635  |    0.8929    0.8910 | 9
+{
+ "late_sessions": 12,
+ "late_tokens_none": 3089048,
+ "late_tokens_memory": 1115595,
+ "late_token_ratio": 0.361,
+ "tokens_pass": false,
+ "llm_calls_late": [
+  215,
+  45
+ ],
+ "tool_calls_late": [
+  439,
+  95
+ ],
+ "agent_seconds_late": [
+  5868,
+  4614
+ ],
+ "quality": {
+  "post-votes": {
+   "none": 0.0649,
+   "memory": 0.0643,
+   "not_worse": true
+  },
+  "user-badge": {
+   "none": 0.8536,
+   "memory": 0.8356,
+   "not_worse": false
+  },
+  "user-engagement": {
+   "none": 0.8845,
+   "memory": 0.8849,
+   "not_worse": true
+  }
+ },
+ "quality_pass": false,
+ "leaks_memory": 0
+}

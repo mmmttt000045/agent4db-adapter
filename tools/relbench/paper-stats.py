@@ -71,11 +71,22 @@ def main():
     a = ap.parse_args()
     macros, table = {}, []
     work = []
+    # every macro exists from the start ("--" until its runs finish), so the paper compiles at any time
+    for db, (pre, _) in RUNS.items():
+        for m in ("Sessions", "Late", "BestBaseline", "MavraVsBest", "MavraSpeedVsBest"):
+            macros[f"Rb{pre}{m}"] = "--"
+        for _, name, _ in ARMS:
+            for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "QA", "QB", "QC"):
+                macros[f"Rb{pre}{name}{m}"] = "--"
+    for m in ("RbNoneMedLlm", "RbNoneMedTok", "RbSchemaProbe", "RbSchemaRepeat"):
+        macros[m] = "--"
     for db, (pre, pattern) in RUNS.items():
         paths = {arm: pattern.format(arm=arm) for arm, _, _ in ARMS}
         done = {arm: p for arm, p in paths.items() if finished(p)}
         data = {arm: cs.load(p) for arm, p in done.items()}
         if "none" not in data:
+            table.append(f"\\multicolumn{{10}}{{@{{}}l}}{{\\textit{{{db}}}: running}}\\\\")
+            table.append("\\midrule")
             continue
         keys = sorted(set.intersection(*(set(d) for d in data.values())), key=lambda x: (x[1], x[0]))
         late = [k for k in keys if k[1] >= 2]
@@ -88,7 +99,7 @@ def main():
         rows = {}
         for arm, name, label in ARMS:
             if arm not in data:
-                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave"):
+                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore"):
                     macros[f"Rb{pre}{name}{m}"] = "--"
                 for i, _ in enumerate(tasks):
                     macros[f"Rb{pre}{name}Q{LETTERS[i]}"] = "--"
@@ -97,7 +108,9 @@ def main():
             d = data[arm]
             tok = sum(d[k]["tokens"] for k in late)
             sec = sum(d[k]["agent_s"] for k in late)
+            explore = sum(d[k]["by_cat"].get("schema", 0) + d[k]["by_cat"].get("probe", 0) for k in late)
             r = {"tok": tok, "tokx": tok / base["tokens"], "llm": sum(d[k]["llm"] for k in late), "tools": sum(d[k]["tools"] for k in late),
+                 "explore": explore, "explore_per": explore / len(late) if late else 0,
                  "min": sec / 60, "speed": base["agent_s"] / sec if sec else float("nan"),
                  "cost": sum(d[k]["cost"]["offpeak"] for k in late), "test": {}}
             for t in tasks:
@@ -107,7 +120,8 @@ def main():
             macros.update({f"Rb{pre}{name}Tok": f"{tok / 1e6:.2f}", f"Rb{pre}{name}TokX": f"{r['tokx']:.2f}",
                            f"Rb{pre}{name}Llm": str(r["llm"]), f"Rb{pre}{name}Tools": str(r["tools"]),
                            f"Rb{pre}{name}Min": f"{r['min']:.0f}", f"Rb{pre}{name}Speed": f"{r['speed']:.1f}",
-                           f"Rb{pre}{name}Cost": f"{r['cost']:.2f}", f"Rb{pre}{name}TokSave": f"{100 * (1 - r['tokx']):.0f}"})
+                           f"Rb{pre}{name}Cost": f"{r['cost']:.2f}", f"Rb{pre}{name}TokSave": f"{100 * (1 - r['tokx']):.0f}",
+                           f"Rb{pre}{name}Explore": f"{r['explore_per']:.1f}"})
             for i, t in enumerate(tasks):
                 v = r["test"][t]
                 macros[f"Rb{pre}{name}Q{LETTERS[i]}"] = "--" if v is None else (f"{v:.4f}" if v < 1 else f"{v:.2f}")
@@ -119,13 +133,13 @@ def main():
             macros[f"Rb{pre}MavraVsBest"] = f"{100 * (1 - rows['mavra']['tok'] / rows[best]['tok']):.0f}"
             macros[f"Rb{pre}MavraSpeedVsBest"] = f"{(sum(data[best][k]['agent_s'] for k in late) / sum(data['mavra'][k]['agent_s'] for k in late)):.1f}"
         # table panel
-        table.append(f"\\multicolumn{{9}}{{@{{}}l}}{{\\textit{{{db}}} ({len(late)} sessions from cutoff 2; test: "
+        table.append(f"\\multicolumn{{10}}{{@{{}}l}}{{\\textit{{{db}}} ({len(late)} sessions from cutoff 2; test: "
                      + ", ".join(f"{TASK_SHORT.get(t, t)} {'AUC' if data['none'][next(k for k in keys if k[0] == t)]['higher'] else 'MAE'}" for t in tasks)
                      + ")}\\\\")
         for arm, name, label in ARMS:
             r = rows.get(arm)
             if r is None:
-                table.append(f"{label} & \\multicolumn{{8}}{{c}}{{(running)}}\\\\")
+                table.append(f"{label} & \\multicolumn{{9}}{{c}}{{(running)}}\\\\")
                 continue
             tests = " & ".join("--" if r["test"][t] is None else (f"{r['test'][t]:.3f}" if r["test"][t] < 1 else f"{r['test'][t]:.2f}") for t in tasks)
             table.append(f"{label} & {r['tok'] / 1e6:.2f} & {r['tokx']:.2f} & {r['llm']} & {r['tools']} & {r['min']:.0f} & {r['cost']:.2f} & {tests}\\\\")

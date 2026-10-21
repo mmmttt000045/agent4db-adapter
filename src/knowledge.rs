@@ -112,6 +112,10 @@ pub struct EntityRef {
     /// 为空时 via 直接等于种子的实体键
     #[serde(default)]
     pub anchor: Option<String>,
+    /// 种子在窗口内没有行时的取值：提交的 SQL 用 coalesce(列, 常数) 给这样的种子填的常数（如“距上次……多少天”无记录时的 9999）；
+    /// 为空时按 empty 规则
+    #[serde(default)]
+    pub fill: Option<f64>,
 }
 
 impl EntityRef {

@@ -351,7 +351,9 @@ def copy_rows(con, table, df):
                 if part[c].dtype == object:
                     part[c] = part[c].map(lambda v: v.replace("\x00", "") if isinstance(v, str) else v)
             buf = io.StringIO()
-            part.to_csv(buf, index=False, header=False, na_rep="\\N", date_format="%Y-%m-%d %H:%M:%S.%f")
+            # rows end with CR LF so that the csv writer quotes every text with a bare CR as well as LF (rel-amazon reviews have
+            # both; an unquoted CR ends the COPY with "unquoted carriage return found in data")
+            part.to_csv(buf, index=False, header=False, na_rep="\\N", date_format="%Y-%m-%d %H:%M:%S.%f", lineterminator="\r\n")
             cp.write(buf.getvalue())
 
 

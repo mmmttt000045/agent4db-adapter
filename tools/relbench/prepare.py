@@ -88,7 +88,9 @@ def copy_frame(cur, table, df):
                 elif pd.api.types.is_integer_dtype(part[c].dtype) and str(part[c].dtype)[0] == "I":
                     part[c] = part[c].astype(object)
             buf = io.StringIO()
-            part.to_csv(buf, index=False, header=False, na_rep="\\N", date_format="%Y-%m-%d %H:%M:%S.%f")
+            # rows end with CR LF so that the csv writer quotes every text with a bare CR as well as LF (rel-amazon reviews have
+            # both; an unquoted CR ends the COPY with "unquoted carriage return found in data")
+            part.to_csv(buf, index=False, header=False, na_rep="\\N", date_format="%Y-%m-%d %H:%M:%S.%f", lineterminator="\r\n")
             cp.write(buf.getvalue())
 
 

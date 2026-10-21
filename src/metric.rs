@@ -475,7 +475,11 @@ pub fn feature_lateral(m: &Metric, alias: &str, seed_key: &str) -> Result<String
     }
     // 度量里未限定的 seed_time 是这个种子的时间
     let measure = seed_time_re().replace_all(&m.measure, "${1}s.seed_time").to_string();
-    let expr = if m.empty == EmptyRule::Zero { format!("coalesce({measure}, 0)") } else { measure };
+    let expr = match e.fill {
+        Some(v) if v.is_finite() => format!("coalesce({measure}, {v})"),
+        _ if m.empty == EmptyRule::Zero => format!("coalesce({measure}, 0)"),
+        _ => measure,
+    };
     Ok(format!("left join lateral (select ({expr})::double precision as v from {from} where {}) {alias} on true", wheres.join(" and ")))
 }
 
@@ -932,7 +936,8 @@ left 是 fact 或列表中前面已关联的表；必须与已验证关联的方
 - entity：{\"table\": 任务的实体表, \"key\": 实体主键, \"via\": \"表.列\"（在 fact 或 joins 到达的表上）, \"window_days\": 回看天数或 null（全部历史）, \
 \"anchor\": null 或实体表上的一列}；via 等于实体键时 anchor 为 null；聚合的是关联实体时（如帖子作者的徽章：实体表 posts，fact badges，via badges.userid），\
 anchor 写实体表上指向它的列（owneruserid），表示 via 等于种子那一行实体的这一列\n\
-- empty：计数类写 \"zero\"，其余写 \"null\"";
+- empty：计数类写 \"zero\"，其余写 \"null\"；提交的 SQL 用 coalesce(列, 常数) 给没有行的种子填值时（如距上次……多少天无记录取 9999），\
+在 entity 里另写 \"fill\": 该常数";
 
 #[derive(Debug)]
 pub struct FeatureDraft {
@@ -1127,7 +1132,7 @@ pub async fn propose(p: &Provider, input: &Value, max_attempts: u32) -> Proposal
 mod tests {
     use super::*;
     use crate::catalog::{Column, Table};
-    use crate::knowledge::JoinRef;
+    use crate::knowledge::{EntityRef, JoinRef};
 
     #[test]
     fn compile_key_range_filters_by_date_key_bounds_without_joining_the_dimension() {
@@ -1187,6 +1192,16 @@ mod tests {
         owner.entity.as_mut().unwrap().anchor = Some("owneruserid".into());
         let sql = feature_lateral(&owner, "f0", "postid").unwrap();
         assert!(sql.contains("posts.owneruserid = (select ent.owneruserid from posts ent where ent.id = s.postid)"), "{sql}");
+        // a seed with no rows takes the constant the submitted SQL filled in (coalesce(days_since_last, 9999))
+        let mut filled = recency.clone();
+        filled.entity.as_mut().unwrap().fill = Some(9999.0);
+        let sql = feature_lateral(&filled, "f0", "owneruserid").unwrap();
+        assert!(
+            sql.contains("(coalesce(extract(epoch from (s.seed_time - max(votes.creationdate))) / 86400, 9999))::double precision"),
+            "{sql}"
+        );
+        let parsed: EntityRef = serde_json::from_str(r#"{"table": "users", "key": "id", "via": "votes.userid", "fill": -1}"#).unwrap();
+        assert_eq!(parsed.fill, Some(-1.0));
     }
 
     #[test]

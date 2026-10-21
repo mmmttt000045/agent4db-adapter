@@ -8,11 +8,24 @@ the test score not worse (classification AUC within 0.01, regression MAE within 
   python3 tools/relbench/compare-stats.py results/relbench-pilot/none-r1,results/relbench-pilot/none-r1-k45 results/relbench-pilot/mavra-r1
 (a comma joins the folders of one run, e.g. a run resumed at a later cutoff)
 """
+import collections
 import glob
 import json
 import os
 import statistics
 import sys
+
+
+# DeepSeek's price per million tokens, CNY (10-21): input cache hit, input cache miss, output; off-peak and peak
+PRICES = {"offpeak": (0.02, 1.0, 4.0), "peak": (0.04, 2.0, 8.0)}
+
+
+def cost(calls, extra_in, extra_out, prices):
+    """Agent calls priced with their cache hits; memory operations (no cache figures) priced as cache misses."""
+    hit, miss, out = prices
+    c = sum((x.get("cached_tokens") or 0) * hit + (x["input_tokens"] - (x.get("cached_tokens") or 0)) * miss + x["output_tokens"] * out
+            for x in calls)
+    return (c + extra_in * miss + extra_out * out) / 1e6
 
 
 def load(runs):
@@ -21,7 +34,13 @@ def load(runs):
     for f in files:
         s = json.load(open(f))
         tot = s["totals"]
+        lr = s.get("learning") or {}
+        calls = (s.get("llm") or []) + (s.get("llm_sub") or [])
         out[(s["task"], s["k"])] = {
+            "cost": {name: cost(calls, lr.get("input_tokens", 0), lr.get("output_tokens", 0), pr) for name, pr in PRICES.items()},
+            "goal": s.get("target"), "goal_why": (s.get("target_detail") or {}).get("why"), "goal_reached": bool(s.get("goal_reached")),
+            "eval_error": (s.get("eval") or {}).get("error"), "learn_error": lr.get("error"),
+            "retry_s": tot.get("llm_retry_seconds", 0),
             "tokens": tot.get("tokens_with_learning", tot["tokens"]), "agent_tokens": tot["tokens"],
             "learn_tokens": tot.get("learn_tokens", 0), "llm": tot["llm_calls"], "tools": tot["tool_calls"],
             # agent time without the leak audit (evaluation machinery; older runs counted it in agent_seconds)
@@ -65,7 +84,22 @@ def main():
         "quality": quality, "quality_pass": all(q["not_worse"] for q in quality.values()) if quality else False,
         "leaks_memory": sum(1 for k in keys if other[k]["audit"] == "leak"),
     }
-    print(json.dumps(gate, indent=1))
+    gate["cost_cny_late"] = {name: [round(sum(base[k]["cost"][name] for k in late), 2), round(sum(other[k]["cost"][name] for k in late), 2)]
+                             for name in PRICES}
+    # what to check before trusting the numbers: sessions cut short, goals missing, scores missing, memory errors
+    health = {}
+    for label, d in (("none", base), ("memory", other)):
+        health[label] = {
+            "stops": dict(collections.Counter(d[k]["stop"] for k in keys)),
+            "goal_reached": sum(1 for k in late if d[k]["goal_reached"]),
+            "no_goal": {f"{k[0]} k{k[1]}": d[k]["goal_why"] for k in late if d[k]["goal"] is None},
+            "missing_test": [f"{k[0]} k{k[1]}" for k in keys if d[k]["test"] is None],
+            "eval_errors": {f"{k[0]} k{k[1]}": d[k]["eval_error"][:120] for k in keys if d[k]["eval_error"]},
+            "learn_errors": {f"{k[0]} k{k[1]}": str(d[k]["learn_error"])[:120] for k in keys if d[k]["learn_error"]},
+            "gateway_retry_seconds": round(sum(d[k]["retry_s"] for k in keys)),
+        }
+    gate["health"] = health
+    print(json.dumps(gate, indent=1, ensure_ascii=False))
 
 
 if __name__ == "__main__":

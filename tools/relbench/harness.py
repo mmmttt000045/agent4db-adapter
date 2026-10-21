@@ -68,6 +68,7 @@ FEATURE_SQL_TIMEOUT_S = 600
 AUDIT_SEEDS = 2000  # seeds for the reproduction check of MAVRA's learning
 AUDIT_LEAK_SEEDS = 5000  # seeds of the leak audit (latest training seed time); 500 in the pilot missed leaks
 IDLE_RECONNECT_S = 30  # a new connection to the gateway after this long without a request
+LLM_RETRIES = 12  # failed requests per call before the run stops (backoff up to 60 s: about 8 minutes)
 POST_GOAL_LLM_CALLS = 5  # after the goal: one more validation within this many model calls (README §1.2, rule B)
 LGB_PARAMS = dict(n_estimators=300, learning_rate=0.05, num_leaves=63, min_child_samples=20, colsample_bytree=0.8,
                   subsample=0.8, subsample_freq=1, random_state=42, deterministic=True, force_row_wise=True,
@@ -91,6 +92,14 @@ FEATURE_TOOLS = ("find_features", "compose_features", "find_program")
 LOCK = threading.Lock()
 
 
+PUBLIC_RE = re.compile(r'(?<![\w"])"?public"?\s*\.', re.I)
+
+
+def in_schema(sql, schema):
+    """Point tables named as public.x (or "public".x) at another schema, e.g. views that hide later rows."""
+    return PUBLIC_RE.sub(f"{schema}.", sql)
+
+
 def log(msg):
     with LOCK:
         print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
@@ -112,6 +121,10 @@ def load_env(path=".env"):
 
 # provider name -> (.env prefix, default base URL), as OPENAI_PROFILES in src/llm.rs; since 10-21 every run uses DeepSeek's own API
 PROVIDERS = {"deepseek": ("DEEPSEEK", "https://api.deepseek.com"), "river": ("RIVER", "https://api.river.ai/v1")}
+
+class LlmUnavailable(RuntimeError):
+    """The model service failed after all retries (or refused a request): the run stops instead of recording a cut session."""
+
 
 class Llm:
     def __init__(self, env, provider="deepseek"):
@@ -155,9 +168,9 @@ class Llm:
                                    headers={"Authorization": f"Bearer {self.key}"})
             except requests.RequestException as e:
                 failures += 1
-                if failures > 3:
-                    raise RuntimeError(f"request failed: {e}")
-                time.sleep(2 ** failures)
+                if failures > LLM_RETRIES:
+                    raise LlmUnavailable(f"request failed: {e}")
+                time.sleep(min(60, 2 ** failures))
                 lost += time.time() - t0
                 continue
             if r.status_code == 200:
@@ -165,26 +178,26 @@ class Llm:
                     return r.json(), failures + limited, lost
                 except ValueError:
                     failures += 1
-                    if failures > 3:
-                        raise RuntimeError(f"non-JSON 200: {r.text[:300]}")
-                    time.sleep(2 ** failures)
+                    if failures > LLM_RETRIES:
+                        raise LlmUnavailable(f"non-JSON 200: {r.text[:300]}")
+                    time.sleep(min(60, 2 ** failures))
                     lost += time.time() - t0
                     continue
             if r.status_code == 429:
                 limited += 1
                 if limited > 8:
-                    raise RuntimeError(f"HTTP 429 after 8 retries: {r.text[:300]}")
+                    raise LlmUnavailable(f"HTTP 429 after 8 retries: {r.text[:300]}")
                 time.sleep(min(120, int(r.headers.get("retry-after", 5 * 2 ** (limited - 1)))) + random.random() * 2)
                 lost += time.time() - t0
                 continue
             if r.status_code >= 500:
                 failures += 1
-                if failures > 3:
-                    raise RuntimeError(f"HTTP {r.status_code}: {r.text[:300]}")
-                time.sleep(2 ** failures)
+                if failures > LLM_RETRIES:
+                    raise LlmUnavailable(f"HTTP {r.status_code}: {r.text[:300]}")
+                time.sleep(min(60, 2 ** failures))
                 lost += time.time() - t0
                 continue
-            raise RuntimeError(f"HTTP {r.status_code}: {r.text[:500]}")
+            raise LlmUnavailable(f"HTTP {r.status_code}: {r.text[:500]}")
 
     def chat(self, messages, tools=None, temperature=None):
         body = {"model": self.model, "messages": messages}
@@ -224,7 +237,7 @@ class Llm:
                 "retries": retries,
                 "retry_seconds": lost,
             }
-        raise RuntimeError(f"no reply from {self.require} in 15 rounds ({discarded} discarded)")
+        raise LlmUnavailable(f"no reply from {self.require} in 15 rounds ({discarded} discarded)")
 
 
 # ───────────────────────── middle layer ─────────────────────────
@@ -598,7 +611,7 @@ class Run:
         sub = tr[tr["seed_time"] == tstar].sort_values(ec).head(AUDIT_LEAK_SEEDS).reset_index(drop=True)
         schema = f"audit_{tname(t)}_k{k}"
         # tables named as public.x read the audit views too
-        hidden_sql = re.sub(r"\bpublic\s*\.", f"{schema}.", sql, flags=re.I)
+        hidden_sql = in_schema(sql, schema)
         with psycopg.connect(self.url, autocommit=True) as con:
             con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
             con.execute(f"CREATE SCHEMA {schema}")
@@ -667,13 +680,18 @@ Shared memory: agents on this database publish verified feature definitions and 
         e = self.tasks[t]
         ec, yc = e["entity_col"].lower(), e["target_col"].lower()
         t0 = time.time()
-        try:
-            xtr, _ = features(self.url, prev[1], f"task.{tname(t)}_train_sample", seeds["train_sample"], ec)
-            xva, _ = features(self.url, prev[1], f"task.{tname(t)}_val", seeds["val"], ec)
-            p, _, _ = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xva)
-            val = score(e["task_type"], seeds["val"][yc], p)
-        except Exception as err:  # noqa: BLE001 - a previous model that no longer runs gives no goal
-            return {"val": None, "why": f"previous model failed: {str(err)[:200]}", "seconds": time.time() - t0}
+        for attempt in (1, 2):
+            try:
+                xtr, _ = features(self.url, prev[1], f"task.{tname(t)}_train_sample", seeds["train_sample"], ec)
+                xva, _ = features(self.url, prev[1], f"task.{tname(t)}_val", seeds["val"], ec)
+                p, _, _ = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xva)
+                val = score(e["task_type"], seeds["val"][yc], p)
+                break
+            except Exception as err:  # noqa: BLE001 - a previous model that no longer runs gives no goal
+                # a statement timeout can come from load (cells run side by side): one more try before giving up the goal
+                if attempt == 1 and "statement timeout" in str(err):
+                    continue
+                return {"val": None, "why": f"previous model failed: {str(err)[:200]}", "attempts": attempt, "seconds": time.time() - t0}
         leak = self.audit(t, k, prev[1], seeds)
         if leak.get("result") == "leak":
             return {"val": None, "why": "previous model reads rows after seed_time on this cutoff", "seconds": time.time() - t0}
@@ -742,7 +760,7 @@ Shared memory: agents on this database publish verified feature definitions and 
                 break
             try:
                 r = self.llm.chat(msgs, self.tool_specs())
-            except Exception as err:
+            except LlmUnavailable as err:
                 rec["error"] = f"llm: {err}"
                 rec["stop"] = "llm_error"
                 break
@@ -869,7 +887,9 @@ Shared memory: agents on this database publish verified feature definitions and 
                 elif name == "submit":
                     entry["category"] = "submit"
                     sql = args.get("sql") or best_sql
+                    ta = time.time()
                     leak = self.audit(t, k, sql, seeds) if sql and sql != best_sql else {}
+                    entry["audit_seconds"] = time.time() - ta
                     if not sql:
                         out = {"error": "nothing validated yet; validate features first or pass sql"}
                     elif leak.get("result") == "leak":
@@ -895,7 +915,8 @@ Shared memory: agents on this database publish verified feature definitions and 
             if stop:
                 rec["stop"] = stop
                 break
-        rec["audit_seconds"] = sum(v.get("audit_seconds", 0) for v in rec["validations"])
+        # leak audits (at every validation and at submit) are the harness's checks, not the agent's work
+        rec["audit_seconds"] = sum(x.get("audit_seconds", 0) for x in rec["tools"])
         rec["agent_seconds"] = time.time() - t_start - rec["audit_seconds"]
         rec["final_sql"] = submitted or best_sql
         rec["final_source"] = "submitted" if submitted else ("best_validated" if best_sql else None)
@@ -914,17 +935,22 @@ Shared memory: agents on this database publish verified feature definitions and 
                 rec["audit"] = {"result": "error", "why": str(err)[:300]}
         if rec["final_sql"] and (rec.get("audit") or {}).get("result") == "clean":
             self.prev_sql[t] = (k, rec["final_sql"])
-        if self.arm.get("feature_memory") and rec["final_sql"]:
+        cut_short = rec["stop"] == "llm_error"  # the run stops after this session is saved; nothing is learned from it
+        if self.arm.get("feature_memory") and rec["final_sql"] and not cut_short:
             try:
                 rec["learning"] = self.learn(t, k, rec, seeds, middle, agent, sid)
+            except LlmUnavailable:
+                raise
             except Exception as err:
                 rec["learning"] = {"error": str(err)[:500]}
-        if self.arm.get("ace"):
+        if self.arm.get("ace") and not cut_short:
             try:
                 rec["learning"] = self.ace_update(t, k, rec, msgs, agent)
+            except LlmUnavailable:
+                raise
             except Exception as err:
                 rec["learning"] = {"error": str(err)[:500]}
-        if self.gmem:
+        if self.gmem and not cut_short:
             ref = self.refs.get((t, k)) or {}
             best = rec["best_val"]
             label = best is not None and ref.get("val") is not None and (best > ref["val"] if higher else best < ref["val"])
@@ -945,7 +971,7 @@ Shared memory: agents on this database publish verified feature definitions and 
             "output_tokens": sum(x["output_tokens"] for x in rec["llm"] + sub_calls),
             "llm_seconds": sum(x["seconds"] for x in rec["llm"] + sub_calls),
             "llm_retry_seconds": sum(x.get("retry_seconds", 0) for x in rec["llm"] + sub_calls),
-            "tool_seconds": sum(x["seconds"] for x in rec["tools"]),
+            "tool_seconds": sum(x["seconds"] - x.get("audit_seconds", 0) for x in rec["tools"]),
             "validation_sql_seconds": sum(x.get("sql_seconds", 0) for x in rec["validations"]),
             "validation_train_seconds": sum(x.get("train_seconds", 0) for x in rec["validations"]),
         }
@@ -964,6 +990,8 @@ Shared memory: agents on this database publish verified feature definitions and 
         ev = rec.get("eval") or {}
         log(f"{t} k{k}: stop={rec['stop']} llm={rec['totals']['llm_calls']} tools={rec['totals']['tool_calls']} "
             f"tok={rec['totals']['tokens']} t={rec['agent_seconds']:.0f}s val={best} test={ev.get('test')} audit={(rec.get('audit') or {}).get('result')}")
+        if cut_short:
+            raise LlmUnavailable(f"{sid}: {rec['error']}")
         return rec
 
     def evaluate_after_run(self, ks):
@@ -989,7 +1017,7 @@ Shared memory: agents on this database publish verified feature definitions and 
                     con.execute(f"CREATE VIEW {schema}.{name.lower()} AS SELECT * FROM public.{name.lower()}{cond}")
             try:
                 for f, r in todo:
-                    sql = re.sub(r"\bpublic\s*\.", f"{schema}.", r["final_sql"], flags=re.I)
+                    sql = in_schema(r["final_sql"], schema)
                     try:
                         r["eval"] = {**self.evaluate(r["task"], k, sql, seeds[r["task"]], search_path=f"{schema}, public"), "after_run": True}
                     except Exception as err:
@@ -1121,6 +1149,8 @@ Shared memory: agents on this database publish verified feature definitions and 
         a = self.a
         arm = ARMS[a.arm]
         log(f"run {a.arm} r{a.run}: database {self.db_name} from {a.template}")
+        with open(os.path.join(a.out, "harness.pid"), "w") as f:  # run-queue.py: is this cell still running?
+            f.write(str(os.getpid()))
         create_run_db(self.url_admin, a.template, self.db_name)
         middle = None
         summary = {"arm": a.arm, "run": a.run, "db": self.db_name, "template": a.template, "smoke": a.smoke, "settings": {
@@ -1178,6 +1208,7 @@ Shared memory: agents on this database publish verified feature definitions and 
                     json.dump(summary, f, indent=1, default=str)
             if not a.eval_now:
                 self.evaluate_after_run(ks)
+            summary["finished"] = time.strftime("%Y-%m-%d %H:%M:%S")  # every cutoff and every test score done
         except Exception:
             traceback.print_exc()
             summary["error"] = traceback.format_exc()[-2000:]

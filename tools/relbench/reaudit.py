@@ -24,6 +24,7 @@ def main():
     ap.add_argument("--data", required=True)
     ap.add_argument("--prep", required=True)
     ap.add_argument("--template", required=True)
+    ap.add_argument("--llm", default="deepseek", help="provider whose key the harness loads (no model call is made)")
     a = ap.parse_args()
     todo = []
     for f in sorted(glob.glob(os.path.join(a.run, "sessions", "*.json"))):
@@ -35,7 +36,8 @@ def main():
         return
     first = json.load(open(todo[0][0]))
     ns = argparse.Namespace(arm=first["arm"], run=first["run"], data=a.data, prep=a.prep, template=a.template,
-                            out=os.path.join(a.run, "reaudit"), tasks=None, cutoffs=None, parallel=1, port=None, keep_db=False, smoke=False)
+                            out=os.path.join(a.run, "reaudit"), tasks=None, cutoffs=None, parallel=1, port=None, keep_db=False, smoke=False,
+                            targets_from=None, llm=a.llm, reasoning_effort=None, eval_now=True)
     os.makedirs(ns.out, exist_ok=True)
     r = harness.Run(ns)
     harness.create_run_db(r.url_admin, a.template, r.db_name)

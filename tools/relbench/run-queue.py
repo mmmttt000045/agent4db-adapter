@@ -11,7 +11,7 @@ the queue drops its database and stops its middle layer. Cells are lines of a pl
 e.g. `mavra rel-stack 2` or `agentsm rel-trial 1 --agentsm-memory results/relbench-agentsm/rel-trial/memory.json`.
 The dataset name maps to results/relbench-data/<dataset>, <dataset>-prep and the template relbench_<short>_t1.
 
-  python3 tools/relbench/run-queue.py cells.txt --out results/relbench-main --parallel 8
+  python3 tools/relbench/run-queue.py cells.txt --out results/relbench-main --parallel 8 --limit rel-amazon=2
 """
 import argparse
 import json
@@ -90,7 +90,10 @@ def main():
     ap.add_argument("--parallel", type=int, default=8)
     ap.add_argument("--min-free-gb", type=float, default=15, help="headroom for running cells' growth (appends, seed tables, temp files)")
     ap.add_argument("--memory-max", default="24G")
+    ap.add_argument("--limit", action="append", default=[], metavar="DATASET=N",
+                    help="at most N cells of a dataset at a time (rel-amazon cells grow to about 15 GB each)")
     a = ap.parse_args()
+    limits = {k: int(v) for k, v in (x.split("=", 1) for x in a.limit)}
     os.makedirs(a.out, exist_ok=True)
     fh = open(os.path.join(a.out, "queue.log"), "a")
     cells = [line.split() for line in open(a.cells) if line.strip() and not line.startswith("#")]
@@ -105,11 +108,11 @@ def main():
                "python3", "tools/relbench/harness.py", "--arm", arm, "--run", run,
                "--data", f"results/relbench-data/{ds}", "--prep", f"results/relbench-data/{ds}-prep",
                "--template", f"relbench_{short}_t1", "--out", out, *extra]
-        pending.append((name, out, cmd))
+        pending.append((name, out, cmd, ds))
     running_cells = {}
     waiting_disk = False
     while pending or running_cells:
-        for name, (proc, out) in list(running_cells.items()):
+        for name, (proc, out, _) in list(running_cells.items()):
             if proc.poll() is not None:
                 ok = proc.returncode == 0 and done(out)
                 log(f"{'done' if ok else 'FAILED'} {name} (exit {proc.returncode})", fh)
@@ -118,13 +121,19 @@ def main():
                 del running_cells[name]
         free = shutil.disk_usage("/").free / 2 ** 30
         while pending and len(running_cells) < a.parallel:
+            per_ds = {}
+            for _, (_, _, ds_) in running_cells.items():
+                per_ds[ds_] = per_ds.get(ds_, 0) + 1
+            nxt = next((i for i, c in enumerate(pending) if per_ds.get(c[3], 0) < limits.get(c[3], a.parallel)), None)
+            if nxt is None:
+                break
             if free < a.min_free_gb:
                 if not waiting_disk:
                     log(f"waiting for disk: {free:.0f} GB free, {a.min_free_gb:.0f} GB needed ({len(pending)} cells pending)", fh)
                 waiting_disk = True
                 break
             waiting_disk = False
-            name, out, cmd = pending.pop(0)
+            name, out, cmd, ds = pending.pop(nxt)
             if done(out):
                 log(f"skip {name} (finished)", fh)
                 continue
@@ -140,7 +149,7 @@ def main():
                 log(f"moved unfinished {name} to {name}.aborted-{stamp}", fh)
             os.makedirs(out, exist_ok=True)
             proc = subprocess.Popen(cmd, stdout=open(f"{out}.log", "a"), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
-            running_cells[name] = (proc, out)
+            running_cells[name] = (proc, out, ds)
             log(f"start {name} (running {len(running_cells)}, free {free:.0f} GB)", fh)
             time.sleep(30)  # let the database copy finish before the next disk check
             free = shutil.disk_usage("/").free / 2 ** 30

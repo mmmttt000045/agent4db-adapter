@@ -186,7 +186,11 @@ the paper's reproduction appendix.
 - **Changes and why:**
   1. Base table = the seed table with the reference columns (the entity table's numeric and time columns, the input of
      RelBench's LightGBM baseline); the entity's own categorical and text columns, which the reference leaves out, are
-     candidates of the empty path (FeatPilot's base table keeps all its columns and AutoGluon encodes them).
+     candidates of the empty path (FeatPilot's base table keeps all its columns and AutoGluon encodes them). The entity
+     row is bounded by seed_time like every other table (`Run.reference_sql` joins it unbounded; on user-engagement a
+     seed's users row is dated after its seed_time, and the audit flagged the reference columns accountid and
+     days_since_creationdate as reading later data). The reference scores in run.json remain `Run.evaluate` of
+     `Run.reference_sql`, as in every arm.
   2. Join graph = RelBench's declared primary and foreign keys in both directions (child → parent m:1, parent → child
      1:m) instead of a discovery system (Aurum, Auctus).
   3. Time: every table on a path that has a time column contributes only rows dated at or before the seed's

@@ -4,7 +4,8 @@ RelBench retraining timeline of exp/2026-10-20-relbench. No LLM. Every choice an
 exp/2026-10-20-relbench/reproduction-notes.md, section FeatPilot.
 
 Per task and cutoff, from scratch (nothing is kept across tasks or cutoffs):
-  base table = the seed table with the entity-table reference columns (Run.reference_sql);
+  base table = the seed table with the entity-table reference columns (Run.reference_sql, the entity row bounded by
+  seed_time);
   join graph = RelBench's primary and foreign keys, both directions (child -> parent m:1, parent -> child 1:m);
   breadth-first search over join paths from the entity table (Algorithm 2): each hop joins one more table, no table
   twice; every table on a path that has a time column contributes only rows with time <= the seed's seed_time;
@@ -264,6 +265,17 @@ class Session:
                            ("avg_len", col, None, f"avg(octet_length({c}))::double precision"))
         return out
 
+    def base_sql(self):
+        """The reference columns (Run.reference_sql) with the entity row bounded by seed_time, as every table on a path:
+        the reference joins the entity row unbounded, and a seed whose entity row is dated after its seed_time then reads
+        data after seed_time (the audit flagged accountid and days_since_creationdate on user-engagement)."""
+        ref = self.r.reference_sql(self.t)
+        tc = self.g.t[self.et]["tc"]
+        tail = f"LEFT JOIN {self.et} e ON e.{self.epk} = s.{self.ec}"
+        if not ref.endswith(tail):
+            raise RuntimeError(f"unexpected reference SQL: {ref[-200:]}")
+        return ref + (f" AND e.{tc} <= s.seed_time" if tc else "")
+
     # ───────── feature importance ─────────
     def us(self, y, p):
         s = H.score(self.task_type, y, p)
@@ -356,7 +368,7 @@ class Session:
         ecc, dist = g.eccentricity(self.et)
         self.kmax = ecc if c.hops == "auto" else int(c.hops)
         self.hop_dist = dist
-        ref = self.r.reference_sql(self.t)
+        ref = self.base_sql()
         t0 = time.time()
         self.xb, s = H.features(self.r.url, ref, f"task.{self.tn}_train_sample", self.seeds["train_sample"], self.ec)
         self.tools.append({"i": len(self.tools), "name": "featpilot_sql", "category": "probe", "purpose": "reference columns",
@@ -495,7 +507,7 @@ class Session:
         return chosen
 
     def final_sql(self, chosen):
-        ref = self.r.reference_sql(self.t)
+        ref = self.base_sql()
         if not chosen:
             return ref
         groups = collections.OrderedDict()
@@ -612,7 +624,7 @@ def main():
     ap.add_argument("--beam", type=int, default=HEAP, help="heap size H (larger than the budget)")
     ap.add_argument("--budget", type=int, default=BUDGET, help="feature budget B")
     ap.add_argument("--tiq", type=float, default=T_IQ, help="IQ threshold T_IQ")
-    ap.add_argument("--resume", action="store_true", help="keep finished sessions (no error) found in --out")
+    ap.add_argument("--resume", action="store_true", help="keep finished sessions (no error, audit clean) found in --out")
     ap.add_argument("--keep-db", action="store_true")
     c = ap.parse_args()
     HEAP, BUDGET, T_IQ = c.beam, c.budget, c.tiq
@@ -641,7 +653,7 @@ def main():
                 x = json.load(open(os.path.join(c.out, "sessions", f)))
             except (OSError, ValueError):
                 continue
-            if not x.get("error") and (x.get("eval") or {}).get("test") is not None:
+            if not x.get("error") and (x.get("eval") or {}).get("test") is not None and (x.get("audit") or {}).get("result") == "clean":
                 done.add((x["task"], x["k"]))
     H.log(f"run {ARM} r{c.run}: database {r.db_name} from {c.template}; {len(done)} sessions kept")
     with open(os.path.join(c.out, "featpilot.pid"), "w") as f:

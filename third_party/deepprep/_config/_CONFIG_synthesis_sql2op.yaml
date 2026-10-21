@@ -1,0 +1,9 @@
+execute_mode: rule
+framework: sql2op
+key_file: keys_local.txt
+llm_name: QWEN3_8B
+openai_base_url: http://localhost:8000/v1/
+max_reflect_op: 20
+max_reflect_turn: 5
+max_explore_turn: 12
+name: synthesis_sql2op

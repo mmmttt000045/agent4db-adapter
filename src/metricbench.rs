@@ -1474,7 +1474,7 @@ async fn lifecycle_cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, 
 // ───────────────────────── 群体 ─────────────────────────
 
 /// 群体评测的抽题：每个智能体从满足 `keep` 的题中不放回地抽 `per` 道，顺序随机。同一 `seed` 在各组相同（配对比较）。
-fn population_plan<'a>(tasks: &'a [Task], agents: u32, per: u32, seed: u64, keep: impl Fn(&Task) -> bool) -> Vec<Vec<&'a Task>> {
+fn population_plan(tasks: &[Task], agents: u32, per: u32, seed: u64, keep: impl Fn(&Task) -> bool) -> Vec<Vec<&Task>> {
     use rand::{seq::SliceRandom, SeedableRng};
     let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
     (0..agents)

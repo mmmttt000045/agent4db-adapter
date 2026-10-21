@@ -4,7 +4,9 @@ main table's body in overleaf/gen/relbench-table.tex. Per database and arm, over
 which an arm can use what it kept): tokens with memory operations, LLM calls, tool calls, agent time, cost at
 DeepSeek's off-peak prices; the test score per task averaged over all cutoffs; and the no-memory arm's workload (LLM
 calls per session, share of schema and probe calls, schema calls repeated from earlier sessions). Sessions are paired
-by (task, cutoff); an arm that has not finished yet is printed as "--".
+by (task, cutoff); an arm that has not finished yet is printed as "--". A session that ends without a valid solution
+(every validation leaked or failed, or no solution) is scored as the entity-table reference, the model a team keeps
+when feature work fails, and counted in Rb<db><arm>Unsolved; the same for every arm.
 
   python3 tools/relbench/paper-stats.py --out overleaf/gen
 """
@@ -80,7 +82,8 @@ def main():
         for m in ("Sessions", "Late", "BestBaseline", "MavraVsBest", "MavraSpeedVsBest"):
             macros[f"Rb{pre}{m}"] = "--"
         for _, name, _ in ARMS:
-            for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "QA", "QB", "QC", "TokSaveAll", "NotWorse"):
+            for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "QA", "QB", "QC", "TokSaveAll", "NotWorse",
+                      "Unsolved"):
                 macros[f"Rb{pre}{name}{m}"] = "--"
     for m in ("RbNoneMedLlm", "RbNoneMedTok", "RbSchemaProbe", "RbSchemaRepeat"):
         macros[m] = "--"
@@ -101,6 +104,14 @@ def main():
             series.setdefault(db, {})[arm] = [{"k": k, "task": t, "tokens": data[arm][(t, k)]["tokens"], "agent_s": data[arm][(t, k)]["agent_s"],
                                                "cost": data[arm][(t, k)]["cost"]["offpeak"], "test": data[arm][(t, k)]["test"]}
                                               for k, t in order if (t, k) in data[arm]]
+        if "none" in data:  # sessions without a valid solution: the reference's test score (run.json of the no-memory run)
+            ref = {(t, c["k"]): v.get("test") for c in json.load(open(os.path.join(done["none"], "run.json")))["cutoffs"]
+                   for t, v in (c.get("reference") or {}).items()}
+            for d in data.values():
+                for key, v in d.items():
+                    v["unsolved"] = v["test"] is None
+                    if v["unsolved"]:
+                        v["test"] = ref.get(key)
         if "none" not in data:
             table.append(f"\\multicolumn{{10}}{{@{{}}l}}{{\\textit{{{db}}}: running}}\\\\")
             table.append("\\midrule")
@@ -117,7 +128,7 @@ def main():
         rows = {}
         for arm, name, label in ARMS:
             if arm not in data:
-                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "TokSaveAll", "NotWorse"):
+                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "TokSaveAll", "NotWorse", "Unsolved"):
                     macros[f"Rb{pre}{name}{m}"] = "--"
                 for i, _ in enumerate(tasks):
                     macros[f"Rb{pre}{name}Q{LETTERS[i]}"] = "--"
@@ -150,6 +161,7 @@ def main():
                            f"Rb{pre}{name}Min": f"{r['min']:.0f}", f"Rb{pre}{name}Speed": f"{r['speed']:.1f}",
                            f"Rb{pre}{name}Cost": f"{r['cost']:.2f}", f"Rb{pre}{name}TokSave": f"{100 * (1 - r['tokx']):.0f}",
                            f"Rb{pre}{name}Explore": f"{r['explore_per']:.1f}",
+                           f"Rb{pre}{name}Unsolved": str(sum(1 for k in keys if d[k]["unsolved"])),
                            f"Rb{pre}{name}TokSaveAll": f"{100 * (1 - sum(d[k]['tokens'] for k in keys) / base_all):.0f}"})
             for i, t in enumerate(tasks):
                 v = r["test"][t]

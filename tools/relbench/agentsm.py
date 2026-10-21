@@ -15,6 +15,8 @@ run_sql repairs a failing statement once; the composite tools run their tool seq
 
   python3 tools/relbench/agentsm.py build --data results/relbench-data/rel-stack --prep results/relbench-data/rel-stack-prep \
       --template relbench_stack_t1 --out results/relbench-agentsm/rel-stack --n 33
+The global n = 100 is split by each database's share of evaluation sessions (largest remainder): rel-stack 15/46 -> 33,
+rel-amazon 16/46 -> 35, rel-trial 15/46 -> 32.
 """
 import argparse
 import collections
@@ -178,7 +180,7 @@ def build(a):
     harness.create_run_db(r.url_admin, a.template, r.db_name)
     middle = None
     try:
-        middle = harness.Middle(r.url, "middle-alone", a.out, 18900 + os.getpid() % 90)
+        middle = harness.Middle(r.url, "middle-alone", a.out, harness.free_port())
         desc = r.manifest.get("description", "")
         examples = "\n".join(f"- {r.task_desc[t]['description']}" for t in list(r.tasks)[:GENQ_EXAMPLES]) or "- (no benchmark tasks available)"
         tasks = []

@@ -14,11 +14,12 @@ Per task and cutoff, from scratch (nothing is kept across tasks or cutoffs):
   the value, one indicator per categorical value, the text length); the entity's own categorical and text columns,
   which the reference leaves out, are candidates of the empty path;
   integration quality IQ = share of training seeds with a non-null feature value (Definition 8);
-  feature importance FI = utility gain of the fixed LightGBM on the rows the feature augments (Definition 7 with
-  Lemma 3): trained on the seeds of 80% of the entities of the 50k training sample, scored on the seeds of the other
-  20%, both restricted to those rows, against the base table on the same rows; FI <= 0 is pruned and a min-heap keeps
-  the H pairs with the largest FI x IQ (Pruning Principle 2); only the H paths of a hop with the highest IQ are
-  extended (the released code's beam);
+  feature importance FI = the utility the feature adds on the rows it augments (Definition 7 with Lemma 3), measured
+  with the fixed LightGBM: the base table augmented with all candidates of one path is fitted on the seeds of 80% of
+  the entities of the 50k training sample; FI(f) = the holdout utility (seeds of the other 20%, rows where f is not
+  null) minus the utility with f's values permuted among those rows (permutation importance, as AutoGluon's
+  feature_importance); FI <= 0 is pruned and a min-heap keeps the H pairs with the largest FI x IQ (Pruning
+  Principle 2); only the H paths of a hop with the highest IQ are extended (the released code's beam);
   exploitation: up to B features chosen greedily by FI x IQ with FeatPilot's weight decay on similar features.
 The chosen features and the reference columns form one feature SQL, scored once with Run.evaluate (validation and
 test) and audited with Run.audit. Validation seeds are used only for the reported validation score.
@@ -31,7 +32,6 @@ Run on noctis (repo root):
 import argparse
 import collections
 import concurrent.futures as cf
-import hashlib
 import heapq
 import json
 import os
@@ -60,6 +60,7 @@ HOLDOUT = 0.2  # share of the training sample's entities held out for FI
 SPLIT_SEED = 42
 SIM_EPS = 0.5  # weight decay: chosen features at least this similar (|Spearman|) count as neighbours
 MIN_TRAIN, MIN_HOLDOUT = 200, 50  # fewer augmented rows than this: FI not measurable (treated as no gain)
+NUM_SHUFFLES = 3  # permutations per candidate for its FI
 PATH_TIMEOUT_S = 300  # statement timeout of one path's candidate query on the training sample
 # estimated seconds of the final SQL on the larger of the validation and test seed tables (the path query's time on the
 # training sample, measured with SQL_WORKERS queries side by side, scaled by the seed count; 4x the real time in the test)
@@ -177,7 +178,6 @@ class Session:
         held = set(ents[perm[:int(round(HOLDOUT * len(ents)))]].tolist())
         self.ho = tr[self.ec].isin(held).to_numpy()
         self.tr = ~self.ho
-        self.base_cache = {}
         self.fi_trainings, self.fi_train_seconds = 0, 0.0
         self.paths = []  # dicts: steps, label, hop, lookup, iq, seconds, candidates, ...
         self.cands = {}  # name -> candidate
@@ -269,24 +269,52 @@ class Session:
         s = H.score(self.task_type, y, p)
         return s if self.higher else -s
 
-    def fi(self, values):
-        """FI = US(base + f) - US(base) on the rows f augments (training part -> holdout part of the 50k sample)."""
-        mask = ~np.isnan(values)
-        tr, ho = self.tr & mask, self.ho & mask
-        if tr.sum() < MIN_TRAIN or ho.sum() < MIN_HOLDOUT:
-            return None
-        ytr, yho = self.y[tr], self.y[ho]
-        if self.task_type == "binary_classification" and (len(np.unique(ytr)) < 2 or len(np.unique(yho)) < 2):
-            return None
-        key = hashlib.md5(np.packbits(mask).tobytes()).hexdigest()
-        if key not in self.base_cache:
-            p, _, s = H.train_predict(self.task_type, self.xb.loc[tr], ytr, self.xb.loc[ho])
-            self.base_cache[key] = self.us(yho, p)
-            self.fi_trainings, self.fi_train_seconds = self.fi_trainings + 1, self.fi_train_seconds + s
-        x = self.xb.assign(fp_candidate=values)
-        p, _, s = H.train_predict(self.task_type, x.loc[tr], ytr, x.loc[ho])
-        self.fi_trainings, self.fi_train_seconds = self.fi_trainings + 1, self.fi_train_seconds + s
-        return self.us(yho, p) - self.base_cache[key]
+    def fit(self, x, y):
+        """The study's fixed LightGBM (harness.train_predict's model), kept for repeated predictions."""
+        import lightgbm as lgb
+
+        if self.task_type == "binary_classification":
+            m = lgb.LGBMClassifier(objective="binary", **H.LGB_PARAMS)
+        else:
+            m = lgb.LGBMRegressor(objective="l1", **H.LGB_PARAMS)
+        m.fit(x, y)
+        return m
+
+    def predict(self, m, x):
+        return m.predict_proba(x)[:, 1] if self.task_type == "binary_classification" else m.predict(x)
+
+    def path_fi(self, names, vals):
+        """FI of each candidate of one path: the base table augmented with all the path's candidates is fitted on the
+        training entities; FI(f) = utility on the held-out rows that f augments minus the utility with f's values
+        permuted among those rows (mean of NUM_SHUFFLES permutations)."""
+        t0 = time.time()
+        x = self.xb.copy()
+        col = {}
+        for j, n in enumerate(names):
+            col[n] = f"fp_{j}"
+            x[col[n]] = vals[n]
+        m = self.fit(x.loc[self.tr], self.y[self.tr])
+        self.fi_trainings += 1
+        out = {}
+        for j, n in enumerate(names):
+            nn = ~np.isnan(vals[n])
+            rows = self.ho & nn
+            yh = self.y[rows]
+            if (self.tr & nn).sum() < MIN_TRAIN or rows.sum() < MIN_HOLDOUT or (
+                    self.task_type == "binary_classification" and len(np.unique(yh)) < 2):
+                out[n] = None  # too few augmented rows to measure
+                continue
+            xh = x.loc[rows]
+            s0 = self.us(yh, self.predict(m, xh))
+            rng = np.random.RandomState(SPLIT_SEED + j)
+            drops = []
+            for _ in range(NUM_SHUFFLES):
+                xp = xh.copy()
+                xp[col[n]] = rng.permutation(xp[col[n]].to_numpy())
+                drops.append(s0 - self.us(yh, self.predict(m, xp)))
+            out[n] = float(np.mean(drops))
+        self.fi_train_seconds += time.time() - t0
+        return out
 
     # ───────── search ─────────
     def add_path(self, steps, hop):
@@ -378,14 +406,19 @@ class Session:
                     continue
                 if hop > 0:
                     nxt.append((iq_path, pi))
+                elig = []
                 for name in p["candidates"]:
-                    v = vals[name]
                     cand = self.cands[name]
-                    cand["iq"] = float(np.mean(~np.isnan(v)))
+                    cand["iq"] = float(np.mean(~np.isnan(vals[name])))
                     if cand["iq"] < T_IQ:
                         cand["pruned"] = "iq"
-                        continue
-                    fi = self.fi(v)
+                    else:
+                        elig.append(name)
+                fis = self.path_fi(elig, vals) if elig else {}
+                for name in elig:
+                    v = vals[name]
+                    cand = self.cands[name]
+                    fi = fis[name]
                     measured += 1
                     cand["fi"] = fi
                     if fi is None or fi <= 0:
@@ -598,7 +631,7 @@ def main():
     r.url = f"{H.base_url(r.url_admin)}/{r.db_name}"
     settings = {"T_IQ": T_IQ, "H": HEAP, "B": BUDGET, "hops": c.hops, "CAT_MAX_DISTINCT": CAT_MAX_DISTINCT, "ONEHOT_TOP": ONEHOT_TOP,
                 "HOLDOUT": HOLDOUT, "SPLIT_SEED": SPLIT_SEED, "SIM_EPS": SIM_EPS, "MIN_TRAIN": MIN_TRAIN, "MIN_HOLDOUT": MIN_HOLDOUT,
-                "PATH_TIMEOUT_S": PATH_TIMEOUT_S, "FINAL_COST_S": FINAL_COST_S, "SQL_WORKERS": SQL_WORKERS,
+                "NUM_SHUFFLES": NUM_SHUFFLES, "FI": "permutation importance per path model", "PATH_TIMEOUT_S": PATH_TIMEOUT_S, "FINAL_COST_S": FINAL_COST_S, "SQL_WORKERS": SQL_WORKERS,
                 "SAMPLE_SIZE": H.SAMPLE_SIZE, "LGB_PARAMS": H.LGB_PARAMS, "llm": None}
     summary = {"arm": ARM, "run": c.run, "db": r.db_name, "template": c.template, "settings": settings, "cutoffs": []}
     done = set()

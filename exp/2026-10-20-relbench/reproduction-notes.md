@@ -126,3 +126,72 @@ the paper's reproduction appendix.
      counted in the session's cost but not in the planner's budget, so the architecture is not cut short.
 - **Not cited:** the abstract's "25% fewer tokens, 35% shorter trajectories": the paper's Table 2 shows AgentSM's
   input tokens above the baselines'.
+
+## FeatPilot (Liang et al., ICDE 2025)
+
+- **Code:** the paper's released code (anonymous.4open.science/r/FeaturePilot-C308, read 10-21: `Search_algo/search.py`,
+  `search_utils.py`, `rank_and_argu.py`, `Data_preprocess/collect_IQ_FI.py`, `Dataset_splitter.py`) works on CSV tables
+  with AutoGluon, a GPU LSTM and BERT embeddings and has no database interface; FeatPilot is reimplemented in
+  `tools/relbench/featpilot.py`, which uses the harness (`Run`) for the database copy, the appends, the seed tables, the
+  reference columns, `Run.evaluate` and `Run.audit`. No LLM: a session has no tokens and no model calls; its tool calls
+  are the SQL statements it runs (category probe) and one validation (the final feature SQL).
+- **As in the paper:** utility gain UG = FI × IQ (Theorem 1); IQ = share of base rows with a non-null feature value
+  (Definition 8); FI = the utility gain on the rows the feature augments (Definition 7 with Lemma 3; the released
+  `compute_FI` drops the rows where the feature is null); breadth-first search from the base table, one more join per
+  hop, no table twice on a path ("avoid cyclic joins"); Pruning Principle 1 (a path with IQ < T_IQ contributes no
+  features and is not extended); Pruning Principle 2 (a min-heap keeps the H (feature, path) pairs with the largest
+  FI × IQ; a pair below the heap's minimum is dropped); as in the released `search.py`, only the H paths of a hop with
+  the highest IQ are extended; aggregation over 1:m joins (count, mean, min/max of numeric columns, one-hot of
+  categorical columns); exploitation: up to B features taken from the heap one at a time by FI × IQ with the weight
+  decay of similar features; B = 10, the paper's largest budget; the model is trained on the base table augmented with
+  the chosen features. FeatPilot runs from scratch for every task and cutoff (it keeps nothing between tasks).
+- **Choices the paper leaves open:** T_IQ = 0.1; H = 30 (the paper requires H > B and sets H to a multiple of B; the
+  released code uses one value, `max_keep`, for the heap and the path beam); the number of hops = the entity table's
+  eccentricity in the key graph, so that every table of the database is a candidate table (2 from users, posts and
+  studies; 4 from facilities), as FeatPilot's discovery step returns every table within k joins and its DFS baseline
+  uses a depth that covers all candidate tables; categorical = text or integer column with at most 50 distinct values
+  (PostgreSQL statistics), one-hot over its 10 most common values; weight-decay neighbours = chosen features with
+  |Spearman| ≥ 0.5 on the training sample; FI holdout = the seeds of 20% of the training sample's entities (seed 42),
+  at least 200 training and 50 holdout rows (otherwise FI = no gain).
+- **Changes and why:**
+  1. Base table = the seed table with the reference columns (the entity table's numeric and time columns, the input of
+     RelBench's LightGBM baseline); the entity's own categorical and text columns, which the reference leaves out, are
+     candidates of the empty path (FeatPilot's base table keeps all its columns and AutoGluon encodes them).
+  2. Join graph = RelBench's declared primary and foreign keys in both directions (child → parent m:1, parent → child
+     1:m) instead of a discovery system (Aurum, Auctus).
+  3. Time: every table on a path that has a time column contributes only rows dated at or before the seed's
+     seed_time (a LATERAL subquery bound by the seed row), as the study's feature contract requires; FeatPilot's
+     datasets have no time.
+  4. Candidates are aggregates per seed. Paths with a 1:m join: count of rows, mean/min/max of numeric columns and of
+     the days before seed_time of time columns, mean of booleans, count per value of categorical columns, mean byte
+     length of text columns; m:1 paths: the value, an indicator per categorical value, the text length. Text embeddings
+     pooled with a language model are replaced by the text length: one embedding per text feature would exceed the
+     study's 100-column limit and need a model pass over millions of texts per session. Declared keys and identifier
+     columns (name ending in "id" with more than 50 distinct values) are skipped. The released code keeps one joined
+     row per base row (`drop_duplicates` after the join) instead of aggregating; we follow the paper.
+  5. IQ is computed exactly from each path's candidate query on the training sample instead of the LSTM estimate, and
+     FI is measured for every candidate with the study's fixed LightGBM instead of AutoGluon on a few selected pairs
+     plus the embedding-cluster estimate; the data-point selection (Algorithm 1) is then unnecessary. Counts are 0, not
+     null, for seeds without rows, so count features have IQ = 1; the IQ of a path (Principle 1 and the beam) is the
+     share of training seeds reaching at least one row through it.
+  6. FI is the holdout gain over the base table on the same rows; the released code subtracts the base table's utility
+     on all rows. In relational data the rows a path reaches are the active entities, whose labels differ from the
+     rest, and a full-table baseline would credit any feature of such a path with that difference.
+  7. The FI holdout holds out whole entities: the released code splits base rows by their id
+     (`Dataset_splitter.new_map_split`); a seed table repeats an entity at several seed times, and a split of seeds
+     credits features that identify the entity (in the cutoff-1 test on site-success such features led the heap).
+  8. Pruning Principle 2's floor is FI ≤ 0 (no measured gain); the released ranking always takes B features.
+  9. Weight decay: similarity = |Spearman| of the feature values on the training sample instead of the cosine of BERT
+     embeddings of column names and sampled values; decayed FI = FI × mean(1 − sim) over the chosen neighbours (we read
+     the paper's FI(f) = 1/|N| Σ FI(f_i)(1 − sim(f, f_i)) with FI(f) in place of FI(f_i)). The released ranking instead
+     multiplies the UG of the same column reached by another path by the share of rows it still leaves empty; here every
+     path gives a different aggregate, so that rule never applies.
+  10. Statement limits: a path whose candidate query takes over 300 s on the training sample is pruned; a candidate
+     whose path would make the final SQL's estimated time on the larger of the validation and test seed tables exceed
+     400 s is skipped (the study's 600 s statement limit applies to every method); if scoring the final SQL fails, the
+     most expensive path is dropped and the SQL scored again (recorded in the session as `evaluate_fallbacks`).
+  11. The downstream model is the study's fixed LightGBM instead of AutoGluon; the search never reads the validation
+     seeds or test labels, which are used only by `Run.evaluate` for the reported scores.
+- **Checked (10-21):** rel-stack user-badge and rel-trial site-success at cutoff 1 (before change 7): the feature SQL runs,
+  the audit is clean, user-badge validation AUC 0.846 against the reference's 0.598 (search 5 min), site-success
+  search 10 min over 16 paths of up to 4 joins.

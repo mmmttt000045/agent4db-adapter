@@ -88,6 +88,13 @@ def main():
         paths = {arm: pattern.format(arm=arm) for arm, _, _ in ARMS}
         done = {arm: p for arm, p in paths.items() if finished(p)}
         data = {arm: cs.load(p) for arm, p in done.items()}
+        for arm, p in done.items():  # time-corrections.json: sessions that ran while their cell was paused
+            fix = os.path.join(os.path.dirname(p), "time-corrections.json")
+            if os.path.exists(fix):
+                for key, secs in json.load(open(fix))["seconds"].get(os.path.basename(p), {}).items():
+                    t, k = key.rsplit("-k", 1)
+                    if (t, int(k)) in data[arm]:
+                        data[arm][(t, int(k))]["agent_s"] -= secs
         for arm, p in done.items():
             run = json.load(open(os.path.join(p, "run.json")))
             order = [(c["k"], t) for c in run["cutoffs"] for t in c["order"]]

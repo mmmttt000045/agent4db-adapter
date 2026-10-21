@@ -140,7 +140,7 @@ def tool_loop(llm, system, user, tools, call, max_calls, log_calls):
         r = llm.chat(msgs, tools)
         m = r.pop("message")
         log_calls.append(r)
-        msgs.append({k: v for k, v in m.items() if k in ("role", "content", "tool_calls")} | {"role": "assistant"})
+        msgs.append(llm.history(m))
         calls = m.get("tool_calls") or []
         if not calls:
             return steps, m.get("content") or ""
@@ -172,7 +172,8 @@ def build(a):
     """Offline memory of one database (Algorithm 1)."""
     os.makedirs(a.out, exist_ok=True)
     ns = argparse.Namespace(arm="none", run=0, data=a.data, prep=a.prep, template=a.template, out=a.out, tasks=None, cutoffs=None,
-                            parallel=1, port=None, keep_db=False, smoke=False)
+                            parallel=1, port=None, keep_db=False, smoke=False, targets_from=None, llm=a.llm,
+                            reasoning_effort=a.reasoning_effort)
     r = harness.Run(ns)
     llm = r.llm
     log_calls = []
@@ -382,6 +383,8 @@ def main():
     b.add_argument("--out", required=True)
     b.add_argument("--n", type=int, required=True, help="synthetic tasks for this database (its share of the global n = 100)")
     b.add_argument("--db-name", dest="db_name", default=None)
+    b.add_argument("--llm", default="deepseek", choices=list(harness.PROVIDERS))
+    b.add_argument("--reasoning-effort", default="medium")
     a = ap.parse_args()
     if a.cmd == "build":
         a.db_name = a.db_name or os.path.basename(a.data.rstrip("/"))

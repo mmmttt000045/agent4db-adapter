@@ -65,15 +65,16 @@ MAX_FEATURES = 100
 TOOL_OUTPUT_CHARS = 20_000
 FEATURE_SQL_TIMEOUT_S = 600
 AUDIT_SEEDS = 2000  # seeds for the reproduction check of MAVRA's learning
-AUDIT_LEAK_SEEDS = 500  # seeds of the leak audit (latest training seed time)
+AUDIT_LEAK_SEEDS = 5000  # seeds of the leak audit (latest training seed time); 500 in the pilot missed leaks
 IDLE_RECONNECT_S = 30  # a new connection to the gateway after this long without a request
+POST_GOAL_LLM_CALLS = 5  # after the goal: one more validation within this many model calls (README §1.2, rule B)
 LGB_PARAMS = dict(n_estimators=300, learning_rate=0.05, num_leaves=63, min_child_samples=20, colsample_bytree=0.8,
                   subsample=0.8, subsample_freq=1, random_state=42, deterministic=True, force_row_wise=True,
                   n_jobs=8, verbose=-1)
 ARMS = {
     "none": {"middle_mode": "middle-alone", "parallel_ok": True},
     # README §1.6: feature definitions shared by all agents; sessions of one cutoff run one after another
-    "mavra": {"middle_mode": "relbench-mavra", "parallel_ok": False, "feature_memory": True, "extractor": "river"},
+    "mavra": {"middle_mode": "relbench-mavra", "parallel_ok": False, "feature_memory": True, "extractor": True},
     # ACE (ICLR 2026) as published: one playbook per agent, online, no ground-truth labels (README §1.3)
     "ace": {"middle_mode": "middle-alone", "parallel_ok": True, "ace": True},
     # G-Memory (NeurIPS 2025) as published: one store shared by all agents, tasks one at a time (README §1.3)
@@ -102,20 +103,33 @@ def load_env(path=".env"):
             if line and not line.startswith("#") and "=" in line:
                 k, v = line.split("=", 1)
                 env[k.strip()] = v.strip().strip('"').strip("'")
-    env.update({k: v for k, v in os.environ.items() if k.startswith(("RIVER_", "AGENTDB_"))})
+    env.update({k: v for k, v in os.environ.items() if k.startswith(("DEEPSEEK_", "RIVER_", "AGENTDB_"))})
     return env
 
 
 # ───────────────────────── LLM (OpenAI-compatible; same request shape as src/llm.rs) ─────────────────────────
 
+# provider name -> (.env prefix, default base URL), as OPENAI_PROFILES in src/llm.rs; since 10-21 every run uses DeepSeek's own API
+PROVIDERS = {"deepseek": ("DEEPSEEK", "https://api.deepseek.com"), "river": ("RIVER", "https://api.river.ai/v1")}
+
 class Llm:
-    def __init__(self, env, prefix="RIVER"):
-        self.base = env.get(f"{prefix}_BASE_URL", "https://api.river.ai/v1").rstrip("/")
+    def __init__(self, env, provider="deepseek"):
+        prefix, base = PROVIDERS[provider]
+        self.provider, self.prefix = provider, prefix
+        self.base = env.get(f"{prefix}_BASE_URL", base).rstrip("/")
         self.key = env[f"{prefix}_API_KEY"]
         self.model = env[f"{prefix}_MODEL"]
         self.effort = env.get(f"{prefix}_REASONING_EFFORT")
+        self.thinking = env.get(f"{prefix}_THINKING")
         self.require = env.get(f"{prefix}_REQUIRE_MODEL")
+        # DeepSeek's thinking mode wants reasoning_content passed back within a tool-calling loop (as src/llm.rs does)
+        self.keep_reasoning = "api.deepseek.com" in self.base
         self.local = threading.local()
+
+    def history(self, m):
+        """The assistant message as it goes back into the conversation."""
+        keep = ("role", "content", "tool_calls", "reasoning_content") if self.keep_reasoning else ("role", "content", "tool_calls")
+        return {k: v for k, v in m.items() if k in keep and v is not None} | {"role": "assistant"}
 
     @property
     def http(self):
@@ -175,6 +189,8 @@ class Llm:
         body = {"model": self.model, "messages": messages}
         if self.effort:
             body["reasoning_effort"] = self.effort
+        if self.thinking:
+            body["thinking"] = {"type": self.thinking}
         if tools:
             body["tools"] = tools
         if temperature is not None:
@@ -215,15 +231,15 @@ class Llm:
 class GMemoryService:
     """tools/relbench/gmemory_service.py in G-Memory's own Python 3.12 environment, one JSON line per request."""
 
-    def __init__(self, env, out):
+    def __init__(self, env, out, llm):
         self.err = open(os.path.join(out, "gmemory.log"), "w")
         # its own environment: no proxies, and none of the harness's packages (PYTHONPATH)
         e = {k: v for k, v in os.environ.items() if "proxy" not in k.lower() and k != "PYTHONPATH"}
-        e.update(OPENAI_API_BASE=env.get("RIVER_BASE_URL", "https://api.river.ai/v1"), OPENAI_API_KEY=env["RIVER_API_KEY"],
+        e.update(OPENAI_API_BASE=llm.base, OPENAI_API_KEY=llm.key,
                  HF_ENDPOINT="https://hf-mirror.com", TOKENIZERS_PARALLELISM="false")
         here = os.path.dirname(os.path.abspath(__file__))
         self.proc = subprocess.Popen([GMEMORY_PYTHON, os.path.join(here, "gmemory_service.py"), "--repo", GMEMORY_REPO,
-                                      "--working-dir", os.path.join(out, "gmemory"), "--model", env["RIVER_MODEL"]],
+                                      "--working-dir", os.path.join(out, "gmemory"), "--model", llm.model],
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self.err, env=e, text=True, bufsize=1)
         first = json.loads(self.proc.stdout.readline() or "{}")
         if not first.get("ready"):
@@ -246,12 +262,12 @@ class GMemoryService:
 
 
 class Middle:
-    def __init__(self, url, mode, out, port, extractor=None, effort=None):
+    def __init__(self, url, mode, out, port, extractor=None, effort=None, prefix=None):
         self.base = f"http://127.0.0.1:{port}"
         self.log = open(os.path.join(out, "middle.log"), "w")
         env = {k: v for k, v in os.environ.items() if "proxy" not in k.lower()}
-        if effort:
-            env["RIVER_REASONING_EFFORT"] = effort  # the extractor uses the agents' setting
+        if effort and prefix:
+            env[f"{prefix}_REASONING_EFFORT"] = effort  # the extractor uses the agents' setting
         self.proc = subprocess.Popen(
             ["./target/release/agentdb-mid", "--db", url, "--pool", "8", "--out", os.path.join(out, "middle"),
              "serve", "--addr", f"127.0.0.1:{port}", "--mode", mode, "--no-etl", *(["--extractor", extractor] if extractor else [])],
@@ -435,7 +451,7 @@ class Run:
         self.task_desc = {t: __import__("yaml").safe_load(open(os.path.join(a.data, "tasks", t, "manifest.yaml"))) for t in self.tasks}
         self.db_name = f"relbench_{a.arm.replace('-', '_')}_r{a.run}_{os.getpid()}"
         self.url = f"{base_url(self.url_admin)}/{self.db_name}"
-        self.llm = Llm(self.env)
+        self.llm = Llm(self.env, a.llm)
         self.llm.effort = a.reasoning_effort
         self.arm = ARMS[a.arm]
         self.refs = {}
@@ -613,7 +629,8 @@ Feature SQL contract: one SELECT statement that uses {{seeds}} as the seed table
 Tools: list_tables, describe_table, join_path, check_join and run_sql explore the database; the first four cover the tables in schema public, and the seed tables are read with run_sql (read-only, at most 50 rows returned). validate_features(sql) computes your features on a {SAMPLE_SIZE}-row training sample and on the validation seeds, trains the model and returns the validation {metric}. submit(sql) ends the session with your final features.
 Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; the session also ends after {PATIENCE} validations in a row without improvement. If you do not submit, your best validated features are used.""" + (
             f"\n\nRetraining goal: this task's model from the previous cutoff ({e['cutoffs'][k - 2]['test_timestamp'][:10]}), refit on this cutoff's data, "
-            f"reaches validation {metric} {self.target(t, k):.5f}; the session ends as soon as your features reach that score." if self.target(t, k) is not None else "") + (f"""
+            f"reaches validation {metric} {self.target(t, k):.5f}. Once your features reach that score you may make one more attempt to improve them: "
+            f"one more validation within the next {POST_GOAL_LLM_CALLS} model calls, after which the session ends with your best validated features." if self.target(t, k) is not None else "") + (f"""
 
 Shared memory: agents on this database publish verified feature definitions and feature programs. Start with find_program (this task's verified program from an earlier cutoff: its complete feature SQL when it still runs, and a feature SQL of its definitions) and find_features (definitions for the entity table, with a feature SQL of them for these seed tables). If they return a feature SQL, validate it first (the complete program SQL first); explore the tables and extend the SQL only to improve on it. compose_features compiles chosen definitions (by key) into a feature SQL.""" if self.arm.get("feature_memory") else "") + (
             "\n\nMemory: retrieve_trajectory returns how the most similar earlier task on this database was explored; call it before you start. "
@@ -636,8 +653,8 @@ Shared memory: agents on this database publish verified feature definitions and 
         ec, yc = e["entity_col"].lower(), e["target_col"].lower()
         t0 = time.time()
         try:
-            xtr, _ = features(self.url, prev[1], f"task.{tname(t)}_train_sample", seeds["train_sample"], ec, search_path=search_path)
-            xva, _ = features(self.url, prev[1], f"task.{tname(t)}_val", seeds["val"], ec, search_path=search_path)
+            xtr, _ = features(self.url, prev[1], f"task.{tname(t)}_train_sample", seeds["train_sample"], ec)
+            xva, _ = features(self.url, prev[1], f"task.{tname(t)}_val", seeds["val"], ec)
             p, _, _ = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xva)
             val = score(e["task_type"], seeds["val"][yc], p)
         except Exception as err:  # noqa: BLE001 - a previous model that no longer runs gives no goal
@@ -695,12 +712,16 @@ Shared memory: agents on this database publish verified feature definitions and 
                 msgs[1]["content"] = g["prompt"]
             rec["gmemory_begin"] = {k2: g.get(k2) for k2 in ("n_success", "n_insights", "error")}
         best, best_sql, streak, idle, submitted = None, None, 0, 0, None
+        goal_hit = None  # model calls made when a validation first reached the goal
         t_start = time.time()
 
         def better(x):
             return best is None or (x > best if higher else x < best)
 
         while True:
+            if goal_hit is not None and len(rec["llm"]) - goal_hit >= POST_GOAL_LLM_CALLS:
+                rec["stop"] = "reached_previous"
+                break
             if len(rec["llm"]) >= MAX_LLM_CALLS:
                 rec["stop"] = "llm_budget"
                 break
@@ -714,7 +735,7 @@ Shared memory: agents on this database publish verified feature definitions and 
             rec["llm"].append({**r, "tool_calls": len(m.get("tool_calls") or []), "content_chars": len(m.get("content") or "")})
             with open(os.path.join(self.a.out, "sessions", f"{tname(t)}-k{k}.partial.json"), "w") as f:
                 json.dump({**rec, "messages": msgs}, f, ensure_ascii=False, default=str)
-            msgs.append({k2: v for k2, v in m.items() if k2 in ("role", "content", "tool_calls")} | {"role": "assistant"})
+            msgs.append(self.llm.history(m))
             calls = m.get("tool_calls") or []
             if not calls:
                 idle += 1
@@ -779,8 +800,8 @@ Shared memory: agents on this database publish verified feature definitions and 
                     if args.get("bullet_ids"):
                         rec["bullet_ids"] = [str(b) for b in args["bullet_ids"]]
                     try:
-                        xtr, s1 = features(self.url, sql, f"task.{tname(t)}_train_sample", seeds["train_sample"], ec, search_path=search_path)
-                        xva, s2 = features(self.url, sql, f"task.{tname(t)}_val", seeds["val"], ec, search_path=search_path)
+                        xtr, s1 = features(self.url, sql, f"task.{tname(t)}_train_sample", seeds["train_sample"], ec)
+                        xva, s2 = features(self.url, sql, f"task.{tname(t)}_val", seeds["val"], ec)
                         p, imp, tt = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xva)
                         val = score(e["task_type"], seeds["val"][yc], p)
                         # leak check at validation time (README §1.2, 10-21): a leaking validation does not count, so that
@@ -814,8 +835,18 @@ Shared memory: agents on this database publish verified feature definitions and 
                         out = {"error": msg, "validations_left": MAX_VALIDATIONS - len(rec["validations"]) - 1}
                         rec["validations"].append({"tool_i": entry["i"], "error": msg[:500], "sql": sql})
                     goal = self.target(t, k)
-                    if goal is not None and best is not None and (best >= goal if higher else best <= goal):
+                    if goal_hit is not None:
+                        # rule B (README §1.2, 10-21 user decision): the one validation allowed after the goal ends the session
                         stop = "reached_previous"
+                    elif goal is not None and best is not None and (best >= goal if higher else best <= goal):
+                        goal_hit = len(rec["llm"])
+                        rec["goal_reached"] = {"validation": len(rec["validations"]), "llm_calls": goal_hit}
+                        if len(rec["validations"]) >= MAX_VALIDATIONS:
+                            stop = "reached_previous"
+                        else:
+                            out["goal_reached"] = (f"This reaches the goal. You may make one more attempt to improve: one more validate_features "
+                                                   f"within the next {POST_GOAL_LLM_CALLS} model calls, after which the session ends with your "
+                                                   f"best validated features. Call submit to finish now.")
                     elif len(rec["validations"]) >= MAX_VALIDATIONS:
                         stop = "validation_budget"
                     elif streak >= PATIENCE and best is not None:
@@ -1082,9 +1113,9 @@ Shared memory: agents on this database publish verified feature definitions and 
             "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "reasoning_effort": self.llm.effort,
             "test_scores": "now" if a.eval_now else "after the run"}, "cutoffs": []}
         try:
-            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), arm.get("extractor"), a.reasoning_effort)
+            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), a.llm if arm.get("extractor") else None, a.reasoning_effort, self.llm.prefix)
             if arm.get("gmemory"):
-                self.gmem = GMemoryService(self.env, a.out)
+                self.gmem = GMemoryService(self.env, a.out, self.llm)
             if arm.get("agentsm"):
                 import agentsm
 
@@ -1170,6 +1201,7 @@ def main():
     ap.add_argument("--keep-db", action="store_true")
     ap.add_argument("--agentsm-memory", help="memory.json from tools/relbench/agentsm.py build (arm agentsm)")
     ap.add_argument("--targets-from", help="run folder whose sessions at the cutoff before the first one give the retraining goals")
+    ap.add_argument("--llm", default="deepseek", choices=list(PROVIDERS), help="model service (pilot: river; since 10-21: deepseek)")
     ap.add_argument("--reasoning-effort", default="medium", help="reasoning effort of the agents and of MAVRA's extractor (pilot: high)")
     ap.add_argument("--eval-now", action="store_true", help="score each session on the test seeds right after it (default: after the run)")
     ap.add_argument("--smoke", action="store_true", help="pipeline check only: 8 LLM calls, 2 validations; results are not used")

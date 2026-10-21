@@ -232,6 +232,16 @@ the paper's reproduction appendix.
      most expensive path is dropped and the SQL scored again (recorded in the session as `evaluate_fallbacks`).
   11. The downstream model is the study's fixed LightGBM instead of AutoGluon; the search never reads the validation
      seeds or test labels, which are used only by `Run.evaluate` for the reported scores.
+  12. Algorithm 2 decrements B at every heap insertion and loops while B > 0; read literally, the search ends after the
+     first hop whenever B pairs qualify, which contradicts the paper's multi-hop results. The search runs to the hop
+     limit and B applies to the exploitation only, as in the released code (`search` has no budget; `rank_and_argu`
+     takes B features from the heap).
+  13. T_IQ also drops single features whose IQ is below it (e.g. a mean over a mostly null column); the paper applies it
+     to paths. A path below T_IQ is not extended, as the paper says; the released code still extends it when it is
+     among the K paths of the hop with the highest IQ.
+  14. Run settings that do not change any computation: the harness's arrival order of run 1 per cutoff; one process
+     per database; path queries of one hop run 4 at a time; `OMP_WAIT_POLICY=PASSIVE` (idle OpenMP threads sleep
+     instead of spinning on the shared machine; reference scores are identical to the other arms').
 - **Checked (10-21):** rel-stack user-badge and rel-trial site-success at cutoff 1, with one fit per candidate and a
   holdout of seeds (before changes 6 and 7): the feature SQL runs, the audit is clean, user-badge validation AUC 0.846
   against the reference's 0.598 (search 5 min), site-success search 10 min over 16 paths of up to 4 joins.

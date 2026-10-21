@@ -41,6 +41,8 @@ def load(runs):
             "goal": s.get("target"), "goal_why": (s.get("target_detail") or {}).get("why"), "goal_reached": bool(s.get("goal_reached")),
             "eval_error": (s.get("eval") or {}).get("error"), "learn_error": lr.get("error"),
             "retry_s": tot.get("llm_retry_seconds", 0),
+            # validations cut by the 600 s statement timeout (load from parallel cells shows up here)
+            "sql_timeouts": sum(1 for v in s["validations"] if "statement timeout" in (v.get("error") or "")),
             "tokens": tot.get("tokens_with_learning", tot["tokens"]), "agent_tokens": tot["tokens"],
             "learn_tokens": tot.get("learn_tokens", 0), "llm": tot["llm_calls"], "tools": tot["tool_calls"],
             # agent time without the leak audit (evaluation machinery; older runs counted it in agent_seconds)
@@ -97,6 +99,7 @@ def main():
             "eval_errors": {f"{k[0]} k{k[1]}": d[k]["eval_error"][:120] for k in keys if d[k]["eval_error"]},
             "learn_errors": {f"{k[0]} k{k[1]}": str(d[k]["learn_error"])[:120] for k in keys if d[k]["learn_error"]},
             "gateway_retry_seconds": round(sum(d[k]["retry_s"] for k in keys)),
+            "validation_sql_timeouts": sum(d[k]["sql_timeouts"] for k in keys),
         }
     gate["health"] = health
     print(json.dumps(gate, indent=1, ensure_ascii=False))

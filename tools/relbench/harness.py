@@ -382,6 +382,8 @@ def features(url, sql, seeds_table, seeds, ec, search_path=None):
     if missing or len(df) != len(seeds):
         raise FeatureError(f"returned {len(df)} rows for {len(seeds)} seeds ({missing} seeds missing); return one row per seed")
     x = merged.drop(columns=[ec, "seed_time", "_merge"])
+    if x.columns.duplicated().any():
+        raise FeatureError(f"duplicate feature column names: {sorted(set(x.columns[x.columns.duplicated()]))[:10]}")
     bad = []
     for c in x.columns:
         if not pd.api.types.is_numeric_dtype(x[c]):
@@ -392,9 +394,10 @@ def features(url, sql, seeds_table, seeds, ec, search_path=None):
                 x[c] = conv
     if bad:
         raise FeatureError(f"non-numeric feature columns: {bad[:10]}; encode them as numbers in SQL")
-    if len(set(x.columns)) != len(x.columns):
-        raise FeatureError("duplicate feature column names")
-    return x.astype(float), secs
+    try:
+        return x.astype(float), secs
+    except (TypeError, ValueError) as err:
+        raise FeatureError(f"feature columns are not numeric: {str(err)[:200]}")
 
 
 # ───────────────────────── one run ─────────────────────────
@@ -757,10 +760,11 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                             out["leak"] = {"counted": False, "columns_reading_data_after_seed_time": leak.get("columns_differing"),
                                            "note": "these columns change when rows after seed_time are hidden; this validation does not count"}
                         entry.update(sql_seconds=s1 + s2, train_seconds=tt, audit_seconds=audit_s)
-                    except FeatureError as err:
+                    except Exception as err:  # noqa: BLE001 - contract errors and anything unexpected go back to the agent
                         # a failed validation uses one of the validations but does not count as "no improvement"
-                        out = {"error": str(err), "validations_left": MAX_VALIDATIONS - len(rec["validations"]) - 1}
-                        rec["validations"].append({"tool_i": entry["i"], "error": str(err)[:500], "sql": sql})
+                        msg = str(err) if isinstance(err, FeatureError) else f"validation failed: {type(err).__name__}: {str(err)[:300]}"
+                        out = {"error": msg, "validations_left": MAX_VALIDATIONS - len(rec["validations"]) - 1}
+                        rec["validations"].append({"tool_i": entry["i"], "error": msg[:500], "sql": sql})
                     goal = self.target(t, k)
                     if goal is not None and best is not None and (best >= goal if higher else best <= goal):
                         stop = "reached_previous"

@@ -240,6 +240,15 @@ AgentSM 离线建库每库 100 个合成会话；rel-stack 附录约 135 个会�
   审计改为返回完整的泄漏列清单（显示仍取前 20 个）。框架收到 SIGTERM 时照常收尾（关中间层、删库），不再留下进程与数据库。
   第二轮的 rel-stack 两格（无记忆截点 1–4、MAVRA 截点 1–2）停掉、不计（`*.aborted-goalrule`），按最终代码重跑；rel-trial、rel-amazon 的截点 1 不涉及目标，照用。
   截至此时第二轮共花 4.58 元。
+- **投 ICDE 2027 的初稿数据（10-21 晚，用户：截稿 11-11，导师次日早上看初稿，“实验有数据就行”）**：每个库各跑 1 次，全部 7 组。
+  rel-stack 用第三轮的运行（`results/relbench-pilot3/*-rel-stack-r1`：无记忆、MAVRA 为第三轮，其余 20:29 起用同一代码），
+  rel-trial 为 `results/relbench-main/*-rel-trial-r1`（`--eval-now`，以防余额耗尽时丢掉测试分数）；rel-amazon 不在初稿里（一个会话 15–40 分钟、费用不够）。
+  **基线（用户决定，最多 5 个，至少两个出自 SIGMOD/VLDB/ICDE）**：ACE、G-Memory、AWM、DeepPrep（PVLDB 19(11) 2026，官方代码原样运行，
+  `tools/relbench/deepprep_arm.py`，源码在 `third_party/deepprep`，仓库无许可证，开源前需征得作者同意）、FeatPilot（ICDE 2025，按论文实现、聚合受种子时间约束，`tools/relbench/featpilot.py`）；
+  AgentSM（预印本）从比较中去掉（已跑的部分停掉，不计）。核实过但不采用：CtxPipe（SIGMOD 2025，单表、不用 LLM）、KnowTrans（ICDE 2025，微调 7B 模型做记录级清洗）、MemLens（VLDB 2026 demo，无代码），只在相关工作中引用。
+  token 的比较只对三个智能体记忆（DeepPrep 每任务至多 6 次调用，FeatPilot 不用 LLM，二者比质量与时间）。
+  余额紧张时 rel-trial 的四个基线单元曾暂停 20:51:48–20:58:57（429 s），暂停时正在进行的会话的智能体时间按 `results/relbench-main/time-corrections.json` 扣除。
+  内存：DeepPrep 把整库读入 pandas，rel-trial 那一格等 rel-stack 无记忆组算完测试分数、释放内存后才启动。
 - **第三轮试跑（最终代码，10-21 19:27 起，`results/relbench-pilot3/`）中的两处小修（只影响之后的运行）**：
   (1) 无记忆组截点 3 的 user-engagement：最终 SQL 在最后一次验证时审计为 clean，会话末尾用同样的 SQL 与种子再审计却报“除以零”
   （查询计划先算了除法、后判断保护条件，同一条 SQL 时成时败），于是这一期方案不能作为下一期目标。改为：最终 SQL 就是某次审计 clean 的验证所用 SQL 时沿用那次结果，

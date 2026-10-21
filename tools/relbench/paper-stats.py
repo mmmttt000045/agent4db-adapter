@@ -78,7 +78,7 @@ def main():
         for m in ("Sessions", "Late", "BestBaseline", "MavraVsBest", "MavraSpeedVsBest"):
             macros[f"Rb{pre}{m}"] = "--"
         for _, name, _ in ARMS:
-            for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "QA", "QB", "QC"):
+            for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "QA", "QB", "QC", "TokSaveAll"):
                 macros[f"Rb{pre}{name}{m}"] = "--"
     for m in ("RbNoneMedLlm", "RbNoneMedTok", "RbSchemaProbe", "RbSchemaRepeat"):
         macros[m] = "--"
@@ -104,10 +104,11 @@ def main():
         w = workload(done["none"])
         work.append(w)
         base = {f: sum(data["none"][k][f] for k in late) for f in ("tokens", "agent_s")}
+        base_all = sum(data["none"][k]["tokens"] for k in keys)
         rows = {}
         for arm, name, label in ARMS:
             if arm not in data:
-                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore"):
+                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "TokSaveAll"):
                     macros[f"Rb{pre}{name}{m}"] = "--"
                 for i, _ in enumerate(tasks):
                     macros[f"Rb{pre}{name}Q{LETTERS[i]}"] = "--"
@@ -129,7 +130,8 @@ def main():
                            f"Rb{pre}{name}Llm": str(r["llm"]), f"Rb{pre}{name}Tools": str(r["tools"]),
                            f"Rb{pre}{name}Min": f"{r['min']:.0f}", f"Rb{pre}{name}Speed": f"{r['speed']:.1f}",
                            f"Rb{pre}{name}Cost": f"{r['cost']:.2f}", f"Rb{pre}{name}TokSave": f"{100 * (1 - r['tokx']):.0f}",
-                           f"Rb{pre}{name}Explore": f"{r['explore_per']:.1f}"})
+                           f"Rb{pre}{name}Explore": f"{r['explore_per']:.1f}",
+                           f"Rb{pre}{name}TokSaveAll": f"{100 * (1 - sum(d[k]['tokens'] for k in keys) / base_all):.0f}"})
             for i, t in enumerate(tasks):
                 v = r["test"][t]
                 macros[f"Rb{pre}{name}Q{LETTERS[i]}"] = "--" if v is None else (f"{v:.4f}" if v < 1 else f"{v:.2f}")

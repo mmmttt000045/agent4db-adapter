@@ -9,6 +9,14 @@
   \setlength{\emergencystretch}{1.5em}
 \fi
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\usepackage{cite}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\providecommand{\Description}[1]{}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{booktabs}
@@ -66,14 +74,6 @@
 \providecommand{\TrTableCorrect}{--}\providecommand{\TrCondRepairedTasks}{--}\providecommand{\TrPairJudge}{--}\providecommand{\TrPairEx}{--}
 \providecommand{\TrPairN}{--}\providecommand{\TrPairExWrong}{--}\providecommand{\TrCondDB}{--}\providecommand{\TrCacheDB}{--}
 \providecommand{\TrSameCondDef}{--}\providecommand{\TrCondUnneeded}{--}\providecommand{\TrCondNeeded}{--}\providecommand{\TrCondDuploadDB}{--}
-\setcopyright{none}
-\settopmatter{printacmref=false}
-\acmConference[SIGMOD '27]{ACM SIGMOD International Conference on Management of Data}{June 13--19, 2027}{Huntington Beach, CA, USA}
-\acmYear{2027}
-\copyrightyear{2027}
-% Submission version: suppress the copyright/permission block with its ISBN and DOI placeholders.
-\renewcommand\footnotetextcopyrightpermission[1]{}
-\citestyle{acmnumeric}
 \newcommand{\system}{MAVRA}
 \newcommand{\bi}[2]{#1\par\ifbilingual #2\par\fi}
 \newcommand{\bt}[2]{#1\ifbilingual\space / #2\fi}

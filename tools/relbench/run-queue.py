@@ -8,7 +8,7 @@ that already finished skipped (so the queue can be restarted). Cells are lines o
 e.g. `mavra rel-stack 2` or `agentsm rel-trial 1 --agentsm-memory results/relbench-agentsm/rel-trial/memory.json`.
 The dataset name maps to results/relbench-data/<dataset>, <dataset>-prep and the template relbench_<short>_t1.
 
-  python3 tools/relbench/queue.py cells.txt --out results/relbench-main --parallel 8
+  python3 tools/relbench/run-queue.py cells.txt --out results/relbench-main --parallel 8
 """
 import argparse
 import json

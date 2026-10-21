@@ -66,6 +66,7 @@ TOOL_OUTPUT_CHARS = 20_000
 FEATURE_SQL_TIMEOUT_S = 600
 AUDIT_SEEDS = 2000  # seeds for the reproduction check of MAVRA's learning
 AUDIT_LEAK_SEEDS = 500  # seeds of the leak audit (latest training seed time)
+IDLE_RECONNECT_S = 30  # a new connection to the gateway after this long without a request
 LGB_PARAMS = dict(n_estimators=300, learning_rate=0.05, num_leaves=63, min_child_samples=20, colsample_bytree=0.8,
                   subsample=0.8, subsample_freq=1, random_state=42, deterministic=True, force_row_wise=True,
                   n_jobs=8, verbose=-1)
@@ -118,9 +119,14 @@ class Llm:
 
     @property
     def http(self):
-        if not hasattr(self.local, "s"):
+        # a kept-alive connection idle for minutes (sessions run one after another, with learning and goals in between)
+        # can be dropped on the way without notice; the next request then waits for the full timeout (pilot: 5 times 300 s)
+        if not hasattr(self.local, "s") or time.time() - self.local.used > IDLE_RECONNECT_S:
+            if hasattr(self.local, "s"):
+                self.local.s.close()
             self.local.s = requests.Session()
             self.local.s.trust_env = False
+        self.local.used = time.time()
         return self.local.s
 
     def _post(self, body):

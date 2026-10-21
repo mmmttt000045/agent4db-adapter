@@ -19,6 +19,7 @@ import json
 import os
 import random
 import re
+import signal
 import socket
 import subprocess
 import sys
@@ -634,7 +635,7 @@ class Run:
         diff = ~np.isclose(a, b, rtol=1e-6, atol=1e-9, equal_nan=True)
         cols = [c for c, d in zip(normal.columns, diff.any(axis=0)) if d]
         return {"result": "leak" if diff.any() else "clean", "seed_time": str(tstar), "seeds": len(sub),
-                "cells_differing": int(diff.sum()), "columns_differing": cols[:20]}
+                "cells_differing": int(diff.sum()), "columns_differing": cols[:20], "all_columns_differing": cols}
 
     # ───────── one session ─────────
     def system_prompt(self, t, k, seeds):
@@ -694,7 +695,16 @@ Shared memory: agents on this database publish verified feature definitions and 
                 return {"val": None, "why": f"previous model failed: {str(err)[:200]}", "attempts": attempt, "seconds": time.time() - t0}
         leak = self.audit(t, k, prev[1], seeds)
         if leak.get("result") == "leak":
-            return {"val": None, "why": "previous model reads rows after seed_time on this cutoff", "seconds": time.time() - t0}
+            # rule (10-21, all arms): columns of the model in use that read later rows on this cutoff are dropped and the
+            # rest refit, as a team would do with an incumbent whose leak shows up on new data (an audit is a sample)
+            bad = set(leak.get("all_columns_differing") or [])
+            keep = [c for c in xtr.columns if c not in bad]
+            if not keep:
+                return {"val": None, "why": "every column of the previous model reads rows after seed_time on this cutoff",
+                        "seconds": time.time() - t0}
+            p, _, _ = train_predict(e["task_type"], xtr[keep], seeds["train_sample"][yc], xva[keep])
+            return {"val": score(e["task_type"], seeds["val"][yc], p), "from_cutoff": prev[0], "dropped_leaking": sorted(bad),
+                    "seconds": time.time() - t0}
         return {"val": val, "from_cutoff": prev[0], "seconds": time.time() - t0}
 
     def tool_specs(self):
@@ -1258,7 +1268,16 @@ def main():
         global MAX_LLM_CALLS, MAX_VALIDATIONS
         MAX_LLM_CALLS, MAX_VALIDATIONS = 8, 2
     os.makedirs(a.out, exist_ok=True)
-    Run(a).main()
+
+    def stop(signum, frame):  # a stopped cell still closes its middle layer and drops its database (Run.main's finally)
+        raise SystemExit(128 + signum)
+
+    signal.signal(signal.SIGTERM, stop)
+    try:
+        Run(a).main()
+    except SystemExit as err:
+        sys.stdout.flush()
+        os._exit(err.code if isinstance(err.code, int) else 1)  # sessions in worker threads would keep the process alive
 
 
 if __name__ == "__main__":

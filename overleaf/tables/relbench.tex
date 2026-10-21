@@ -1,0 +1,14 @@
+\begin{table*}[t]
+\caption{\bt{RelBench, one agent per task and a new session at every cutoff, data appended between cutoffs. Cost columns are totals over the sessions from cutoff 2 on, in which a method can use what it kept: tokens including memory operations (millions, and relative to no memory), LLM calls, tool calls, agent time, and cost at DeepSeek's off-peak prices. Test scores are the official metrics of the submitted features, averaged over all cutoffs (AUC higher is better, MAE lower is better).}{RelBench：每个任务一个智能体，每个截点一个新会话，截点之间追加数据。代价列是从第 2 个截点起各会话的合计（此时各方法才能用上自己保留的内容）：含记忆操作的 token（百万，及相对无记忆的倍数）、LLM 调用、工具调用、智能体时间、按 DeepSeek 闲时价格折算的金额。测试分数是提交特征的官方指标在各截点上的平均（AUC 越高越好，MAE 越低越好）。}}
+\label{tab:relbench}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrr|rrr@{}}
+\toprule
+\bh{Method}{方法} & \bh{Tokens (M)}{token（百万）} & \bh{$\times$ none}{相对无记忆} & \bh{LLM calls}{LLM 调用} & \bh{Tool calls}{工具调用} & \bh{Time (min)}{时间（分钟）} & \bh{Cost (CNY)}{金额（元）} & \multicolumn{3}{c}{\bt{Test score per task}{各任务测试分数}}\\
+\midrule
+\input{gen/relbench-table}
+\bottomrule
+\end{tabular}
+\end{table*}

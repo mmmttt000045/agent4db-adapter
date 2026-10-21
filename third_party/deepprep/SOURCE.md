@@ -11,4 +11,5 @@ otherwise a public release points to the official repository instead.
 
 `tools/relbench/deepprep_arm.py` runs a scratch copy of this folder (DeepPrep writes its configuration and logs in its own
 directory) and changes only, at run time: the base configuration's data paths and benchmark list (no benchmark data
-is loaded), and the display settings its API-model configuration lacks (taken from its base configuration).
+is loaded), the display settings its API-model configuration lacks (taken from its base configuration), and one
+system-message file whose name the released prompt loader cannot split (`..._Buildings.md`, not used by the agent) is set aside.

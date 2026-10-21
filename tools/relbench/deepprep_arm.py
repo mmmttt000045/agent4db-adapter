@@ -68,6 +68,11 @@ def import_deepprep(workdir):
     cfg = yaml.safe_load(open(path))
     cfg.update({k: v for k, v in base_cfg.items() if k not in cfg})
     yaml.safe_dump(cfg, open(path, "w"))
+    # the released prompt loader splits every file name at "_" into agent and module; one system message of the release
+    # has two underscores and stops the import, and the reasoning agent does not use it
+    odd = os.path.join(workdir, "src", "prompt", "system_message", "TreeBasedAgenticReasoning_TreeBasedAgenticReasoning_Buildings.md")
+    if os.path.exists(odd):
+        os.rename(odd, odd + ".unused")
     os.makedirs(os.path.join(workdir, "_data"), exist_ok=True)
     os.makedirs(os.path.join(workdir, "_tmp", "schema_description"), exist_ok=True)
     os.chdir(workdir)

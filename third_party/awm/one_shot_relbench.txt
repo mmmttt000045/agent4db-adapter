@@ -1,0 +1,89 @@
+## Concrete Examples
+
+Query: Predict whether a driver finishes in the top 3 of a race in the next 30 days. (cutoff 2010-01-01)
+Actions:
+<think>
+I need to know which tables describe drivers and their results. I will list the tables first.
+</think>
+<action>
+list_tables({})
+</action>
+
+<think>
+The results table holds one row per driver and race; races holds the race date. I will look at both tables.
+</think>
+<action>
+describe_table({"table": "results"})
+describe_table({"table": "races"})
+</action>
+
+<think>
+Results are dated through races.date. I will check that every result joins to exactly one race.
+</think>
+<action>
+check_join({"left": "results", "right": "races", "on": [["raceid", "raceid"]]})
+</action>
+
+<think>
+The join is many-to-one. I will count each driver's past podiums and races before the seed time and validate them as features.
+</think>
+<action>
+validate_features({"sql": "SELECT s.driverid, s.seed_time, count(x.resultid) FILTER (WHERE x.positionorder <= 3) AS podiums, count(x.resultid) AS races FROM {seeds} s LEFT JOIN (SELECT r.resultid, r.driverid, r.positionorder, ra.date FROM results r JOIN races ra ON ra.raceid = r.raceid) x ON x.driverid = s.driverid AND x.date <= s.seed_time GROUP BY 1, 2"})
+</action>
+
+<think>
+The validation score is better than before. I will submit these features.
+</think>
+<action>
+submit({})
+</action>
+
+Query: Predict whether a driver does not finish a race in the next 30 days. (cutoff 2010-01-01)
+Actions:
+<think>
+I need the drivers' past results and their race dates. I will describe the results and races tables.
+</think>
+<action>
+describe_table({"table": "results"})
+describe_table({"table": "races"})
+</action>
+
+<think>
+statusid tells how a race ended. I will check its values on a few rows.
+</think>
+<action>
+run_sql({"sql": "SELECT statusid, count(*) FROM results GROUP BY 1 ORDER BY 2 DESC LIMIT 10"})
+</action>
+
+<think>
+I will count each driver's past races that did not end with a classified finish, before the seed time, and validate.
+</think>
+<action>
+validate_features({"sql": "SELECT s.driverid, s.seed_time, count(x.resultid) FILTER (WHERE x.statusid <> 1) AS not_finished, count(x.resultid) AS races FROM {seeds} s LEFT JOIN (SELECT r.resultid, r.driverid, r.statusid, ra.date FROM results r JOIN races ra ON ra.raceid = r.raceid) x ON x.driverid = s.driverid AND x.date <= s.seed_time GROUP BY 1, 2"})
+</action>
+
+## Summary Workflows
+
+Workflow 1: Find the fact table of the task entity and how its rows are dated
+<think>
+I need to know which tables describe {entity} and their events. I will describe the fact table and the table that holds its time column.
+</think>
+<action>
+describe_table({"table": "{fact_table}"})
+describe_table({"table": "{time_table}"})
+</action>
+
+<think>
+Rows of {fact_table} are dated through {time_table}.{time_column}. I will check that every row joins to exactly one row there.
+</think>
+<action>
+check_join({"left": "{fact_table}", "right": "{time_table}", "on": [["{join_column}", "{join_column}"]]})
+</action>
+
+Workflow 2: Aggregate the entity's past events before the seed time and validate them as features
+<think>
+I will count the {entity}'s past {events} before the seed time and validate them as features.
+</think>
+<action>
+validate_features({"sql": "SELECT s.{entity_key}, s.seed_time, count(x.{fact_key}) FILTER (WHERE {condition}) AS {feature_name}, count(x.{fact_key}) AS {count_name} FROM {seeds} s LEFT JOIN (SELECT f.*, t.{time_column} FROM {fact_table} f JOIN {time_table} t ON t.{join_column} = f.{join_column}) x ON x.{entity_key} = s.{entity_key} AND x.{time_column} <= s.seed_time GROUP BY 1, 2"})
+</action>

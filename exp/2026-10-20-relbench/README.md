@@ -74,9 +74,10 @@ r1-mem-awm 与 `results/pop-mem-20261013-agentsm/`）**一律不报告**。
 | ACE（ICLR 2026） | 一个智能体一本手册，在线一遍 → 每个智能体一本 | 官方 `REFLECTOR_PROMPT_NO_GT`、`CURATOR_PROMPT_NO_GT` 原文；三个角色同一模型、温度 0；条目格式与计数、只增、80,000 预算；整本手册进提示 | 反馈 = 验证分数记录（原文无标签时用执行反馈）；`submit` 附用到的条目编号；一轮反思；不做多轮 epoch（会泄漏未来标签）；去重默认关（官方 AppWorld 配置同） |
 | ~~APC（NeurIPS 2025）~~ **不做（10-21 晚用户决定）：其节省来自换用便宜约 10 倍的小模型，DeepSeek 官方 API 上没有对应的小模型** | 一个应用一份缓存，服务全部请求 → 所有智能体共用一份（原文如此） | 附录 B.4.3–B.4.5 提示词原文；关键词精确匹配；未命中且成功才写入；命中时由小模型逐轮改写模板；LRU 100；温度 0、max_tokens 4096；关键词与模板生成计入成本 | 搭“计划—执行”两级结构；需要比计划模型便宜约 10 倍的小模型（待定，见第 5 节）；“输出正确”= 验证分数优于参照；另跑 APC 自己的无缓存对照（原文的 Accuracy-Optimal） |
 | G-Memory（NeurIPS 2025） | 一个多智能体系统一份，所有智能体共用 → 所有智能体共用（原文如此） | 官方代码 `bingreeky/GMemory` 的记忆模块原样调用（10-20 用户：直接使用），阈值与日程照其发布的设置（successful_topk 1、insights_topk 5 等） | 智能体之间不对话，交互图退化为工具调用链（官方运行中该层不被读回、角色定制默认关）；Resolved = 提交且验证分数优于参照；失败的工具调用 reward −1；只改写 ALFWorld 专用文字并公开差异 |
+| AWM（ICML 2025；10-21 晚用户决定从附录移入主实验） | 一个网站一份，由在该网站上依次做任务的智能体在线归纳 → 每个智能体每个库一份（与 ACE 相同，按预注册） | 官方 `webarena/prompt/instruction.txt`（Apache-2.0，`third_party/awm/`）；`pipeline.py` 的日程：每个任务后判定成功、再从全部成功经历重新归纳（每个任务模板随机取 1 条，`induce_prompt.py`）；温度 1.0、最多 2,048 个输出 token；轨迹只含想法与动作、去掉无效动作；工作流整段追加到系统提示 | 成功 = 验证分数优于参照（对应其 `gt` 判据）；指令中网页用语换成数据库用语；单样例换成同格式的 rel-f1 示例；不加网页动作提示（`click`、`select_option`） |
 | **MAVRA（本文）** | 所有智能体共用 | — | 共享对象扩展为按实体、相对种子时间窗口的特征定义，新增“不读种子时间之后的数据”条件（开工前另写增补方案） |
 
-附录（只在 rel-stack 上）：AWM（ICML 2025，每个智能体每个库一份，官方 `instruction.txt`）、ReasoningBank（ICLR 2026），
+附录（只在 rel-stack 上）：ReasoningBank（ICLR 2026；AWM 已移入主实验），
 以及敏感性实验“一个 ACE 智能体承担一个库上的全部会话”（仍是原文的单智能体用法）。
 原文本来就共享的只有 APC 与 G-Memory；“共享现有记忆仍要探索、会过期”由它们检验，不做任何单智能体方法的共享扩展。
 
@@ -93,7 +94,7 @@ r1-mem-awm 与 `results/pop-mem-20261013-agentsm/`）**一律不报告**。
 
 ### 1.5 规模
 
-主实验 5 组（无记忆、AgentSM、ACE、G-Memory、MAVRA；10-21 晚去掉 APC 与其无缓存对照）× 3 个库（rel-stack 15、rel-amazon 16、rel-trial 15 个会话）× 3 次 = 690 个会话；
+主实验 6 组（无记忆、AgentSM、ACE、G-Memory、AWM、MAVRA；10-21 晚去掉 APC 与其无缓存对照、加入 AWM）× 3 个库（rel-stack 15、rel-amazon 16、rel-trial 15 个会话）× 3 次 = 828 个会话；
 AgentSM 离线建库每库 100 个合成会话；rel-stack 附录约 135 个会话。总 token 在 pilot 之后核算。
 
 ### 1.6 增补：MAVRA 的 RelBench 扩展（写于 P2 之前，看到任何 MAVRA 结果之前）

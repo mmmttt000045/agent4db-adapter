@@ -67,6 +67,33 @@ the paper's reproduction appendix.
 - **Checked (10-20):** two fake sessions: the first stores the trajectory and its extracted key steps (557 tokens);
   the second retrieves it (one relevance-scoring call) and the agent prompt shows it in G-Memory's format.
 
+## AWM (Wang et al., ICML 2025)
+
+- **Code:** prompts from the official repository zorazrw/agent-workflow-memory @ 8c0ff8c (Apache-2.0), vendored in
+  `third_party/awm/` (`instruction.txt`, `one_shot.txt` unchanged); the online loop of `webarena/pipeline.py` and
+  `webarena/induce_prompt.py` reimplemented in `Run.awm_update` (harness), since the released code drives a browser.
+- **Verbatim:** the online schedule (after every task: judge success, then induce workflows again from all successful
+  experiences); at most one trajectory per task template, sampled at random (`num_samples` 1); the prompt =
+  instruction + one-shot example + `## Concrete Examples` (`Query:` and `<think>`/`<action>` steps, actions only) +
+  `## Summary Workflows`; temperature 1.0, at most 2,048 output tokens; the reply appended to the agent's system prompt
+  (`sys_msg += '\n\n' + workflows`); same model as the agent.
+- **Scope:** one workflow memory per agent and database (the agent owning one task), as ACE and as pre-registered:
+  AWM's memory belongs to the agent that works through a website's tasks; a database-wide memory shared by the task
+  agents would be our extension and is not run.
+- **Changes and why:**
+  1. Success = the study's signal (validation better than the entity-table reference), AWM's `gt` criterion in place of
+     its LLM evaluator; test labels are never used.
+  2. A step = one assistant turn: `<think>` = its text (or, when empty, its reasoning text), `<action>` = its tool calls
+     as `name(arguments)`; calls that returned an error are left out, as AWM drops invalid actions; an action is cut at
+     20,000 characters (the harness's limit for tool outputs).
+  3. The web wording of the instruction is replaced (`AWM_OVERRIDES`): "web navigation tasks" -> "database feature
+     engineering tasks", "(input text, button strings)" -> "(task-specific values such as time windows, thresholds and
+     filter values)", the ids of "Search" or "Customers" -> "names of tables and columns"; the rest verbatim.
+  4. The one-shot example (shopping-site clicks) is replaced by `one_shot_relbench.txt`, written for this study in the
+     same format on rel-f1 (a RelBench database not in the study), whose SQL reads no rows after the seed time.
+  5. The web-action reminders `induce_prompt.py` appends (`click('id')`, `select_option`) are left out.
+  6. A task template = one prediction task (its sessions at different cutoffs are instances of it).
+
 ## AgentSM (Biswal et al., arXiv 2601.15709, preprint)
 
 - **Code:** no official code (the paper's anonymous repository has expired; two files survive on the Wayback Machine:

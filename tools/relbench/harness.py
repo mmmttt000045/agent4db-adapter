@@ -34,6 +34,16 @@ import requests
 
 # ACE's official prompts and playbook helpers (Apache-2.0), see third_party/ace/README.md
 ACE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "third_party", "ace")
+AWM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "third_party", "awm")
+# AWM's induction instruction (webarena/prompt/instruction.txt) with its web wording replaced, the rest verbatim
+AWM_OVERRIDES = [
+    ("Given a list of web navigation tasks", "Given a list of database feature engineering tasks"),
+    ("(input text, button strings)", "(task-specific values such as time windows, thresholds and filter values)"),
+    ('e.g., id of "Search" or "Customers"', "e.g., names of tables and columns"),
+]
+AWM_TEMPERATURE = 1.0  # webarena/induce_prompt.py
+AWM_MAX_TOKENS = 2048
+AWM_PER_TEMPLATE = 1  # num_samples: at most this many trajectories of one task template
 sys.path.insert(0, ACE_DIR)
 import curator_prompts as ace_curator  # noqa: E402
 import playbook_utils as ace_pb  # noqa: E402
@@ -84,6 +94,8 @@ ARMS = {
     "gmemory": {"middle_mode": "middle-alone", "parallel_ok": False, "gmemory": True},
     # AgentSM (preprint) as described: read-only memory of this database built offline (tools/relbench/agentsm.py build)
     "agentsm": {"middle_mode": "middle-alone", "parallel_ok": True, "agentsm": True},
+    # AWM (ICML 2025) as published (online WebArena pipeline): one workflow memory per agent, re-induced after every task
+    "awm": {"middle_mode": "middle-alone", "parallel_ok": True, "awm": True},
 }
 GMEMORY_REPO = "results/ext/GMemory"
 GMEMORY_PYTHON = "results/ext/venv-gmem/bin/python"
@@ -200,8 +212,10 @@ class Llm:
                 continue
             raise LlmUnavailable(f"HTTP {r.status_code}: {r.text[:500]}")
 
-    def chat(self, messages, tools=None, temperature=None):
+    def chat(self, messages, tools=None, temperature=None, max_tokens=None):
         body = {"model": self.model, "messages": messages}
+        if max_tokens:
+            body["max_tokens"] = max_tokens
         if self.effort:
             body["reasoning_effort"] = self.effort
         if self.thinking:
@@ -497,6 +511,8 @@ class Run:
                 if r0["k"] == first - 1 and r0.get("final_sql") and (r0.get("audit") or {}).get("result") == "clean":
                     self.prev_sql[r0["task"]] = (r0["k"], r0["final_sql"])
         self.playbooks = {}  # ACE: agent -> playbook text
+        self.awm_pool = {}  # AWM: agent -> successful trajectories
+        self.awm_workflows = {}  # AWM: agent -> induced workflows (appended to the system prompt)
         self.ace_steps = {}
         self.gmem = None
         self.asm = None
@@ -667,7 +683,8 @@ Shared memory: agents on this database publish verified feature definitions and 
             "that agents often call together." if self.arm.get("agentsm") else "") + (
             "\n\n" + open(os.path.join(ACE_DIR, "appworld_playbook_block.txt")).read().replace(
                 "{{ playbook }}", self.playbooks.get(f"{tname(t)}-agent", ACE_EMPTY_PLAYBOOK)).rstrip()
-            + "\nWhen you call validate_features or submit, list in bullet_ids the playbook bullets you used." if self.arm.get("ace") else "")
+            + "\nWhen you call validate_features or submit, list in bullet_ids the playbook bullets you used." if self.arm.get("ace") else "") + (
+            "\n\n" + self.awm_workflows[f"{tname(t)}-agent"] if self.arm.get("awm") and self.awm_workflows.get(f"{tname(t)}-agent") else "")
 
     def target(self, t, k):
         """Validation score of this run's previous-cutoff model of task t, refit on cutoff k (none at the first cutoff)."""
@@ -966,6 +983,13 @@ Shared memory: agents on this database publish verified feature definitions and 
                 raise
             except Exception as err:
                 rec["learning"] = {"error": str(err)[:500]}
+        if self.arm.get("awm") and not cut_short:
+            try:
+                rec["learning"] = self.awm_update(t, k, rec, msgs, agent)
+            except LlmUnavailable:
+                raise
+            except Exception as err:
+                rec["learning"] = {"error": str(err)[:500]}
         if self.gmem and not cut_short:
             ref = self.refs.get((t, k)) or {}
             best = rec["best_val"]
@@ -1166,6 +1190,65 @@ Shared memory: agents on this database publish verified feature definitions and 
         log(f"{t} k{k}: ACE {len(tags)} tags, {len(ops)} additions, playbook {n} bullets")
         return {"seconds": time.time() - t0, "input_tokens": tok_in, "output_tokens": tok_out, "bullet_tags": tags,
                 "operations": ops, "playbook_bullets": n}
+
+    def awm_update(self, t, k, rec, msgs, agent):
+        """AWM after a session, as its online WebArena pipeline (pipeline.py, induce_prompt.py): a successful session joins
+        the agent's experience; then workflows are induced again from all successful experiences, at most
+        AWM_PER_TEMPLATE per task template (here: the task) sampled at random, with AWM's instruction, a one-shot example
+        in its format and the examples (`Query:` with `<think>`/`<action>` steps, actions only, failed calls left out as
+        AWM drops invalid steps). Success = the study's signal (validation better than the reference), as AWM's "gt"
+        criterion; test labels are never used."""
+        e = self.tasks[t]
+        ref = self.refs.get((t, k)) or {}
+        best, higher = rec["best_val"], rec["higher_is_better"]
+        success = best is not None and ref.get("val") is not None and (best > ref["val"] if higher else best < ref["val"])
+        if success:
+            out_of = {m["tool_call_id"]: m["content"] for m in msgs if m["role"] == "tool"}
+            steps = []
+            for m in msgs:
+                if m["role"] != "assistant" or not m.get("tool_calls"):
+                    continue
+                acts = []
+                for c in m["tool_calls"]:
+                    try:
+                        failed = "error" in json.loads(out_of.get(c["id"], "{}"))
+                    except ValueError:
+                        failed = False
+                    if not failed:
+                        acts.append(f"{c['function']['name']}({c['function'].get('arguments') or '{}'})"[:TOOL_OUTPUT_CHARS])
+                if acts:
+                    steps.append(((m.get("content") or m.get("reasoning_content") or "").strip(), acts))
+            query = f"{self.task_desc[t]['description']} (cutoff {e['cutoffs'][k - 1]['test_timestamp'][:10]})"
+            self.awm_pool.setdefault(agent, []).append({"template": t, "query": query, "steps": steps})
+        pool = self.awm_pool.get(agent) or []
+        if not pool:
+            return {"success": success, "skipped": "no successful experience yet"}
+        rng = random.Random(self.a.run * 1000 + k)
+        by_template = {}
+        for ex in pool:
+            by_template.setdefault(ex["template"], []).append(ex)
+        chosen = [ex for v in by_template.values() for ex in rng.sample(v, min(AWM_PER_TEMPLATE, len(v)))]
+        instruction = open(os.path.join(AWM_DIR, "instruction.txt")).read()
+        for old, new in AWM_OVERRIDES:
+            assert old in instruction, old
+            instruction = instruction.replace(old, new)
+        one_shot = open(os.path.join(AWM_DIR, "one_shot_relbench.txt")).read()
+        examples = []
+        for ex in chosen:
+            traj = "\n\n".join(f"<think>\n{th}\n</think>\n<action>\n" + "\n".join(acts) + "\n</action>" for th, acts in ex["steps"])
+            examples.append(f"Query: {ex['query']}\nActions:\n{traj}")
+        prompt = "\n\n".join([instruction, one_shot, "\n\n".join(["## Concrete Examples"] + examples + ["## Summary Workflows"])])
+        t0 = time.time()
+        r = self.llm.chat([{"role": "user", "content": prompt}], temperature=AWM_TEMPERATURE, max_tokens=AWM_MAX_TOKENS)
+        workflows = (r["message"].get("content") or "").strip()
+        if workflows:
+            self.awm_workflows[agent] = workflows
+        os.makedirs(os.path.join(self.a.out, "workflows"), exist_ok=True)
+        with open(os.path.join(self.a.out, "workflows", f"{agent}-k{k}.txt"), "w") as f:
+            f.write(workflows)
+        log(f"{t} k{k}: AWM {len(pool)} successful experiences, {len(chosen)} in the prompt, workflows {len(workflows)} chars")
+        return {"success": success, "seconds": time.time() - t0, "input_tokens": r["input_tokens"], "output_tokens": r["output_tokens"],
+                "experiences": len(pool), "examples": len(chosen), "workflow_chars": len(workflows), "finish_reason": r.get("finish_reason")}
 
     def main(self):
         a = self.a

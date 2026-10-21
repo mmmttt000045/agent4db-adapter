@@ -19,6 +19,7 @@ import json
 import os
 import random
 import re
+import socket
 import subprocess
 import sys
 import threading
@@ -276,13 +277,16 @@ class Middle:
             stdout=self.log, stderr=subprocess.STDOUT, env=env)
         self.local = threading.local()
         for _ in range(120):
-            try:
-                if self.http.get(f"{self.base}/v1/tools", timeout=5).ok:
-                    return
-            except requests.RequestException:
-                pass
             if self.proc.poll() is not None:
                 raise RuntimeError(f"middle layer exited ({self.proc.returncode}); see middle.log")
+            try:
+                if self.http.get(f"{self.base}/v1/tools", timeout=5).ok:
+                    time.sleep(1)  # a middle layer that could not bind the port exits at once: the answer was not ours
+                    if self.proc.poll() is None:
+                        return
+                    raise RuntimeError(f"middle layer exited ({self.proc.returncode}); port {port} belongs to another process")
+            except requests.RequestException:
+                pass
             time.sleep(1)
         raise RuntimeError("middle layer did not start")
 
@@ -316,6 +320,13 @@ class Middle:
 
 def base_url(url):
     return url.rsplit("/", 1)[0]
+
+
+def free_port():
+    """A port no other process listens on: cells running side by side must never reach each other's middle layer."""
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        return sock.getsockname()[1]
 
 
 def create_run_db(url, template, name):
@@ -1116,7 +1127,7 @@ Shared memory: agents on this database publish verified feature definitions and 
             "thinking": self.llm.thinking,
             "test_scores": "now" if a.eval_now else "after the run"}, "cutoffs": []}
         try:
-            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), a.llm if arm.get("extractor") else None, self.llm.effort, self.llm.prefix)
+            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or free_port(), a.llm if arm.get("extractor") else None, self.llm.effort, self.llm.prefix)
             if arm.get("gmemory"):
                 self.gmem = GMemoryService(self.env, a.out, self.llm)
             if arm.get("agentsm"):

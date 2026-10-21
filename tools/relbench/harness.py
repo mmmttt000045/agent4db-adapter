@@ -235,6 +235,8 @@ class GMemoryService:
         self.err = open(os.path.join(out, "gmemory.log"), "w")
         # its own environment: no proxies, and none of the harness's packages (PYTHONPATH)
         e = {k: v for k, v in os.environ.items() if "proxy" not in k.lower() and k != "PYTHONPATH"}
+        if llm.keep_reasoning:  # DeepSeek's API: G-Memory's own calls in non-thinking mode (reproduction notes)
+            e["GMEMORY_THINKING"] = "disabled"
         e.update(OPENAI_API_BASE=llm.base, OPENAI_API_KEY=llm.key,
                  HF_ENDPOINT="https://hf-mirror.com", TOKENIZERS_PARALLELISM="false")
         here = os.path.dirname(os.path.abspath(__file__))

@@ -82,6 +82,20 @@ def main():
     fmt = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(fmt)
 
+    thinking = os.environ.get("GMEMORY_THINKING")
+    if thinking:
+        # DeepSeek's API thinks unless told otherwise, and reasoning counts against G-Memory's max_tokens 512; its calls go in the
+        # mode set here (the harness sets "disabled": the paper's models are non-reasoning). G-Memory's own code is unchanged.
+        from openai.resources.chat.completions import Completions
+
+        create = Completions.create
+
+        def create_in_mode(self, *args, **kw):
+            kw["extra_body"] = {**(kw.get("extra_body") or {}), "thinking": {"type": thinking}}
+            return create(self, *args, **kw)
+
+        Completions.create = create_in_mode
+
     P = gprompt.GMemoryPrompts
     for name, (old, new) in PROMPT_OVERRIDES.items():
         text = getattr(P, name)

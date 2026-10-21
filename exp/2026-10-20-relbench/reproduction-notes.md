@@ -58,8 +58,12 @@ the paper's reproduction appendix.
      success-critique system prompt; the object-state checks of the mistake-detection prompt → whether the feature SQL
      returned one row per seed and described the entity before the seed time; the ALFWorld key-steps example → a short
      rel-f1 example (a database not used in this study).
-  6. The LLM is the study's model through the same gateway (`OPENAI_API_BASE`/`OPENAI_API_KEY` set for the service);
-     G-Memory's calls go without a reasoning setting, as its code sends none.
+  6. The LLM is the study's model through the same service (`OPENAI_API_BASE`/`OPENAI_API_KEY` set for the service).
+     G-Memory's code sends no reasoning setting; DeepSeek's API (used since 10-21) thinks by default, and the reasoning
+     counts against G-Memory's `max_tokens` 512 (a reply cut there returns no text, which G-Memory turns into an empty
+     answer). G-Memory's own calls therefore go in DeepSeek's non-thinking mode, as the paper's models (GPT-4o-mini,
+     Qwen2.5) are non-reasoning; set in our adapter (`GMEMORY_THINKING`), G-Memory's code unchanged. The agents themselves
+     use the study's setting (thinking, low).
 - **Checked (10-20):** two fake sessions: the first stores the trajectory and its extracted key steps (557 tokens);
   the second retrieves it (one relevance-scoring call) and the agent prompt shows it in G-Memory's format.
 

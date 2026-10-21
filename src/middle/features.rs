@@ -40,6 +40,12 @@ pub struct LearnReq {
     pub audit_seeds: Option<String>,
     pub val_score: f64,
     pub metric: String,
+    /// 提交的 SQL 的泄漏审计为 clean：只有这时才把整份 SQL 存进任务方案
+    #[serde(default)]
+    pub audit_clean: bool,
+    /// 该任务的验证种子表（如 task.user_badge_val），复用前核对整份 SQL 能否在当前快照上执行
+    #[serde(default)]
+    pub val_table: Option<String>,
 }
 
 /// 结果行按（实体键, seed_time）取某一列的值。
@@ -146,11 +152,13 @@ impl Middle {
             }
             results.push(v);
         }
-        let program = if members.is_empty() {
+        // 任务方案：通过检查的定义，加上审计为 clean 的整份提交 SQL（复用前核对能否在当前快照上执行，智能体验证时再审计一次）
+        let program = if members.is_empty() && !req.audit_clean {
             Value::Null
         } else {
             let prog = json!({"task": req.task, "cutoff": req.cutoff, "metric": req.metric, "val_score": req.val_score,
-                              "seed_key": req.seed_key, "features": members});
+                              "seed_key": req.seed_key, "features": members,
+                              "sql_full": if req.audit_clean { json!(req.sql) } else { Value::Null }, "val_table": req.val_table});
             let key = format!("program:{}", req.task);
             let e = self.new_entry(ctx, &key, Content::Result(prog.clone()), Default::default(), vec![]);
             self.store.put(&self.mfk(ctx, &key), e);
@@ -430,9 +438,24 @@ impl Middle {
         let keys: Vec<String> =
             prog["features"].as_array().into_iter().flatten().filter_map(|f| f["key"].as_str().map(String::from)).collect();
         let seed_key = prog["seed_key"].as_str().unwrap_or_default().to_string();
-        let composed = self.compose_feature_sql(ctx, &keys, &seed_key).await?;
-        Ok(json!({"program": {"task": prog["task"], "cutoff": prog["cutoff"], "metric": prog["metric"], "val_score": prog["val_score"]},
-                  "sql": composed["sql"], "columns": composed["columns"], "unavailable": composed["unavailable"]}))
+        let mut v =
+            json!({"program": {"task": prog["task"], "cutoff": prog["cutoff"], "metric": prog["metric"], "val_score": prog["val_score"]}});
+        if !keys.is_empty() {
+            let composed = self.compose_feature_sql(ctx, &keys, &seed_key).await?;
+            v["sql"] = composed["sql"].clone();
+            v["columns"] = composed["columns"].clone();
+            v["unavailable"] = composed["unavailable"].clone();
+        }
+        if let (Some(full), Some(val)) = (prog["sql_full"].as_str(), prog["val_table"].as_str()) {
+            // 整份 SQL 在当前快照上能否执行（50 个验证种子）；能执行才提供，智能体验证时再做泄漏审计
+            let seeds = format!("(select * from {val} limit 50)");
+            let q = format!("select count(*) from ({}) q", full.trim().trim_end_matches(';').replace("{seeds}", &seeds));
+            match self.vquery(QKind::Metric, &q).await {
+                Ok(_) => v["program_sql"] = json!(full),
+                Err(e) => v["program_sql_unavailable"] = json!(format!("the program's SQL no longer runs on the current data: {e:#}")),
+            }
+        }
+        Ok(v)
     }
 
     /// 已发布的特征定义（框架在运行结束时导出）。
@@ -470,7 +493,7 @@ pub fn feature_tool_specs() -> Vec<ToolSpec> {
         },
         ToolSpec {
             name: "find_program",
-            description: "The latest verified feature program for a task (cutoff, validation score) with its still-valid definitions compiled into one feature SQL.",
+            description: "The latest verified feature program for a task (cutoff, validation score): its complete verified feature SQL when it still runs, and its still-valid definitions compiled into one feature SQL.",
             schema: json!({"type": "object", "properties": {"task": {"type": "string"}}, "required": ["task"]}),
         },
     ]

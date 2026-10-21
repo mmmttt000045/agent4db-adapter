@@ -417,16 +417,18 @@ class Run:
         self.llm = Llm(self.env)
         self.arm = ARMS[a.arm]
         self.refs = {}
-        # retraining goal (README §1.2, 10-21): task -> (cutoff, best validation score) of this run's latest session
-        self.prev_best = {}
+        # retraining goal (README §1.2, 10-21): the previous cutoff's model, refit on this cutoff's data.
+        # task -> (cutoff, final feature SQL whose audit was clean) of this run's latest session
+        self.prev_sql = {}
+        self.targets = {}
         if a.targets_from:
             first = min(int(x) for x in a.cutoffs) if a.cutoffs else 1
             for f in glob.glob(os.path.join(a.targets_from, "sessions", "*.json")):
                 if f.endswith(".partial.json"):
                     continue
                 r0 = json.load(open(f))
-                if r0["k"] == first - 1 and r0.get("best_val") is not None:
-                    self.prev_best[r0["task"]] = (r0["k"], r0["best_val"])
+                if r0["k"] == first - 1 and r0.get("final_sql") and (r0.get("audit") or {}).get("result") == "clean":
+                    self.prev_sql[r0["task"]] = (r0["k"], r0["final_sql"])
         self.playbooks = {}  # ACE: agent -> playbook text
         self.ace_steps = {}
         self.gmem = None
@@ -588,10 +590,10 @@ Feature SQL contract: one SELECT statement that uses {{seeds}} as the seed table
 
 Tools: list_tables, describe_table, join_path, check_join and run_sql explore the database; the first four cover the tables in schema public, and the seed tables are read with run_sql (read-only, at most 50 rows returned). validate_features(sql) computes your features on a {SAMPLE_SIZE}-row training sample and on the validation seeds, trains the model and returns the validation {metric}. submit(sql) ends the session with your final features.
 Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; the session also ends after {PATIENCE} validations in a row without improvement. If you do not submit, your best validated features are used.""" + (
-            f"\n\nRetraining goal: at the previous cutoff ({e['cutoffs'][k - 2]['test_timestamp'][:10]}) this task's model reached validation {metric} "
-            f"{self.target(t, k):.5f}; the session ends as soon as your features reach that score." if self.target(t, k) is not None else "") + (f"""
+            f"\n\nRetraining goal: this task's model from the previous cutoff ({e['cutoffs'][k - 2]['test_timestamp'][:10]}), refit on this cutoff's data, "
+            f"reaches validation {metric} {self.target(t, k):.5f}; the session ends as soon as your features reach that score." if self.target(t, k) is not None else "") + (f"""
 
-Shared memory: agents on this database publish verified feature definitions. Start with find_program (this task's verified program from an earlier cutoff, with its feature SQL) and find_features (definitions for the entity table, with a feature SQL of them for these seed tables). If they return a feature SQL, validate it first; explore the tables and extend the SQL only to improve on it. compose_features compiles chosen definitions (by key) into a feature SQL.""" if self.arm.get("feature_memory") else "") + (
+Shared memory: agents on this database publish verified feature definitions and feature programs. Start with find_program (this task's verified program from an earlier cutoff: its complete feature SQL when it still runs, and a feature SQL of its definitions) and find_features (definitions for the entity table, with a feature SQL of them for these seed tables). If they return a feature SQL, validate it first (the complete program SQL first); explore the tables and extend the SQL only to improve on it. compose_features compiles chosen definitions (by key) into a feature SQL.""" if self.arm.get("feature_memory") else "") + (
             "\n\nMemory: retrieve_trajectory returns how the most similar earlier task on this database was explored; call it before you start. "
             "schema_linking asks a schema linking agent to map a task to tables, columns and joins. The other extra tools run tool sequences "
             "that agents often call together." if self.arm.get("agentsm") else "") + (
@@ -600,9 +602,28 @@ Shared memory: agents on this database publish verified feature definitions. Sta
             + "\nWhen you call validate_features or submit, list in bullet_ids the playbook bullets you used." if self.arm.get("ace") else "")
 
     def target(self, t, k):
-        """The previous cutoff's best validation score of this task in this run (none at the first cutoff)."""
-        prev = self.prev_best.get(t)
-        return prev[1] if prev and prev[0] == k - 1 else None
+        """Validation score of this run's previous-cutoff model of task t, refit on cutoff k (none at the first cutoff)."""
+        return (self.targets.get((t, k)) or {}).get("val")
+
+    def incumbent(self, t, k, seeds):
+        """Refit the previous cutoff's final feature SQL on cutoff k and score it on the validation seeds (no LLM)."""
+        prev = self.prev_sql.get(t)
+        if not prev or prev[0] != k - 1:
+            return {"val": None, "why": "no previous model"}
+        e = self.tasks[t]
+        ec, yc = e["entity_col"].lower(), e["target_col"].lower()
+        t0 = time.time()
+        try:
+            xtr, _ = features(self.url, prev[1], f"task.{tname(t)}_train_sample", seeds["train_sample"], ec)
+            xva, _ = features(self.url, prev[1], f"task.{tname(t)}_val", seeds["val"], ec)
+            p, _, _ = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xva)
+            val = score(e["task_type"], seeds["val"][yc], p)
+        except Exception as err:  # noqa: BLE001 - a previous model that no longer runs gives no goal
+            return {"val": None, "why": f"previous model failed: {str(err)[:200]}", "seconds": time.time() - t0}
+        leak = self.audit(t, k, prev[1], seeds)
+        if leak.get("result") == "leak":
+            return {"val": None, "why": "previous model reads rows after seed_time on this cutoff", "seconds": time.time() - t0}
+        return {"val": val, "from_cutoff": prev[0], "seconds": time.time() - t0}
 
     def tool_specs(self):
         def fn(name, desc, props, req):
@@ -635,8 +656,10 @@ Shared memory: agents on this database publish verified feature definitions. Sta
         agent = f"{tname(t)}-agent"
         sid = f"{self.a.arm}-r{self.a.run}-{tname(t)}-k{k}"
         metric, higher = metric_of(e["task_type"])
+        self.targets[(t, k)] = self.incumbent(t, k, seeds) if k > 1 else {"val": None, "why": "first cutoff"}
         ec, yc = e["entity_col"].lower(), e["target_col"].lower()
         rec = {"arm": self.a.arm, "run": self.a.run, "task": t, "k": k, "agent": agent, "session": sid, "metric": metric, "target": self.target(t, k),
+               "target_detail": self.targets.get((t, k)),
                "higher_is_better": higher, "llm": [], "tools": [], "validations": [], "stop": None, "error": None}
         task_line = f"Build features for {t} at cutoff {e['cutoffs'][k - 1]['test_timestamp'][:10]}."
         msgs = [{"role": "system", "content": self.system_prompt(t, k, seeds)}, {"role": "user", "content": task_line}]
@@ -805,8 +828,6 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                 break
         rec["audit_seconds"] = sum(v.get("audit_seconds", 0) for v in rec["validations"])
         rec["agent_seconds"] = time.time() - t_start - rec["audit_seconds"]
-        if best is not None:
-            self.prev_best[t] = (k, best)
         rec["final_sql"] = submitted or best_sql
         rec["final_source"] = "submitted" if submitted else ("best_validated" if best_sql else None)
         rec["best_val"] = best
@@ -819,6 +840,8 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                 rec["audit"] = self.audit(t, k, rec["final_sql"], seeds)
             except Exception as err:
                 rec["audit"] = {"result": "error", "why": str(err)[:300]}
+        if rec["final_sql"] and (rec.get("audit") or {}).get("result") == "clean":
+            self.prev_sql[t] = (k, rec["final_sql"])
         if self.arm.get("feature_memory") and rec["final_sql"]:
             try:
                 rec["learning"] = self.learn(t, k, rec, seeds, middle, agent, sid)
@@ -901,7 +924,8 @@ Shared memory: agents on this database publish verified feature definitions. Sta
                 "cutoff": e["cutoffs"][k - 1]["test_timestamp"], "seed_key": ec, "entity_table": e["entity_table"].lower(),
                 "entity_key": self.manifest["tables"][e["entity_table"]]["pkey"].lower(), "sql": rec["final_sql"], "importance": imp,
                 "seeds": f"(select * from task.{tname(t)}_train_sample order by {ec}, seed_time limit {AUDIT_SEEDS})",
-                "audit_schema": schema, "audit_seeds": f"(select * from {schema}.seeds)", "val_score": best, "metric": rec["metric"]}
+                "audit_schema": schema, "audit_seeds": f"(select * from {schema}.seeds)", "val_score": best, "metric": rec["metric"],
+                "audit_clean": audit.get("result") == "clean", "val_table": f"task.{tname(t)}_val"}
         t0 = time.time()
         try:
             r = middle.post("/v1/learn_features", body)

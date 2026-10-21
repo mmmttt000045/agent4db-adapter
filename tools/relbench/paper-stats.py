@@ -80,7 +80,7 @@ def main():
         for m in ("Sessions", "Late", "BestBaseline", "MavraVsBest", "MavraSpeedVsBest"):
             macros[f"Rb{pre}{m}"] = "--"
         for _, name, _ in ARMS:
-            for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "QA", "QB", "QC", "TokSaveAll"):
+            for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "QA", "QB", "QC", "TokSaveAll", "NotWorse"):
                 macros[f"Rb{pre}{name}{m}"] = "--"
     for m in ("RbNoneMedLlm", "RbNoneMedTok", "RbSchemaProbe", "RbSchemaRepeat"):
         macros[m] = "--"
@@ -117,7 +117,7 @@ def main():
         rows = {}
         for arm, name, label in ARMS:
             if arm not in data:
-                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "TokSaveAll"):
+                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "TokSaveAll", "NotWorse"):
                     macros[f"Rb{pre}{name}{m}"] = "--"
                 for i, _ in enumerate(tasks):
                     macros[f"Rb{pre}{name}Q{LETTERS[i]}"] = "--"
@@ -135,6 +135,16 @@ def main():
                 ks = [k for k in keys if k[0] == t and all(data[x][k]["test"] is not None for x in data)]
                 r["test"][t] = statistics.mean(d[k]["test"] for k in ks) if ks else None
             rows[arm] = r
+            # tasks on which the arm's mean test score is not worse than no memory's (pre-registered: AUC within 0.01, MAE within 2%)
+            if "none" in rows and rows["none"] is not None:
+                nw = 0
+                for t in tasks:
+                    a_, b_ = r["test"].get(t), rows["none"]["test"].get(t)
+                    if a_ is None or b_ is None:
+                        continue
+                    higher = data["none"][next(k for k in keys if k[0] == t)]["higher"]
+                    nw += (a_ >= b_ - 0.01) if higher else (a_ <= b_ * 1.02)
+                macros[f"Rb{pre}{name}NotWorse"] = str(nw)
             macros.update({f"Rb{pre}{name}Tok": f"{tok / 1e6:.2f}", f"Rb{pre}{name}TokX": f"{r['tokx']:.2f}",
                            f"Rb{pre}{name}Llm": str(r["llm"]), f"Rb{pre}{name}Tools": str(r["tools"]),
                            f"Rb{pre}{name}Min": f"{r['min']:.0f}", f"Rb{pre}{name}Speed": f"{r['speed']:.1f}",

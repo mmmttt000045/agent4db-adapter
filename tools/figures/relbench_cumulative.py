@@ -27,8 +27,8 @@ TEXT = {'en': {'y': 'Cumulative tokens (M)', 'x': 'Session (in arrival order)', 
         'zh': {'y': '累计 token（百万）', 'x': '会话（按到来顺序）', 'k': '截点 {k}'}}
 
 
-def draw(lang):
-    data = json.loads(DATA.read_text(encoding='utf-8'))
+def draw(lang, data_path=DATA, out_dir=None):
+    data = json.loads(Path(data_path).read_text(encoding='utf-8'))
     mplstyle.setup(lang)
     fig = mplstyle.figure(W, H)
     dbs = [db for db in ('rel-stack', 'rel-trial') if db in data]
@@ -60,11 +60,12 @@ def draw(lang):
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper center', ncol=3, bbox_to_anchor=(.5, 1.02), fontsize=mplstyle.TICK)
     fig.subplots_adjust(left=.1, right=.99, bottom=.2, top=.72, wspace=.28)
-    out = style.OUT / (f'{NAME}.pdf' if lang == 'en' else f'{NAME}-zh.pdf')
+    out = Path(out_dir or style.OUT) / (f'{NAME}.pdf' if lang == 'en' else f'{NAME}-zh.pdf')
     mplstyle.save(fig, out)
     print(out)
 
 
 if __name__ == '__main__':
+    # optional: the sessions JSON and the output folder (default: the archived JSON and overleaf/figures)
     for lang in ('en', 'zh'):
-        draw(lang)
+        draw(lang, *(sys.argv[1:3]))

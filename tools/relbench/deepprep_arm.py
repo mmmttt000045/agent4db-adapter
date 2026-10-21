@@ -17,7 +17,8 @@ copying all of them (the operators copy the table they change).
 Per task and cutoff (DeepPrep keeps nothing between tasks): the input tables are the database at the cutoff (rows
 dated at or before test_k), plus "seeds" (entity key, seed_time): 2,000 training seeds while exploring, then the
 50,000-seed training sample, the validation seeds and the test seeds for the final solution. The solution's table is
-the feature table; the study's fixed LightGBM gives the validation and test scores. A solution is checked for leakage
+the feature table; the study's fixed LightGBM gives the validation and test scores (each split's run within 600 s, the
+other arms' statement timeout; feature names reduced to letters, digits and _). A solution is checked for leakage
 as every method's features are (recomputed with rows after the latest training seed time hidden); a leaking solution
 is returned to the agent as an error, as DeepPrep returns any failed solution.
 
@@ -27,7 +28,9 @@ is returned to the agent as an error, as DeepPrep returns any failed solution.
 import argparse
 import json
 import os
+import re
 import shutil
+import signal
 import sys
 import tempfile
 import time
@@ -44,6 +47,9 @@ DEEPPREP = os.path.join(ROOT, "third_party", "deepprep")
 CONFIG = "tree_based_agentic_reasoning_claude"  # DeepPrep's configuration for API models
 EXPLORE_SEEDS = 2000
 AUDIT_SEEDS = H.AUDIT_LEAK_SEEDS
+# the final solution on one split of the full seeds: the other arms' statement timeout (DeepPrep's own client also waits
+# 600 s for its execution service)
+FINAL_SECONDS = 600
 
 
 def log(msg):
@@ -101,6 +107,10 @@ def import_deepprep(workdir):
 
 class LlmGone(BaseException):
     """The model service failed after all retries: not an Exception, so DeepPrep's error loop does not retry it."""
+
+
+class ChainTimeout(BaseException):
+    """The final solution ran past FINAL_SECONDS on one split (not an Exception: generated code may catch those)."""
 
 
 class StudyLlm:
@@ -184,6 +194,31 @@ def run_chain(dp, executor, tables, chain, task):
     return out
 
 
+def run_chain_limited(dp, executor, tables, chain, task):
+    def stop(*_):
+        raise ChainTimeout(f"the solution ran over {FINAL_SECONDS} s on {len(tables['seeds'])} seeds")
+
+    old = signal.signal(signal.SIGALRM, stop)
+    signal.alarm(FINAL_SECONDS)
+    try:
+        return run_chain(dp, executor, tables, chain, task)
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, old)
+
+
+def plain_names(cols):
+    """LightGBM rejects JSON characters in feature names: keep letters, digits and _, unique."""
+    out, seen = [], set()
+    for c in cols:
+        n = re.sub(r"[^0-9A-Za-z_]", "_", c)
+        while n in seen:
+            n += "_"
+        seen.add(n)
+        out.append(n)
+    return out
+
+
 def features_from(table, seeds, ec):
     """One numeric row per seed, in the seeds' order (the study's feature contract)."""
     df = table.copy()
@@ -202,6 +237,7 @@ def features_from(table, seeds, ec):
             x[c] = conv
         keep.append(c)
     x = x[keep[:H.MAX_FEATURES]].astype(float)
+    x.columns = plain_names(x.columns)
     if x.shape[1] == 0:
         x = pd.DataFrame({"constant": np.zeros(len(seeds))})
     return x
@@ -321,14 +357,14 @@ class Cell:
         if solution:
             try:
                 tv = time.time()
-                xtr = features_from(run_chain(dp, executor, {**tables, "seeds": train[[ec, "seed_time"]]}, solution, task), train, ec)
-                xva = features_from(run_chain(dp, executor, {**tables, "seeds": val[[ec, "seed_time"]]}, solution, task), val, ec)
+                xtr = features_from(run_chain_limited(dp, executor, {**tables, "seeds": train[[ec, "seed_time"]]}, solution, task), train, ec)
+                xva = features_from(run_chain_limited(dp, executor, {**tables, "seeds": val[[ec, "seed_time"]]}, solution, task), val, ec)
                 sql_s = time.time() - tv
                 pv, _, tt = H.train_predict(e["task_type"], xtr, train[yc], xva)
                 vscore = H.score(e["task_type"], val[yc], pv)
                 rec["validations"].append({"val": vscore, "sql_seconds": sql_s, "train_seconds": tt, "leak": False, "n_features": xtr.shape[1]})
                 rec["best_val"] = vscore
-                xte = features_from(run_chain(dp, executor, {**tables, "seeds": test[[ec, "seed_time"]]}, solution, task), test, ec)
+                xte = features_from(run_chain_limited(dp, executor, {**tables, "seeds": test[[ec, "seed_time"]]}, solution, task), test, ec)
                 labels = pd.read_parquet(os.path.join(self.a.prep, "tasks", t, f"k{k}", "test.parquet"))
                 labels.columns = [c.lower() for c in labels.columns]
                 labels = labels.rename(columns={e["time_col"].lower(): "seed_time"})
@@ -339,10 +375,12 @@ class Cell:
                 ta = time.time()
                 rec["audit"] = self.audit(dp, executor, solution, task, tables, train, t, k)
                 audit_s = time.time() - ta
-            except Exception as err:  # noqa: BLE001 - the solution failed on the full seeds
+            except (Exception, ChainTimeout) as err:  # noqa: BLE001 - the solution failed on the full seeds
                 rec["error"] = f"final execution: {str(err)[:400]}"
-                rec["stop"] = "solution_failed"
-        val_s = sum(v.get("sql_seconds", 0) + v.get("train_seconds", 0) for v in rec["validations"])
+                rec["stop"] = "solution_timeout" if isinstance(err, ChainTimeout) else "solution_failed"
+                if not rec["validations"]:  # the time spent on the failed run counts as the validation's
+                    rec["failed_execution_seconds"] = time.time() - tv
+        val_s = sum(v.get("sql_seconds", 0) + v.get("train_seconds", 0) for v in rec["validations"]) + rec.get("failed_execution_seconds", 0)
         rec["audit_seconds"] = audit_s
         rec["agent_seconds"] = reasoning_s + val_s  # reasoning (LLM and exploration) plus the one validation, as other arms
         rec.setdefault("best_val", None)

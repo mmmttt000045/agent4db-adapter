@@ -93,6 +93,36 @@ the paper's reproduction appendix.
      same format on rel-f1 (a RelBench database not in the study), whose SQL reads no rows after the seed time.
   5. The web-action reminders `induce_prompt.py` appends (`click('id')`, `select_option`) are left out.
   6. A task template = one prediction task (its sessions at different cutoffs are instances of it).
+  7. Induction runs in DeepSeek's non-thinking mode (`AWM_THINKING`, 10-21): AWM induces with a non-reasoning model
+     (GPT-4) within 2,048 output tokens; with thinking on, the reasoning used up that budget (`finish_reason` length)
+     and most induced workflows were empty, so the first AWM runs were discarded and rerun. The agents themselves use
+     the study's setting (thinking, low), as with G-Memory.
+
+## DeepPrep (Fan et al., PVLDB 19(11), 2026)
+
+- **Code:** the official repository ruc-datalab/DeepPrep @ b4e64b0 (no license file; ask the authors before the
+  artifact is published), vendored in `third_party/deepprep/` (`SOURCE.md`), run by `tools/relbench/deepprep_arm.py`.
+- **Verbatim:** the tree-based agentic reasoning loop (`TreeBasedAgenticReasoningAgent.reasoning_step`: `<think>`,
+  exploratory `<operator>` chains executed with their observations, a final `<solution>` chain ending in Terminate),
+  its prompts (`PromptGenerator.tree_based_agentic_reasoning_generate`), its 31 operators and rule executor, and the
+  settings of its configuration for API models (`_CONFIG_tree_based_agentic_reasoning_claude.yaml`: max_explore_turn 5,
+  max_explore_op 50, agent_max_err_cnt 5).
+- **Scope:** DeepPrep keeps nothing between tasks: it searches every task and cutoff from the start.
+- **Changes and why:**
+  1. The LLM client is the study's model and service (every call recorded); the FastAPI/Redis execution service is
+     replaced by the same executor calls in process (copy, step, simulate).
+  2. The target-table description (DeepPrep's benchmarks give a fixed target schema) is the task's feature table: one
+     row per (entity, seed_time), numeric features, at most 100 columns, no rows after seed_time.
+  3. The input tables are the database at the cutoff (rows dated at or before test_k) plus `seeds`; DeepPrep explores on
+     2,000 training seeds (its benchmarks are small tables), then its solution runs on the 50,000-seed training sample,
+     the validation seeds and the test seeds, each within 600 s (the statement timeout of every other method's feature
+     SQL; DeepPrep's own client also waits 600 s for its execution service). A run past 600 s counts as no solution and
+     its time counts as validation time.
+  4. A solution is checked for leakage like every method's features; a leaking solution is returned to the agent as an
+     error, as DeepPrep returns any failed solution.
+  5. Speed only, what the agent sees unchanged: tables are printed from their first rows (DeepPrep deep-copies a whole
+     table to print its head), and a simulation shares the unmodified tables instead of copying all of them.
+  6. Feature names are reduced to letters, digits and `_` before the fixed LightGBM (LightGBM rejects JSON characters).
 
 ## AgentSM (Biswal et al., arXiv 2601.15709, preprint)
 

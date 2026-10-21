@@ -939,10 +939,16 @@ Shared memory: agents on this database publish verified feature definitions and 
                     rec["eval"] = {"error": str(err)[:500]}
             else:
                 rec["eval"] = {"pending": True}
-            try:
-                rec["audit"] = self.audit(t, k, rec["final_sql"], seeds)
-            except Exception as err:
-                rec["audit"] = {"result": "error", "why": str(err)[:300]}
+            # the final SQL is usually one already audited at its validation (same SQL, same seeds): that result is kept.
+            # Auditing it again can fail on its own, e.g. a division the query plan evaluates before its guard (pilot 3).
+            seen = next((v for v in reversed(rec["validations"]) if v.get("sql") == rec["final_sql"] and "val" in v and v.get("leak") is False), None)
+            if seen is not None:
+                rec["audit"] = {"result": "clean", "from_validation": seen["tool_i"]}
+            else:
+                try:
+                    rec["audit"] = self.audit(t, k, rec["final_sql"], seeds)
+                except Exception as err:
+                    rec["audit"] = {"result": "error", "why": str(err)[:300]}
         if rec["final_sql"] and (rec.get("audit") or {}).get("result") == "clean":
             self.prev_sql[t] = (k, rec["final_sql"])
         cut_short = rec["stop"] == "llm_error"  # the run stops after this session is saved; nothing is learned from it
@@ -1025,16 +1031,22 @@ Shared memory: agents on this database publish verified feature definitions and 
                     tc = spec.get("time_col")
                     cond = f" WHERE {tc.lower()} <= '{pd.Timestamp(cut)}'" if tc else ""
                     con.execute(f"CREATE VIEW {schema}.{name.lower()} AS SELECT * FROM public.{name.lower()}{cond}")
+
+            def score_one(f, r):
+                sql = in_schema(r["final_sql"], schema)
+                try:
+                    r["eval"] = {**self.evaluate(r["task"], k, sql, seeds[r["task"]], search_path=f"{schema}, public"), "after_run": True}
+                except Exception as err:
+                    r["eval"] = {"error": str(err)[:500], "after_run": True}
+                with open(f, "w") as fh:
+                    json.dump(r, fh, ensure_ascii=False, indent=1, default=str)
+                log(f"{r['task']} k{k}: test={r['eval'].get('test')}")
+
             try:
-                for f, r in todo:
-                    sql = in_schema(r["final_sql"], schema)
-                    try:
-                        r["eval"] = {**self.evaluate(r["task"], k, sql, seeds[r["task"]], search_path=f"{schema}, public"), "after_run": True}
-                    except Exception as err:
-                        r["eval"] = {"error": str(err)[:500], "after_run": True}
-                    with open(f, "w") as fh:
-                        json.dump(r, fh, ensure_ascii=False, indent=1, default=str)
-                    log(f"{r['task']} k{k}: test={r['eval'].get('test')}")
+                # the sessions of one cutoff are scored side by side (each on its own connections; scores do not depend on it)
+                with cf.ThreadPoolExecutor(len(todo)) as ex:
+                    for fut in [ex.submit(score_one, f, r) for f, r in todo]:
+                        fut.result()
             finally:
                 with psycopg.connect(self.url, autocommit=True) as con:
                     con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")

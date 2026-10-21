@@ -1202,7 +1202,8 @@ def main():
     ap.add_argument("--agentsm-memory", help="memory.json from tools/relbench/agentsm.py build (arm agentsm)")
     ap.add_argument("--targets-from", help="run folder whose sessions at the cutoff before the first one give the retraining goals")
     ap.add_argument("--llm", default="deepseek", choices=list(PROVIDERS), help="model service (pilot: river; since 10-21: deepseek)")
-    ap.add_argument("--reasoning-effort", default="medium", help="reasoning effort of the agents and of MAVRA's extractor (pilot: high)")
+    ap.add_argument("--reasoning-effort", default="high",
+                    help="reasoning effort of the agents and of MAVRA's extractor; DeepSeek's API offers low/high/max and treats medium as high")
     ap.add_argument("--eval-now", action="store_true", help="score each session on the test seeds right after it (default: after the run)")
     ap.add_argument("--smoke", action="store_true", help="pipeline check only: 8 LLM calls, 2 validations; results are not used")
     a = ap.parse_args()

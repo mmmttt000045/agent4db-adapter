@@ -384,7 +384,7 @@ def main():
     b.add_argument("--n", type=int, required=True, help="synthetic tasks for this database (its share of the global n = 100)")
     b.add_argument("--db-name", dest="db_name", default=None)
     b.add_argument("--llm", default="deepseek", choices=list(harness.PROVIDERS))
-    b.add_argument("--reasoning-effort", default="medium")
+    b.add_argument("--reasoning-effort", default="high")
     a = ap.parse_args()
     if a.cmd == "build":
         a.db_name = a.db_name or os.path.basename(a.data.rstrip("/"))

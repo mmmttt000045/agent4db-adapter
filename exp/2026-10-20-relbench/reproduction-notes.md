@@ -174,9 +174,15 @@ the paper's reproduction appendix.
      plus the embedding-cluster estimate; the data-point selection (Algorithm 1) is then unnecessary. Counts are 0, not
      null, for seeds without rows, so count features have IQ = 1; the IQ of a path (Principle 1 and the beam) is the
      share of training seeds reaching at least one row through it.
-  6. FI is the holdout gain over the base table on the same rows; the released code subtracts the base table's utility
-     on all rows. In relational data the rows a path reaches are the active entities, whose labels differ from the
-     rest, and a full-table baseline would credit any feature of such a path with that difference.
+  6. FI is measured per path: the base table augmented with all candidates of the path is fitted once on the training
+     entities, and FI(f) = the holdout utility on the rows f augments minus the utility with f's values permuted
+     among those rows (mean of 3 permutations), i.e. permutation importance, which is also what AutoGluon's
+     `feature_importance` (used by the released code's importance filtering) computes. The released `compute_FI` fits
+     one AutoGluon model per (feature, path) and subtracts the base table's utility on all rows. One fit per candidate
+     (150 to 400 per session) was tried first and took over 20 minutes per hop on the shared machine (about twelve
+     8-thread LightGBM cells at once). The utility is compared on the same rows, not with the base table on all rows:
+     the rows a path reaches are the active entities, whose labels differ from the rest, and a base utility on all rows
+     would credit any feature of such a path with that difference.
   7. The FI holdout holds out whole entities: the released code splits base rows by their id
      (`Dataset_splitter.new_map_split`); a seed table repeats an entity at several seed times, and a split of seeds
      credits features that identify the entity (in the cutoff-1 test on site-success such features led the heap).
@@ -192,6 +198,6 @@ the paper's reproduction appendix.
      most expensive path is dropped and the SQL scored again (recorded in the session as `evaluate_fallbacks`).
   11. The downstream model is the study's fixed LightGBM instead of AutoGluon; the search never reads the validation
      seeds or test labels, which are used only by `Run.evaluate` for the reported scores.
-- **Checked (10-21):** rel-stack user-badge and rel-trial site-success at cutoff 1 (before change 7): the feature SQL runs,
-  the audit is clean, user-badge validation AUC 0.846 against the reference's 0.598 (search 5 min), site-success
-  search 10 min over 16 paths of up to 4 joins.
+- **Checked (10-21):** rel-stack user-badge and rel-trial site-success at cutoff 1, with one fit per candidate and a
+  holdout of seeds (before changes 6 and 7): the feature SQL runs, the audit is clean, user-badge validation AUC 0.846
+  against the reference's 0.598 (search 5 min), site-success search 10 min over 16 paths of up to 4 joins.

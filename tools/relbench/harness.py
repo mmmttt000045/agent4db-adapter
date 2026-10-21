@@ -43,6 +43,9 @@ AWM_OVERRIDES = [
 ]
 AWM_TEMPERATURE = 1.0  # webarena/induce_prompt.py
 AWM_MAX_TOKENS = 2048
+# AWM induces with a non-reasoning model (GPT-4) within 2048 tokens; with thinking on, the reasoning used up those tokens
+# (finish_reason "length", empty workflows), so induction runs without thinking, as G-Memory's memory operations do
+AWM_THINKING = "disabled"
 AWM_PER_TEMPLATE = 1  # num_samples: at most this many trajectories of one task template
 sys.path.insert(0, ACE_DIR)
 import curator_prompts as ace_curator  # noqa: E402
@@ -212,14 +215,15 @@ class Llm:
                 continue
             raise LlmUnavailable(f"HTTP {r.status_code}: {r.text[:500]}")
 
-    def chat(self, messages, tools=None, temperature=None, max_tokens=None):
+    def chat(self, messages, tools=None, temperature=None, max_tokens=None, thinking=None):
         body = {"model": self.model, "messages": messages}
+        thinking = thinking or self.thinking
         if max_tokens:
             body["max_tokens"] = max_tokens
-        if self.effort:
+        if self.effort and thinking != "disabled":
             body["reasoning_effort"] = self.effort
-        if self.thinking:
-            body["thinking"] = {"type": self.thinking}
+        if thinking:
+            body["thinking"] = {"type": thinking}
         if tools:
             body["tools"] = tools
         if temperature is not None:
@@ -514,6 +518,22 @@ class Run:
         self.awm_pool = {}  # AWM: agent -> successful trajectories
         self.awm_workflows = {}  # AWM: agent -> induced workflows (appended to the system prompt)
         self.ace_steps = {}
+        # a run resumed at a later cutoff (--cutoffs from k, --targets-from the earlier run, whose sessions before k were
+        # copied into --out): the earlier cutoffs' records, and each ACE agent's latest playbook before k
+        self.kept_cutoffs = []
+        if a.targets_from:
+            run0 = os.path.join(a.targets_from, "run.json")
+            if os.path.exists(run0):
+                self.kept_cutoffs = [c for c in json.load(open(run0))["cutoffs"] if c["k"] < first]
+                self.refs.update({(t, c["k"]): v for c in self.kept_cutoffs for t, v in (c.get("reference") or {}).items()})
+            latest = {}
+            for f in glob.glob(os.path.join(a.targets_from, "playbooks", "*-k*.txt")):
+                agent, kk = os.path.basename(f)[:-4].rsplit("-k", 1)
+                if int(kk) < first and int(kk) > latest.get(agent, (0, None))[0]:
+                    latest[agent] = (int(kk), f)
+            for agent, (kk, f) in latest.items():
+                self.playbooks[agent] = open(f).read()
+                self.ace_steps[agent] = kk
         self.gmem = None
         self.asm = None
         os.makedirs(os.path.join(a.out, "sessions"), exist_ok=True)
@@ -1239,7 +1259,7 @@ Shared memory: agents on this database publish verified feature definitions and 
             examples.append(f"Query: {ex['query']}\nActions:\n{traj}")
         prompt = "\n\n".join([instruction, one_shot, "\n\n".join(["## Concrete Examples"] + examples + ["## Summary Workflows"])])
         t0 = time.time()
-        r = self.llm.chat([{"role": "user", "content": prompt}], temperature=AWM_TEMPERATURE, max_tokens=AWM_MAX_TOKENS)
+        r = self.llm.chat([{"role": "user", "content": prompt}], temperature=AWM_TEMPERATURE, max_tokens=AWM_MAX_TOKENS, thinking=AWM_THINKING)
         workflows = (r["message"].get("content") or "").strip()
         if workflows:
             self.awm_workflows[agent] = workflows
@@ -1262,7 +1282,9 @@ Shared memory: agents on this database publish verified feature definitions and 
             "MAX_LLM_CALLS": MAX_LLM_CALLS, "MAX_VALIDATIONS": MAX_VALIDATIONS, "PATIENCE": PATIENCE, "SAMPLE_SIZE": SAMPLE_SIZE,
             "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "llm": self.llm.provider, "reasoning_effort": self.llm.effort,
             "thinking": self.llm.thinking,
-            "test_scores": "now" if a.eval_now else "after the run"}, "cutoffs": []}
+            "test_scores": "now" if a.eval_now else "after the run"}, "cutoffs": list(self.kept_cutoffs)}
+        if a.targets_from:
+            summary["resumed"] = {"from": a.targets_from, "at_cutoff": min(int(x) for x in a.cutoffs) if a.cutoffs else 1}
         try:
             middle = Middle(self.url, arm["middle_mode"], a.out, a.port or free_port(), a.llm if arm.get("extractor") else None, self.llm.effort, self.llm.prefix)
             if arm.get("gmemory"):
@@ -1312,7 +1334,7 @@ Shared memory: agents on this database publish verified feature definitions and 
                 with open(os.path.join(a.out, "run.json"), "w") as f:
                     json.dump(summary, f, indent=1, default=str)
             if not a.eval_now:
-                self.evaluate_after_run(ks)
+                self.evaluate_after_run(range(1, self.timeline["K"] + 1))  # a resumed run: the copied sessions too
             summary["finished"] = time.strftime("%Y-%m-%d %H:%M:%S")  # every cutoff and every test score done
         except Exception:
             traceback.print_exc()
@@ -1347,7 +1369,7 @@ def main():
     ap.add_argument("--template", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--tasks", nargs="*")
-    ap.add_argument("--cutoffs", nargs="*", help="subset of cutoffs (smoke tests)")
+    ap.add_argument("--cutoffs", nargs="*", help="subset of cutoffs (smoke tests; with --targets-from, resume a run at a cutoff)")
     ap.add_argument("--parallel", type=int, default=3)
     ap.add_argument("--port", type=int)
     ap.add_argument("--keep-db", action="store_true")

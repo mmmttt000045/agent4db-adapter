@@ -28,7 +28,7 @@ def main():
     ap.add_argument("--template", default="relbench_stack_t1")
     c = ap.parse_args()
     a = argparse.Namespace(arm="none", run=0, data=c.data, prep=c.prep, template=c.template, out=c.out, tasks=None,
-                           cutoffs=None, targets_from=None, reasoning_effort="medium", eval_now=False, llm="river")
+                           cutoffs=None, targets_from=None, reasoning_effort=None, eval_now=False, llm="river")
     r = H.Run(a)
     cuts = [x["test_timestamp"] for x in next(iter(r.tasks.values()))["cutoffs"]]
     H.create_run_db(r.url_admin, a.template, r.db_name)

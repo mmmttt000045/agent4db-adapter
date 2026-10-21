@@ -40,7 +40,7 @@ r1-mem-awm 与 `results/pop-mem-20261013-agentsm/`）**一律不报告**。
 
 ### 1.2 会话（所有方法相同）
 
-- 模型：**10-21 起所有实验用 DeepSeek 官方 API**（`DEEPSEEK_*`，`--llm deepseek`；模型 `deepseek-flash`，官方标为 DeepSeek-V4.1-Flash-1017，思考模式开），思考强度 high：用户选的 medium 官方不支持（只有 low/high/max），实测传 medium 与 high 的思考 token 相同，即被当作默认的 high；试跑用的是 river 网关
+- 模型：**10-21 起所有实验用 DeepSeek 官方 API**（`DEEPSEEK_*`，`--llm deepseek`；模型 `deepseek-flash`，官方标为 DeepSeek-V4.1-Flash-1017，思考模式开），思考模式开、思考强度 low（10-21 晚用户决定；官方只有 low/high/max，先前选的 medium 实测被当作默认的 high）；试跑用的是 river 网关
   `deepseek-ai/DeepSeek-V4.1-Flash`、推理强度 high，试跑结果不与之后的结果混用。智能体、MAVRA 的提炼器与各方法的记忆操作用同一模型与同一服务。
 - 工具：`list_tables`、`describe_table`、`join_path`、`check_join`、`run_sql`（中间层 HTTP 接口 `/v1/tools`；
   除 MAVRA 外都用 `middle-alone` 配置，表描述、连接路径与查询结果只在一个会话内有效），`validate_features`、`submit`

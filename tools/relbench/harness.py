@@ -452,7 +452,7 @@ class Run:
         self.db_name = f"relbench_{a.arm.replace('-', '_')}_r{a.run}_{os.getpid()}"
         self.url = f"{base_url(self.url_admin)}/{self.db_name}"
         self.llm = Llm(self.env, a.llm)
-        self.llm.effort = a.reasoning_effort
+        self.llm.effort = a.reasoning_effort or self.llm.effort
         self.arm = ARMS[a.arm]
         self.refs = {}
         # retraining goal (README §1.2, 10-21): the previous cutoff's model, refit on this cutoff's data.
@@ -1110,10 +1110,11 @@ Shared memory: agents on this database publish verified feature definitions and 
         middle = None
         summary = {"arm": a.arm, "run": a.run, "db": self.db_name, "template": a.template, "smoke": a.smoke, "settings": {
             "MAX_LLM_CALLS": MAX_LLM_CALLS, "MAX_VALIDATIONS": MAX_VALIDATIONS, "PATIENCE": PATIENCE, "SAMPLE_SIZE": SAMPLE_SIZE,
-            "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "reasoning_effort": self.llm.effort,
+            "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "llm": self.llm.provider, "reasoning_effort": self.llm.effort,
+            "thinking": self.llm.thinking,
             "test_scores": "now" if a.eval_now else "after the run"}, "cutoffs": []}
         try:
-            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), a.llm if arm.get("extractor") else None, a.reasoning_effort, self.llm.prefix)
+            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), a.llm if arm.get("extractor") else None, self.llm.effort, self.llm.prefix)
             if arm.get("gmemory"):
                 self.gmem = GMemoryService(self.env, a.out, self.llm)
             if arm.get("agentsm"):
@@ -1202,8 +1203,8 @@ def main():
     ap.add_argument("--agentsm-memory", help="memory.json from tools/relbench/agentsm.py build (arm agentsm)")
     ap.add_argument("--targets-from", help="run folder whose sessions at the cutoff before the first one give the retraining goals")
     ap.add_argument("--llm", default="deepseek", choices=list(PROVIDERS), help="model service (pilot: river; since 10-21: deepseek)")
-    ap.add_argument("--reasoning-effort", default="high",
-                    help="reasoning effort of the agents and of MAVRA's extractor; DeepSeek's API offers low/high/max and treats medium as high")
+    ap.add_argument("--reasoning-effort", help="reasoning effort of the agents and of MAVRA's extractor (default: the .env setting; "
+                    "since 10-21 low with thinking on; DeepSeek's API offers low/high/max and treats medium as high)")
     ap.add_argument("--eval-now", action="store_true", help="score each session on the test seeds right after it (default: after the run)")
     ap.add_argument("--smoke", action="store_true", help="pipeline check only: 8 LLM calls, 2 validations; results are not used")
     a = ap.parse_args()

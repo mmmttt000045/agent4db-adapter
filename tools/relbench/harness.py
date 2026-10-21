@@ -227,10 +227,12 @@ class GMemoryService:
 
 
 class Middle:
-    def __init__(self, url, mode, out, port, extractor=None):
+    def __init__(self, url, mode, out, port, extractor=None, effort=None):
         self.base = f"http://127.0.0.1:{port}"
         self.log = open(os.path.join(out, "middle.log"), "w")
         env = {k: v for k, v in os.environ.items() if "proxy" not in k.lower()}
+        if effort:
+            env["RIVER_REASONING_EFFORT"] = effort  # the extractor uses the agents' setting
         self.proc = subprocess.Popen(
             ["./target/release/agentdb-mid", "--db", url, "--pool", "8", "--out", os.path.join(out, "middle"),
              "serve", "--addr", f"127.0.0.1:{port}", "--mode", mode, "--no-etl", *(["--extractor", extractor] if extractor else [])],
@@ -415,6 +417,7 @@ class Run:
         self.db_name = f"relbench_{a.arm.replace('-', '_')}_r{a.run}_{os.getpid()}"
         self.url = f"{base_url(self.url_admin)}/{self.db_name}"
         self.llm = Llm(self.env)
+        self.llm.effort = a.reasoning_effort
         self.arm = ARMS[a.arm]
         self.refs = {}
         # retraining goal (README §1.2, 10-21): the previous cutoff's model, refit on this cutoff's data.
@@ -519,7 +522,7 @@ class Run:
         ec = e["entity_col"].lower()
         return f"SELECT s.{ec}, s.seed_time, {', '.join(cols)} FROM {{seeds}} s LEFT JOIN {et.lower()} e ON e.{pk} = s.{ec}"
 
-    def evaluate(self, t, k, sql, seeds):
+    def evaluate(self, t, k, sql, seeds, search_path=None):
         """Validation and test scores of a feature SQL (train on the 50k sample)."""
         e = self.tasks[t]
         ec, yc = e["entity_col"].lower(), e["target_col"].lower()
@@ -527,9 +530,9 @@ class Run:
         test_labels.columns = [c.lower() for c in test_labels.columns]
         test_labels = test_labels.rename(columns={e["time_col"].lower(): "seed_time"})
         test_labels["seed_time"] = pd.to_datetime(test_labels["seed_time"])
-        xtr, s1 = features(self.url, sql, f"task.{tname(t)}_train_sample", seeds["train_sample"], ec)
-        xva, s2 = features(self.url, sql, f"task.{tname(t)}_val", seeds["val"], ec)
-        xte, s3 = features(self.url, sql, f"task.{tname(t)}_test", seeds["test"], ec)
+        xtr, s1 = features(self.url, sql, f"task.{tname(t)}_train_sample", seeds["train_sample"], ec, search_path=search_path)
+        xva, s2 = features(self.url, sql, f"task.{tname(t)}_val", seeds["val"], ec, search_path=search_path)
+        xte, s3 = features(self.url, sql, f"task.{tname(t)}_test", seeds["test"], ec, search_path=search_path)
         ytest = seeds["test"][[ec, "seed_time"]].merge(test_labels[[ec, "seed_time", yc]], on=[ec, "seed_time"], how="left")[yc]
         pv, _, _ = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xva)
         pt, _, tt = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xte)
@@ -614,8 +617,8 @@ Shared memory: agents on this database publish verified feature definitions and 
         ec, yc = e["entity_col"].lower(), e["target_col"].lower()
         t0 = time.time()
         try:
-            xtr, _ = features(self.url, prev[1], f"task.{tname(t)}_train_sample", seeds["train_sample"], ec)
-            xva, _ = features(self.url, prev[1], f"task.{tname(t)}_val", seeds["val"], ec)
+            xtr, _ = features(self.url, prev[1], f"task.{tname(t)}_train_sample", seeds["train_sample"], ec, search_path=search_path)
+            xva, _ = features(self.url, prev[1], f"task.{tname(t)}_val", seeds["val"], ec, search_path=search_path)
             p, _, _ = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xva)
             val = score(e["task_type"], seeds["val"][yc], p)
         except Exception as err:  # noqa: BLE001 - a previous model that no longer runs gives no goal
@@ -656,7 +659,8 @@ Shared memory: agents on this database publish verified feature definitions and 
         agent = f"{tname(t)}-agent"
         sid = f"{self.a.arm}-r{self.a.run}-{tname(t)}-k{k}"
         metric, higher = metric_of(e["task_type"])
-        self.targets[(t, k)] = self.incumbent(t, k, seeds) if k > 1 else {"val": None, "why": "first cutoff"}
+        if (t, k) not in self.targets:
+            self.targets[(t, k)] = self.incumbent(t, k, seeds) if k > 1 else {"val": None, "why": "first cutoff"}
         ec, yc = e["entity_col"].lower(), e["target_col"].lower()
         rec = {"arm": self.a.arm, "run": self.a.run, "task": t, "k": k, "agent": agent, "session": sid, "metric": metric, "target": self.target(t, k),
                "target_detail": self.targets.get((t, k)),
@@ -756,8 +760,8 @@ Shared memory: agents on this database publish verified feature definitions and 
                     if args.get("bullet_ids"):
                         rec["bullet_ids"] = [str(b) for b in args["bullet_ids"]]
                     try:
-                        xtr, s1 = features(self.url, sql, f"task.{tname(t)}_train_sample", seeds["train_sample"], ec)
-                        xva, s2 = features(self.url, sql, f"task.{tname(t)}_val", seeds["val"], ec)
+                        xtr, s1 = features(self.url, sql, f"task.{tname(t)}_train_sample", seeds["train_sample"], ec, search_path=search_path)
+                        xva, s2 = features(self.url, sql, f"task.{tname(t)}_val", seeds["val"], ec, search_path=search_path)
                         p, imp, tt = train_predict(e["task_type"], xtr, seeds["train_sample"][yc], xva)
                         val = score(e["task_type"], seeds["val"][yc], p)
                         # leak check at validation time (README §1.2, 10-21): a leaking validation does not count, so that
@@ -832,10 +836,13 @@ Shared memory: agents on this database publish verified feature definitions and 
         rec["final_source"] = "submitted" if submitted else ("best_validated" if best_sql else None)
         rec["best_val"] = best
         if rec["final_sql"]:
-            try:
-                rec["eval"] = self.evaluate(t, k, rec["final_sql"], seeds)
-            except Exception as err:
-                rec["eval"] = {"error": str(err)[:500]}
+            if self.a.eval_now:
+                try:
+                    rec["eval"] = self.evaluate(t, k, rec["final_sql"], seeds)
+                except Exception as err:
+                    rec["eval"] = {"error": str(err)[:500]}
+            else:
+                rec["eval"] = {"pending": True}
             try:
                 rec["audit"] = self.audit(t, k, rec["final_sql"], seeds)
             except Exception as err:
@@ -892,6 +899,42 @@ Shared memory: agents on this database publish verified feature definitions and 
         log(f"{t} k{k}: stop={rec['stop']} llm={rec['totals']['llm_calls']} tools={rec['totals']['tool_calls']} "
             f"tok={rec['totals']['tokens']} t={rec['agent_seconds']:.0f}s val={best} test={ev.get('test')} audit={(rec.get('audit') or {}).get('result')}")
         return rec
+
+    def evaluate_after_run(self, ks):
+        """Test scores of every session, after the last cutoff, on the database as it was at the session's cutoff: views
+        that keep the rows with time <= that cutoff's test timestamp, which are exactly the rows the database held then
+        (the template holds time <= test_1 without null times, every append adds (previous, current]). The seed tables
+        of the cutoff are rebuilt and the final SQL is scored as `evaluate` scores it at the end of a session."""
+        t0 = time.time()
+        for k in ks:
+            todo = [(f, json.load(open(f))) for f in glob.glob(os.path.join(self.a.out, "sessions", f"*-k{k}.json"))]
+            todo = [(f, r) for f, r in todo if r.get("final_sql") and (r.get("eval") or {}).get("pending")]
+            if not todo:
+                continue
+            cut = next(iter(self.tasks.values()))["cutoffs"][k - 1]["test_timestamp"]
+            schema = f"replay_k{k}"
+            seeds = self.seed_tables(k)
+            with psycopg.connect(self.url, autocommit=True) as con:
+                con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+                con.execute(f"CREATE SCHEMA {schema}")
+                for name, spec in self.manifest["tables"].items():
+                    tc = spec.get("time_col")
+                    cond = f" WHERE {tc.lower()} <= '{pd.Timestamp(cut)}'" if tc else ""
+                    con.execute(f"CREATE VIEW {schema}.{name.lower()} AS SELECT * FROM public.{name.lower()}{cond}")
+            try:
+                for f, r in todo:
+                    sql = re.sub(r"\bpublic\s*\.", f"{schema}.", r["final_sql"], flags=re.I)
+                    try:
+                        r["eval"] = {**self.evaluate(r["task"], k, sql, seeds[r["task"]], search_path=f"{schema}, public"), "after_run": True}
+                    except Exception as err:
+                        r["eval"] = {"error": str(err)[:500], "after_run": True}
+                    with open(f, "w") as fh:
+                        json.dump(r, fh, ensure_ascii=False, indent=1, default=str)
+                    log(f"{r['task']} k{k}: test={r['eval'].get('test')}")
+            finally:
+                with psycopg.connect(self.url, autocommit=True) as con:
+                    con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+        log(f"test scores after the run: {time.time() - t0:.0f}s")
 
     def learn(self, t, k, rec, seeds, middle, agent, sid):
         """Learning after a session (README §1.6, amended before any P2 result): when the submission beats the reference.
@@ -1016,9 +1059,10 @@ Shared memory: agents on this database publish verified feature definitions and 
         middle = None
         summary = {"arm": a.arm, "run": a.run, "db": self.db_name, "template": a.template, "smoke": a.smoke, "settings": {
             "MAX_LLM_CALLS": MAX_LLM_CALLS, "MAX_VALIDATIONS": MAX_VALIDATIONS, "PATIENCE": PATIENCE, "SAMPLE_SIZE": SAMPLE_SIZE,
-            "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "reasoning_effort": self.llm.effort}, "cutoffs": []}
+            "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "reasoning_effort": self.llm.effort,
+            "test_scores": "now" if a.eval_now else "after the run"}, "cutoffs": []}
         try:
-            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), arm.get("extractor"))
+            middle = Middle(self.url, arm["middle_mode"], a.out, a.port or 18100 + (os.getpid() % 800), arm.get("extractor"), a.reasoning_effort)
             if arm.get("gmemory"):
                 self.gmem = GMemoryService(self.env, a.out)
             if arm.get("agentsm"):
@@ -1046,6 +1090,11 @@ Shared memory: agents on this database publish verified feature definitions and 
                         rec["reference"][t] = {"error": str(err)[:300]}
                 log(f"k{k}: reference {json.dumps({t: (v.get('val'), v.get('test')) for t, v in rec['reference'].items()})}")
                 self.refs.update({(t, k): v for t, v in rec["reference"].items()})
+                if k > 1:
+                    with cf.ThreadPoolExecutor(len(self.tasks)) as ex:
+                        goals = {t: ex.submit(self.incumbent, t, k, seeds[t]) for t in self.tasks}
+                        self.targets.update({(t, k): g.result() for t, g in goals.items()})
+                    log(f"k{k}: goals {json.dumps({t: (self.targets[(t, k)] or {}).get('val') for t in self.tasks})}")
                 order = list(self.tasks)
                 random.Random(a.run * 1000 + k).shuffle(order)
                 rec["order"] = order
@@ -1060,6 +1109,8 @@ Shared memory: agents on this database publish verified feature definitions and 
                 summary["cutoffs"].append(rec)
                 with open(os.path.join(a.out, "run.json"), "w") as f:
                     json.dump(summary, f, indent=1, default=str)
+            if not a.eval_now:
+                self.evaluate_after_run(ks)
         except Exception:
             traceback.print_exc()
             summary["error"] = traceback.format_exc()[-2000:]
@@ -1099,6 +1150,8 @@ def main():
     ap.add_argument("--keep-db", action="store_true")
     ap.add_argument("--agentsm-memory", help="memory.json from tools/relbench/agentsm.py build (arm agentsm)")
     ap.add_argument("--targets-from", help="run folder whose sessions at the cutoff before the first one give the retraining goals")
+    ap.add_argument("--reasoning-effort", default="medium", help="reasoning effort of the agents and of MAVRA's extractor (pilot: high)")
+    ap.add_argument("--eval-now", action="store_true", help="score each session on the test seeds right after it (default: after the run)")
     ap.add_argument("--smoke", action="store_true", help="pipeline check only: 8 LLM calls, 2 validations; results are not used")
     a = ap.parse_args()
     if a.smoke:

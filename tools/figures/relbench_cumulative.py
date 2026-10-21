@@ -20,9 +20,9 @@ NAME = 'relbench-cumulative'
 W, H = 88.9, 46.0  # IEEE column width (3.5 in)
 DATA = style.ROOT / 'exp/2026-10-20-relbench/paper-sessions.json'
 # arm -> (English, Chinese, colour name in the preamble, marker)
-ARMS = [('none', 'No memory', '无记忆', 'mNoShare', '^'), ('agentsm', 'AgentSM', 'AgentSM', 'mAgentSM', 's'),
-        ('ace', 'ACE', 'ACE', 'mACE', 'v'), ('gmemory', 'G-Memory', 'G-Memory', 'mGMem', 'P'),
-        ('awm', 'AWM', 'AWM', 'mAWM', 'X'), ('mavra', 'MAVRA (ours)', 'MAVRA（本文）', 'mCond', 'o')]
+ARMS = [('none', 'No memory', '无记忆', 'mNoShare', '^'), ('ace', 'ACE', 'ACE', 'mACE', 'v'),
+        ('gmemory', 'G-Memory', 'G-Memory', 'mGMem', 'P'), ('awm', 'AWM', 'AWM', 'mAWM', 'X'),
+        ('deepprep', 'DeepPrep', 'DeepPrep', 'mDeepPrep', 's'), ('mavra', 'MAVRA (ours)', 'MAVRA（本文）', 'mCond', 'o')]
 TEXT = {'en': {'y': 'Cumulative tokens (M)', 'x': 'Session (in arrival order)', 'k': 'cutoff {k}'},
         'zh': {'y': '累计 token（百万）', 'x': '会话（按到来顺序）', 'k': '截点 {k}'}}
 

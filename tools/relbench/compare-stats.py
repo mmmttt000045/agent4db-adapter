@@ -24,7 +24,10 @@ def load(runs):
         out[(s["task"], s["k"])] = {
             "tokens": tot.get("tokens_with_learning", tot["tokens"]), "agent_tokens": tot["tokens"],
             "learn_tokens": tot.get("learn_tokens", 0), "llm": tot["llm_calls"], "tools": tot["tool_calls"],
-            "by_cat": tot["tool_calls_by_category"], "agent_s": s["agent_seconds"], "llm_s": tot["llm_seconds"],
+            # agent time without the leak audit (evaluation machinery; older runs counted it in agent_seconds)
+            "by_cat": tot["tool_calls_by_category"],
+            "agent_s": s["agent_seconds"] - (0 if "audit_seconds" in s else sum(v.get("audit_seconds", 0) for v in s["validations"])),
+            "llm_s": tot["llm_seconds"],
             "test": (s.get("eval") or {}).get("test"), "val": s.get("best_val"), "higher": s["higher_is_better"],
             "audit": (s.get("audit") or {}).get("result"), "stop": s["stop"],
             "published": sum(1 for e in ((s.get("learning") or {}).get("events") or []) if e.get("event") in ("promoted", "corroborated")),

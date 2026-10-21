@@ -64,7 +64,8 @@ SAMPLE_SEED = 42
 MAX_FEATURES = 100
 TOOL_OUTPUT_CHARS = 20_000
 FEATURE_SQL_TIMEOUT_S = 600
-AUDIT_SEEDS = 2000
+AUDIT_SEEDS = 2000  # seeds for the reproduction check of MAVRA's learning
+AUDIT_LEAK_SEEDS = 500  # seeds of the leak audit (latest training seed time)
 LGB_PARAMS = dict(n_estimators=300, learning_rate=0.05, num_leaves=63, min_child_samples=20, colsample_bytree=0.8,
                   subsample=0.8, subsample_freq=1, random_state=42, deterministic=True, force_row_wise=True,
                   n_jobs=8, verbose=-1)
@@ -539,7 +540,7 @@ class Run:
         ec = e["entity_col"].lower()
         tr = seeds["train_sample"]
         tstar = tr["seed_time"].max()
-        sub = tr[tr["seed_time"] == tstar].sort_values(ec).head(AUDIT_SEEDS).reset_index(drop=True)
+        sub = tr[tr["seed_time"] == tstar].sort_values(ec).head(AUDIT_LEAK_SEEDS).reset_index(drop=True)
         schema = f"audit_{tname(t)}_k{k}"
         # tables named as public.x read the audit views too
         hidden_sql = re.sub(r"\bpublic\s*\.", f"{schema}.", sql, flags=re.I)
@@ -552,6 +553,7 @@ class Run:
                 con.execute(f"CREATE VIEW {schema}.{name.lower()} AS SELECT * FROM public.{name.lower()}{cond}")
             con.execute(f"CREATE TABLE {schema}.seeds AS SELECT * FROM task.{tname(t)}_train_sample WHERE false")
             copy_rows(con, f"{schema}.seeds", sub[[c for c in sub.columns]])
+            con.execute(f"ANALYZE {schema}.seeds")
         try:
             normal, _ = features(self.url, sql, f"{schema}.seeds", sub, ec)
             hidden, _ = features(self.url, hidden_sql, f"{schema}.seeds", sub, ec, search_path=f"{schema}, public")
@@ -801,7 +803,8 @@ Shared memory: agents on this database publish verified feature definitions. Sta
             if stop:
                 rec["stop"] = stop
                 break
-        rec["agent_seconds"] = time.time() - t_start
+        rec["audit_seconds"] = sum(v.get("audit_seconds", 0) for v in rec["validations"])
+        rec["agent_seconds"] = time.time() - t_start - rec["audit_seconds"]
         if best is not None:
             self.prev_best[t] = (k, best)
         rec["final_sql"] = submitted or best_sql

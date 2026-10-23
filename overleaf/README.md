@@ -39,6 +39,15 @@ python3 tools/replay-safety-summary.py
 
 ## 数值与实验存档
 
+### 2026-10-23 一致性核对
+
+- 群体实验的 3,520 会话包含四种方法（无记忆、私有记忆、示例检索、MAVRA）各五轮：初始阶段 `4 × 16 × 7 × 5 = 2,240`，更正后 `4 × 16 × 4 × 5 = 1,280`。`exp/2026-10-12-population/population-stats.json` 中每种方法分别为 560 与 320 个有效会话；正文按阶段报告结果。
+- 九条优化修订来自端到端优化实验；四条前提失效修订来自独立的系统测试，见 `exp/2026-10-08-optimize/README.md` 与 `premise-report.json`，并非九条中只有四条受月份重编号影响。
+- 175 条定义来自全部 99 个 TPC-DS 模板的静态分析，其中 82 个模板含定义；每个 SELECT 块内同一事实表的聚合合算一条。来源为 `tools/tpcds-sharing.py` 与 `exp/2026-10-02-cache-baseline-tpcds/tpcds-sharing.json`，不同于群体实验选取的五个指标。
+- Table IV 的 rel-stack 后四个截点：无记忆的缓存输入／未缓存输入／输出分别为 3,696,128／149,925／462,532 token，MAVRA 为 884,736／247,429／196,020（包含学习开销，沿用计价脚本将未记录缓存命中的学习输入按未缓存计价）。token 下降 69.17%；原始重计价金额从 0.311096334 降至 0.157380558 美元，下降 49.41%。表内金额保留两位小数，按 0.31 与 0.16 计算才得到约 48%；正文解释缓存与输入／输出构成，不将舍入后的比值当作原始测量值。
+- Table VII 的 unit/backup 组共 267 题次：89 正确、115 错误、63 拒绝；43% 的分母包含拒绝，只计返回答案时为 `115 / 204 ≈ 56%`。正文与未来工作明确量纲及权威来源约束的边界。
+- Lemma 1 的覆盖范围依据 `src/catalog.rs`、`src/middle/metrics.rs` 与 PostgreSQL 18 的 [COPY](https://www.postgresql.org/docs/18/sql-copy.html)、[CREATE TRIGGER](https://www.postgresql.org/docs/18/sql-createtrigger.html)、[TRUNCATE](https://www.postgresql.org/docs/18/sql-truncate.html) 文档核对。版本递增随事务回滚；ABA 防护要求缓存存续期间不重置或复用计数。非普通 MVCC 操作要求读事务静默，绕过触发器及重置类操作要求清除检查缓存；这些是保证成立的部署前提，不表示原型已自动拦截所有管理操作。代码没有以时间戳为基础的完备兜底机制，模式指纹与 ETL 批次标记不能证明未观测写入的安全性。
+
 [实验索引](../exp/README.md) 列出实验批次。各批次的失败、替换和排除规则以原协议为准。正常编辑与编译直接使用已提交的宏和 PDF，无需运行实验。
 
 | 生成文件 | 当前来源与生成入口 |

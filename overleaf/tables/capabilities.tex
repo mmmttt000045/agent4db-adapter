@@ -1,5 +1,5 @@
 \begin{table*}[t]
-\caption{\bt{Reuse objects and validity mechanisms in the cited designs. Data-condition entries describe maintained prerequisites for reuse. NR: the cited source does not describe this mechanism for its reuse object; this is not a claim of impossibility. \system's metric guarantees assume the business premises of Proposition~\ref{prop:sufficiency} and tracked writes.}{所引设计的复用对象与有效性机制。数据条件栏描述受维护的复用前提。NR：所引来源未描述针对其复用对象的这一机制，不表示该设计无法扩展支持。\system\ 的指标保证以命题~\ref{prop:sufficiency} 的业务前提及受跟踪写入为条件。}}
+\caption{\bt{Reuse objects and validity mechanisms across designs (NR: not reported for the reuse object).}{不同设计的复用对象与有效性机制（NR：未报告针对该复用对象的机制）。}}
 \label{tab:capabilities}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -18,5 +18,5 @@ TxCache~\cite{ports2010txcache} & \bt{Cached application computations}{缓存的
 \bottomrule
 \end{tabularx}
 \par\smallskip
-\bt{$^{a}$Databricks documents that \code{at\_most\_one\_match} is not validated at runtime; this does not characterize every validation facility of either product.}{$^{a}$Databricks 文档明确 \code{at\_most\_one\_match} 不在运行时验证；此处不概括两个产品的全部验证能力。}
+\bt{$^{a}$Databricks metric views document that join multiplicity declarations (\code{at\_most\_one\_match}) are assumed rather than validated at runtime~\cite{databricks2026metricviews}.}{$^{a}$Databricks 指标视图文档说明，连接基数声明（\code{at\_most\_one\_match}）被假定为成立，而不在运行时验证~\cite{databricks2026metricviews}。}
 \end{table*}

@@ -1,0 +1,5 @@
+# Drawing dependencies; external TeX fonts and Ghostscript are documented in README.md.
+reportlab
+matplotlib
+fonttools
+numpy

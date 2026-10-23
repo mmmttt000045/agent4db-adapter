@@ -1,5 +1,5 @@
 //! 指标经验评测：学习 → 参数 / 题型留出 → 数据变化场景（每个场景从 v1 独立施加、结束后回滚，见 `scenario`）。
-//! 在独立数据库上生成合成零售数据；查询 Agent 与提炼器都调用真实模型。协议见 docs/metric-experience-protocol.md。
+//! 在独立数据库上生成合成零售数据；查询 Agent 与提炼器都调用真实模型。协议见 docs/history/metric-experience-protocol.md。
 
 use crate::catalog;
 use crate::db::{diff, lit, Db, QKind};
@@ -1910,7 +1910,7 @@ fn markdown(report: &Value) -> String {
     let changes: Vec<(String, String, String)> = phases[1..].to_vec();
     let mut s = format!(
         "# 指标经验评测\n\n查询 Agent：`{}`；提炼器：`{}`；温度：{}。数据：`{}`。重复 {} 轮。\n\n\
-         本报告是描述性结果，不作显著性声明。协议见 docs/metric-experience-protocol.md。\n",
+         本报告是描述性结果，不作显著性声明。协议见 docs/history/metric-experience-protocol.md。\n",
         report["providers"]["agent"].as_str().unwrap_or_default(),
         report["providers"]["extractor"].as_str().unwrap_or_default(),
         report["providers"]["temperature"].as_str().unwrap_or_default(),

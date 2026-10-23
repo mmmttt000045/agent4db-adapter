@@ -1,6 +1,6 @@
 # 共享记忆主线：贡献与证据定位
 
-> 2026-10-04：本轮重构已回退，论文回到 `60d0783` 的主线（指标定义的有效性维护与使用时强制）。本文件保留为重构稿与补充实验的记录；重构稿源码见 `../exp/2026-10-03-shared-memory/overleaf-restructure-2026-10-03.tar.gz`，补充实验的去向见 [research-status.md](research-status.md)。
+> 2026-10-04：本轮重构已回退，论文回到 `60d0783` 的主线（指标定义的有效性维护与使用时强制）。本文件保留为重构稿与补充实验的记录；重构稿源码见 `../exp/2026-10-03-shared-memory/overleaf-restructure-2026-10-03.tar.gz`，补充实验的去向见 [research-status.md](research-status-2026-10-07.md)。
 
 核心问题是：同一数据库与业务空间的用户侧智能体，能否复用其他智能体已经得到的知识，减少重复摸索，同时知道知识何时还适用，以及何种执行经验值得采纳为策略。当前原型把画像、关系与反例、业务指标和验证排序经验连接起来。
 
@@ -33,4 +33,4 @@
 - 已建库消费者收益不含最初学习、提炼和准入；三流及重复题不支持宽泛显著性或其他领域、模型泛化。
 - 普通版本缓存与定义级重验在配对维护中给出同样正确性和大量相近效率。本文应把类型化条目的解释、来源、失效责任和消费者约束写清楚。
 
-完整数值与失败记录见 [补充实验](../exp/2026-10-03-shared-memory/analysis/results.md)，协议见 [shared-memory-study.md](shared-memory-study.md)。
+完整数值与失败记录见 [补充实验](../../exp/2026-10-03-shared-memory/analysis/results.md)，协议见 [shared-memory-study.md](shared-memory-study.md)。

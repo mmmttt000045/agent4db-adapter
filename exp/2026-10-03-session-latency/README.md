@@ -29,7 +29,7 @@
 
 完整结果见 [report.md](report.md)，原始数据与输入库在 `raw/`；大文件采用无损 gzip，分析脚本直接支持读取。主结果是：三个共享方法均答对 54/54（不共享 16/54）；MAVRA 更新后首用较快，但整体平均耗时和有效吞吐没有领先通用缓存。
 
-已写入论文 Q5 的 [会话完成时间小节](../../overleaf/sections/evaluation/session-latency.tex) 与 [对照表](../../overleaf/tables/session-latency.tex)，英文和双语入口共用。`--tex-out overleaf/gen` 从相同原始记录生成正文数值宏与表格数据，不在论文中手抄结果。
+已写入论文 Q5 的 会话完成时间小节（当时路径 `overleaf/sections/evaluation/session-latency.tex`，现已移出正文） 与 对照表（当时路径 `overleaf/tables/session-latency.tex`，现已移出正文），英文和双语入口共用。`--tex-out overleaf/gen` 从相同原始记录生成正文数值宏与表格数据，不在论文中手抄结果。
 
 论文两种入口已编译通过：英文 15 页（正文 13 页）、双语 23 页；增补前同环境的英文也是 15 页、正文 13 页。新实验为第 7.6.1 节、表 9；交叉引用正常，新小节与表格无越界排版。详见 [paper-check.json](verification/paper-check.json)。当前仍需整体压缩正文到项目的 12 页目标。
 

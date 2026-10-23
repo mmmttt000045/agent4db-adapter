@@ -1,5 +1,5 @@
 //! 时序共享记忆实验。生产者的轨迹只生成一次，各方法获得同一个时间前缀；
-//! 消费者为全新会话，留出答案不进入提炼或发布。协议见 docs/shared-memory-study.md。
+//! 消费者为全新会话，留出答案不进入提炼或发布。协议见 docs/history/shared-memory-study.md。
 
 use crate::db::{diff, Db, QKind};
 use crate::etl;

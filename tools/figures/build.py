@@ -3,7 +3,7 @@
     python3 tools/figures/build.py              # all paper figures
     python3 tools/figures/build.py sharing      # only the named ones
     python3 tools/figures/build.py --out /tmp/x # somewhere else, for previews
-    python3 tools/figures/build.py --deck       # the report deck's three figures, into tools/deck/figures/
+    python3 tools/figures/build.py --deck       # the report deck's figures, into slides/figures/
 
 Each figure is written twice: <name>.pdf for the English paper and
 <name>-zh.pdf for the bilingual build.
@@ -19,8 +19,9 @@ import style  # noqa: E402
 FIGURES = {'running-example': 'example', 'architecture': 'architecture', 'replay-outcomes': 'replay_outcomes',
            'maintenance-cost': 'maintenance_cost', 'scenario-changes': 'scenario_changes',
            'two-schemas': 'two_schemas', 'consumer-cost': 'consumer_cost'}
-DECK = {'structure': 'structure', 'definition': 'definition', 'process': 'process'}   # report deck only
-DECK_OUT = style.ROOT / 'tools/deck/figures'
+DECK = {'structure': 'structure', 'definition': 'definition', 'process': 'process',   # report deck only
+        'run-publish': 'run_publish', 'run-use': 'run_use', 'run-maintain': 'run_maintain'}
+DECK_OUT = style.ROOT / 'slides/figures'
 
 
 def main():

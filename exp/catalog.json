@@ -1,0 +1,352 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-10-22",
+  "experiments": [
+    {
+      "id": "2026-09-29-maint-share",
+      "title": "维护方式与共享度扫描",
+      "status": "supporting",
+      "scope": "早期维护对照；与反序复验配对。当前通用缓存与扩展规模结果另见 10-02。",
+      "evidence": [
+        "exp/2026-09-29-maint-share/cells.txt",
+        "exp/2026-09-29-maint-share/report.md"
+      ],
+      "analysis": [
+        "tools/paper-results.py"
+      ],
+      "outputs": [],
+      "raw_data": "noctis `/root/agentdb-mid/results/maint-1790686347212630/`；本地为汇总与日志。",
+      "code_record": "`5e82e37`；命令与环境见本目录 README、历史索引。"
+    },
+    {
+      "id": "2026-09-30-maint-share-rev",
+      "title": "维护扫描反序复验",
+      "status": "supporting",
+      "scope": "早期运行顺序控制；不当作独立统计显著性检验。",
+      "evidence": [
+        "exp/2026-09-30-maint-share-rev/cells.txt",
+        "exp/2026-09-30-maint-share-rev/report.md"
+      ],
+      "analysis": [
+        "tools/paper-results.py"
+      ],
+      "outputs": [],
+      "raw_data": "noctis `/root/agentdb-mid/results/maint-1790707404365821/`；本地为汇总与日志。",
+      "code_record": "`5e82e37` 加计算链/G3 修复，原记录称不涉及 maint-bench；见 README。"
+    },
+    {
+      "id": "2026-09-30-metric-maint-named",
+      "title": "单模型指标维护",
+      "status": "historical",
+      "scope": "早期命名题实验；保留舍入核对和失败说明，当前场景主表使用后续批次。",
+      "evidence": [
+        "exp/2026-09-30-metric-maint-named/analysis.md",
+        "exp/2026-09-30-metric-maint-named/verified-results.json"
+      ],
+      "analysis": [
+        "tools/aggregate-metric.py"
+      ],
+      "outputs": [],
+      "raw_data": "noctis `results/metric-1790700840466648/`；普通中间层取 `results/metric-1790690815978959/` 的指定单元，其余缺陷组弃用。",
+      "code_record": "`5e82e37` 加计算链/G3 修复；详见本目录 README 与历史索引。"
+    },
+    {
+      "id": "2026-10-01-scenarios",
+      "title": "早期三模型场景",
+      "status": "historical",
+      "scope": "旧批次与服务限额失败保留；宏使用 PrevScen 前缀，不混入后续五轮统计。",
+      "evidence": [
+        "exp/2026-10-01-scenarios/paper-results.json"
+      ],
+      "analysis": [
+        "tools/paper-results.py"
+      ],
+      "outputs": [
+        "overleaf/gen/numbers-prev.tex"
+      ],
+      "raw_data": "noctis `results/scen-20260930/`；本地为采用组、排除原因与汇总。",
+      "code_record": "场景代码 `26c2b48` 起；完整批次记录见历史索引。"
+    },
+    {
+      "id": "2026-10-01-workload-characterization",
+      "title": "工作负载刻画与 Redset",
+      "status": "supporting",
+      "scope": "采用完成的 DeepSeek 会话；两个因余额耗尽未完成的 GLM 组不计入。",
+      "evidence": [
+        "exp/2026-10-01-workload-characterization/workload-stats.json",
+        "exp/2026-10-01-workload-characterization/workload-stats.md",
+        "exp/2026-10-01-workload-characterization/audit-sample.jsonl"
+      ],
+      "analysis": [
+        "tools/workload-stats.py"
+      ],
+      "outputs": [],
+      "raw_data": "本地 `deepseek-v4.1-flash/`；Redset 原始 parquet 在 noctis `results/workload-baselines/redset/data/`。",
+      "code_record": "`9b98bc9`；provider、并发与工作负载命令见 README。"
+    },
+    {
+      "id": "2026-10-02-cache-baseline-tpcds",
+      "title": "验证缓存、并发快照与 TPC-DS 回放",
+      "status": "current",
+      "scope": "维护成本与回放依据；不同时期的回放、修复和快照协议按 README 分开解释。",
+      "evidence": [
+        "exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json",
+        "exp/2026-10-02-cache-baseline-tpcds/tpcds-replay-stats.json",
+        "exp/2026-10-02-cache-baseline-tpcds/tpcds-replay-outcomes.json.gz"
+      ],
+      "analysis": [
+        "tools/review-results.py",
+        "tools/replay-stats.py",
+        "tools/replay-safety-summary.py"
+      ],
+      "outputs": [
+        "overleaf/gen/review.tex",
+        "overleaf/gen/snapshot-stress.tex"
+      ],
+      "raw_data": "本地保存压缩回放与关键汇总；其余原始组在 noctis `results/motiv-20261001/` 等 README 指定目录。",
+      "code_record": "各目录 README 的设计、运行记录与启动命令；运行版本以原记录为准。"
+    },
+    {
+      "id": "2026-10-02-scenarios-ds",
+      "title": "三轮场景及后续修正",
+      "status": "current",
+      "scope": "用于既有示例和部分宏；当前五轮图表另见 10-10，不能直接用本批宏覆盖五轮结果。",
+      "evidence": [
+        "exp/2026-10-02-scenarios-ds/scen-stats.json",
+        "exp/2026-10-02-scenarios-ds/paper-results.json"
+      ],
+      "analysis": [
+        "tools/scen-stats.py",
+        "tools/paper-results.py"
+      ],
+      "outputs": [],
+      "raw_data": "noctis `results/scen-20261002/`；本地保存汇总和当时队列脚本。",
+      "code_record": "各目录 README 的设计、运行记录与启动命令；运行版本以原记录为准。"
+    },
+    {
+      "id": "2026-10-03-session-latency",
+      "title": "固定定义库会话耗时",
+      "status": "supporting",
+      "scope": "固定库、配对会话的补充证据；完整任务耗时与启动成本分列，所有请求计分。",
+      "evidence": [
+        "exp/2026-10-03-session-latency/report.md",
+        "exp/2026-10-03-session-latency/stats.json",
+        "exp/2026-10-03-session-latency/verification/audit.json"
+      ],
+      "analysis": [
+        "tools/run-session-latency.py",
+        "tools/session-latency-stats.py"
+      ],
+      "outputs": [
+        "overleaf/gen/session-latency.tex"
+      ],
+      "raw_data": "本地 `raw/`、`verification/`；远端 `/root/agentdb-session-latency-20261003/results/session-latency-20261003/`。",
+      "code_record": "`60d0783` 加 `verification/run-source.tar.gz`；各会话 manifest 与 README 记录配置。"
+    },
+    {
+      "id": "2026-10-03-shared-memory",
+      "title": "共享记忆补充实验与回退稿",
+      "status": "supporting",
+      "scope": "补充实验保留；10-03 稿件重构已回退，原失败轮与恢复轮分别保留。",
+      "evidence": [
+        "exp/2026-10-03-shared-memory/manifest.json",
+        "exp/2026-10-03-shared-memory/analysis/results.md",
+        "exp/2026-10-03-shared-memory/analysis/summary.json"
+      ],
+      "analysis": [
+        "tools/memory-study-stats.py",
+        "tools/run-memory-study.py",
+        "tools/run-strategy-study.py",
+        "tools/metadata-audit.py"
+      ],
+      "outputs": [],
+      "raw_data": "本地 `raw/`、`analysis/` 与源码归档；远端路径见 manifest 和 README。",
+      "code_record": "`60d0783` 加运行时源码与二进制哈希；manifest、inputs 和 verification 记录为准。"
+    },
+    {
+      "id": "2026-10-08-lifecycle",
+      "title": "共享库累积更新生命周期",
+      "status": "supporting",
+      "scope": "生产、使用与更新累积的补充实验；与每次恢复初始数据的场景实验分开解释。",
+      "evidence": [
+        "exp/2026-10-08-lifecycle/lifecycle-stats.json",
+        "exp/2026-10-08-lifecycle/cell-mavra.json",
+        "exp/2026-10-08-lifecycle/cell-traj.json",
+        "exp/2026-10-08-lifecycle/cell-none.json"
+      ],
+      "analysis": [
+        "tools/lifecycle-stats.py"
+      ],
+      "outputs": [
+        "overleaf/gen/lifecycle.tex",
+        "overleaf/gen/lifecycle-rows.tex"
+      ],
+      "raw_data": "本地保存三个方法的 cell 和统计；完整轨迹位置见 README。",
+      "code_record": "生命周期设计从 `b1c5974` 起；配置及方法见 README。"
+    },
+    {
+      "id": "2026-10-08-optimize",
+      "title": "优化修订与前提失效",
+      "status": "current",
+      "scope": "论文优化收益、前提失效及贯穿示例的证据。",
+      "evidence": [
+        "exp/2026-10-08-optimize/opt-stats.md",
+        "exp/2026-10-08-optimize/premise-report.json",
+        "exp/2026-10-08-optimize/report.md"
+      ],
+      "analysis": [
+        "tools/opt-stats.py",
+        "tools/premise-stats.py",
+        "tools/sharing-stats.py"
+      ],
+      "outputs": [
+        "overleaf/gen/opt.tex",
+        "overleaf/gen/premise.tex",
+        "overleaf/gen/sharing.tex"
+      ],
+      "raw_data": "本地 `trace/` 与汇总；完整优化单元在 noctis `results/scen-20261008-opt/`，学习轨迹在 `results/scen-20261008-trace/`。",
+      "code_record": "各目录 README 的设计、运行记录与启动命令；运行版本以原记录为准。"
+    },
+    {
+      "id": "2026-10-10-scenarios-q5",
+      "title": "题集 v2、每种方法五轮",
+      "status": "current",
+      "scope": "当前合成场景正确率和使用成本依据；沿用协议中的失败、替换与排除规则。",
+      "evidence": [
+        "exp/2026-10-10-scenarios-q5/scen-stats.json",
+        "exp/2026-10-10-scenarios-q5/paper-results.json",
+        "exp/2026-10-10-scenarios-q5/holdout-cost.json"
+      ],
+      "analysis": [
+        "tools/scen-stats.py",
+        "tools/paper-results.py",
+        "tools/sharing-stats.py"
+      ],
+      "outputs": [
+        "overleaf/gen/scen-ds.tex",
+        "overleaf/gen/numbers.tex",
+        "overleaf/gen/scen-cost.tex"
+      ],
+      "raw_data": "noctis `results/scen-20261010/`；本地为汇总、成本与启动脚本。",
+      "code_record": "题集 v2 从 `7e9b532` 起；队列、题目、轮次与实际运行记录见 README。"
+    },
+    {
+      "id": "2026-10-11-generality",
+      "title": "TPC-H、SSB、financial 与回放安全",
+      "status": "current",
+      "scope": "模式通用性、TPC-H 端到端与四库服务/拒绝审计；按共同题次统计，保留错误服务。",
+      "evidence": [
+        "exp/2026-10-11-generality/generality-stats.json",
+        "exp/2026-10-11-generality/replay-safety-summary.json",
+        "exp/2026-10-11-generality/e2e/scen-stats.json",
+        "exp/2026-10-11-generality/e2e/outcomes.json.gz"
+      ],
+      "analysis": [
+        "tools/generality-stats.py",
+        "tools/replay-safety-summary.py",
+        "tools/bench-library.py",
+        "tools/scen-stats.py"
+      ],
+      "outputs": [
+        "overleaf/gen/generality.tex",
+        "overleaf/gen/replay-safety.tex"
+      ],
+      "raw_data": "本地包含模式、查询、定义库、压缩回放和 e2e 汇总；数据库模板与完整模型运行见 README。",
+      "code_record": "各目录 README 的设计、运行记录与启动命令；运行版本以原记录为准。"
+    },
+    {
+      "id": "2026-10-12-population",
+      "title": "TPC-DS 群体共享与私有记忆",
+      "status": "current",
+      "scope": "采用无记忆、私有记忆与 MAVRA 的受控结果；早期外部记忆基线依 RelBench 协议一律不报告。",
+      "evidence": [
+        "exp/2026-10-12-population/population-stats.json",
+        "exp/2026-10-12-population/tpcds-defs.json"
+      ],
+      "analysis": [
+        "tools/population-stats.py"
+      ],
+      "outputs": [
+        "overleaf/gen/population.tex"
+      ],
+      "raw_data": "noctis `results/pop-tpcds-20261013/`，无记忆 r1–r2 沿用上一轮；合成试跑、配额失败和 pop-mem 系列的排除范围见 README 与 RelBench 协议。",
+      "code_record": "各目录 README 的设计、运行记录与启动命令；运行版本以原记录为准。"
+    },
+    {
+      "id": "2026-10-12-reforce",
+      "title": "ReFoRCE 作为使用者",
+      "status": "supporting",
+      "scope": "外部 Text-to-SQL 使用者的补充记录；结果采用范围和接口适配按原协议。",
+      "evidence": [
+        "exp/2026-10-12-reforce/reforce-stats.json"
+      ],
+      "analysis": [
+        "tools/reforce-stats.py",
+        "tools/reforce/mavra_reforce.py"
+      ],
+      "outputs": [],
+      "raw_data": "noctis `results/reforce-20261012/`；本地为统计与队列脚本。",
+      "code_record": "ReFoRCE 来源版本及适配方式见 README、third_party/reforce/README.md。"
+    },
+    {
+      "id": "2026-10-14-external-motivation",
+      "title": "外部任务中的知识复用",
+      "status": "current",
+      "scope": "BIRD、LiveSQLBench、Spider 2.0 的动机统计；统计口径为协议中的文本与术语代理。",
+      "evidence": [
+        "exp/2026-10-14-external-motivation/reuse-stats.json",
+        "exp/2026-10-14-external-motivation/reuse-stats.md"
+      ],
+      "analysis": [
+        "tools/external-reuse-stats.py"
+      ],
+      "outputs": [
+        "overleaf/gen/external.tex"
+      ],
+      "raw_data": "noctis `results/external-benchmarks/`；本地为汇总，数据下载与范围见 README。",
+      "code_record": "各目录 README 的设计、运行记录与启动命令；运行版本以原记录为准。"
+    },
+    {
+      "id": "2026-10-20-relbench",
+      "title": "RelBench 主实验与恢复审计",
+      "status": "current",
+      "scope": "当前主实验为 Stack/Trial；恢复评估与时间修正有审计，旧试跑不混入，无争用计时尚未执行。",
+      "evidence": [
+        "exp/2026-10-20-relbench/paper-sessions.json",
+        "exp/2026-10-20-relbench/recovery-audit.json",
+        "exp/2026-10-20-relbench/manuscript-review-audit.json",
+        "exp/2026-10-20-relbench/timing-replay-plan.json",
+        "exp/2026-10-20-relbench/reproduction-notes.md"
+      ],
+      "analysis": [
+        "tools/relbench/paper-stats.py",
+        "tools/relbench/compare-stats.py",
+        "tools/relbench/prepare-replay.py"
+      ],
+      "outputs": [
+        "overleaf/gen/relbench.tex",
+        "overleaf/gen/relbench-table.tex"
+      ],
+      "raw_data": "本地及 noctis 的 `results/relbench-pilot3/`、`results/relbench-main/`；数据准备与模板在 noctis `results/relbench-data/`。",
+      "code_record": "README 的逐轮记录、reproduction-notes、原始 run.json 和 timing-replay-plan 源文件哈希；10-22 恢复说明见 overleaf/README.md。"
+    },
+    {
+      "id": "2026-10-22-sql-only",
+      "title": "RelBench 完整 SQL 复用对照",
+      "status": "supporting",
+      "scope": "SQL-only／rel-stack 完成；其他组因网关空回复及上游额度不足停止，尚无完整配对结论。",
+      "evidence": [
+        "exp/2026-10-22-sql-only/cells.txt",
+        "exp/2026-10-22-sql-only/preflight.json",
+        "exp/2026-10-22-sql-only/run-provenance.json",
+        "exp/2026-10-22-sql-only/status.json"
+      ],
+      "analysis": [
+        "tools/relbench/sql-only-stats.py"
+      ],
+      "outputs": [],
+      "raw_data": "noctis `/root/agentdb-sql-only-20261022/results/sql-only-20261022/`；独立保存。",
+      "code_record": "本目录 README、preflight.json 与运行文件的代码及二进制哈希。"
+    }
+  ]
+}

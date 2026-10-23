@@ -37,7 +37,7 @@ def main():
     pinned = inputs / "agentdb-mid"
     shutil.copy2(binary, pinned)
     source_files = [Path("Cargo.toml"), Path("Cargo.lock"), *sorted(Path("src").rglob("*.rs")),
-                    Path("docs/shared-memory-study.md"), Path(__file__).resolve().relative_to(Path.cwd())]
+                    Path("docs/history/shared-memory-study.md"), Path(__file__).resolve().relative_to(Path.cwd())]
     hashes = {str(p): sha256(p) for p in source_files}
     (inputs / "source-sha256.json").write_text(json.dumps(hashes, indent=2) + "\n")
     archive_path = inputs / "primary-source.tar.gz"

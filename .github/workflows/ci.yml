@@ -6,6 +6,12 @@ permissions:
   contents: read
 
 jobs:
+  experiment-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/experiment-index.py --check
+
   test:
     strategy:
       matrix:

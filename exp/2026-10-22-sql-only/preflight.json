@@ -1,0 +1,48 @@
+{
+  "status": "passed",
+  "provider": "happy",
+  "base_url": "https://happycoding.xyz/v1",
+  "requested_model": "deepseek-v4.1-flash",
+  "required_response_model": "deepseek/deepseek-v4.1-flash-1017",
+  "reasoning_effort": "low",
+  "thinking": "enabled",
+  "responses": [
+    {
+      "finish_reason": "tool_calls",
+      "model": "deepseek/deepseek-v4.1-flash-1017",
+      "input_tokens": 301,
+      "output_tokens": 60,
+      "cached_tokens": 128,
+      "reasoning_tokens": 23,
+      "seconds": 1.9293041229248047,
+      "discarded": 0,
+      "discarded_tokens": 0,
+      "retries": 0,
+      "retry_seconds": 0.0
+    },
+    {
+      "finish_reason": "stop",
+      "model": "deepseek/deepseek-v4.1-flash-1017",
+      "input_tokens": 374,
+      "output_tokens": 2,
+      "cached_tokens": 128,
+      "reasoning_tokens": 0,
+      "seconds": 1.1287033557891846,
+      "discarded": 0,
+      "discarded_tokens": 0,
+      "retries": 0,
+      "retry_seconds": 0.0
+    }
+  ],
+  "tool_round_trip": true,
+  "python": "3.10.12",
+  "sha256": {
+    "tools/relbench/harness.py": "b5839f4fe51c3357535db266500d6a0712e26a52b46ebeef67f37102cc1b1657",
+    "tools/relbench/test_sql_only.py": "69180b75b92ccbc2409de65237b537dbd4e72f18d49d19acfb7801fc90011513",
+    "tools/relbench/run-queue.py": "58736799612004c70cc82b3c209bf2a311408c6b4c0fcf47ff3981426b4746a6",
+    "target/release/agentdb-mid": "99bc3a66cc2cf4f7f4d27cb3cb3c33d75fdb0bf6de435fc5d992b1bcdb3b9367",
+    "src/middle/features.rs": "35fd1c36d01bf79f93dfc24c0b6925f8f488dbb257b32059a5f1850536fb566a",
+    "src/metricbench.rs": "8c0ece2fff3f78b51519465fd7d9b4c0196a1120063dccc13eacfc2c2265dfff"
+  },
+  "previous_probe": "Old expected model omitted -1017 suffix; 15 short responses rejected, no experiment sessions launched."
+}

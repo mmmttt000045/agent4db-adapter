@@ -1,6 +1,6 @@
 # 论文重构与补充实验验收
 
-> 2026-10-04：本轮重构已回退，论文回到 `60d0783` 的主线（指标定义的有效性维护与使用时强制）。本文件保留为重构稿与补充实验的记录；重构稿源码见 `../exp/2026-10-03-shared-memory/overleaf-restructure-2026-10-03.tar.gz`，补充实验的去向见 [research-status.md](research-status.md)。
+> 2026-10-04：本轮重构已回退，论文回到 `60d0783` 的主线（指标定义的有效性维护与使用时强制）。本文件保留为重构稿与补充实验的记录；重构稿源码见 `../exp/2026-10-03-shared-memory/overleaf-restructure-2026-10-03.tar.gz`，补充实验的去向见 [research-status.md](research-status-2026-10-07.md)。
 
 本轮从“共享指标定义的维护”重构为：**给同一数据库和业务空间的用户侧智能体提供共享知识与经验证的经验，减少重复探索；知识发布、策略采纳和有效性维护分别使用可核查的证据。** 指标条件、受限修复及快照执行作为这层最强使用契约的实例。
 
@@ -8,14 +8,14 @@
 
 | 材料 | 位置 |
 | --- | --- |
-| 英文主稿 | [main-en.pdf](../overleaf/build/main-en.pdf)，13 页，正文在第 12 页结束 |
-| 双语主稿 | [main.pdf](../overleaf/build/main.pdf)，20 页 |
-| 保留旧场景细节的扩展工作稿 | [英文](../overleaf/build/main-en-details.pdf) / [双语](../overleaf/build/main-details.pdf)；供复核，正式投稿附录需单独制作 PDF |
-| Overleaf 上传源码包 | [mavra-sigmod-bilingual.zip](../overleaf/mavra-sigmod-bilingual.zip)，64 个源文件、四种入口；主稿已从空目录重新编译 |
-| 新实验结果 | [results.md](../exp/2026-10-03-shared-memory/analysis/results.md)、[summary.json](../exp/2026-10-03-shared-memory/analysis/summary.json) |
-| 方法、原始记录及失败说明 | [实验存档](../exp/2026-10-03-shared-memory/README.md)、[研究协议](shared-memory-study.md) |
+| 英文主稿 | `overleaf/build/main-en.pdf`（当时的构建输出），13 页，正文在第 12 页结束 |
+| 双语主稿 | `overleaf/build/main.pdf`（当时的构建输出），20 页 |
+| 保留旧场景细节的扩展工作稿 | `overleaf/build/main-en-details.pdf`（当时的构建输出） / `overleaf/build/main-details.pdf`（当时的构建输出）；供复核，正式投稿附录需单独制作 PDF |
+| Overleaf 上传源码包 | [mavra-sigmod-bilingual.zip](artifacts/mavra-sigmod-bilingual.zip)，64 个源文件、四种入口；主稿已从空目录重新编译 |
+| 新实验结果 | [results.md](../../exp/2026-10-03-shared-memory/analysis/results.md)、[summary.json](../../exp/2026-10-03-shared-memory/analysis/summary.json) |
+| 方法、原始记录及失败说明 | [实验存档](../../exp/2026-10-03-shared-memory/README.md)、[研究协议](shared-memory-study.md) |
 | 文献与贡献定位 | [shared-memory-positioning.md](shared-memory-positioning.md)，对照五项最接近的原论文或官方文档 |
-| 最终实现与交付摘要 | [final-implementation.tar.gz](../exp/2026-10-03-shared-memory/final-implementation.tar.gz)、[deliverables.json](../exp/2026-10-03-shared-memory/analysis/deliverables.json)，与实验时源码分别归档 |
+| 最终实现与交付摘要 | [final-implementation.tar.gz](../../exp/2026-10-03-shared-memory/final-implementation.tar.gz)、[deliverables.json](../../exp/2026-10-03-shared-memory/analysis/deliverables.json)，与实验时源码分别归档 |
 
 标题、摘要、引言、架构、模型、研究问题、相关工作、限制与结论均已对齐新主线。已有固定库会话、配对维护、真实 TPC-DS 定义片段、并发和修复实验保留，没有删除不利结果。两个主稿保持 ACM 默认字号和版面尺寸；扩展入口仅关闭末页自动栏平衡。
 
@@ -34,12 +34,12 @@
 
 原按量线路另有完整 264 次尝试，其中 28 次 HTTP 402（主分析 19、命名 9）。实际返回的 197 个主分析答案全部正确；错误路径的 token／轮数是下界。恢复是在原轮审计后，仅因服务不足决定，沿用相同二进制、端点、返回模型名校验和预算，重新生成全部生产者及消费者。两轮不合并；事后完成调用敏感性分析单列，不能替代原始全部尝试。
 
-运行时源码、二进制摘要、逐工具轨迹、12 个前缀／轮、所有失败及清理结果均归档。原轮和恢复轮的 29 个源码／协议／启动文件分别匹配归档摘要；策略实验的 28 个代码文件同样匹配。早期策略协议未完整存档，不声称已恢复。统计、表格、坐标重新生成后逐字节一致，见 [往返核对](../exp/2026-10-03-shared-memory/analysis/source-and-roundtrip-verification.json)。额外十进制复核确认两轮返回的主分析答案都在题面精度内；SQL 探查分类是代理指标，[复核记录](../exp/2026-10-03-shared-memory/analysis/classification-review.md)由 Codex 完成，不能称为独立人工标注。
+运行时源码、二进制摘要、逐工具轨迹、12 个前缀／轮、所有失败及清理结果均归档。原轮和恢复轮的 29 个源码／协议／启动文件分别匹配归档摘要；策略实验的 28 个代码文件同样匹配。早期策略协议未完整存档，不声称已恢复。统计、表格、坐标重新生成后逐字节一致，见 [往返核对](../../exp/2026-10-03-shared-memory/analysis/source-and-roundtrip-verification.json)。额外十进制复核确认两轮返回的主分析答案都在题面精度内；SQL 探查分类是代理指标，[复核记录](../../exp/2026-10-03-shared-memory/analysis/classification-review.md)由 Codex 完成，不能称为独立人工标注。
 
 最终审查修复两处问题：反向连接可能重复累计事实金额；条件比较及过滤去重曾合并字符串值的大小写和空格。新原型拒绝反向、多跳和自连接，保守比较保留字面量，并通过真实数据库反例：100 被错误累计为 200；不同过滤总体具有不同唯一性。两轮最终前缀的 25 个指标条目全部满足新方向约束，相关过滤未触发旧字面量合并问题。补丁在实验后完成，实验时源码保持原样，不声称数据由最终修正版重跑。
 
-常规测试 **40 项通过**，Clippy 全目标无警告，格式和 release 构建通过。最终 **5 项 PostgreSQL 集成测试全部通过**，覆盖变化场景、HTTP 生命周期、连接方向与过滤字面量、修复歧义和并发快照；2026-10-03 20:52:50 UTC 完成，整套运行 2177.78 秒，线程栈设为 32 MiB。见 [完整日志](../exp/2026-10-03-shared-memory/raw/validation/results/final-integration-v3-full.log) 与 [时间、命令和源码摘要](../exp/2026-10-03-shared-memory/raw/validation/results/final-integration-v3-full-run.json)。最终测试的 27 个代码／构建文件与当前工作区逐一一致，各测试的数据库清理检查通过。默认调试栈溢出、连接反例测试开发中的阶段预期错误及缺失批次表均保留日志；不作为成功数据。
+常规测试 **40 项通过**，Clippy 全目标无警告，格式和 release 构建通过。最终 **5 项 PostgreSQL 集成测试全部通过**，覆盖变化场景、HTTP 生命周期、连接方向与过滤字面量、修复歧义和并发快照；2026-10-03 20:52:50 UTC 完成，整套运行 2177.78 秒，线程栈设为 32 MiB。见 [完整日志](../../exp/2026-10-03-shared-memory/raw/validation/results/final-integration-v3-full.log) 与 [时间、命令和源码摘要](../../exp/2026-10-03-shared-memory/raw/validation/results/final-integration-v3-full-run.json)。最终测试的 27 个代码／构建文件与当前工作区逐一一致，各测试的数据库清理检查通过。默认调试栈溢出、连接反例测试开发中的阶段预期错误及缺失批次表均保留日志；不作为成功数据。
 
-四个 PDF 已核对引用、主要数字、页数与视觉布局，均无越界、缺字或未解析引用。源码包的两个主稿从空目录重新编译成功，提取文字与交付 PDF 逐字节一致；见 [源码包独立编译核对](../exp/2026-10-03-shared-memory/analysis/cold-package-verification.json)。英文主稿正文在第 12 页结束，双语稿用于共同写作；扩展工作稿不直接作为正式投稿主稿。
+四个 PDF 已核对引用、主要数字、页数与视觉布局，均无越界、缺字或未解析引用。源码包的两个主稿从空目录重新编译成功，提取文字与交付 PDF 逐字节一致；见 [源码包独立编译核对](../../exp/2026-10-03-shared-memory/analysis/cold-package-verification.json)。英文主稿正文在第 12 页结束，双语稿用于共同写作；扩展工作稿不直接作为正式投稿主稿。
 
-重构前源码、原有未提交修改和源包保存在 [before-refactor.tar.gz](../exp/2026-10-03-shared-memory/before-refactor.tar.gz) 与 [initial-workspace.diff](../exp/2026-10-03-shared-memory/initial-workspace.diff)。工作在本地及服务器独立目录完成，未提交或发布。
+重构前源码、原有未提交修改和源包保存在 [before-refactor.tar.gz](../../exp/2026-10-03-shared-memory/before-refactor.tar.gz) 与 [initial-workspace.diff](../../exp/2026-10-03-shared-memory/initial-workspace.diff)。工作在本地及服务器独立目录完成，未提交或发布。

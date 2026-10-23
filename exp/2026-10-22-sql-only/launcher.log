@@ -1,0 +1,24 @@
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.003s
+
+OK
+[10-22 21:15:00] start sql-only-rel-stack-r1 (running 1, free 60 GB)
+[10-22 21:15:30] start mavra-rel-trial-r1 (running 2, free 59 GB)
+[10-22 22:06:03] FAILED mavra-rel-trial-r1 (exit 1)
+[10-22 22:06:03] start mavra-rel-stack-r1 (running 2, free 59 GB)
+[10-22 23:19:36] done sql-only-rel-stack-r1 (exit 0)
+[10-22 23:19:36] FAILED mavra-rel-stack-r1 (exit 1)
+[10-22 23:19:36] start sql-only-rel-trial-r1 (running 1, free 61 GB)
+[10-22 23:21:06] FAILED sql-only-rel-trial-r1 (exit 1)
+[10-22 23:22:06] queue finished
+Traceback (most recent call last):
+  File "/root/agentdb-sql-only-20261022/tools/relbench/sql-only-stats.py", line 125, in <module>
+    main()
+  File "/root/agentdb-sql-only-20261022/tools/relbench/sql-only-stats.py", line 85, in main
+    data = {arm: load(a.root / f"{arm}-{db}-r{a.run}") for arm in ("sql-only", "mavra")}
+  File "/root/agentdb-sql-only-20261022/tools/relbench/sql-only-stats.py", line 85, in <dictcomp>
+    data = {arm: load(a.root / f"{arm}-{db}-r{a.run}") for arm in ("sql-only", "mavra")}
+  File "/root/agentdb-sql-only-20261022/tools/relbench/sql-only-stats.py", line 13, in load
+    raise ValueError(f"{path}: not a complete production run")
+ValueError: results/sql-only-20261022/mavra-rel-stack-r1: not a complete production run

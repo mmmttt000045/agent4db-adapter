@@ -22,7 +22,7 @@
 | `analysis/paper-verification.json` / `analysis/cold-package-verification.json` | 四个 PDF 核对；64 文件源码包从空目录编译及主稿内容一致性 |
 | `analysis/deliverables.json` | 最终交付文件摘要、测试结果及源码一致性 |
 
-协议见 [shared-memory-study.md](../../docs/shared-memory-study.md)。主实验给各组相同业务定义，命名题另报；来源学习、提炼与完整检查采集不混入已建库消费者代价。三个生产者流及三个同负载计时重复支持描述性结论，不能把相关题视为独立统计重复。
+协议见 [shared-memory-study.md](../../docs/history/shared-memory-study.md)。主实验给各组相同业务定义，命名题另报；来源学习、提炼与完整检查采集不混入已建库消费者代价。三个生产者流及三个同负载计时重复支持描述性结论，不能把相关题视为独立统计重复。
 
 恢复轮主分析四组均 54/54，无服务错误。持续积累相对隔离的每次尝试输入 token 低 **24.4%**、结构查找低 **27.7%**，相对首轮冻结的输入 token 低 **18.9%**。仅报名称的次要题：隔离 3/12、冻结 6/12、积累和轨迹均 12/12。来源学习与提炼累计 343.6 秒、277.2 千 token；不含建表及外部判题 SQL，不宣称净部署收益。原按量轮返回的 197 个主分析答案全部正确，服务失败不能算作推理错误。
 
@@ -68,4 +68,4 @@ python3 tools/memory-study-stats.py \
 
 条件比较及编译时过滤去重还曾忽略字符串值中的大小写和空格。最终实现采用保留字面量的保守 token 比较，遇到转义、美元引用、注释和不支持的运算符时退回精确文本；不同取值不能共享验证结论或被当成同一过滤。真实数据库测试中 `A B`／`AB`、`ABC`／`abc` 的总体具有不同唯一性，修正版均正确区分。两轮 S1 快照的全部指标／连接过滤及唯一性条件中，没有含内部空格或 ASCII 大写字符的字面量；源码与统计往返核对见 `analysis/source-and-roundtrip-verification.json`。集成测试开发中的错误阶段预期及缺失测试批次表也保留在失败日志中，没有作为实验结果使用。
 
-最终验收常规测试 40 项、PostgreSQL 集成测试 5 项全部通过；Clippy 全目标、格式及 release 构建通过。完整集成日志和执行时的 27 个文件摘要位于 `raw/validation/results/final-integration-v3-full*`，与当前最终代码一致。集成测试使用 32 MiB 线程栈；失败尝试和成功复核分别保留，不覆盖旧记录。完整交付入口见 [验收报告](../../docs/refactor-acceptance.md)。
+最终验收常规测试 40 项、PostgreSQL 集成测试 5 项全部通过；Clippy 全目标、格式及 release 构建通过。完整集成日志和执行时的 27 个文件摘要位于 `raw/validation/results/final-integration-v3-full*`，与当前最终代码一致。集成测试使用 32 MiB 线程栈；失败尝试和成功复核分别保留，不覆盖旧记录。完整交付入口见 [验收报告](../../docs/history/refactor-acceptance.md)。

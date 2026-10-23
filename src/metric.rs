@@ -1,5 +1,5 @@
 //! 指标经验的纯逻辑：题型、规范 SQL 编译、计算链求值、静态检查与离线提炼。
-//! 需要数据库的门槛、守护、受限修复与回归在 `middle::metrics`。协议见 docs/metric-experience-protocol.md。
+//! 需要数据库的门槛、守护、受限修复与回归在 `middle::metrics`。协议见 docs/history/metric-experience-protocol.md。
 
 use crate::catalog::Catalog;
 use crate::knowledge::{Basis, EmptyRule, JoinKind, Metric, TimeSpec, TimeStrategy};

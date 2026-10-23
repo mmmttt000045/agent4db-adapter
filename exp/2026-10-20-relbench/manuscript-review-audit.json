@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-22",
+  "status": "manuscript_revised; isolated_timing_pending",
+  "english_pages": 14,
+  "body_end_page": 12,
+  "bilingual_pages": 23,
+  "printed_references": 69,
+  "uncited_entries_excluded": 11,
+  "source_bibliography_entries": 80,
+  "undefined_citations_or_references": 0,
+  "english_overfull_boxes": 0,
+  "relbench_sessions": 210,
+  "experiment_results_unchanged_except_usd_repricing": true,
+  "deepprep_failure_counts": {
+    "rel-stack": {
+      "solution_timeout": 5,
+      "no_solution": 2
+    },
+    "rel-trial": {
+      "solution_timeout": 6
+    }
+  },
+  "prepared_replay": "exp/2026-10-20-relbench/timing-replay-plan.json",
+  "remaining": [
+    "Isolated component replay and controlled API latency measurements require reserved resources; not executed.",
+    "Author names/affiliations remain placeholders."
+  ],
+  "sources": {
+    "page_limit": "https://icde2027.github.io/cf-research-papers",
+    "usd_rates": "https://api-docs.deepseek.com/quick_start/pricing/?push_animated=1&theme=light&webview_progress_bar=1"
+  },
+  "artifacts": {
+    "overleaf/build/main-en.pdf": "9aec6799c118df6a8fdf8d43a36b51533ad17ec54617224fb5903955e419ecd2",
+    "overleaf/build/main.pdf": "d9dde65b365dfb125138c93d333d58ad176bb5d5848bb81cd3fab8a70d790c8f",
+    "overleaf/mavra-icde-bilingual.zip": "fe46e4280291b91008a4fc2bbdace0501fe425e60664e84d2519ac681455eb73"
+  }
+}

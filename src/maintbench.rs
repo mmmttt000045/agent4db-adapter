@@ -4,7 +4,7 @@
 //! 而不只是“保留定义比删除定义好”。
 //!
 //! 口径按族生成，同族定义共享同一批条件（事实表粒度、时间关联；比率口径另外共享门店销售与退货的关联）。
-//! 共享度越低、写入涉及的条件越多，两种重验越接近。协议见 docs/metric-experience-protocol.md“维护方式对照”。
+//! 共享度越低、写入涉及的条件越多，两种重验越接近。协议见 docs/history/metric-experience-protocol.md“维护方式对照”。
 
 use crate::catalog;
 use crate::db::{diff, Db, QKind};
@@ -666,7 +666,7 @@ fn markdown(report: &Value) -> String {
     let cells: Vec<&Value> = report["cells"].as_array().into_iter().flatten().collect();
     let mut out = format!(
         "# 维护方式对照（不调用 LLM）\n\n口径数随共享度 k 变化（k = 6 为全部 {} 条），{} 个 Agent；每次变化后每个 Agent 把全部口径各用一次。\
-         组名 r轮次-k共享度-维护方式-到达方式。本报告是描述性结果，不作显著性声明。协议见 docs/metric-experience-protocol.md。\n",
+         组名 r轮次-k共享度-维护方式-到达方式。本报告是描述性结果，不作显著性声明。协议见 docs/history/metric-experience-protocol.md。\n",
         SPECS.len(),
         report["options"]["agents"]
     );

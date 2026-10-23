@@ -1,0 +1,196 @@
+{
+  "checked_at": "2026-10-22",
+  "runs": [
+    {
+      "database": "rel-stack",
+      "arm": "none",
+      "finished": "2026-10-21 21:30:07",
+      "sessions": 15,
+      "scored": 15,
+      "reference_fallback": 0,
+      "stops": {
+        "submitted": 1,
+        "validation_budget": 4,
+        "patience": 3,
+        "reached_previous": 7
+      }
+    },
+    {
+      "database": "rel-stack",
+      "arm": "ace",
+      "finished": "2026-10-22 00:50:37",
+      "sessions": 15,
+      "scored": 14,
+      "reference_fallback": 1,
+      "stops": {
+        "reached_previous": 9,
+        "validation_budget": 2,
+        "patience": 4
+      }
+    },
+    {
+      "database": "rel-stack",
+      "arm": "gmemory",
+      "finished": "2026-10-22 01:07:16",
+      "sessions": 15,
+      "scored": 15,
+      "reference_fallback": 0,
+      "stops": {
+        "patience": 8,
+        "reached_previous": 7
+      }
+    },
+    {
+      "database": "rel-stack",
+      "arm": "awm",
+      "finished": "2026-10-22 00:51:25",
+      "sessions": 15,
+      "scored": 15,
+      "reference_fallback": 0,
+      "stops": {
+        "patience": 5,
+        "submitted": 1,
+        "reached_previous": 7,
+        "validation_budget": 2
+      }
+    },
+    {
+      "database": "rel-stack",
+      "arm": "deepprep",
+      "finished": "2026-10-22 01:02:52",
+      "sessions": 15,
+      "scored": 8,
+      "reference_fallback": 7,
+      "stops": {
+        "no_solution": 2,
+        "solution_timeout": 5,
+        "solution": 8
+      }
+    },
+    {
+      "database": "rel-stack",
+      "arm": "featpilot",
+      "finished": "2026-10-22 00:27:05",
+      "sessions": 15,
+      "scored": 15,
+      "reference_fallback": 0,
+      "stops": {
+        "featpilot": 15
+      }
+    },
+    {
+      "database": "rel-stack",
+      "arm": "mavra",
+      "finished": "2026-10-21 22:21:21",
+      "sessions": 15,
+      "scored": 15,
+      "reference_fallback": 0,
+      "stops": {
+        "reached_previous": 12,
+        "submitted": 1,
+        "patience": 2
+      }
+    },
+    {
+      "database": "rel-trial",
+      "arm": "none",
+      "finished": "2026-10-21 22:49:01",
+      "sessions": 15,
+      "scored": 14,
+      "reference_fallback": 1,
+      "stops": {
+        "reached_previous": 8,
+        "patience": 5,
+        "validation_budget": 1,
+        "llm_budget": 1
+      }
+    },
+    {
+      "database": "rel-trial",
+      "arm": "ace",
+      "finished": "2026-10-22 00:18:09",
+      "sessions": 15,
+      "scored": 15,
+      "reference_fallback": 0,
+      "stops": {
+        "reached_previous": 8,
+        "patience": 5,
+        "submitted": 2
+      }
+    },
+    {
+      "database": "rel-trial",
+      "arm": "gmemory",
+      "finished": "2026-10-22 01:39:34",
+      "sessions": 15,
+      "scored": 15,
+      "reference_fallback": 0,
+      "stops": {
+        "patience": 6,
+        "reached_previous": 7,
+        "llm_budget": 2
+      }
+    },
+    {
+      "database": "rel-trial",
+      "arm": "awm",
+      "finished": "2026-10-22 15:25:08",
+      "sessions": 15,
+      "scored": 14,
+      "reference_fallback": 1,
+      "stops": {
+        "reached_previous": 9,
+        "validation_budget": 1,
+        "llm_budget": 2,
+        "patience": 3
+      }
+    },
+    {
+      "database": "rel-trial",
+      "arm": "deepprep",
+      "finished": "2026-10-22 06:46:34",
+      "sessions": 15,
+      "scored": 9,
+      "reference_fallback": 6,
+      "stops": {
+        "solution": 9,
+        "solution_timeout": 6
+      }
+    },
+    {
+      "database": "rel-trial",
+      "arm": "featpilot",
+      "finished": "2026-10-22 00:52:23",
+      "sessions": 15,
+      "scored": 15,
+      "reference_fallback": 0,
+      "stops": {
+        "featpilot": 15
+      }
+    },
+    {
+      "database": "rel-trial",
+      "arm": "mavra",
+      "finished": "2026-10-22 01:08:57",
+      "sessions": 15,
+      "scored": 15,
+      "reference_fallback": 0,
+      "stops": {
+        "reached_previous": 11,
+        "llm_budget": 2,
+        "patience": 1,
+        "validation_budget": 1
+      }
+    }
+  ],
+  "total_sessions": 210,
+  "checks": [
+    "all runs finished",
+    "15 sessions per run",
+    "no unresolved evaluation errors",
+    "no recorded learning errors",
+    "no final audit marked leak",
+    "AWM restored pool matched original implementation offline",
+    "statistics reject missing sessions and pending clean scores"
+  ]
+}

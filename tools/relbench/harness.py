@@ -26,6 +26,7 @@ import sys
 import threading
 import time
 import traceback
+import hashlib
 
 import numpy as np
 import pandas as pd
@@ -91,6 +92,9 @@ ARMS = {
     "none": {"middle_mode": "middle-alone", "parallel_ok": True},
     # README §1.6: feature definitions shared by all agents; sessions of one cutoff run one after another
     "mavra": {"middle_mode": "relbench-mavra", "parallel_ok": False, "feature_memory": True, "extractor": True},
+    # Same base metadata/query caches as MAVRA; only task-local, audited SQL is retained.
+    # No feature tools, extraction, definition publication or composition are used.
+    "sql-only": {"middle_mode": "relbench-mavra", "parallel_ok": False, "sql_memory": True},
     # ACE (ICLR 2026) as published: one playbook per agent, online, no ground-truth labels (README §1.3)
     "ace": {"middle_mode": "middle-alone", "parallel_ok": True, "ace": True},
     # G-Memory (NeurIPS 2025) as published: one store shared by all agents, tasks one at a time (README §1.3)
@@ -129,14 +133,15 @@ def load_env(path=".env"):
             if line and not line.startswith("#") and "=" in line:
                 k, v = line.split("=", 1)
                 env[k.strip()] = v.strip().strip('"').strip("'")
-    env.update({k: v for k, v in os.environ.items() if k.startswith(("DEEPSEEK_", "RIVER_", "AGENTDB_"))})
+    env.update({k: v for k, v in os.environ.items() if k.startswith(("DEEPSEEK_", "RIVER_", "HAPPY_", "AGENTDB_"))})
     return env
 
 
 # ───────────────────────── LLM (OpenAI-compatible; same request shape as src/llm.rs) ─────────────────────────
 
 # provider name -> (.env prefix, default base URL), as OPENAI_PROFILES in src/llm.rs; since 10-21 every run uses DeepSeek's own API
-PROVIDERS = {"deepseek": ("DEEPSEEK", "https://api.deepseek.com"), "river": ("RIVER", "https://api.river.ai/v1")}
+PROVIDERS = {"deepseek": ("DEEPSEEK", "https://api.deepseek.com"), "river": ("RIVER", "https://api.river.ai/v1"),
+             "happy": ("HAPPY", "https://happycoding.xyz/v1")}
 
 class LlmUnavailable(RuntimeError):
     """The model service failed after all retries (or refused a request): the run stops instead of recording a cut session."""
@@ -229,6 +234,7 @@ class Llm:
         if temperature is not None:
             body["temperature"] = temperature
         discarded, wasted, retries, lost = 0, 0, 0, 0.0
+        invalid = []
         t0 = time.time()
         for _ in range(15):
             t1 = time.time()
@@ -240,15 +246,31 @@ class Llm:
                 lost += time.time() - t1 - secs
                 continue
             u = v.get("usage") or {}
-            msg = v["choices"][0]["message"]
+            choice = (v.get("choices") or [{}])[0]
+            msg = choice.get("message") or {}
+            # Some gateways return HTTP 200 with finish_reason=error and reasoning-only text.
+            # Such a reply cannot be appended as a role-only assistant message: the next
+            # upstream request rejects it. Retry the identical conversation and retain usage.
+            if choice.get("finish_reason") == "error" or not (msg.get("content") or msg.get("tool_calls")):
+                invalid.append({"finish_reason": choice.get("finish_reason"), "model": v.get("model"),
+                                "input_tokens": u.get("prompt_tokens", 0), "output_tokens": u.get("completion_tokens", 0),
+                                "cached_tokens": (u.get("prompt_tokens_details") or {}).get("cached_tokens", 0) or 0,
+                                "reasoning_tokens": (u.get("completion_tokens_details") or {}).get("reasoning_tokens", 0) or 0})
+                retries += 1
+                if len(invalid) >= 4:
+                    raise LlmUnavailable(f"four unusable model responses; attempts={json.dumps(invalid)}")
+                time.sleep(min(20, 2 ** len(invalid)))
+                lost += time.time() - t1 - secs
+                continue
             return {
                 "message": msg,
-                "finish_reason": v["choices"][0].get("finish_reason"),
+                "finish_reason": choice.get("finish_reason"),
                 "model": v.get("model"),
-                "input_tokens": u.get("prompt_tokens", 0),
-                "output_tokens": u.get("completion_tokens", 0),
-                "cached_tokens": (u.get("prompt_tokens_details") or {}).get("cached_tokens"),
-                "reasoning_tokens": (u.get("completion_tokens_details") or {}).get("reasoning_tokens"),
+                "input_tokens": u.get("prompt_tokens", 0) + sum(x["input_tokens"] for x in invalid),
+                "output_tokens": u.get("completion_tokens", 0) + sum(x["output_tokens"] for x in invalid),
+                "cached_tokens": ((u.get("prompt_tokens_details") or {}).get("cached_tokens", 0) or 0) + sum(x["cached_tokens"] for x in invalid),
+                "reasoning_tokens": ((u.get("completion_tokens_details") or {}).get("reasoning_tokens", 0) or 0) + sum(x["reasoning_tokens"] for x in invalid),
+                "invalid_responses": invalid,
                 "seconds": time.time() - t0,
                 "discarded": discarded,
                 "discarded_tokens": wasted,
@@ -505,6 +527,7 @@ class Run:
         # retraining goal (README §1.2, 10-21): the previous cutoff's model, refit on this cutoff's data.
         # task -> (cutoff, final feature SQL whose audit was clean) of this run's latest session
         self.prev_sql = {}
+        self.sql_programs = {}  # SQL-only: latest successful, clean program per task; never other tasks' SQL
         self.targets = {}
         if a.targets_from:
             first = min(int(x) for x in a.cutoffs) if a.cutoffs else 1
@@ -534,6 +557,8 @@ class Run:
             for agent, (kk, f) in latest.items():
                 self.playbooks[agent] = open(f).read()
                 self.ace_steps[agent] = kk
+            if self.arm.get("awm"):
+                self.restore_awm(a.targets_from, first)
         self.gmem = None
         self.asm = None
         os.makedirs(os.path.join(a.out, "sessions"), exist_ok=True)
@@ -698,6 +723,10 @@ Budget: at most {MAX_VALIDATIONS} validations and {MAX_LLM_CALLS} model calls; t
             f"one more validation within the next {POST_GOAL_LLM_CALLS} model calls, after which the session ends with your best validated features." if self.target(t, k) is not None else "") + ("""
 
 Shared memory: agents on this database publish verified feature definitions and feature programs. Start with find_program (this task's verified program from an earlier cutoff: its complete feature SQL when it still runs, and a feature SQL of its definitions) and find_features (definitions for the entity table, with a feature SQL of them for these seed tables). If they return a feature SQL, validate it first (the complete program SQL first); explore the tables and extend the SQL only to improve on it. compose_features compiles chosen definitions (by key) into a feature SQL.""" if self.arm.get("feature_memory") else "") + (
+            "\n\nSQL memory: successful sessions save their complete audited feature SQL for this task. Start with find_program "
+            "(this task's verified program from an earlier cutoff: its complete feature SQL when it still runs). If it returns "
+            "a feature SQL, validate it first; explore the tables and extend the SQL only to improve on it."
+            if self.arm.get("sql_memory") else "") + (
             "\n\nMemory: retrieve_trajectory returns how the most similar earlier task on this database was explored; call it before you start. "
             "schema_linking asks a schema linking agent to map a task to tables, columns and joins. The other extra tools run tool sequences "
             "that agents often call together." if self.arm.get("agentsm") else "") + (
@@ -768,7 +797,38 @@ Shared memory: agents on this database publish verified feature definitions and 
                {"keys": {"type": "array", "items": s}}, ["keys"]),
             fn("find_program", "The latest verified feature program for this task (from an earlier cutoff): its validation score and its still-valid definitions compiled into one feature SQL, ready for validate_features.",
                {}, []),
-        ] if self.arm.get("feature_memory") else []) + (self.asm.tool_specs() if self.asm else [])
+        ] if self.arm.get("feature_memory") else []) + ([
+            fn("find_program", "The latest successful, audited feature program for this task from an earlier cutoff: "
+               "its validation score and complete feature SQL when it still runs, ready for validate_features.", {}, []),
+        ] if self.arm.get("sql_memory") else []) + (self.asm.tool_specs() if self.asm else [])
+
+    def find_sql_program(self, t, k):
+        """Match MAVRA's 50-seed executability check, without extraction or feature composition."""
+        program = self.sql_programs.get(t)
+        if not program or program["k"] >= k:
+            return {"program": None, "note": "no verified program for this task yet"}
+        out = {"program": {key: program[key] for key in ("task", "cutoff", "metric", "val_score")}}
+        seeds = f"(select * from task.{tname(t)}_val limit 50)"
+        sql = program["sql"].strip().rstrip(";").replace("{seeds}", seeds)
+        try:
+            read_sql(self.url, f"select count(*) from ({sql}) q", timeout_s=300)
+            out["program_sql"] = program["sql"]
+        except Exception as err:
+            out["program_sql_unavailable"] = f"the program's SQL no longer runs on the current data: {err}"
+        return out
+
+    def save_sql_program(self, t, k, rec):
+        """Admission uses validation and the clean audit only, with MAVRA's success threshold."""
+        ref = (self.refs.get((t, k)) or {}).get("val")
+        best = rec.get("best_val")
+        beats = best is not None and ref is not None and (best > ref if rec["higher_is_better"] else best < ref)
+        if rec.get("stop") == "llm_error" or not rec.get("final_sql") or not beats:
+            return {"saved": False, "reason": "no successful completed program"}
+        if (rec.get("audit") or {}).get("result") != "clean":
+            return {"saved": False, "reason": "program audit is not clean"}
+        self.sql_programs[t] = {"task": t, "k": k, "cutoff": self.tasks[t]["cutoffs"][k - 1]["test_timestamp"],
+                                "metric": rec["metric"], "val_score": best, "sql": rec["final_sql"]}
+        return {"saved": True, "source_cutoff": k, "sql_sha256": hashlib.sha256(rec["final_sql"].encode()).hexdigest()}
 
     def session(self, t, k, seeds, middle):
         e = self.tasks[t]
@@ -836,6 +896,9 @@ Shared memory: agents on this database publish verified feature definitions and 
                 entry = {"i": len(rec["tools"]), "llm_i": len(rec["llm"]) - 1, "name": name, "args": args}
                 if stop:
                     out = {"error": "session already ended"}
+                elif name == "find_program" and self.arm.get("sql_memory"):
+                    out = self.find_sql_program(t, k)
+                    entry["category"] = "memory"
                 elif name in FEATURE_TOOLS and self.arm.get("feature_memory"):
                     # the harness fills in what the agent cannot know: the seed table's entity column and this task's id
                     if name in ("compose_features", "find_features"):
@@ -989,6 +1052,10 @@ Shared memory: agents on this database publish verified feature definitions and 
         if rec["final_sql"] and (rec.get("audit") or {}).get("result") == "clean":
             self.prev_sql[t] = (k, rec["final_sql"])
         cut_short = rec["stop"] == "llm_error"  # the run stops after this session is saved; nothing is learned from it
+        if self.arm.get("sql_memory"):
+            t0 = time.time()
+            rec["sql_memory"] = self.save_sql_program(t, k, rec)
+            rec["sql_memory"]["seconds"] = time.time() - t0
         if self.arm.get("feature_memory") and rec["final_sql"] and not cut_short:
             try:
                 rec["learning"] = self.learn(t, k, rec, seeds, middle, agent, sid)
@@ -1211,6 +1278,53 @@ Shared memory: agents on this database publish verified feature definitions and 
         return {"seconds": time.time() - t0, "input_tokens": tok_in, "output_tokens": tok_out, "bullet_tags": tags,
                 "operations": ops, "playbook_bullets": n}
 
+    def awm_experience(self, t, k, msgs):
+        """Reconstruct the exact experience used by online induction from its saved messages."""
+        out_of = {m["tool_call_id"]: m["content"] for m in msgs if m["role"] == "tool"}
+        steps = []
+        for m in msgs:
+            if m["role"] != "assistant" or not m.get("tool_calls"):
+                continue
+            acts = []
+            for c in m["tool_calls"]:
+                try:
+                    failed = "error" in json.loads(out_of.get(c["id"], "{}"))
+                except ValueError:
+                    failed = False
+                if not failed:
+                    acts.append(f"{c['function']['name']}({c['function'].get('arguments') or '{}'})"[:TOOL_OUTPUT_CHARS])
+            if acts:
+                steps.append(((m.get("content") or m.get("reasoning_content") or "").strip(), acts))
+        query = f"{self.task_desc[t]['description']} (cutoff {self.tasks[t]['cutoffs'][k - 1]['test_timestamp'][:10]})"
+        return {"template": t, "query": query, "steps": steps}
+
+    def restore_awm(self, source, first):
+        """Restore both accumulated experiences and the last nonempty workflows, without LLM calls."""
+        records = []
+        for f in glob.glob(os.path.join(source, "sessions", "*.json")):
+            if not f.endswith(".partial.json"):
+                rec = json.load(open(f))
+                if rec["k"] < first:
+                    records.append(rec)
+        for rec in sorted(records, key=lambda r: (r["k"], r["task"])):
+            agent, t, k = rec["agent"], rec["task"], rec["k"]
+            learning = rec.get("learning") or {}
+            if learning.get("success"):
+                if not rec.get("messages"):
+                    raise ValueError(f"Cannot restore AWM: missing messages for {t} k{k}")
+                self.awm_pool.setdefault(agent, []).append(self.awm_experience(t, k, rec["messages"]))
+            pool = self.awm_pool.get(agent) or []
+            if pool:
+                if learning.get("experiences") != len(pool) or learning.get("error"):
+                    raise ValueError(f"Cannot restore AWM: incomplete induction for {t} k{k}")
+                path = os.path.join(source, "workflows", f"{agent}-k{k}.txt")
+                workflows = open(path).read()
+                if len(workflows) != learning.get("workflow_chars"):
+                    raise ValueError(f"Cannot restore AWM: workflow mismatch for {t} k{k}")
+                if workflows:
+                    self.awm_workflows[agent] = workflows
+        log(f"restored AWM: {sum(map(len, self.awm_pool.values()))} experiences, {len(self.awm_workflows)} workflows")
+
     def awm_update(self, t, k, rec, msgs, agent):
         """AWM after a session, as its online WebArena pipeline (pipeline.py, induce_prompt.py): a successful session joins
         the agent's experience; then workflows are induced again from all successful experiences, at most
@@ -1218,28 +1332,11 @@ Shared memory: agents on this database publish verified feature definitions and 
         in its format and the examples (`Query:` with `<think>`/`<action>` steps, actions only, failed calls left out as
         AWM drops invalid steps). Success = the study's signal (validation better than the reference), as AWM's "gt"
         criterion; test labels are never used."""
-        e = self.tasks[t]
         ref = self.refs.get((t, k)) or {}
         best, higher = rec["best_val"], rec["higher_is_better"]
         success = best is not None and ref.get("val") is not None and (best > ref["val"] if higher else best < ref["val"])
         if success:
-            out_of = {m["tool_call_id"]: m["content"] for m in msgs if m["role"] == "tool"}
-            steps = []
-            for m in msgs:
-                if m["role"] != "assistant" or not m.get("tool_calls"):
-                    continue
-                acts = []
-                for c in m["tool_calls"]:
-                    try:
-                        failed = "error" in json.loads(out_of.get(c["id"], "{}"))
-                    except ValueError:
-                        failed = False
-                    if not failed:
-                        acts.append(f"{c['function']['name']}({c['function'].get('arguments') or '{}'})"[:TOOL_OUTPUT_CHARS])
-                if acts:
-                    steps.append(((m.get("content") or m.get("reasoning_content") or "").strip(), acts))
-            query = f"{self.task_desc[t]['description']} (cutoff {e['cutoffs'][k - 1]['test_timestamp'][:10]})"
-            self.awm_pool.setdefault(agent, []).append({"template": t, "query": query, "steps": steps})
+            self.awm_pool.setdefault(agent, []).append(self.awm_experience(t, k, msgs))
         pool = self.awm_pool.get(agent) or []
         if not pool:
             return {"success": success, "skipped": "no successful experience yet"}
@@ -1282,6 +1379,8 @@ Shared memory: agents on this database publish verified feature definitions and 
             "MAX_LLM_CALLS": MAX_LLM_CALLS, "MAX_VALIDATIONS": MAX_VALIDATIONS, "PATIENCE": PATIENCE, "SAMPLE_SIZE": SAMPLE_SIZE,
             "LGB_PARAMS": LGB_PARAMS, "model": self.llm.model, "llm": self.llm.provider, "reasoning_effort": self.llm.effort,
             "thinking": self.llm.thinking,
+            "base_url": self.llm.base, "require_model": self.llm.require, "arm_config": arm,
+            "harness_sha256": hashlib.sha256(open(__file__, "rb").read()).hexdigest(),
             "test_scores": "now" if a.eval_now else "after the run"}, "cutoffs": list(self.kept_cutoffs)}
         if a.targets_from:
             summary["resumed"] = {"from": a.targets_from, "at_cutoff": min(int(x) for x in a.cutoffs) if a.cutoffs else 1}
@@ -1348,6 +1447,9 @@ Shared memory: agents on this database publish verified feature definitions and 
             if self.asm:
                 self.asm.close()
             if middle:
+                if arm.get("sql_memory"):
+                    with open(os.path.join(a.out, "sql-programs.json"), "w") as f:
+                        json.dump(self.sql_programs, f, ensure_ascii=False, indent=1)
                 if arm.get("feature_memory"):
                     try:
                         with open(os.path.join(a.out, "features.json"), "w") as f:
@@ -1381,6 +1483,8 @@ def main():
     ap.add_argument("--eval-now", action="store_true", help="score each session on the test seeds right after it (default: after the run)")
     ap.add_argument("--smoke", action="store_true", help="pipeline check only: 8 LLM calls, 2 validations; results are not used")
     a = ap.parse_args()
+    if a.arm == "sql-only" and a.targets_from:
+        ap.error("sql-only must start from an empty memory; --targets-from does not restore SQL memory")
     if a.smoke:
         global MAX_LLM_CALLS, MAX_VALIDATIONS
         MAX_LLM_CALLS, MAX_VALIDATIONS = 8, 2

@@ -1,36 +1,46 @@
-# 论文矢量图生成器
+# 论文与汇报绘图
 
-论文的五幅图都由这里的 Python 脚本画成矢量 PDF，不经过 TikZ、pgfplots、Visio 或 PPT。两张示意图用 `vecfig.py` 的 ReportLab 绘图套件（示意图需要毫米级的手工布局；贯穿示例沿用汇报图的 `parts.py`，按 300 mm 画、由 LaTeX 缩到版宽），三张数据图自 2026-10-07 起用 matplotlib（`mplstyle.py` 统一样式）：
+图形使用 ReportLab、fontTools 与 matplotlib 生成矢量 PDF；论文的中英文图作为编译输入保存在 `overleaf/figures/`，PPT 图保存在 `slides/figures/`。以下路径相对仓库根目录。
 
-| 图 | 脚本 | 输出（`overleaf/figures/`） | 数据 |
-| --- | --- | --- | --- |
-| 图 1 贯穿示例：门店营业额从学习、优化、使用到修复（通栏） | `example.py` | `running-example.pdf` | 数值写在脚本里，来源见脚本顶部说明（`exp/2026-10-08-optimize/trace`、`exp/2026-10-08-optimize/README.md`、noctis `results/scen-20261002`） |
-| 图 2 系统架构 | `architecture.py` | `architecture.pdf` | 无 |
-| 图 3 定义库回放（三个面板：学到的定义库、TPC-DS、另外三种模式合并） | `replay_outcomes.py` | `replay-outcomes.pdf` | `exp/2026-10-02-cache-baseline-tpcds/replay-stats.json`、`tpcds-replay-stats.json`、`tpcds-library.json`（定义数）；`exp/2026-10-11-generality/generality-stats.json` 的 `pooled`（TPC-H、SSB、BIRD financial，与 `generality.tex` 的 `\Gn*` 核对） |
-| 图 4 维护代价 | `maintenance_cost.py` | `maintenance-cost.pdf` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
-| 图 5 逐情形正确率结果矩阵（通栏；9 种方法为行，按表 2 分组，行首为方法色块；12 种情形为列，按变化性质分组；每格为 5 次运行合并的正确率、其下为 5 次运行的范围，底色为一种藏青色阶；深红框为 ≥25% 的题用了过期定义；MAVRA 行加框；右侧为全部覆盖的破坏上的正确率与 95% 区间、每次运行的失效数与修复数） | `scenario_changes.py` | `scenario-changes.pdf` | `exp/2026-10-10-scenarios-q5/scen-stats.json`（每种方法 `runs` 里逐次运行的计数、各组的 95% 区间），与 `paper-results.json` 交叉核对；情形顺序取自 `tools/paper-results.py` 的 `PHASES` |
-
-每幅图生成两份：`<名称>.pdf` 用于英文稿（`main-en.tex`），`<名称>-zh.pdf` 用于双语稿（`main.tex`），标签为中文。`overleaf/figures/<名称>.tex` 按 `\ifbilingual` 选用其中一份，标题、标签和 `\Description` 仍写在 tex 文件里。
+## 构建与依赖
 
 ```bash
-python3 tools/figures/build.py                  # 全部，写入 overleaf/figures/
-python3 tools/figures/build.py architecture     # 只生成某几幅
-python3 tools/figures/build.py --out /tmp/x     # 写到别处预览
-pdftoppm -r 400 -png /tmp/x/architecture.pdf /tmp/x/architecture
+python3 -m pip install -r tools/figures/requirements.txt
+make figures                       # 包括群体图和 RelBench 累计图
+python3 tools/figures/build.py architecture  # 只画一幅
+python3 tools/figures/build.py --out /tmp/mavra-figures  # 主绘图器输出到预览目录
+make deck-figures                  # PPT 的六幅图，生成 PDF 并转 PNG
 ```
 
-依赖：`reportlab`、`matplotlib`、`fonttools`、Ghostscript（`gs`），以及带 `kpsewhich` 的 TeX Live（libertine、inconsolata、fandol 字体）；架构图的中文版另需 Noto Sans CJK SC。noctis 上都已具备，本机没有装 reportlab。生成的 PDF 是论文源文件，要提交到仓库，Overleaf 不运行 Python。
+系统依赖：Ghostscript（`gs`）、带 `kpsewhich` 的 TeX Live 及 libertine、inconsolata、fandol 字体；中文图还需 Noto Sans CJK SC；PPT 的 PNG 转换需要 Poppler 的 `pdftoppm`。Python 依赖清单用于建立绘图环境，未声明为历史实验环境锁文件。
 
-## 汇报用的三张图
+论文编译直接使用已提交的 PDF，无需绘图环境。`make figures` 调用主绘图器、`population.py` 和 `relbench_cumulative.py`；后两者保留各自现有接口。
 
-`structure.py`、`definition.py`、`process.py` 是汇报 PPT 的三张核心图，不进论文，从三个视角讲同一个方法：图 1 系统架构（MAVRA 在 agent 与数据库之间，共享记忆与发布、使用、维护与优化三项职责），图 2 数据模型（指标定义 = 口径 + SQL + 从 SQL 结构推导的前提条件 + 版本号；三种日常写入下前提条件怎样识别有害的写入），图 3 生命周期（指标定义随数据变化的状态图：学习、发布前校验、有效、待校验、执行前校验、自动修复、回归测试、新版本、优化、指标失效）。用词用数据库、数仓行业的常用说法。每张图先用黑色文字讲机制本身，再用棕色“例”（`parts.example`）标出贯穿全场的门店营业额，数值取自实验记录（来源写在各脚本开头）。它们按幻灯片尺寸画（300 mm 宽，12–15 pt 字，共用部件在 `parts.py`，状态框用 `parts.state`），只出中文版（`LANGS = ('zh',)`），用标准的数据库术语，不用论文符号，也不写年份。`python3 tools/figures/build.py --deck` 写到 `tools/deck/figures/`，PPT 的生成见 `tools/deck/README.md`。
+## 图形与数据来源
 
-## 数据核对
+| 输出名（均有英文与 `-zh` 中文 PDF） | 脚本 | 数据或来源 |
+| --- | --- | --- |
+| `running-example` | `example.py` | 优化实验的学习、使用与修复轨迹，来源见脚本文件头 |
+| `architecture` | `architecture.py` | 系统示意 |
+| `replay-outcomes` | `replay_outcomes.py` | 验证缓存、TPC-DS 和通用性回放 |
+| `maintenance-cost` | `maintenance_cost.py` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
+| `scenario-changes` | `scenario_changes.py` | `exp/2026-10-10-scenarios-q5/` |
+| `two-schemas` | `two_schemas.py` | 合成场景五轮与通用性 `e2e/` 的正确率 |
+| `consumer-cost` | `consumer_cost.py` | 合成场景 `holdout-cost.json` 与通用性 `e2e/outcomes.json.gz` |
+| `population` | `population.py` | `exp/2026-10-12-population/population-stats.json` |
+| `relbench-cumulative` | `relbench_cumulative.py` | `exp/2026-10-20-relbench/paper-sessions.json` |
 
-- 图 2–4 直接读取 `exp/` 中的存档，不经过 `gen/` 的中间文件。图里每个数值按正文的格式化方式，与 `overleaf/gen/` 中正文引用的宏比较，不一致就报错停止：图 2 对 `review.tex` 的 `\Rp*` 与 `\Tr*`，图 3 对 `\Cb*`，图 4 对 `numbers.tex` 的 `\ScenAcc*`（各方法平均值与正文引用的情形）以及 `scen-ds.tex` 的 `\Ds*Modeled*`、`\Ds*Revoked`、`\Ds*Repaired`；图 4 每个（方法，情形）的合并正确率还要与 `paper-results.json` 里 `tools/paper-results.py` 算出的一致，保证两份存档说的是同一批运行。
-- 图 4 的前身是逐情形热力图（2026-10-06 由表 7 改成），2026-10-07 改为每次运行一个小点的点图：热力图只有均值，看不出三次独立运行和离散程度；右面板的失效／修复数原来在表 4 里。
-- 原图 1（定义共享条件）于 2026-10-07 删去：它说明的共享不是本文的贡献，§2.4 的正文保留其计数；脚本在 git 历史中（`tools/figures/sharing.py`）。
-- 方法颜色从 `overleaf/latex/preamble.tex` 的 `\definecolor` 读取，与表格里的色块是同一组定义；方法名称与表 2 一致（`style.py` 的 `METHODS`）。
+具体哪些图进入稿件，由 `overleaf/sections/` 和图形包装 `.tex` 的引用决定；不使用固定图号来标识脚本。`baselines.py` 是保留的辅助图，不包含在 `make figures` 中；早期外部记忆基线的采用范围以 RelBench 协议为准。
+
+## 汇报图
+
+`build.py --deck` 绘制 `structure`、`definition`、`process` 三张机制图，以及 `run-publish`、`run-use`、`run-maintain` 三张过程图，只生成中文版。共用组件在 `parts.py`、`deckparts.py`，配色在 `deckpal.py`。这些脚本和论文绘图共用工具，输出到 `slides/figures/`；PPT 生成与版本说明见 [slides/README.md](../../slides/README.md)。
+
+## 数值核对
+
+数据图读取 `exp/` 中的归档，并按各脚本的实现与 `overleaf/gen/` 宏交叉核对。场景题集、重复轮次和采用的运行必须一致；更新数据时先检查 [实验索引](../../exp/README.md) 和 [论文说明](../../overleaf/README.md)，再重算宏和图形。
+
+方法颜色从 `overleaf/latex/preamble.tex` 读取；图注、标签与 `Description` 在各图对应的 `.tex` 中维护。单图尺寸以脚本内的 `W`、`H` 为准。
 
 ## 怎么画出来的
 
@@ -63,7 +73,7 @@ Scale(d0, d1, p0, p1)                          # 数据值到毫米的线性映�
 | --- | --- |
 | 某个标签的文字 | 各脚本里的 `LABELS` / `TEXT` 字典，`en` 与 `zh` 各一份 |
 | 方法名称或颜色 | 名称在 `style.py` 的 `METHODS`；颜色改 `preamble.tex` 的 `\definecolor`，图和表一起变 |
-| 架构图的模块位置 | `architecture.py` 顶部的 `ADM`、`STORE`、`MAINT` 等框，箭头按框的边自动对齐 |
+| 架构图的模块位置 | `architecture.py` 中的 `ADM`、`STORE`、`MAINT`、`LOOKUP`、`EXEC` 坐标；版式以 2026-10-07 最终版为基线，数据库标签固定为 `DataBase` |
 | 数据图的方法与顺序 | `replay_outcomes.py` 的 `ROWS`，`maintenance_cost.py` 的 `SERIES`，`scenario_changes.py` 的 `ROWS`（9 种方法，按表 2 分组）与 `MAINTAINERS`（右侧每次运行的失效与修复数） |
 | 结果矩阵的情形简称、分组与过期阈值 | `scenario_changes.py` 的 `TEXT`、`GROUP` 与 `STALE` |
 | 图的尺寸 | 各脚本的 `W, H`（单栏图宽用 `style.COLUMN`） |

@@ -1,0 +1,105 @@
+{
+  "checked_at_utc": "2026-10-22T15:49:30+00:00",
+  "status": "stopped_gateway_errors",
+  "gateway_probe": {
+    "http_status": 402,
+    "limit_source": "openrouter_credits",
+    "requested_model": "deepseek-v4.1-flash"
+  },
+  "cells": {
+    "mavra-rel-stack-r1": {
+      "finished": null,
+      "completed_non_interrupted_sessions": 7,
+      "test_scored": 0,
+      "failure": "insufficient_upstream_credits_402",
+      "files_sha256": {
+        "results/sql-only-20261022/mavra-rel-stack-r1/run.json": "3c9bb55657547165e097502e6a07fc6a7edb9cf05ed76717c31bdffb25f759b7",
+        "results/sql-only-20261022/mavra-rel-stack-r1/sessions/post_votes-k2.json": "63dc8cb08a3872852ac988396af541602491dcb3fd5b3960f9d7fbd6d6d7bec9",
+        "results/sql-only-20261022/mavra-rel-stack-r1/sessions/user_engagement-k1.json": "df526c9374bf2423006e89cbec02fccbcf0a40176e95ae5e0073203e59adce4a",
+        "results/sql-only-20261022/mavra-rel-stack-r1/sessions/user_engagement-k3.json": "10f61045d8f158f3447256eb7184378251c49efecd1cb6e9ae4e7c36d4fab100",
+        "results/sql-only-20261022/mavra-rel-stack-r1/sessions/user_badge-k1.json": "d1186d14ab4cfe09f3a3ddf8b5519a09267239c6175d2b93a50b5811851b8b01",
+        "results/sql-only-20261022/mavra-rel-stack-r1/sessions/post_votes-k1.json": "553e66002ceb447cedc435a89a60f3766295f1edd7a6d6a8a45ccc8b43886733",
+        "results/sql-only-20261022/mavra-rel-stack-r1/sessions/post_votes-k3.json": "96bdd4f7953fbb49d7bc8e122b08b1f1780c420e6c4531d7aafce05787e296a7",
+        "results/sql-only-20261022/mavra-rel-stack-r1/sessions/user_engagement-k2.json": "e562e6390440eedd9600ce35c7303be7575fd5f95b694d51c7fea229ce7febd8",
+        "results/sql-only-20261022/mavra-rel-stack-r1/sessions/user_badge-k2.json": "c7b79857cf8769cc12877642905430e0ddddec46bcf0f88c822dc2c5886bb574"
+      }
+    },
+    "mavra-rel-trial-r1": {
+      "finished": null,
+      "completed_non_interrupted_sessions": 3,
+      "test_scored": 0,
+      "failure": "unusable_assistant_message_400",
+      "files_sha256": {
+        "results/sql-only-20261022/mavra-rel-trial-r1/run.json": "7bf8edff62bd7f3e16b5db83e4765fd561b55e3b1b3cf3595de6ca4cbc304297",
+        "results/sql-only-20261022/mavra-rel-trial-r1/sessions/site_success-k1.json": "006ee0cc9594cd665f56c0d897c60d25f98f32723b4e1334c82c9ea633225fc6",
+        "results/sql-only-20261022/mavra-rel-trial-r1/sessions/study_outcome-k1.json": "170a777b8a64c979863b4cf49c0ac52d8e5684b2cf24df70c2cb1a8b2d493031",
+        "results/sql-only-20261022/mavra-rel-trial-r1/sessions/site_success-k2.json": "0e9ab1b76115be30e8651d52181e7f3ade5b5877903154f7de1d18581dd7585b",
+        "results/sql-only-20261022/mavra-rel-trial-r1/sessions/study_adverse-k1.json": "bce5098601ec58ce650b0a9ca7d72f7d12dafdcb4b64ffc90335a8703cd76a27"
+      }
+    },
+    "sql-only-rel-stack-r1": {
+      "finished": "2026-10-22 23:18:44",
+      "completed_non_interrupted_sessions": 15,
+      "test_scored": 15,
+      "failure": null,
+      "files_sha256": {
+        "results/sql-only-20261022/sql-only-rel-stack-r1/run.json": "38b805fb8f29748411928f60c1517b553856337b8715d1a80e0d6de12d2d4e53",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/post_votes-k2.json": "ffdf6694706d1e42c60fb70ecab36ba12e5431343266500d13779912a72a6d88",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_engagement-k4.json": "aea3d7658e7f3264f4bc3eef702e834921e35722cc626e715edbcf3745656141",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_engagement-k1.json": "4893449b1eca5fb87f1198791082f768e6ffeec1f484a999642b98c827c0300a",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_badge-k5.json": "0b969d6a7976d3f696eadcba0664901571994e774f847f9026d4be8ea1f796bc",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_engagement-k3.json": "073286f451871ec003fae0997077b596974f7d32e74ea5f36583e0a42f3e81a6",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_badge-k1.json": "4c00c3bf59d70ea6d6e7b157f4f0cd4731ec7eb1de8083c8de73b073c82d5457",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_engagement-k5.json": "d0d276ade24bf20925106b7ef8144ee58e299a63ea610f6a429c9a6d41a3cd76",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/post_votes-k1.json": "b179a60e754122d4ae9d51bb90325c0845bea3097ff5c2807d7b1727bdb15774",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/post_votes-k3.json": "781fcc11b680bf941c3087fd0c29b441bf60d921023b17b79e9f8829d4593670",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_engagement-k2.json": "bc2bb3d62818c1f4d3758c6d6adf05c678c69807cbc28b9327a532bcf5df7618",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_badge-k4.json": "273bba1adac34121ba1ef004a34524c104879a636374d35881bf3261083eeb0b",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/post_votes-k4.json": "e8219478393955c3387d8abddeeab2b3d88118ac993f110b546fa3c91a502e7d",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/post_votes-k5.json": "131846b33de1b3086b317d57eb2a1f4c1526ac7a55e95eab648e5e469fac05a4",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_badge-k2.json": "0cf30da898ee277dd7f2735c06a42d06ef6f39dc0d37cdb214a59973ce676df1",
+        "results/sql-only-20261022/sql-only-rel-stack-r1/sessions/user_badge-k3.json": "77d8f40b7c0831c9eb137a5503d547d08538b56e437925999d01aa726d927197"
+      }
+    },
+    "sql-only-rel-trial-r1": {
+      "finished": null,
+      "completed_non_interrupted_sessions": 0,
+      "test_scored": 0,
+      "failure": "insufficient_upstream_credits_402",
+      "files_sha256": {
+        "results/sql-only-20261022/sql-only-rel-trial-r1/run.json": "63611f91a1cd68fee0b1ec940332c717ac3b6dae19e2147a1ccb7d168427e7a3",
+        "results/sql-only-20261022/sql-only-rel-trial-r1/sessions/study_adverse-k1.json": "44b6dd881e3f30281cc448848b76f36923d1128f8dc1110cc2cd6ed4d44c20f6"
+      }
+    }
+  },
+  "preliminary_sql_only_stack": {
+    "scope": "Completed SQL-only rel-stack run; historical comparisons are unpaired and not the new experiment conclusion.",
+    "all_tokens": 1951358,
+    "reuse_tokens": 881889,
+    "reuse_sessions": 12,
+    "reuse_goal_on_first_validation": 11,
+    "test_means": {
+      "post-votes": 0.06442167311852756,
+      "user-badge": 0.8604313102870292,
+      "user-engagement": 0.88570302639837
+    },
+    "historical_reference": {
+      "none": {
+        "reuse_tokens": 4308585,
+        "sql_only_token_saving_fraction": 0.7953181845083711
+      },
+      "mavra": {
+        "reuse_tokens": 1328185,
+        "sql_only_token_saving_fraction": 0.33601945512108633
+      }
+    }
+  },
+  "client_fix": {
+    "status": "implemented_and_tested_not_used_in_original_runs",
+    "tests_passed": 8,
+    "source_sha256": {
+      "tools/relbench/harness.py": "8e6b4d9906ec5e04cae169e88ef8ab436b07f810908b8857bb982a4523e05e38",
+      "tools/relbench/test_sql_only.py": "a797b380eff1aa2d3119e57d4c4a6db3b4e499c9a6e0ec09c934c34180aa17e8"
+    }
+  }
+}

@@ -30,8 +30,8 @@
 {若 B1、B2 在 $D_s$ 上成立，且 $C(m^r)$ 中每个条件都在 $D_s$ 上成立，则对每个期间 $p$，$m^r$ 的生成的 SQL 返回日期落在 $p$ 内的事件度量值的 $\mathrm{AGG}$，每个事件恰好贡献一次；被遗漏的只有日期键或连接键匹配不到任何行的事件，其比例受完整性条件约束。}
 \end{proposition}
 \begin{proof}[\bt{Proof sketch}{证明概要}]
-\bi{By B1 and filtered key uniqueness, $\sigma_\varphi(F)$ holds one row per event. Join cardinality keeps every join from duplicating a row, join completeness bounds the rows that inner joins drop, and the date join gives each row at most one date and hence at most one period. Every remaining row contributes its measurement (B2) once, to the period of its date.}
-{由 B1 和过滤后键唯一性，$\sigma_\varphi(F)$ 中每个事件恰有一行。连接基数保证连接不复制任何行，连接完整性约束内连接排除的行，日期连接给每行至多一个日期，因而至多一个期间。于是每个保留下来的行把其度量值（B2）恰好贡献一次，归入其日期所在的期间。}
+\bi{By B1 and filtered key uniqueness, $\sigma_\varphi(F)$ holds one row per event. Join cardinality keeps every join from duplicating a row, join completeness bounds the rows that inner joins drop, and the date join gives each row at most one date and hence at most one period. Every remaining row contributes its measurement (B2) once, to the period of its date.\ifbilingual\else\qedhere\fi}
+{由 B1 和过滤后键唯一性，$\sigma_\varphi(F)$ 中每个事件恰有一行。连接基数保证连接不复制任何行，连接完整性约束内连接排除的行，日期连接给每行至多一个日期，因而至多一个期间。于是每个保留下来的行把其度量值（B2）恰好贡献一次，归入其日期所在的期间。\qedhere}
 \end{proof}
 \bi{Conversely, while B1 and B2 hold, every data-only update that makes the generated SQL count an event twice or drop facts beyond the recorded fraction violates a condition.}
 {反过来，只要 B1、B2 成立，凡是使生成的 SQL 把一个事件计数两次、或排除超过记录比例的事实的纯数据更新，都会违反某个条件。}

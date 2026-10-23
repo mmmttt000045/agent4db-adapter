@@ -1,9 +1,10 @@
 \section{\bt{Evaluation}{实验评估}}
 \label{sec:evaluation}
+\bi{We evaluate executable reuse and its maintenance separately. RelBench measures the combined reuse of task programs and feature definitions. Metric workloads measure sharing across consumers, the cost of reusing checks, and recovery after data changes; a concurrent-write test isolates execution-snapshot validation. These studies distinguish reuse savings from the conditions under which reused definitions remain valid.}
+{我们分别评估可执行复用及其维护。RelBench 测量任务方案与特征定义的联合复用。指标负载测量跨消费者共享、复用检查的代价及数据变化后的恢复；并发写入测试单独检验执行快照验证。这些研究区分复用带来的节省，以及所复用定义保持有效的条件。}
 \input{sections/evaluation/relbench}
 \input{sections/evaluation/setup}
 \input{sections/evaluation/population}
 \input{sections/evaluation/sharing}
 \input{sections/evaluation/cost}
 \input{sections/evaluation/changes}
-\input{sections/evaluation/summary}

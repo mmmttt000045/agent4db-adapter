@@ -1,14 +1,29 @@
 \begin{table*}[t]
-\caption{\bt{RelBench, one agent per task and a new session at every cutoff, data appended between cutoffs. Cost columns are totals over the sessions from cutoff 2 on, in which a method can use what it kept: tokens including memory operations (millions, and relative to no memory), LLM calls, tool calls, agent time, and cost at DeepSeek's off-peak prices. Test scores are the official metrics of the submitted features, averaged over all cutoffs (AUC higher is better, MAE lower is better).}{RelBench：每个任务一个智能体，每个截点一个新会话，截点之间追加数据。代价列是从第 2 个截点起各会话的合计（此时各方法才能用上自己保留的内容）：含记忆操作的 token（百万，及相对无记忆的倍数）、LLM 调用、工具调用、智能体时间、按 DeepSeek 闲时价格折算的金额。测试分数是提交特征的官方指标在各截点上的平均（AUC 越高越好，MAE 越低越好）。}}
+\caption{\bt{RelBench: predictive quality, valid solutions, and reuse cost. Each method runs three tasks at five cutoffs per database.}{RelBench：预测质量、有效方案与复用代价。每种方法在每个数据库上运行三个任务、五个截点。}}
 \label{tab:relbench}
 \centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lrrrrrr|rrr@{}}
+\ifbilingual\footnotesize\else\small\fi
+\setlength{\tabcolsep}{2.8pt}
+\renewcommand{\arraystretch}{1.08}
+\newcommand{\RbPanelHeader}[4]{%
+  \multicolumn{12}{@{}l}{\textbf{#1}}\\[2pt]
+  & \multicolumn{6}{c}{\bh{Reuse cost: cutoffs 2--5}{复用代价：截点 2--5}}
+  & \multicolumn{3}{c}{\bh{Mean test score: cutoffs 1--5}{平均测试分数：截点 1--5}}
+  & \multicolumn{2}{c}{\bh{Quality summary}{质量汇总}}\\
+  \cmidrule(lr){2-7}\cmidrule(lr){8-10}\cmidrule(l){11-12}
+  \bh{Method}{方法} & \bh{Tokens\\(M)}{token\\（百万）} & \bh{Token\\ratio}{token\\比率}
+  & \bh{LLM\\calls}{LLM\\调用} & \bh{Tool\\calls}{工具\\调用}
+  & \bh{Obs.\\min}{观测\\分钟} & \bh{Cost\\(USD)}{美元}
+  & #2 & #3 & #4 & \bh{Valid\\sessions}{有效会话} & \bh{Quality\\tasks}{达标任务}\\
+  \midrule
+}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrrrrrrcc@{}}
 \toprule
-\bh{Method}{方法} & \bh{Tokens (M)}{token（百万）} & \bh{$\times$ none}{相对无记忆} & \bh{LLM calls}{LLM 调用} & \bh{Tool calls}{工具调用} & \bh{Time (min)}{时间（分钟）} & \bh{Cost (CNY)}{金额（元）} & \multicolumn{3}{c}{\bt{Test score per task}{各任务测试分数}}\\
-\midrule
 \RbTableBody
 \bottomrule
-\end{tabular}
+\end{tabular*}
+\par\smallskip
+\parbox{\textwidth}{\footnotesize\raggedright
+\bt{Cost columns total 12 sessions at cutoffs 2--5, including memory operations; token ratios are relative to no memory. Test scores average all five cutoffs, using the entity-table reference for sessions without a valid solution. \emph{Valid sessions}: non-fallback solutions (/15). \emph{Quality tasks}: tasks retaining no-memory predictive quality (/3), with $\mathrm{AUC}\geq\mathrm{AUC}_0-0.01$ or $\mathrm{MAE}\leq 1.02\,\mathrm{MAE}_0$. Subscript 0 denotes no memory; best task means are bold. Time and USD accounting are specified in Section~\ref{sec:relbench-eval}.}{代价列合计截点 2--5 的 12 个会话，含记忆操作；token 比率以无记忆为参照。测试分数取五个截点的平均，无有效方案的会话采用实体表参照分数。有效会话计数排除参照回退（共 15 个）；达标任务指保持无记忆预测质量的任务数（共 3 项），满足 $\mathrm{AUC}\geq\mathrm{AUC}_0-0.01$ 或 $\mathrm{MAE}\leq 1.02\,\mathrm{MAE}_0$。下标 0 表示无记忆；各任务最佳平均分加粗。时间与美元计量见第~\ref{sec:relbench-eval} 节。}
+}
 \end{table*}

@@ -1,96 +1,63 @@
-# MAVRA Overleaf 工程
+# MAVRA：ICDE 稿件
 
-论文标题：**MAVRA: Maintainable Shared Memory for Data Agents**。
+`main-en.tex` 是英文投稿入口（IEEEtran conference，pdfLaTeX）；`main.tex` 是共用源码的中英对照阅读稿（XeLaTeX）。双语稿不用于投稿。
 
-`main.tex` 是双语入口，`main-en.tex` 是英文入口，两者直接读取同一份 `paper.tex`。修改对应章节即可同时更新两种语言，不再生成或维护正文副本。本次拆分保留原有正文、公式、图表、数值、引用顺序和排版设置。
+根据 [ICDE 2027 Research CFP](https://icde2027.github.io/cf-research-papers)，正文最多 12 页，参考文献和 AI 生成内容声明不计入，不能附加附录。作者姓名与单位仍为占位符，投稿前需填写。最终以投稿编译环境生成的 PDF 为准。
 
-## 目录与编辑位置
+## 编译与上传
 
-| 路径 | 用途 |
-| --- | --- |
-| `main.tex` | 双语入口，只设置文档类与语言开关 |
-| `main-en.tex` | 英文入口，只设置文档类与语言开关 |
-| `paper.tex` | 标题、作者、文档环境与章节顺序 |
-| `acmart.cls` | 随包提供的官方 ACM 文档类，不依赖编译环境预装此文件 |
-| `latex/preamble.tex` | 宏包、语言宏、颜色、图表样式和数值宏加载 |
-| `latex/acmart/acmart.dtx` | 官方文档类的对应源码，保留版权及 LPPL 许可说明 |
-| `sections/abstract.tex` | 中英文摘要、关键词与 `\maketitle` |
-| `sections/01-*.tex` 至 `10-*.tex` | 正文各章：引言、背景与动机、系统概览、`04-sharing.tex`（共享的定义、条件、维护与优化，10-12 由原第 4–6 章合并）、实验、相关工作、讨论与结论 |
-| `sections/evaluation/` | 实验设置、群体实验（共享 vs 单智能体记忆）、每道题的代价、数据变化时的正确性、维护与优化五个小节 |
-| `figures/` | 正文用六幅图（运行示例、架构、群体代价、使用者代价、两种模式、回放）：`*.tex` 写标题、标签与描述，图本身是 [`tools/figures/build.py`](../tools/figures/README.md) 生成的矢量 PDF（`<名称>.pdf` 用于英文稿，`<名称>-zh.pdf` 用于双语稿），不要手改；维护代价、结果矩阵与算法 1 的文件保留但不再引用 |
-| `tables/` | 正文用两张表（负载、方法），包括标题和生成数据的加载位置；并发与生命周期表保留但不再引用 |
-| `references.tex` | 原样保留的 `thebibliography`，引用键与条目顺序不变 |
-| `gen/` | 实验统计脚本生成的数值宏、表格数据和绘图坐标；不要手改 |
-| `build.sh` | 编译或生成 Overleaf 上传包 |
-| `mavra-sigmod-bilingual.zip` | 包含两个入口、论文源码与 ACM 文档类的 Overleaf 源码包；标准宏包和字体由 TeX 环境提供 |
-
-章节中的 `\bi{English}{中文}`、标题与图表中的 `\bt{English}{中文}` 保持原用法。论文的 LaTeX 文件均在本目录内；在安装了所需宏包与字体的 TeX 环境中，编译不依赖父目录、实验数据或实验服务器。
-
-## Overleaf 设置
-
-1. 上传 `mavra-sigmod-bilingual.zip`，保留包内目录结构。
-2. 双语稿：Main document 选择 `main.tex`，Compiler 选择 **XeLaTeX**。
-3. 英文稿：Main document 选择 `main-en.tex`，Compiler 选择 **pdfLaTeX**，也可使用 XeLaTeX。
-
-Overleaf 的编译器需要在项目设置中选择；源码顶部的 `% !TeX program` 注释不会自动改变这一设置。若使用 pdfLaTeX 编译双语入口 `main.tex`，应先改用 XeLaTeX。[官方编译器设置说明](https://docs.overleaf.com/getting-started/recompiling-your-project/selecting-a-tex-live-version-and-latex-compiler)。
-
-上传包现已包含 `acmart.cls`，应放在与 `main.tex` 相同的项目根目录。模板使用 [CTAN / TeX Live 官方发行版](https://ctan.org/pkg/acmart) **2.20（2026-08-16）**，文件原样保留，随包携带对应的 `acmart.dtx` 源码。
-
-保留 `\documentclass[sigconf,review,anonymous]{acmart}` 和模板原有排版。投稿格式参考 [SIGMOD 2027 Research 官方要求](https://2027.sigmod.org/calls_papers_sigmod_research.shtml)，最终页数应以投稿用编译器生成的 PDF 为准。
-
-## 编译与打包
+生成文件统一放在 `overleaf/build/`。在仓库根目录可执行 `bash overleaf/build.sh all` 或 `bash overleaf/build.sh pack`；旧 SIGMOD 上传包不再维护。
 
 在本目录执行：
 
 ```bash
-./build.sh en    # 英文稿 → build/main-en.pdf
-./build.sh bi    # 双语稿 → build/main.pdf
-./build.sh all   # 两份都编译，默认选项
-./build.sh pack  # 更新 mavra-sigmod-bilingual.zip，不需要 LaTeX 环境
+bash build.sh en    # build/main-en.pdf
+bash build.sh bi    # build/main.pdf
+bash build.sh all   # 两份均编译
+bash build.sh pack  # build/mavra-icde-bilingual.zip
 ```
 
-编译优先使用 `latexmk`：英文调用 pdfLaTeX，双语调用 XeLaTeX；也支持已有的 Tectonic 环境。ACM 文档类已随包提供；环境仍需提供其标准宏包依赖与 colortbl，以及双语模式下的 `ctex` / Fandol 字体。打包只需要 Python 3，包含官方文档类及其源码，并按 `\input` 与 `\includegraphics` 依赖收集论文文件，不包含实验附件、编译缓存或无关生成文件。构建不会改写论文源文件。
+构建优先使用 latexmk，亦支持 Tectonic。TeX 环境须提供 IEEEtran 类与参考文献样式及标准宏包；双语稿还需 ctex 和 Noto Serif CJK SC、Noto Sans CJK SC、Noto Sans Mono CJK SC 字体。`build.sh` 预检直接宏包依赖，字体由 XeLaTeX 检查。
 
-### 缺少标准宏包时
+上传 `build/mavra-icde-bilingual.zip` 至 Overleaf 后，英文选择 `main-en.tex` / pdfLaTeX，双语选择 `main.tex` / XeLaTeX。包内按输入与图形依赖收集源码，并包含 `references.bib`；不需要实验服务器或原始数据即可编译。
 
-`acmart.cls` 成功加载后仍报 `xkeyval.sty` 等文件缺失，说明编译环境未安装对应宏包。类文件不能替代宏包和字体安装。使用 `latexmk` 且存在 `kpsewhich` 时，`build.sh` 会在编译前一次列出缺失的直接依赖和双语字体；这项预检不覆盖所有间接依赖。Overleaf 网页中的直接编译不会执行此脚本。
+`references.tex` 调用 `IEEEtran.bst` 与 BibTeX：只输出正文引用的条目，按首次引用排序。`references.bib` 保留原稿全部元数据；未引用条目不占参考文献版面。此次转换未对每条文献重新做出版信息核验。
 
-自建 Overleaf Community Edition 默认只有精简版 TeX Live。按照[官方安装说明](https://docs.overleaf.com/on-premises/installation/upgrading-tex-live)，管理员应在**实际编译容器**内补齐环境；使用 Overleaf Toolkit 时先执行 `bin/shell`，然后运行：
+## 2026-10-22 修订与计时范围
+
+RelBench 的 14 组运行、210 个会话已恢复完成。表 IV 从记录用量按[官方美元价目](https://api-docs.deepseek.com/quick_start/pricing/?push_animated=1&theme=light&webview_progress_bar=1)重新计价：每百万 token 缓存命中 $0.003、未命中 $0.15、输出 $0.60（闲时价，2026-10-22 查询），不是历史账单金额或汇率换算。原始比较工具默认人民币定价不变，论文生成器显式选用美元价。
+
+在仓库根目录重新生成：
 
 ```bash
-tlmgr install scheme-full
-tlmgr path add
+python3 tools/relbench/paper-stats.py --out overleaf/gen --sessions-json exp/2026-10-20-relbench/paper-sessions.json
+python3 tools/figures/relbench_cumulative.py
+python3 tools/replay-safety-summary.py
 ```
 
-安装后可用 `kpsewhich xkeyval.sty`、`kpsewhich ctex.sty` 和 `kpsewhich FandolSong-Regular.otf` 检查是否返回文件路径。容器升级或重建时，应按官方说明保留完整 TeX 安装；Server Pro 的独立编译容器应按[对应镜像配置说明](https://docs.overleaf.com/on-premises/maintenance/extending-tex-live)处理。
-
-如果使用官方 `overleaf.com`，可在项目设置中切换到另一年度 TeX Live 后重新编译；若仍缺少标准宏包，应交由平台排查编译环境。本地 TeX Live 则由其安装管理员通过包管理器补齐。Tectonic 会通过自己的资源包获取宏包，Tectonic 编译成功不能证明其他环境已安装相同依赖。
+现有 RelBench 时间列是共享服务器上的观测值，尚未执行无争用计时，不据此声称隔离加速比。SQL 子集重放不能代表完整系统重放，回放时间与估计 API 延迟之和也不能当作实测端到端时间。
 
 ## 数值与实验存档
 
-实验数据统一保存在仓库的 `exp/`，不再在 Overleaf 工程中保留副本。
+[实验索引](../exp/README.md) 列出实验批次。各批次的失败、替换和排除规则以原协议为准。正常编辑与编译直接使用已提交的宏和 PDF，无需运行实验。
 
-| 生成文件 | 来源与生成脚本 |
+| 生成文件 | 当前来源与生成入口 |
 | --- | --- |
-| `gen/numbers.tex`、`gen/scen-cost.tex` | `tools/paper-results.py`；原始场景结果在 noctis 的 `results/scen-20261002/`，汇总存档在 `exp/2026-10-02-scenarios-ds/paper-results.json` |
-| `gen/numbers-prev.tex` | `tools/paper-results.py --numbers-only`；此前一轮三模型实验，原始结果在 noctis 的 `results/scen-20260930/` |
-| `gen/scen-ds.tex` | `tools/scen-stats.py`；汇总存档在 `exp/2026-10-02-scenarios-ds/scen-stats.json` |
-| `gen/review.tex`、`gen/snapshot-stress.tex` | `tools/review-results.py`；本地存档在 `exp/2026-10-02-cache-baseline-tpcds/` |
-| `gen/session-latency.tex` | `tools/session-latency-stats.py --tex-out`；存档在 `exp/2026-10-03-session-latency/` |
-| `figures/*.pdf` | `tools/figures/build.py`；图 2–4 直接读取上面的存档（`replay-stats.json`、`tpcds-replay-stats.json`、`cb-1m-share-stats.json`、`paper-results.json`、`scen-stats.json`），并与 `gen/` 中正文引用的数值逐一核对 |
-| 工作负载表中的数值 | `exp/2026-10-01-workload-characterization/` |
+| `gen/relbench.tex`、`gen/relbench-table.tex` | `tools/relbench/paper-stats.py`；采用 `results/relbench-pilot3/` 与 `results/relbench-main/` 中的最终运行 |
+| `gen/population.tex` | `tools/population-stats.py`；TPC-DS 群体实验的采用组见 `exp/2026-10-12-population/README.md`，早期外部记忆基线排除范围见 RelBench 协议 |
+| `gen/numbers.tex`、`gen/scen-cost.tex`、`gen/scen-ds.tex` | `tools/paper-results.py`、`tools/scen-stats.py`；当前五轮场景汇总在 `exp/2026-10-10-scenarios-q5/` |
+| `gen/numbers-prev.tex` | 早期三模型批次，`PrevScen` 前缀；存档在 `exp/2026-10-01-scenarios/` |
+| `gen/review.tex`、`gen/snapshot-stress.tex` | `tools/review-results.py`；`exp/2026-10-02-cache-baseline-tpcds/` |
+| `gen/generality.tex`、`gen/replay-safety.tex` | `tools/generality-stats.py`、`tools/replay-safety-summary.py`；通用性回放与共同题次审计 |
+| `gen/opt.tex`、`gen/premise.tex`、`gen/sharing.tex` | `tools/opt-stats.py`、`tools/premise-stats.py`、`tools/sharing-stats.py`；优化、前提失效与使用成本，具体输入范围见各脚本和实验清单 |
+| `gen/external.tex` | `tools/external-reuse-stats.py`；`exp/2026-10-14-external-motivation/` |
+| `gen/session-latency.tex`、`gen/lifecycle*.tex` | 补充实验宏，分别由会话耗时和生命周期统计工具生成 |
+| `figures/*.pdf` | 脚本、数据和单图入口见 [绘图说明](../tools/figures/README.md)；架构图由 `tools/figures/build.py architecture` 生成，RelBench 图由 `tools/figures/relbench_cumulative.py` 生成 |
 
-在 noctis 的仓库根目录重新生成（2026-10-06 核对：前四条命令逐字节复现 `gen/` 中对应文件）：
+重算时先确认输入目录与采用范围，建议先写临时输出目录并比较差异，再更新 `gen/`。旧三轮场景命令不能直接替换当前五轮图表的输入。
 
-```bash
-python3 tools/paper-results.py --scen results/scen-20260930 --prefix PrevScen --numbers-only overleaf/gen/numbers-prev.tex
-python3 tools/paper-results.py --scen results/scen-20261002 --models "DeepSeek V4.1 Flash" --out overleaf/gen \
-  --json exp/2026-10-02-scenarios-ds/paper-results.json
-python3 tools/scen-stats.py --scen results/scen-20261002 --json exp/2026-10-02-scenarios-ds/scen-stats.json --tex-out overleaf/gen
-python3 tools/review-results.py --exp exp/2026-10-02-cache-baseline-tpcds --out overleaf/gen
-python3 tools/figures/build.py
-```
+项目说明见 [主仓库 README](../README.md)。当前 `references.bib` 是稿件实际编译的来源。
 
-场景生成命令需要服务器上完整的原始结果；正常编辑与编译不需要重新运行实验。研究状态与实现边界见 [docs/research-status.md](../docs/research-status.md)，实验索引见 [exp/README.md](../exp/README.md)，参考文献核对记录见 [docs/citation-audit-2026-10-01.md](../docs/citation-audit-2026-10-01.md)。
+## 独立论文仓库
 
-`overleaf/` 是主仓库的普通目录。上传包可以手动导入 Overleaf，目前未配置在线项目自动同步。
+`overleaf/` 仍是主仓库的普通目录，主仓库远程地址保持不变。独立论文仓库为 [icde-2027-paper](https://github.com/mmmttt000045/icde-2027-paper)，论文源文件放在该仓库根目录，可用 Overleaf 的 GitHub 导入功能创建项目。本地独立工作副本位于同级目录 `../icde-2027-paper/`；本目录的修改不会自动同步过去，需先更新独立工作副本并推送，再在 Overleaf 的 Integrations → GitHub 中手动拉取。Overleaf 中的修改也需先推送回 GitHub，再拉取至本地工作副本。

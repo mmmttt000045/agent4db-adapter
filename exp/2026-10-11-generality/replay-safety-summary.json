@@ -1,0 +1,247 @@
+{
+  "unit": "common (library, change, entry, task) question instance",
+  "arm": "condition/snapshot",
+  "sources": [
+    {
+      "path": "exp/2026-10-02-cache-baseline-tpcds/tpcds-replay-outcomes.json.gz",
+      "sha256": "8572341eaa7f4321a74ccaaa676a688c86cc3e311af44d8448cceb056ef002f5"
+    },
+    {
+      "path": "exp/2026-10-11-generality/tpch-replay-report.json.gz",
+      "sha256": "deb7bd48c6c4a046f61900ea736c1c9650a45897c6c75eaa5927545bb2f2c6b7"
+    },
+    {
+      "path": "exp/2026-10-11-generality/ssb-replay-report.json.gz",
+      "sha256": "da23068575d461c1915c7cea03be4799aae08b9750fb8843569fe9dd2c1d5ab0"
+    },
+    {
+      "path": "exp/2026-10-11-generality/financial-replay-report.json.gz",
+      "sha256": "100474a048b0c9ec76386248b14af7d7d36688c60988196c1a076187f52f0ddf"
+    }
+  ],
+  "datasets": {
+    "tpcds": {
+      "Benign": {
+        "n": 288,
+        "correct": 288,
+        "served_wrong": 0,
+        "unavailable_needed": 0,
+        "unavailable_unneeded": 0
+      },
+      "Structural": {
+        "n": 549,
+        "correct": 279,
+        "served_wrong": 0,
+        "unavailable_needed": 244,
+        "unavailable_unneeded": 26
+      },
+      "Outside": {
+        "n": 144,
+        "correct": 63,
+        "served_wrong": 72,
+        "unavailable_needed": 6,
+        "unavailable_unneeded": 3
+      }
+    },
+    "tpch": {
+      "Benign": {
+        "n": 84,
+        "correct": 84,
+        "served_wrong": 0,
+        "unavailable_needed": 0,
+        "unavailable_unneeded": 0
+      },
+      "Structural": {
+        "n": 102,
+        "correct": 48,
+        "served_wrong": 3,
+        "unavailable_needed": 39,
+        "unavailable_unneeded": 12
+      },
+      "Outside": {
+        "n": 42,
+        "correct": 16,
+        "served_wrong": 11,
+        "unavailable_needed": 10,
+        "unavailable_unneeded": 5
+      }
+    },
+    "ssb": {
+      "Benign": {
+        "n": 132,
+        "correct": 132,
+        "served_wrong": 0,
+        "unavailable_needed": 0,
+        "unavailable_unneeded": 0
+      },
+      "Structural": {
+        "n": 147,
+        "correct": 81,
+        "served_wrong": 0,
+        "unavailable_needed": 61,
+        "unavailable_unneeded": 5
+      },
+      "Outside": {
+        "n": 66,
+        "correct": 4,
+        "served_wrong": 29,
+        "unavailable_needed": 22,
+        "unavailable_unneeded": 11
+      }
+    },
+    "financial": {
+      "Benign": {
+        "n": 30,
+        "correct": 30,
+        "served_wrong": 0,
+        "unavailable_needed": 0,
+        "unavailable_unneeded": 0
+      },
+      "Structural": {
+        "n": 42,
+        "correct": 24,
+        "served_wrong": 0,
+        "unavailable_needed": 10,
+        "unavailable_unneeded": 8
+      },
+      "Outside": {
+        "n": 15,
+        "correct": 6,
+        "served_wrong": 3,
+        "unavailable_needed": 4,
+        "unavailable_unneeded": 2
+      }
+    }
+  },
+  "structural_failures": [
+    {
+      "dataset": "tpch",
+      "change": "latekey",
+      "class": "served_wrong",
+      "def": "q12_b0_lineitem",
+      "entry": "q12_b0_lineitem",
+      "gold": "6107",
+      "lib": "results/tpch-queries",
+      "oracle": "snapshot",
+      "orig_ok": false,
+      "orig_value": "4149",
+      "policy": "condition",
+      "repaired": false,
+      "revision": 0,
+      "status": "valid",
+      "task": "q12_b0_lineitem-P1",
+      "value": "4149"
+    },
+    {
+      "dataset": "tpch",
+      "change": "latekey",
+      "class": "served_wrong",
+      "def": "q12_b0_lineitem",
+      "entry": "q12_b0_lineitem",
+      "gold": "1949",
+      "lib": "results/tpch-queries",
+      "oracle": "snapshot",
+      "orig_ok": false,
+      "orig_value": "-9",
+      "policy": "condition",
+      "repaired": false,
+      "revision": 0,
+      "status": "valid",
+      "task": "q12_b0_lineitem-T1",
+      "value": "-9"
+    },
+    {
+      "dataset": "tpch",
+      "change": "latekey",
+      "class": "served_wrong",
+      "def": "q12_b0_lineitem",
+      "entry": "q12_b0_lineitem",
+      "gold": "10",
+      "lib": "results/tpch-queries",
+      "oracle": "snapshot",
+      "orig_ok": false,
+      "orig_value": "3",
+      "policy": "condition",
+      "repaired": false,
+      "revision": 0,
+      "status": "valid",
+      "task": "q12_b0_lineitem-T2",
+      "value": "3"
+    }
+  ],
+  "predicate_failure_definition": {
+    "path": "exp/2026-10-11-generality/libs/tpch-kept.json",
+    "sha256": "941fe4bd7ce8288a31d272662cfede5c673387255619026047e93c1086084182",
+    "time": {
+      "role": "receipt date",
+      "fact_col": "lineitem.l_receiptdate",
+      "dim": "",
+      "dim_col": "",
+      "grain": "month",
+      "loss_ratio": 0.0,
+      "strategy": "column"
+    },
+    "filters": {
+      "lineitem": "lineitem.l_shipmode IN ('MAIL', 'SHIP') and lineitem.l_shipdate < lineitem.l_commitdate"
+    },
+    "holdout": [
+      {
+        "id": "q12_b0_lineitem-P1",
+        "ask": {
+          "kind": "single",
+          "period": {
+            "year": 1997,
+            "m1": 9,
+            "m2": 9
+          }
+        }
+      },
+      {
+        "id": "q12_b0_lineitem-T1",
+        "ask": {
+          "kind": "diff",
+          "a": {
+            "year": 1997,
+            "m1": 9,
+            "m2": 9
+          },
+          "b": {
+            "year": 1996,
+            "m1": 6,
+            "m2": 6
+          }
+        }
+      },
+      {
+        "id": "q12_b0_lineitem-T2",
+        "ask": {
+          "kind": "rank_month",
+          "year": 1997
+        }
+      }
+    ]
+  },
+  "pooled": {
+    "Benign": {
+      "n": 534,
+      "correct": 534,
+      "served_wrong": 0,
+      "unavailable_needed": 0,
+      "unavailable_unneeded": 0
+    },
+    "Structural": {
+      "n": 840,
+      "correct": 432,
+      "served_wrong": 3,
+      "unavailable_needed": 354,
+      "unavailable_unneeded": 51
+    },
+    "Outside": {
+      "n": 267,
+      "correct": 89,
+      "served_wrong": 115,
+      "unavailable_needed": 42,
+      "unavailable_unneeded": 21
+    }
+  }
+}

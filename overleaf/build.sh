@@ -18,8 +18,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 root = Path.cwd()
 files = {
-    Path('README.md'), Path('build.sh'), Path('acmart.cls'),
-    Path('latex/acmart/acmart.dtx'),
+    Path('README.md'), Path('build.sh'), Path('references.bib'),
 }
 
 def collect(path, stack=()):
@@ -47,7 +46,8 @@ def collect(path, stack=()):
 for entry in ('main.tex', 'main-en.tex'):
     collect(Path(entry))
 
-archive = 'mavra-sigmod-bilingual.zip'
+archive = Path('build/mavra-icde-bilingual.zip')
+archive.parent.mkdir(parents=True, exist_ok=True)
 with ZipFile(archive, 'w', compression=ZIP_DEFLATED) as bundle:
     for path in sorted(files):
         info = ZipInfo(path.as_posix(), date_time=(2026, 1, 1, 0, 0, 0))
@@ -71,22 +71,13 @@ fi
 check_dependencies() {
   local dependency
   local -a required_files=(
-    xkeyval.sty xstring.sty iftex.sty microtype.sty etoolbox.sty
-    booktabs.sty refcount.sty totpages.sty environ.sty setspace.sty
-    framed.sty zref-savepos.sty zref-user.sty natbib.sty babel.sty
-    hyperref.sty hyperxmp.sty graphicx.sty xcolor.sty geometry.sty
-    manyfoot.sty cmap.sty libertine.sty zi4.sty newtxmath.sty
-    amssymb.sty pifont.sty caption.sty float.sty comment.sty
-    fancyhdr.sty balance.sty amsmath.sty tabularx.sty
+    IEEEtran.cls IEEEtran.bst cite.sty amsmath.sty amssymb.sty amsthm.sty
+    url.sty hyperref.sty graphicx.sty xcolor.sty booktabs.sty tabularx.sty
     colortbl.sty algorithm.sty algpseudocode.sty
   )
   local -a missing_files=()
   if [ "$target" != en ]; then
-    required_files+=(
-      ctex.sty xeCJK.sty fontspec.sty unicode-math.sty
-      FandolSong-Regular.otf FandolHei-Regular.otf
-      FandolFang-Regular.otf FandolKai-Regular.otf LinLibertine_R.otf
-    )
+    required_files+=(ctex.sty xeCJK.sty fontspec.sty)
   fi
   for dependency in "${required_files[@]}"; do
     if [ ! -f "$dependency" ] && ! kpsewhich "$dependency" >/dev/null 2>&1; then

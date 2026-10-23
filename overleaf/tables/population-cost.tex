@@ -3,6 +3,8 @@
 \label{tab:popcost}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
+% Stack bilingual labels so the numeric columns leave room for method names.
+\ifbilingual\let\bt\bh\fi
 \begin{tabularx}{\linewidth}{@{}Lrrrrr@{}}
 \toprule
 & \bt{LLM}{大模型} & \bt{Tools}{工具} & \bt{Tokens}{token} & \bt{Time}{时间} & \bt{Correct}{正确}\\

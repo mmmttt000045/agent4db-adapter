@@ -24,9 +24,12 @@
 \usepackage{xcolor}
 \usepackage{colortbl}
 \usepackage{graphicx}
-% Floats sit closer to the text than the LaTeX default of 20pt.
-\setlength{\textfloatsep}{14pt plus 2pt minus 4pt}
+% Keep natural float gaps compact; allow stretch to align column bottoms.
+\setlength{\textfloatsep}{14pt plus 8pt minus 4pt}
 \setlength{\dbltextfloatsep}{14pt plus 2pt minus 4pt}
+\setlength{\floatsep}{0.85\baselineskip plus 0.5\baselineskip minus 0.2\baselineskip}
+% Preserve the zero natural paragraph gap, with a little more stretch.
+\setlength{\parskip}{0ex plus 0.35ex minus 0.1ex}
 % Method colors, fixed across every figure and table; the figures (tools/figures/) read these
 % definitions, so a method has the same color in a figure and in a table swatch. Six slots in the
 % CVD-validated order (blue, orange, aqua, yellow, magenta, green), assigned in reverse along the
@@ -69,6 +72,7 @@
 \input{gen/premise}
 \input{gen/lifecycle}
 \input{gen/generality}
+\input{gen/replay-safety}
 \input{gen/population}
 \input{gen/external}
 \input{gen/relbench}
@@ -84,6 +88,7 @@
 \providecommand{\TrPairN}{--}\providecommand{\TrPairExWrong}{--}\providecommand{\TrCondDB}{--}\providecommand{\TrCacheDB}{--}
 \providecommand{\TrSameCondDef}{--}\providecommand{\TrCondUnneeded}{--}\providecommand{\TrCondNeeded}{--}\providecommand{\TrCondDuploadDB}{--}
 \newcommand{\system}{MAVRA}
+\newcommand{\llmmodel}{DeepSeek-V4.1-Flash-1017}
 \newcommand{\bi}[2]{#1\par\ifbilingual #2\par\fi}
 \newcommand{\bt}[2]{#1\ifbilingual\space / #2\fi}
 \newcommand{\bh}[2]{\begin{tabular}[b]{@{}c@{}}#1\ifbilingual\\#2\fi\end{tabular}}

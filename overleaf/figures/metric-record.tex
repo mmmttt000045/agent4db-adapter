@@ -1,0 +1,18 @@
+\begin{figure}[t]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}rL@{}}
+\toprule
+\multicolumn{2}{@{}l@{}}{\code{store\_revenue}: \code{SUM(ss\_net\_paid)}}\\
+\multicolumn{2}{@{}l@{}}{\bt{Grain}{粒度}: \code{(ss\_ticket\_number, ss\_item\_sk)}}\\
+\midrule
+1 & \bt{\textbf{Learn.} Agent A learns March revenue with one sale per ticket--item key. Publication checks that the key is unique.}{\textbf{学习。}智能体 A 学习三月收入，每个票据--商品键对应一次销售；发布时检查键唯一性。}\\[2pt]
+2 & \bt{\textbf{Reuse.} Agent B asks about September. It reuses the definition with a new period, without repeating the exploration.}{\textbf{复用。}智能体 B 询问九月收入，以新的期间复用同一定义，无须重复探索。}\\[2pt]
+3 & \bt{\textbf{Change.} A restatement retains old rows. Key uniqueness fails, blocking the old revision before reuse.}{\textbf{变化。}数据更正保留旧行，键唯一性失败，旧版本的复用被阻止。}\\[2pt]
+4 & \bt{\textbf{Maintain.} Here \code{ss\_is\_current = 1} identifies the current version. Publish this filter only if it is the unique repair, preserves keys, and reproduces the learning-time answer; otherwise revoke.}{\textbf{维护。}本例中 \code{ss\_is\_current = 1} 标识当前版本；只有该过滤是唯一修复、保持键集合且重现学习时答案，才发布，否则撤销定义。}\\
+\bottomrule
+\end{tabularx}
+\caption{\bt{Running example: reuse changes the query period; repair changes the definition's row filter under the stated version semantics.}{贯穿示例：复用改变查询期间；修复依据给定版本语义改变定义的行过滤。}}
+\label{fig:metric-record}
+\end{figure}

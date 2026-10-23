@@ -1,5 +1,6 @@
 \begin{table}[t]
-\caption{\bt{Application and agent workloads. Application: Redset~\cite{vanrenen2024redset}, 441\,M queries from 400 Redshift clusters (read queries). Agents: 100 new sessions issuing 521 database calls, 176 of them SQL; a \emph{lookup} is a schema lookup, data probe, or validation call; an LLM call issues no answer SQL when none of its tool calls runs a query that the final answer uses.}{应用与智能体负载。应用：Redset~\cite{vanrenen2024redset}，400 个 Redshift 集群的 4.41 亿条查询（读查询）。智能体：100 个全新会话共 521 次数据库调用，其中 SQL 176 条；\emph{查找}指结构查找、数据探查或验证调用；一次大模型调用若其工具调用都没有执行最终答案所用的查询，即为不发出答案所用 SQL。}}
+% IEEE table captions use small caps; reset the shape for the italic term.
+\caption{\bt{Application and agent workloads. Application: Redset~\cite{vanrenen2024redset}, 441\,M queries from 400 Redshift clusters (read queries). Agents: 100 new sessions issuing 521 database calls, 176 of them SQL; a \textnormal{\emph{lookup}} is a schema lookup, data probe, or validation call; an LLM call issues no answer SQL when none of its tool calls runs a query that the final answer uses.}{应用与智能体负载。应用：Redset~\cite{vanrenen2024redset}，400 个 Redshift 集群的 4.41 亿条查询（读查询）。智能体：100 个全新会话共 521 次数据库调用，其中 SQL 176 条；\textnormal{查找}指结构查找、数据探查或验证调用；一次大模型调用若其工具调用都没有执行最终答案所用的查询，即为不发出答案所用 SQL。}}
 \label{tab:workload-characterization}
 \footnotesize
 \setlength{\tabcolsep}{4pt}

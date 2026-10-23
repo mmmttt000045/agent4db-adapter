@@ -2,11 +2,12 @@
 """Numbers of the paper's RelBench experiment (exp/2026-10-20-relbench): macros in overleaf/gen/relbench.tex and the
 main table's body in overleaf/gen/relbench-table.tex. Per database and arm, over the cutoffs from 2 on (the sessions in
 which an arm can use what it kept): tokens with memory operations, LLM calls, tool calls, agent time, cost at
-DeepSeek's off-peak prices; the test score per task averaged over all cutoffs; and the no-memory arm's workload (LLM
+DeepSeek's official off-peak USD prices (standardized repricing, not invoiced cost); the test score per task averaged over all cutoffs; and the no-memory arm's workload (LLM
 calls per session, share of schema and probe calls, schema calls repeated from earlier sessions). Sessions are paired
 by (task, cutoff); an arm that has not finished yet is printed as "--". A session that ends without a valid solution
 (every validation leaked or failed, or no solution) is scored as the entity-table reference, the model a team keeps
-when feature work fails, and counted in Rb<db><arm>Unsolved; the same for every arm.
+when feature work fails, and counted in Rb<db><arm>Unsolved; the same for every arm. The table also reports valid
+solutions out of all 15 sessions and tasks meeting the prespecified quality tolerance out of all three tasks.
 
   python3 tools/relbench/paper-stats.py --out overleaf/gen
 """
@@ -38,6 +39,10 @@ ARMS = [("none", "None", "No memory"), ("ace", "ACE", "ACE~\\cite{zhang2026ace}"
 TASK_SHORT = {"post-votes": "post-votes", "user-badge": "user-badge", "user-engagement": "user-engage.",
               "study-outcome": "study-outcome", "study-adverse": "study-adverse", "site-success": "site-success"}
 LETTERS = "ABC"
+
+
+def score_text(value):
+    return "--" if value is None else (f"{value:.4f}" if value < 1 else f"{value:.2f}")
 
 
 def finished(path):
@@ -83,14 +88,24 @@ def main():
             macros[f"Rb{pre}{m}"] = "--"
         for _, name, _ in ARMS:
             for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "QA", "QB", "QC", "TokSaveAll", "NotWorse",
-                      "Unsolved"):
+                      "Unsolved", "Solved"):
                 macros[f"Rb{pre}{name}{m}"] = "--"
     for m in ("RbNoneMedLlm", "RbNoneMedTok", "RbSchemaProbe", "RbSchemaRepeat"):
         macros[m] = "--"
     for db, (pre, pattern) in RUNS.items():
         paths = {arm: pattern.format(arm=arm) for arm, _, _ in ARMS}
         done = {arm: p for arm, p in paths.items() if finished(p)}
-        data = {arm: cs.load(p) for arm, p in done.items()}
+        data = {arm: cs.load(p, prices=cs.USD_PRICES) for arm, p in done.items()}
+        for arm, p in done.items():
+            run = json.load(open(os.path.join(p, "run.json")))
+            expected = {(t, c["k"]) for c in run["cutoffs"] for t in c["order"]}
+            if set(data[arm]) != expected:
+                raise ValueError(f"{p}: completed run has missing or unexpected session records")
+            for key, session in data[arm].items():
+                if session["test"] is None and session["audit"] == "clean":
+                    raise ValueError(f"{p}: {key} has an unresolved test evaluation; recover scoring before publishing")
+        if "none" in data and any(set(d) != set(data["none"]) for d in data.values()):
+            raise ValueError(f"{db}: completed arms cover different sessions; refusing a partial intersection")
         for arm, p in done.items():  # time-corrections.json: sessions that ran while their cell was paused
             fix = os.path.join(os.path.dirname(p), "time-corrections.json")
             if os.path.exists(fix):
@@ -113,7 +128,7 @@ def main():
                     if v["unsolved"]:
                         v["test"] = ref.get(key)
         if "none" not in data:
-            table.append(f"\\multicolumn{{10}}{{@{{}}l}}{{\\textit{{{db}}}: running}}\\\\")
+            table.append(f"\\multicolumn{{12}}{{@{{}}l}}{{\\textit{{{db}}}: running}}\\\\")
             table.append("\\midrule")
             continue
         keys = sorted(set.intersection(*(set(d) for d in data.values())), key=lambda x: (x[1], x[0]))
@@ -128,7 +143,7 @@ def main():
         rows = {}
         for arm, name, label in ARMS:
             if arm not in data:
-                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "TokSaveAll", "NotWorse", "Unsolved"):
+                for m in ("Tok", "TokX", "Llm", "Tools", "Min", "Speed", "Cost", "TokSave", "Explore", "TokSaveAll", "NotWorse", "Unsolved", "Solved"):
                     macros[f"Rb{pre}{name}{m}"] = "--"
                 for i, _ in enumerate(tasks):
                     macros[f"Rb{pre}{name}Q{LETTERS[i]}"] = "--"
@@ -141,7 +156,8 @@ def main():
             r = {"tok": tok, "tokx": tok / base["tokens"], "llm": sum(d[k]["llm"] for k in late), "tools": sum(d[k]["tools"] for k in late),
                  "explore": explore, "explore_per": explore / len(late) if late else 0,
                  "min": sec / 60, "speed": base["agent_s"] / sec if sec else float("nan"),
-                 "cost": sum(d[k]["cost"]["offpeak"] for k in late), "test": {}}
+                 "cost": sum(d[k]["cost"]["offpeak"] for k in late), "test": {},
+                 "solved": sum(not d[k]["unsolved"] for k in keys), "not_worse": 0}
             for t in tasks:
                 ks = [k for k in keys if k[0] == t and all(data[x][k]["test"] is not None for x in data)]
                 r["test"][t] = statistics.mean(d[k]["test"] for k in ks) if ks else None
@@ -156,12 +172,14 @@ def main():
                     higher = data["none"][next(k for k in keys if k[0] == t)]["higher"]
                     nw += (a_ >= b_ - 0.01) if higher else (a_ <= b_ * 1.02)
                 macros[f"Rb{pre}{name}NotWorse"] = str(nw)
+                r["not_worse"] = nw
             macros.update({f"Rb{pre}{name}Tok": f"{tok / 1e6:.2f}", f"Rb{pre}{name}TokX": f"{r['tokx']:.2f}",
                            f"Rb{pre}{name}Llm": str(r["llm"]), f"Rb{pre}{name}Tools": str(r["tools"]),
                            f"Rb{pre}{name}Min": f"{r['min']:.0f}", f"Rb{pre}{name}Speed": f"{r['speed']:.1f}",
                            f"Rb{pre}{name}Cost": f"{r['cost']:.2f}", f"Rb{pre}{name}TokSave": f"{100 * (1 - r['tokx']):.0f}",
                            f"Rb{pre}{name}Explore": f"{r['explore_per']:.1f}",
                            f"Rb{pre}{name}Unsolved": str(sum(1 for k in keys if d[k]["unsolved"])),
+                           f"Rb{pre}{name}Solved": str(r["solved"]),
                            f"Rb{pre}{name}TokSaveAll": f"{100 * (1 - sum(d[k]['tokens'] for k in keys) / base_all):.0f}"})
             for i, t in enumerate(tasks):
                 v = r["test"][t]
@@ -175,17 +193,26 @@ def main():
             macros[f"Rb{pre}BestBaseline"] = dict((x, n) for x, n, _ in ARMS)[best]
             macros[f"Rb{pre}MavraVsBest"] = f"{100 * (1 - rows['mavra']['tok'] / rows[best]['tok']):.0f}"
             macros[f"Rb{pre}MavraSpeedVsBest"] = f"{(sum(data[best][k]['agent_s'] for k in late) / sum(data['mavra'][k]['agent_s'] for k in late)):.1f}"
-        # table panel
-        table.append(f"\\multicolumn{{10}}{{@{{}}l}}{{\\textit{{{db}}} ({len(late)} sessions from cutoff 2; test: "
-                     + ", ".join(f"{TASK_SHORT.get(t, t)} {'AUC' if data['none'][next(k for k in keys if k[0] == t)]['higher'] else 'MAE'}" for t in tasks)
-                     + ")}\\\\")
+        # Task-specific headings make every score interpretable without a task-order legend.
+        headings, best_scores = [], {}
+        for t in tasks:
+            higher = data['none'][next(k for k in keys if k[0] == t)]['higher']
+            metric = r"AUC $\uparrow$" if higher else r"MAE $\downarrow$"
+            headings.append(r"\shortstack{" + TASK_SHORT.get(t, t) + r"\\" + metric + "}")
+            scores = [r["test"][t] for r in rows.values() if r and r["test"][t] is not None]
+            best_scores[t] = score_text((max if higher else min)(scores)) if scores else None
+        table.append(r"\RbPanelHeader{" + db + "}{" + "}{".join(headings) + "}")
         for arm, name, label in ARMS:
             r = rows.get(arm)
             if r is None:
-                table.append(f"{label} & \\multicolumn{{9}}{{c}}{{(running)}}\\\\")
+                table.append(f"{label} & \\multicolumn{{11}}{{c}}{{(running)}}\\\\")
                 continue
-            tests = " & ".join("--" if r["test"][t] is None else (f"{r['test'][t]:.3f}" if r["test"][t] < 1 else f"{r['test'][t]:.2f}") for t in tasks)
-            table.append(f"{label} & {r['tok'] / 1e6:.2f} & {r['tokx']:.2f} & {r['llm']} & {r['tools']} & {r['min']:.0f} & {r['cost']:.2f} & {tests}\\\\")
+            tests = []
+            for t in tasks:
+                text = score_text(r["test"][t])
+                tests.append(r"\textbf{" + text + "}" if text == best_scores[t] else text)
+            table.append(f"{label} & {r['tok'] / 1e6:.2f} & {r['tokx']:.2f} & {r['llm']} & {r['tools']} & {r['min']:.0f} & {r['cost']:.2f} & "
+                         + " & ".join(tests) + f" & {r['solved']}/{len(keys)} & {r['not_worse']}/{len(tasks)}\\\\")
         table.append("\\midrule")
     if table and table[-1] == "\\midrule":
         table.pop()

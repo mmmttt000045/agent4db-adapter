@@ -18,7 +18,6 @@
 !figures/*.pdf
 *.xdv
 *.zip
-!mavra-sigmod-bilingual.zip
 /build/
 
 # Local editor and environment files

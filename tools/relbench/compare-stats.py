@@ -18,6 +18,9 @@ import sys
 
 # DeepSeek's price per million tokens, CNY (10-21): input cache hit, input cache miss, output; off-peak and peak
 PRICES = {"offpeak": (0.02, 1.0, 4.0), "peak": (0.04, 2.0, 8.0)}
+# Published USD rate card, checked 2026-10-22 (cache hit, cache miss, output / 1M tokens).
+# https://api-docs.deepseek.com/quick_start/pricing/
+USD_PRICES = {"offpeak": (0.003, 0.15, 0.60), "peak": (0.006, 0.30, 1.20)}
 
 
 def cost(calls, extra_in, extra_out, prices):
@@ -28,7 +31,7 @@ def cost(calls, extra_in, extra_out, prices):
     return (c + extra_in * miss + extra_out * out) / 1e6
 
 
-def load(runs):
+def load(runs, prices=PRICES):
     out = {}
     files = [f for run in runs.split(",") for f in glob.glob(os.path.join(run, "sessions", "*.json")) if not f.endswith(".partial.json")]
     for f in files:
@@ -37,7 +40,7 @@ def load(runs):
         lr = s.get("learning") or {}
         calls = (s.get("llm") or []) + (s.get("llm_sub") or [])
         out[(s["task"], s["k"])] = {
-            "cost": {name: cost(calls, lr.get("input_tokens", 0), lr.get("output_tokens", 0), pr) for name, pr in PRICES.items()},
+            "cost": {name: cost(calls, lr.get("input_tokens", 0), lr.get("output_tokens", 0), pr) for name, pr in prices.items()},
             "goal": s.get("target"), "goal_why": (s.get("target_detail") or {}).get("why"), "goal_reached": bool(s.get("goal_reached")),
             "eval_error": (s.get("eval") or {}).get("error"), "learn_error": lr.get("error"),
             "retry_s": tot.get("llm_retry_seconds", 0),

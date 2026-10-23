@@ -8,7 +8,7 @@ MAVRA（Maintaining Shared Metric Definitions for Data Agents）的系统原型�
 
 论文源文件与实验依据在 [overleaf/](overleaf/README.md)：
 
-- [中英文双语入口](overleaf/main.tex)：SIGMOD 2027 双栏匿名格式，XeLaTeX。
+- [中英文双语入口](overleaf/main.tex)：ICDE 2027 IEEE 双栏格式，XeLaTeX。
 - [英文入口](overleaf/main-en.tex)：pdfLaTeX 或 XeLaTeX；两种语言共用 [paper.tex](overleaf/paper.tex) 与 `sections/` 正文，无需导出。
 - [汇报 PPT](docs/mavra-system.pptx)：11 页，先用“门店营业额”的真实例子引出问题，再用三张图讲 MAVRA 的结构、功能和工作流，最后回到例子；[生成方法](tools/deck/README.md)。
 - `overleaf/build.sh [en|bi|all|pack]`：编译 PDF 或更新 Overleaf 上传包。

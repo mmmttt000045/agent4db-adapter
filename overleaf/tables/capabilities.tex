@@ -1,20 +1,22 @@
-\begin{table}[t]
-\caption{\bt{What existing designs save for agents that share one database: (1) saves for every agent; (2) saves on questions no agent has asked; (3) learned from the agents' own sessions; (4) keeps the saving after data updates; (5) upkeep paid once for all agents. $\bullet$: yes; $\circ$: partly; --: no.}{现有设计能为共享同一数据库的智能体省下什么：(1) 为每个智能体省下代价；(2) 在尚无人问过的问题上省下代价；(3) 从智能体自己的会话中学到；(4) 数据更新后保住节省；(5) 维护代价为所有智能体只付一次。$\bullet$：是；$\circ$：部分；--：否。}}
+\begin{table*}[t]
+\caption{\bt{Reuse objects and validity mechanisms in the cited designs. Data-condition entries describe maintained prerequisites for reuse. NR: the cited source does not describe this mechanism for its reuse object; this is not a claim of impossibility. \system's metric guarantees assume the business premises of Proposition~\ref{prop:sufficiency} and tracked writes.}{所引设计的复用对象与有效性机制。数据条件栏描述受维护的复用前提。NR：所引来源未描述针对其复用对象的这一机制，不表示该设计无法扩展支持。\system\ 的指标保证以命题~\ref{prop:sufficiency} 的业务前提及受跟踪写入为条件。}}
 \label{tab:capabilities}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\newcommand{\capyes}{$\bullet$}
-\newcommand{\cappart}{$\circ$}
-\begin{tabularx}{\linewidth}{@{}Lccccc@{}}
+\begin{tabularx}{\linewidth}{@{}P{0.15\linewidth}P{0.22\linewidth}LLL@{}}
 \toprule
-\bt{Design}{设计} & (1) & (2) & (3) & (4) & (5)\\
+\bt{Design}{设计} & \bt{Reusable object / source}{复用对象／来源} & \bt{Derived conditions / shared checks}{派生条件／共享检查} & \bt{Binding to execution snapshot}{与执行快照的绑定} & \bt{Maintenance / recovery}{维护／恢复}\\
 \midrule
-\bt{Per-agent memory~\cite{chhikara2025mem0,wang2025awm,ouyang2026reasoningbank}}{单智能体记忆~\cite{chhikara2025mem0,wang2025awm,ouyang2026reasoningbank}} & -- & \capyes & \capyes & -- & --\\
-\bt{Query and result caches~\cite{dar1996semantic,ports2010txcache}}{查询与结果缓存~\cite{dar1996semantic,ports2010txcache}} & \capyes & -- & \capyes & \cappart & --\\
-\bt{Metric layers~\cite{dbt2026metricflow,databricks2026metricviews}}{指标层~\cite{dbt2026metricflow,databricks2026metricviews}} & \capyes & \capyes & -- & -- & --\\
-\bt{Data validation~\cite{schelter2018deequ,dbt2026tests}}{数据验证~\cite{schelter2018deequ,dbt2026tests}} & -- & -- & -- & \cappart & --\\
+AgentSM~\cite{biswal2026agentsm} & \bt{Structured trajectories; composite tools}{结构化轨迹；复合工具} & NR & NR & \bt{NR for stored trajectories}{存储轨迹：NR}\\
+G-Memory~\cite{zhang2025gmemory} & \bt{Trajectories and insights shared within a multi-agent system}{多智能体系统内共享轨迹与洞见} & NR & NR & \bt{Memory evolves with task feedback}{记忆随任务反馈演化}\\
+DataLab~\cite{weng2025datalab} & \bt{Business logic from SQL/Python history; knowledge retrieval and DSL}{SQL/Python 历史中的业务逻辑；知识检索与 DSL} & \bt{NR for extracted logic}{提取的逻辑：NR} & NR & \bt{Notebook dependencies updated after edits}{编辑后更新笔记本依赖}\\
+\bt{MetricFlow / metric views~\cite{dbt2026metricflow,databricks2026metricviews}}{MetricFlow／指标视图~\cite{dbt2026metricflow,databricks2026metricviews}} & \bt{Centrally declared metrics; shared SQL generation}{集中声明指标；共享 SQL 生成} & \bt{Declared joins; metric-view multiplicity may be assumed$^{a}$}{声明连接；指标视图可假设连接基数$^{a}$} & \bt{NR for data-condition checks}{数据条件检查：NR} & \bt{Definition edits shared by consumers}{定义修改供消费者共享}\\
+\bt{Semantic caching~\cite{dar1996semantic}}{语义缓存~\cite{dar1996semantic}} & \bt{Data regions reused across different queries}{可供不同查询复用的数据区域} & \bt{Semantic query decomposition}{语义查询分解} & NR & \bt{Updates outside the cited study}{所引研究不评估更新}\\
+TxCache~\cite{ports2010txcache} & \bt{Cached application computations}{缓存的应用计算结果} & \bt{Dependency tracking and validity intervals}{依赖跟踪与有效区间} & \bt{Cached and database reads see one snapshot}{缓存与数据库读取处于同一快照} & \bt{Dependency-driven invalidation}{依赖驱动的失效}\\
 \midrule
-\bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \capyes & \capyes & \capyes & \capyes & \capyes\\
+\system\ & \bt{Revisioned metric definitions from verified sessions}{核实会话产生的版本化指标定义} & \bt{Derived from grain/joins; shared by dependency version}{从粒度／连接派生；按依赖版本共享} & \bt{Conditions checked on the query snapshot}{在查询快照上检查条件} & \bt{Recheck; checked repair or revocation}{重验；经检查的修复或撤销}\\
 \bottomrule
 \end{tabularx}
-\end{table}
+\par\smallskip
+\bt{$^{a}$Databricks documents that \code{at\_most\_one\_match} is not validated at runtime; this does not characterize every validation facility of either product.}{$^{a}$Databricks 文档明确 \code{at\_most\_one\_match} 不在运行时验证；此处不概括两个产品的全部验证能力。}
+\end{table*}

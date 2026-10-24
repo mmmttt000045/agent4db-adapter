@@ -1,7 +1,7 @@
 \section{\bt{System Overview}{系统概览}}
 \label{sec:overview}
-\bi{\system\ is a shared memory layer between data agents and a SQL database, PostgreSQL in our prototype. It shares verified, executable metric and feature definitions, their numbered revisions and learning records, and check results. Agents supply analytical questions or prediction tasks; the layer returns reusable definitions and SQL for the requested period or seed table. Figure~\ref{fig:architecture} summarizes its publication, reuse, and maintenance paths.}
-{\system\ 是位于数据智能体与 SQL 数据库之间的共享记忆层，原型使用 PostgreSQL。它共享经验证的可执行指标与特征定义、定义版本及其学习记录，以及检查结果。智能体提供分析问题或预测任务；系统返回可复用的定义，以及针对所需期间或种子表生成的 SQL。图~\ref{fig:architecture} 概括其发布、复用和维护三条路径。}
+\bi{\system\ places a shared memory layer between data agents and a SQL database, PostgreSQL in our prototype, to reduce repeated exploration and its token and time cost. Successful sessions contribute executable metric and feature definitions, table descriptions, and verified join paths. Later agents retrieve this knowledge and obtain SQL for their periods or seed tables. Numbered revisions, learning records, and shared check results support validation and maintenance within the layer. Figure~\ref{fig:architecture} shows the publication, reuse, and maintenance paths.}
+{\system\ 在数据智能体与 SQL 数据库之间设置共享记忆层，减少重复探索及其 token 和时间开销；原型采用 PostgreSQL。成功会话贡献可执行指标与特征定义、表描述以及经验证的连接路径。后续智能体检索这些知识，获得针对自身期间或种子表的 SQL。带编号的版本、学习记录与共享检查结果支撑层内的验证与维护。图~\ref{fig:architecture} 展示发布、复用与维护路径。}
 
 \input{figures/architecture}
 

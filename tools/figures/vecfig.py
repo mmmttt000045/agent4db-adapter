@@ -248,7 +248,10 @@ def _math(expression, size):
                            prop=FontProperties(size=_REF, math_fontfamily='custom'))
     k = size / _REF
     glyphs = []
-    for font, glyph_size, code, ox, oy in parsed.glyphs:
+    # glyph entries gained a glyph_index before the offsets in matplotlib 3.11;
+    # take the last two as the offsets so older and newer versions both work.
+    for font, glyph_size, code, *rest in parsed.glyphs:
+        ox, oy = rest[-2:]
         font.set_size(float(glyph_size), 72)
         font.load_char(int(code), flags=LoadFlags.NO_HINTING)
         vertices, codes = font.get_path()

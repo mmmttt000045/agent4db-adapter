@@ -18,7 +18,8 @@ import style  # noqa: E402
 
 FIGURES = {'running-example': 'example', 'architecture': 'architecture', 'replay-outcomes': 'replay_outcomes',
            'maintenance-cost': 'maintenance_cost', 'scenario-changes': 'scenario_changes',
-           'two-schemas': 'two_schemas', 'consumer-cost': 'consumer_cost'}
+           'two-schemas': 'two_schemas', 'consumer-cost': 'consumer_cost',
+           'metric-record': 'metric_record'}
 DECK = {'structure': 'structure', 'definition': 'definition', 'process': 'process',   # report deck only
         'run-publish': 'run_publish', 'run-use': 'run_use', 'run-maintain': 'run_maintain'}
 DECK_OUT = style.ROOT / 'slides/figures'

@@ -4,7 +4,9 @@ main table's body in overleaf/gen/relbench-table.tex. Per database and arm, over
 which an arm can use what it kept): tokens with memory operations, LLM calls, tool calls, agent time, cost at
 DeepSeek's official off-peak USD prices (standardized repricing, not invoiced cost); the test score per task averaged over all cutoffs; and the no-memory arm's workload (LLM
 calls per session, share of schema and probe calls, schema calls repeated from earlier sessions). Sessions are paired
-by (task, cutoff); an arm that has not finished yet is printed as "--". A session that ends without a valid solution
+by (task, cutoff); an arm that has not finished yet is printed as "--", and so are the LLM-side cost columns
+(tokens, token ratio, LLM calls, USD) of an arm with no LLM in the loop (NO_LLM, FeatPilot), whose structural
+zeros would otherwise read as free or infinitely cheap. A session that ends without a valid solution
 (every validation leaked or failed, or no solution) is scored as the entity-table reference, the model a team keeps
 when feature work fails, and counted in Rb<db><arm>Unsolved; the same for every arm. The table also reports valid
 solutions out of all 15 sessions and tasks meeting the prespecified quality tolerance out of all three tasks.
@@ -38,6 +40,8 @@ ARMS = [("none", "None", "No memory"), ("ace", "ACE", "ACE~\\cite{zhang2026ace}"
         ("mavra", "Mavra", "\\textbf{\\system\\ (ours)}")]
 TASK_SHORT = {"post-votes": "post-votes", "user-badge": "user-badge", "user-engagement": "user-engage.",
               "study-outcome": "study-outcome", "study-adverse": "study-adverse", "site-success": "site-success"}
+# arms with no LLM in the loop: their LLM-side cost metrics do not apply and print as "--", not 0
+NO_LLM = {"featpilot"}
 LETTERS = "ABC"
 
 
@@ -211,8 +215,11 @@ def main():
             for t in tasks:
                 text = score_text(r["test"][t])
                 tests.append(r"\textbf{" + text + "}" if text == best_scores[t] else text)
-            table.append(f"{label} & {r['tok'] / 1e6:.2f} & {r['tokx']:.2f} & {r['llm']} & {r['tools']} & {r['min']:.0f} & {r['cost']:.2f} & "
-                         + " & ".join(tests) + f" & {r['solved']}/{len(keys)} & {r['not_worse']}/{len(tasks)}\\\\")
+            if arm in NO_LLM:
+                head = f"{label} & -- & -- & -- & {r['tools']} & {r['min']:.0f} & -- & "
+            else:
+                head = f"{label} & {r['tok'] / 1e6:.2f} & {r['tokx']:.2f} & {r['llm']} & {r['tools']} & {r['min']:.0f} & {r['cost']:.2f} & "
+            table.append(head + " & ".join(tests) + f" & {r['solved']}/{len(keys)} & {r['not_worse']}/{len(tasks)}\\\\")
         table.append("\\midrule")
     if table and table[-1] == "\\midrule":
         table.pop()

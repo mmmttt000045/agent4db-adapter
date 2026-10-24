@@ -7,13 +7,17 @@ The four stages then walk one scenario, kept consistent with the intro and
 Section 4: agent A learns March revenue with one sale per ticket-item key and
 publishes v1 after the check; agent B reuses v1 for September, a new period,
 without repeating schema inspection, value probes, or join tests; a
-restatement that retains old rows duplicates a grain key, so c1 fails and v1
-is blocked before reuse; the candidate filter `ss_is_current = 1` is
-published as v2 only if it is the unique repair, preserves the key set, and
-reproduces the learning-time answer, otherwise the record is revoked.
-Schematic content, no experiment data. Colors and marks follow the
-architecture figure: purple is the learning path, blue reuse and
-maintenance, amber changed rows, and the check marks hold/fail.
+restatement that retains old rows duplicates a grain key, and stage 3 shows
+both fates — unmaintained reuse still executes and answers too high (the
+over-count range measured in the population study), while MAVRA blocks v1
+before reuse — and stage 4 repairs: the candidate filter `ss_is_current = 1`
+is published as v2 only if it is the unique repair, preserves the key set,
+and reproduces the learning-time answer, otherwise the record is revoked.
+The only measured value is the too-high range, read from the
+PpTrajChangeOverMin/Max macros of gen/population.tex so that the figure
+prints exactly the over-count Section 7 prints; everything else is
+schematic. Colors and marks follow the architecture figure: purple is the
+learning path, blue reuse and maintenance, amber changed rows.
 """
 import sys
 from pathlib import Path
@@ -24,7 +28,10 @@ import style  # noqa: E402
 from style import ACC, ACC_DK, ACC_PALE, AMBER, AMBER_PALE, EDGE, FACE, INK, MUTED, RED, RULE, WHITE  # noqa: E402
 
 NAME = 'metric-record'
-W, H = style.COLUMN, 89.5
+W, H = style.COLUMN, 92.5
+
+_PP = style.macros('population')
+OVER = f"{_PP['PpTrajChangeOverMin']}–{_PP['PpTrajChangeOverMax']}%"
 
 # IEEEtran conference \scriptsize is 7pt; the PDF is 84.6 mm wide and is
 # scaled to the 88.9 mm column (x1.05), so TITLE, BODY and NOTE print at or
@@ -43,7 +50,8 @@ LABELS = {
                'holds on the new snapshot', 'schema, value probes, joins: skipped', 'SQL'),
         's3': ('Change', 'A restatement keeps old rows in `store_sales`:',
                ('(1001, 7)', 'current'), ('(1001, 7)', 'old'), ('(1002, 4)', 'current'),
-               'the grain key has two rows: ', 'blocked'),
+               ('Unmaintained reuse:', ' SQL still runs, answer {} too high'),
+               ('MAVRA:', ' a duplicated key violates $c_1$ → v1'), 'blocked'),
         's4': ('Maintain', 'candidate filter ', ('unique repair', 'keys preserved', 'March answer'),
                'all three hold', 'v2', '· otherwise ', 'revoke'),
     },
@@ -55,7 +63,8 @@ LABELS = {
                '在新快照上仍成立', '模式、探查、连接：跳过', 'SQL'),
         's3': ('变化', '更正在 `store_sales` 中保留旧行：',
                ('(1001, 7)', '当前'), ('(1001, 7)', '旧行'), ('(1002, 4)', '当前'),
-               '同一粒度键有两行：', '已阻止'),
+               ('不维护的复用：', 'SQL 照常执行，答案偏高 {}'),
+               ('MAVRA：', '重复的键违反 $c_1$ → v1'), '已阻止'),
         's4': ('维护', '候选过滤 ', ('唯一修复', '键不变', '三月答案不变'),
                '三条全部成立', 'v2', '· 否则', '撤销'),
     },
@@ -64,7 +73,7 @@ LABELS = {
 CARD = (1.2, 1.2, 82.2, 11.8)
 X_CIRCLE, X_TEXT, RIGHT = 6.0, 9.6, 83.4
 Y1, Y2 = 18.8, 32.6                      # circle centres of stages 1 and 2
-Y3, Y4 = 49.6, 72.4
+Y3, Y4 = 49.0, 74.8
 
 
 def baseline(y_center, size):
@@ -135,8 +144,8 @@ def draw(s, lang):
     state_chip(y_c, sql)
     text(X_TEXT, baseline(y + 11.4, SMALL), l3, SMALL, MUTED, width=RIGHT - X_TEXT)
 
-    # 3 Change: the restatement duplicates a grain key, the check fails -----
-    y, t, l1, r1, r2, r3, l2, blocked = Y3, *L['s3']
+    # 3 Change: the restatement duplicates a grain key; two fates follow ----
+    y, t, l1, r1, r2, r3, naive, guarded, blocked = Y3, *L['s3']
     stage(y, 3, AMBER, t)
     text(X_TEXT, baseline(y + 4.6, NOTE), l1, NOTE, INK, width=RIGHT - X_TEXT)
     for k, (key, state) in enumerate((r1, r2, r3)):
@@ -146,11 +155,19 @@ def draw(s, lang):
              AMBER if hot else None, .1, r=.3)
         text(X_TEXT + 1.2, yy + 1.55, key, CHIP, INK, 'code')
         text(X_TEXT + 31.8, yy + 1.55, state, CHIP, WAIT if hot else MUTED, align='right')
-    y_c = y + 16.7
-    w = text(X_TEXT, baseline(y_c, NOTE), l2, NOTE, INK)
-    w += text(X_TEXT + w, baseline(y_c, NOTE), '$c_1$', NOTE, INK)
-    mark(X_TEXT + w + 1.4, y_c, 'fail')
-    state_chip(y_c, blocked, fill=RED_PALE, edge=RED, tcol=RED)
+    # The two fates of the same question: without maintenance the SQL still
+    # runs and silently answers too high; MAVRA blocks and stage 4 repairs.
+    y_c = y + 16.6
+    w = text(X_TEXT, baseline(y_c, NOTE), naive[0], NOTE, RED, 'bold')
+    text(X_TEXT + w, baseline(y_c, NOTE), naive[1].format(OVER), NOTE, INK,
+         width=RIGHT - X_TEXT - w)
+    y_c = y + 20.0
+    w = text(X_TEXT, baseline(y_c, NOTE), guarded[0], NOTE, ACC_DK, 'bold')
+    w += text(X_TEXT + w, baseline(y_c, NOTE), guarded[1], NOTE, INK,
+              width=RIGHT - X_TEXT - w - 16.0)
+    chip_w = state_chip(y_c, blocked, fill=RED_PALE, edge=RED, tcol=RED)
+    if X_TEXT + w + 1.2 + chip_w > RIGHT + .01:
+        raise SystemExit(f'stage 3: chip collides with text ({X_TEXT + w + 1.2 + chip_w:.1f} > {RIGHT})')
 
     # 4 Maintain: publish the repair only if the three criteria hold --------
     y, t, l1, crit, hold, rev, else_, revoke = Y4, *L['s4']

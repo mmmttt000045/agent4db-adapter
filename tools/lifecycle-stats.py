@@ -133,7 +133,7 @@ def main():
     ap.add_argument("--json")
     a = ap.parse_args()
     m, t, z = analyze(a.mavra), analyze(a.traj), analyze(a.none)
-    for name, x in (("MAVRA", m), ("example retrieval", t), ("no memory", z)):
+    for name, x in (("MAVRA", m), ("trajectory retrieval", t), ("no memory", z)):
         print(f"## {name} ({x['cell']}): {x['correct']}/{x['tasks']} = {100 * x['acc']:.0f}%, breaking {100 * x['acc_breaking']:.0f}%, "
               f"{x['tok_per_task'] / 1000:.1f}k tok/task, {x['s_per_task']:.1f} s/task, production {x['production_tokens'] / 1000:.0f}k tok, "
               f"{x['tok_per_correct'] / 1000:.1f}k tok/correct, run {x['seconds'] / 60:.0f} min")
@@ -164,7 +164,7 @@ def main():
         "LcDeclaredPct": pct(tot("declared") / m["tasks"]),
         "LcRelearnRefused": tot("relearn_refused"),
     }
-    # 失效之前（时间线上第一次重复装载之前）每题的 token 与轮数；重复装载一步；之后各步示例检索的答对数
+    # 失效之前（时间线上第一次重复装载之前）每题的 token 与轮数；重复装载一步；之后各步轨迹检索的答对数
     def before_dup(x):
         out = []
         for st in x["steps"]:

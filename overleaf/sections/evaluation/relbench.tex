@@ -8,8 +8,6 @@
 {\emph{基线。} 我们与五个已发表的方法比较，并在有官方提示词与代码时直接使用。其中三个是智能体记忆：ACE~\cite{zhang2026ace}，每个智能体一本手册，每次会话后由官方的反思者与整理者在无真实标签的设置下更新；G-Memory~\cite{zhang2025gmemory}，使用官方代码，一个库的所有智能体共用一份记忆；AWM~\cite{wang2025awm}，每个智能体一份工作流记忆，每次会话后用官方提示词从其成功的会话重新归纳。另外两个是数据库领域的数据准备系统，每个任务都重新搜索：DeepPrep~\cite{fan2026deepprep}，一个 LLM 智能体，其官方代码以树的形式在执行反馈下探索算子流水线（它的推理循环、提示词、算子与执行器原样运行在任务的表上，使用本研究的模型；它在 2,000 个种子上探索，方案随后在全部种子上运行，每个划分同样最多 600\,s）；FeatPilot~\cite{liang2025featpilot}，不用 LLM，搜索对模型提升最大的连接路径特征（我们按论文实现，每个聚合都受种子时间约束）。需要成功信号的方法统一使用“验证分数优于实体表参照”。无记忆组是不带任何记忆的同一个智能体。实现配置与复现步骤见随文工件。}
 \bi{\emph{The workload.} Without memory, a session takes a median of \RbNoneMedLlm\ LLM calls and \RbNoneMedTok\,k tokens, \RbSchemaProbe\% of its tool calls inspect the schema or probe values, and \RbSchemaRepeat\% of the schema calls in later sessions repeat a call that an earlier session on the same database already made.}
 {\emph{工作负载。} 没有记忆时，一个会话的 LLM 调用中位数为 \RbNoneMedLlm\ 次、token 中位数为 \RbNoneMedTok\,k，\RbSchemaProbe\% 的工具调用在看结构或探查取值，后续会话里 \RbSchemaRepeat\% 的看结构调用重复了同一数据库上更早会话已做过的调用。}
-\bi{\emph{Cost accounting.} USD costs are recomputed from logged usage at the \href{https://api-docs.deepseek.com/quick_start/pricing/}{official off-peak rates} recorded on October 22, 2026: per million tokens, \$0.003 for cached input, \$0.15 for uncached input, and \$0.60 for output.}
-{\emph{代价计量。}美元金额由记录用量按 2026 年 10 月 22 日查询的\href{https://api-docs.deepseek.com/quick_start/pricing/}{官方闲时价格}重新计算：每百万 token，缓存命中输入 0.003 美元、未命中输入 0.15 美元、输出 0.60 美元。}
 
 \input{tables/relbench}
 \input{figures/relbench-cumulative}

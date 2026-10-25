@@ -6,7 +6,7 @@ usage: population-stats.py --runs results/pop-20261012 [--json-out FILE] [--tex-
 
 Methods: no memory (middle-alone: table profiles, join paths and query results kept per question), single-agent memory
 (metric-private: same learning, checks and maintenance as MAVRA, but each agent sees only the definitions and schema
-knowledge it learned itself), example retrieval (traj-global, shared), MAVRA (metric-global-snap).
+knowledge it learned itself), trajectory retrieval (traj-global, shared), MAVRA (metric-global-snap).
 
 Cost of a task: tokens = the agent session's tokens (input + output) plus, when the memory learned from that session,
 the extraction's tokens (learning is charged to the session that triggered it); seconds = the agent session's wall time
@@ -28,7 +28,7 @@ import statistics
 
 METHODS = ["middle-alone", "metric-private", "mem-awm", "mem-ace", "mem-mem0", "mem-reasoningbank", "mem-apc",
            "mem-ace-shared", "mem-apc-shared", "traj-global", "metric-global-snap"]
-NAMES = {"middle-alone": "No memory", "metric-private": "Single-agent memory", "traj-global": "Example retrieval (shared)",
+NAMES = {"middle-alone": "No memory", "metric-private": "Single-agent memory", "traj-global": "Trajectory Retrieval (shared)",
          "metric-global-snap": "MAVRA", "mem-awm": "AWM", "mem-ace": "ACE", "mem-mem0": "Mem0", "mem-reasoningbank": "ReasoningBank",
          "mem-apc": "APC", "mem-ace-shared": "ACE (shared)", "mem-apc-shared": "APC (shared)"}
 KEY = {"middle-alone": "None", "metric-private": "Private", "traj-global": "Traj", "metric-global-snap": "Mavra",

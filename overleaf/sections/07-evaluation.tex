@@ -1,10 +1,10 @@
 \section{\bt{Evaluation}{实验评估}}
 \label{sec:evaluation}
-\bi{We measure how shared memory reduces exploration, token consumption, and end-to-end time, and how these savings grow across agents and sessions. RelBench evaluates reuse across prediction tasks and retraining cutoffs; metric workloads measure sharing across consumers and the costs of learning, checking, and execution. We then evaluate answer correctness after data changes and snapshot validation under concurrent writes.}
-{我们测量共享记忆如何减少探索、token 消耗和端到端时间，以及这些收益如何随智能体和会话的增加而增长。RelBench 评估跨预测任务与重训截点的复用；指标负载测量跨使用者共享，以及学习、检查和执行的代价。随后评估数据变化后的答案正确性，以及并发写入下的快照验证。}
+\bi{We first measure how shared memory reduces exploration, token consumption, and end-to-end time across agents and sessions. RelBench evaluates reuse across prediction tasks and retraining cutoffs; metric workloads measure sharing across consumers and the cost of learning. We then test whether agents still answer correctly after data changes, examine the limits of validation, and measure the maintenance and optimization costs shared by consumers.}
+{我们先测量共享记忆如何减少跨智能体和会话的探索、token 消耗及端到端时间。RelBench 评估跨预测任务与重训截点的复用，指标负载测量跨使用者共享与学习代价。随后检验数据变化后智能体是否仍能正确作答，分析验证的边界，最后测量由使用者共同分摊的维护与优化代价。}
 \input{sections/evaluation/relbench}
 \input{sections/evaluation/setup}
 \input{sections/evaluation/population}
 \input{sections/evaluation/sharing}
-\input{sections/evaluation/cost}
 \input{sections/evaluation/changes}
+\input{sections/evaluation/cost}

@@ -19,6 +19,7 @@
 | 用途 | 脚本 |
 | --- | --- |
 | 场景、逐模型与历史汇总 | `paper-results.py`、`scen-stats.py`、`aggregate-metric.py` |
+| 场景补充结果表（留出题、各类变化与全部情形） | `scenario-summary.py`；读取归档计数生成 `overleaf/gen/scenario-summary.tex` |
 | 维护、回放、并发与快照 | `review-results.py`、`cache-baseline-stats.py`、`replay-stats.py`、`replay-safety-summary.py`、`snapshot-stats.py`、`merge-replay.py`、`declared-use.py` |
 | 使用成本、优化与前提 | `sharing-stats.py`、`opt-stats.py`、`premise-stats.py`、`trace-stats.py` |
 | 群体、生命周期、工作负载 | `population-stats.py`、`lifecycle-stats.py`、`workload-stats.py` |

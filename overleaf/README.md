@@ -15,6 +15,7 @@ bash build.sh en    # build/main-en.pdf
 bash build.sh bi    # build/main.pdf
 bash build.sh all   # 两份均编译
 bash build.sh pack  # build/mavra-icde-bilingual.zip
+bash build.sh supplement  # 独立的场景补充结果，中英文各一份
 ```
 
 构建优先使用 latexmk，亦支持 Tectonic。TeX 环境须提供 IEEEtran 类与参考文献样式及标准宏包；双语稿还需 ctex 和 Noto Serif CJK SC、Noto Sans CJK SC、Noto Sans Mono CJK SC 字体。`build.sh` 预检直接宏包依赖，字体由 XeLaTeX 检查。
@@ -72,3 +73,7 @@ python3 tools/replay-safety-summary.py
 `overleaf/` 仍是主仓库的普通目录，主仓库远程地址保持不变。独立论文仓库为 [icde-2027-paper](https://github.com/mmmttt000045/icde-2027-paper)，论文源文件放在该仓库根目录，可用 Overleaf 的 GitHub 导入功能创建项目。本机当前同步副本在主仓库的 `tmp/paper-sync/`（不进入主仓库 Git 历史）。本目录的修改不会自动同步过去，需先更新独立工作副本并推送，再在 Overleaf 的 Integrations → GitHub 中手动拉取。Overleaf 中的修改也需先推送回 GitHub，再拉取至本地工作副本。
 
 2026-10-25 整理时保留的完整英文预览、图 1 与引言预览、图形 PNG 和 Overleaf 源码包见 [论文产物归档](../artifacts/2026-10-25/README.md)。源码包与整理时的论文输入逐字节核对一致。完整英文 PDF 沿用 2026-10-24 已有的 14 页预览，编译时额外使用 `fig1-review-en.tex` 启用 T1 字体编码；它是现有阅读预览。本次整理未重新编译或改变正文，英文投稿仍以 `main-en.tex` 和投稿环境生成的 PDF 为准。
+
+## 场景补充结果
+
+主图按正常更新、目标结构变化和范围外变化展示最终答案正确率。留出题与全部情形保存在单独的 `scenario-results-en.tex` / `scenario-results-bi.tex` 阅读入口，并单列单位变化、备份副本及回归变体。运行主仓库的 `python3 tools/scenario-summary.py` 可从归档重新生成表，再执行 `bash build.sh supplement` 编译。补充页与论文主入口分开，普通 `pack` 包仅收集论文依赖。

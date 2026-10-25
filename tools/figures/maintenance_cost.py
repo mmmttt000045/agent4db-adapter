@@ -29,7 +29,7 @@ SERIES = {'condition-scope': ('Scope', (0, (1.0, 1.6)), 'v', True),
           'definition-cache': ('Cache', (0, (3.0, 1.6)), 'D', False)}
 SHARES = (1, 2, 4, 6)
 TEXT = {
-    'en': {'y': 'DB time, % of full recheck per definition', 'x': 'Definitions',
+    'en': {'y': 'DB time, % of Maint-DefLevel', 'x': 'Definitions',
            'panels': ('Staggered', 'Simultaneous')},
     'zh': {'y': '相对整定义重查的 DB 时间', 'x': '定义数', 'panels': ('错峰', '同时到达')},
 }

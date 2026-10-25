@@ -41,17 +41,18 @@ GRID = PAPER_COLORS['gridline']
 WRONG, FOCUS = '#B2182B', '#EBEEF6'
 OUT_CORRECT, OUT_NEEDED, OUT_UNNEEDED = '#4A4A4A', '#A6A6A6', '#D9D9D9'
 
-# Experiment method key -> (English, Chinese, color name), as in Table 2.
+# Experiment method key -> (chart short name in English, Chinese, color name).
+# Full names and chart aliases are defined for readers in tables/strategies.tex.
 METHODS = {
-    'middle': ('No memory', '无记忆', 'mNoShare'),
-    'middle-alone': ('No memory', '无记忆', 'mNoShare'),
-    'traj-global': ('Example retrieval', '示例检索', 'mTraj'),
-    'traj-verify': ('Example retrieval + self-verification', '示例检索 + 自行核验', 'mTrajVerify'),
+    'middle': ('No-Memory', '无指标记忆', 'mNoShare'),
+    'middle-alone': ('No-Memory', '无记忆', 'mNoShare'),
+    'traj-global': ('Traj-Retrieve', '轨迹检索', 'mTraj'),
+    'traj-verify': ('Traj-PromptVerify', '轨迹+提示核验', 'mTrajVerify'),
     'metric-global-noguard': ('Never revalidated', '从不重验证', 'mUnguarded'),   # not in the paper
-    'metric-global-schema': ('Invalidate on schema change', '模式变更时失效', 'mSchema'),
-    'metric-global-revoke': ('Invalidate on every write', '每次写入即失效', 'mRevoke'),
-    'metric-global-def': ('Full recheck per definition', '整定义重查', 'mDef'),
-    'metric-global-snap': ('MAVRA (ours)', 'MAVRA（本文）', 'mCond'),
+    'metric-global-schema': ('Metric-Schema', '结构兼容检查', 'mSchema'),
+    'metric-global-revoke': ('Metric-Relearn', '写入即重学', 'mRevoke'),
+    'metric-global-def': ('Maint-DefLevel', '整定义重查', 'mDef'),
+    'metric-global-snap': ('MAVRA (Ours)', 'MAVRA', 'mCond'),
     'metric-private': ('Single-agent memory', '单智能体记忆', 'mPrivate'),
     # published agent memories (population study): per agent in the single-agent colour, shared in the retrieval colour
     'mem-awm': ('AWM', 'AWM', 'mPrivate'),
@@ -61,14 +62,14 @@ METHODS = {
     'mem-apc': ('APC', 'APC', 'mPrivate'),
     'mem-ace-shared': ('ACE, shared', 'ACE（共享）', 'mTraj'),
     'mem-apc-shared': ('APC, shared', 'APC（共享）', 'mTraj'),
-    'metric-global-exref': ('MAVRA, regression on current data', 'MAVRA，回归测试用当前数据', 'mCondCur'),
-    'metric-global': ('MAVRA, gold-SQL reference', 'MAVRA，标准答案作参照', 'mCondGold'),
+    'metric-global-exref': ('MAVRA-CurrData', 'MAVRA（当前数据回归）', 'mCondCur'),
+    'metric-global': ('MAVRA-OracleRef', 'MAVRA（真值参照）', 'mCondGold'),
     'tabletest': ('dbt-style table tests', 'dbt 式表级测试', 'mTable'),
-    'definition': ('Full recheck per definition', '整定义重查', 'mDef'),
-    'definition-cache': ('Full recheck + query cache', '整定义重查 + 查询缓存', 'mCache'),
+    'definition': ('Maint-DefLevel', '整定义重查', 'mDef'),
+    'definition-cache': ('Maint-DefLevel + cache', '整定义重查 + 查询缓存', 'mCache'),
     'condition-scope': ('Recheck changed tables only', '只重查变化的表', 'mScope'),
-    'condition': ('MAVRA (ours)', 'MAVRA（本文）', 'mCond'),
-    'condition-current': ('MAVRA, regression on current data', 'MAVRA，回归测试用当前数据', 'mCondCur'),
+    'condition': ('MAVRA (Ours)', 'MAVRA', 'mCond'),
+    'condition-current': ('MAVRA-CurrData', 'MAVRA（当前数据回归）', 'mCondCur'),
 }
 
 

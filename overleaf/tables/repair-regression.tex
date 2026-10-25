@@ -1,6 +1,6 @@
 \input{gen/repair-regression}
 \begin{table}[t]
-\caption{\bt{Repair-regression comparison on synthetic retail. Final answer accuracy (\%), including fallback exploration; parentheses give run ranges, not confidence intervals. The five structural scenarios have equal weight.}{合成零售数据的修复回归比较。最终答案正确率（\%），包含回退探索；括号为各次运行的范围，非置信区间。五种结构变化等权。}}
+\caption{\bt{Repair-regression ablation on synthetic retail: final answer accuracy (\%).}{合成零售数据的修复回归消融：最终答案正确率（\%）。}}
 \label{tab:repair-regression}
 \centering
 \footnotesize
@@ -13,9 +13,4 @@
 \RepairRegressionRows
 \bottomrule
 \end{tabularx}
-\par\smallskip
-\begin{minipage}{\linewidth}
-\footnotesize
-\bt{Five independently learned libraries per method. Asterisks mark four scored runs: provider failures left unit and backup questions unscored in the fifth MAVRA-CurrData run. Pooled values use all scored questions. Repair references are specified in Table~\ref{tab:ladder}.}{每种方法独立学习五个定义库。星号表示四次有计分题的运行：MAVRA-CurrData 第五次运行的单位与备份问题因服务端失败未计分。合并值使用全部计分题。修复参照见表~\ref{tab:ladder}。}
-\end{minipage}
 \end{table}

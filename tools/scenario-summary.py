@@ -82,7 +82,7 @@ def render():
 
 
 def render_regression():
-    """Four-row main-paper comparison; preserve the supplement's denominators."""
+    """Compact main-paper results; run details remain in the artifact table."""
     data = json.loads((ROOT / PANELS[0][2]).read_text(encoding='utf-8'))['methods']
     modes = {'metric-global-def', 'metric-global-snap', 'metric-global-exref', 'metric-global'}
     groups = ('modeled', 'unit', 'mirror')
@@ -97,10 +97,7 @@ def render_regression():
             phases = PHASES[group]
             pooled = rate(method['runs'], phases)
             assert isclose(pooled, 100 * method[group]['acc'], abs_tol=1e-10), (mode, group)
-            runs = [rate([r], phases) for r in method['runs']
-                    if all(r['acc'].get(p, [0, 0])[1] for p in phases)]
-            mark = r'\textsuperscript{*}' if len(runs) < len(method['runs']) else ''
-            cells.append(rf'\shortstack{{{pooled:.1f}{mark}\\{{\scriptsize ({min(runs):.1f}--{max(runs):.1f})}}}}')
+            cells.append(f'{pooled:.1f}')
         name = rf'\bhl{{{short}}}{{{chinese}}}'
         if mode == 'metric-global-snap':
             name = rf'\textbf{{{name}}}'

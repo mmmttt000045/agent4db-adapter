@@ -27,7 +27,7 @@ make deck-figures                  # PPT 的六幅图，生成 PDF 并转 PNG
 | `maintenance-cost` | `maintenance_cost.py` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
 | `scenario-changes` | `scenario_changes.py` | `exp/2026-10-10-scenarios-q5/` |
 | `two-schemas` | `two_schemas.py` | 合成场景七种方法各五轮；TPC-H `e2e/` 仅三种已运行方法各三轮；回归变体另在正文与方法表说明 |
-| `consumer-cost` | `consumer_cost.py` | 合成场景 `holdout-cost.json` 与通用性 `e2e/outcomes.json.gz` |
+| `consumer-cost`（保留备查，已不进入主稿） | `consumer_cost.py` | 合成场景 `holdout-cost.json` 与通用性 `e2e/outcomes.json.gz` |
 | `population` | `population.py` | `exp/2026-10-12-population/population-stats.json` |
 | `relbench-cumulative` | `relbench_cumulative.py` | `exp/2026-10-20-relbench/paper-sessions.json` |
 
@@ -87,10 +87,12 @@ MAVRA 藏青 `#2F4F9F`，其消融（当前数据回归）浅蓝 `#5F86D6`；轨
 结构兼容检查 珊瑚 `#E3643A`；写入即重学 青蓝 `#1F8FB0`；dbt 式表级测试 紫 `#8E5BB0`；只重查变化的表 赭 `#A9740A`；
 整定义重查 浅灰 `#B8B8B8`（参照线，带直接标注）、整定义重查 + 查询缓存 深灰 `#3A3A3A`。颜色定义在 `overleaf/latex/preamble.tex`，
 `style.method()` 读取。非方法颜色在 `style.py`：答错与过期定义一律深红 `WRONG`，强调区域（MAVRA 所在行、底色组）一律浅藏青 `FOCUS`，
-其余结果用中性灰。图 5 的正确率底色是一种藏青色阶（`#F7F8FC`→`#4F6CB5`），过期仍用深红框，MAVRA 行用藏青框。点线图的标记按方法固定：MAVRA 圆、轨迹检索 方、无记忆 正三角、只重查变化的表 倒三角、查询缓存 空心菱形；
+其余结果用中性灰。`scenario-changes` 的正确率底色是一种藏青色阶（`#F7F8FC`→`#4F6CB5`），过期仍用深红框，MAVRA 行用藏青框。点线图的标记按方法固定：MAVRA 圆、轨迹检索 方、无记忆 正三角、只重查变化的表 倒三角、查询缓存 空心菱形；
 图例里 MAVRA 一律加粗、用藏青。示意图（图 1、2）保留自己的颜色（`ACC` 等常量），不随方法颜色变化。
 
 ## 方法名称与图表简写
+
+不变数据上的使用代价现由 `overleaf/tables/consumer-cost.tex` 汇总为表，不再使用两方法散点图。运行 `python3 tools/consumer-stats.py` 可从同一归档生成三方法、两种数据集的耗时、token、正确率和每个正确答案的 token；每个正确答案的代价包含错误回答所花的 token，建库代价单独报告。
 
 标准中英文名与策略属性见 `overleaf/tables/strategies.tex`；`style.METHODS` 使用图表简写，统计生成器保留原方法代码作为数据键。历史 `exp/` 数据与报告不因改名重写。
 

@@ -22,6 +22,7 @@
 | 场景补充结果表（留出题、各类变化与全部情形） | `scenario-summary.py`；读取归档计数生成 `overleaf/gen/scenario-summary.tex` |
 | 维护、回放、并发与快照 | `review-results.py`、`cache-baseline-stats.py`、`replay-stats.py`、`replay-safety-summary.py`、`snapshot-stats.py`、`merge-replay.py`、`declared-use.py` |
 | 使用成本、优化与前提 | `sharing-stats.py`、`opt-stats.py`、`premise-stats.py`、`trace-stats.py` |
+| 不变数据上的复用代价对照 | `consumer-stats.py`；生成 `overleaf/gen/consumer-cost.tex`，含轨迹检索及每个正确答案的 token |
 | 群体、生命周期、工作负载 | `population-stats.py`、`lifecycle-stats.py`、`workload-stats.py` |
 | 通用性、外部动机与 ReFoRCE | `generality-stats.py`、`external-reuse-stats.py`、`reforce-stats.py`、`tpcds-sharing.py` |
 | 补充会话与共享记忆研究 | `session-latency-stats.py`、`memory-study-stats.py` |

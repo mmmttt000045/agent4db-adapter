@@ -11,8 +11,8 @@
 \bi{A definition revision is $m^r=(B,I,C,E,r)$, where $B$ is its business meaning, $I$ its structured implementation, $C$ its set of executable conditions, $E$ its learning record, and $r$ its revision number. The implementation records the fact table, aggregate expression, grain, date join, joins, and definition filters; its joins form a many-to-one tree rooted at the fact table (a star or snowflake). Question parameters such as the month are not part of it: the generated SQL is compiled from $I$ for any period, difference, or ranking, so one learning session serves questions that no agent has asked yet. Figure~\ref{fig:metric-record} illustrates how this record supports reuse and maintenance.}
 {定义的一个版本记为 $m^r=(B,I,C,E,r)$，其中 $B$ 为业务含义，$I$ 为结构化实现，$C$ 为可执行条件集，$E$ 为学习记录，$r$ 为版本号。实现记录事实表、聚合表达式、粒度、日期连接、连接和定义过滤；连接构成以事实表为根的多对一连接树（星型或雪花型）。月份等题目参数不属于实现：生成的 SQL 由 $I$ 针对任意期间、差值或排名编译得到，因此一次学习会话可以服务尚无智能体问过的问题。图~\ref{fig:metric-record} 展示该记录如何支持复用与维护。}
 
-\bi{\emph{Extraction and publication.} Publication turns a successful answer into a definition that other agents can execute. The session must state the business definition and have an independently verified answer, supplied by a user, report, or analyst. In our benchmarks, an automated oracle verifies the final scalar answer against the reference on the same snapshot before extraction. The LLM extractor then uses the question, SQL and arithmetic trace, rejected queries, and schema and join metadata to propose a JSON record; business rows and result values are withheld. The server derives evidence and conditions from its fields and applies seven deterministic checks in three stages.}
-{\emph{提取与发布。}发布将一次成功作答转化为其他智能体可以执行的定义。会话须明确业务定义，并有由用户、报表或分析师提供的独立核实答案。在基准实验中，自动判题器先将最终标量答案与同一快照上的参考答案比较，再开始提取。LLM 提取器根据题目、SQL 与算术轨迹、被拒绝的查询以及模式和连接元数据提出 JSON 记录，不接收业务行或结果值。服务器从记录字段推导证据与条件，分三个阶段执行七项确定性检查。}
+\bi{\emph{Extraction and publication.} Publication turns a successful answer into a definition that other agents can execute. The session must state the business definition and have an independently verified answer, supplied by a user, report, or analyst. In our benchmarks, an automated oracle verifies the final scalar answer against the reference on the same snapshot before extraction. The LLM extractor then uses the question, SQL and arithmetic trace, rejected queries, and schema and join metadata to propose a JSON record; business rows and result values are withheld. The server derives evidence and conditions from its fields and applies seven deterministic publication gates (G1--G7) in three stages.}
+{\emph{提取与发布。}发布将一次成功作答转化为其他智能体可以执行的定义。会话须明确业务定义，并有由用户、报表或分析师提供的独立核实答案。在基准实验中，自动判题器先将最终标量答案与同一快照上的参考答案比较，再开始提取。LLM 提取器根据题目、SQL 与算术轨迹、被拒绝的查询以及模式和连接元数据提出 JSON 记录，不接收业务行或结果值。服务器从记录字段推导证据与条件，分三个阶段执行七项确定性发布门控（G1--G7）。}
 
 \bi{\textbf{\emph{(1) Provenance checks.}} G1 requires an explicit business-definition basis; G2 requires an independently judged answer and a verified calculation chain.}
 {\textbf{\emph{（1）来源验证。}}G1 要求明确的业务定义依据；G2 要求答案经过独立判定，且计算链可验证。}
@@ -28,17 +28,20 @@
 
 \subsection{\bt{When shared knowledge is correct}{共享的知识何时正确}}
 \label{sec:sufficiency}
-\bi{Data-only updates can break learned SQL while the schema stays the same. Status-change rows, restatements, and duplicate loads violate the grain; reused dimension keys make a many-to-one join fan out; late or reformatted date keys move facts to another period or to none~\cite{kimball2013toolkit}. A condition $c$ is a predicate over the tables $\operatorname{dep}(c)$ with a check query $Q_c$ that returns violating rows or nothing. Its normalized form $\operatorname{id}(c)$ consists of its type, tables, keys, join direction, normalized filters, and null policy. \system\ derives four condition types from $I$, covering three aspects of aggregation.}
-{纯数据更新可在模式不变的情况下破坏学到的 SQL。状态流水、更正保留旧行或重复加载会破坏粒度；被重用的维度键使多对一连接放大行数；迟到或改了格式的日期键把事实移到别的期间或使其无处可归~\cite{kimball2013toolkit}。条件 $c$ 是表集合 $\operatorname{dep}(c)$ 上的谓词，附带一个检查查询 $Q_c$，返回违例行或空。其规范化形式 $\operatorname{id}(c)$ 由类型、表、键、连接方向、规范化的过滤和空值规则组成。\system\ 从 $I$ 推导四类条件，覆盖聚合的三个方面。}
+\bi{Data-only updates can break learned SQL while the schema stays the same. Status-change rows, restatements, and duplicate loads violate the grain; reused dimension keys make a many-to-one join fan out; late or reformatted date keys move facts to another period or to none~\cite{kimball2013toolkit}. A condition $c$ is a predicate over the tables $\operatorname{dep}(c)$ with a check query $Q_c$ that returns violating rows or nothing. Its normalized form $\operatorname{id}(c)$ consists of its type, tables, keys, join direction, normalized filters, and null policy. \system\ derives the following four condition types from $I$.}
+{纯数据更新可在模式不变的情况下破坏学到的 SQL。状态流水、更正保留旧行或重复加载会破坏粒度；被重用的维度键使多对一连接放大行数；迟到或改了格式的日期键把事实移到别的期间或使其无处可归~\cite{kimball2013toolkit}。条件 $c$ 是表集合 $\operatorname{dep}(c)$ 上的谓词，附带一个检查查询 $Q_c$，返回违例行或空。其规范化形式 $\operatorname{id}(c)$ 由类型、表、键、连接方向、规范化的过滤和空值规则组成。\system\ 从 $I$ 推导以下四类条件。}
 
-\bi{\textbf{\emph{(1) Fact grain.}} No two rows of $\sigma_\varphi(T)$ may agree on $K$, as checked by filtered key uniqueness $\operatorname{KeyUnique}(T,K,\varphi)$.}
-{\textbf{\emph{（1）事实粒度。}}过滤后键唯一性 $\operatorname{KeyUnique}(T,K,\varphi)$ 要求 $\sigma_\varphi(T)$ 中没有两行在 $K$ 上取值相同。}
+\bi{\textbf{\emph{(1) Filtered key uniqueness.}} No two rows of $\sigma_\varphi(T)$ may agree on $K$, as checked by filtered key uniqueness $\operatorname{KeyUnique}(T,K,\varphi)$.}
+{\textbf{\emph{（1）过滤后键唯一性。}}过滤后键唯一性 $\operatorname{KeyUnique}(T,K,\varphi)$ 要求 $\sigma_\varphi(T)$ 中没有两行在 $K$ 上取值相同。}
 
-\bi{\textbf{\emph{(2) Join structure.}} Join cardinality bounds the number of $R$ rows matched by each row of $L$ in a join $L\to R$. The date-join condition requires the fact's date key to join the date dimension many-to-one.}
-{\textbf{\emph{（2）连接结构。}}连接基数限制连接 $L\to R$ 中每条 $L$ 记录匹配的 $R$ 记录数。日期连接条件要求事实的日期键与日期维度多对一连接。}
+\bi{\textbf{\emph{(2) Join cardinality.}} This condition bounds the number of $R$ rows matched by each row of $L$ in a join $L\to R$.}
+{\textbf{\emph{（2）连接基数。}}该条件限制连接 $L\to R$ 中每条 $L$ 记录匹配的 $R$ 记录数。}
 
-\bi{\textbf{\emph{(3) Join completeness.}} For the date join and every inner join, the fraction of fact rows that match no row must stay within the fraction recorded at publication plus 0.1 percentage points.}
-{\textbf{\emph{（3）连接完整性。}}对日期连接和每个内连接，匹配不到任何行的事实行比例不得超过发布时记录的比例加 0.1 个百分点。}
+\bi{\textbf{\emph{(3) Date join.}} The fact's date key must join the date dimension many-to-one.}
+{\textbf{\emph{（3）日期连接。}}事实的日期键须与日期维度多对一连接。}
+
+\bi{\textbf{\emph{(4) Join completeness.}} For the date join and every inner join, the fraction of fact rows that match no row must stay within the fraction recorded at publication plus 0.1 percentage points.}
+{\textbf{\emph{（4）连接完整性。}}对日期连接和每个内连接，匹配不到任何行的事实行比例不得超过发布时记录的比例加 0.1 个百分点。}
 
 \bi{For a period $p$, the generated SQL evaluates $\mathrm{AGG}(e)$ over the rows of $\sigma_\varphi(F)\bowtie R_1\bowtie\cdots\bowtie R_k$ whose date falls in $p$. The business definition establishes two domain premises connecting physical records to business events: (B1) the metric's business events correspond one-to-one to the values of $K$ in $\sigma_\varphi(F)$, and (B2) $e$ evaluates on an event's row to that event's measurement.}
 {对期间 $p$，生成的 SQL 在 $\sigma_\varphi(F)\bowtie R_1\bowtie\cdots\bowtie R_k$ 中日期落在 $p$ 内的行上计算 $\mathrm{AGG}(e)$。业务定义确立两条连接物理记录与业务事件的领域前提：（B1）指标的业务事件与 $\sigma_\varphi(F)$ 中 $K$ 的取值一一对应；（B2）在事件对应的行上，$e$ 求值得到该事件的度量值。}

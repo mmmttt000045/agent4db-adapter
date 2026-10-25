@@ -69,4 +69,6 @@ python3 tools/replay-safety-summary.py
 
 ## 独立论文仓库
 
-`overleaf/` 仍是主仓库的普通目录，主仓库远程地址保持不变。独立论文仓库为 [icde-2027-paper](https://github.com/mmmttt000045/icde-2027-paper)，论文源文件放在该仓库根目录，可用 Overleaf 的 GitHub 导入功能创建项目。本地独立工作副本位于同级目录 `../icde-2027-paper/`；本目录的修改不会自动同步过去，需先更新独立工作副本并推送，再在 Overleaf 的 Integrations → GitHub 中手动拉取。Overleaf 中的修改也需先推送回 GitHub，再拉取至本地工作副本。
+`overleaf/` 仍是主仓库的普通目录，主仓库远程地址保持不变。独立论文仓库为 [icde-2027-paper](https://github.com/mmmttt000045/icde-2027-paper)，论文源文件放在该仓库根目录，可用 Overleaf 的 GitHub 导入功能创建项目。本机当前同步副本在主仓库的 `tmp/paper-sync/`（不进入主仓库 Git 历史）。本目录的修改不会自动同步过去，需先更新独立工作副本并推送，再在 Overleaf 的 Integrations → GitHub 中手动拉取。Overleaf 中的修改也需先推送回 GitHub，再拉取至本地工作副本。
+
+2026-10-25 整理时保留的完整英文预览、图 1 与引言预览、图形 PNG 和 Overleaf 源码包见 [论文产物归档](../artifacts/2026-10-25/README.md)。源码包与整理时的论文输入逐字节核对一致。完整英文 PDF 沿用 2026-10-24 已有的 14 页预览，编译时额外使用 `fig1-review-en.tex` 启用 T1 字体编码；它是现有阅读预览。本次整理未重新编译或改变正文，英文投稿仍以 `main-en.tex` 和投稿环境生成的 PDF 为准。

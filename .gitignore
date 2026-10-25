@@ -2,7 +2,11 @@
 build.log
 .env
 .env.deepseek
+.env.*
+!.env.example
 /results/
+/tmp/
+/output/
 /slides/node_modules/
 /slides/build/
 __pycache__/

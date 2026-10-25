@@ -8,6 +8,7 @@
 | --- | --- |
 | 论文、PPT、检查 | 根目录 [Makefile](../Makefile) |
 | 更新或检查实验索引 | [experiment-index.py](experiment-index.py)；`--check` 只检查文件与目录 |
+| 校验或恢复工作区备份 | [workspace-backup.py](workspace-backup.py)；使用方法与归档范围见 [备份说明](../archives/README.md) |
 | 论文和 PPT 绘图 | [figures/README.md](figures/README.md) |
 | PPT 生成与版本 | [slides/README.md](../slides/README.md) |
 | RelBench SQL 复用对照 | [协议](../exp/2026-10-22-sql-only/README.md)、`relbench/sql-only-stats.py`、`relbench/test_sql_only.py` |

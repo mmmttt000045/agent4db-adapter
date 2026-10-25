@@ -93,8 +93,7 @@ def e2e_macros(m, exp):
 
     for key, mode in E2E_MODES:
         v = stats["methods"][mode]
-        for g, name in (("modeled", "Modeled"), ("holdout", "Holdout"), ("all", "All"),
-                        ("benign", "Benign"), ("unit", "Unit"), ("mirror", "Mirror")):
+        for g, name in (("modeled", "Modeled"), ("holdout", "Holdout"), ("all", "All"), ("mirror", "Mirror")):
             m[f"Ge{key}{name}"] = round(100 * v[g]["acc"])
         for g, name, phases in (("modeled", "Modeled", COVERED), ("holdout", "Holdout", ["holdout"])):
             vals = [acc([x for x in scored if x["mode"] == mode and x["run"].startswith(r + "-")], phases) for r in runs]

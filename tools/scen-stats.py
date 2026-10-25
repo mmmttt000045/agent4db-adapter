@@ -28,12 +28,11 @@ import random
 
 METHODS = ["middle", "traj-global", "traj-verify", "metric-global-schema", "metric-global-revoke",  # noguard 不进论文
            "metric-global-def", "metric-global", "metric-global-exref", "metric-global-snap"]
-NAMES = {"middle": "In-Situ Exploration (No Memory)", "traj-global": "Trajectory Retrieval",
-         "traj-verify": "Trajectory Retrieval + Prompted Verification",
-         "metric-global-noguard": "Never revalidated", "metric-global-schema": "Metric Reuse (Schema Compatibility)",
-         "metric-global-revoke": "Metric Reuse (Write-Triggered Relearning)", "metric-global-def": "Definition-Level Maintenance",
-         "metric-global": "MAVRA (Oracle-Guided Regression)", "metric-global-exref": "MAVRA (Current-Data Regression)",
-         "metric-global-snap": "MAVRA (Ours)"}
+NAMES = {"middle": "No memory", "traj-global": "Example retrieval", "traj-verify": "Example retrieval + self-verification",
+         "metric-global-noguard": "Never revalidated", "metric-global-schema": "Invalidate on schema change",
+         "metric-global-revoke": "Invalidate on every write", "metric-global-def": "Full recheck per definition",
+         "metric-global": "MAVRA, gold-SQL reference", "metric-global-exref": "MAVRA, regression on current data",
+         "metric-global-snap": "MAVRA (ours)"}
 PHASES = ["holdout", "append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"]
 TYPE_WORDS = {"P1": "Period", "T1": "Diff", "T2": "Top", "T3": "Rise", "T4": "Above"}
 GROUPS = {

@@ -10,7 +10,7 @@ has such reruns, otherwise all of its cells); refusals by
 the replay checks (G6 example SQL, G7 canonical SQL) and by the provenance chain are counted over both studies, and the
 G7 refusal whose canonical answer is furthest from the learned answer is reported as the example.
 
-Consumer performance (MAVRA = metric-global-snap, three runs; exploring alone = middle; trajectory retrieval = traj-global
+Consumer performance (MAVRA = metric-global-snap, three runs; exploring alone = middle; example retrieval = traj-global
 and traj-verify):
 - production per run: the learning sessions (all tokens and seconds), extraction and admission;
 - held-out consumer tasks: tokens (input + output), seconds and accuracy per task, the speedup and the token saving
@@ -181,9 +181,9 @@ def main():
     vv = per_task(verify, ["holdout"] + BENIGN)
     m_benign, m_repair, m_inval = maint_per_change(cond, BENIGN), maint_per_change(cond, REPAIRED), maint_per_change(cond, INVALIDATED)
     tasks_per_change = statistics.mean(per_task(cond, [p])["n"] / len(cond) for p in BENIGN + REPAIRED + INVALIDATED)
-    print("\n## Maintenance against prompted verification")
+    print("\n## Maintenance against self-verification")
     print(f"maintenance DB s per change and run: benign {m_benign:.1f}, repaired {m_repair:.1f}, invalidated {m_inval:.1f}")
-    print(f"prompted verification extra per task (held-out + benign): {vv['s'] - tv['s']:.1f} s, {vv['tok'] - tv['tok']:.0f} tokens")
+    print(f"self-verification extra per task (held-out + benign): {vv['s'] - tv['s']:.1f} s, {vv['tok'] - tv['tok']:.0f} tokens")
     print(f"consumer tasks per change and run: {tasks_per_change:.1f}")
 
     valid_c = per_task(cond, ["holdout"] + BENIGN + REPAIRED)

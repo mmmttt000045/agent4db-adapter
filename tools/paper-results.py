@@ -36,15 +36,15 @@ MODELS = [  # (任务目录前缀, 显示名)；前缀长的先匹配
 MODEL_ORDER = ["DeepSeek V4.1 Flash", "GLM-5.3", "GLM-5.3 Flash"]
 METHODS = [  # (mode, 英文, 中文)；全文统一的方法名（表 2）。metric-global-noguard（共享但从不重验证）
     # 2026-10-07 起不再进入论文：在这组变化里它与模式变更时失效只差 0–1 个点，其运行不计入任何统计。
-    ("middle", "In-Situ Exploration (No Memory)", "现场探索（无指标记忆）"),
-    ("traj-global", "Trajectory Retrieval", "轨迹检索（直接复用）"),
-    ("traj-verify", "Trajectory Retrieval + Prompted Verification", "轨迹检索 + 提示核验"),
-    ("metric-global-schema", "Metric Reuse (Schema Compatibility)", "指标复用（结构兼容检查）"),
-    ("metric-global-revoke", "Metric Reuse (Write-Triggered Relearning)", "指标复用（写入即重学）"),
-    ("metric-global-def", "Definition-Level Maintenance", "指标维护（整定义级重查）"),
-    ("metric-global-snap", r"\system\ (Ours)", r"\system"),
-    ("metric-global-exref", r"\system\ (Current-Data Regression)", r"\system（当前数据回归）"),
-    ("metric-global", r"\system\ (Oracle-Guided Regression)", r"\system（真值参照回归）"),
+    ("middle", "No memory", "无记忆"),
+    ("traj-global", "Example retrieval", "示例检索"),
+    ("traj-verify", "Example retrieval + self-verification", "示例检索 + 自行核验"),
+    ("metric-global-schema", "Invalidate on schema change", "模式变更时失效"),
+    ("metric-global-revoke", "Invalidate on every write", "每次写入即失效"),
+    ("metric-global-def", "Full recheck per definition", "整定义重查"),
+    ("metric-global-snap", r"\system\ (ours)", r"\system（本文）"),
+    ("metric-global-exref", r"\system, regression on current data", r"\system，回归测试用当前数据"),
+    ("metric-global", r"\system, gold-SQL reference", r"\system，标准答案作参照"),
 ]
 # 论文中的 MAVRA：G8 以智能体自己的 SQL 为参照、在学习时快照上比较（metric-global-snap）；metric-global-exref 是同一参照
 # 在当前数据上比较（消融）；metric-global 是 MAVRA (gold SQL)。较早的数据里没有前者时依次退回 exref、metric-global。
@@ -66,14 +66,8 @@ COLOR = {  # 与正文导言的方法颜色一致
 }
 
 
-# Compact aliases match the figure legends; full names appear in tables/strategies.tex.
-TABLE_EN = {"middle": "No-Memory", "traj-global": "Traj-Retrieve", "traj-verify": "Traj-PromptVerify",
-            "metric-global-schema": "Metric-Schema", "metric-global-revoke": "Metric-Relearn",
-            "metric-global-def": "Maint-DefLevel", "metric-global-exref": "MAVRA-CurrData",
-            "metric-global": "MAVRA-OracleRef"}
-TABLE_ZH = {"middle": "无指标记忆", "traj-global": "轨迹检索", "traj-verify": "轨迹+提示核验",
-            "metric-global-schema": "结构兼容检查", "metric-global-revoke": "写入即重学",
-            "metric-global-def": "整定义重查"}
+TABLE_EN = {"traj-verify": r"Example retrieval\\+ self-verification",  # 窄栏表格里需要断行的方法名
+            "metric-global-exref": r"\system, regression\\on current data"}
 
 
 def main_mode():
@@ -296,7 +290,7 @@ def tex_cost_table(A):
         ms = mean([x for (m, mo), xs in A["maint"].items() if mo == mode for x in xs])
         tk = mean([mean(xs) for (m, mo), xs in A["hold_tokens"].items() if mo == mode and xs])
         ms_s = "--" if mode in ("middle", "traj-global", "traj-verify") or ms is None else f"{ms:.0f}"
-        en, zh = TABLE_EN.get(mode, en), TABLE_ZH.get(mode, zh)
+        en = TABLE_EN.get(mode, en)  # 窄栏表格里把长方法名断成两行
         lines.append(rf"\swatch{{{COLOR[mode]}}}\ \bhl{{{en}}}{{{zh}}} & {100 * v:.0f} & {st} & {ms_s} & {tk / 1000:.1f}\\")
     lines += [r"\bottomrule", r"\end{tabular}"]
     return "\n".join(lines) + "\n"

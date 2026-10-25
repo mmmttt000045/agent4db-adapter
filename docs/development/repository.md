@@ -7,8 +7,6 @@
 - 当前设计、状态与研究笔记放 `docs/research/`；固定的历史协议、已回退方案与阶段审查放 `docs/history/`。旧记录使用历史措辞，不随当前结论改写。
 - 论文使用的图形 PDF 和 `overleaf/gen/*.tex` 随源码提交，生成方式见论文与工具说明。编译缓存和常规上传 ZIP 放 `overleaf/build/`。
 - PPT 生成器与图片放 `slides/`，生成输出放 `slides/build/`；需要长期保留的版本放 `slides/versions/`，同时登记来源。独立编辑版本不得被生成器覆盖。
-- 需要上传 GitHub 保留的论文 PDF、图形预览与 Overleaf 包放 `artifacts/YYYY-MM-DD/paper/`，在对应日期的说明和校验清单中登记；日常 `output/` 仍作为本地生成目录。
-- 整理本机现有工作区时，原始结果和制作过程文件可放入 `archives/YYYY-MM-DD/` 的分卷 ZIP；保留原路径、逐文件与逐分卷 SHA-256，并提供恢复命令。原始 `results/` 与 `tmp/` 保留在本机，不将密钥、连接密码、下载依赖和编译缓存打包。2026-10-25 的具体范围见 [备份说明](../../archives/README.md)。
 - 第三方源码在 `third_party/` 内保留原有来源说明。实验中的 `script-as-run` 和源码快照是当时的运行证据；改进后的工具另存，不覆盖归档。
 
 ## 实验登记与更新

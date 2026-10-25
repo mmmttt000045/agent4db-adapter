@@ -63,7 +63,13 @@ TEXT = {
                         'revision': 'Restated\nsales', 'dupload': 'Duplicate\nload', 'dimhist': 'SCD\nType 2',
                         'latekey': 'Date-key\nformat', 'unit': 'Unit\nchange', 'mirror': 'Backup\ncopy',
                         'covered': 'All covered\nbreaks', 'inval': 'Invalidated', 'repair': 'Repaired'},
-           'rows': {},
+           'rows': {'middle': 'No memory', 'traj-global': 'Example retrieval',
+                    'traj-verify': 'Example retrieval\n+ self-verification',
+                    'metric-global-schema': 'Invalidate on\nschema change',
+                    'metric-global-revoke': 'Invalidate on\nevery write',
+                    'metric-global-def': 'Full recheck\nper definition', 'metric-global-snap': 'MAVRA (ours)',
+                    'metric-global-exref': 'MAVRA, regression\non current data',
+                    'metric-global': 'MAVRA, gold-SQL\nreference'},
            'key_cell': 'accuracy (%);\nrange of 5 runs', 'key_stale': 'stale definition\nin ≥25% of tasks'},
     'zh': {'groups': {'none': '无变化', 'benign': '正常更新', 'covered': '条件覆盖的破坏性变化',
                       'outside': '保证范围之外', 'run': '每次运行'},
@@ -72,8 +78,11 @@ TEXT = {
                         'revision': '更正保留\n旧行', 'dupload': '重复\n加载', 'dimhist': '缓慢\n变化维',
                         'latekey': '日期键\n格式', 'unit': '金额\n单位', 'mirror': '备份\n副本',
                         'covered': '全部覆盖\n的破坏', 'inval': '失效', 'repair': '修复'},
-           'rows': {'metric-global-exref': 'MAVRA\n（当前数据回归）',
-                    'metric-global': 'MAVRA\n（真值参照）'},
+           'rows': {'middle': '无记忆', 'traj-global': '示例检索', 'traj-verify': '示例检索\n+ 自行核验',
+                    'metric-global-schema': '模式变更时失效', 'metric-global-revoke': '每次写入即失效',
+                    'metric-global-def': '整定义重查', 'metric-global-snap': 'MAVRA（本文）',
+                    'metric-global-exref': 'MAVRA，回归\n测试用当前数据',
+                    'metric-global': 'MAVRA，标准\n答案作参照'},
            'key_cell': '正确率（%）；\n5 次运行的范围', 'key_stale': '≥25% 的题用\n了过期定义'},
 }
 
@@ -210,7 +219,7 @@ def figure(lang):
         label, color = style.method(mode, lang)
         ax.add_patch(FancyBboxPatch((.4, y + (CELL_H - SWATCH) / 2), SWATCH, SWATCH,
                                     boxstyle='round,pad=0,rounding_size=.3', facecolor=color, lw=0))
-        text(LABEL_W - 1.2, y + CELL_H / 2, T['rows'].get(mode, label), ha='right', va='center',
+        text(LABEL_W - 1.2, y + CELL_H / 2, T['rows'][mode], ha='right', va='center',
              fontweight='bold' if ours else 'normal', color=color if ours else INK)
         weight = 'bold' if ours else 'normal'
         for phase, *_ in PHASES:

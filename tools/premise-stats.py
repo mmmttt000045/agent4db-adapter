@@ -64,7 +64,6 @@ def main():
         "PbStaleErrMin": f"{min(rel_err):.2f}",
         "PbStaleErrMax": f"{max(rel_err):.0f}",
         "PbFallbackMsMax": f"{max(wall):,.0f}".replace(",", "{,}"),
-        "PbFallbackSMax": f"{max(wall) / 1000:.1f}",
         "PbFallbackMsMean": f"{statistics.mean(wall):,.0f}".replace(",", "{,}"),
         "PbOrphanBase": m.group(1) if m else "--",
         "PbOrphanNow": m.group(2) if m else "--",

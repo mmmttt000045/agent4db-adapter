@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Compile the shared manuscript or package its sources for Overleaf.
-# Usage: ./build.sh [en|bi|all|supplement|pack]   (default: all)
+# Usage: ./build.sh [en|bi|all|pack]   (default: all)
 set -euo pipefail
 cd "$(dirname "$0")"
 target="${1:-all}"
 
 case "$target" in
-  en|bi|all|supplement|pack) ;;
-  *) echo "usage: $0 [en|bi|all|supplement|pack]" >&2; exit 2 ;;
+  en|bi|all|pack) ;;
+  *) echo "usage: $0 [en|bi|all|pack]" >&2; exit 2 ;;
 esac
 
 if [ "$target" = pack ]; then
@@ -116,5 +116,4 @@ case "$target" in
   en)  compile main-en.tex -pdf ;;
   bi)  compile main.tex -xelatex ;;
   all) compile main-en.tex -pdf; compile main.tex -xelatex ;;
-  supplement) compile scenario-results-en.tex -pdf; compile scenario-results-bi.tex -xelatex ;;
 esac

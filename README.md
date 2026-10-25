@@ -12,8 +12,6 @@ MAVRA 是面向数据智能体的共享记忆系统原型：在智能体与 Post
 | 修改与生成汇报 PPT | [汇报说明](slides/README.md)、[现有版本](slides/versions/README.md) |
 | 了解当前研究状态 | [研究状态与证据](docs/research/README.md) |
 | 查阅阶段性方案与历史记录 | [历史文档](docs/history/README.md) |
-| 下载已保留的论文、Overleaf 包与 PPT | [产物索引](artifacts/README.md)、[2026-10-25 归档](artifacts/2026-10-25/README.md) |
-| 校验或恢复本机实验与制作过程文件 | [工作区备份](archives/README.md) |
 
 ## 快速开始
 
@@ -51,9 +49,5 @@ make check            # Rust 格式、单元测试与 Clippy
 | `data/` | 最小数据库测试输入 |
 | `third_party/` | 外部基线源码；来源与使用条件见各目录说明 |
 | `results/` | 本地实验运行输出，Git 忽略 |
-| `artifacts/` | 按日期保留的论文 PDF、图形预览、Overleaf 包与产物校验记录 |
-| `archives/` | 本机实验原始结果和制作过程文件的分卷备份、文件清单与恢复说明 |
 
 论文依赖的 `overleaf/gen/*.tex` 和图形 PDF 作为编译输入提交；常规编译文件与上传包放在 `build/` 中。运行日志、历史源码快照和正式保留的 PPT 有各自的来源说明。新增文件的归属与旧路径映射见 [仓库维护约定](docs/development/repository.md)。
-
-2026-10-25 已将本机现有论文预览、Overleaf 包与三份新增 PPT 归档，并为 `results/` 和论文／PPT 制作过程文件建立可恢复的压缩备份。备份仅包含本机实际存在的文件；服务器上的其他实验原始记录仍按实验清单中的位置与可用性登记。本地密钥、含密码的连接文件、依赖与构建缓存不进入 GitHub。

@@ -1,26 +1,22 @@
-\begin{table*}[t]
-\caption{\bt{Methods in the metric data-change study. Bold names are chart aliases. Condition sharing means reusing validation conclusions across definitions at the same table versions.}{指标数据变化实验的方法。粗体为图表简写。“条件共享”指在同一组表版本上跨定义复用验证结论。}}
+\begin{table}[t]
+% The Times symbol font has no small-caps section sign.
+\caption{\bt{Compared methods, by what later sessions get. P: population study (\textup{\S}\ref{sec:population-eval}); Q: cost per question (\textup{\S}\ref{sec:sharing-eval}); C: cost of sharing (\textup{\S}\ref{sec:cost}); D: data changes (\textup{\S}\ref{sec:changes-eval}).}{本文比较的方法，按之后的会话得到什么划分。P：群体实验（\textup{\S}\ref{sec:population-eval}）；Q：每道题的代价（\textup{\S}\ref{sec:sharing-eval}）；C：共享的代价（\textup{\S}\ref{sec:cost}）；D：数据变化（\textup{\S}\ref{sec:changes-eval}）。}}
 \label{tab:ladder}
-\centering
 \footnotesize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{tabularx}{\textwidth}{@{}P{0.20\textwidth}P{0.085\textwidth}P{0.235\textwidth}P{0.10\textwidth}P{0.13\textwidth}L@{}}
+\setlength{\tabcolsep}{2.4pt}
+\newcommand{\usedin}{$\bullet$}
+\begin{tabularx}{\linewidth}{@{}P{0.27\linewidth}Lcccc@{}}
 \toprule
-\bt{Method}{方法} & \bt{Reuse unit}{复用载体} & \bt{Maintenance trigger and scope}{维护触发与范围} & \bt{Condition sharing}{条件共享} & \bt{Recovery}{失效恢复} & \bt{Repair regression}{修复回归}\\
+\bt{Method}{方法} & \bt{What later sessions get}{之后的会话得到什么} & P & Q & C & D\\
 \midrule
-\textbf{No-Memory}\newline\bt{In-Situ Exploration (No Memory)}{现场探索（无指标记忆）} & --- & \bt{No metric or trajectory memory; shared metadata and tools remain available}{无指标或轨迹记忆；仍可使用共享元数据与工具} & --- & \bt{Explore current data}{现场探索} & ---\\
-\midrule
-\textbf{Traj-Retrieve}\newline\bt{Trajectory Retrieval}{轨迹检索（直接复用）} & \bt{Trajectories}{历史轨迹} & \bt{Retrieve up to three successful examples; no automatic maintenance}{检索最多三条成功示例；不自动维护} & --- & \bt{Agent adaptation}{智能体自行调整} & ---\\
-\textbf{Traj-PromptVerify}\newline\bt{Trajectory Retrieval + Prompted Verification}{轨迹检索 + 提示核验} & \bt{Trajectories}{历史轨迹} & \bt{Same retrieval; a prompt asks the agent to check grain, joins, and dates before reuse}{同上；提示智能体在复用前核对粒度、连接与日期} & \bt{No}{否} & \bt{Agent verification and rewriting}{智能体核验与改写} & ---\\
-\midrule
-\textbf{Metric-Schema}\newline\bt{Metric Reuse (Schema Compatibility)}{指标复用（结构兼容检查）} & \bt{Definitions}{指标定义} & \bt{On reuse after a dependency changes, check only referenced tables and columns for compatibility}{依赖变化后复用时，仅检查所用表与列是否兼容} & --- & \bt{Invalidate; explore}{失效后探索} & ---\\
-\textbf{Metric-Relearn}\newline\bt{Metric Reuse (Write-Triggered Relearning)}{指标复用（写入即重学）} & \bt{Definitions}{指标定义} & \bt{Any write to a dependency revokes affected definitions and triggers relearning}{依赖表写入即撤销受影响定义并触发重学} & --- & \bt{Relearn and republish}{重新学习并发布} & ---\\
-\textbf{Maint-DefLevel}\newline\bt{Definition-Level Maintenance}{指标维护（整定义级重查）} & \bt{Definitions}{指标定义} & \bt{First use after a dependency changes: recheck the whole definition}{依赖变化后的首次使用：整定义重查} & \bt{No; definition state is shared}{否；共享定义状态} & \bt{Restricted repair; otherwise explore}{受限修复，否则探索} & \bt{Oracle SQL on current data}{标准答案 SQL；当前数据}\\
-\midrule
-\textbf{\system\ (Ours)}\newline\bt{Learning-Snapshot Regression}{学习快照回归} & \bt{Definitions}{指标定义} & \bt{First use after a dependency changes: check affected conditions, reuse existing conclusions}{依赖变化后的首次使用：检查受影响条件并复用已有结论} & \bt{Yes; also reuse repair filters}{是；也复用修复过滤} & \bt{Restricted repair; otherwise explore}{受限修复，否则探索} & \bt{Learning-trajectory SQL on the learning snapshot}{学习轨迹 SQL；学习快照}\\
-\textbf{MAVRA-CurrData}\newline\bt{\system\ (Current-Data Regression)}{\system（当前数据回归）} & \bt{Definitions}{指标定义} & \bt{Same condition-level maintenance as \system}{同 \system\ 的条件级维护} & \bt{Same as \system}{同 \system} & \bt{Same as \system}{同 \system} & \bt{Learning-trajectory SQL on current data}{学习轨迹 SQL；当前数据}\\
-\textbf{MAVRA-OracleRef}\newline\bt{\system\ (Oracle-Guided Regression)}{\system（真值参照回归）} & \bt{Definitions}{指标定义} & \bt{Same condition-level maintenance as \system}{同 \system\ 的条件级维护} & \bt{Same as \system}{同 \system} & \bt{Same as \system}{同 \system} & \bt{Oracle SQL on current data}{标准答案 SQL；当前数据}\\
+\bt{No memory}{无记忆} & \bt{nothing; every question is explored}{什么也没有，每道题都探索} & \usedin & \usedin & & \usedin\\
+\bt{Single-agent memory}{单智能体记忆} & \bt{\system's memory, but each agent uses only what it learned itself}{\system\ 的记忆，但每个智能体只用自己学到的} & \usedin & & \usedin & \\
+\bt{Example retrieval}{示例检索} & \bt{up to three similar past sessions (question, SQL, calculation), never maintained}{最多三条相似的过去会话（题面、SQL、算式），从不维护} & & & & \usedin\\
+\bt{\quad + self-verification}{\quad + 自行核验} & \bt{the same, told to verify grain, joins, and date keys}{同上，并被要求先核对粒度、连接与日期键} & & & \usedin & \\
+\bt{Invalidate on every write}{每次写入即失效} & \bt{definitions, dropped on any write and relearned}{定义，任何写入都丢弃并重新学习} & & & \usedin & \\
+\bt{Full recheck per definition}{整定义重查} & \bt{definitions, all conditions rechecked on use, no shared results}{定义，使用时重查全部条件、不共享结果} & & & \usedin & \\
+\addlinespace
+\bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \bt{one memory for all agents; definitions checked, maintained, and optimized once}{所有智能体共用一份记忆；定义的检查、维护与优化都只做一次} & \usedin & \usedin & \usedin & \usedin\\
 \bottomrule
 \end{tabularx}
-\end{table*}
+\end{table}

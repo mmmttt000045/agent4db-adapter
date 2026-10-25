@@ -67,7 +67,7 @@ TEXT = {
 }
 LEFT, RIGHT = .40, .85          # axes span in figure fractions: labels left, DB seconds right
 # Labels too long for the margin are broken over two lines here.
-LABELS = {'condition-current': {'en': 'MAVRA-CurrData', 'zh': 'MAVRA\n（当前数据回归）'}}
+LABELS = {'condition-current': {'en': 'MAVRA, regression\non current data', 'zh': 'MAVRA，回归测试\n用当前数据'}}
 
 
 def _int(n):

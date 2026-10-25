@@ -26,8 +26,8 @@ make deck-figures                  # PPT 的六幅图，生成 PDF 并转 PNG
 | `replay-outcomes` | `replay_outcomes.py` | 验证缓存、TPC-DS 和通用性回放 |
 | `maintenance-cost` | `maintenance_cost.py` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
 | `scenario-changes` | `scenario_changes.py` | `exp/2026-10-10-scenarios-q5/` |
-| `two-schemas` | `two_schemas.py` | 合成场景七种方法各五轮；TPC-H `e2e/` 仅三种已运行方法各三轮；回归变体另在正文与方法表说明 |
-| `consumer-cost`（保留备查，已不进入主稿） | `consumer_cost.py` | 合成场景 `holdout-cost.json` 与通用性 `e2e/outcomes.json.gz` |
+| `two-schemas` | `two_schemas.py` | 合成场景五轮与通用性 `e2e/` 的正确率 |
+| `consumer-cost` | `consumer_cost.py` | 合成场景 `holdout-cost.json` 与通用性 `e2e/outcomes.json.gz` |
 | `population` | `population.py` | `exp/2026-10-12-population/population-stats.json` |
 | `relbench-cumulative` | `relbench_cumulative.py` | `exp/2026-10-20-relbench/paper-sessions.json` |
 
@@ -83,31 +83,9 @@ Scale(d0, d1, p0, p1)                          # 数据值到毫米的线性映�
 
 ## 实验图的配色（图 3–7，2026-10-11 起）
 方法颜色取 Nature（NPG）配色的色相，按色觉与对比度校验调深或调饱和（dataviz 的 validate_palette 逐图检查相邻颜色）：
-MAVRA 藏青 `#2F4F9F`，其消融（当前数据回归）浅蓝 `#5F86D6`；轨迹检索 青绿 `#00A087`；无记忆 棕 `#9C5A26`；
-结构兼容检查 珊瑚 `#E3643A`；写入即重学 青蓝 `#1F8FB0`；dbt 式表级测试 紫 `#8E5BB0`；只重查变化的表 赭 `#A9740A`；
+MAVRA 藏青 `#2F4F9F`，其消融（回归测试用当前数据）浅蓝 `#5F86D6`；示例检索 青绿 `#00A087`；无记忆 棕 `#9C5A26`；
+模式变更时失效 珊瑚 `#E3643A`；每次写入即失效 青蓝 `#1F8FB0`；dbt 式表级测试 紫 `#8E5BB0`；只重查变化的表 赭 `#A9740A`；
 整定义重查 浅灰 `#B8B8B8`（参照线，带直接标注）、整定义重查 + 查询缓存 深灰 `#3A3A3A`。颜色定义在 `overleaf/latex/preamble.tex`，
 `style.method()` 读取。非方法颜色在 `style.py`：答错与过期定义一律深红 `WRONG`，强调区域（MAVRA 所在行、底色组）一律浅藏青 `FOCUS`，
-其余结果用中性灰。`scenario-changes` 的正确率底色是一种藏青色阶（`#F7F8FC`→`#4F6CB5`），过期仍用深红框，MAVRA 行用藏青框。点线图的标记按方法固定：MAVRA 圆、轨迹检索 方、无记忆 正三角、只重查变化的表 倒三角、查询缓存 空心菱形；
+其余结果用中性灰。图 5 的正确率底色是一种藏青色阶（`#F7F8FC`→`#4F6CB5`），过期仍用深红框，MAVRA 行用藏青框。点线图的标记按方法固定：MAVRA 圆、示例检索 方、无记忆 正三角、只重查变化的表 倒三角、查询缓存 空心菱形；
 图例里 MAVRA 一律加粗、用藏青。示意图（图 1、2）保留自己的颜色（`ACC` 等常量），不随方法颜色变化。
-
-## 方法名称与图表简写
-
-不变数据上的使用代价现由 `overleaf/tables/consumer-cost.tex` 汇总为表，不再使用两方法散点图。运行 `python3 tools/consumer-stats.py` 可从同一归档生成三方法、两种数据集的耗时、token、正确率和每个正确答案的 token；每个正确答案的代价包含错误回答所花的 token，建库代价单独报告。
-
-标准中英文名与策略属性见 `overleaf/tables/strategies.tex`；`style.METHODS` 使用图表简写，统计生成器保留原方法代码作为数据键。历史 `exp/` 数据与报告不因改名重写。
-
-| 数据键 | 英文图表简写 | 中文图表简写 |
-| --- | --- | --- |
-| `middle` | No-Memory | 无指标记忆 |
-| `traj-global` | Traj-Retrieve | 轨迹检索 |
-| `traj-verify` | Traj-PromptVerify | 轨迹+提示核验 |
-| `metric-global-schema` | Metric-Schema | 结构兼容检查 |
-| `metric-global-revoke` | Metric-Relearn | 写入即重学 |
-| `metric-global-def` | Maint-DefLevel | 整定义重查 |
-| `metric-global-snap` | MAVRA (Ours) | MAVRA |
-| `metric-global-exref` | MAVRA-CurrData | MAVRA（当前数据回归） |
-| `metric-global` | MAVRA-OracleRef | MAVRA（真值参照） |
-
-`two-schemas` 读取每次运行的计数，主图按正常更新、目标结构变化和范围外变化分组，组内变化情形等权汇总，以点表示合并正确率、竖线表示运行范围；竖线不是置信区间。范围外组是单位缩放与备份副本正确率的等权平均，不是按两者题数合并。左面板展示前七组，右面板只展示 `middle`、`traj-global` 与 `metric-global-snap`；不得把合成数据的其他方法填入 TPC-H。
-
-留出题、全部情形及分开的单位／备份结果在独立补充表中保留：运行 `python3 tools/scenario-summary.py`，再运行 `bash overleaf/build.sh supplement`。补充表包含合成数据九种方法及 TPC-H 三种方法，括号内为运行范围；它是工件阅读材料，不附加在论文主入口中。

@@ -1,0 +1,392 @@
+{
+  "sources_sha256": {
+    "results/official-20261028/analysis.json": "5a429744358cd80eff026227c30852a085b8a8da0acfe6b780f96a2d4fa0fb84",
+    "results/official-20261028/evidence-audit.json": "916466b5012a8137e1caa95300090208f8abc6bcfb60807eb0831a4e020c83bf"
+  },
+  "session_count": 90,
+  "independent_runs_per_method": 1,
+  "quality": [
+    {
+      "dataset": "rel-stack",
+      "task": "post-votes",
+      "metric": "mae",
+      "unit": "relative MAE reduction (%)",
+      "threshold": -2.0,
+      "rows": [
+        {
+          "method": "none",
+          "mean": 0.06673267320377024,
+          "delta": 0.0,
+          "valid": 2,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "ace",
+          "mean": 0.06534868139825961,
+          "delta": 2.0739343099362593,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "awm",
+          "mean": 0.06666150575433664,
+          "delta": 0.10664558456438042,
+          "valid": 2,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "gmemory",
+          "mean": 0.06486097216679683,
+          "delta": 2.804774553625505,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "mavra",
+          "mean": 0.06526335798964016,
+          "delta": 2.2017928303928254,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        }
+      ]
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "user-badge",
+      "metric": "roc_auc",
+      "unit": "AUC percentage points",
+      "threshold": -1.0,
+      "rows": [
+        {
+          "method": "none",
+          "mean": 0.8536028877677851,
+          "delta": 0.0,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "ace",
+          "mean": 0.8378583608286051,
+          "delta": -1.5744526939180048,
+          "valid": 3,
+          "n": 3,
+          "within_margin": false
+        },
+        {
+          "method": "awm",
+          "mean": 0.8524843635918437,
+          "delta": -0.11185241759414932,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "gmemory",
+          "mean": 0.8562888120612621,
+          "delta": 0.26859242934769156,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "mavra",
+          "mean": 0.8541171933898157,
+          "delta": 0.05143056220305864,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        }
+      ]
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "user-engagement",
+      "metric": "roc_auc",
+      "unit": "AUC percentage points",
+      "threshold": -1.0,
+      "rows": [
+        {
+          "method": "none",
+          "mean": 0.8805879698664308,
+          "delta": 0.0,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "ace",
+          "mean": 0.8812103282730075,
+          "delta": 0.062235840657665076,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "awm",
+          "mean": 0.8807175372974115,
+          "delta": 0.012956743098069268,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "gmemory",
+          "mean": 0.7740080279931312,
+          "delta": -10.657994187329967,
+          "valid": 2,
+          "n": 3,
+          "within_margin": false
+        },
+        {
+          "method": "mavra",
+          "mean": 0.8790900309608888,
+          "delta": -0.14979389055420622,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        }
+      ]
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "site-success",
+      "metric": "mae",
+      "unit": "relative MAE reduction (%)",
+      "threshold": -2.0,
+      "rows": [
+        {
+          "method": "none",
+          "mean": 0.44494166185193096,
+          "delta": 0.0,
+          "valid": 0,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "ace",
+          "mean": 0.43992582735532376,
+          "delta": 1.1273016052779479,
+          "valid": 2,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "awm",
+          "mean": 0.43330705283423493,
+          "delta": 2.6148616808034104,
+          "valid": 1,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "gmemory",
+          "mean": 0.4199764497220972,
+          "delta": 5.610895600543195,
+          "valid": 1,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "mavra",
+          "mean": 0.41878499117485773,
+          "delta": 5.878674199265638,
+          "valid": 1,
+          "n": 3,
+          "within_margin": true
+        }
+      ]
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "study-adverse",
+      "metric": "mae",
+      "unit": "relative MAE reduction (%)",
+      "threshold": -2.0,
+      "rows": [
+        {
+          "method": "none",
+          "mean": 43.274756282477185,
+          "delta": 0.0,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "ace",
+          "mean": 45.77876450161257,
+          "delta": -5.786302302410214,
+          "valid": 2,
+          "n": 3,
+          "within_margin": false
+        },
+        {
+          "method": "awm",
+          "mean": 43.32360606493968,
+          "delta": -0.11288285979851356,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "gmemory",
+          "mean": 41.49718604025901,
+          "delta": 4.107637789142093,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "mavra",
+          "mean": 44.69168664230283,
+          "delta": -3.2742653721180757,
+          "valid": 2,
+          "n": 3,
+          "within_margin": false
+        }
+      ]
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "study-outcome",
+      "metric": "roc_auc",
+      "unit": "AUC percentage points",
+      "threshold": -1.0,
+      "rows": [
+        {
+          "method": "none",
+          "mean": 0.6496340031223504,
+          "delta": 0.0,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "ace",
+          "mean": 0.6414407603018576,
+          "delta": -0.819324282049283,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "awm",
+          "mean": 0.6487517225098999,
+          "delta": -0.08822806124505478,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "gmemory",
+          "mean": 0.6616192868723335,
+          "delta": 1.1985283749983089,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        },
+        {
+          "method": "mavra",
+          "mean": 0.6469814070807356,
+          "delta": -0.265259604161483,
+          "valid": 3,
+          "n": 3,
+          "within_margin": true
+        }
+      ]
+    }
+  ],
+  "work": {
+    "rel-stack": {
+      "none": {
+        "schema": 6.833333333333333,
+        "probe": 13.5,
+        "validate": 3.5,
+        "memory": 0,
+        "submit": 0,
+        "llm_calls": 15
+      },
+      "ace": {
+        "schema": 7.833333333333333,
+        "probe": 12.5,
+        "validate": 3,
+        "memory": 0,
+        "submit": 0,
+        "llm_calls": 13.166666666666666
+      },
+      "awm": {
+        "schema": 7.333333333333333,
+        "probe": 14,
+        "validate": 3.5,
+        "memory": 0,
+        "submit": 0,
+        "llm_calls": 15
+      },
+      "gmemory": {
+        "schema": 4.5,
+        "probe": 10,
+        "validate": 3.8333333333333335,
+        "memory": 0,
+        "submit": 0,
+        "llm_calls": 10.666666666666666
+      },
+      "mavra": {
+        "schema": 1.3333333333333333,
+        "probe": 1,
+        "validate": 2.5,
+        "memory": 1,
+        "submit": 0,
+        "llm_calls": 4.833333333333333
+      }
+    },
+    "rel-trial": {
+      "none": {
+        "schema": 12.166666666666666,
+        "probe": 22.5,
+        "validate": 1.8333333333333333,
+        "memory": 0,
+        "submit": 0,
+        "llm_calls": 22.666666666666668
+      },
+      "ace": {
+        "schema": 8,
+        "probe": 21.166666666666668,
+        "validate": 3.3333333333333335,
+        "memory": 0,
+        "submit": 0,
+        "llm_calls": 19.833333333333332
+      },
+      "awm": {
+        "schema": 9.833333333333334,
+        "probe": 21.333333333333332,
+        "validate": 3,
+        "memory": 0,
+        "submit": 0,
+        "llm_calls": 20.833333333333332
+      },
+      "gmemory": {
+        "schema": 1.6666666666666667,
+        "probe": 24.5,
+        "validate": 2.8333333333333335,
+        "memory": 0,
+        "submit": 0,
+        "llm_calls": 16.5
+      },
+      "mavra": {
+        "schema": 5.666666666666667,
+        "probe": 10,
+        "validate": 1.5,
+        "memory": 1.5,
+        "submit": 0,
+        "llm_calls": 13.666666666666666
+      }
+    }
+  },
+  "quality_scope": "All 90 scheduled sessions, no completed failures excluded.",
+  "work_scope": "Six reuse sessions per method/database, including failures; internal model calls are not agent tool calls."
+}

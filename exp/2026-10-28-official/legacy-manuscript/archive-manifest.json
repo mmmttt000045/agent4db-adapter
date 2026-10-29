@@ -1,0 +1,27 @@
+[
+  {
+    "relative_path": "tables/scenario-cost.tex",
+    "sha256": "446213171cb76358fa89fc6273a335b16d48aa9dcf4f12bc251979ab5c7ef458",
+    "reason": "Unused legacy example-retrieval figure or table; preserved outside active manuscript"
+  },
+  {
+    "relative_path": "gen/scen-cost.tex",
+    "sha256": "f40fe44b49fa625643573c5eba5744e1e5459c1f0e956c1e6597616bc83302a2",
+    "reason": "Unused legacy example-retrieval figure or table; preserved outside active manuscript"
+  },
+  {
+    "relative_path": "figures/scenario-changes.tex",
+    "sha256": "14c047abdbb02f92c256b83cd090d92a453b1ca5be095893d8abadcd5e645a18",
+    "reason": "Unused legacy example-retrieval figure or table; preserved outside active manuscript"
+  },
+  {
+    "relative_path": "figures/scenario-changes.pdf",
+    "sha256": "a651edcc8cf1bbf0493ba4e57d85caa5ddb6e2a9444b5110ed5d5fef14acd9c3",
+    "reason": "Unused legacy example-retrieval figure or table; preserved outside active manuscript"
+  },
+  {
+    "relative_path": "figures/scenario-changes-zh.pdf",
+    "sha256": "2b6841ab370877a5ac0fa7f52444d4fed08da68756051ca35f84165acafec369",
+    "reason": "Unused legacy example-retrieval figure or table; preserved outside active manuscript"
+  }
+]

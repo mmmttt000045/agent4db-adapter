@@ -1,10 +1,14 @@
 \section{\bt{Evaluation}{实验评估}}
 \label{sec:evaluation}
-\bi{We measure how shared memory reduces exploration, token consumption, and end-to-end time, and how these savings grow across agents and sessions. RelBench evaluates reuse across prediction tasks and retraining cutoffs; metric workloads measure sharing across consumers and the costs of learning, checking, and execution. We then evaluate answer correctness after data changes and snapshot validation under concurrent writes.}
-{我们测量共享记忆如何减少探索、token 消耗和端到端时间，以及这些收益如何随智能体和会话的增加而增长。RelBench 评估跨预测任务与重训截点的复用；指标负载测量跨使用者共享，以及学习、检查和执行的代价。随后评估数据变化后的答案正确性，以及并发写入下的快照验证。}
+\bi{We distinguish policy-level savings, development diagnostics, and mechanism controls. RelBench comparisons and SQL traces describe agent work; a separate memory-access pilot examines coverage and source-cost amortization. Metric studies vary memory scope and check sharing. Finally, data-change tests and a matched-version concurrency control examine maintenance and snapshot validity. Each study retains its own samples, accounting, and limitations.}
+{我们区分完整策略的节省、开发诊断与机制对照。RelBench比较及SQL轨迹描述智能体工作量，独立的记忆访问预实验考察完成率与源成本分摊；指标实验改变记忆作用域及检查共享程度；数据变化实验与同版本源并发对照考察维护及快照有效性。各研究分别保留样本、计量口径与局限。}
 \input{sections/evaluation/relbench}
+\input{sections/evaluation/sharing}
+\input{sections/evaluation/memory-pilot}
 \input{sections/evaluation/setup}
 \input{sections/evaluation/population}
-\input{sections/evaluation/sharing}
 \input{sections/evaluation/cost}
 \input{sections/evaluation/changes}
+\input{sections/evaluation/snapshot}
+% Keep evaluation figures and tables within the evaluation section.
+\FloatBarrier

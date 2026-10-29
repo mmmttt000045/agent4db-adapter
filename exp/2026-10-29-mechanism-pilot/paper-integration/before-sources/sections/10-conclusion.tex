@@ -1,0 +1,16 @@
+\section{\bt{Discussion and Conclusion}{讨论与结论}}
+\label{sec:limitations}
+\bi{\system\ turns database exploration into executable metric and feature definitions. Sharing these definitions together with their data conditions, validation evidence, and maintenance reduces repeated exploration while sustaining reuse as data evolve.}
+{\system\ 将数据库探索转化为可执行的指标与特征定义。共享这些定义及其数据条件、验证证据与维护工作，能够减少重复探索，并在数据演进过程中维持复用。}
+
+\bi{The central design is to share the computation together with the evidence supporting its reuse. Publication checks preserve the learned calculation, condition identities and dependency versions share validation work, and snapshot-bound execution aligns metric checks with the consuming query. Shared repairs and equivalent rewrites carry these benefits forward as data and workloads evolve. This extends amortization from knowledge discovery to the continuing work of validation, maintenance, and execution.}
+{这一设计将计算及其复用依据一并共享。发布检查保留学得的计算逻辑，条件标识与依赖版本支持共享验证，快照绑定执行将指标检查与消费查询对齐。共享修复与等价改写，使这些收益随数据和负载演进持续发挥作用，从而将开销分摊从知识发现扩展到持续的验证、维护与执行。}
+
+\bi{\emph{Future work.} We will extend compilation to repeated-role joins and many-to-many bridges and develop incremental feature maintenance. Adding explicit units, authoritative-source constraints, and checks on filters and value distributions will broaden the semantic properties that shared definitions can express and maintain.}
+{\emph{未来工作。}我们将把编译扩展到同表多角色连接和多对多桥接表，并探索特征的增量维护。加入显式量纲、权威来源约束，以及对过滤条件和取值分布的检查，将扩展共享定义能够表达与维护的语义性质。}
+
+\section*{\bt{Acknowledgment of AI-Generated Content}{AI 生成内容声明}}
+% ICDE 2027 requires this section (not counted in the 12 pages). The authors must confirm the wording below before submission.
+% Disclosure scope follows https://icde2027.github.io/cf-research-papers (checked 2026-10-23).
+\bi{Evaluated agents and memory operations use \llmmodel{} under the documented configurations. Under the authors' direction, Claude and ChatGPT assisted with coding, data analysis, visualization, and manuscript editing. The authors designed the study, verified all code, results, and text, and take full responsibility for the work.\looseness=-1}
+{受评估的智能体与记忆操作使用 \llmmodel{}，配置见实验说明。在作者指导下，Claude（Anthropic）与 OpenAI Codex 辅助了编码、数据分析、可视化及文稿编辑。作者设计研究、核实全部代码、结果和文本，并对全部工作负责。}

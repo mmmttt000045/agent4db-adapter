@@ -158,7 +158,7 @@ class Llm:
         self.thinking = env.get(f"{prefix}_THINKING")
         self.require = env.get(f"{prefix}_REQUIRE_MODEL")
         # DeepSeek's thinking mode wants reasoning_content passed back within a tool-calling loop (as src/llm.rs does)
-        self.keep_reasoning = "api.deepseek.com" in self.base
+        self.keep_reasoning = provider == "deepseek" or "api.deepseek.com" in self.base
         self.local = threading.local()
 
     def history(self, m):
@@ -952,7 +952,8 @@ Shared memory: agents on this database publish verified feature definitions and 
                         ta = time.time()
                         leak = self.audit(t, k, sql, seeds)
                         audit_s = time.time() - ta
-                        leaking = leak.get("result") == "leak"
+                        # A failed audit is not evidence of safety. All arms must pass.
+                        leaking = leak.get("result") != "clean"
                         improved = (not leaking) and better(val)
                         if improved:
                             best, best_sql, streak = val, sql, 0

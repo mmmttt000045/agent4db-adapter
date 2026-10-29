@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_on": "2026-10-22",
+  "reviewed_on": "2026-10-29",
   "experiments": [
     {
       "id": "2026-09-29-maint-share",
@@ -211,7 +211,7 @@
       "id": "2026-10-10-scenarios-q5",
       "title": "题集 v2、每种方法五轮",
       "status": "current",
-      "scope": "当前合成场景正确率和使用成本依据；沿用协议中的失败、替换与排除规则。",
+      "scope": "合成场景正确率依据；旧使用成本宏随旧稿归档，沿用协议中的失败、替换与排除规则。",
       "evidence": [
         "exp/2026-10-10-scenarios-q5/scen-stats.json",
         "exp/2026-10-10-scenarios-q5/paper-results.json",
@@ -225,7 +225,7 @@
       "outputs": [
         "overleaf/gen/scen-ds.tex",
         "overleaf/gen/numbers.tex",
-        "overleaf/gen/scen-cost.tex"
+        "exp/2026-10-28-official/legacy-manuscript/gen/scen-cost.tex"
       ],
       "raw_data": "noctis `results/scen-20261010/`；本地为汇总、成本与启动脚本。",
       "code_record": "题集 v2 从 `7e9b532` 起；队列、题目、轮次与实际运行记录见 README。"
@@ -347,6 +347,181 @@
       "outputs": [],
       "raw_data": "noctis `/root/agentdb-sql-only-20261022/results/sql-only-20261022/`；独立保存。",
       "code_record": "本目录 README、preflight.json 与运行文件的代码及二进制哈希。"
+    },
+    {
+      "id": "2026-10-27-sql-only",
+      "title": "RelBench SQL-only 与 MAVRA 同批配对重跑",
+      "status": "historical",
+      "scope": "两库四组、60 会话已完成；经第三方网关运行，稳定性待验证，按用户要求仅作内部探索，暂不纳入论文。",
+      "evidence": [
+        "exp/2026-10-27-sql-only/cells-stack.txt",
+        "exp/2026-10-27-sql-only/cells-trial.txt",
+        "exp/2026-10-27-sql-only/run.sh",
+        "exp/2026-10-27-sql-only/preflight.json",
+        "exp/2026-10-27-sql-only/run-provenance.json",
+        "exp/2026-10-27-sql-only/legacy-diagnostic.md",
+        "exp/2026-10-27-sql-only/final-status.json",
+        "exp/2026-10-27-sql-only/verified-results.md",
+        "exp/2026-10-27-sql-only/verified-results.json"
+      ],
+      "analysis": [
+        "exp/2026-10-27-sql-only/gate.py",
+        "exp/2026-10-27-sql-only/audit-legacy.py",
+        "exp/2026-10-27-sql-only/analyze-results.py",
+        "exp/2026-10-27-sql-only/test-analysis.py",
+        "tools/relbench/sql-only-stats.py"
+      ],
+      "outputs": [],
+      "raw_data": "本地 `results/sql-only-20261027/` 与 noctis `/root/agentdb-sql-only-20261027/results/sql-only-20261027/`；保留四组原始会话、源码归档与输入清单。",
+      "code_record": "同一份 10-22 空回复恢复代码；运行时记录输入、代码和二进制哈希，并保存源码归档。"
+    },
+    {
+      "id": "2026-10-28-official",
+      "title": "官方API方法比较与机制图重构",
+      "status": "supporting",
+      "scope": "官方 API 五方法、两库、三任务、三截点的 90 个正式会话已完成；用于当前工作量与质量边界说明，和历史网关结果分开解释，不单独归因于特征组合。",
+      "evidence": [
+        "exp/2026-10-28-official/README.md",
+        "exp/2026-10-28-official/protocol.json"
+      ],
+      "analysis": [
+        "exp/2026-10-28-official/analyze.py",
+        "exp/2026-10-28-official/build-figures.py"
+      ],
+      "outputs": [],
+      "raw_data": "noctis /root/agentdb-official-20261028/results/official-20261028/；本机 results/official-20261028/ 为同步目录。",
+      "code_record": "source-as-started.tar.gz、source-manifest.json、build-provenance.json；后续基础设施修复另记。"
+    },
+    {
+      "id": "2026-10-29-mechanism-pilot",
+      "title": "三幅机制图预实验与受控补充",
+      "status": "current",
+      "scope": "用户确认后合入论文 Fig.5/6/7：A 为八格开发预实验，B 为 72 格固定定义数共享对照，C 为 30 次同版本源快照对照及单列归档开销。A 不支持正式表示或组合增益结论，B 保留强缓存对照和异常格，C 各批次限制明示。",
+      "evidence": [
+        "exp/2026-10-29-mechanism-pilot/protocol.json",
+        "exp/2026-10-29-mechanism-pilot/systems-protocol.json",
+        "exp/2026-10-29-mechanism-pilot/pilot-summary.json",
+        "exp/2026-10-29-mechanism-pilot/system-summary.json",
+        "exp/2026-10-29-mechanism-pilot/seed-binding-preflight.json",
+        "exp/2026-10-29-mechanism-pilot/formal-a-next.json",
+        "exp/2026-10-29-mechanism-pilot/paper-integration/README.md",
+        "exp/2026-10-29-mechanism-pilot/paper-integration/validation.json"
+      ],
+      "analysis": [
+        "exp/2026-10-29-mechanism-pilot/analyze_pilot.py",
+        "exp/2026-10-29-mechanism-pilot/build_previews.py",
+        "exp/2026-10-29-mechanism-pilot/plot_pilot.py",
+        "exp/2026-10-29-mechanism-pilot/analyze_systems.py",
+        "exp/2026-10-29-mechanism-pilot/build_delivery.py",
+        "tools/figures/mechanism.py"
+      ],
+      "outputs": [
+        "output/mechanism-pilot-20261029/figure-a-pilot.pdf",
+        "output/mechanism-pilot-20261029/figure-b-controlled.pdf",
+        "output/mechanism-pilot-20261029/figure-c-combined-preview.pdf",
+        "overleaf/gen/mechanism.tex",
+        "overleaf/figures/memory-access-pilot.pdf",
+        "overleaf/figures/fixed-sharing.pdf",
+        "overleaf/figures/snapshot-control.pdf"
+      ],
+      "raw_data": "本地 results/mechanism-pilot-20261029/ 与 results/mechanism-systems-20261029/；服务器隔离目录及输出位置见 README。",
+      "code_record": "protocol、runtime-manifest 与 systems-manifest；接口故障前代码、修复子批次、冻结源编译一致性检查及费用账本分开保存。"
+    },
+    {
+      "id": "2026-10-29-fig3-restore",
+      "title": "Fig.3 历史累计图恢复与质量图移除",
+      "status": "historical",
+      "scope": "稿件恢复记录；Fig.3 沿用历史五截点数据，官方 API 工作量图另行保留；未新增实验。",
+      "evidence": [
+        "exp/2026-10-29-fig3-restore/restored-fig3.json",
+        "exp/2026-10-29-fig3-restore/protected-files.json",
+        "exp/2026-10-29-fig3-restore/github-push-result.json"
+      ],
+      "analysis": [
+        "exp/2026-10-29-fig3-restore/update-paper.py",
+        "exp/2026-10-29-fig3-restore/prepare.py"
+      ],
+      "outputs": [
+        "overleaf/figures/relbench-cumulative.tex",
+        "overleaf/figures/relbench-cumulative.pdf",
+        "overleaf/figures/relbench-cumulative-zh.pdf"
+      ],
+      "raw_data": "本目录保存恢复来源、保护清单和同步结果；历史实验数据仍归 2026-10-20-relbench，不新增原始运行。",
+      "code_record": "恢复来源 01daa2133a54ee45a8d1b529b5e04167e81ed340；当时提交与核验结果见 github-push-result.json。"
+    },
+    {
+      "id": "2026-10-29-fig45-official",
+      "title": "官方 API 图表的历史重构版本",
+      "status": "historical",
+      "scope": "图表迭代记录；六任务质量图后来退出正文，工作量图继续使用官方 API 数据；保留当时图号与分析。",
+      "evidence": [
+        "exp/2026-10-29-fig45-official/figure-data.json",
+        "exp/2026-10-29-fig45-official/protected-files.json",
+        "exp/2026-10-29-fig45-official/github-push-result.json"
+      ],
+      "analysis": [
+        "exp/2026-10-29-fig45-official/build-figures.py",
+        "exp/2026-10-29-fig45-official/update-paper.py"
+      ],
+      "outputs": [],
+      "raw_data": "使用 2026-10-28 官方 API 已完成会话；逐点数据与来源保存在 figure-data.json，未新增模型调用。",
+      "code_record": "当时生成与同步逻辑见本目录脚本；版本记录见 github-base.json 和 github-push-result.json。"
+    },
+    {
+      "id": "2026-10-29-fig5-review",
+      "title": "复用轨迹来源与归因范围审计",
+      "status": "supporting",
+      "scope": "只读复核完整任务 SQL 与结构化定义的实际使用；工作量结果不单独证明特征组合的增量作用。",
+      "evidence": [
+        "exp/2026-10-29-fig5-review/lineage-audit.json",
+        "exp/2026-10-29-fig5-review/github-push-result.json"
+      ],
+      "analysis": [
+        "exp/2026-10-29-fig5-review/audit_lineage.py"
+      ],
+      "outputs": [
+        "overleaf/sections/evaluation/sharing.tex"
+      ],
+      "raw_data": "审阅 2026-10-28 官方 API 的 MAVRA 原始会话；本目录保存逐会话来源审计及历史修订草稿，不新增实验。",
+      "code_record": "审计逻辑见 audit_lineage.py；冻结时源码、候选修订和后续同步按本目录 README 分开解释。"
+    },
+    {
+      "id": "2026-10-29-fig5-table3-restore",
+      "title": "Fig.5 与 Table III 中间恢复记录",
+      "status": "historical",
+      "scope": "稿件中间版本：恢复成本散点图与 Table III；后续 Table III 更正在 2026-10-29-table4-fig1 单列。",
+      "evidence": [
+        "exp/2026-10-29-fig5-table3-restore/github-base.json",
+        "exp/2026-10-29-fig5-table3-restore/github-push-result.json",
+        "exp/2026-10-29-fig5-table3-restore/sync-plan.json"
+      ],
+      "analysis": [
+        "exp/2026-10-29-fig5-table3-restore/prepare.py"
+      ],
+      "outputs": [],
+      "raw_data": "本目录为历史源码恢复和推送记录，没有新增实验数据；原始实验归相应既有批次。",
+      "code_record": "论文仓库提交 514d6c474cbfd8339c7392acf809d6a5e93e0f25；恢复来源和文件清单见 github-push-result.json。"
+    },
+    {
+      "id": "2026-10-29-table4-fig1",
+      "title": "历史 Table IV 恢复与 Fig.1 位置更正",
+      "status": "historical",
+      "scope": "稿件更正记录：恢复历史 Table IV 及旧数值、撤销 Table III 误回滚，并调整 Fig.1 声明位置；未新增实验。",
+      "evidence": [
+        "exp/2026-10-29-table4-fig1/github-base.json",
+        "exp/2026-10-29-table4-fig1/github-push-result.json",
+        "exp/2026-10-29-table4-fig1/sync-plan.json"
+      ],
+      "analysis": [
+        "exp/2026-10-29-table4-fig1/prepare.py"
+      ],
+      "outputs": [
+        "overleaf/tables/relbench.tex",
+        "overleaf/gen/relbench.tex",
+        "overleaf/gen/relbench-table.tex"
+      ],
+      "raw_data": "历史五截点网关数据与官方 API 数据分开保留；本目录仅记录源码恢复与同步，没有新运行。",
+      "code_record": "论文仓库提交 b2755c23953b646e27ccd5fe9a1f9cf1798cca92；恢复来源、编译与核验见 github-push-result.json。"
     }
   ]
 }

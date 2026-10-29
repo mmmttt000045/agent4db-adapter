@@ -1,0 +1,249 @@
+[
+  {
+    "recorded_utc": "2026-10-28T10:57:49.038241+00:00",
+    "changes": [
+      "Budget increased from default CNY 10 to user-authorized CNY 50; all prior charges remain included.",
+      "Added postprocessing and offline integrity checks. No change to model, candidate selection, task budgets or comparison arms.",
+      "Corrected development isolation description: seed loader reads test file into host process, but no development test score is computed or used and labels are never passed to the agent."
+    ],
+    "files": {
+      "analysis.md": "ec1c2abe3fe0e5d4df62c312923f621c79b1e2e8bbe73e33244dac8a2dd7e5b4",
+      "analyze.py": "f99c70253a4dee5cc4d13176f857d14d336b4f0dc63fc7c66e17609f55e44d17",
+      "bootstrap-remote.py": "0ed8bd3af8beb7ce7a60d4415b744415070ad761da09fb3f238507c2c2e6243a",
+      "budget-proxy.py": "8de054e202498ba30c0863b6eb94f0070cc065e1780bc5b79480499c9e954b15",
+      "build-figures.py": "14e9b244404bf3a641c5baf0fe2f0bed8a2fb03572cec919e7ad82f73c577e13",
+      "coordinator.py": "e626595f667a439fe6916ceca8bac1bc011fd1d0358f2367f5a477f7c77ebcd0",
+      "preflight.py": "22096c9a507266d248fea695bcf2381e83474c4719e4a78a5b81368e2e403c71",
+      "protocol.json": "a2069e90f65dc2c390e1eccad82beb30e4b413ad247d8c603aa2f91d43a1a4f3",
+      "README.md": "039afc1f5489bf0b47b77af10bc315e7e9220ad2b7298dac1e00f0e527359a91",
+      "report-loop.py": "a72baad24b7e95875ee8faba707ca3403334d0b86c7877f2dabaf5edc814f573",
+      "study-cell.py": "61d93023866efba6ebacadbdd685fe03dedf84fb50cebd3a81e29b4a4ed50f17",
+      "test-analysis.py": "947adea589913d0c2ece4b98d89c6859ba66d78aaa580c7c5d695b1fcdbb6fb9",
+      "test-budget.py": "664b9df9945bf5863dc7e842703d7926a8adac21dfc49f4d6817f06255461970"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T11:12:51.405864+00:00",
+    "changes": [
+      "Added mechanism counts for program versus structured-feature reuse after the first development session; no experimental settings changed.",
+      "Started server reporting loop, completed G-Memory dependency-only preflight, and compiled/rendered intermediate manuscript cleanup."
+    ],
+    "files": {
+      "analyze.py": "7672aa42aac5a623833c631dc79fb9a7ffb4b00beed193f2672aa8fd16cf90fa",
+      "build-figures.py": "91da97547336748491afc86b3ac4973ca9eea731b8b18f83ad82b844d2f8dc6d",
+      "report-loop.py": "a72baad24b7e95875ee8faba707ca3403334d0b86c7877f2dabaf5edc814f573",
+      "test-analysis.py": "947adea589913d0c2ece4b98d89c6859ba66d78aaa580c7c5d695b1fcdbb6fb9",
+      "README.md": "e080d5fc3255a47c0b6b5977b28fbb519e9b29ef66e63d6fc81dc47aadc6b0a1"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T11:47:03.457415+00:00",
+    "changes": [
+      "Scheduling-only amendment: overlap the fixed no-memory rel-stack control with the second development candidate to save wall time. At most two cells remain active. Development selection does not read control/test outcomes; all algorithm parameters and budgets remain unchanged.",
+      "Coordinator can adopt a verified existing worker after supervisor restart without rerunning or overwriting paid cells."
+    ],
+    "files": {
+      "coordinator.py": "52d3616dd64c6b952451381c977d3dd5591859aa059c079e5b425c326340cbd0",
+      "protocol.json": "cc45d87779505b173295f40572b2bf9fa5f9080ee30f90d67f3fb34c1ac5eb60",
+      "test-coordinator.py": "66e778fdebd3e91ee92bf6352d49edd0cd3fc2b0410b8c58a6308a2260927e12"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T12:48:02.668877+00:00",
+    "changes": [
+      "Scheduling-only amendment: replace method-pair barriers with a fixed FIFO queue of complete method/database cells, with two worker slots. Parameters and task counts unchanged.",
+      "Preserve already frozen selection.json byte for byte on supervisor restarts."
+    ],
+    "files": {
+      "coordinator.py": "d9f54d6cfc965e18a3aeb6c5ecb9f2ed23fd31c80454728268ddbf91aeb25613",
+      "protocol.json": "aa1ff87bf837f52645f76c3ef87da7844f71f9b6af3b7c3fe8d0a625b16b7421",
+      "test-coordinator.py": "a1154a6bc0881483546655a45950b13e89ba04eba31dba58cf16c7ec7e44b66e"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T12:51:45.452902+00:00",
+    "changes": [
+      "Postprocessing-only fix: read server JSON explicitly as UTF-8 on Windows; no experimental execution changes. Six analysis integrity tests passed, including non-ASCII logs."
+    ],
+    "files": {
+      "analyze.py": "8080a4ee6643eb060396031a05358fcc987cbf5a3d6a15110b034326ec9c70d8",
+      "test-analysis.py": "aa9e1f9eb60997f7cab42ae1b26ed999ee282b0ba9d0c770c593528fe30389bc",
+      "build-figures.py": "0e9be4c80312006f49c346f614c23a1b392a8280714a376bbd210a700966365d"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T13:19:02.980276+00:00",
+    "changes": [
+      "Resource scheduling only: increase concurrent complete cells from 2 to 3 after observing 48 CPUs, load 2.69/2.02/2.03, available RAM 63.7 GiB and free disk 72.5 GiB. Keep each cell at 20 GiB, each LightGBM fit at 8 threads, and all task, validation and API budgets unchanged. Preserve the already frozen selection.",
+      "Observed wall times are not isolated speed measurements; comparison emphasizes quality and tokens."
+    ],
+    "files": {
+      "coordinator.py": "1340abdacd87291fecf6fde7f319b7e0b6bf6b6f1a4b4a7bdaf81d4d97cb2f88",
+      "protocol.json": "2569d9846f780148e35b3c2d6b96a340a801d92cddae083ba03b77650a5be5bf",
+      "test-coordinator.py": "422fb641b2bfee894d44de83ce2c5b3cde01de82b9230c1de5da75fbcd35aa53"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T14:18:53.883109+00:00",
+    "changes": [
+      "Correct an implementation/metadata discrepancy: actual feature-statement timeout has been 600 seconds for every cell, not intended 180, due to an import-time bound Python default. Dynamic tool HTTP timeout is 180. Preserve all existing runtime limits; add an assertion and effective-runtime fields for future cells. No method, prompt, quality threshold or result changed."
+    ],
+    "files": {
+      "study-cell.py": "3e54060b6db6eacc7a4d7b498564643dd7c00de91bf418c97e4239449811918f",
+      "protocol.json": "e6bd57739e7b3837f3b07649ca59618b2c2201c63f32342b90c557eaad1f6c46"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T14:48:44.420963+00:00",
+    "changes": [
+      "Postprocessing only: retain reasons for entity-reference quality fallbacks; show clean and successfully evaluated session counts in the primary table. Label memory tokens as including retrieval and updates, rather than learning alone. No runtime or result changed."
+    ],
+    "files": {
+      "analyze.py": "f688883ba30429432a4372742c43c4722bc8d0a6df88d990b78fb570e14c53b1",
+      "test-analysis.py": "23c74ef7d9590d319f63c05bac8b018f55e6c8c96beeb8c9442bd4aa8b5737b8",
+      "build-figures.py": "adba29d94fa70b07ea93beba109eaa20c94e294f0d0291f6a2df12b17c7539a1"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T15:48:34.986685+00:00",
+    "changes": [
+      "Postprocessing only: report both all-cutoff and predeclared reuse-cutoff quality, keeping the all-cutoff headline and all costs. This makes reuse-token comparisons interpretable without discarding first-cutoff failures. Seven analysis integrity tests pass. No task selection or runtime change."
+    ],
+    "files": {
+      "analyze.py": "e9fe9fdf7095405d04ed0880c7f43bcf5a42f4402e98e10f09594d4d5fa01f75",
+      "test-analysis.py": "633f68b8c1d8b461c8e85301876e693b6bae55cb1f1bebfecba1b97433e3ff81",
+      "build-figures.py": "4b2aeed6c4542eca28bcf9a66617a761cc1b628a38f1e2fc66e486b26b217214"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T16:52:42.529674+00:00",
+    "changes": [
+      "Plot layout only: size both new figures for the existing 86 mm single-column manuscript floats, with vertically stacked database panels and wrapped legends/notes. Complete five-method data are still required; no interim or synthetic data plotted. Final render and visual review remain required."
+    ],
+    "files": {
+      "build-figures.py": "65c4d164f4a7a9461da9aa6f5f9ff1634b29ccbce63d6dcd4093500f303e27b0"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T17:16:05.263949+00:00",
+    "changes": [
+      "Resource scheduling only: increase concurrent complete cells from 3 to 4 after observing 48 CPUs, load 2.71/3.36/3.78, available RAM 60.3 GiB and free disk 71.4 GiB. Preserve fixed FIFO ordering, each 20 GiB cell, sequential sessions, 8-thread LightGBM and all model/validation/SQL settings. No tasks repeated, selected by results or omitted.",
+      "At 01:14 local, MAVRA rel-stack was scoring its final frozen query; its worker is adopted without interruption. Additional capacity lets the next queued published baseline begin before that scoring ends. Observed wall times remain unsuitable as isolated speedup measurements."
+    ],
+    "files": {
+      "protocol.json": "e16b0cc646bc692957c16fe2e32bf6debfbf9824f2b16afae74931944492d900"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T17:19:47.570122+00:00",
+    "changes": [
+      "Presentation only: name each task and metric directly in the primary table, show direction arrows, bold every method tied for the best mean, and mark failures of the predeclared quality margins for every arm. Add hatching to mechanism categories for monochrome reading. No data, comparison support or execution changes. Final complete-data rendering remains pending."
+    ],
+    "files": {
+      "build-figures.py": "d0bc41160fff3d1970c447427b6768dca97eb03d7d23ccca1e1273a5165ed894"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T17:52:18.615840+00:00",
+    "changes": [
+      "Budget accounting only: verified official CNY peak rates of 0.04/2/8 per million cached-input/uncached-input/output tokens, twice current offpeak prices. Replace the earlier USD-times-10 estimate of 0.06/3/12 without changing the CNY 50 authorization or deadline. Preserve original usage ledger and unknown charges; archive a migration audit. Eight offline accounting tests pass.",
+      "Deployment requires a verified idle relay with no pending reservations or active HTTP connections; no paid request may be interrupted. Model configuration and task queue are unchanged."
+    ],
+    "files": {
+      "budget-proxy.py": "f250ed2ae89370eb6e651ca857083ee58cfa7dc2dacb4ecf03a0a23b8a461a24",
+      "test-budget.py": "8ed90391610aa8887bb86880c76d18d98440377953bff0cf8f85bcaa21d94201",
+      "restart-proxy-when-idle.py": "99b14923572ede31bc42c4db1a5cc308a70905157c716f1640b4e8483e5cf087",
+      "pricing-verification.json": "2c2568570f1bc25030a1cfec3ce52bb966776995ce69ee8d3377a4d107459522"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T18:04:06.702445+00:00",
+    "changes": [
+      "Manuscript preparation only: staged replacement prose, captions, and separately named official-API numeric macros from complete no-memory/MAVRA pairs. Removed old five-cutoff claims from the staged text and explicitly retained the all-cutoff quality regression and absence of explicit feature composition. Active paper is unchanged until full figures/tables are available and visually checked.",
+      "Use multiline bilingual table headers and track all pre-integration source hashes in staging-manifest.json."
+    ],
+    "files": {
+      "build-figures.py": "f1535c46ef5fdf2bd54ae4c8bea1c841e0f90bde3f1a3234ad26df66ccaf7e1e",
+      "staging-manifest.json": "a496949feb92dd2155eff866296a6ed5850eaedf2ec9d3384532035c49eb06b3"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T18:30:24.292961+00:00",
+    "changes": [
+      "Presentation and compilation only: added an opt-in, prominently labeled incomplete-comparison layout preview with distinct filenames; normal publishing still requires all five complete methods on both databases. No experiment execution or data selection changed.",
+      "Fixed twelve invalid Chinese TeX escape sequences in staged prose, confirmed 14-page English and 22-page bilingual previews compile, and visually inspected actual-size figures and tables. Active manuscript remains unchanged until final data integration."
+    ],
+    "files": {
+      "build-figures.py": "337db80affd3702caafffd4c12449287e41c36f1c088952b051d03938fa5e096",
+      "staging-manifest.json": "dff2386e96da0e76af7fcf77dcda131a0e606b11e852de36bd65bf9e01289a19",
+      "layout-preview-audit.json": "26e047b8979ff9480dbdba45afc944eb027a3badfd2a472ad39f9a3ded3d4281",
+      "manuscript/sections/abstract.tex": "77a92224d17b7e194b30659ae70556c9d8583c2cd3b8e5b79568b0ea719c6d3a",
+      "manuscript/sections/evaluation/sharing.tex": "0471d1bbc5a2f980e162fcf4496c395174c70f3565384fba7bda8f7420708ae5"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T18:53:19.354202+00:00",
+    "changes": [
+      "Offline delivery and expense reconciliation only: recompute charges from immutable provider usage at verified off-peak prices; require a settled consistent ledger and a closing balance before finalization. Five expense integrity tests pass.",
+      "Prepared and visually reviewed a six-page Chinese report preview. Replaced direct Agg PNG output with 300 dpi rendering of the embedded-font PDF to fix omitted Chinese annotations. No running experiment or method changed."
+    ],
+    "files": {
+      "audit-expenses.py": "f609473237b99d4f0ccfe8104375e29a65076b8c5bb85c2d2fc1035a5de712ae",
+      "test-expenses.py": "27defba0204ab264910fc03b513292db6807c9d214d8e7403918a6dba0cd0dc8",
+      "build-delivery-report.py": "f808c17eca2db1f5282abce6f145050db41d23319b041cac952ff08ec5eab434",
+      "build-figures.py": "e84017a52cdba25ff1aa8698f6591cc97c35efbf406f638989780da3da0c49dd"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T19:19:27.731500+00:00",
+    "changes": [
+      "Offline evidence and delivery checks only: verify frozen selection, identical common settings, task/cutoff support, equal entity references, deferred test evaluation, and exact provider/session token reconciliation at final completion.",
+      "Prepared guarded manuscript integration with original/staged source hash checks and a backup before any replacement. It has not been run.",
+      "No additional paid independent repeat is scheduled because the first complete block is still running with about one hour left; the decision uses time feasibility, not test performance."
+    ],
+    "files": {
+      "audit-evidence.py": "7b5242db893e8f9de9900f41f43256158be7725c9e969a0e004d7ecf576b0654",
+      "integrate-manuscript.py": "44a71b082e64cb48c9db8154b1986b7c5c963b829f381aa14ca1a09ed402017c"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T19:54:14.930940+00:00",
+    "changes": [
+      "All 90 formal sessions and memory operations have finished. Provider token ledger exactly reconciles with formal sessions, both development candidates and preflight. With no outstanding requests, stopped only the study coordinator and cost relay and created STOP; kept the last worker performing frozen SQL scoring. No model calls are allowed after this phase closure. This prevents an API deadline from discarding unpaid final scoring of already frozen solutions.",
+      "Disclosed the one-time 0.669M-token development cost separately from formal sequence costs, including its effect when fully charged to the two-database MAVRA total. No algorithm or generated solution changed."
+    ],
+    "files": {
+      "close-study.py": "db85b04c4ffc1bf963c3848ada1dcd63b8ae561c2a58c512a29cefcbb38920a5",
+      "staging-manifest.json": "ef2fab39a5037094ddcf1efb88d72b4d491959b20d028574e0cf80211e10461d",
+      "manuscript/sections/evaluation/relbench.tex": "b84a387d2c7d5f2a8a773eae0ce089e59010da5885101b12e410c9eef6fa5b43",
+      "manuscript/sections/abstract.tex": "2974c6b214b7d4675cf983d4a0a107e6c3ffa7d0ffc60a78aea76a3791480e23",
+      "build-delivery-report.py": "caccf86f16e824b6643cbd8cbc40bfce65f03fb5242776225deab0ad1bec56c4"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T19:59:22.514318+00:00",
+    "changes": [
+      "Archived five unreferenced legacy example-retrieval figure/table files outside the active manuscript, preserving exact hashes and original evidence. Retained palette entries used by historical plotting tools without old baseline text in the staged preamble. Active source hash checks still pass."
+    ],
+    "files": {
+      "legacy-manuscript/archive-manifest.json": "0338016b0b99e4715c0e466d1469bb2579aa5736fc12acaf13384ce5d201895d",
+      "manuscript/latex/preamble.tex": "c64856bd94aa9771823203f25807cf492eb241bf02db42791ca28cb3b3ffa7df",
+      "staging-manifest.json": "5caab2f5837bdb0d048ab5d67f40c6fa7a6c5311f7f209fe3e798e58a7d644f2"
+    }
+  },
+  {
+    "recorded_utc": "2026-10-28T20:15:44.779510+00:00",
+    "changes": [
+      "Completed all frozen formal evaluations; reconciled all 1669 responses and 90 formal sessions. Closed model calls and saved closing balance.",
+      "Integrated complete published-method results, archived unused ad hoc baseline figures with original evidence retained, compiled both manuscripts and reviewed final layouts. No model or test-driven configuration changes.",
+      "Delivered complete study with quality regressions, missing independent repetitions and mechanism limitations explicit."
+    ],
+    "files": {
+      "close-study.py": "cd8d69d5d773f27495be9af4ad00007993f1bc4433cb4b6cdc7e60a3fc87c4ff",
+      "build-delivery-report.py": "caccf86f16e824b6643cbd8cbc40bfce65f03fb5242776225deab0ad1bec56c4",
+      "build-figures.py": "e84017a52cdba25ff1aa8698f6591cc97c35efbf406f638989780da3da0c49dd",
+      "delivery-verification.json": "bc0b283a25d83f7bca33bc7feddf7be20a39eb4cf1ddef5e209e53339542e9c3",
+      "integration-audit.json": "ee26029866e29f0579d420c1bbe630259626b5c501598190a7e188fd69f29082"
+    }
+  }
+]

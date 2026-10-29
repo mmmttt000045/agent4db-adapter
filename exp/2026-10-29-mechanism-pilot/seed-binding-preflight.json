@@ -1,0 +1,61 @@
+{
+  "role": "new formal-protocol preparation; not a replacement for original pilot outcomes",
+  "llm_calls": 0,
+  "binding": "same identifier-only wrapper for program and compiled definitions",
+  "targets": [
+    {
+      "target": {
+        "name": "cross-task",
+        "task": "user-engagement",
+        "cutoff": 1
+      },
+      "source_seed_key": "userid",
+      "target_seed_key": "owneruserid",
+      "audits": {
+        "program": {
+          "result": "clean",
+          "seed_time": "2019-07-04 00:00:00",
+          "seeds": 760,
+          "cells_differing": 0,
+          "columns_differing": [],
+          "all_columns_differing": []
+        },
+        "compiled": {
+          "result": "clean",
+          "seed_time": "2019-07-04 00:00:00",
+          "seeds": 760,
+          "cells_differing": 0,
+          "columns_differing": [],
+          "all_columns_differing": []
+        }
+      }
+    },
+    {
+      "target": {
+        "name": "same-task-later",
+        "task": "user-badge",
+        "cutoff": 2
+      },
+      "source_seed_key": "userid",
+      "target_seed_key": "userid",
+      "audits": {
+        "program": {
+          "result": "clean",
+          "seed_time": "2019-10-03 00:00:00",
+          "seeds": 751,
+          "cells_differing": 0,
+          "columns_differing": [],
+          "all_columns_differing": []
+        },
+        "compiled": {
+          "result": "clean",
+          "seed_time": "2019-10-03 00:00:00",
+          "seeds": 751,
+          "cells_differing": 0,
+          "columns_differing": [],
+          "all_columns_differing": []
+        }
+      }
+    }
+  ]
+}

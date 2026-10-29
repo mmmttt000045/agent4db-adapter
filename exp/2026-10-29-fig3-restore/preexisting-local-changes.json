@@ -1,0 +1,17 @@
+[
+  {
+    "path": "sections/01-introduction.tex",
+    "local_blob_lf": "4c94d912405f9df100bf4f8ab66582dce499111e",
+    "published_blob": "e68d067468a73a0e8b78701fe39ab1429041cb9b"
+  },
+  {
+    "path": "sections/abstract.tex",
+    "local_blob_lf": "f7771a2b150cc25eec1282156cc42ede16020f48",
+    "published_blob": "34003c54bb8be0da1c4db69f0c076dc949b16d7b"
+  },
+  {
+    "path": "sections/10-conclusion.tex",
+    "local_blob_lf": "aa82dfcf70b6d9ee4b4639dcbe634ec12695845c",
+    "published_blob": "209723ba69bbd144873d294db35a455f5d25e6d0"
+  }
+]

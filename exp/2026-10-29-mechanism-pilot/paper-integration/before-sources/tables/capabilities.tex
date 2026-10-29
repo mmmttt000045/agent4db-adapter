@@ -1,0 +1,30 @@
+\begin{table*}[t]
+\caption{\bt{Comparison of reuse and validity capabilities.}{复用与有效性能力对比。}}
+\label{tab:capabilities}
+\footnotesize
+\newcommand{\capyes}{\ding{51}}
+\newcommand{\capno}{\ding{55}}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{@{}P{0.18\linewidth}P{0.20\linewidth}*{5}{>{\centering\arraybackslash}X}@{}}
+\toprule
+\multicolumn{3}{c}{\textbf{\bt{Reuse}{复用}}} & \multicolumn{4}{c}{\textbf{\bt{Validity}{有效性}}}\\
+\cmidrule(lr){1-3}\cmidrule(lr){4-7}
+\textbf{\bh{Design}{设计}} & \textbf{\bh{Reusable object}{复用对象}} & \textbf{\bh{Knowledge\\extraction}{知识提取}} & \textbf{\bh{Derived\\data checks}{派生数据检查}} & \textbf{\bh{Shared\\check results}{共享检查结果}} & \textbf{\bh{Snapshot\\alignment}{快照对齐}} & \textbf{\bh{Data-update\\handling}{数据更新处理}}\\
+\midrule
+AgentSM~\cite{biswal2026agentsm} & \bhl{Trajectories; tools}{轨迹；工具} & \capyes & \capno & \capno & \capno & \capno\\
+G-Memory~\cite{zhang2025gmemory} & \bhl{Trajectories; insights}{轨迹；洞见} & \capyes & \capno & \capno & \capno & \capno\\
+DataLab~\cite{weng2025datalab} & \bhl{Business logic}{业务逻辑} & \capyes & \capno & \capno & \capno & \capno\\
+dbt Semantic Layer (MetricFlow)~\cite{dbt2026metricflow,dbt2026slcache} & \bhl{Metrics; cached results}{指标；缓存结果} & \capno & \capno & \capno & \capno & \capyes$^{a}$\\
+Databricks metric views~\cite{databricks2026metricviews,databricks2026materialization} & \bhl{Metrics; materialized data}{指标；物化数据} & \capno & \capno & \capno & \capyes$^{b}$ & \capyes$^{b}$\\
+\bhl{Semantic cache~\cite{dar1996semantic}\\(Dar et al., 1996)}{语义缓存} & \bhl{Data regions}{数据区域} & \capno & \capno & \capno & \capno & \capno\\
+TxCache~\cite{ports2010txcache} & \bhl{Computation results}{计算结果} & \capno & \capno & \capno & \capyes & \capyes\\
+\midrule
+\rowcolor{black!6}
+\textbf{\system} & \textbf{\bhl{Metric definitions}{指标定义}} & \capyes & \capyes & \capyes & \capyes$^{c}$ & \capyes\\
+\bottomrule
+\end{tabularx}
+\par\smallskip
+\bt{\capyes: supported; \capno: not supported by the cited design for the listed object. Data checks concern grain/join predicates.}{\capyes：支持；\capno：所引设计对所列对象不支持。数据检查指粒度／连接谓词。}
+\bt{$^{a}$With declarative caching. $^{b}$With unaggregated materialization and scheduled refresh. $^{c}$With snapshot checking and write tracking (Section~\ref{sec:maintenance}).}{$^{a}$启用声明式缓存。$^{b}$启用非聚合物化与定时刷新。$^{c}$启用快照检查与写入跟踪（第~\ref{sec:maintenance} 节）。}
+\end{table*}

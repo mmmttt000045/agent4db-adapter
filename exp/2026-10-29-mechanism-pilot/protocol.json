@@ -1,0 +1,43 @@
+{
+  "study": "mechanism-pilot-20261029",
+  "phase": "development pilot; not confirmatory or manuscript evidence",
+  "authorization": "2026-10-29 user requested implementation and one small pilot for Figure A, archive-based previews for B/C, then formal experiments based on findings.",
+  "budget_cny": 10.0,
+  "budget_basis": "Conservative assistant-imposed ceiling for this explicitly requested small pilot, not reuse of any previous study authorization.",
+  "model": "deepseek-flash",
+  "reasoning_effort": "low",
+  "thinking": "enabled",
+  "max_output_tokens": 16384,
+  "max_model_calls": 12,
+  "max_validations": 3,
+  "patience": 2,
+  "training_sample": 10000,
+  "validation_sample": 2000,
+  "audit_seeds": 5000,
+  "publication_seeds": 2000,
+  "feature_sql_timeout_seconds": 180,
+  "tool_output_chars": 100000,
+  "dataset": "rel-stack",
+  "source": {
+    "task": "user-badge",
+    "cutoff": 1,
+    "file": "results/official-20261028/mavra-rel-stack-r1/sessions/user_badge-k1.json",
+    "selection": "Fixed before new pilot outcomes. Use only this source task's audited final SQL; no later-cutoff definitions, target solutions, test scores or target traces are loaded. Re-extract once and freeze for all arms.",
+    "historical_cost": "Source exploration tokens are archived and reported separately from new API spending; source allocation per memory arm is divided over its two targets. New extraction is allocated only to definition/full arms. No-memory has no source setup charge."
+  },
+  "arms": ["none", "program", "definition", "full"],
+  "targets": [
+    {"name": "cross-task", "task": "user-engagement", "cutoff": 1},
+    {"name": "same-task-later", "task": "user-badge", "cutoff": 2}
+  ],
+  "ordering_seed": 20261029,
+  "repetitions": 1,
+  "concurrency": 1,
+  "goal": "No method-dependent incumbent target. Identical fixed planner/validation/patience budgets and common prompt; all memory tools optional.",
+  "memory": "Frozen source, no target writeback; program memory searchable across tasks sharing the entity. Definition compiler is the archived Rust implementation, accessed through a live source-only middleware. Target metadata caches start empty in separate cloned databases. Source compilation is not a certificate for target data; common target audit remains mandatory.",
+  "quality": "Pilot validation only, no test-label access or test scoring. A qualified solution must pass the target audit and reach the paired no-memory validation AUC minus 0.01. Report score, validity, coverage, cost and adoption separately. This pilot cannot establish test non-inferiority.",
+  "failure": "Retain failures, leaks, missing solutions and all incurred costs. Do not replace unsuccessful source or target with a better-looking run. Stop on unavailable source memory; preserve diagnostic evidence. No automatic paid reruns.",
+  "source_gate": "Source SQL must pass a fresh temporal audit. Publication must admit at least one definition. Record frozen compiled SQL audits on both target populations before agents; do not filter definitions using target feedback.",
+  "figure_b_c": "Read-only archival previews, with measurement batch and single-run limits explicit. Do not imply fixed-definition overlap sweeps or writer-rate scans already exist.",
+  "formal_gate": "Freeze a new formal protocol only after the pilot, addressing provenance, source admission, temporal audit, complete paired support and confounds. Preserve all pilot outcomes."
+}

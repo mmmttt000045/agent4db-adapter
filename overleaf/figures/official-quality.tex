@@ -1,0 +1,11 @@
+\begin{figure*}[t]
+\centering
+\ifbilingual
+\includegraphics[width=\textwidth]{figures/official-quality-zh}
+\else
+\includegraphics[width=\textwidth]{figures/official-quality}
+\fi
+\caption{\bt{Test quality and valid solutions in the official-API comparison. Each point uses all three cutoffs; unsuccessful sessions retain the entity-reference score. Positive values favor the method over no memory: $100(\mathrm{AUC}-\mathrm{AUC}_0)$ in percentage points, or $100(\mathrm{MAE}_0-\mathrm{MAE})/\mathrm{MAE}_0$ in percent. Shading marks the predeclared quality margin; panels have separate scales. Valid counts solutions passing the temporal audit and final evaluation, out of three attempts per task. The 90 sessions are one sequence per method and database, not independent repetitions.}{官方API对照的测试质量与有效方案。每点使用全部三个截点；失败会话保留实体表参照分数。正值表示优于无记忆：AUC为$100(\mathrm{AUC}-\mathrm{AUC}_0)$个百分点，MAE为$100(\mathrm{MAE}_0-\mathrm{MAE})/\mathrm{MAE}_0$百分比。阴影标出预设质量门槛；各子图使用独立刻度。有效方案数指每任务三次尝试中通过时间审计及最终评估的数量。90个会话对应每种方法、每个数据库一条序列，并非独立重复。}}
+\label{fig:official-quality}
+\Description{Six dot plots compare all five methods on the six RelBench tasks. Each panel shows quality relative to no memory, a zero line, the quality margin, and the valid-solution count. Unfavorable outcomes and fallback scores remain visible.}
+\end{figure*}

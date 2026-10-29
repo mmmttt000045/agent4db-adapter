@@ -1,22 +1,30 @@
 \begin{table*}[t]
-\caption{\bt{Reuse objects and validity mechanisms across designs (NR: not reported for the reuse object).}{不同设计的复用对象与有效性机制（NR：未报告针对该复用对象的机制）。}}
+\caption{\bt{Comparison of reuse and validity capabilities.}{复用与有效性能力对比。}}
 \label{tab:capabilities}
 \footnotesize
+\newcommand{\capyes}{\ding{51}}
+\newcommand{\capno}{\ding{55}}
 \setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\linewidth}{@{}P{0.15\linewidth}P{0.22\linewidth}LLL@{}}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{@{}P{0.18\linewidth}P{0.20\linewidth}*{5}{>{\centering\arraybackslash}X}@{}}
 \toprule
-\bt{Design}{设计} & \bt{Reusable object / source}{复用对象／来源} & \bt{Derived conditions / shared checks}{派生条件／共享检查} & \bt{Binding to execution snapshot}{与执行快照的绑定} & \bt{Maintenance / recovery}{维护／恢复}\\
+\multicolumn{3}{c}{\textbf{\bt{Reuse}{复用}}} & \multicolumn{4}{c}{\textbf{\bt{Validity}{有效性}}}\\
+\cmidrule(lr){1-3}\cmidrule(lr){4-7}
+\textbf{\bh{Design}{设计}} & \textbf{\bh{Reusable object}{复用对象}} & \textbf{\bh{Knowledge\\extraction}{知识提取}} & \textbf{\bh{Derived\\data checks}{派生数据检查}} & \textbf{\bh{Shared\\check results}{共享检查结果}} & \textbf{\bh{Snapshot\\alignment}{快照对齐}} & \textbf{\bh{Data-update\\handling}{数据更新处理}}\\
 \midrule
-AgentSM~\cite{biswal2026agentsm} & \bt{Structured trajectories; composite tools}{结构化轨迹；复合工具} & NR & NR & \bt{NR for stored trajectories}{存储轨迹：NR}\\
-G-Memory~\cite{zhang2025gmemory} & \bt{Trajectories and insights shared within a multi-agent system}{多智能体系统内共享轨迹与洞见} & NR & NR & \bt{Memory evolves with task feedback}{记忆随任务反馈演化}\\
-DataLab~\cite{weng2025datalab} & \bt{Business logic from SQL/Python history; knowledge retrieval and DSL}{SQL/Python 历史中的业务逻辑；知识检索与 DSL} & \bt{NR for extracted logic}{提取的逻辑：NR} & NR & \bt{Notebook dependencies updated after edits}{编辑后更新笔记本依赖}\\
-\bt{MetricFlow / metric views~\cite{dbt2026metricflow,databricks2026metricviews}}{MetricFlow／指标视图~\cite{dbt2026metricflow,databricks2026metricviews}} & \bt{Centrally declared metrics; shared SQL generation}{集中声明指标；共享 SQL 生成} & \bt{Declared joins; metric-view multiplicity may be assumed$^{a}$}{声明连接；指标视图可假设连接基数$^{a}$} & \bt{NR for data-condition checks}{数据条件检查：NR} & \bt{Definition edits shared by consumers}{定义修改供消费者共享}\\
-\bt{Semantic caching~\cite{dar1996semantic}}{语义缓存~\cite{dar1996semantic}} & \bt{Data regions reused across different queries}{可供不同查询复用的数据区域} & \bt{Semantic query decomposition}{语义查询分解} & NR & \bt{Updates outside the cited study}{所引研究不评估更新}\\
-TxCache~\cite{ports2010txcache} & \bt{Cached application computations}{缓存的应用计算结果} & \bt{Dependency tracking and validity intervals}{依赖跟踪与有效区间} & \bt{Cached and database reads see one snapshot}{缓存与数据库读取处于同一快照} & \bt{Dependency-driven invalidation}{依赖驱动的失效}\\
+AgentSM~\cite{biswal2026agentsm} & \bhl{Trajectories; tools}{轨迹；工具} & \capyes & \capno & \capno & \capno & \capno\\
+G-Memory~\cite{zhang2025gmemory} & \bhl{Trajectories; insights}{轨迹；洞见} & \capyes & \capno & \capno & \capno & \capno\\
+DataLab~\cite{weng2025datalab} & \bhl{Business logic}{业务逻辑} & \capyes & \capno & \capno & \capno & \capno\\
+dbt Semantic Layer (MetricFlow)~\cite{dbt2026metricflow,dbt2026slcache} & \bhl{Metrics; cached results}{指标；缓存结果} & \capno & \capno & \capno & \capno & \capyes$^{a}$\\
+Databricks metric views~\cite{databricks2026metricviews,databricks2026materialization} & \bhl{Metrics; materialized data}{指标；物化数据} & \capno & \capno & \capno & \capyes$^{b}$ & \capyes$^{b}$\\
+\bhl{Semantic cache~\cite{dar1996semantic}\\(Dar et al., 1996)}{语义缓存} & \bhl{Data regions}{数据区域} & \capno & \capno & \capno & \capno & \capno\\
+TxCache~\cite{ports2010txcache} & \bhl{Computation results}{计算结果} & \capno & \capno & \capno & \capyes & \capyes\\
 \midrule
-\system\ & \bt{Revisioned metric definitions from verified sessions}{核实会话产生的版本化指标定义} & \bt{Derived from grain/joins; shared by dependency version}{从粒度／连接派生；按依赖版本共享} & \bt{Conditions checked on the query snapshot}{在查询快照上检查条件} & \bt{Recheck; checked repair or revocation}{重验；经检查的修复或撤销}\\
+\rowcolor{black!6}
+\textbf{\system} & \textbf{\bhl{Metric definitions}{指标定义}} & \capyes & \capyes & \capyes & \capyes$^{c}$ & \capyes\\
 \bottomrule
 \end{tabularx}
 \par\smallskip
-\bt{$^{a}$Databricks metric views document that join multiplicity declarations (\code{at\_most\_one\_match}) are assumed rather than validated at runtime~\cite{databricks2026metricviews}.}{$^{a}$Databricks 指标视图文档说明，连接基数声明（\code{at\_most\_one\_match}）被假定为成立，而不在运行时验证~\cite{databricks2026metricviews}。}
+\bt{\capyes: supported; \capno: not supported by the cited design for the listed object. Data checks concern grain/join predicates.}{\capyes：支持；\capno：所引设计对所列对象不支持。数据检查指粒度／连接谓词。}
+\bt{$^{a}$With declarative caching. $^{b}$With unaggregated materialization and scheduled refresh. $^{c}$With snapshot checking and write tracking (Section~\ref{sec:maintenance}).}{$^{a}$启用声明式缓存。$^{b}$启用非聚合物化与定时刷新。$^{c}$启用快照检查与写入跟踪（第~\ref{sec:maintenance} 节）。}
 \end{table*}

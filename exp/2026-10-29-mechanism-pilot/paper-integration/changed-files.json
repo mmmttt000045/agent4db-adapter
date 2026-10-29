@@ -1,0 +1,109 @@
+{
+  "overleaf\\README.md": {
+    "status": "modified",
+    "before": "1ba91bdeefe2a814f50f50645703405c145886d03fc9bb97834cebe68dba35a2",
+    "after": "0cf6fbd7abbea7fb827b49cfbdfc3f38b85a890a9f0f14049ff7f31dc4482123"
+  },
+  "overleaf\\figures\\fixed-sharing-zh.pdf": {
+    "status": "new",
+    "after": "fdb4202d1c0ce8fd17745ad34f0c2b8542c87f542723ad6a61713c968bb0335c"
+  },
+  "overleaf\\figures\\fixed-sharing.pdf": {
+    "status": "new",
+    "after": "9ad72300f77a0c0c27ed4cb146ca7ba29bded44590b534a38dff41c05d08fb73"
+  },
+  "overleaf\\figures\\fixed-sharing.tex": {
+    "status": "new",
+    "after": "2f10bb390d8d35d54da45193164a6e412d8a92ff47c91a80422849dbfd5bc6a6"
+  },
+  "overleaf\\figures\\memory-access-pilot-zh.pdf": {
+    "status": "new",
+    "after": "f4cd6e60c7de4b4121090b03dcbe24865dc181ac083364fa18ef95167b1c760f"
+  },
+  "overleaf\\figures\\memory-access-pilot.pdf": {
+    "status": "new",
+    "after": "6c1e156adf2511594bb5f306b62b7d61b20c285c7768f4348827c2aa59a234cc"
+  },
+  "overleaf\\figures\\memory-access-pilot.tex": {
+    "status": "new",
+    "after": "3d61c67d3c750f0e5fe4a5ac9e86daa6c23836228df937cf77e0c0149cf78ace"
+  },
+  "overleaf\\figures\\snapshot-control-zh.pdf": {
+    "status": "new",
+    "after": "936d6f08a9024e435d27b1c92504a9a4c167ed32e00870864e3cb81f409543b6"
+  },
+  "overleaf\\figures\\snapshot-control.pdf": {
+    "status": "new",
+    "after": "1c1d3188202322970ef090c31100fc525cc8ef6bec7d3b1c3fe59d2a5b5fc0a6"
+  },
+  "overleaf\\figures\\snapshot-control.tex": {
+    "status": "new",
+    "after": "c6f9d3e594253ad33997ca89e416b6536dde94036fe55f44689e20dc47e953ad"
+  },
+  "overleaf\\gen\\mechanism.tex": {
+    "status": "new",
+    "after": "d64b650a63a688112015e431aad7a1c04e4220ac4216ed32f7c8cf1b37ec2eac"
+  },
+  "overleaf\\latex\\preamble.tex": {
+    "status": "modified",
+    "before": "cbf0550daf5e4d1037abe9eca4817489c27b50432100642410fba5c044756a55",
+    "after": "ae2907846f37065568fb1ebf42fdf41a7618f79af6be876dc299cf0f01285a9e"
+  },
+  "overleaf\\sections\\07-evaluation.tex": {
+    "status": "modified",
+    "before": "b7b8970d211d6e9b4d2ecf3e12fb553571a57212db9d53763b3c262830013d94",
+    "after": "e3161c998b47087be541d01765892a26ce765636ee6f16d5f076a2910bfc8a58"
+  },
+  "overleaf\\sections\\08-related-work.tex": {
+    "status": "modified",
+    "before": "3f7c0eaed43335eb7c7f6b19ebfd3610b545107d6fce9e4d4fd675dbbd72b95e",
+    "after": "c76c4a1c727900295ff215a89a419e01bb847c9f2b45051ee67b357c5c5271e6"
+  },
+  "overleaf\\sections\\10-conclusion.tex": {
+    "status": "modified",
+    "before": "f8dc38753fcee42e29d24fe0f288341a303d37038c45bbc83ceaa7adabe803a6",
+    "after": "81bc034466b2015126c2fd40f0d0bd8328bd4db4c57f8c9bfeda8bcf0890a8e7"
+  },
+  "overleaf\\sections\\evaluation\\changes.tex": {
+    "status": "modified",
+    "before": "e70c93aceab9b84648b045d71122d7e8551bdfc751fa8c81ff5ba5e9637fafd2",
+    "after": "5fa0acbb7aab8353c52925c6795ec9f1bb1a45c34a75dce72c06ab4cba916ee4"
+  },
+  "overleaf\\sections\\evaluation\\check-sharing.tex": {
+    "status": "new",
+    "after": "5b77a9ccfe09536b38ea4f32f2820d1fd308c491eb8ff53dad0732325a20103c"
+  },
+  "overleaf\\sections\\evaluation\\cost.tex": {
+    "status": "modified",
+    "before": "4dc53874e30707344062f85347e538d578f41cb4191df97444703ce04a97ee36",
+    "after": "6c37809f3aaee6f0fcef435b0c75a3e89559e4782557f3988b0ebe1e12f6c39a"
+  },
+  "overleaf\\sections\\evaluation\\memory-pilot.tex": {
+    "status": "new",
+    "after": "9408cb6407ca989fc0cdf13159ed3e384547944c19288038bfeb11f090e52c95"
+  },
+  "overleaf\\sections\\evaluation\\population.tex": {
+    "status": "modified",
+    "before": "5af1ea1f100aa029445c0656caba75f85c28203cd7e8ebf137e2d20ac769983f",
+    "after": "053782b09c5e4233d2a7abfa30f5de0a35c3be160bc3be854ccd457d90ccc183"
+  },
+  "overleaf\\sections\\evaluation\\relbench.tex": {
+    "status": "modified",
+    "before": "2432f54fb32de1d7985e0cdb146cf8541c10b9a13ce7b11aa6c00f5ea1b89039",
+    "after": "b469a576c9024a99b7f12ac27bb939e39d73a33e821734038ad43d69ac0419dc"
+  },
+  "overleaf\\sections\\evaluation\\setup.tex": {
+    "status": "modified",
+    "before": "a6e4efcd659999c4b43194c14c2aa01217ab293b6244b5f68315202975aebb50",
+    "after": "2106cb64aedd0657fc2cbded0bbac9e84b9f25d2e4ac9bc538ab5a33a87680bb"
+  },
+  "overleaf\\sections\\evaluation\\sharing.tex": {
+    "status": "modified",
+    "before": "0bf6a35f32c347a75177526623383796b35f691039b910186a691c00fd66772e",
+    "after": "3a3926aeb01ac546352b95a0c70a0c57b8025cf5e3ed1b2ab01ade08e9e8ae31"
+  },
+  "overleaf\\sections\\evaluation\\snapshot.tex": {
+    "status": "new",
+    "after": "75d4c3dd80c5b97b1bdabd0d703479d8a71592e5ecebe1afbac95d37c6ebdcd2"
+  }
+}

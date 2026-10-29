@@ -45,6 +45,7 @@ figures:
 	$(PYTHON) tools/figures/build.py
 	$(PYTHON) tools/figures/population.py
 	$(PYTHON) tools/figures/relbench_cumulative.py
+	$(PYTHON) tools/figures/mechanism.py
 
 deck-figures:
 	$(PYTHON) tools/figures/build.py --deck

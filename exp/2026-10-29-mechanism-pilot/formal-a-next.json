@@ -1,0 +1,32 @@
+{
+  "status": "formal expansion gated on pilot diagnostics; not a completed experiment",
+  "completed_preflight": {
+    "common_seed_binding": "Passed for both program and compiled SQL on both target settings; same wrapper, no model calls.",
+    "cross_task_latest_training_seeds": 760,
+    "same_task_later_latest_training_seeds": 751,
+    "differing_feature_cells": 0,
+    "source": "results/mechanism-pilot-20261029/seed-binding-preflight.json",
+    "scope": "Sampled latest-training-time audit only; does not replace pilot outcomes or certify all rows."
+  },
+  "why_not_copy_pilot_to_paper": [
+    "One run per cell does not estimate between-run variation.",
+    "Some cross-task cells exhaust 12 calls before any validation, so quality support is incomplete.",
+    "The frozen source program and admitted definition set differ in feature content.",
+    "The source and target use different seed identifiers; the original pilot leaves adaptation to the agent.",
+    "The HTTP tool timeout is 180 seconds while the frozen Rust database pool timeout is 300 seconds, so timed-out probes may consume resources until the server deadline."
+  ],
+  "required_fixes_before_freeze": [
+    "Apply the same tested identifier-only seed binding to returned programs and compiled definitions, then audit both on each target.",
+    "Use a content-matched flat-SQL control built from exactly the same frozen admitted definitions; retain the original richer source program as a separately labeled additional control.",
+    "Use one server-enforced query deadline and a slightly longer HTTP deadline for every arm; record cancellation, failed attempts and costs.",
+    "Calibrate a common 24-call/4-validation candidate budget on development data for all arms, without selecting different limits or incumbent targets by method. This value is a candidate, not a validated formal protocol.",
+    "Freeze source selection, task pairs, model/version, random order, sample IDs and independent repetition seeds before scoring final test labels."
+  ],
+  "confirmatory_outputs": [
+    "Quality and valid-solution coverage for every attempted target, including failures.",
+    "Total and online costs, with source construction charged and reuse horizon stated.",
+    "Retrieval, composition, actual validation and final SQL lineage as distinct outcomes.",
+    "Paired results across independent repetitions; do not count cutoffs or requests as independent seeds."
+  ],
+  "execution_rule": "Do not enlarge a known-confounded paid batch merely to obtain more figures. Complete the bounded pilot and no-LLM B/C supplements; clear the listed A gates before a separate formal run."
+}

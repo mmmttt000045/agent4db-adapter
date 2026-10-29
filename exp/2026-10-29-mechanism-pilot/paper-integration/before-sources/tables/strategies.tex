@@ -1,0 +1,21 @@
+\begin{table}[t]
+% The Times symbol font has no small-caps section sign.
+\caption{\bt{Comparison of memory designs and maintenance policies across evaluation studies. P: population study; Q: cost per question; C: cost of sharing; D: data changes.}{各项评估中记忆设计与维护策略的比较。P：群体实验；Q：每道题的代价；C：共享的代价；D：数据变化。}}
+\label{tab:ladder}
+\footnotesize
+\setlength{\tabcolsep}{2.4pt}
+\newcommand{\usedin}{$\bullet$}
+\begin{tabularx}{\linewidth}{@{}P{0.27\linewidth}Lcccc@{}}
+\toprule
+\bt{Method}{方法} & \bt{Information available to later sessions}{后续会话可用的信息} & P & Q & C & D\\
+\midrule
+\bt{No memory}{无记忆} & \bt{nothing; every question is explored}{什么也没有，每道题都探索} & \usedin & \usedin & & \usedin\\
+\bt{Single-agent memory}{单智能体记忆} & \bt{\system's memory, but each agent uses only what it learned itself}{\system\ 的记忆，但每个智能体只用自己学到的} & \usedin & & \usedin & \\
+\bt{Invalidate on every write}{每次写入即失效} & \bt{definitions, dropped on any write and relearned}{定义，任何写入都丢弃并重新学习} & & & \usedin & \\
+\bt{Full recheck per definition}{整定义重查} & \bt{definitions, all conditions rechecked on use, no shared results}{定义，使用时重查全部条件、不共享结果} & & & \usedin & \\
+\bt{Validation SQL cache}{验证 SQL 缓存} & \bt{rechecks cached by SQL and dependency versions}{按验证 SQL 与依赖版本缓存重查结果} & & & \usedin & \\
+\addlinespace
+\bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \bt{one memory for all agents; definitions checked, maintained, and optimized once}{所有智能体共用一份记忆；定义的检查、维护与优化都只做一次} & \usedin & \usedin & \usedin & \usedin\\
+\bottomrule
+\end{tabularx}
+\end{table}

@@ -1,0 +1,23 @@
+{
+  "checked_utc": "2026-10-28T17:52:18.615218+00:00",
+  "source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "model_alias": "deepseek-flash",
+  "documented_version": "DeepSeek-V4.1-Flash-1017",
+  "response_model_remains_alias": true,
+  "cny_per_million": {
+    "offpeak": {
+      "hit": 0.02,
+      "miss": 1.0,
+      "output": 4.0
+    },
+    "peak": {
+      "hit": 0.04,
+      "miss": 2.0,
+      "output": 8.0
+    }
+  },
+  "guard_uses": "peak",
+  "authorized_total_cny": 50.0,
+  "deadline_utc": "2026-10-28T20:19:55Z",
+  "note": "Known token usage may be revalued at official CNY peak rates; preserve old ledger charges, unknown costs, and pre-migration state. Restart only when no reservations or active HTTP connections exist."
+}

@@ -1,0 +1,16 @@
+\begin{table}[t]
+\caption{\bt{Fixed-library replay on TPC-DS, TPC-H, SSB, and BIRD financial: \RsTotal\ common question instances, \system\ with the learning-snapshot reference. Refused denotes unavailable definitions; parentheses indicate conservative invalidations where the original SQL still matches the reference.}{TPC-DS、TPC-H、SSB 与 BIRD financial 固定库回放：\RsTotal\ 个共同题次，\system\ 使用学习快照参照。拒绝表示定义不可用；括号内为原 SQL 仍与参照结果一致的保守失效。}}
+\label{tab:replay-safety}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\bh{Change group}{变化分组} & \bh{Correct}{正确服务} & \bh{Wrong}{错误服务} & \bh{Refused}{拒绝}\\
+\midrule
+\bh{Non-breaking (4)}{正常更新（4 类）} & \RsBenignCorrect & \RsBenignWrong & \RsBenignRefused\ (\RsBenignUnneeded)\\
+\bh{Targeted structural (5)}{目标结构变化（5 类）} & \RsStructuralCorrect & \RsStructuralWrong & \RsStructuralRefused\ (\RsStructuralUnneeded)\\
+\bh{Unit / backup copy (2)}{单位／备份副本（2 类）} & \RsOutsideCorrect & \RsOutsideWrong & \RsOutsideRefused\ (\RsOutsideUnneeded)\\
+\bottomrule
+\end{tabular}
+\end{table}

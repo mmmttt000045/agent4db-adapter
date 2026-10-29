@@ -1,0 +1,90 @@
+{
+  "status": "pushed_and_verified",
+  "verified_utc": "2026-10-29T04:59:24.844Z",
+  "repository": "mmmttt000045/icde-2027-paper",
+  "branch": "main",
+  "previous_head": "986fd00be273224c0a12ed171539d086ad020cc9",
+  "commit": "8d09128c7b9bdc62f749093e37661d23a832559b",
+  "tree": "c02a61dcfa1711762555d6d3299884f7eed7f5b8",
+  "commit_url": "https://github.com/mmmttt000045/icde-2027-paper/commit/8d09128c7b9bdc62f749093e37661d23a832559b",
+  "files_verified": 99,
+  "fig3": "Original English PDF, Chinese PDF and caption restored byte-for-byte from 01daa2133a54ee45a8d1b529b5e04167e81ed340.",
+  "removed": "Added official-quality figure removed from active document; earlier source assets retained as history.",
+  "original_fig5": "Official-API work PDFs unchanged; automatically renumbered as Figure 4.",
+  "protected_local_files": 46,
+  "published_front_matter_unchanged": true,
+  "unrelated_local_writing_preserved_and_not_pushed": [
+    "sections/01-introduction.tex",
+    "sections/abstract.tex",
+    "sections/10-conclusion.tex"
+  ],
+  "model_calls_added": 0,
+  "compile": {
+    "en": {
+      "issues": [],
+      "labels": {
+        "fig:metric-record": {
+          "number": "1",
+          "page": 1
+        },
+        "fig:relbench-cumulative": {
+          "number": "3",
+          "page": 9
+        },
+        "fig:official-cumulative": null,
+        "fig:official-quality": null,
+        "fig:reuse-work": {
+          "number": "4",
+          "page": 9
+        },
+        "tab:capabilities": {
+          "number": "III",
+          "page": 4
+        },
+        "tab:relbench": {
+          "number": "IV",
+          "page": 8
+        }
+      }
+    },
+    "bi": {
+      "issues": [],
+      "labels": {
+        "fig:metric-record": {
+          "number": "1",
+          "page": 1
+        },
+        "fig:relbench-cumulative": {
+          "number": "3",
+          "page": 12
+        },
+        "fig:official-cumulative": null,
+        "fig:official-quality": null,
+        "fig:reuse-work": {
+          "number": "4",
+          "page": 14
+        },
+        "tab:capabilities": {
+          "number": "III",
+          "page": 6
+        },
+        "tab:relbench": {
+          "number": "IV",
+          "page": 13
+        }
+      }
+    }
+  },
+  "visual_qa": {
+    "english_pages": [
+      1,
+      9
+    ],
+    "bilingual_pages": [
+      1,
+      12,
+      14
+    ],
+    "result": "Figures legible; no clipping, overlaps or unresolved references."
+  }
+}

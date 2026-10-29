@@ -1,0 +1,10 @@
+{
+  "exp\\2026-10-29-mechanism-pilot\\pilot-summary.json": "13d19a03f72bbe1bbc1e93930ac3c4735b9bcace8834fe29ac1bc7c7df3f558a",
+  "exp\\2026-10-29-mechanism-pilot\\system-summary.json": "53aad2e1307d567ef02138345e5add8046fb00c65104beea273a9c3f520b14e5",
+  "exp\\2026-10-02-cache-baseline-tpcds\\snapshot-binding-stats.json": "661dc863bd75b97d50daa0ac5ed7531bdff910b110502fa9f5f1d2ef94fb7ab8",
+  "exp\\2026-10-02-cache-baseline-tpcds\\snapshot-binding-shards-stats.json": "3c298674a0c3030dadf6d607df2d933182a0bd2803fdf07861ab0e555a3adcb0",
+  "tools\\figures\\mechanism.py": "dec60f0d881ad9e1ca241f9b48c10272b161b23d8b429ff493d59dedb1a399ad",
+  "tools\\figures\\mplstyle.py": "ad28fc1bcb78c9aeb8b93f9f041ef221c739e148076f0dc9a2537a7be04c43aa",
+  "tools\\figures\\style.py": "82f1ec3fc0ba079822602393f072c22eef9570085bddfb5b869729a14390fea3",
+  "overleaf\\latex\\preamble.tex": "ae2907846f37065568fb1ebf42fdf41a7618f79af6be876dc299cf0f01285a9e"
+}

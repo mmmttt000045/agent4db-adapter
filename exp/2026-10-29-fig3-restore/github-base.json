@@ -1,0 +1,798 @@
+{
+  "head": "986fd00be273224c0a12ed171539d086ad020cc9",
+  "tree": "36cb3ad36de0aa5d0fe7d101eece6c8c0bc575a1",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d72fd520b1c12f276273f6d5b6cbc0c7f3bbf884",
+      "size": 13,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/d72fd520b1c12f276273f6d5b6cbc0c7f3bbf884"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e11f5c025554126589c216930ef1cd17302e879",
+      "size": 315,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/8e11f5c025554126589c216930ef1cd17302e879"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82872aacd7ff8bd3187f4281ace5a695848f5482",
+      "size": 2581,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/82872aacd7ff8bd3187f4281ace5a695848f5482"
+    },
+    {
+      "path": "build.sh",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "301946c0685d1ea2d9558b814dc46dedc6d7c057",
+      "size": 4232,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/301946c0685d1ea2d9558b814dc46dedc6d7c057"
+    },
+    {
+      "path": "evidence/2026-10-29-fig45/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f1020f7a4b7fe4ab192aa263faeb37d3f2be2d9",
+      "size": 2725,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/3f1020f7a4b7fe4ab192aa263faeb37d3f2be2d9"
+    },
+    {
+      "path": "evidence/2026-10-29-fig45/figure-data.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4523d319f2b117f8a48938b4f83f747d98595fe8",
+      "size": 9946,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/4523d319f2b117f8a48938b4f83f747d98595fe8"
+    },
+    {
+      "path": "evidence/2026-10-29/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b620659e3edad6bbf866ebf33b12e0de1f8ba2d6",
+      "size": 9443,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/b620659e3edad6bbf866ebf33b12e0de1f8ba2d6"
+    },
+    {
+      "path": "evidence/2026-10-29/lineage-summary.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cfed7dcc4542eb9c93c3ccfa5943a09d55d310f4",
+      "size": 56160,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/cfed7dcc4542eb9c93c3ccfa5943a09d55d310f4"
+    },
+    {
+      "path": "evidence/official-20261028/analysis.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2e1cdc5946dd37f170a00ea34d54c9a963394de",
+      "size": 190916,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/e2e1cdc5946dd37f170a00ea34d54c9a963394de"
+    },
+    {
+      "path": "evidence/official-20261028/evidence-audit.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6b9a3859ae39cf9b37e632e9f91d6a0166085764",
+      "size": 21764,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/6b9a3859ae39cf9b37e632e9f91d6a0166085764"
+    },
+    {
+      "path": "figures/architecture-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f5b1f60f20a24836eeecae5b01a106be0239bd59",
+      "size": 134378,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/f5b1f60f20a24836eeecae5b01a106be0239bd59"
+    },
+    {
+      "path": "figures/architecture.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c7fbd374ec0e233a3e0835d0dbefe0e15fbcb0d6",
+      "size": 134948,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/c7fbd374ec0e233a3e0835d0dbefe0e15fbcb0d6"
+    },
+    {
+      "path": "figures/architecture.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23d3099db8429dee1cc883a0c871ba6220e458cc",
+      "size": 2915,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/23d3099db8429dee1cc883a0c871ba6220e458cc"
+    },
+    {
+      "path": "figures/consumer-cost-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2407c85bd3f17e5ccfe47089fa20e1b9c46e7417",
+      "size": 52227,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/2407c85bd3f17e5ccfe47089fa20e1b9c46e7417"
+    },
+    {
+      "path": "figures/consumer-cost.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f381d8f5faf35987b1e63a054d550cc52c632384",
+      "size": 48127,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/f381d8f5faf35987b1e63a054d550cc52c632384"
+    },
+    {
+      "path": "figures/consumer-cost.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9321a0f6a4328a03af53a71d8e3906aa2949e770",
+      "size": 1244,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/9321a0f6a4328a03af53a71d8e3906aa2949e770"
+    },
+    {
+      "path": "figures/maintenance-cost-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39217159d73c813facf109f5d67ae5b088d7b941",
+      "size": 52232,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/39217159d73c813facf109f5d67ae5b088d7b941"
+    },
+    {
+      "path": "figures/maintenance-cost.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aac6ca9acb2fc0b9b00a64c7648a3c718c6f0f91",
+      "size": 55706,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/aac6ca9acb2fc0b9b00a64c7648a3c718c6f0f91"
+    },
+    {
+      "path": "figures/maintenance-cost.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9b4c5fde8d4b43837c84a4eb1ea932fb759e8a01",
+      "size": 1165,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/9b4c5fde8d4b43837c84a4eb1ea932fb759e8a01"
+    },
+    {
+      "path": "figures/metric-record-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10f71f22c69663592d6a6470e1400b766acab474",
+      "size": 38380,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/10f71f22c69663592d6a6470e1400b766acab474"
+    },
+    {
+      "path": "figures/metric-record.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9de41d8c53bac2ef615510aa2c7ea0eada6786af",
+      "size": 39925,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/9de41d8c53bac2ef615510aa2c7ea0eada6786af"
+    },
+    {
+      "path": "figures/metric-record.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14f2045cf1049744c6670df29cd7af5700feff6f",
+      "size": 1731,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/14f2045cf1049744c6670df29cd7af5700feff6f"
+    },
+    {
+      "path": "figures/official-cumulative-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9de5d58c9c3af48361d87bfb34bcf923d933f63",
+      "size": 43180,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/b9de5d58c9c3af48361d87bfb34bcf923d933f63"
+    },
+    {
+      "path": "figures/official-cumulative.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "694a38a84cc1238ad68270134e72086e890ec7c8",
+      "size": 38219,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/694a38a84cc1238ad68270134e72086e890ec7c8"
+    },
+    {
+      "path": "figures/official-cumulative.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82ebfa0c056ccd0ca4b2483f84c1d4dbbffeac93",
+      "size": 962,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/82ebfa0c056ccd0ca4b2483f84c1d4dbbffeac93"
+    },
+    {
+      "path": "figures/official-quality-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d8507b2d2524779ed90bb7cab853d5c113256a9f",
+      "size": 65199,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/d8507b2d2524779ed90bb7cab853d5c113256a9f"
+    },
+    {
+      "path": "figures/official-quality.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33f93d5bfd1ed8c3cc517ddb6a8d6aedb2de7428",
+      "size": 54754,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/33f93d5bfd1ed8c3cc517ddb6a8d6aedb2de7428"
+    },
+    {
+      "path": "figures/official-quality.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d15503aaf20deb6b79f3aa3e3fae49c92e00cbdc",
+      "size": 1588,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/d15503aaf20deb6b79f3aa3e3fae49c92e00cbdc"
+    },
+    {
+      "path": "figures/population-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9fd7e30c16b621fec29a9e90b3da03fdf2dbdde5",
+      "size": 48822,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/9fd7e30c16b621fec29a9e90b3da03fdf2dbdde5"
+    },
+    {
+      "path": "figures/population.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d34d53a7c9cd24798c6e3b5b0bf3f516dadb7dff",
+      "size": 48538,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/d34d53a7c9cd24798c6e3b5b0bf3f516dadb7dff"
+    },
+    {
+      "path": "figures/population.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e239e77cfe2dd9ca30dd6b99d679c87faf63b2c9",
+      "size": 1397,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/e239e77cfe2dd9ca30dd6b99d679c87faf63b2c9"
+    },
+    {
+      "path": "figures/relbench-cumulative-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a081b245e952b91610f13b164933fe18d778b28a",
+      "size": 47575,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/a081b245e952b91610f13b164933fe18d778b28a"
+    },
+    {
+      "path": "figures/relbench-cumulative.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f54598d10bcbc33e3dc4defe456247f63cf4f4b",
+      "size": 42299,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/9f54598d10bcbc33e3dc4defe456247f63cf4f4b"
+    },
+    {
+      "path": "figures/relbench-cumulative.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c0b3f68fbddf68167e8b967855f3222c65282d90",
+      "size": 1232,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/c0b3f68fbddf68167e8b967855f3222c65282d90"
+    },
+    {
+      "path": "figures/repair-algorithm.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3fa0b58fa85d25f3362ac3a2fe7c421995fda1fd",
+      "size": 1622,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/3fa0b58fa85d25f3362ac3a2fe7c421995fda1fd"
+    },
+    {
+      "path": "figures/replay-outcomes-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "890d5dcdf118a3187147ff9abe68070cc44f9bf3",
+      "size": 155110,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/890d5dcdf118a3187147ff9abe68070cc44f9bf3"
+    },
+    {
+      "path": "figures/replay-outcomes.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1baba253fd200e89119e6167c58b81dd2038b3eb",
+      "size": 150854,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/1baba253fd200e89119e6167c58b81dd2038b3eb"
+    },
+    {
+      "path": "figures/replay-outcomes.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8de9a73213fc7a54a5e948c8af0ef51f8e0ac72b",
+      "size": 3070,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/8de9a73213fc7a54a5e948c8af0ef51f8e0ac72b"
+    },
+    {
+      "path": "figures/reuse-work-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2de199aaf05c859b8aa4d3e39b3f068c45b3b13e",
+      "size": 60431,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/2de199aaf05c859b8aa4d3e39b3f068c45b3b13e"
+    },
+    {
+      "path": "figures/reuse-work.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cb86a0b3e365cbc027f53ecbc10c7ddc317a81cc",
+      "size": 53786,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/cb86a0b3e365cbc027f53ecbc10c7ddc317a81cc"
+    },
+    {
+      "path": "figures/reuse-work.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c01f82f945c1dd4fd37267913f852d59459d49ef",
+      "size": 1192,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/c01f82f945c1dd4fd37267913f852d59459d49ef"
+    },
+    {
+      "path": "figures/running-example-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2066bb31d56e709b67886dc862e64b3b5ea76f19",
+      "size": 118761,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/2066bb31d56e709b67886dc862e64b3b5ea76f19"
+    },
+    {
+      "path": "figures/running-example.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab94b06fc2a6ee5ea17d859cbd23d1d564517d9f",
+      "size": 98262,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/ab94b06fc2a6ee5ea17d859cbd23d1d564517d9f"
+    },
+    {
+      "path": "figures/running-example.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cdfa470a582d04e82e63da180c0b8cc27eb947d1",
+      "size": 3249,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/cdfa470a582d04e82e63da180c0b8cc27eb947d1"
+    },
+    {
+      "path": "figures/two-schemas-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9c5f122b71a9f4dd263e41e52dea09d9c5cf776f",
+      "size": 77491,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/9c5f122b71a9f4dd263e41e52dea09d9c5cf776f"
+    },
+    {
+      "path": "figures/two-schemas.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21250dabecf2dca5534728243ae08ae04289ca1a",
+      "size": 77375,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/21250dabecf2dca5534728243ae08ae04289ca1a"
+    },
+    {
+      "path": "figures/two-schemas.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc1c9c2ea79622602ec1177a0523d7243fec53e3",
+      "size": 1585,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/cc1c9c2ea79622602ec1177a0523d7243fec53e3"
+    },
+    {
+      "path": "figures/use-session.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe8ef81500e18dddbd27db587d3018dbdd055737",
+      "size": 4070,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/fe8ef81500e18dddbd27db587d3018dbdd055737"
+    },
+    {
+      "path": "gen/external.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e25b5b5b358cabd6c3c7decbb261ba1ee62a4460",
+      "size": 1233,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/e25b5b5b358cabd6c3c7decbb261ba1ee62a4460"
+    },
+    {
+      "path": "gen/generality.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac748db2adf7b4c0b508453137a7c871f12d8dd3",
+      "size": 6891,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/ac748db2adf7b4c0b508453137a7c871f12d8dd3"
+    },
+    {
+      "path": "gen/lifecycle-rows.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f21ca4ad9208fa124a8b60b2ba67eafbf9587719",
+      "size": 1430,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/f21ca4ad9208fa124a8b60b2ba67eafbf9587719"
+    },
+    {
+      "path": "gen/lifecycle.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "04b5e310c2ad4acfe56a36a0ec14f779675c401b",
+      "size": 2190,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/04b5e310c2ad4acfe56a36a0ec14f779675c401b"
+    },
+    {
+      "path": "gen/numbers-prev.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a6339676e84bda466579161865993d977ec163a",
+      "size": 4777,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/6a6339676e84bda466579161865993d977ec163a"
+    },
+    {
+      "path": "gen/numbers.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f021e03f7fecab32ef3e9a83d0427b7f79b4cf2",
+      "size": 5294,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/3f021e03f7fecab32ef3e9a83d0427b7f79b4cf2"
+    },
+    {
+      "path": "gen/official-numbers.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ce9458a76d6879cdfa8a56c4163d8fc938705c8a",
+      "size": 607,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/ce9458a76d6879cdfa8a56c4163d8fc938705c8a"
+    },
+    {
+      "path": "gen/opt.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e050fbb74b8596562752c8864044cb01f49ba68c",
+      "size": 429,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/e050fbb74b8596562752c8864044cb01f49ba68c"
+    },
+    {
+      "path": "gen/population.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c359518b60eec6448124650745124989ac7afb4",
+      "size": 8410,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/3c359518b60eec6448124650745124989ac7afb4"
+    },
+    {
+      "path": "gen/premise.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4f562cd712d52d501016375c1539590cc2eb8ca2",
+      "size": 474,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/4f562cd712d52d501016375c1539590cc2eb8ca2"
+    },
+    {
+      "path": "gen/relbench-table.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8a9cd3c69f33eb20a764e6b5cb577c7d0ad7546b",
+      "size": 1934,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/8a9cd3c69f33eb20a764e6b5cb577c7d0ad7546b"
+    },
+    {
+      "path": "gen/relbench.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e407e408d2a2be604517f79942dd0e27500dab66",
+      "size": 18203,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/e407e408d2a2be604517f79942dd0e27500dab66"
+    },
+    {
+      "path": "gen/replay-safety.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df03a1b09b598e7cfedba985accb46784a0bef0b",
+      "size": 817,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/df03a1b09b598e7cfedba985accb46784a0bef0b"
+    },
+    {
+      "path": "gen/review.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1da5c3db0ee9f57316bd3deed2464700dcf96869",
+      "size": 9930,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/1da5c3db0ee9f57316bd3deed2464700dcf96869"
+    },
+    {
+      "path": "gen/scen-ds.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ad0812dc0811d76f117b42ffe715192fe7d4e4e",
+      "size": 14085,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/1ad0812dc0811d76f117b42ffe715192fe7d4e4e"
+    },
+    {
+      "path": "gen/session-latency.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ef3508a941ba33b9044405106e9a5b213fc52572",
+      "size": 1274,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/ef3508a941ba33b9044405106e9a5b213fc52572"
+    },
+    {
+      "path": "gen/sharing.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23a99a5b4819e0a273fd1549a51cc407a010a39f",
+      "size": 1648,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/23a99a5b4819e0a273fd1549a51cc407a010a39f"
+    },
+    {
+      "path": "gen/snapshot-stress.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4539b8e9ffce40f8ede964d529db511c39837be0",
+      "size": 831,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/4539b8e9ffce40f8ede964d529db511c39837be0"
+    },
+    {
+      "path": "latex/preamble.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b597a6aa74f6220fc229fb44d895a84c68d850bb",
+      "size": 5718,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/b597a6aa74f6220fc229fb44d895a84c68d850bb"
+    },
+    {
+      "path": "main-en.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e75974597b38d8785d1b6fb2c51f7bebe1588be",
+      "size": 291,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/8e75974597b38d8785d1b6fb2c51f7bebe1588be"
+    },
+    {
+      "path": "main.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "897f2e81462019ebc0d6ca31c17d8b4a96b665f7",
+      "size": 289,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/897f2e81462019ebc0d6ca31c17d8b4a96b665f7"
+    },
+    {
+      "path": "paper.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29e9a1e0a88a61b4ecb40a38af024496c39e3862",
+      "size": 849,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/29e9a1e0a88a61b4ecb40a38af024496c39e3862"
+    },
+    {
+      "path": "references.bib",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad2df5fbc26ade4866f2188f0c7078d02f9bc0cb",
+      "size": 31606,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/ad2df5fbc26ade4866f2188f0c7078d02f9bc0cb"
+    },
+    {
+      "path": "references.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "48c237f72ed285ea794b89d727e802847578b113",
+      "size": 172,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/48c237f72ed285ea794b89d727e802847578b113"
+    },
+    {
+      "path": "sections/01-introduction.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e68d067468a73a0e8b78701fe39ab1429041cb9b",
+      "size": 11182,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/e68d067468a73a0e8b78701fe39ab1429041cb9b"
+    },
+    {
+      "path": "sections/02-background.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5ad2cd44b99161c975b351d4cfefa726e0bb1a2",
+      "size": 15282,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/d5ad2cd44b99161c975b351d4cfefa726e0bb1a2"
+    },
+    {
+      "path": "sections/03-overview.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6e3accb2782a4739304bc5f5e4e9c5dc9b39d98",
+      "size": 4028,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/f6e3accb2782a4739304bc5f5e4e9c5dc9b39d98"
+    },
+    {
+      "path": "sections/04-sharing.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "84031d075acf54fc17f2dbf3a807b67f1dd84a3d",
+      "size": 31877,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/84031d075acf54fc17f2dbf3a807b67f1dd84a3d"
+    },
+    {
+      "path": "sections/07-evaluation.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "96f4632be8a70301ff902a8b3c7fc0805e06497f",
+      "size": 1268,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/96f4632be8a70301ff902a8b3c7fc0805e06497f"
+    },
+    {
+      "path": "sections/08-related-work.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4bcd7fbab32d7310bb9ff24b07b50f8c15c01a49",
+      "size": 10406,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/4bcd7fbab32d7310bb9ff24b07b50f8c15c01a49"
+    },
+    {
+      "path": "sections/10-conclusion.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "209723ba69bbd144873d294db35a455f5d25e6d0",
+      "size": 3164,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/209723ba69bbd144873d294db35a455f5d25e6d0"
+    },
+    {
+      "path": "sections/abstract.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34003c54bb8be0da1c4db69f0c076dc949b16d7b",
+      "size": 2914,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/34003c54bb8be0da1c4db69f0c076dc949b16d7b"
+    },
+    {
+      "path": "sections/evaluation/changes.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a290cef71099324826abfdaaf9fd74a855c8cbdc",
+      "size": 4289,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/a290cef71099324826abfdaaf9fd74a855c8cbdc"
+    },
+    {
+      "path": "sections/evaluation/cost.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "994c738636b67118982ea9c6f31259ccc405995b",
+      "size": 5617,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/994c738636b67118982ea9c6f31259ccc405995b"
+    },
+    {
+      "path": "sections/evaluation/population.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0ad4c9017a280d62c6ff1bebffe4238eaf7399e",
+      "size": 5213,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/a0ad4c9017a280d62c6ff1bebffe4238eaf7399e"
+    },
+    {
+      "path": "sections/evaluation/quality.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f454aa7c793f588c2b6b550373bda62a4ee6eb3d",
+      "size": 2816,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/f454aa7c793f588c2b6b550373bda62a4ee6eb3d"
+    },
+    {
+      "path": "sections/evaluation/relbench.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4901f9fed8d412f9f615b601dbdc93088eb9e420",
+      "size": 10005,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/4901f9fed8d412f9f615b601dbdc93088eb9e420"
+    },
+    {
+      "path": "sections/evaluation/setup.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea0b3edfc21be6e674a0b2b936d36fd135934991",
+      "size": 4719,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/ea0b3edfc21be6e674a0b2b936d36fd135934991"
+    },
+    {
+      "path": "sections/evaluation/sharing.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65b7d346639a25b3d909de702418ad9e95be234c",
+      "size": 3214,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/65b7d346639a25b3d909de702418ad9e95be234c"
+    },
+    {
+      "path": "source-notes.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "12c7d041d3bf57dccc76e5fbdca551fde2286bb4",
+      "size": 10304,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/12c7d041d3bf57dccc76e5fbdca551fde2286bb4"
+    },
+    {
+      "path": "tables/capabilities.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2337315c3d8b7ae3b095a4eef95e930c6e74c82",
+      "size": 2724,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/d2337315c3d8b7ae3b095a4eef95e930c6e74c82"
+    },
+    {
+      "path": "tables/concurrency.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d959c8b81ba1e720a653fe83cba0c414acf3328c",
+      "size": 1512,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/d959c8b81ba1e720a653fe83cba0c414acf3328c"
+    },
+    {
+      "path": "tables/external.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5be0eeba2f572d64842d3993f7d931b4039c508e",
+      "size": 2061,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/5be0eeba2f572d64842d3993f7d931b4039c508e"
+    },
+    {
+      "path": "tables/lifecycle.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8d306d0af85221ed738729fef1962c0e4d99d529",
+      "size": 2368,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/8d306d0af85221ed738729fef1962c0e4d99d529"
+    },
+    {
+      "path": "tables/official-results.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0d73382f8ff3c1c4d10c6d8252ebc8aa897d8fb",
+      "size": 2631,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/d0d73382f8ff3c1c4d10c6d8252ebc8aa897d8fb"
+    },
+    {
+      "path": "tables/population-cost.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6fede6939a376d9f3247bad0474b1c31ea123d17",
+      "size": 1413,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/6fede6939a376d9f3247bad0474b1c31ea123d17"
+    },
+    {
+      "path": "tables/population-metrics.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f59dca2acdfa096077f5001abeceb9e6d64ca2b",
+      "size": 1966,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/1f59dca2acdfa096077f5001abeceb9e6d64ca2b"
+    },
+    {
+      "path": "tables/relbench.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f7513b1319f0e452dd34e1a288c0799c3445b89",
+      "size": 2522,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/7f7513b1319f0e452dd34e1a288c0799c3445b89"
+    },
+    {
+      "path": "tables/replay-safety.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76979b31c3a8a8cef5d5e37f059691253c63e3b7",
+      "size": 1236,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/76979b31c3a8a8cef5d5e37f059691253c63e3b7"
+    },
+    {
+      "path": "tables/strategies.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f3386babafe00e4efe0262ab5da3e131040701d1",
+      "size": 1889,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/f3386babafe00e4efe0262ab5da3e131040701d1"
+    },
+    {
+      "path": "tables/workload.tex",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e393286bd402a65231be49da4a0cecfa286a9c64",
+      "size": 2253,
+      "url": "https://api.github.com/repos/mmmttt000045/icde-2027-paper/git/blobs/e393286bd402a65231be49da4a0cecfa286a9c64"
+    }
+  ]
+}

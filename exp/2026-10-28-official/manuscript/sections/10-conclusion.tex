@@ -1,0 +1,16 @@
+\section{\bt{Discussion and Conclusion}{讨论与结论}}
+\label{sec:limitations}
+\bi{\system\ turns database exploration into executable metric and feature definitions. Sharing these definitions together with their data conditions, validation evidence, and maintenance reduces repeated exploration while sustaining reuse as data evolve.}
+{\system\ 将数据库探索转化为可执行的指标与特征定义。共享这些定义及其数据条件、验证证据与维护工作，能够减少重复探索，并在数据演进过程中维持复用。}
+
+\bi{\emph{Empirical limits.} RelBench uses one three-cutoff sequence per method, so temporal cutoffs do not establish independent-repetition significance. Five of six tasks meet the full-sequence quality margins, and study-adverse retains a \OfAdverseRegression\% MAE regression. The traces combine full-program reuse with optional definition retrieval and contain no explicit feature-composition call; this study does not isolate the contribution of structured definitions. The controlled metric experiments separately test publication and shared maintenance.}
+{\emph{实证限制。}RelBench每种方法只有一条三截点序列，时间截点不能作为独立重复来确立统计显著性。六项任务中五项满足全序列质量门槛，study-adverse仍有\OfAdverseRegression\%的MAE回退。轨迹同时包含整份方案复用与按需定义检索，没有显式特征组合调用；本轮没有分离结构化定义的独立贡献。受控指标实验分别检验发布检查与共享维护。}
+
+\bi{\emph{Future work.} We will extend compilation to repeated-role joins and many-to-many bridges and develop incremental feature maintenance. Explicit units, authoritative-source constraints, and checks on filters and value distributions will address the semantic limitations exposed by unit and backup-copy changes.}
+{\emph{未来工作。}我们将把编译扩展到同表多角色连接和多对多桥接表，并探索特征的增量维护。通过显式量纲、权威来源约束，以及对过滤条件和取值分布的检查，解决单位与备份副本变化暴露的语义局限。}
+
+\section*{\bt{Acknowledgment of AI-Generated Content}{AI 生成内容声明}}
+% ICDE 2027 requires this section (not counted in the 12 pages). The authors must confirm the wording below before submission.
+% Disclosure scope follows https://icde2027.github.io/cf-research-papers (checked 2026-10-23).
+\bi{Evaluated agents and memory operations use \llmmodel{} under the documented configurations. Under the authors' direction, Claude and ChatGPT assisted with coding, data analysis, visualization, and manuscript editing. The authors designed the study, verified all code, results, and text, and take full responsibility for the work.\looseness=-1}
+{受评估的智能体与记忆操作使用 \llmmodel{}，配置见实验说明。在作者指导下，Claude（Anthropic）与 OpenAI Codex 辅助了编码、数据分析、可视化及文稿编辑。作者设计研究、核实全部代码、结果和文本，并对全部工作负责。}

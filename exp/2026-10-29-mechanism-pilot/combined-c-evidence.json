@@ -1,0 +1,224 @@
+{
+  "purpose": "Archived-data previews; not new experiments",
+  "sources": {
+    "snapshot-binding-stats.json": {
+      "path": "E:\\agent4db-adapter\\exp\\2026-10-02-cache-baseline-tpcds\\snapshot-binding-stats.json",
+      "sha256": "661dc863bd75b97d50daa0ac5ed7531bdff910b110502fa9f5f1d2ef94fb7ab8"
+    },
+    "snapshot-binding-report.json": {
+      "path": "E:\\agent4db-adapter\\exp\\2026-10-02-cache-baseline-tpcds\\snapshot-binding-report.json",
+      "sha256": "513b594c317350adf23370191f78289a18e69d993203da62de63b653f0e7cb89"
+    },
+    "snapshot-binding-shards-stats.json": {
+      "path": "E:\\agent4db-adapter\\exp\\2026-10-02-cache-baseline-tpcds\\snapshot-binding-shards-stats.json",
+      "sha256": "3c298674a0c3030dadf6d607df2d933182a0bd2803fdf07861ab0e555a3adcb0"
+    },
+    "matched-system-analysis": {
+      "path": "E:\\agent4db-adapter\\output\\mechanism-pilot-20261029\\system-analysis.json",
+      "sha256": "53aad2e1307d567ef02138345e5add8046fb00c65104beea273a9c3f520b14e5"
+    }
+  },
+  "figures": {
+    "C": {
+      "outcomes": [
+        {
+          "case": "benign_after_check",
+          "mode": "tx-precheck",
+          "n": 5,
+          "served": 5,
+          "violation": 0,
+          "rejected": 0,
+          "error": 0,
+          "calls": 5
+        },
+        {
+          "case": "benign_after_check",
+          "mode": "tx-bound",
+          "n": 5,
+          "served": 5,
+          "violation": 0,
+          "rejected": 0,
+          "error": 0,
+          "calls": 5
+        },
+        {
+          "case": "violation_after_check",
+          "mode": "tx-precheck",
+          "n": 5,
+          "served": 0,
+          "violation": 5,
+          "rejected": 0,
+          "error": 0,
+          "calls": 5
+        },
+        {
+          "case": "violation_after_check",
+          "mode": "tx-bound",
+          "n": 5,
+          "served": 5,
+          "violation": 0,
+          "rejected": 0,
+          "error": 0,
+          "calls": 5
+        },
+        {
+          "case": "violation_before_call",
+          "mode": "tx-precheck",
+          "n": 5,
+          "served": 0,
+          "violation": 0,
+          "rejected": 5,
+          "error": 0,
+          "calls": 5
+        },
+        {
+          "case": "violation_before_call",
+          "mode": "tx-bound",
+          "n": 5,
+          "served": 0,
+          "violation": 0,
+          "rejected": 5,
+          "error": 0,
+          "calls": 5
+        }
+      ],
+      "reader_p50_ms": {
+        "precheck": {
+          "steady_ms": 5.1,
+          "first_after_write_ms": 1188.0,
+          "second_after_write_ms": 6.5
+        },
+        "snapshot": {
+          "steady_ms": 6.9,
+          "first_after_write_ms": 1095.1,
+          "second_after_write_ms": 5.7
+        }
+      },
+      "reader_runs": [
+        {
+          "mode": "precheck",
+          "steady_ms": {
+            "max": 9.200795,
+            "mean": 5.2911135,
+            "n": 40,
+            "p50": 5.148878,
+            "p95": 6.4401600000000006
+          },
+          "first_after_write_ms": {
+            "max": 1794.665758,
+            "mean": 1355.1860895999998,
+            "n": 10,
+            "p50": 1330.069992,
+            "p95": 1794.665758
+          },
+          "second_after_write_ms": {
+            "max": 18.951653999999998,
+            "mean": 9.2347553,
+            "n": 10,
+            "p50": 7.922424000000001,
+            "p95": 18.951653999999998
+          }
+        },
+        {
+          "mode": "snapshot",
+          "steady_ms": {
+            "max": 11.655612,
+            "mean": 8.321168924999998,
+            "n": 40,
+            "p50": 8.354246,
+            "p95": 11.188071
+          },
+          "first_after_write_ms": {
+            "max": 1372.111312,
+            "mean": 1158.3871321,
+            "n": 10,
+            "p50": 1165.376499,
+            "p95": 1372.111312
+          },
+          "second_after_write_ms": {
+            "max": 9.907179000000001,
+            "mean": 6.7451531000000005,
+            "n": 10,
+            "p50": 6.140623,
+            "p95": 9.907179000000001
+          }
+        },
+        {
+          "mode": "precheck",
+          "steady_ms": {
+            "max": 7.653995,
+            "mean": 4.9946281,
+            "n": 40,
+            "p50": 5.0200000000000005,
+            "p95": 5.863152
+          },
+          "first_after_write_ms": {
+            "max": 1102.583636,
+            "mean": 1042.0178749,
+            "n": 10,
+            "p50": 1045.8641719999998,
+            "p95": 1102.583636
+          },
+          "second_after_write_ms": {
+            "max": 7.864917000000001,
+            "mean": 5.5486537,
+            "n": 10,
+            "p50": 5.106061,
+            "p95": 7.864917000000001
+          }
+        },
+        {
+          "mode": "snapshot",
+          "steady_ms": {
+            "max": 7.673997,
+            "mean": 5.5835946000000005,
+            "n": 40,
+            "p50": 5.506742,
+            "p95": 6.007414
+          },
+          "first_after_write_ms": {
+            "max": 1223.3451579999999,
+            "mean": 1065.5479685,
+            "n": 10,
+            "p50": 1024.894415,
+            "p95": 1223.3451579999999
+          },
+          "second_after_write_ms": {
+            "max": 7.929698000000001,
+            "mean": 5.6539894,
+            "n": 10,
+            "p50": 5.256501,
+            "p95": 7.929698000000001
+          }
+        }
+      ],
+      "writer_medians": {
+        "no_trigger": {
+          "sequential_stmt_per_s": 2124.0,
+          "concurrent8_stmt_per_s": 21428.3,
+          "concurrent32_stmt_per_s": 25787.2,
+          "bulk_ms_per_stmt": 15.7
+        },
+        "shards1": {
+          "sequential_stmt_per_s": 1534.4,
+          "concurrent8_stmt_per_s": 13954.0,
+          "concurrent32_stmt_per_s": 9309.6,
+          "bulk_ms_per_stmt": 16.1
+        },
+        "shards16": {
+          "sequential_stmt_per_s": 1484.3,
+          "concurrent8_stmt_per_s": 17312.1,
+          "concurrent32_stmt_per_s": 24916.3,
+          "bulk_ms_per_stmt": 16.5
+        }
+      },
+      "limitations": [
+        "legacy reader version-source confound in panel (b)",
+        "different reader/writer cohorts",
+        "controlled safety schedules are not natural violation rates",
+        "not writer-rate scan"
+      ],
+      "safety_panel": "new matched version-source control"
+    }
+  }
+}

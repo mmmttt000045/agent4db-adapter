@@ -1,0 +1,30 @@
+{
+  "staged_utc": "2026-10-28T18:00:35.339485+00:00",
+  "status": "staged only; integrate after complete tables and figures are available",
+  "sources": {
+    "figures/official-cumulative.tex": null,
+    "figures/reuse-work.tex": null,
+    "gen/official-numbers.tex": null,
+    "latex/preamble.tex": "f26524e3512cdc4b037aad570b292819d6565fb905f9844cd47b3896c6d1bd28",
+    "sections/01-introduction.tex": "c70567b736312ae64c2ce6ec8439f48bc777d97fe2f0e8f7953e01d66d5c1b40",
+    "sections/07-evaluation.tex": "f2e2b7f7bb7b8ff2394117344d0f277225a00e98bc39a74d64a462a002a95dd9",
+    "sections/10-conclusion.tex": "826703bc334980a3276ae02717c4b68867934bce9441b3c8dcb4ead17726e9cb",
+    "sections/abstract.tex": "b4e0e3b2f3bda519a3c275419d34e19f98657e5a141b2e48c589ad2710a96647",
+    "sections/evaluation/relbench.tex": "cd487b80b11df12e4aa195b3960cc1675fc6fd32b721daf3d79fa50197ef9932",
+    "sections/evaluation/setup.tex": "7e5ca26fe3ccfe13c20237cb354e3edbecf2e5f90015edc7b6aab8369fdf91ff",
+    "sections/evaluation/sharing.tex": "2b5e7eb1828a2c889cea7d2b67d651345ca6224eb9ffe727ca3023547b388853"
+  },
+  "staged": {
+    "figures/official-cumulative.tex": "f08b652b527a574d94dea00be5228d3d26d033498e5508a4e79c744ab82a93cc",
+    "figures/reuse-work.tex": "bcb347b3f37bb9ec7f2b7e1fb3b753176acf78fec6fd499ddeaf97ad81f290cf",
+    "gen/official-numbers.tex": "555d16e646c61dd2425eebc2f0de768251c522942f0e19cfcb4ba1f5d9af3b47",
+    "latex/preamble.tex": "c64856bd94aa9771823203f25807cf492eb241bf02db42791ca28cb3b3ffa7df",
+    "sections/01-introduction.tex": "181d2699a69ca7438bf033776e36fe8cec9372a0fcae78cc8e08b639e52d36a9",
+    "sections/07-evaluation.tex": "80bd17c4e59650d18b72574e22e835dfbc1e5630a8a04d7a591eea9236dc6422",
+    "sections/10-conclusion.tex": "d1e9d6522613b8c4542657f34792c46b0d0f5048753896015120cd5667f1d54c",
+    "sections/abstract.tex": "2974c6b214b7d4675cf983d4a0a107e6c3ffa7d0ffc60a78aea76a3791480e23",
+    "sections/evaluation/relbench.tex": "106a336a81c318d978a396430b2c9f5f9b448037a583b39e00dd1811e43ee5ee",
+    "sections/evaluation/setup.tex": "9ab5f4a380f45756d881bcc7cfe28a11bd788b21b43a2e5ee67c70fef390b326",
+    "sections/evaluation/sharing.tex": "0471d1bbc5a2f980e162fcf4496c395174c70f3565384fba7bda8f7420708ae5"
+  }
+}

@@ -12,6 +12,8 @@
 | PPT 生成与版本 | [slides/README.md](../slides/README.md) |
 | RelBench SQL 复用对照 | [协议](../exp/2026-10-22-sql-only/README.md)、`relbench/sql-only-stats.py`、`relbench/test_sql_only.py` |
 | RelBench 主实验 | [实验协议](../exp/2026-10-20-relbench/README.md)、[基线复现说明](../exp/2026-10-20-relbench/reproduction-notes.md)、`relbench/` |
+| 机制预实验与论文图 | [10-29 证据与合入记录](../exp/2026-10-29-mechanism-pilot/paper-integration/README.md)；`figures/mechanism.py` 从已存档 JSON 生成 A/B/C 图与数值宏，无模型调用 |
+| 官方 API 实验与图表重构 | [10-28 协议、队列与分析](../exp/2026-10-28-official/README.md)；费用闸门、完整配对核对、独立机制图 |
 
 ## 统计与论文数值
 

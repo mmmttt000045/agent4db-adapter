@@ -1,0 +1,11 @@
+\begin{figure}[t]
+\centering
+\ifbilingual
+\includegraphics[width=\linewidth]{figures/reuse-work-zh}
+\else
+\includegraphics[width=\linewidth]{figures/reuse-work}
+\fi
+\caption{\bt{Agent work during reuse: mean tool calls over six sessions per method and database (three tasks, cutoffs 2--3), including failed attempts. Internal memory-model calls are excluded from this tool breakdown but included in Table~\ref{tab:official-results}'s token accounting.}{复用阶段的智能体工作：每种方法、每个数据库六个会话（三个任务、截点2--3）的平均工具调用数，保留失败尝试。此分解不计记忆模块内部的模型调用，其token已计入表~\ref{tab:official-results}。}}
+\label{fig:reuse-work}
+\Description{Two vertically stacked panels, one per database, compare all five methods. Stacked bars distinguish schema inspection, SQL probes, validation, memory tools, and submission with colors and hatching. The y-axis counts agent-issued tool calls per reuse session and starts at zero.}
+\end{figure}

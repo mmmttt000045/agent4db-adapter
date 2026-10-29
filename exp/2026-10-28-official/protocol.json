@@ -1,0 +1,83 @@
+{
+  "study": "official-20261028",
+  "created_utc": "2026-10-28T10:35:00Z",
+  "deadline_utc": "2026-10-28T20:19:55Z",
+  "budget_cny": 50.0,
+  "budget_source": "User explicitly approved a maximum of CNY 50 in this chat on 2026-10-28; account balance is not the cap.",
+  "official_endpoint": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "reasoning_effort": "low",
+  "thinking": "enabled",
+  "max_output_tokens": 16384,
+  "max_model_calls": 24,
+  "max_validations": 5,
+  "post_goal_calls": 3,
+  "sql_timeout_seconds": 180,
+  "training_sample": 50000,
+  "leak_audit_seeds": 5000,
+  "development": {
+    "dataset": "rel-amazon",
+    "tasks": [
+      "user-churn"
+    ],
+    "cutoffs": [
+      1,
+      2
+    ],
+    "candidates": [
+      "original",
+      "compact-reuse"
+    ],
+    "selection": "Use compact-reuse only if all development sessions finish, all final audits are clean, validation AUC is within 0.01 of original at each cutoff, and total tokens including learning are lower. Never read development test labels. Otherwise use original."
+  },
+  "evaluation": {
+    "datasets": [
+      "rel-stack",
+      "rel-trial"
+    ],
+    "arms": [
+      "none",
+      "mavra",
+      "ace",
+      "awm",
+      "gmemory"
+    ],
+    "cutoffs": [
+      1,
+      2,
+      3
+    ],
+    "runs": [
+      1
+    ],
+    "parallel_cells": 4,
+    "within_cell_parallel": 1,
+    "memory_max_gb": 20,
+    "min_disk_free_gb": 20,
+    "order": "Fixed method/database order with at most four active cells (increased from three after a resource-only audit at 01:14 local: 48 cores, load 2.71/3.36/3.78, available RAM 60.3 GiB, free disk 71.4 GiB). A free slot takes the next full sequence without waiting for a method pair. The no-memory rel-stack control may overlap the second development candidate. Selection reads development validation only and preserves its original freeze record on restart. No scheduling or repetition selection based on test scores."
+  },
+  "reporting": {
+    "primary": [
+      "test AUC or MAE by task",
+      "all-session tokens including memory",
+      "reuse-session tokens",
+      "completed and clean sessions"
+    ],
+    "secondary": [
+      "schema and probe calls",
+      "validation and memory calls",
+      "memory construction and maintenance time",
+      "observed session time"
+    ],
+    "quality_margin": {
+      "auc_absolute": 0.01,
+      "mae_relative": 0.02
+    },
+    "single_run": "Descriptive comparison; time cutoffs are not independent repeats. No significance claim.",
+    "incomplete": "Show every scheduled cell's status. Only complete matched support is used in comparative plots; no winner-selected tasks, runs or cutoffs.",
+    "historical": "Do not pool third-party-gateway runs with this official-API study. Preserve archived evidence."
+  },
+  "feature_statement_timeout_seconds": 600,
+  "tool_call_http_timeout_seconds": 180,
+  "timeout_implementation_audit": "The shared read_sql function bound timeout_s=600 when imported. Setting harness.FEATURE_SQL_TIMEOUT_S to 180 only affected dynamic lookups such as Middle.call HTTP timeout, not that bound default. All existing cells actually used 600-second feature statements. Correct metadata only; preserve runtime behavior and frozen algorithm."
+}

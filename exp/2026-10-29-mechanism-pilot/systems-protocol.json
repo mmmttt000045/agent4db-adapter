@@ -1,0 +1,26 @@
+{
+  "phase": "bounded mechanism supplement, specified after archive inspection and before new system measurements",
+  "llm_calls": 0,
+  "sequence": "Run after Figure A pilot completes, on an isolated synthetic database; do not compete with its CPU/database measurements.",
+  "B": {
+    "definitions": 16,
+    "rows_per_fact": 100000,
+    "reuse_factors": [1, 2, 4, 8],
+    "policies": ["definition", "definition-cache", "condition"],
+    "agents": 8,
+    "arrivals": ["staggered", "burst"],
+    "repetitions": 3,
+    "seed": 20261029,
+    "design": "All 16 fact/date table pairs exist and are warmed in every cell. Each definition uses one pair. The number of definitions, rows per fact, requests, seed/admission gates, version invalidation and in-flight merging are fixed. Sharing changes only the mapping of definitions to table pairs. Distinct sums over the same grain use different constant unit conversions. Explicit committed batches invalidate BOTH the fact and the date table in every pair before measurement, avoiding an unchanged-dimension skipping advantage. No-op writes preserve semantic validity.",
+    "limits": "Exact shared checks in a controlled synthetic workload, not evidence of semantic subsumption or application-level generalization. The active table working set necessarily shrinks as sharing rises. Three run blocks support spread plots, not a strong significance claim. Full recheck and SQL/version cache are both retained."
+  },
+  "C": {
+    "rows": 200000,
+    "modes": ["transactional-version precheck", "transactional-version snapshot-bound"],
+    "cases": ["benign_after_check", "violation_after_check", "violation_before_call"],
+    "trials_per_case_and_mode": 5,
+    "design": "Same compiled query, guards, transactional version table, condition cache and run_bound path. A test-only switch releases the validation snapshot before execution in the precheck control. An explicit test-only two-way barrier makes the concurrent commit occur after successful validation and before execution. The writer and reader use different connections. The returned query includes its own same-statement grain-condition oracle.",
+    "limits": "Deterministic mechanism verification, not a throughput benchmark or naturally occurring violation-rate estimate. Artificial barrier time must never appear in a performance figure. The older asynchronous-version experiment remains separate.",
+    "pass_gate": "All bound calls in these controlled schedules are condition-valid or refused; a breaking write before validation is refused by both modes; all calls/errors remain in the output."
+  }
+}

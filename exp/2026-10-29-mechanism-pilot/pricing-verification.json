@@ -1,0 +1,11 @@
+{
+  "verified_date": "2026-10-29",
+  "source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "model_version": "DeepSeek-V4.1-Flash-1017",
+  "ceiling_cny_per_million": {
+    "hit": 0.04,
+    "miss": 2,
+    "output": 8
+  },
+  "conservative_peak_prices": true
+}

@@ -1,0 +1,390 @@
+{
+  "head": "01daa2133a54ee45a8d1b529b5e04167e81ed340",
+  "tree": "926da61d2dd9fb0a9481db83ca25a6515ce1e6b1",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "sha": "d72fd520b1c12f276273f6d5b6cbc0c7f3bbf884",
+      "size": 13
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "sha": "8e11f5c025554126589c216930ef1cd17302e879",
+      "size": 315
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "sha": "259a94fa236add018d9ffe2555d5323b7332b8db",
+      "size": 7847
+    },
+    {
+      "path": "build.sh",
+      "mode": "100644",
+      "sha": "3066146533c92c2b839810a4527d416cbf4f5433",
+      "size": 4221
+    },
+    {
+      "path": "figures/architecture-zh.pdf",
+      "mode": "100644",
+      "sha": "f5b1f60f20a24836eeecae5b01a106be0239bd59",
+      "size": 134378
+    },
+    {
+      "path": "figures/architecture.pdf",
+      "mode": "100644",
+      "sha": "c7fbd374ec0e233a3e0835d0dbefe0e15fbcb0d6",
+      "size": 134948
+    },
+    {
+      "path": "figures/architecture.tex",
+      "mode": "100644",
+      "sha": "23d3099db8429dee1cc883a0c871ba6220e458cc",
+      "size": 2915
+    },
+    {
+      "path": "figures/consumer-cost-zh.pdf",
+      "mode": "100644",
+      "sha": "2407c85bd3f17e5ccfe47089fa20e1b9c46e7417",
+      "size": 52227
+    },
+    {
+      "path": "figures/consumer-cost.pdf",
+      "mode": "100644",
+      "sha": "f381d8f5faf35987b1e63a054d550cc52c632384",
+      "size": 48127
+    },
+    {
+      "path": "figures/consumer-cost.tex",
+      "mode": "100644",
+      "sha": "9321a0f6a4328a03af53a71d8e3906aa2949e770",
+      "size": 1244
+    },
+    {
+      "path": "figures/metric-record-zh.pdf",
+      "mode": "100644",
+      "sha": "10f71f22c69663592d6a6470e1400b766acab474",
+      "size": 38380
+    },
+    {
+      "path": "figures/metric-record.pdf",
+      "mode": "100644",
+      "sha": "9de41d8c53bac2ef615510aa2c7ea0eada6786af",
+      "size": 39925
+    },
+    {
+      "path": "figures/metric-record.tex",
+      "mode": "100644",
+      "sha": "6411b264d0fcacd405b5fac5ea00855fb2d16a97",
+      "size": 1908
+    },
+    {
+      "path": "figures/population-zh.pdf",
+      "mode": "100644",
+      "sha": "c8908d9f63e6600bb82edca08a044b3ecaf9f1e7",
+      "size": 77962
+    },
+    {
+      "path": "figures/population.pdf",
+      "mode": "100644",
+      "sha": "699c8388c899ab240e43b90c94a62eac487418fd",
+      "size": 65560
+    },
+    {
+      "path": "figures/population.tex",
+      "mode": "100644",
+      "sha": "dcb46226d7c958ad416a12ab96ddeefdc97a83ba",
+      "size": 1606
+    },
+    {
+      "path": "figures/relbench-cumulative-zh.pdf",
+      "mode": "100644",
+      "sha": "c2d58d2bef053a01ef99641cb924fcbd990284e6",
+      "size": 62648
+    },
+    {
+      "path": "figures/relbench-cumulative.pdf",
+      "mode": "100644",
+      "sha": "22c0165451a2a973387a99fb33087313dbd8c63a",
+      "size": 52666
+    },
+    {
+      "path": "figures/relbench-cumulative.tex",
+      "mode": "100644",
+      "sha": "f2cca8bbeaa7f2b968d8d7a846eaa680459281b1",
+      "size": 1096
+    },
+    {
+      "path": "figures/two-schemas-zh.pdf",
+      "mode": "100644",
+      "sha": "87851d5a0eef26fbe9e57f0da8cd27a94276b011",
+      "size": 61472
+    },
+    {
+      "path": "figures/two-schemas.pdf",
+      "mode": "100644",
+      "sha": "897be488029d45e3ddca441f3792e0a8eac0611f",
+      "size": 51815
+    },
+    {
+      "path": "figures/two-schemas.tex",
+      "mode": "100644",
+      "sha": "00b1c8bc2c62ea6e95a657925d7294e4c53bef41",
+      "size": 1354
+    },
+    {
+      "path": "gen/external.tex",
+      "mode": "100644",
+      "sha": "e25b5b5b358cabd6c3c7decbb261ba1ee62a4460",
+      "size": 1233
+    },
+    {
+      "path": "gen/generality.tex",
+      "mode": "100644",
+      "sha": "ac748db2adf7b4c0b508453137a7c871f12d8dd3",
+      "size": 6891
+    },
+    {
+      "path": "gen/lifecycle.tex",
+      "mode": "100644",
+      "sha": "04b5e310c2ad4acfe56a36a0ec14f779675c401b",
+      "size": 2190
+    },
+    {
+      "path": "gen/numbers-prev.tex",
+      "mode": "100644",
+      "sha": "6a6339676e84bda466579161865993d977ec163a",
+      "size": 4777
+    },
+    {
+      "path": "gen/numbers.tex",
+      "mode": "100644",
+      "sha": "3f021e03f7fecab32ef3e9a83d0427b7f79b4cf2",
+      "size": 5294
+    },
+    {
+      "path": "gen/opt.tex",
+      "mode": "100644",
+      "sha": "e050fbb74b8596562752c8864044cb01f49ba68c",
+      "size": 429
+    },
+    {
+      "path": "gen/population.tex",
+      "mode": "100644",
+      "sha": "3c359518b60eec6448124650745124989ac7afb4",
+      "size": 8410
+    },
+    {
+      "path": "gen/premise.tex",
+      "mode": "100644",
+      "sha": "4f562cd712d52d501016375c1539590cc2eb8ca2",
+      "size": 474
+    },
+    {
+      "path": "gen/relbench-table.tex",
+      "mode": "100644",
+      "sha": "8a9cd3c69f33eb20a764e6b5cb577c7d0ad7546b",
+      "size": 1934
+    },
+    {
+      "path": "gen/relbench.tex",
+      "mode": "100644",
+      "sha": "e407e408d2a2be604517f79942dd0e27500dab66",
+      "size": 18203
+    },
+    {
+      "path": "gen/replay-safety.tex",
+      "mode": "100644",
+      "sha": "df03a1b09b598e7cfedba985accb46784a0bef0b",
+      "size": 817
+    },
+    {
+      "path": "gen/review.tex",
+      "mode": "100644",
+      "sha": "1da5c3db0ee9f57316bd3deed2464700dcf96869",
+      "size": 9930
+    },
+    {
+      "path": "gen/scen-ds.tex",
+      "mode": "100644",
+      "sha": "1ad0812dc0811d76f117b42ffe715192fe7d4e4e",
+      "size": 14085
+    },
+    {
+      "path": "gen/session-latency.tex",
+      "mode": "100644",
+      "sha": "ef3508a941ba33b9044405106e9a5b213fc52572",
+      "size": 1274
+    },
+    {
+      "path": "gen/sharing.tex",
+      "mode": "100644",
+      "sha": "23a99a5b4819e0a273fd1549a51cc407a010a39f",
+      "size": 1648
+    },
+    {
+      "path": "latex/preamble.tex",
+      "mode": "100644",
+      "sha": "5a1954d9b97af537a86dbcefea1b67143b18c304",
+      "size": 5668
+    },
+    {
+      "path": "main-en.tex",
+      "mode": "100644",
+      "sha": "8e75974597b38d8785d1b6fb2c51f7bebe1588be",
+      "size": 291
+    },
+    {
+      "path": "main.tex",
+      "mode": "100644",
+      "sha": "897f2e81462019ebc0d6ca31c17d8b4a96b665f7",
+      "size": 289
+    },
+    {
+      "path": "paper.tex",
+      "mode": "100644",
+      "sha": "3950224c974eedc22632bcd45ccd05d4ec1c0c61",
+      "size": 748
+    },
+    {
+      "path": "references.bib",
+      "mode": "100644",
+      "sha": "9ef6d99880bf87762beb8675ba584243ff3e0fd2",
+      "size": 30882
+    },
+    {
+      "path": "references.tex",
+      "mode": "100644",
+      "sha": "48c237f72ed285ea794b89d727e802847578b113",
+      "size": 172
+    },
+    {
+      "path": "sections/01-introduction.tex",
+      "mode": "100644",
+      "sha": "ca0001e1afe8dba90dfe33d58563014044b2c08d",
+      "size": 9457
+    },
+    {
+      "path": "sections/02-background.tex",
+      "mode": "100644",
+      "sha": "10210bb0f38fa20983083102e9f1a8eb40200de0",
+      "size": 14180
+    },
+    {
+      "path": "sections/03-overview.tex",
+      "mode": "100644",
+      "sha": "a01facbe13d04f8fe3f2d95d445d9a70026514d6",
+      "size": 4369
+    },
+    {
+      "path": "sections/04-sharing.tex",
+      "mode": "100644",
+      "sha": "a1cdfd4f2675943e3fdee8df72ddb604a7346b60",
+      "size": 32288
+    },
+    {
+      "path": "sections/07-evaluation.tex",
+      "mode": "100644",
+      "sha": "418c63d9159012d45288aa5f3e1e868524a49c7f",
+      "size": 1360
+    },
+    {
+      "path": "sections/08-related-work.tex",
+      "mode": "100644",
+      "sha": "a0dc4e6b97cfa899f7df2a6a6246b08176c2db95",
+      "size": 9974
+    },
+    {
+      "path": "sections/10-conclusion.tex",
+      "mode": "100644",
+      "sha": "8120163c253c3c5d9510e20205bc62eb1bcb791c",
+      "size": 3225
+    },
+    {
+      "path": "sections/abstract.tex",
+      "mode": "100644",
+      "sha": "3cd1fddc9079539c759ed81cc74ce5371a19d8d6",
+      "size": 3181
+    },
+    {
+      "path": "sections/evaluation/changes.tex",
+      "mode": "100644",
+      "sha": "6957e89ded77b4e8cf9495f423a90a7053bb52bb",
+      "size": 4417
+    },
+    {
+      "path": "sections/evaluation/cost.tex",
+      "mode": "100644",
+      "sha": "9f2b515f57ac8c16e95276f284bdf2d6696059c9",
+      "size": 5928
+    },
+    {
+      "path": "sections/evaluation/population.tex",
+      "mode": "100644",
+      "sha": "dd30385cb9fe53bd9ce868608f2e1987ea4ab218",
+      "size": 5646
+    },
+    {
+      "path": "sections/evaluation/relbench.tex",
+      "mode": "100644",
+      "sha": "3179596b03cb661fe18d71651ca62ec4c73b84a6",
+      "size": 14419
+    },
+    {
+      "path": "sections/evaluation/setup.tex",
+      "mode": "100644",
+      "sha": "76f709411c62ab09e985ebc3ad754f88510aa946",
+      "size": 4806
+    },
+    {
+      "path": "sections/evaluation/sharing.tex",
+      "mode": "100644",
+      "sha": "275fe96a3ac9d352ad30ea94e44aafe915169c46",
+      "size": 3851
+    },
+    {
+      "path": "tables/capabilities.tex",
+      "mode": "100644",
+      "sha": "2f13b50e5490472dda2e82e092bf3e571db49862",
+      "size": 3338
+    },
+    {
+      "path": "tables/external.tex",
+      "mode": "100644",
+      "sha": "5be0eeba2f572d64842d3993f7d931b4039c508e",
+      "size": 2061
+    },
+    {
+      "path": "tables/population-cost.tex",
+      "mode": "100644",
+      "sha": "6fede6939a376d9f3247bad0474b1c31ea123d17",
+      "size": 1413
+    },
+    {
+      "path": "tables/relbench.tex",
+      "mode": "100644",
+      "sha": "7f7513b1319f0e452dd34e1a288c0799c3445b89",
+      "size": 2522
+    },
+    {
+      "path": "tables/replay-safety.tex",
+      "mode": "100644",
+      "sha": "76979b31c3a8a8cef5d5e37f059691253c63e3b7",
+      "size": 1236
+    },
+    {
+      "path": "tables/strategies.tex",
+      "mode": "100644",
+      "sha": "03b058216034f78855f86ad27605141a469a8e9b",
+      "size": 2590
+    },
+    {
+      "path": "tables/workload.tex",
+      "mode": "100644",
+      "sha": "e393286bd402a65231be49da4a0cecfa286a9c64",
+      "size": 2253
+    }
+  ]
+}

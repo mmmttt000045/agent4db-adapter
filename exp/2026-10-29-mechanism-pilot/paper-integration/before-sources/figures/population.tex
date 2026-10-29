@@ -1,0 +1,11 @@
+\begin{figure*}[t]
+\centering
+\ifbilingual
+\includegraphics[width=\textwidth]{figures/population-zh}
+\else
+\includegraphics[width=\textwidth]{figures/population}
+\fi
+\caption{\bt{Cost across \PpAgents\ sequential agents on TPC-DS: (a) cumulative tokens, including learning; (b) cumulative agent-session time; (c) tokens per question for each agent (log scale). Lines show means and error bars show the minimum--maximum range over \PpRuns\ runs. Mean accuracy is \PpNoneAcc\%, \PpPrivateAcc\%, and \PpMavraAcc\% for no memory, single-agent memory, and \system, respectively.}{TPC-DS 上 \PpAgents\ 个智能体依次到达时的代价：(a) 累计 token，含学习；(b) 累计智能体会话时间；(c) 各智能体每题的 token（对数坐标）。折线为 \PpRuns\ 次运行的均值，误差线表示最小值到最大值。无记忆、单智能体记忆和 \system\ 的平均正确率分别为 \PpNoneAcc\%、\PpPrivateAcc\% 和 \PpMavraAcc\%。}}
+\label{fig:population}
+\Description{Three line charts with capped minimum--maximum error bars compare no memory, single-agent memory, and MAVRA over five runs. Left: cumulative tokens in millions versus the number of agents that have arrived, 1 to 16. Middle: cumulative agent-session time in minutes. Right: tokens per question of each agent on a log scale. Different line styles and hollow markers distinguish the methods.}
+\end{figure*}

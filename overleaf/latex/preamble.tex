@@ -7,9 +7,13 @@
   \setCJKmonofont{Noto Sans Mono CJK SC}
   % Bilingual draft only: stretch interword space rather than overflow the margin.
   \setlength{\emergencystretch}{1.5em}
+\else
+  % Preserve IEEE's Times fonts with pdfLaTeX and the XeTeX-based fallback compiler.
+  \usepackage[T1]{fontenc}
 \fi
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{pifont}
 \usepackage{amsthm}
 \newtheorem{proposition}{Proposition}
 \newtheorem{lemma}{Lemma}
@@ -24,6 +28,7 @@
 \usepackage{xcolor}
 \usepackage{colortbl}
 \usepackage{graphicx}
+\usepackage{placeins}
 % Give each full-width float its own page-top slot (especially Table III and Fig. 2).
 \setcounter{dbltopnumber}{1}
 % Keep natural float gaps compact; allow stretch to align column bottoms.
@@ -48,8 +53,8 @@
 \definecolor{mNoShare}{HTML}{9C5A26}
 \definecolor{mScope}{HTML}{A9740A}
 \definecolor{mCache}{HTML}{3A3A3A}
-\definecolor{mTraj}{HTML}{00A087} % example retrieval
-\definecolor{mTrajVerify}{HTML}{66C2AE} % example retrieval with self-verification: tint of the retrieval teal
+\definecolor{mTraj}{HTML}{00A087} % retained palette entry for archived figures
+\definecolor{mTrajVerify}{HTML}{66C2AE} % retained palette entry for archived figures
 \definecolor{mCondGold}{HTML}{9DB3E4} % MAVRA, gold-SQL reference: tint of the MAVRA navy
 \definecolor{mCondCur}{HTML}{5F86D6} % MAVRA, regression on current data: lighter blue of the MAVRA family
 \definecolor{mTable}{HTML}{8E5BB0} % dbt-style table tests
@@ -77,6 +82,8 @@
 \input{gen/replay-safety}
 \input{gen/population}
 \input{gen/external}
+\input{gen/official-numbers}
+\input{gen/mechanism}
 \input{gen/relbench}
 \input{gen/relbench-table}
 % Macros of runs still in progress: the generated files override these once the numbers exist.

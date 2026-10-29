@@ -1,0 +1,87 @@
+{
+  "verified_utc": "2026-10-28T20:15:44.779510+00:00",
+  "status": "complete; compiled and visually reviewed",
+  "pdfs": [
+    {
+      "path": "output\\pdf\\mavra-official-report-zh.pdf",
+      "sha256": "fb09930179ec33b0139fe682ed68488d9e6e185bc66ff3926be12c9a58da5e92",
+      "pages": 6
+    },
+    {
+      "path": "output\\pdf\\mavra-paper-en.pdf",
+      "sha256": "1ed0e5f2d9a794be8101b70e630ff224555c081474412cdafec16baf63228445",
+      "pages": 15
+    },
+    {
+      "path": "output\\pdf\\mavra-paper-bilingual.pdf",
+      "sha256": "8a0b4e8118a6c2cb273e1da145baf09f0aad03a397889e524e9af6d4f65047a0",
+      "pages": 22
+    },
+    {
+      "path": "output\\pdf\\fig5-reuse-work-en.pdf",
+      "sha256": "362ebfedd923bc4345e4495e242c72794d98dbbf408802c6da8c9027ebb2f6e4",
+      "pages": 1
+    },
+    {
+      "path": "output\\pdf\\fig5-reuse-work-zh.pdf",
+      "sha256": "0e584401413093c55e0df1c99766062f82e904edd98a951fd66b826ab22a0c99",
+      "pages": 1
+    },
+    {
+      "path": "output\\pdf\\fig3-cumulative-en.pdf",
+      "sha256": "3717493053dde1b6b8f457435ad92fc7720d5c728374e998460b6679f40148fa",
+      "pages": 1
+    },
+    {
+      "path": "output\\pdf\\fig3-cumulative-zh.pdf",
+      "sha256": "a4b3136d2751aa8e5a42cd5f4095f8c77a3f03b31a45b5ceda6a7b092ffb51f5",
+      "pages": 1
+    }
+  ],
+  "review": {
+    "report_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "english_paper_pages": [
+      1,
+      8,
+      9,
+      10,
+      12,
+      13
+    ],
+    "bilingual_paper_pages": [
+      1,
+      13,
+      14,
+      16
+    ],
+    "standalone_figures": "both languages reviewed",
+    "english_body_last_page": 12,
+    "english_references_first_page": 13,
+    "compiler": "remote TeX Live; latexmk PDF and XeLaTeX, exit 0; no undefined references or overfull boxes"
+  },
+  "evidence_sha256": {
+    "analysis.json": "5a429744358cd80eff026227c30852a085b8a8da0acfe6b780f96a2d4fa0fb84",
+    "evidence-audit.json": "916466b5012a8137e1caa95300090208f8abc6bcfb60807eb0831a4e020c83bf",
+    "expenses.json": "a11b34b409d3e759614ecc984f3960e5bb3daf0fb09f518a1d8693ce53a8369d",
+    "closing-balance.json": "1120abb597bb01b65e808415233488d5018d1aa9554bd2ec2927431ad6fd1bd4"
+  },
+  "formal_sessions": 90,
+  "formal_sequences": 10,
+  "official_requests": 1669,
+  "account_charge_cny": 14.63,
+  "usage_charge_cny": 14.62816972,
+  "authorized_budget_cny": 50,
+  "limitations": [
+    "One sequence per method/database, no independent repeats or confidence interval.",
+    "MAVRA passes 5/6 full-sequence quality margins; study-adverse MAE is 3.3% higher than no memory.",
+    "No explicit feature-composition calls; end-to-end savings cannot isolate feature composition.",
+    "Historical gateway studies remain separate from official-API results."
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "status": "pushed_and_verified",
+  "verified_utc": "2026-10-29T03:59:43.798Z",
+  "repository": "mmmttt000045/icde-2027-paper",
+  "branch": "main",
+  "previous_head": "b2755c23953b646e27ccd5fe9a1f9cf1798cca92",
+  "commit": "986fd00be273224c0a12ed171539d086ad020cc9",
+  "tree": "36cb3ad36de0aa5d0fe7d101eece6c8c0bc575a1",
+  "commit_url": "https://github.com/mmmttt000045/icde-2027-paper/commit/986fd00be273224c0a12ed171539d086ad020cc9",
+  "source_files_verified": 97,
+  "remote_only_preserved": [
+    ".gitattributes",
+    ".gitignore"
+  ],
+  "fig4": "All 90 official API sessions: 5 methods, 6 tasks; quality changes and valid-solution counts, including protocol fallback scores.",
+  "fig5": "Morning five-method work-distribution layout and values restored; internal-memory accounting footnote corrected.",
+  "protected": [
+    "Table III capability table",
+    "Table IV old layout and old experimental data",
+    "Fig.1 placement and introduction"
+  ],
+  "experiment_calls_added": 0,
+  "english_pages": 15,
+  "english_body_pages": 12,
+  "bilingual_pages": 23,
+  "compile": {
+    "en": {
+      "issues": [],
+      "labels": {
+        "fig:metric-record": {
+          "number": "1",
+          "page": 1
+        },
+        "fig:official-cumulative": {
+          "number": "3",
+          "page": 9
+        },
+        "fig:official-quality": {
+          "number": "4",
+          "page": 10
+        },
+        "fig:reuse-work": {
+          "number": "5",
+          "page": 11
+        },
+        "tab:capabilities": {
+          "number": "III",
+          "page": 4
+        },
+        "tab:relbench": {
+          "number": "IV",
+          "page": 8
+        }
+      }
+    },
+    "bi": {
+      "issues": [
+        "LaTeX Font Warning: Font shape `TU/ptm/m/n' undefined",
+        "LaTeX Font Warning: Font shape `TU/ptm/bx/n' undefined",
+        "LaTeX Font Warning: Font shape `TU/ptm/m/it' undefined",
+        "LaTeX Font Warning: Font shape `TU/ptm/bx/it' undefined",
+        "LaTeX Font Warning: Font shape `TU/NotoSerifCJKSC(0)/m/sc' undefined",
+        "LaTeX Font Warning: Font shape `TU/NotoSerifCJKSC(0)/m/it' undefined"
+      ],
+      "labels": {
+        "fig:metric-record": {
+          "number": "1",
+          "page": 1
+        },
+        "fig:official-cumulative": {
+          "number": "3",
+          "page": 14
+        },
+        "fig:official-quality": {
+          "number": "4",
+          "page": 15
+        },
+        "fig:reuse-work": {
+          "number": "5",
+          "page": 16
+        },
+        "tab:capabilities": {
+          "number": "III",
+          "page": 6
+        },
+        "tab:relbench": {
+          "number": "IV",
+          "page": 13
+        }
+      }
+    }
+  },
+  "visual_qa": {
+    "english_pages": [
+      1,
+      4,
+      8,
+      10,
+      11
+    ],
+    "bilingual_pages": [
+      1,
+      15,
+      16
+    ],
+    "figure_previews": [
+      "official-quality",
+      "official-quality-zh",
+      "reuse-work"
+    ],
+    "result": "No clipped figures, overlapping labels, or undefined references observed."
+  }
+}

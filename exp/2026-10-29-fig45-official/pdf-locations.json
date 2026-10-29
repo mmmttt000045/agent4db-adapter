@@ -1,0 +1,60 @@
+{
+  "en": {
+    "pages": 15,
+    "locations": {
+      "Fig. 3.": [
+        9
+      ],
+      "Fig. 4.": [
+        10
+      ],
+      "Fig. 5.": [
+        11
+      ],
+      "TABLE III": [
+        4
+      ],
+      "TABLE IV": [
+        8
+      ],
+      "REFERENCES": [
+        13
+      ]
+    },
+    "rendered_pages": [
+      1,
+      4,
+      8,
+      10,
+      11
+    ]
+  },
+  "bi": {
+    "pages": 23,
+    "locations": {
+      "Fig. 3.": [
+        14
+      ],
+      "Fig. 4.": [
+        15
+      ],
+      "Fig. 5.": [
+        16
+      ],
+      "TABLE III": [
+        6
+      ],
+      "TABLE IV": [
+        13
+      ],
+      "REFERENCES": []
+    },
+    "rendered_pages": [
+      1,
+      6,
+      13,
+      15,
+      16
+    ]
+  }
+}

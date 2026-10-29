@@ -1,0 +1,183 @@
+{
+  "date": "2026-10-29",
+  "scope": "Paper integration of frozen evidence; no new model or database calls.",
+  "preserved": {
+    "existing_pdf_count": 24,
+    "existing_numeric_source_count": 18,
+    "all_old_figures_and_numbers_unchanged": true,
+    "references_bib_unchanged": true,
+    "additional_protected_files": [
+      "figures/relbench-cumulative.tex",
+      "figures/reuse-work.tex",
+      "sections/abstract.tex",
+      "sections/01-introduction.tex"
+    ]
+  },
+  "citations": {
+    "keys_preserved": 68,
+    "added": [],
+    "removed": []
+  },
+  "data": {
+    "all_figure_input_hashes_match": true,
+    "number_macros_match_source": true,
+    "macro_count": 15,
+    "pilot_cells": 8,
+    "pilot_valid": 6,
+    "B_requests": 9216,
+    "C_gate_passed": true
+  },
+  "new_figures": {
+    "memory-access-pilot.pdf": {
+      "sha256": "6c1e156adf2511594bb5f306b62b7d61b20c285c7768f4348827c2aa59a234cc",
+      "fonts": {
+        "/FUNCGH+TimesNewRomanPSMT": {
+          "type": "/CIDFontType2",
+          "embedded": true
+        }
+      },
+      "pages": 1
+    },
+    "memory-access-pilot-zh.pdf": {
+      "sha256": "f4cd6e60c7de4b4121090b03dcbe24865dc181ac083364fa18ef95167b1c760f",
+      "fonts": {
+        "/FWJJXU+SimSun": {
+          "type": "/CIDFontType2",
+          "embedded": true
+        },
+        "/DEUQTW+TimesNewRomanPSMT": {
+          "type": "/CIDFontType2",
+          "embedded": true
+        }
+      },
+      "pages": 1
+    },
+    "fixed-sharing.pdf": {
+      "sha256": "9ad72300f77a0c0c27ed4cb146ca7ba29bded44590b534a38dff41c05d08fb73",
+      "fonts": {
+        "/GYDUDA+TimesNewRomanPSMT": {
+          "type": "/CIDFontType2",
+          "embedded": true
+        }
+      },
+      "pages": 1
+    },
+    "fixed-sharing-zh.pdf": {
+      "sha256": "fdb4202d1c0ce8fd17745ad34f0c2b8542c87f542723ad6a61713c968bb0335c",
+      "fonts": {
+        "/FDZXVI+SimSun": {
+          "type": "/CIDFontType2",
+          "embedded": true
+        },
+        "/EZYHDA+TimesNewRomanPSMT": {
+          "type": "/CIDFontType2",
+          "embedded": true
+        }
+      },
+      "pages": 1
+    },
+    "snapshot-control.pdf": {
+      "sha256": "1c1d3188202322970ef090c31100fc525cc8ef6bec7d3b1c3fe59d2a5b5fc0a6",
+      "fonts": {
+        "/BXPKTX+TimesNewRomanPSMT": {
+          "type": "/CIDFontType2",
+          "embedded": true
+        }
+      },
+      "pages": 1
+    },
+    "snapshot-control-zh.pdf": {
+      "sha256": "936d6f08a9024e435d27b1c92504a9a4c167ed32e00870864e3cb81f409543b6",
+      "fonts": {
+        "/BYRMCO+SimSun": {
+          "type": "/CIDFontType2",
+          "embedded": true
+        },
+        "/DZMYGI+TimesNewRomanPSMT": {
+          "type": "/CIDFontType2",
+          "embedded": true
+        }
+      },
+      "pages": 1
+    }
+  },
+  "compiled": {
+    "main-en": {
+      "pages": 15,
+      "sha256": "0fbc1949b033275dc82544befa70cf560f7dbd57d8b4a1a8a2e409f3d4a43bbf",
+      "new_layout_or_reference_errors": [],
+      "known_backend_warnings": [
+        "Tectonic TU/ptm font fallback",
+        "duplicate float-object warnings"
+      ],
+      "font_mapping": "original source",
+      "body_last_page": 12,
+      "ai_and_references_start_page": 13
+    },
+    "main": {
+      "pages": 22,
+      "sha256": "a3eef87c0b5916eb02f6f0ae4bf30cca54ca583fae584fa04c06b04fcfdb5779",
+      "new_layout_or_reference_errors": [],
+      "known_backend_warnings": [
+        "Tectonic TU/ptm font fallback",
+        "duplicate float-object warnings"
+      ],
+      "font_mapping": "local staged relative Noto files; portable source unchanged"
+    }
+  },
+  "labels": {
+    "memory-access-pilot": {
+      "number": 5,
+      "english_page": 10
+    },
+    "fixed-sharing": {
+      "number": 6,
+      "english_page": 11
+    },
+    "snapshot-control": {
+      "number": 7,
+      "english_page": 12
+    },
+    "twoschemas": {
+      "number": 8,
+      "english_page": 12
+    }
+  },
+  "package": {
+    "name": "mavra-icde-mechanism-20261029.zip",
+    "source_files": 73,
+    "all_files_match_current_sources": true,
+    "sha256": "bddb3c3d2c8715678f4ce3caeab8af9632952d3cc4e0e58896f1872a52b86838",
+    "same_as_default": true
+  },
+  "visual_qa": {
+    "english_pages": [
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "bilingual_pages": [
+      15,
+      17,
+      18,
+      19,
+      20
+    ],
+    "render_directory": "tmp/mechanism-paper-qa",
+    "findings": "No clipped legends, overlapping labels, missing glyphs, or caption collisions in inspected new figure pages."
+  },
+  "preexisting_index_issues": [
+    "2026-10-29-fig3-restore",
+    "2026-10-29-fig45-official",
+    "2026-10-29-fig5-review",
+    "2026-10-29-fig5-table3-restore",
+    "2026-10-29-table4-fig1"
+  ],
+  "catalog_entry_paths_valid": true,
+  "whitespace_check": {
+    "passed": true,
+    "windows_crlf_accepted": true
+  }
+}

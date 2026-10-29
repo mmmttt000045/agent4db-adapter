@@ -1,46 +1,35 @@
-"""Figure: end-to-end accuracy on two schemas.
+"""End-to-end accuracy on synthetic retail and TPC-H SF1.
 
-Two panels share the y axis: the synthetic retail fixture (five runs per method)
-and TPC-H SF1 (three runs per method). Each group pools settings of one class:
-held-out questions, the four benign updates, the five breaking changes the
-conditions cover, and all twelve settings; settings within a group weigh
-equally, as in tools/scen-stats.py. For every method a vertical line spans the
-per-run accuracies and a marker gives the pooled value; marker shapes repeat the
-method colours so that identity does not rest on colour. The covered-breaks
-group is shaded, with its pooled values printed in a row at its foot.
-Data: exp/2026-10-10-scenarios-q5/scen-stats.json and
-exp/2026-10-11-generality/e2e/scen-stats.json (per-run counts in `runs`),
-checked against the \\Ds* and \\Ge* macros the text prints.
+Grouped bars show pooled accuracy, with settings weighted equally as in
+tools/scen-stats.py. Capped error bars span per-run accuracies. The four groups,
+original data sources, and macro checks are unchanged.
 """
 import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from matplotlib.lines import Line2D  # noqa: E402
+from matplotlib.patches import Patch  # noqa: E402
 import mplstyle  # noqa: E402
 import style  # noqa: E402
-from style import FOCUS, INK, MUTED, WHITE  # noqa: E402
 
 NAME = 'two-schemas'
-W, H = style.COLUMN, 42.0
+W, H = style.COLUMN, 52.0
 PHASES = {'holdout': ['holdout'], 'benign': ['append', 'backfill', 'correct', 'addcol'],
           'modeled': ['status', 'revision', 'dupload', 'dimhist', 'latekey'],
           'all': ['holdout', 'append', 'backfill', 'correct', 'addcol', 'status', 'revision', 'dupload', 'dimhist',
                   'latekey', 'unit', 'mirror']}
 GROUPS = ['holdout', 'benign', 'modeled', 'all']
 # (mode, macro key of the synthetic study, macro key of TPC-H, marker)
-METHODS = [('middle', 'NoShare', 'NoShare', '^'), ('traj-global', 'Traj', 'Traj', 's'),
+METHODS = [('middle', 'NoShare', 'NoShare', '^'),
            ('metric-global-snap', 'Cond', 'Cond', 'o')]
 PANELS = [(style.ROOT / 'exp/2026-10-10-scenarios-q5/scen-stats.json', 'Ds'),
           (style.ROOT / 'exp/2026-10-11-generality/e2e/scen-stats.json', 'Ge')]
-OFFSET = .26
-VALUE_ROW = 15.5   # y of the printed values in the covered-breaks group
 TEXT = {
     'en': {'groups': ['Held-\nout', 'Non-\nbreaking', 'Covered\nbreaks', 'All\nsettings'],
-           'panels': ['Synthetic retail, {runs} runs', 'TPC-H SF1, {runs} runs'], 'y': 'Accuracy (%)'},
-    'zh': {'groups': ['留出题', '正常更新', '覆盖的\n破坏', '全部\n情形'],
-           'panels': ['合成零售数据，{runs} 次运行', 'TPC-H SF1，{runs} 次运行'], 'y': '正确率（%）'},
+           'panels': ['(a) Synthetic retail', '(b) TPC-H SF1'], 'y': 'Accuracy (%)'},
+    'zh': {'groups': ['留出题', '正常\n更新', '覆盖的\n破坏', '全部\n情形'],
+           'panels': ['(a) 合成零售数据', '(b) TPC-H SF1'], 'y': '正确率（%）'},
 }
 
 
@@ -77,46 +66,37 @@ def load():
 def figure(lang):
     panels, T = load(), TEXT[lang]
     fig = mplstyle.figure(W, H)
-    axes = fig.subplots(1, 2, sharey=True, gridspec_kw=dict(left=.085, right=.995, top=.74, bottom=.17, wspace=.06))
-    handles = []
-    for mode, _, _, marker in METHODS:
-        label, color = style.method(mode, lang)
-        handles.append(Line2D([], [], color=color, marker=marker, ms=3.6, mfc=color, mec=WHITE, mew=.35, lw=.9,
-                              label=label))
-    legend = fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.54, 1.0), ncol=3, handlelength=1.4,
-               columnspacing=1.0)
-    # MAVRA's entry is set as in Figures 4 and 5: bold, in its colour
-    for entry in legend.get_texts():
-        if entry.get_text().startswith('MAVRA'):
-            entry.set_color(style.method('metric-global-snap', lang)[1])
-            entry.set_fontweight('bold')
-    for k, (ax, (runs, rows)) in enumerate(zip(axes, panels)):
-        ax.set_title(T['panels'][k].format(runs=runs), pad=3)
-        ax.axvspan(1.5, 2.5, color=FOCUS, lw=0, zorder=0)
-        for gi, g in enumerate(GROUPS):
-            for mi, (mode, _, _, marker) in enumerate(METHODS):
-                _, color = style.method(mode, lang)
-                pooled, per_run = rows[mode][g]
-                x = gi + (mi - 1) * OFFSET
-                ax.plot([x, x], [min(per_run), max(per_run)], color=color, lw=.9, solid_capstyle='butt', zorder=2)
-                ax.plot([x], [pooled], ls='', marker=marker, ms=3.6, mfc=color, mec=WHITE, mew=.35, zorder=3)
-                if g == 'modeled':
-                    # Pooled values in one row at the foot of the shaded group, under their markers
-                    ax.text(x, VALUE_ROW, f'{pooled:.0f}', ha='center', va='bottom', fontsize=mplstyle.SMALL,
-                            color=INK, fontweight='bold' if mode == 'metric-global-snap' else 'normal')
+    axes = fig.subplots(1, 2, sharey=True,
+                        gridspec_kw=dict(left=.12, right=.99, top=.86, bottom=.23, wspace=.24))
+    hatches = {'middle': '////', 'traj-global': r'\\\\', 'metric-global-snap': '....'}
+    handles = [Patch(**mplstyle.bar_style(mode, hatches[mode]), label=mplstyle.name(mode, lang))
+               for mode, _, _, _ in METHODS]
+    fig.legend(handles=handles, loc='upper center', bbox_to_anchor=(.51, 1.0), ncol=3,
+               handlelength=1.2, columnspacing=.9, fontsize=mplstyle.SMALL)
+    width = .30
+    for k, (ax, (_, rows)) in enumerate(zip(axes, panels)):
+        for mi, (mode, _, _, _) in enumerate(METHODS):
+            values = [rows[mode][g][0] for g in GROUPS]
+            lows = [min(rows[mode][g][1]) for g in GROUPS]
+            highs = [max(rows[mode][g][1]) for g in GROUPS]
+            xs = [gi + (mi - (len(METHODS) - 1) / 2) * width for gi in range(len(GROUPS))]
+            ax.bar(xs, values, width=width, **mplstyle.bar_style(mode, hatches[mode]), zorder=2)
+            ax.errorbar(xs, values,
+                        yerr=[[v - low for v, low in zip(values, lows)],
+                              [high - v for high, v in zip(highs, values)]],
+                        fmt='none', ecolor='black', elinewidth=.45, capsize=1.0,
+                        capthick=.45, zorder=3)
         ax.set_xlim(-.55, len(GROUPS) - .45)
-        ax.set_ylim(14, 104)
-        ax.set_xticks(range(len(GROUPS)))
-        ax.set_xticklabels(T['groups'])
-        ax.tick_params(axis='x', length=0, pad=2)
-        ax.set_yticks([25, 50, 75, 100])
+        ax.set_ylim(0, 105)
+        ax.set_xticks(range(len(GROUPS)), T['groups'])
+        ax.tick_params(axis='x', length=0, labelsize=mplstyle.SMALL)
+        ax.set_yticks([0, 25, 50, 75, 100])
         ax.yaxis.grid(True)
-        ax.set_axisbelow(True)
-        ax.spines['left'].set_visible(k == 0)
-        ax.tick_params(axis='y', length=0 if k else 1.8)
-    fig.text(.01, .905, T['y'], color=MUTED, fontsize=mplstyle.LABEL, ha='left', va='top')
+        box = ax.get_position()
+        fig.text((box.x0 + box.x1) / 2, .025, T['panels'][k],
+                 ha='center', va='bottom', fontsize=mplstyle.LABEL)
+    axes[0].set_ylabel(T['y'])
     return fig
-
 
 if __name__ == '__main__':
     for path in style.build(sys.modules[__name__]):

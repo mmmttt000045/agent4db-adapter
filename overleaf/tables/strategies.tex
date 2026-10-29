@@ -1,20 +1,19 @@
 \begin{table}[t]
 % The Times symbol font has no small-caps section sign.
-\caption{\bt{Compared methods, by what later sessions get. P: population study (\textup{\S}\ref{sec:population-eval}); Q: cost per question (\textup{\S}\ref{sec:sharing-eval}); C: cost of sharing (\textup{\S}\ref{sec:cost}); D: data changes (\textup{\S}\ref{sec:changes-eval}).}{本文比较的方法，按之后的会话得到什么划分。P：群体实验（\textup{\S}\ref{sec:population-eval}）；Q：每道题的代价（\textup{\S}\ref{sec:sharing-eval}）；C：共享的代价（\textup{\S}\ref{sec:cost}）；D：数据变化（\textup{\S}\ref{sec:changes-eval}）。}}
+\caption{\bt{Comparison of memory designs and maintenance policies across evaluation studies. P: population study; Q: cost per question; C: cost of sharing; D: data changes.}{各项评估中记忆设计与维护策略的比较。P：群体实验；Q：每道题的代价；C：共享的代价；D：数据变化。}}
 \label{tab:ladder}
 \footnotesize
 \setlength{\tabcolsep}{2.4pt}
 \newcommand{\usedin}{$\bullet$}
 \begin{tabularx}{\linewidth}{@{}P{0.27\linewidth}Lcccc@{}}
 \toprule
-\bt{Method}{方法} & \bt{What later sessions get}{之后的会话得到什么} & P & Q & C & D\\
+\bt{Method}{方法} & \bt{Information available to later sessions}{后续会话可用的信息} & P & Q & C & D\\
 \midrule
 \bt{No memory}{无记忆} & \bt{nothing; every question is explored}{什么也没有，每道题都探索} & \usedin & \usedin & & \usedin\\
 \bt{Single-agent memory}{单智能体记忆} & \bt{\system's memory, but each agent uses only what it learned itself}{\system\ 的记忆，但每个智能体只用自己学到的} & \usedin & & \usedin & \\
-\bt{Example retrieval}{示例检索} & \bt{up to three similar past sessions (question, SQL, calculation), never maintained}{最多三条相似的过去会话（题面、SQL、算式），从不维护} & & & & \usedin\\
-\bt{\quad + self-verification}{\quad + 自行核验} & \bt{the same, told to verify grain, joins, and date keys}{同上，并被要求先核对粒度、连接与日期键} & & & \usedin & \\
 \bt{Invalidate on every write}{每次写入即失效} & \bt{definitions, dropped on any write and relearned}{定义，任何写入都丢弃并重新学习} & & & \usedin & \\
 \bt{Full recheck per definition}{整定义重查} & \bt{definitions, all conditions rechecked on use, no shared results}{定义，使用时重查全部条件、不共享结果} & & & \usedin & \\
+\bt{Validation SQL cache}{验证 SQL 缓存} & \bt{rechecks cached by SQL and dependency versions}{按验证 SQL 与依赖版本缓存重查结果} & & & \usedin & \\
 \addlinespace
 \bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \bt{one memory for all agents; definitions checked, maintained, and optimized once}{所有智能体共用一份记忆；定义的检查、维护与优化都只做一次} & \usedin & \usedin & \usedin & \usedin\\
 \bottomrule

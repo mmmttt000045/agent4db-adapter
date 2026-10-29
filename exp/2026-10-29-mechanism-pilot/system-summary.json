@@ -1,0 +1,1354 @@
+{
+  "kind": "new controlled supplements; separate from archival previews",
+  "B": {
+    "complete": true,
+    "groups": [
+      {
+        "arrival": "staggered",
+        "reuse_factor": 1,
+        "policy": "definition",
+        "db_ms": {
+          "n": 3,
+          "median": 8739.968000000003,
+          "min": 8307.661,
+          "max": 9271.030000000002,
+          "raw": [
+            8307.661,
+            8739.968000000003,
+            9271.030000000002
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "raw": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 48,
+          "min": 48,
+          "max": 48,
+          "raw": [
+            48,
+            48,
+            48
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 8.778659326,
+          "min": 8.342796328,
+          "max": 9.312683529,
+          "raw": [
+            8.342796328,
+            8.778659326,
+            9.312683529
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 1,
+        "policy": "definition-cache",
+        "db_ms": {
+          "n": 3,
+          "median": 9407.660000000002,
+          "min": 8573.622999999998,
+          "max": 18482.922,
+          "raw": [
+            8573.622999999998,
+            9407.660000000002,
+            18482.922
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0763952453830494,
+          "min": 1.0320140650900413,
+          "max": 1.9936212049793813,
+          "raw": [
+            1.0320140650900413,
+            1.0763952453830494,
+            1.9936212049793813
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 48,
+          "min": 48,
+          "max": 96,
+          "raw": [
+            48,
+            48,
+            96
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 9.470234904,
+          "min": 8.630411081,
+          "max": 18.588902846,
+          "raw": [
+            8.630411081,
+            9.470234904,
+            18.588902846
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 1,
+        "policy": "condition",
+        "db_ms": {
+          "n": 3,
+          "median": 9335.986,
+          "min": 8202.623000000001,
+          "max": 9593.257000000001,
+          "raw": [
+            8202.623000000001,
+            9335.986,
+            9593.257000000001
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0347563323600504,
+          "min": 0.9873564893897333,
+          "max": 1.0681945288586867,
+          "raw": [
+            0.9873564893897333,
+            1.0681945288586867,
+            1.0347563323600504
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 48,
+          "min": 48,
+          "max": 48,
+          "raw": [
+            48,
+            48,
+            48
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 9.402115874,
+          "min": 8.257362723,
+          "max": 9.665549891,
+          "raw": [
+            8.257362723,
+            9.402115874,
+            9.665549891
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 2,
+        "policy": "definition",
+        "db_ms": {
+          "n": 3,
+          "median": 8814.591999999999,
+          "min": 8136.5639999999985,
+          "max": 9345.985,
+          "raw": [
+            8136.5639999999985,
+            8814.591999999999,
+            9345.985
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "raw": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 48,
+          "min": 48,
+          "max": 48,
+          "raw": [
+            48,
+            48,
+            48
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 8.848100333,
+          "min": 8.170737169,
+          "max": 9.389541335,
+          "raw": [
+            8.170737169,
+            8.848100333,
+            9.389541335
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 2,
+        "policy": "definition-cache",
+        "db_ms": {
+          "n": 3,
+          "median": 5645.129999999999,
+          "min": 4420.1680000000015,
+          "max": 5893.374999999999,
+          "raw": [
+            4420.1680000000015,
+            5645.129999999999,
+            5893.374999999999
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.6305782643562983,
+          "min": 0.543247493659486,
+          "max": 0.6404300959136849,
+          "raw": [
+            0.543247493659486,
+            0.6404300959136849,
+            0.6305782643562983
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 24,
+          "min": 24,
+          "max": 24,
+          "raw": [
+            24,
+            24,
+            24
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 5.695985783,
+          "min": 4.462343331,
+          "max": 5.963360607,
+          "raw": [
+            4.462343331,
+            5.695985783,
+            5.963360607
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 2,
+        "policy": "condition",
+        "db_ms": {
+          "n": 3,
+          "median": 5167.5599999999995,
+          "min": 4659.4259999999995,
+          "max": 5494.8859999999995,
+          "raw": [
+            4659.4259999999995,
+            5167.5599999999995,
+            5494.8859999999995
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.5862506171584573,
+          "min": 0.5726527807069421,
+          "max": 0.5879408109471607,
+          "raw": [
+            0.5726527807069421,
+            0.5862506171584573,
+            0.5879408109471607
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 24,
+          "min": 24,
+          "max": 24,
+          "raw": [
+            24,
+            24,
+            24
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 5.208756573,
+          "min": 4.706367265,
+          "max": 5.548022824,
+          "raw": [
+            4.706367265,
+            5.208756573,
+            5.548022824
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 4,
+        "policy": "definition",
+        "db_ms": {
+          "n": 3,
+          "median": 8505.397,
+          "min": 8389.456999999999,
+          "max": 9188.581,
+          "raw": [
+            8389.456999999999,
+            8505.397,
+            9188.581
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "raw": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 48,
+          "min": 48,
+          "max": 48,
+          "raw": [
+            48,
+            48,
+            48
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 8.546561545,
+          "min": 8.419484986,
+          "max": 9.236208944,
+          "raw": [
+            8.419484986,
+            8.546561545,
+            9.236208944
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 4,
+        "policy": "definition-cache",
+        "db_ms": {
+          "n": 3,
+          "median": 3203.107000000001,
+          "min": 2822.948999999999,
+          "max": 4088.8590000000004,
+          "raw": [
+            2822.948999999999,
+            3203.107000000001,
+            4088.8590000000004
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.37659700070437635,
+          "min": 0.33648768925092526,
+          "max": 0.44499351967403894,
+          "raw": [
+            0.33648768925092526,
+            0.37659700070437635,
+            0.44499351967403894
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 12,
+          "min": 12,
+          "max": 12,
+          "raw": [
+            12,
+            12,
+            12
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 3.259554992,
+          "min": 2.867208572,
+          "max": 4.168115544,
+          "raw": [
+            2.867208572,
+            3.259554992,
+            4.168115544
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 4,
+        "policy": "condition",
+        "db_ms": {
+          "n": 3,
+          "median": 3160.801999999999,
+          "min": 2388.813,
+          "max": 3505.6279999999997,
+          "raw": [
+            2388.813,
+            3160.801999999999,
+            3505.6279999999997
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.371623100015202,
+          "min": 0.28473988245008,
+          "max": 0.38152006278227285,
+          "raw": [
+            0.28473988245008,
+            0.371623100015202,
+            0.38152006278227285
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 12,
+          "min": 12,
+          "max": 12,
+          "raw": [
+            12,
+            12,
+            12
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 3.205009945,
+          "min": 2.41931136,
+          "max": 3.5472765539999997,
+          "raw": [
+            2.41931136,
+            3.205009945,
+            3.5472765539999997
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 8,
+        "policy": "definition",
+        "db_ms": {
+          "n": 3,
+          "median": 9033.956000000002,
+          "min": 8118.608,
+          "max": 9068.897000000003,
+          "raw": [
+            8118.608,
+            9068.897000000003,
+            9033.956000000002
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "raw": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 48,
+          "min": 48,
+          "max": 48,
+          "raw": [
+            48,
+            48,
+            48
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 9.085159663,
+          "min": 8.152253493,
+          "max": 9.116213017,
+          "raw": [
+            8.152253493,
+            9.116213017,
+            9.085159663
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 8,
+        "policy": "definition-cache",
+        "db_ms": {
+          "n": 3,
+          "median": 2757.1129999999994,
+          "min": 1630.881,
+          "max": 2797.5499999999997,
+          "raw": [
+            1630.881,
+            2757.1129999999994,
+            2797.5499999999997
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.30401855925808824,
+          "min": 0.20088185068179176,
+          "max": 0.30967053636302844,
+          "raw": [
+            0.20088185068179176,
+            0.30401855925808824,
+            0.30967053636302844
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 6,
+          "min": 6,
+          "max": 6,
+          "raw": [
+            6,
+            6,
+            6
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 2.820730083,
+          "min": 1.669096191,
+          "max": 2.853126183,
+          "raw": [
+            1.669096191,
+            2.820730083,
+            2.853126183
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "staggered",
+        "reuse_factor": 8,
+        "policy": "condition",
+        "db_ms": {
+          "n": 3,
+          "median": 1986.8860000000004,
+          "min": 1771.5659999999996,
+          "max": 2829.48,
+          "raw": [
+            1771.5659999999996,
+            1986.8860000000004,
+            2829.48
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.21908794421195874,
+          "min": 0.2182105602339711,
+          "max": 0.31320497908114664,
+          "raw": [
+            0.2182105602339711,
+            0.21908794421195874,
+            0.31320497908114664
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 6,
+          "min": 6,
+          "max": 6,
+          "raw": [
+            6,
+            6,
+            6
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 2.017383758,
+          "min": 1.805603794,
+          "max": 2.8745047919999998,
+          "raw": [
+            1.805603794,
+            2.017383758,
+            2.8745047919999998
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 1,
+        "policy": "definition",
+        "db_ms": {
+          "n": 3,
+          "median": 8067.677,
+          "min": 8023.158999999998,
+          "max": 8429.016,
+          "raw": [
+            8067.677,
+            8429.016,
+            8023.158999999998
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "raw": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 48,
+          "min": 48,
+          "max": 48,
+          "raw": [
+            48,
+            48,
+            48
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 1.712913458,
+          "min": 1.5973798399999999,
+          "max": 2.198332588,
+          "raw": [
+            1.5973798399999999,
+            2.198332588,
+            1.712913458
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 1,
+        "policy": "definition-cache",
+        "db_ms": {
+          "n": 3,
+          "median": 8240.899,
+          "min": 8132.293,
+          "max": 8560.576000000001,
+          "raw": [
+            8240.899,
+            8560.576000000001,
+            8132.293
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0156079903039692,
+          "min": 1.0136023728309513,
+          "max": 1.0214711124404212,
+          "raw": [
+            1.0214711124404212,
+            1.0156079903039692,
+            1.0136023728309513
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 48,
+          "min": 48,
+          "max": 48,
+          "raw": [
+            48,
+            48,
+            48
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 1.791635391,
+          "min": 1.702499091,
+          "max": 2.343050867,
+          "raw": [
+            1.702499091,
+            2.343050867,
+            1.791635391
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 1,
+        "policy": "condition",
+        "db_ms": {
+          "n": 3,
+          "median": 8136.594000000001,
+          "min": 8019.624,
+          "max": 8213.63,
+          "raw": [
+            8213.63,
+            8136.594000000001,
+            8019.624
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.9995594004805342,
+          "min": 0.9653076942789053,
+          "max": 1.0180910812368913,
+          "raw": [
+            1.0180910812368913,
+            0.9653076942789053,
+            0.9995594004805342
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 48,
+          "min": 48,
+          "max": 48,
+          "raw": [
+            48,
+            48,
+            48
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 1.7398079850000001,
+          "min": 1.6855543,
+          "max": 2.227579119,
+          "raw": [
+            1.6855543,
+            2.227579119,
+            1.7398079850000001
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 2,
+        "policy": "definition",
+        "db_ms": {
+          "n": 3,
+          "median": 7555.719000000001,
+          "min": 7511.470000000001,
+          "max": 8139.8009999999995,
+          "raw": [
+            7511.470000000001,
+            7555.719000000001,
+            8139.8009999999995
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "raw": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 47,
+          "min": 45,
+          "max": 48,
+          "raw": [
+            45,
+            47,
+            48
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 1.716564041,
+          "min": 1.613739145,
+          "max": 2.07158566,
+          "raw": [
+            1.613739145,
+            2.07158566,
+            1.716564041
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 2,
+        "policy": "definition-cache",
+        "db_ms": {
+          "n": 3,
+          "median": 4330.264000000001,
+          "min": 4124.3110000000015,
+          "max": 4385.165999999999,
+          "raw": [
+            4124.3110000000015,
+            4330.264000000001,
+            4385.165999999999
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.5490684246891755,
+          "min": 0.5387313522775311,
+          "max": 0.5731107787359483,
+          "raw": [
+            0.5490684246891755,
+            0.5731107787359483,
+            0.5387313522775311
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 24,
+          "min": 24,
+          "max": 24,
+          "raw": [
+            24,
+            24,
+            24
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 1.219118836,
+          "min": 1.10146102,
+          "max": 1.3423754909999999,
+          "raw": [
+            1.10146102,
+            1.219118836,
+            1.3423754909999999
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 2,
+        "policy": "condition",
+        "db_ms": {
+          "n": 3,
+          "median": 4328.3179999999975,
+          "min": 4152.529999999999,
+          "max": 4707.341,
+          "raw": [
+            4152.529999999999,
+            4707.341,
+            4328.3179999999975
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.5528252126414668,
+          "min": 0.5317473977557925,
+          "max": 0.6230169491480559,
+          "raw": [
+            0.5528252126414668,
+            0.6230169491480559,
+            0.5317473977557925
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 24,
+          "min": 24,
+          "max": 24,
+          "raw": [
+            24,
+            24,
+            24
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 1.279250135,
+          "min": 1.15693366,
+          "max": 1.308575612,
+          "raw": [
+            1.15693366,
+            1.279250135,
+            1.308575612
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 4,
+        "policy": "definition",
+        "db_ms": {
+          "n": 3,
+          "median": 5331.252,
+          "min": 5199.889999999999,
+          "max": 5711.32,
+          "raw": [
+            5199.889999999999,
+            5711.32,
+            5331.252
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "raw": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 33,
+          "min": 32,
+          "max": 34,
+          "raw": [
+            32,
+            34,
+            33
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 1.782176741,
+          "min": 1.649687171,
+          "max": 2.174000474,
+          "raw": [
+            1.649687171,
+            2.174000474,
+            1.782176741
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 4,
+        "policy": "definition-cache",
+        "db_ms": {
+          "n": 3,
+          "median": 2310.9120000000003,
+          "min": 2151.618,
+          "max": 2405.2840000000006,
+          "raw": [
+            2151.618,
+            2310.9120000000003,
+            2405.2840000000006
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.4137814453767292,
+          "min": 0.40461959757113947,
+          "max": 0.4511668178506663,
+          "raw": [
+            0.4137814453767292,
+            0.40461959757113947,
+            0.4511668178506663
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 12,
+          "min": 12,
+          "max": 12,
+          "raw": [
+            12,
+            12,
+            12
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 0.935141069,
+          "min": 0.646298358,
+          "max": 1.223920738,
+          "raw": [
+            0.646298358,
+            1.223920738,
+            0.935141069
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 4,
+        "policy": "condition",
+        "db_ms": {
+          "n": 3,
+          "median": 2273.076,
+          "min": 2121.6980000000003,
+          "max": 2364.2150000000006,
+          "raw": [
+            2121.6980000000003,
+            2364.2150000000006,
+            2273.076
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.4139524663300254,
+          "min": 0.40802747750433194,
+          "max": 0.42636814016670005,
+          "raw": [
+            0.40802747750433194,
+            0.4139524663300254,
+            0.42636814016670005
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 12,
+          "min": 12,
+          "max": 12,
+          "raw": [
+            12,
+            12,
+            12
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 0.784541899,
+          "min": 0.624649978,
+          "max": 1.258625766,
+          "raw": [
+            0.624649978,
+            1.258625766,
+            0.784541899
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 8,
+        "policy": "definition",
+        "db_ms": {
+          "n": 3,
+          "median": 3440.9629999999997,
+          "min": 3283.7740000000013,
+          "max": 3974.9580000000005,
+          "raw": [
+            3283.7740000000013,
+            3974.9580000000005,
+            3440.9629999999997
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "raw": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 24,
+          "min": 21,
+          "max": 26,
+          "raw": [
+            24,
+            26,
+            21
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 1.792135806,
+          "min": 1.59447999,
+          "max": 2.184274089,
+          "raw": [
+            1.59447999,
+            2.184274089,
+            1.792135806
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 8,
+        "policy": "definition-cache",
+        "db_ms": {
+          "n": 3,
+          "median": 1328.7789999999995,
+          "min": 1158.4650000000001,
+          "max": 1339.3399999999997,
+          "raw": [
+            1158.4650000000001,
+            1339.3399999999997,
+            1328.7789999999995
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.3527846313418645,
+          "min": 0.3369444406708195,
+          "max": 0.38616486140653056,
+          "raw": [
+            0.3527846313418645,
+            0.3369444406708195,
+            0.38616486140653056
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 6,
+          "min": 6,
+          "max": 6,
+          "raw": [
+            6,
+            6,
+            6
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 0.851865994,
+          "min": 0.672013066,
+          "max": 0.854931692,
+          "raw": [
+            0.672013066,
+            0.851865994,
+            0.854931692
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      },
+      {
+        "arrival": "burst",
+        "reuse_factor": 8,
+        "policy": "condition",
+        "db_ms": {
+          "n": 3,
+          "median": 1157.7779999999998,
+          "min": 1116.533,
+          "max": 1297.8249999999998,
+          "raw": [
+            1116.533,
+            1157.7779999999998,
+            1297.8249999999998
+          ]
+        },
+        "paired_db_ratio": {
+          "n": 3,
+          "median": 0.34001517765838923,
+          "min": 0.2912679832088791,
+          "max": 0.3771691238760777,
+          "raw": [
+            0.34001517765838923,
+            0.2912679832088791,
+            0.3771691238760777
+          ]
+        },
+        "validation_queries": {
+          "n": 3,
+          "median": 6,
+          "min": 6,
+          "max": 6,
+          "raw": [
+            6,
+            6,
+            6
+          ]
+        },
+        "wall_seconds": {
+          "n": 3,
+          "median": 0.690745769,
+          "min": 0.646278064,
+          "max": 0.807203577,
+          "raw": [
+            0.646278064,
+            0.690745769,
+            0.807203577
+          ]
+        },
+        "unavailable": 0,
+        "requests": 384
+      }
+    ],
+    "extra_refresh_cells": [
+      {
+        "repeat": 2,
+        "reuse_factor": 1,
+        "policy": "definition-cache",
+        "arrival": "staggered",
+        "maintenance_events": 32,
+        "refreshes_per_key": {
+          "metric:unit_conversion_3": 2,
+          "metric:unit_conversion_5": 2,
+          "metric:unit_conversion_13": 2,
+          "metric:unit_conversion_15": 2,
+          "metric:unit_conversion_1": 2,
+          "metric:unit_conversion_0": 2,
+          "metric:unit_conversion_2": 2,
+          "metric:unit_conversion_6": 2,
+          "metric:unit_conversion_12": 2,
+          "metric:unit_conversion_9": 2,
+          "metric:unit_conversion_10": 2,
+          "metric:unit_conversion_7": 2,
+          "metric:unit_conversion_11": 2,
+          "metric:unit_conversion_14": 2,
+          "metric:unit_conversion_4": 2,
+          "metric:unit_conversion_8": 2
+        },
+        "interpretation": "Observed a second refresh for the same definitions; retained without exclusion. The version counter sequence was not recorded, so the cause is not established."
+      }
+    ],
+    "unavailable": 0,
+    "requests": 9216,
+    "limits": [
+      "three randomized run blocks; error bars show min-max, not confidence intervals",
+      "exact shared checks; no claim of semantic subsumption",
+      "active table working set shrinks with reuse",
+      "both fact and date versions change; no unchanged-dimension skip benefit",
+      "one zero-overlap SQL-cache cell refreshed all definitions twice; retained in the range",
+      "legacy versions include asynchronous DML counters; the cause of the second refresh is unresolved"
+    ]
+  },
+  "C": {
+    "failed_attempts": [
+      {
+        "error": "matched-C admission failed: {\"failed_gate\":\"G7\",\"gates\":[{\"gate\":\"G3\",\"pass\":true},{\"gate\":\"G4\",\"pass\":true},{\"gate\":\"G5\",\"pass\":true},{\"gate\":\"G7\",\"pass\":false,\"reason\":\"判题查询失败：SQL 执行失败：42703 字段 s.ss_is_current 不存在\"}],\"key\":\"metric:门店营业额\",\"promoted\":false,\"reason\":\"判题查询失败：SQL 执行失败：42703 字段 s.ss_is_current 不存在\",\"revision\":0}"
+      }
+    ],
+    "complete": true,
+    "groups": [
+      {
+        "case": "benign_after_check",
+        "mode": "tx-precheck",
+        "n": 5,
+        "served": 5,
+        "violation": 0,
+        "rejected": 0,
+        "error": 0
+      },
+      {
+        "case": "benign_after_check",
+        "mode": "tx-bound",
+        "n": 5,
+        "served": 5,
+        "violation": 0,
+        "rejected": 0,
+        "error": 0
+      },
+      {
+        "case": "violation_after_check",
+        "mode": "tx-precheck",
+        "n": 5,
+        "served": 0,
+        "violation": 5,
+        "rejected": 0,
+        "error": 0
+      },
+      {
+        "case": "violation_after_check",
+        "mode": "tx-bound",
+        "n": 5,
+        "served": 5,
+        "violation": 0,
+        "rejected": 0,
+        "error": 0
+      },
+      {
+        "case": "violation_before_call",
+        "mode": "tx-precheck",
+        "n": 5,
+        "served": 0,
+        "violation": 0,
+        "rejected": 5,
+        "error": 0
+      },
+      {
+        "case": "violation_before_call",
+        "mode": "tx-bound",
+        "n": 5,
+        "served": 0,
+        "violation": 0,
+        "rejected": 5,
+        "error": 0
+      }
+    ],
+    "gate_passed": true,
+    "limits": [
+      "controlled interleavings; no natural violation-rate estimate",
+      "artificial barrier time excluded from performance claims",
+      "same transactional version source in both modes"
+    ]
+  },
+  "sources": {
+    "results\\mechanism-systems-20261029\\B-1793254203844558\\report.json": {
+      "sha256": "1e4bb21cd23dd379dbbff7a5ddf2d55b142fecee1931e7cf98f9f545a444441a",
+      "cleaned_up": true
+    },
+    "results\\mechanism-systems-20261029\\C-1793253907819501\\report.json": {
+      "sha256": "c99e8cc925116fcac333c593e38c70ab245d5e146d6b6b7227dce0c8e62ba50f",
+      "cleaned_up": true
+    },
+    "results\\mechanism-systems-20261029\\C-1793254035988620\\report.json": {
+      "sha256": "8c4a2e24592148019fe51a35dc4d54b53d57c4f3f7270fdd213178d4d3899f23",
+      "cleaned_up": true
+    }
+  }
+}

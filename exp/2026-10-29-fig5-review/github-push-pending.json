@@ -1,0 +1,68 @@
+{
+  "status": "resolved_pushed_see_github-push-result.json",
+  "repository": "mmmttt000045/icde-2027-paper",
+  "branch": "main",
+  "expected_head": "01daa2133a54ee45a8d1b529b5e04167e81ed340",
+  "base_tree": "926da61d2dd9fb0a9481db83ca25a6515ce1e6b1",
+  "uploaded_blobs": [
+    {
+      "path": "figures/consumer-cost-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6d2bcf71a8aa1e6ab03bb6e1d62590ff7b43993c"
+    },
+    {
+      "path": "figures/consumer-cost.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a53e4df09646e6b6055d4df7ba745ee8ae0f358a"
+    },
+    {
+      "path": "figures/maintenance-cost-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39217159d73c813facf109f5d67ae5b088d7b941"
+    },
+    {
+      "path": "figures/maintenance-cost.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aac6ca9acb2fc0b9b00a64c7648a3c718c6f0f91"
+    },
+    {
+      "path": "figures/official-cumulative-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9de5d58c9c3af48361d87bfb34bcf923d933f63"
+    },
+    {
+      "path": "figures/official-cumulative.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "694a38a84cc1238ad68270134e72086e890ec7c8"
+    },
+    {
+      "path": "figures/population-zh.pdf",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9fd7e30c16b621fec29a9e90b3da03fdf2dbdde5"
+    }
+  ],
+  "required_binary_blob_count": 18,
+  "changed_file_count": 63,
+  "authenticated_login": "mmmttt000045",
+  "repository_owner": "mmmttt000045",
+  "visibility": "private",
+  "compilation": {
+    "en": {
+      "exit": 0,
+      "pages": 15,
+      "body_pages": 12
+    },
+    "bilingual": {
+      "exit": 0,
+      "pages": 22
+    }
+  },
+  "review_reason": "Automatic approval review requires explicit human confirmation of unpublished manuscript, results and PDF figure upload to the named repository, even after authenticated account and owner matched. No branch update, tree or commit was created."
+}

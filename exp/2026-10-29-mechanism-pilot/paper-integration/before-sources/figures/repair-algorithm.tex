@@ -1,0 +1,23 @@
+\begin{algorithm}[t]
+\caption{\bt{Automatic repair of a failed grain condition}{粒度条件失效后的自动修复}}
+\label{alg:repair}
+\footnotesize
+\begin{algorithmic}[1]
+\Require \bt{revision $m^r$ whose $\operatorname{KeyUnique}(F,K,\varphi)$ failed; learning question $x$; the agent's learning SQL $R$; the database $D_\ell$ as of learning time; low-cardinality columns $A$ of $F$}{$\operatorname{KeyUnique}(F,K,\varphi)$ 失效的版本 $m^r$；学习题 $x$；智能体的学习 SQL $R$；学习时刻的数据库 $D_\ell$（as-of）；$F$ 的低基数列 $A$}
+\State $P\gets\emptyset$
+\ForAll{$a\in A$ \textbf{and} $v\in\pi_a(F)$}
+  \State $\psi\gets\varphi\wedge(a=v)$
+  \If{$\operatorname{KeyUnique}(F,K,\psi)$ \textbf{and} $\pi_K(\sigma_\psi F)=\pi_K(\sigma_\varphi F)$}\label{alg:repair:keys}
+    \State $P\gets P\cup\{\psi\}$ \Comment{\bt{one row per key, no key lost}{每键一行且不丢键}}
+  \EndIf
+\EndFor
+\If{$|P|\neq 1$}\label{alg:repair:unique}
+  \State \Return \textsc{invalidate} \Comment{\bt{no fix, or several equivalent fixes}{没有修复，或多个等价修复}}
+\EndIf
+\State $m'\gets m^r$ \bt{with}{，令} $\varphi:=\psi$ \bt{for the single $\psi\in P$; re-derive $C(m')$}{（$\psi$ 为 $P$ 的唯一元素），重新推导 $C(m')$}
+\If{$m'$ \bt{fails the static, grain, or SQL checks}{未通过静态、粒度或 SQL 检查} \textbf{or} $\operatorname{compile}(m',x)(D_\ell)\neq R(D_\ell)$}\label{alg:repair:regression}
+  \State \Return \textsc{invalidate} \Comment{\bt{regression test}{回归测试}}
+\EndIf
+\State \bt{publish}{发布} $m^{r+1}=m'$
+\end{algorithmic}
+\end{algorithm}

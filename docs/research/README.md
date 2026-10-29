@@ -37,4 +37,8 @@
 
 ## 研究记录
 
+[TABLE III 原文核对](table-iii-audit-2026-10-28.md) 逐项说明能力符号、论文页码、官方文档与配置前提。
+
+[中英文润色清单](../../ccfa-review-reports/mavra-writing-review.md) 记录 2026-10-29 的用词、句式与段落调整及核查结果；[论文同步记录](../development/paper-sync.json) 保存独立论文仓库的已核验版本。
+
 [相关工作笔记](related-work.md) 保留检索时的论证；当前引用与基线实现说明分别在论文源码和 RelBench 实验目录。2026-10-07 的状态、10-03 已回退的稿件重构与早期实验协议见 [历史目录](../history/README.md)。

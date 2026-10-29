@@ -1,0 +1,566 @@
+{
+  "phase": "development pilot; validation only; one run per cell",
+  "complete": true,
+  "source": {
+    "historical_exploration_tokens": 241015,
+    "new_extraction_tokens": 10965,
+    "drafts": 12,
+    "published": 7,
+    "source_sha256": "46e0a428fac4896075f8d69cd8fdba974f356d1cff8f627fa412d0dccd5c7e99",
+    "lineage_check": {
+      "checked": true,
+      "source_sha256": "48d63517630429494879d10220f752a21d4087b4d3c0c5da03f20f54ae1af8b0",
+      "memory_responses": [
+        {
+          "tool": "find_program",
+          "features_returned": 0,
+          "program_returned": false,
+          "sql_returned": false
+        },
+        {
+          "tool": "find_features",
+          "features_returned": 0,
+          "program_returned": false,
+          "sql_returned": false
+        }
+      ],
+      "empty_source_memory": true
+    }
+  },
+  "rows": [
+    {
+      "name": "cross-task-none",
+      "arm": "none",
+      "target": {
+        "name": "cross-task",
+        "task": "user-engagement",
+        "cutoff": 1
+      },
+      "status": "complete",
+      "original_attempt_status": "complete",
+      "valid": false,
+      "validation_auc": null,
+      "audit": null,
+      "stop": "llm_budget",
+      "agent_tokens": 93755,
+      "historical_source_allocated_tokens": 0,
+      "new_extraction_allocated_tokens": 0,
+      "amortized_tokens": 93755,
+      "agent_seconds": 355.1278598308563,
+      "tools": {
+        "schema": 7,
+        "probe": 13,
+        "validate": 0,
+        "memory": 0,
+        "submit": 0
+      },
+      "memory_calls": [],
+      "exact_final_memory_matches": [],
+      "validation_memory_matches": [],
+      "source_path": "results\\mechanism-pilot-20261029\\cross-task-none\\sessions\\user_engagement-k1.json",
+      "sha256": "d987cb4aaca74a8a4781d637ee49a0443db4a63f5e292eb0814f6604fe3a1abb",
+      "pilot_flags": {
+        "test_labels_read": false,
+        "test_scored": false,
+        "target_writeback": false,
+        "source_sha256": null
+      },
+      "test_score": null,
+      "paired_validation_threshold": null,
+      "qualified_on_pilot_validation": null
+    },
+    {
+      "name": "cross-task-program",
+      "arm": "program",
+      "target": {
+        "name": "cross-task",
+        "task": "user-engagement",
+        "cutoff": 1
+      },
+      "status": "complete",
+      "original_attempt_status": "failed",
+      "valid": true,
+      "validation_auc": 0.8468620331950207,
+      "audit": {
+        "result": "clean",
+        "from_validation": 13
+      },
+      "stop": "validation_budget",
+      "agent_tokens": 119610,
+      "historical_source_allocated_tokens": 120507.5,
+      "new_extraction_allocated_tokens": 0,
+      "amortized_tokens": 240117.5,
+      "agent_seconds": 121.82033085823059,
+      "tools": {
+        "schema": 6,
+        "probe": 6,
+        "validate": 3,
+        "memory": 1,
+        "submit": 0
+      },
+      "memory_calls": [
+        "retrieve_programs"
+      ],
+      "exact_final_memory_matches": [],
+      "validation_memory_matches": [
+        {
+          "tool_i": 13,
+          "memory_match": [],
+          "val": 0.8468620331950207,
+          "leak": false,
+          "error": null
+        },
+        {
+          "tool_i": 14,
+          "memory_match": [],
+          "val": 0.8419562586445366,
+          "leak": false,
+          "error": null
+        },
+        {
+          "tool_i": 15,
+          "memory_match": [],
+          "val": 0.8424605232826187,
+          "leak": false,
+          "error": null
+        }
+      ],
+      "source_path": "results\\mechanism-pilot-20261029\\repair-v1\\cross-task-program\\sessions\\user_engagement-k1.json",
+      "sha256": "6b52d1fba26de6e6a40a421da035fcc49cd9f770aa10daba16e97fdcace1d848",
+      "pilot_flags": {
+        "test_labels_read": false,
+        "test_scored": false,
+        "target_writeback": false,
+        "source_sha256": "48d63517630429494879d10220f752a21d4087b4d3c0c5da03f20f54ae1af8b0"
+      },
+      "test_score": null,
+      "paired_validation_threshold": null,
+      "qualified_on_pilot_validation": null
+    },
+    {
+      "name": "cross-task-definition",
+      "arm": "definition",
+      "target": {
+        "name": "cross-task",
+        "task": "user-engagement",
+        "cutoff": 1
+      },
+      "status": "complete",
+      "original_attempt_status": "failed",
+      "valid": true,
+      "validation_auc": 0.8365966459197787,
+      "audit": {
+        "result": "clean",
+        "from_validation": 23
+      },
+      "stop": "validation_budget",
+      "agent_tokens": 153875,
+      "historical_source_allocated_tokens": 120507.5,
+      "new_extraction_allocated_tokens": 5482.5,
+      "amortized_tokens": 279865.0,
+      "agent_seconds": 111.29389667510986,
+      "tools": {
+        "schema": 7,
+        "probe": 13,
+        "validate": 3,
+        "memory": 1,
+        "submit": 0
+      },
+      "memory_calls": [
+        "find_features"
+      ],
+      "exact_final_memory_matches": [],
+      "validation_memory_matches": [
+        {
+          "tool_i": 21,
+          "memory_match": [],
+          "val": 0.8283050945136008,
+          "leak": true,
+          "error": null
+        },
+        {
+          "tool_i": 22,
+          "memory_match": [],
+          "val": null,
+          "leak": null,
+          "error": "SQL error: division by zero"
+        },
+        {
+          "tool_i": 23,
+          "memory_match": [],
+          "val": 0.8365966459197787,
+          "leak": false,
+          "error": null
+        }
+      ],
+      "source_path": "results\\mechanism-pilot-20261029\\repair-v1\\cross-task-definition\\sessions\\user_engagement-k1.json",
+      "sha256": "113680609932cef41c68c98bf908b9436b8bbb36ae776fb7a505096a38446081",
+      "pilot_flags": {
+        "test_labels_read": false,
+        "test_scored": false,
+        "target_writeback": false,
+        "source_sha256": "48d63517630429494879d10220f752a21d4087b4d3c0c5da03f20f54ae1af8b0"
+      },
+      "test_score": null,
+      "paired_validation_threshold": null,
+      "qualified_on_pilot_validation": null
+    },
+    {
+      "name": "cross-task-full",
+      "arm": "full",
+      "target": {
+        "name": "cross-task",
+        "task": "user-engagement",
+        "cutoff": 1
+      },
+      "status": "complete",
+      "original_attempt_status": "failed",
+      "valid": false,
+      "validation_auc": null,
+      "audit": null,
+      "stop": "llm_budget",
+      "agent_tokens": 136731,
+      "historical_source_allocated_tokens": 120507.5,
+      "new_extraction_allocated_tokens": 5482.5,
+      "amortized_tokens": 262721.0,
+      "agent_seconds": 49.4807767868042,
+      "tools": {
+        "schema": 7,
+        "probe": 9,
+        "validate": 0,
+        "memory": 2,
+        "submit": 0
+      },
+      "memory_calls": [
+        "find_features",
+        "retrieve_programs"
+      ],
+      "exact_final_memory_matches": [],
+      "validation_memory_matches": [],
+      "source_path": "results\\mechanism-pilot-20261029\\repair-v1\\cross-task-full\\sessions\\user_engagement-k1.json",
+      "sha256": "636bcf154ace4529bd104dceea1420390eeb535f97912d9721d3c67061c29434",
+      "pilot_flags": {
+        "test_labels_read": false,
+        "test_scored": false,
+        "target_writeback": false,
+        "source_sha256": "48d63517630429494879d10220f752a21d4087b4d3c0c5da03f20f54ae1af8b0"
+      },
+      "test_score": null,
+      "paired_validation_threshold": null,
+      "qualified_on_pilot_validation": null
+    },
+    {
+      "name": "same-task-later-none",
+      "arm": "none",
+      "target": {
+        "name": "same-task-later",
+        "task": "user-badge",
+        "cutoff": 2
+      },
+      "status": "complete",
+      "original_attempt_status": "complete",
+      "valid": true,
+      "validation_auc": 0.7851588044145313,
+      "audit": {
+        "result": "clean",
+        "from_validation": 14
+      },
+      "stop": "validation_budget",
+      "agent_tokens": 103255,
+      "historical_source_allocated_tokens": 0,
+      "new_extraction_allocated_tokens": 0,
+      "amortized_tokens": 103255,
+      "agent_seconds": 91.39635920524597,
+      "tools": {
+        "schema": 8,
+        "probe": 8,
+        "validate": 3,
+        "memory": 0,
+        "submit": 0
+      },
+      "memory_calls": [],
+      "exact_final_memory_matches": [],
+      "validation_memory_matches": [
+        {
+          "tool_i": 14,
+          "memory_match": [],
+          "val": 0.7851588044145313,
+          "leak": false,
+          "error": null
+        },
+        {
+          "tool_i": 17,
+          "memory_match": [],
+          "val": 0.7507369289429471,
+          "leak": false,
+          "error": null
+        },
+        {
+          "tool_i": 18,
+          "memory_match": [],
+          "val": 0.7593889274539986,
+          "leak": false,
+          "error": null
+        }
+      ],
+      "source_path": "results\\mechanism-pilot-20261029\\same-task-later-none\\sessions\\user_badge-k2.json",
+      "sha256": "fec98762e78a2ab58cbf50bf1a8d2aae1e6d7c254b9d322006773450566b9f6e",
+      "pilot_flags": {
+        "test_labels_read": false,
+        "test_scored": false,
+        "target_writeback": false,
+        "source_sha256": null
+      },
+      "test_score": null,
+      "paired_validation_threshold": 0.7751588044145313,
+      "qualified_on_pilot_validation": true
+    },
+    {
+      "name": "same-task-later-program",
+      "arm": "program",
+      "target": {
+        "name": "same-task-later",
+        "task": "user-badge",
+        "cutoff": 2
+      },
+      "status": "complete",
+      "original_attempt_status": "failed",
+      "valid": true,
+      "validation_auc": 0.8176088290626666,
+      "audit": {
+        "result": "clean",
+        "from_validation": 18
+      },
+      "stop": "llm_budget",
+      "agent_tokens": 198430,
+      "historical_source_allocated_tokens": 120507.5,
+      "new_extraction_allocated_tokens": 0,
+      "amortized_tokens": 318937.5,
+      "agent_seconds": 445.7746036052704,
+      "tools": {
+        "schema": 7,
+        "probe": 10,
+        "validate": 1,
+        "memory": 1,
+        "submit": 0
+      },
+      "memory_calls": [
+        "retrieve_programs"
+      ],
+      "exact_final_memory_matches": [],
+      "validation_memory_matches": [
+        {
+          "tool_i": 18,
+          "memory_match": [],
+          "val": 0.8176088290626666,
+          "leak": false,
+          "error": null
+        }
+      ],
+      "source_path": "results\\mechanism-pilot-20261029\\repair-v1\\same-task-later-program\\sessions\\user_badge-k2.json",
+      "sha256": "75e14f94badb3809b886c4f8b9f55507011ebed85eeb526a526d4f97e153cc4b",
+      "pilot_flags": {
+        "test_labels_read": false,
+        "test_scored": false,
+        "target_writeback": false,
+        "source_sha256": "48d63517630429494879d10220f752a21d4087b4d3c0c5da03f20f54ae1af8b0"
+      },
+      "test_score": null,
+      "paired_validation_threshold": 0.7751588044145313,
+      "qualified_on_pilot_validation": true
+    },
+    {
+      "name": "same-task-later-definition",
+      "arm": "definition",
+      "target": {
+        "name": "same-task-later",
+        "task": "user-badge",
+        "cutoff": 2
+      },
+      "status": "complete",
+      "original_attempt_status": "failed",
+      "valid": true,
+      "validation_auc": 0.7961951327478144,
+      "audit": {
+        "result": "clean",
+        "from_validation": 13
+      },
+      "stop": "validation_budget",
+      "agent_tokens": 143096,
+      "historical_source_allocated_tokens": 120507.5,
+      "new_extraction_allocated_tokens": 5482.5,
+      "amortized_tokens": 269086.0,
+      "agent_seconds": 110.5151469707489,
+      "tools": {
+        "schema": 7,
+        "probe": 8,
+        "validate": 3,
+        "memory": 1,
+        "submit": 0
+      },
+      "memory_calls": [
+        "find_features"
+      ],
+      "exact_final_memory_matches": [],
+      "validation_memory_matches": [
+        {
+          "tool_i": 13,
+          "memory_match": [],
+          "val": 0.7961951327478144,
+          "leak": false,
+          "error": null
+        },
+        {
+          "tool_i": 14,
+          "memory_match": [],
+          "val": null,
+          "leak": null,
+          "error": "SQL error: syntax error at or near \"FILTER\"\nLINE 62:     (10*sum(up) - 2*sum(dn) + 15*sum(acc)) FILTER (WHERE pda...\n                                                    ^"
+        },
+        {
+          "tool_i": 18,
+          "memory_match": [],
+          "val": 0.7884133643195606,
+          "leak": false,
+          "error": null
+        }
+      ],
+      "source_path": "results\\mechanism-pilot-20261029\\repair-v1\\same-task-later-definition\\sessions\\user_badge-k2.json",
+      "sha256": "b223388aa2315917e3c2081ee0458ff8e8c5347bffa5da1d6ebcf7a9f7224ec4",
+      "pilot_flags": {
+        "test_labels_read": false,
+        "test_scored": false,
+        "target_writeback": false,
+        "source_sha256": "48d63517630429494879d10220f752a21d4087b4d3c0c5da03f20f54ae1af8b0"
+      },
+      "test_score": null,
+      "paired_validation_threshold": 0.7751588044145313,
+      "qualified_on_pilot_validation": true
+    },
+    {
+      "name": "same-task-later-full",
+      "arm": "full",
+      "target": {
+        "name": "same-task-later",
+        "task": "user-badge",
+        "cutoff": 2
+      },
+      "status": "complete",
+      "original_attempt_status": "failed",
+      "valid": true,
+      "validation_auc": 0.7943440074849848,
+      "audit": {
+        "result": "clean",
+        "from_validation": 12
+      },
+      "stop": "validation_budget",
+      "agent_tokens": 75890,
+      "historical_source_allocated_tokens": 120507.5,
+      "new_extraction_allocated_tokens": 5482.5,
+      "amortized_tokens": 201880.0,
+      "agent_seconds": 95.83938431739807,
+      "tools": {
+        "schema": 7,
+        "probe": 4,
+        "validate": 3,
+        "memory": 1,
+        "submit": 0
+      },
+      "memory_calls": [
+        "find_features"
+      ],
+      "exact_final_memory_matches": [],
+      "validation_memory_matches": [
+        {
+          "tool_i": 12,
+          "memory_match": [],
+          "val": 0.7943440074849848,
+          "leak": false,
+          "error": null
+        },
+        {
+          "tool_i": 13,
+          "memory_match": [],
+          "val": 0.7914667149568909,
+          "leak": false,
+          "error": null
+        },
+        {
+          "tool_i": 14,
+          "memory_match": [],
+          "val": 0.783790581394179,
+          "leak": false,
+          "error": null
+        }
+      ],
+      "source_path": "results\\mechanism-pilot-20261029\\repair-v1\\same-task-later-full\\sessions\\user_badge-k2.json",
+      "sha256": "b257b3f2627af1cbd1fbae2e07652a8fd488cf8ea5393d882e8749896cd17c76",
+      "pilot_flags": {
+        "test_labels_read": false,
+        "test_scored": false,
+        "target_writeback": false,
+        "source_sha256": "48d63517630429494879d10220f752a21d4087b4d3c0c5da03f20f54ae1af8b0"
+      },
+      "test_score": null,
+      "paired_validation_threshold": 0.7751588044145313,
+      "qualified_on_pilot_validation": true
+    }
+  ],
+  "source_target_audits": {
+    "cross-task": {
+      "program": {
+        "result": "error",
+        "why": "SQL error: column \"userid\" does not exist\nLINE 2:   SELECT userid, seed_time FROM audit_user_engagement_k1.see...\n                 ^"
+      },
+      "compiled": {
+        "result": "error",
+        "why": "SQL error: column s.userid does not exist\nLINE 1: ... precision as v from badges where badges.userid = s.userid a...\n                                                             ^"
+      }
+    },
+    "same-task-later": {
+      "program": {
+        "result": "clean",
+        "seed_time": "2019-10-03 00:00:00",
+        "seeds": 751,
+        "cells_differing": 0,
+        "columns_differing": [],
+        "all_columns_differing": []
+      },
+      "compiled": {
+        "result": "clean",
+        "seed_time": "2019-10-03 00:00:00",
+        "seeds": 751,
+        "cells_differing": 0,
+        "columns_differing": [],
+        "all_columns_differing": []
+      }
+    }
+  },
+  "infrastructure_repair": {
+    "failed_cells": 6,
+    "retained_completed_controls": 2,
+    "partial_tokens": 8717,
+    "reason": "names set was incorrectly exposed where the harness expects a callable names(); fixed before six memory-cell reruns",
+    "compiled_source": "same seven definitions; all 127 subsets generated by unchanged Rust compiler; full SQL required to match exactly",
+    "hidden_sql_repair": "explicitly disabled in shared composite hook before memory cells could run"
+  },
+  "new_api_usage": {
+    "calls": 92,
+    "ceiling_cny": 1.23327864,
+    "errors": 0,
+    "models": {
+      "deepseek-flash": 92
+    },
+    "pricing_policy": "official-cny-peak-2026-10-29"
+  },
+  "limits": [
+    "one source and two target settings, one repetition",
+    "source program contains more features than the seven admitted definitions",
+    "validation scores are development data, never test non-inferiority",
+    "no paired quality claim where no-memory has no valid SQL",
+    "exact SQL matching identifies unchanged adoption only; edited derivations are not automatically assigned",
+    "source setup cost is allocated over only two targets; historical source tokens are not new spending",
+    "infrastructure interruption and resumed cells preclude a clean timing comparison",
+    "HTTP probe timeout 180s differs from frozen Rust server query timeout 300s"
+  ]
+}

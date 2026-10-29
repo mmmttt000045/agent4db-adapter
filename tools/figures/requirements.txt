@@ -1,4 +1,4 @@
-# Drawing dependencies; external TeX fonts and Ghostscript are documented in README.md.
+# Drawing dependencies; data-figure fonts and schematic TeX fonts are documented in README.md.
 reportlab
 matplotlib
 fonttools

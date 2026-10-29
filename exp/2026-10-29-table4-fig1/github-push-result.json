@@ -1,0 +1,45 @@
+{
+  "status": "pushed_and_verified",
+  "verified_utc": "2026-10-29T03:28:59.310Z",
+  "repository": "mmmttt000045/icde-2027-paper",
+  "branch": "main",
+  "previous_head": "514d6c474cbfd8339c7392acf809d6a5e93e0f25",
+  "commit": "b2755c23953b646e27ccd5fe9a1f9cf1798cca92",
+  "commit_url": "https://github.com/mmmttt000045/icde-2027-paper/commit/b2755c23953b646e27ccd5fe9a1f9cf1798cca92",
+  "tree": "c43d5aa357fd211abb5d92f2ef6f2a188727bf7f",
+  "table3_restored_to": "3f3f5d088b7281397ef533ad2e9d0cb4779ea5b5",
+  "table4_restored_from": "01daa2133a54ee45a8d1b529b5e04167e81ed340",
+  "table4_exact_files": [
+    "tables/relbench.tex",
+    "gen/relbench.tex",
+    "gen/relbench-table.tex"
+  ],
+  "fig1_change": "Moved source after first introduction reference and suppressed first-column top float; both PDFs now place Fig.1 in the first-page right column with abstract at left top.",
+  "verification": {
+    "sha": "c43d5aa357fd211abb5d92f2ef6f2a188727bf7f",
+    "checked": 91,
+    "preserved": 2,
+    "total": 93,
+    "changed": 11
+  },
+  "compilation": {
+    "en": {
+      "success": true,
+      "pages": 15,
+      "fig1_page": 1,
+      "table3_page": 4,
+      "table4_page": 8
+    },
+    "bilingual": {
+      "success": true,
+      "pages": 23,
+      "fig1_page": 1,
+      "table3_page": 6,
+      "table4_page": 13
+    }
+  },
+  "visual_qa": "Six affected pages inspected; no clipping, overflow or unresolved references.",
+  "user_clarification": "Restore the entire historical Table IV including old data; do not roll back Table III.",
+  "official_api_results": "Preserved independently in source artifact and prose; not pooled with historical results.",
+  "overleaf_sync": "GitHub updated; Overleaf-side pull not performed."
+}

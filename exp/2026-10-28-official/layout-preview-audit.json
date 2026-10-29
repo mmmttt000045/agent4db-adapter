@@ -1,0 +1,50 @@
+{
+  "recorded_utc": "2026-10-28T18:30:24.292961+00:00",
+  "status": "layout preview only; G-Memory incomplete; active manuscript unchanged",
+  "analysis_sha256": "e7d7c30cb93a6298a2afe4853dc5110b7155a3431c4a6ba4b4bb13b2356b15ff",
+  "compilation": {
+    "english": {
+      "pages": 14,
+      "reviewed_pages": [
+        8,
+        9,
+        10
+      ]
+    },
+    "bilingual": {
+      "pages": 22,
+      "reviewed_pages": [
+        13,
+        14,
+        16
+      ]
+    }
+  },
+  "visual_review": [
+    "New mechanism plot remains Fig. 5; cumulative plot is Fig. 3 and primary comparison is Table IV.",
+    "Reviewed actual column-width figures, table task labels, quality daggers, captions and pending-method labels in both language versions.",
+    "No overfull boxes, undefined control sequences or undefined references in final preview TeX logs.",
+    "Fixed twelve invalid macro-to-Chinese escape sequences in staged abstract/sharing; regenerated and recompiled bilingual preview.",
+    "Cumulative pending label repositioned below data; no overlap remains."
+  ],
+  "limitations": [
+    "Pending methods are explicitly marked, and preview filenames and paper title prevent confusion with final results.",
+    "Final five-method data, regeneration, integration and new PDF review remain required."
+  ],
+  "artifacts": {
+    "official-cumulative-preview.pdf": "09b428265512d9194e3772f146c7cb3d9443f0698d70e879030e4dbb8987a272",
+    "official-cumulative-zh-preview.pdf": "0ce9cdf1147748a9ff33ff9aa13292164b57604c0c8de0a99932b44e9220b945",
+    "paper-layout-bilingual.pdf": "e12f90aad776afb748745e87b3c78ccb0af6534a5ac0de1817d3d8eee8ab9590",
+    "paper-layout-en.pdf": "66e81bc0066f7916b795c7880db996443dce706d64de6c8d37098678ed62354a",
+    "reuse-work-preview.pdf": "631af21e127d841564b6b459980e65a624994b93e8be76d409caad19c4331483",
+    "reuse-work-zh-preview.pdf": "4f0de6f5be44ab0c8f115bfb07e50015ae49ba866d80ce09a5c1be9d7b17a0ea"
+  },
+  "report_preview": {
+    "reviewed_utc": "2026-10-28T18:53:19.354202+00:00",
+    "pages": 6,
+    "all_pages_visually_reviewed": true,
+    "final_delivery_pending": true,
+    "png_rendering": "300dpi Poppler rendering of embedded-font PDFs; CJK annotation loss resolved",
+    "sha256": "49f40fa82622d119a87c0c93d8dc715023e7ed27f4916f199efec6cb1d21cdd8"
+  }
+}

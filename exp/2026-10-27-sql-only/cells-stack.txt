@@ -1,0 +1,2 @@
+sql-only rel-stack 1 --llm happy --reasoning-effort low --parallel 1
+mavra rel-stack 1 --llm happy --reasoning-effort low --parallel 1

@@ -1,0 +1,11 @@
+\begin{figure}[t]
+\centering
+\ifbilingual
+\includegraphics[width=\linewidth]{figures/reuse-work-zh}
+\else
+\includegraphics[width=\linewidth]{figures/reuse-work}
+\fi
+\caption{\bt{Observed agent work in the official-API study: mean tool calls over six reuse sessions per method and database (three tasks, cutoffs 2--3), including failures. Validation is the common harness tool. The artifact's official-study total tokens include internal memory-model work. This complete-policy comparison does not isolate feature composition.}{官方API实验观察到的智能体工作：每种方法、每个数据库六个复用会话（三个任务、截点2--3）的平均调用数，包含失败。验证指共同框架工具。工件中的官方实验总token包含内部记忆模型工作。完整策略对照未分离特征组合的作用。}}
+\label{fig:reuse-work}
+\Description{Two vertically stacked panels, one per database, compare all five methods. Stacked bars distinguish schema inspection, SQL probes, validation, memory tools, and submission with colors and hatching. The y-axis counts agent-issued tool calls per reuse session and starts at zero.}
+\end{figure}

@@ -1,0 +1,11 @@
+\begin{figure}[t]
+\centering
+\ifbilingual
+\includegraphics[width=\linewidth]{figures/official-cumulative-zh}
+\else
+\includegraphics[width=\linewidth]{figures/official-cumulative}
+\fi
+\caption{\bt{Cumulative tokens through each retraining cutoff, including all three tasks, unsuccessful attempts, and memory retrieval and updates. Cutoff 1 includes initial construction; cutoffs 2--3 permit reuse. Each line is one sequence, not a mean over independent repetitions.}{截至每个重训截点的累计token，包含三个任务、失败尝试以及记忆检索与更新。截点1计入初始构建，截点2--3允许复用。每条线为一条序列，并非多次独立重复的均值。}}
+\label{fig:official-cumulative}
+\Description{Two vertically stacked line charts show cumulative tokens in millions at cutoffs 1, 2 and 3 for all five methods on rel-stack and rel-trial. Distinct colors and markers identify methods; both y-axes start at zero.}
+\end{figure}

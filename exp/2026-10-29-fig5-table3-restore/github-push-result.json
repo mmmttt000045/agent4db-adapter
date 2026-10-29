@@ -1,0 +1,53 @@
+{
+  "status": "restored_pushed_and_verified",
+  "verified_utc": "2026-10-29T03:01:11.762Z",
+  "repository": "mmmttt000045/icde-2027-paper",
+  "branch": "main",
+  "previous_head": "3f3f5d088b7281397ef533ad2e9d0cb4779ea5b5",
+  "commit": "514d6c474cbfd8339c7392acf809d6a5e93e0f25",
+  "commit_url": "https://github.com/mmmttt000045/icde-2027-paper/commit/514d6c474cbfd8339c7392acf809d6a5e93e0f25",
+  "tree": "b341c6b39b483e80a62816a993d4328d97492f78",
+  "restored_from": "01daa2133a54ee45a8d1b529b5e04167e81ed340",
+  "exact_restored_paths": [
+    "figures/consumer-cost.pdf",
+    "figures/consumer-cost-zh.pdf",
+    "figures/consumer-cost.tex",
+    "tables/capabilities.tex"
+  ],
+  "changed_files": [
+    "evidence/2026-10-29/README.md",
+    "figures/consumer-cost-zh.pdf",
+    "figures/consumer-cost.pdf",
+    "figures/consumer-cost.tex",
+    "README.md",
+    "sections/02-background.tex",
+    "sections/08-related-work.tex",
+    "sections/evaluation/relbench.tex",
+    "sections/evaluation/setup.tex",
+    "sections/evaluation/sharing.tex",
+    "source-notes.md",
+    "tables/capabilities.tex"
+  ],
+  "verification": {
+    "sha": "b341c6b39b483e80a62816a993d4328d97492f78",
+    "checked": 91,
+    "preserved": 2,
+    "total": 93
+  },
+  "compilation": {
+    "en": {
+      "success": true,
+      "pages": 14,
+      "table3_page": 4,
+      "fig5_page": 10
+    },
+    "bilingual": {
+      "success": true,
+      "pages": 22,
+      "table3_page": 6,
+      "fig5_page": 16
+    }
+  },
+  "visual_qa": "Four affected pages reviewed; no clipping, overflow, or unresolved references.",
+  "overleaf_sync": "GitHub updated; Overleaf-side pull not performed."
+}

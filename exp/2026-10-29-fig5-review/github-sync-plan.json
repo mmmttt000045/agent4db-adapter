@@ -1,0 +1,831 @@
+{
+  "created_utc": "2026-10-29T02:27:15.001442+00:00",
+  "repository": "mmmttt000045/icde-2027-paper",
+  "branch": "main",
+  "expected_head": "01daa2133a54ee45a8d1b529b5e04167e81ed340",
+  "base_tree": "926da61d2dd9fb0a9481db83ca25a6515ce1e6b1",
+  "source_directory": "E:\\agent4db-adapter\\tmp\\paper-github-20261029",
+  "files": [
+    {
+      "path": "build.sh",
+      "sha": "301946c0685d1ea2d9558b814dc46dedc6d7c057",
+      "sha256": "5fa26fdf32adf103e98b4f7601cd6308e749102e31030f4644759c0548b40102",
+      "size": 4232,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "evidence/2026-10-29/lineage-summary.json",
+      "sha": "cfed7dcc4542eb9c93c3ccfa5943a09d55d310f4",
+      "sha256": "deea1ab4468567395b5deb7a0a3b6690fc4104d23ebd261750de0ffc79df24ae",
+      "size": 56160,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "evidence/2026-10-29/README.md",
+      "sha": "62d787cfde774a6454fe2252ac1d2a6c9d433c10",
+      "sha256": "10038f8e607b5f0143b2031df9350d0a27094242e56801ef785f2df287fbbaf6",
+      "size": 9239,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "evidence/official-20261028/analysis.json",
+      "sha": "e2e1cdc5946dd37f170a00ea34d54c9a963394de",
+      "sha256": "5a429744358cd80eff026227c30852a085b8a8da0acfe6b780f96a2d4fa0fb84",
+      "size": 190916,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "evidence/official-20261028/evidence-audit.json",
+      "sha": "6b9a3859ae39cf9b37e632e9f91d6a0166085764",
+      "sha256": "916466b5012a8137e1caa95300090208f8abc6bcfb60807eb0831a4e020c83bf",
+      "size": 21764,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/architecture-zh.pdf",
+      "sha": "f5b1f60f20a24836eeecae5b01a106be0239bd59",
+      "sha256": "345088ae66b746c46a0008eaba7ed1d71de98f407f6b28e9bfe0940d382d45fa",
+      "size": 134378,
+      "mode": "100644",
+      "changed": false,
+      "binary": true
+    },
+    {
+      "path": "figures/architecture.pdf",
+      "sha": "c7fbd374ec0e233a3e0835d0dbefe0e15fbcb0d6",
+      "sha256": "3464e05de5a5efbdc84434680fa776f164ae17392f942c0f5446cec301e0fdd4",
+      "size": 134948,
+      "mode": "100644",
+      "changed": false,
+      "binary": true
+    },
+    {
+      "path": "figures/architecture.tex",
+      "sha": "23d3099db8429dee1cc883a0c871ba6220e458cc",
+      "sha256": "63b705b5541b844a66073da284b94e528b44f6a0c7799bfe0d569825b4c6f5a5",
+      "size": 2915,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "figures/consumer-cost-zh.pdf",
+      "sha": "6d2bcf71a8aa1e6ab03bb6e1d62590ff7b43993c",
+      "sha256": "81dabb2702d05d4e6331cd8fab39a619dd1c0fe66666add9b3a3854899c17d6a",
+      "size": 78434,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/consumer-cost.pdf",
+      "sha": "a53e4df09646e6b6055d4df7ba745ee8ae0f358a",
+      "sha256": "4c9af02ecc6d5a7ac023b0620e0f959076d03ac540f903a80112bc0002c440cd",
+      "size": 76931,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/consumer-cost.tex",
+      "sha": "d300648a31ee6f02f605f30961ef07941b3800af",
+      "sha256": "e135864e2c86f36ac4183657d172db5e1b49637e3ad7bebca0477452bcdfcc6a",
+      "size": 1315,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/maintenance-cost-zh.pdf",
+      "sha": "39217159d73c813facf109f5d67ae5b088d7b941",
+      "sha256": "5b14971764474e8bb693c608359b497c4a2b41f331bf895a0f55a005b696c023",
+      "size": 52232,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/maintenance-cost.pdf",
+      "sha": "aac6ca9acb2fc0b9b00a64c7648a3c718c6f0f91",
+      "sha256": "414f7f0a932d06295f45291ba8a8245a1687b7e64890dd394060ff4b4cf1bb0d",
+      "size": 55706,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/maintenance-cost.tex",
+      "sha": "9b4c5fde8d4b43837c84a4eb1ea932fb759e8a01",
+      "sha256": "3e45a19f964afc7a3fac5c379ec613be4bd591fe04964dbd19e0efc2eb0cbe77",
+      "size": 1165,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/metric-record-zh.pdf",
+      "sha": "10f71f22c69663592d6a6470e1400b766acab474",
+      "sha256": "503db76bceaedef1c483d3851e93242ae31d70eec9915463b57a314b6d44417d",
+      "size": 38380,
+      "mode": "100644",
+      "changed": false,
+      "binary": true
+    },
+    {
+      "path": "figures/metric-record.pdf",
+      "sha": "9de41d8c53bac2ef615510aa2c7ea0eada6786af",
+      "sha256": "47e3ad814f737d814f01a1db5c9a3f746dd51f4a5d075e6c066f06bdef020357",
+      "size": 39925,
+      "mode": "100644",
+      "changed": false,
+      "binary": true
+    },
+    {
+      "path": "figures/metric-record.tex",
+      "sha": "d209ac4f6aa4a19c4dc2881b8528f8c5b1ed0faf",
+      "sha256": "00c6980abd4e471211f8738977f5d808e7cede40b4842ec02ca3c2ae49382f49",
+      "size": 1732,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/official-cumulative-zh.pdf",
+      "sha": "b9de5d58c9c3af48361d87bfb34bcf923d933f63",
+      "sha256": "a4b3136d2751aa8e5a42cd5f4095f8c77a3f03b31a45b5ceda6a7b092ffb51f5",
+      "size": 43180,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/official-cumulative.pdf",
+      "sha": "694a38a84cc1238ad68270134e72086e890ec7c8",
+      "sha256": "3717493053dde1b6b8f457435ad92fc7720d5c728374e998460b6679f40148fa",
+      "size": 38219,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/official-cumulative.tex",
+      "sha": "82ebfa0c056ccd0ca4b2483f84c1d4dbbffeac93",
+      "sha256": "f08b652b527a574d94dea00be5228d3d26d033498e5508a4e79c744ab82a93cc",
+      "size": 962,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/population-zh.pdf",
+      "sha": "9fd7e30c16b621fec29a9e90b3da03fdf2dbdde5",
+      "sha256": "a18ecaeab11cebcb6ce931b1b00d6d9a9674fa56f82bc0abf039afa5f2a818a0",
+      "size": 48822,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/population.pdf",
+      "sha": "d34d53a7c9cd24798c6e3b5b0bf3f516dadb7dff",
+      "sha256": "5e1aa56859e8dcb5b0ea0ddc66af2764cda09c23461414b707e90c126d9960f3",
+      "size": 48538,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/population.tex",
+      "sha": "e239e77cfe2dd9ca30dd6b99d679c87faf63b2c9",
+      "sha256": "263b848413e0ce02f625335d750c0e8e99d25b88b93accd4f2af0ea1c9e9b7e3",
+      "size": 1397,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/relbench-cumulative-zh.pdf",
+      "sha": "a081b245e952b91610f13b164933fe18d778b28a",
+      "sha256": "58eed258645a19ba6f9c63903c22ec18290b3cf5161e8b261ec62b63665fca77",
+      "size": 47575,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/relbench-cumulative.pdf",
+      "sha": "9f54598d10bcbc33e3dc4defe456247f63cf4f4b",
+      "sha256": "ce1b3dc862a687a509d9e26d79266417c88e4c60c77c1b9844c716798dcf6c7f",
+      "size": 42299,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/relbench-cumulative.tex",
+      "sha": "c0b3f68fbddf68167e8b967855f3222c65282d90",
+      "sha256": "a3b77a87a2ce80b710550fb5bafb322b5fab568609852ef66879a8f9a01c2cc3",
+      "size": 1232,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/repair-algorithm.tex",
+      "sha": "3fa0b58fa85d25f3362ac3a2fe7c421995fda1fd",
+      "sha256": "217a14d47af6a6551996b70d50c7c5ac0314345e77a1694d2e5a5966ddc743bd",
+      "size": 1622,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/replay-outcomes-zh.pdf",
+      "sha": "890d5dcdf118a3187147ff9abe68070cc44f9bf3",
+      "sha256": "41d4aa8801bcde14140602b164f65eaa617769d037c82554c68e32b08b005f9e",
+      "size": 155110,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/replay-outcomes.pdf",
+      "sha": "1baba253fd200e89119e6167c58b81dd2038b3eb",
+      "sha256": "caf6865e86c8ecb2ca33978b141ac68701c71e7ebf1edce3edfcd365b22d4a33",
+      "size": 150854,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/replay-outcomes.tex",
+      "sha": "8de9a73213fc7a54a5e948c8af0ef51f8e0ac72b",
+      "sha256": "50d81bed794af98c4e8c835609333e679048c6bcea7c48a7452062ba04d5c1ee",
+      "size": 3070,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/reuse-work-zh.pdf",
+      "sha": "fb9df7c31c9903103994b2ee7a6f103331a60028",
+      "sha256": "0e584401413093c55e0df1c99766062f82e904edd98a951fd66b826ab22a0c99",
+      "size": 60310,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/reuse-work.pdf",
+      "sha": "88b77604e0aeefff2dbe9000b13cbd2f8e9c8bf0",
+      "sha256": "362ebfedd923bc4345e4495e242c72794d98dbbf408802c6da8c9027ebb2f6e4",
+      "size": 53789,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/reuse-work.tex",
+      "sha": "bedb184e490e4da3950468dcac850097179603fb",
+      "sha256": "65fb91342b304449288afedf09d627e48c101a2bd566ec79d6aacc78c53bd593",
+      "size": 1117,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/running-example-zh.pdf",
+      "sha": "2066bb31d56e709b67886dc862e64b3b5ea76f19",
+      "sha256": "0061e61b705f4e72f21a00beabe703db28145753a0216926c827cc9ddebefad7",
+      "size": 118761,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/running-example.pdf",
+      "sha": "ab94b06fc2a6ee5ea17d859cbd23d1d564517d9f",
+      "sha256": "200bf8365af73e789b4ea9f6f2ce00d205b8c6a2b18b2cd421075362965f37c5",
+      "size": 98262,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/running-example.tex",
+      "sha": "cdfa470a582d04e82e63da180c0b8cc27eb947d1",
+      "sha256": "ef4f2b0a818e276ddf3e486f10f3892764c7b4e08df46d49a3052089822a7fd3",
+      "size": 3249,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/two-schemas-zh.pdf",
+      "sha": "9c5f122b71a9f4dd263e41e52dea09d9c5cf776f",
+      "sha256": "1a41067281f0637b99ec2712dbcf76acb17d7e22ca64fe35e12c8a619557d565",
+      "size": 77491,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/two-schemas.pdf",
+      "sha": "21250dabecf2dca5534728243ae08ae04289ca1a",
+      "sha256": "6e72355bf4ae62495eba42cb52a44ddc764a132ad029c12bbf1a936516e48c91",
+      "size": 77375,
+      "mode": "100644",
+      "changed": true,
+      "binary": true
+    },
+    {
+      "path": "figures/two-schemas.tex",
+      "sha": "cc1c9c2ea79622602ec1177a0523d7243fec53e3",
+      "sha256": "4e6114190d7efc9f7447d50cf16d74dd2c71f12bac1a7514749112499f40ce74",
+      "size": 1585,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "figures/use-session.tex",
+      "sha": "fe8ef81500e18dddbd27db587d3018dbdd055737",
+      "sha256": "f06347b510e1a3a73d9958abf3dae62281b13329d81549b05418b94e83d139a3",
+      "size": 4070,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "gen/external.tex",
+      "sha": "e25b5b5b358cabd6c3c7decbb261ba1ee62a4460",
+      "sha256": "efbb31718de00aa77ab12a38c1874a04624688a1ba4d44a3a9ab6e512572d4b4",
+      "size": 1233,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/generality.tex",
+      "sha": "ac748db2adf7b4c0b508453137a7c871f12d8dd3",
+      "sha256": "9b10ac71b8bf9dc248394723639e868309014a8ba1ca35c3118affe19937a362",
+      "size": 6891,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/lifecycle-rows.tex",
+      "sha": "f21ca4ad9208fa124a8b60b2ba67eafbf9587719",
+      "sha256": "15fd5e9fd0bae8bbb3b98c427b26c5a7f94714d9edc17860c3cfa04ba3237da4",
+      "size": 1430,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "gen/lifecycle.tex",
+      "sha": "04b5e310c2ad4acfe56a36a0ec14f779675c401b",
+      "sha256": "d0e61853c826983d5511dbe909c5ee90697fda1ce7498b99deb79fdbd54fcf11",
+      "size": 2190,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/numbers-prev.tex",
+      "sha": "6a6339676e84bda466579161865993d977ec163a",
+      "sha256": "47e85327fe9339aabab6389b84d6b44ebf131af18975fa2fe66239d7d534a1d3",
+      "size": 4777,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/numbers.tex",
+      "sha": "3f021e03f7fecab32ef3e9a83d0427b7f79b4cf2",
+      "sha256": "a72d2cc1f9c7d0fc71b41707cf1242d9a297bb464fad0761f4c7676738c186d6",
+      "size": 5294,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/official-numbers.tex",
+      "sha": "ce9458a76d6879cdfa8a56c4163d8fc938705c8a",
+      "sha256": "de2e51d09708cd79e684924deb32a5fb25de0bfacf13551558aa0b54e0a8c7a6",
+      "size": 607,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "gen/opt.tex",
+      "sha": "e050fbb74b8596562752c8864044cb01f49ba68c",
+      "sha256": "eddc612a8ac4a01d61ee54f30f8bb8768a479923df40be25b918e6c012fe9855",
+      "size": 429,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/population.tex",
+      "sha": "3c359518b60eec6448124650745124989ac7afb4",
+      "sha256": "40fc86d3edc9ac4530b72dbcf8f9a116332633249331fdb7feca90c1a7188178",
+      "size": 8410,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/premise.tex",
+      "sha": "4f562cd712d52d501016375c1539590cc2eb8ca2",
+      "sha256": "9f6e3f95c1c36cca26763d93cc1a4f91ee10ef742c56060403e807e9b6fccfd6",
+      "size": 474,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/relbench-table.tex",
+      "sha": "8a9cd3c69f33eb20a764e6b5cb577c7d0ad7546b",
+      "sha256": "dcf757cc41646bc1da40db3d07837eddb3d4c48fc6abfcb5e4688dd536ee6fa2",
+      "size": 1934,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/relbench.tex",
+      "sha": "e407e408d2a2be604517f79942dd0e27500dab66",
+      "sha256": "609a0f00049d14324e6fba4e465a5deff094480471bb9bc9e3b13bb5cddc7326",
+      "size": 18203,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/replay-safety.tex",
+      "sha": "df03a1b09b598e7cfedba985accb46784a0bef0b",
+      "sha256": "348a832f1afa357028d3d7ef60832400874d11c0cb1be5ea1f2d6afce5069cc5",
+      "size": 817,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/review.tex",
+      "sha": "1da5c3db0ee9f57316bd3deed2464700dcf96869",
+      "sha256": "c0842c09a79261fc6e0a1d89a43aa09150f77cd286b789c6d01db00e7d2db499",
+      "size": 9930,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/scen-ds.tex",
+      "sha": "1ad0812dc0811d76f117b42ffe715192fe7d4e4e",
+      "sha256": "26b495ac467a8b5e0c91e47bc0e759c31d3304ed6ae39a8f7acf9dd7ee8be5c8",
+      "size": 14085,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/session-latency.tex",
+      "sha": "ef3508a941ba33b9044405106e9a5b213fc52572",
+      "sha256": "0afd060952dee582ed3c3646d47f9c373f1a98c92c2f30795cd56dd95cd44fb6",
+      "size": 1274,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/sharing.tex",
+      "sha": "23a99a5b4819e0a273fd1549a51cc407a010a39f",
+      "sha256": "9e4d83af8e9e9ac583d1f27e9fec439ba1f06a3e67866aa755c055df1fe1c2f4",
+      "size": 1648,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "gen/snapshot-stress.tex",
+      "sha": "4539b8e9ffce40f8ede964d529db511c39837be0",
+      "sha256": "2656d328901652cdf417c6528f022f835c1673dc07a9b283ad4f3d16b496e87c",
+      "size": 831,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "latex/preamble.tex",
+      "sha": "a48d55a150dad8db55b4ae2aac92f9c9bfb6b8d4",
+      "sha256": "4daf4c7d08efbe4e34cf62ca9873e4522d819a2e96e7b98a31682e4b20bb7365",
+      "size": 5670,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "main-en.tex",
+      "sha": "8e75974597b38d8785d1b6fb2c51f7bebe1588be",
+      "sha256": "1d65a2b8b6c255992f0ef0864622073be7e659e112c0e475257ecab70dfab3a2",
+      "size": 291,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "main.tex",
+      "sha": "897f2e81462019ebc0d6ca31c17d8b4a96b665f7",
+      "sha256": "d2965ae208daa3b4e107882b05fec5f5587cdd445376973e8022a22673666001",
+      "size": 289,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "paper.tex",
+      "sha": "3950224c974eedc22632bcd45ccd05d4ec1c0c61",
+      "sha256": "abb19b7050b4f4c1354fc87b49644df527d6541f7b699de637454a50075f6724",
+      "size": 748,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "README.md",
+      "sha": "0c30e1af77ac199ceb520eefed7f3f890b1629d8",
+      "sha256": "d23eea876f75652022ba4997b1520a10e5fa67f640969fade5c3edcb0a485ae7",
+      "size": 2294,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "references.bib",
+      "sha": "ad2df5fbc26ade4866f2188f0c7078d02f9bc0cb",
+      "sha256": "6302caf1d71822158ca0c1bf3d8f3699273275c32b737609f55bcfa43d73f689",
+      "size": 31606,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "references.tex",
+      "sha": "48c237f72ed285ea794b89d727e802847578b113",
+      "sha256": "e6047d7f32d95f034bad6b1b3d0016084f614ffb279a93e7d7a0381637af4342",
+      "size": 172,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "sections/01-introduction.tex",
+      "sha": "8f3da8eac830c4a3242d6cfc08ec6ebef4024221",
+      "sha256": "54126c368321de25f5385a3c1632c5556fb6306014d98d35c41b027262d082a6",
+      "size": 11181,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/02-background.tex",
+      "sha": "d5ad2cd44b99161c975b351d4cfefa726e0bb1a2",
+      "sha256": "51b49140437c96ed2caebbcf71637fef789c95a96bd4782d47dca3fa4dfa1235",
+      "size": 15282,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/03-overview.tex",
+      "sha": "f6e3accb2782a4739304bc5f5e4e9c5dc9b39d98",
+      "sha256": "4f7dd675ec4fa9800ebe80c66e43658b9fc11d8a8eab7804e35dc02e6c8a15a7",
+      "size": 4028,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/04-sharing.tex",
+      "sha": "84031d075acf54fc17f2dbf3a807b67f1dd84a3d",
+      "sha256": "4935a8426eaab9c59695b9f8b0bbc20a5a164a3d2a9968eef68bd08306b7cfb6",
+      "size": 31877,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/07-evaluation.tex",
+      "sha": "0194a61606f7a650ba925572e144388d284eb384",
+      "sha256": "00cf47d4323b195dcede45d15e65650a9c4ac11298441ca439fd8fb0188253c9",
+      "size": 1232,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/08-related-work.tex",
+      "sha": "4bcd7fbab32d7310bb9ff24b07b50f8c15c01a49",
+      "sha256": "d9789f35d3b1fd581f46b0bdc39b75791c102ca722d634900a5e7cb873147496",
+      "size": 10406,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/10-conclusion.tex",
+      "sha": "209723ba69bbd144873d294db35a455f5d25e6d0",
+      "sha256": "dfea167c5110134d14963af5db9de811d976b76a8056fdf4d838b8506a4a2f74",
+      "size": 3164,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/abstract.tex",
+      "sha": "34003c54bb8be0da1c4db69f0c076dc949b16d7b",
+      "sha256": "3b6618d8a9e99aa21d17346dabb1dd537f86a8cce6e86fc95d89cb738a6861a9",
+      "size": 2914,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/evaluation/changes.tex",
+      "sha": "a290cef71099324826abfdaaf9fd74a855c8cbdc",
+      "sha256": "59f0ca4d04a5234918c134363b827f88ff6231c85243aec11ef2567a557bf504",
+      "size": 4289,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/evaluation/cost.tex",
+      "sha": "994c738636b67118982ea9c6f31259ccc405995b",
+      "sha256": "636d3621a452db1a4cc28f7477c45b91e5993d213d54e4f52a4ccb9e2647a235",
+      "size": 5617,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/evaluation/population.tex",
+      "sha": "cfe5f041cada0d67c958aa2bf3ecd19c4b01933f",
+      "sha256": "9c04489dc4e078caefb7325a734b2f6cda36ff3167032902c2701b47b64712c8",
+      "size": 5719,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/evaluation/relbench.tex",
+      "sha": "587d7663e68ade6a26d55916ebe5c828ea3adf57",
+      "sha256": "9815d3831addf6ae96f2144bcd41b687f24021749c1777f527651c0bbe4537d6",
+      "size": 9240,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/evaluation/setup.tex",
+      "sha": "e3b67bc3802770ac88176427f6f8bf2e73a15841",
+      "sha256": "c6620d695849bdff079170302bc9ce61a0dc06d9cc9bd6fc711f1d3710c5fa86",
+      "size": 4692,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "sections/evaluation/sharing.tex",
+      "sha": "a53644c16aacd362da8f2e71b35c71f853c48eb0",
+      "sha256": "df13283b034f3da7a89d33b40383dcc43e45c64797f490876ab029af33994954",
+      "size": 3903,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "source-notes.md",
+      "sha": "1d5270bf807a70a3e36e94887681a7ff25de8f33",
+      "sha256": "0326c9640bd78ec01ee62bc8fe30ee3a401ac41fa6777e425786cb02501ea06d",
+      "size": 9238,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "tables/capabilities.tex",
+      "sha": "d2337315c3d8b7ae3b095a4eef95e930c6e74c82",
+      "sha256": "082561b2c8a8c63b5c286003ff434431dc2f5f4f39891002728c6a9849a83b38",
+      "size": 2724,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "tables/concurrency.tex",
+      "sha": "d959c8b81ba1e720a653fe83cba0c414acf3328c",
+      "sha256": "5e238a46db9744b4bc9132f0da55abf636487ef15d0ed69384d31d94176badb0",
+      "size": 1512,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "tables/external.tex",
+      "sha": "5be0eeba2f572d64842d3993f7d931b4039c508e",
+      "sha256": "5233e96d1a806150d5e7cb40b0949fdfd43cc8982c5da13334587cf248b262ce",
+      "size": 2061,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "tables/lifecycle.tex",
+      "sha": "8d306d0af85221ed738729fef1962c0e4d99d529",
+      "sha256": "5c13201a7d26075105eeb19bdc40a5f3a6d4ee1f29dad75447737fa7497cddba",
+      "size": 2368,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "tables/official-results.tex",
+      "sha": "d0d73382f8ff3c1c4d10c6d8252ebc8aa897d8fb",
+      "sha256": "27a29c8e6fcdfcd95a228d8466d2c4aaa2710f78a0df4f8ad63cdc48c1c54d7b",
+      "size": 2631,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "tables/population-cost.tex",
+      "sha": "6fede6939a376d9f3247bad0474b1c31ea123d17",
+      "sha256": "04124a5464280eb8099f796b27aa63ebfbb747c7c79f801eb634fd43cd0aede4",
+      "size": 1413,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "tables/population-metrics.tex",
+      "sha": "1f59dca2acdfa096077f5001abeceb9e6d64ca2b",
+      "sha256": "b8b093dbf4a7e89a7fd5077af0ac15cd2f182af945e711a036677ac2da7dcb1c",
+      "size": 1966,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "tables/relbench.tex",
+      "sha": "5ef6c573293cdfa96bf9a238bf088d0162478476",
+      "sha256": "247125c4dae8e17b76d48e92585d7bda859b63960f808827d8b28bb92222fa58",
+      "size": 2390,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "tables/replay-safety.tex",
+      "sha": "76979b31c3a8a8cef5d5e37f059691253c63e3b7",
+      "sha256": "62b08028632fd6233ed619f7b2334f5961b8ff83e1c31524f24791e564a37162",
+      "size": 1236,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    },
+    {
+      "path": "tables/strategies.tex",
+      "sha": "f3386babafe00e4efe0262ab5da3e131040701d1",
+      "sha256": "d1e5c2e12ddc51c31abe2f9647e9fbb79a0d1682c723ce00afefda71a8518eac",
+      "size": 1889,
+      "mode": "100644",
+      "changed": true,
+      "binary": false
+    },
+    {
+      "path": "tables/workload.tex",
+      "sha": "e393286bd402a65231be49da4a0cecfa286a9c64",
+      "sha256": "6005327e90491261a5d309cb165eec19ef49948fe8cdad5fcc617e4b71dbcb67",
+      "size": 2253,
+      "mode": "100644",
+      "changed": false,
+      "binary": false
+    }
+  ],
+  "preserve_remote_only": true,
+  "deletions": []
+}

@@ -1,0 +1,11 @@
+\begin{figure*}[t]
+\centering
+\ifbilingual
+\includegraphics[width=\textwidth]{figures/snapshot-control-zh}
+\else
+\includegraphics[width=\textwidth]{figures/snapshot-control}
+\fi
+\caption{\bt{Snapshot validity and separately measured overhead. (a) New matched-version control, five calls per mode and schedule: P releases the checked snapshot; B executes within it. (b) Archived reader latency, the mean of two run medians; the legacy precheck also uses a different version source. (c) Archived writer throughput, medians of three runs, normalized to no version trigger. These cohorts do not estimate a common safety--throughput tradeoff.}{快照有效性及分别测得的开销。(a) 新增同版本源对照，每种模式、每种交错顺序五次调用：P释放已核验快照，B在其中执行。(b) 归档读延迟，为两次运行中位数的均值；旧预检查的版本来源也不同。(c) 归档写吞吐，为三次运行中位数，相对无版本触发器归一化。这些批次不估计同一负载的安全性与吞吐权衡。}}
+\label{fig:snapshot-control}
+\Description{Three panels distinguish controlled safety counts from archived performance. In panel a, both modes return condition-valid results after benign writes. A breaking commit after validation yields five condition-violating precheck results and five valid snapshot-bound results. A breaking commit before invocation makes both modes refuse. Panels b and c show legacy read latency and version-trigger write throughput from separate experiments; artificial barrier waits are never used as performance samples.}
+\end{figure*}

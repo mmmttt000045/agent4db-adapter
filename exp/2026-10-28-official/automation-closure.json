@@ -1,0 +1,16 @@
+{
+  "verified_utc": "2026-10-28T20:16:24.286595+00:00",
+  "automations": [
+    {
+      "id": "mavra",
+      "status": "PAUSED",
+      "updated_at": 1793218557067
+    },
+    {
+      "id": "mavra-api",
+      "status": "PAUSED",
+      "updated_at": 1793218559118
+    }
+  ],
+  "chat_archived": false
+}

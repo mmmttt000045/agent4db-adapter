@@ -13,11 +13,12 @@
 | [2026-10-02-cache-baseline-tpcds](2026-10-02-cache-baseline-tpcds/README.md)<br>验证缓存、并发快照与 TPC-DS 回放 | 维护成本与回放依据；不同时期的回放、修复和快照协议按 README 分开解释。 |
 | [2026-10-02-scenarios-ds](2026-10-02-scenarios-ds/README.md)<br>三轮场景及后续修正 | 用于既有示例和部分宏；当前五轮图表另见 10-10，不能直接用本批宏覆盖五轮结果。 |
 | [2026-10-08-optimize](2026-10-08-optimize/README.md)<br>优化修订与前提失效 | 论文优化收益、前提失效及贯穿示例的证据。 |
-| [2026-10-10-scenarios-q5](2026-10-10-scenarios-q5/README.md)<br>题集 v2、每种方法五轮 | 当前合成场景正确率和使用成本依据；沿用协议中的失败、替换与排除规则。 |
+| [2026-10-10-scenarios-q5](2026-10-10-scenarios-q5/README.md)<br>题集 v2、每种方法五轮 | 合成场景正确率依据；旧使用成本宏随旧稿归档，沿用协议中的失败、替换与排除规则。 |
 | [2026-10-11-generality](2026-10-11-generality/README.md)<br>TPC-H、SSB、financial 与回放安全 | 模式通用性、TPC-H 端到端与四库服务/拒绝审计；按共同题次统计，保留错误服务。 |
 | [2026-10-12-population](2026-10-12-population/README.md)<br>TPC-DS 群体共享与私有记忆 | 采用无记忆、私有记忆与 MAVRA 的受控结果；早期外部记忆基线依 RelBench 协议一律不报告。 |
 | [2026-10-14-external-motivation](2026-10-14-external-motivation/README.md)<br>外部任务中的知识复用 | BIRD、LiveSQLBench、Spider 2.0 的动机统计；统计口径为协议中的文本与术语代理。 |
 | [2026-10-20-relbench](2026-10-20-relbench/README.md)<br>RelBench 主实验与恢复审计 | 当前主实验为 Stack/Trial；恢复评估与时间修正有审计，旧试跑不混入，无争用计时尚未执行。 |
+| [2026-10-29-mechanism-pilot](2026-10-29-mechanism-pilot/README.md)<br>三幅机制图预实验与受控补充 | 用户确认后合入论文 Fig.5/6/7：A 为八格开发预实验，B 为 72 格固定定义数共享对照，C 为 30 次同版本源快照对照及单列归档开销。A 不支持正式表示或组合增益结论，B 保留强缓存对照和异常格，C 各批次限制明示。 |
 
 ## 补充证据
 
@@ -31,6 +32,8 @@
 | [2026-10-08-lifecycle](2026-10-08-lifecycle/README.md)<br>共享库累积更新生命周期 | 生产、使用与更新累积的补充实验；与每次恢复初始数据的场景实验分开解释。 |
 | [2026-10-12-reforce](2026-10-12-reforce/README.md)<br>ReFoRCE 作为使用者 | 外部 Text-to-SQL 使用者的补充记录；结果采用范围和接口适配按原协议。 |
 | [2026-10-22-sql-only](2026-10-22-sql-only/README.md)<br>RelBench 完整 SQL 复用对照 | SQL-only／rel-stack 完成；其他组因网关空回复及上游额度不足停止，尚无完整配对结论。 |
+| [2026-10-28-official](2026-10-28-official/README.md)<br>官方API方法比较与机制图重构 | 官方 API 五方法、两库、三任务、三截点的 90 个正式会话已完成；用于当前工作量与质量边界说明，和历史网关结果分开解释，不单独归因于特征组合。 |
+| [2026-10-29-fig5-review](2026-10-29-fig5-review/README.md)<br>复用轨迹来源与归因范围审计 | 只读复核完整任务 SQL 与结构化定义的实际使用；工作量结果不单独证明特征组合的增量作用。 |
 
 ## 历史批次
 
@@ -38,6 +41,11 @@
 | --- | --- |
 | [2026-09-30-metric-maint-named](2026-09-30-metric-maint-named/README.md)<br>单模型指标维护 | 早期命名题实验；保留舍入核对和失败说明，当前场景主表使用后续批次。 |
 | [2026-10-01-scenarios](2026-10-01-scenarios/README.md)<br>早期三模型场景 | 旧批次与服务限额失败保留；宏使用 PrevScen 前缀，不混入后续五轮统计。 |
+| [2026-10-27-sql-only](2026-10-27-sql-only/README.md)<br>RelBench SQL-only 与 MAVRA 同批配对重跑 | 两库四组、60 会话已完成；经第三方网关运行，稳定性待验证，按用户要求仅作内部探索，暂不纳入论文。 |
+| [2026-10-29-fig3-restore](2026-10-29-fig3-restore/README.md)<br>Fig.3 历史累计图恢复与质量图移除 | 稿件恢复记录；Fig.3 沿用历史五截点数据，官方 API 工作量图另行保留；未新增实验。 |
+| [2026-10-29-fig45-official](2026-10-29-fig45-official/README.md)<br>官方 API 图表的历史重构版本 | 图表迭代记录；六任务质量图后来退出正文，工作量图继续使用官方 API 数据；保留当时图号与分析。 |
+| [2026-10-29-fig5-table3-restore](2026-10-29-fig5-table3-restore/README.md)<br>Fig.5 与 Table III 中间恢复记录 | 稿件中间版本：恢复成本散点图与 Table III；后续 Table III 更正在 2026-10-29-table4-fig1 单列。 |
+| [2026-10-29-table4-fig1](2026-10-29-table4-fig1/README.md)<br>历史 Table IV 恢复与 Fig.1 位置更正 | 稿件更正记录：恢复历史 Table IV 及旧数值、撤销 Table III 误回滚，并调整 Fig.1 声明位置；未新增实验。 |
 
 ## 证据与复现入口
 
@@ -54,13 +62,21 @@
 | 2026-10-03-shared-memory | [manifest.json](2026-10-03-shared-memory/manifest.json)、[results.md](2026-10-03-shared-memory/analysis/results.md)、[summary.json](2026-10-03-shared-memory/analysis/summary.json) | [memory-study-stats.py](../tools/memory-study-stats.py)、[run-memory-study.py](../tools/run-memory-study.py)、[run-strategy-study.py](../tools/run-strategy-study.py)、[metadata-audit.py](../tools/metadata-audit.py) | — |
 | 2026-10-08-lifecycle | [lifecycle-stats.json](2026-10-08-lifecycle/lifecycle-stats.json)、[cell-mavra.json](2026-10-08-lifecycle/cell-mavra.json)、[cell-traj.json](2026-10-08-lifecycle/cell-traj.json)、[cell-none.json](2026-10-08-lifecycle/cell-none.json) | [lifecycle-stats.py](../tools/lifecycle-stats.py) | [lifecycle.tex](../overleaf/gen/lifecycle.tex)、[lifecycle-rows.tex](../overleaf/gen/lifecycle-rows.tex) |
 | 2026-10-08-optimize | [opt-stats.md](2026-10-08-optimize/opt-stats.md)、[premise-report.json](2026-10-08-optimize/premise-report.json)、[report.md](2026-10-08-optimize/report.md) | [opt-stats.py](../tools/opt-stats.py)、[premise-stats.py](../tools/premise-stats.py)、[sharing-stats.py](../tools/sharing-stats.py) | [opt.tex](../overleaf/gen/opt.tex)、[premise.tex](../overleaf/gen/premise.tex)、[sharing.tex](../overleaf/gen/sharing.tex) |
-| 2026-10-10-scenarios-q5 | [scen-stats.json](2026-10-10-scenarios-q5/scen-stats.json)、[paper-results.json](2026-10-10-scenarios-q5/paper-results.json)、[holdout-cost.json](2026-10-10-scenarios-q5/holdout-cost.json) | [scen-stats.py](../tools/scen-stats.py)、[paper-results.py](../tools/paper-results.py)、[sharing-stats.py](../tools/sharing-stats.py) | [scen-ds.tex](../overleaf/gen/scen-ds.tex)、[numbers.tex](../overleaf/gen/numbers.tex)、[scen-cost.tex](../overleaf/gen/scen-cost.tex) |
+| 2026-10-10-scenarios-q5 | [scen-stats.json](2026-10-10-scenarios-q5/scen-stats.json)、[paper-results.json](2026-10-10-scenarios-q5/paper-results.json)、[holdout-cost.json](2026-10-10-scenarios-q5/holdout-cost.json) | [scen-stats.py](../tools/scen-stats.py)、[paper-results.py](../tools/paper-results.py)、[sharing-stats.py](../tools/sharing-stats.py) | [scen-ds.tex](../overleaf/gen/scen-ds.tex)、[numbers.tex](../overleaf/gen/numbers.tex)、[scen-cost.tex](2026-10-28-official/legacy-manuscript/gen/scen-cost.tex) |
 | 2026-10-11-generality | [generality-stats.json](2026-10-11-generality/generality-stats.json)、[replay-safety-summary.json](2026-10-11-generality/replay-safety-summary.json)、[scen-stats.json](2026-10-11-generality/e2e/scen-stats.json)、[outcomes.json.gz](2026-10-11-generality/e2e/outcomes.json.gz) | [generality-stats.py](../tools/generality-stats.py)、[replay-safety-summary.py](../tools/replay-safety-summary.py)、[bench-library.py](../tools/bench-library.py)、[scen-stats.py](../tools/scen-stats.py) | [generality.tex](../overleaf/gen/generality.tex)、[replay-safety.tex](../overleaf/gen/replay-safety.tex) |
 | 2026-10-12-population | [population-stats.json](2026-10-12-population/population-stats.json)、[tpcds-defs.json](2026-10-12-population/tpcds-defs.json) | [population-stats.py](../tools/population-stats.py) | [population.tex](../overleaf/gen/population.tex) |
 | 2026-10-12-reforce | [reforce-stats.json](2026-10-12-reforce/reforce-stats.json) | [reforce-stats.py](../tools/reforce-stats.py)、[mavra_reforce.py](../tools/reforce/mavra_reforce.py) | — |
 | 2026-10-14-external-motivation | [reuse-stats.json](2026-10-14-external-motivation/reuse-stats.json)、[reuse-stats.md](2026-10-14-external-motivation/reuse-stats.md) | [external-reuse-stats.py](../tools/external-reuse-stats.py) | [external.tex](../overleaf/gen/external.tex) |
 | 2026-10-20-relbench | [paper-sessions.json](2026-10-20-relbench/paper-sessions.json)、[recovery-audit.json](2026-10-20-relbench/recovery-audit.json)、[manuscript-review-audit.json](2026-10-20-relbench/manuscript-review-audit.json)、[timing-replay-plan.json](2026-10-20-relbench/timing-replay-plan.json)、[reproduction-notes.md](2026-10-20-relbench/reproduction-notes.md) | [paper-stats.py](../tools/relbench/paper-stats.py)、[compare-stats.py](../tools/relbench/compare-stats.py)、[prepare-replay.py](../tools/relbench/prepare-replay.py) | [relbench.tex](../overleaf/gen/relbench.tex)、[relbench-table.tex](../overleaf/gen/relbench-table.tex) |
 | 2026-10-22-sql-only | [cells.txt](2026-10-22-sql-only/cells.txt)、[preflight.json](2026-10-22-sql-only/preflight.json)、[run-provenance.json](2026-10-22-sql-only/run-provenance.json)、[status.json](2026-10-22-sql-only/status.json) | [sql-only-stats.py](../tools/relbench/sql-only-stats.py) | — |
+| 2026-10-27-sql-only | [cells-stack.txt](2026-10-27-sql-only/cells-stack.txt)、[cells-trial.txt](2026-10-27-sql-only/cells-trial.txt)、[run.sh](2026-10-27-sql-only/run.sh)、[preflight.json](2026-10-27-sql-only/preflight.json)、[run-provenance.json](2026-10-27-sql-only/run-provenance.json)、[legacy-diagnostic.md](2026-10-27-sql-only/legacy-diagnostic.md)、[final-status.json](2026-10-27-sql-only/final-status.json)、[verified-results.md](2026-10-27-sql-only/verified-results.md)、[verified-results.json](2026-10-27-sql-only/verified-results.json) | [gate.py](2026-10-27-sql-only/gate.py)、[audit-legacy.py](2026-10-27-sql-only/audit-legacy.py)、[analyze-results.py](2026-10-27-sql-only/analyze-results.py)、[test-analysis.py](2026-10-27-sql-only/test-analysis.py)、[sql-only-stats.py](../tools/relbench/sql-only-stats.py) | — |
+| 2026-10-28-official | [README.md](2026-10-28-official/README.md)、[protocol.json](2026-10-28-official/protocol.json) | [analyze.py](2026-10-28-official/analyze.py)、[build-figures.py](2026-10-28-official/build-figures.py) | — |
+| 2026-10-29-mechanism-pilot | [protocol.json](2026-10-29-mechanism-pilot/protocol.json)、[systems-protocol.json](2026-10-29-mechanism-pilot/systems-protocol.json)、[pilot-summary.json](2026-10-29-mechanism-pilot/pilot-summary.json)、[system-summary.json](2026-10-29-mechanism-pilot/system-summary.json)、[seed-binding-preflight.json](2026-10-29-mechanism-pilot/seed-binding-preflight.json)、[formal-a-next.json](2026-10-29-mechanism-pilot/formal-a-next.json)、[README.md](2026-10-29-mechanism-pilot/paper-integration/README.md)、[validation.json](2026-10-29-mechanism-pilot/paper-integration/validation.json) | [analyze_pilot.py](2026-10-29-mechanism-pilot/analyze_pilot.py)、[build_previews.py](2026-10-29-mechanism-pilot/build_previews.py)、[plot_pilot.py](2026-10-29-mechanism-pilot/plot_pilot.py)、[analyze_systems.py](2026-10-29-mechanism-pilot/analyze_systems.py)、[build_delivery.py](2026-10-29-mechanism-pilot/build_delivery.py)、[mechanism.py](../tools/figures/mechanism.py) | [figure-a-pilot.pdf](../output/mechanism-pilot-20261029/figure-a-pilot.pdf)、[figure-b-controlled.pdf](../output/mechanism-pilot-20261029/figure-b-controlled.pdf)、[figure-c-combined-preview.pdf](../output/mechanism-pilot-20261029/figure-c-combined-preview.pdf)、[mechanism.tex](../overleaf/gen/mechanism.tex)、[memory-access-pilot.pdf](../overleaf/figures/memory-access-pilot.pdf)、[fixed-sharing.pdf](../overleaf/figures/fixed-sharing.pdf)、[snapshot-control.pdf](../overleaf/figures/snapshot-control.pdf) |
+| 2026-10-29-fig3-restore | [restored-fig3.json](2026-10-29-fig3-restore/restored-fig3.json)、[protected-files.json](2026-10-29-fig3-restore/protected-files.json)、[github-push-result.json](2026-10-29-fig3-restore/github-push-result.json) | [update-paper.py](2026-10-29-fig3-restore/update-paper.py)、[prepare.py](2026-10-29-fig3-restore/prepare.py) | [relbench-cumulative.tex](../overleaf/figures/relbench-cumulative.tex)、[relbench-cumulative.pdf](../overleaf/figures/relbench-cumulative.pdf)、[relbench-cumulative-zh.pdf](../overleaf/figures/relbench-cumulative-zh.pdf) |
+| 2026-10-29-fig45-official | [figure-data.json](2026-10-29-fig45-official/figure-data.json)、[protected-files.json](2026-10-29-fig45-official/protected-files.json)、[github-push-result.json](2026-10-29-fig45-official/github-push-result.json) | [build-figures.py](2026-10-29-fig45-official/build-figures.py)、[update-paper.py](2026-10-29-fig45-official/update-paper.py) | — |
+| 2026-10-29-fig5-review | [lineage-audit.json](2026-10-29-fig5-review/lineage-audit.json)、[github-push-result.json](2026-10-29-fig5-review/github-push-result.json) | [audit_lineage.py](2026-10-29-fig5-review/audit_lineage.py) | [sharing.tex](../overleaf/sections/evaluation/sharing.tex) |
+| 2026-10-29-fig5-table3-restore | [github-base.json](2026-10-29-fig5-table3-restore/github-base.json)、[github-push-result.json](2026-10-29-fig5-table3-restore/github-push-result.json)、[sync-plan.json](2026-10-29-fig5-table3-restore/sync-plan.json) | [prepare.py](2026-10-29-fig5-table3-restore/prepare.py) | — |
+| 2026-10-29-table4-fig1 | [github-base.json](2026-10-29-table4-fig1/github-base.json)、[github-push-result.json](2026-10-29-table4-fig1/github-push-result.json)、[sync-plan.json](2026-10-29-table4-fig1/sync-plan.json) | [prepare.py](2026-10-29-table4-fig1/prepare.py) | [relbench.tex](../overleaf/tables/relbench.tex)、[relbench.tex](../overleaf/gen/relbench.tex)、[relbench-table.tex](../overleaf/gen/relbench-table.tex) |
 
 ## 原始数据与代码版本记录
 
@@ -84,6 +100,14 @@
 | 2026-10-14-external-motivation | noctis `results/external-benchmarks/`；本地为汇总，数据下载与范围见 README。 | 各目录 README 的设计、运行记录与启动命令；运行版本以原记录为准。 |
 | 2026-10-20-relbench | 本地及 noctis 的 `results/relbench-pilot3/`、`results/relbench-main/`；数据准备与模板在 noctis `results/relbench-data/`。 | README 的逐轮记录、reproduction-notes、原始 run.json 和 timing-replay-plan 源文件哈希；10-22 恢复说明见 overleaf/README.md。 |
 | 2026-10-22-sql-only | noctis `/root/agentdb-sql-only-20261022/results/sql-only-20261022/`；独立保存。 | 本目录 README、preflight.json 与运行文件的代码及二进制哈希。 |
+| 2026-10-27-sql-only | 本地 `results/sql-only-20261027/` 与 noctis `/root/agentdb-sql-only-20261027/results/sql-only-20261027/`；保留四组原始会话、源码归档与输入清单。 | 同一份 10-22 空回复恢复代码；运行时记录输入、代码和二进制哈希，并保存源码归档。 |
+| 2026-10-28-official | noctis /root/agentdb-official-20261028/results/official-20261028/；本机 results/official-20261028/ 为同步目录。 | source-as-started.tar.gz、source-manifest.json、build-provenance.json；后续基础设施修复另记。 |
+| 2026-10-29-mechanism-pilot | 本地 results/mechanism-pilot-20261029/ 与 results/mechanism-systems-20261029/；服务器隔离目录及输出位置见 README。 | protocol、runtime-manifest 与 systems-manifest；接口故障前代码、修复子批次、冻结源编译一致性检查及费用账本分开保存。 |
+| 2026-10-29-fig3-restore | 本目录保存恢复来源、保护清单和同步结果；历史实验数据仍归 2026-10-20-relbench，不新增原始运行。 | 恢复来源 01daa2133a54ee45a8d1b529b5e04167e81ed340；当时提交与核验结果见 github-push-result.json。 |
+| 2026-10-29-fig45-official | 使用 2026-10-28 官方 API 已完成会话；逐点数据与来源保存在 figure-data.json，未新增模型调用。 | 当时生成与同步逻辑见本目录脚本；版本记录见 github-base.json 和 github-push-result.json。 |
+| 2026-10-29-fig5-review | 审阅 2026-10-28 官方 API 的 MAVRA 原始会话；本目录保存逐会话来源审计及历史修订草稿，不新增实验。 | 审计逻辑见 audit_lineage.py；冻结时源码、候选修订和后续同步按本目录 README 分开解释。 |
+| 2026-10-29-fig5-table3-restore | 本目录为历史源码恢复和推送记录，没有新增实验数据；原始实验归相应既有批次。 | 论文仓库提交 514d6c474cbfd8339c7392acf809d6a5e93e0f25；恢复来源和文件清单见 github-push-result.json。 |
+| 2026-10-29-table4-fig1 | 历史五截点网关数据与官方 API 数据分开保留；本目录仅记录源码恢复与同步，没有新运行。 | 论文仓库提交 b2755c23953b646e27ccd5fe9a1f9cf1798cca92；恢复来源、编译与核验见 github-push-result.json。 |
 
 ## 维护索引
 

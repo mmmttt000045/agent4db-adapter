@@ -1,0 +1,104 @@
+\ifbilingual
+  % Noto CJK instead of Fandol: Fandol subsets embedded by xdvipdfmx render as blank pages in
+  % browser and macOS PDF viewers. The bilingual entry is the writing version only.
+  \usepackage[UTF8,scheme=plain,fontset=none]{ctex}
+  \setCJKmainfont{Noto Serif CJK SC}
+  \setCJKsansfont{Noto Sans CJK SC}
+  \setCJKmonofont{Noto Sans Mono CJK SC}
+  % Bilingual draft only: stretch interword space rather than overflow the margin.
+  \setlength{\emergencystretch}{1.5em}
+\else
+  % Preserve IEEE's Times fonts with pdfLaTeX and the XeTeX-based fallback compiler.
+  \usepackage[T1]{fontenc}
+\fi
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pifont}
+\usepackage{amsthm}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\usepackage{cite}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\providecommand{\Description}[1]{}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+% Give each full-width float its own page-top slot (especially Table III and Fig. 2).
+\setcounter{dbltopnumber}{1}
+% Keep natural float gaps compact; allow stretch to align column bottoms.
+\setlength{\textfloatsep}{14pt plus 8pt minus 4pt}
+\setlength{\dbltextfloatsep}{14pt plus 2pt minus 4pt}
+\setlength{\floatsep}{0.85\baselineskip plus 0.5\baselineskip minus 0.2\baselineskip}
+% Preserve the zero natural paragraph gap, with a little more stretch.
+\setlength{\parskip}{0ex plus 0.35ex minus 0.1ex}
+% Method colors, fixed across every figure and table; the figures (tools/figures/) read these
+% definitions, so a method has the same color in a figure and in a table swatch. Six slots in the
+% CVD-validated order (blue, orange, aqua, yellow, magenta, green), assigned in reverse along the
+% method order so neighbouring methods are validated pairs; scope-only (controlled benchmark only)
+% uses violet. Blue is reserved for MAVRA (its gold-SQL variant takes a tint); accuracy shading uses a neutral ramp. The generic
+% version-keyed cache (cost figure and replay only) uses a neutral gray with its own marker and dash.
+% Method colours of the experiment figures (Figures 3-7): hues of the Nature (NPG) palette, darkened or saturated where
+% needed to pass colour-vision and contrast checks; MAVRA navy, its ablations lighter blues, reference recheck family in grays.
+\definecolor{mCond}{HTML}{2F4F9F}
+\definecolor{mDef}{HTML}{B8B8B8}
+\definecolor{mRevoke}{HTML}{1F8FB0}
+\definecolor{mSchema}{HTML}{E3643A}
+\definecolor{mUnguarded}{HTML}{E87BA4}
+\definecolor{mNoShare}{HTML}{9C5A26}
+\definecolor{mScope}{HTML}{A9740A}
+\definecolor{mCache}{HTML}{3A3A3A}
+\definecolor{mTraj}{HTML}{00A087} % retained palette entry for archived figures
+\definecolor{mTrajVerify}{HTML}{66C2AE} % retained palette entry for archived figures
+\definecolor{mCondGold}{HTML}{9DB3E4} % MAVRA, gold-SQL reference: tint of the MAVRA navy
+\definecolor{mCondCur}{HTML}{5F86D6} % MAVRA, regression on current data: lighter blue of the MAVRA family
+\definecolor{mTable}{HTML}{8E5BB0} % dbt-style table tests
+\definecolor{mPrivate}{HTML}{E6A01E} % single-agent memory (same mechanism as MAVRA, not shared)
+% RelBench figure: the four published memories, one hue each
+\definecolor{mAgentSM}{HTML}{8E5BB0}
+\definecolor{mACE}{HTML}{E6A01E}
+\definecolor{mGMem}{HTML}{00A087}
+\definecolor{mAWM}{HTML}{E87BA4}
+\definecolor{mDeepPrep}{HTML}{8E5BB0}
+\definecolor{mFeatPilot}{HTML}{A9740A}
+\definecolor{inkmuted}{HTML}{52514E}
+\definecolor{gridline}{HTML}{DDDCD8}
+\newcommand{\swatch}[1]{\textcolor{#1}{\rule[-0.1ex]{0.8em}{0.8em}}}
+\input{gen/numbers}
+\input{gen/review}
+\input{gen/numbers-prev}
+\input{gen/scen-ds}
+\input{gen/session-latency}
+\input{gen/opt}
+\input{gen/sharing}
+\input{gen/premise}
+\input{gen/lifecycle}
+\input{gen/generality}
+\input{gen/replay-safety}
+\input{gen/population}
+\input{gen/external}
+\input{gen/official-numbers}
+% Macros of runs still in progress: the generated files override these once the numbers exist.
+\providecommand{\RpTableCorrect}{--}\providecommand{\RpTableWrong}{--}\providecommand{\RpTableNeeded}{--}
+\providecommand{\RpTableUnneeded}{--}\providecommand{\RpTableDB}{--}
+\providecommand{\RpTableOnlyCond}{--}\providecommand{\RpTableOnlyTable}{--}\providecommand{\RpTableWrongModeled}{--}
+\providecommand{\TrDefs}{--}\providecommand{\TrJoinDefs}{--}\providecommand{\TrFilterDefs}{--}\providecommand{\TrSeeded}{--}
+\providecommand{\TrSeedFailed}{--}\providecommand{\TrCondN}{--}\providecommand{\TrCondCorrect}{--}\providecommand{\TrCondWrongModeled}{--}
+\providecommand{\TrSchemaWrongModeled}{--}\providecommand{\TrTableNeeded}{--}\providecommand{\TrTableUnneeded}{--}
+\providecommand{\TrTableCorrect}{--}\providecommand{\TrCondRepairedTasks}{--}\providecommand{\TrPairJudge}{--}\providecommand{\TrPairEx}{--}
+\providecommand{\TrPairN}{--}\providecommand{\TrPairExWrong}{--}\providecommand{\TrCondDB}{--}\providecommand{\TrCacheDB}{--}
+\providecommand{\TrSameCondDef}{--}\providecommand{\TrCondUnneeded}{--}\providecommand{\TrCondNeeded}{--}\providecommand{\TrCondDuploadDB}{--}
+\newcommand{\system}{MAVRA}
+\newcommand{\llmmodel}{DeepSeek-V4.1-Flash-1017}
+\newcommand{\bi}[2]{#1\par\ifbilingual #2\par\fi}
+\newcommand{\bt}[2]{#1\ifbilingual\space / #2\fi}
+\newcommand{\bh}[2]{\begin{tabular}[b]{@{}c@{}}#1\ifbilingual\\#2\fi\end{tabular}}
+% Top-aligned so that a two-line method name starts on the row's baseline, next to its swatch.
+\newcommand{\bhl}[2]{\begin{tabular}[t]{@{}l@{}}#1\ifbilingual\\#2\fi\end{tabular}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}

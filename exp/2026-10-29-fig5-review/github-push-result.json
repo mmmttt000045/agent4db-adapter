@@ -1,0 +1,27 @@
+{
+  "status": "pushed_and_verified",
+  "verified_utc": "2026-10-29T02:45:38.217Z",
+  "repository": "mmmttt000045/icde-2027-paper",
+  "branch": "main",
+  "previous_commit": "01daa2133a54ee45a8d1b529b5e04167e81ed340",
+  "commit": "3f3f5d088b7281397ef533ad2e9d0cb4779ea5b5",
+  "commit_url": "https://github.com/mmmttt000045/icde-2027-paper/commit/3f3f5d088b7281397ef533ad2e9d0cb4779ea5b5",
+  "tree": "b42099e9962f83b1e6165d1c78a273eee9f9ab7c",
+  "prepared_files_verified": 91,
+  "changed_files": 63,
+  "remote_files": 93,
+  "remote_only_files_preserved": 2,
+  "compilation": {
+    "english": {
+      "success": true,
+      "total_pages": 15,
+      "body_pages": 12
+    },
+    "bilingual": {
+      "success": true,
+      "total_pages": 22
+    }
+  },
+  "authorization": "User explicitly confirmed upload of unpublished manuscript sources, experimental results and figure PDFs to this private repository and main branch.",
+  "overleaf_project_sync": "GitHub updated; Overleaf-side pull not performed."
+}

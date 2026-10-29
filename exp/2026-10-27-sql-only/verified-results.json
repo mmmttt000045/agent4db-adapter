@@ -1,0 +1,1472 @@
+{
+  "rel-stack": {
+    "source_files_verified": 32,
+    "sessions": {
+      "sql-only": [
+        {
+          "task": "post-votes",
+          "k": 1,
+          "test": 0.06399470722865426,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "patience",
+          "validations": 5,
+          "higher": false,
+          "tokens": 490839,
+          "learning_tokens": 0,
+          "llm_calls": 26,
+          "tool_calls": 37
+        },
+        {
+          "task": "post-votes",
+          "k": 2,
+          "test": 0.06983801686983362,
+          "target": 0.06428103068740632,
+          "target_detail": {
+            "val": 0.06428103068740632,
+            "from_cutoff": 1,
+            "seconds": 126.63751578330994
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": false,
+          "tokens": 39833,
+          "learning_tokens": 0,
+          "llm_calls": 4,
+          "tool_calls": 6
+        },
+        {
+          "task": "post-votes",
+          "k": 3,
+          "test": 0.0615431891636013,
+          "target": 0.06937525356228208,
+          "target_detail": {
+            "val": 0.06937525356228208,
+            "from_cutoff": 2,
+            "seconds": 155.56676292419434
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": false,
+          "tokens": 89145,
+          "learning_tokens": 0,
+          "llm_calls": 6,
+          "tool_calls": 8
+        },
+        {
+          "task": "post-votes",
+          "k": 4,
+          "test": 0.06084401819340841,
+          "target": 0.062455757116497215,
+          "target_detail": {
+            "val": 0.062455757116497215,
+            "from_cutoff": 3,
+            "seconds": 154.25185918807983
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 108431,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 10
+        },
+        {
+          "task": "post-votes",
+          "k": 5,
+          "test": 0.0662934826727241,
+          "target": 0.061188810002266045,
+          "target_detail": {
+            "val": 0.061188810002266045,
+            "from_cutoff": 4,
+            "seconds": 153.02000212669373
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 103229,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 12
+        },
+        {
+          "task": "user-badge",
+          "k": 1,
+          "test": 0.8259060848399377,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "validation_budget",
+          "validations": 8,
+          "higher": true,
+          "tokens": 301624,
+          "learning_tokens": 0,
+          "llm_calls": 14,
+          "tool_calls": 23
+        },
+        {
+          "task": "user-badge",
+          "k": 2,
+          "test": 0.825115477040922,
+          "target": 0.8256718351604507,
+          "target_detail": {
+            "val": 0.8256718351604507,
+            "from_cutoff": 1,
+            "seconds": 120.8260588645935
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 88584,
+          "learning_tokens": 0,
+          "llm_calls": 6,
+          "tool_calls": 9
+        },
+        {
+          "task": "user-badge",
+          "k": 3,
+          "test": 0.838229778614247,
+          "target": 0.8305126400791866,
+          "target_detail": {
+            "val": 0.8305126400791866,
+            "from_cutoff": 2,
+            "seconds": 122.63745307922363
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 100542,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 11
+        },
+        {
+          "task": "user-badge",
+          "k": 4,
+          "test": 0.8555596043603222,
+          "target": 0.833018749514405,
+          "target_detail": {
+            "val": 0.833018749514405,
+            "from_cutoff": 3,
+            "seconds": 120.68678498268127
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 67295,
+          "learning_tokens": 0,
+          "llm_calls": 5,
+          "tool_calls": 8
+        },
+        {
+          "task": "user-badge",
+          "k": 5,
+          "test": 0.8389057774702213,
+          "target": 0.8549008182698739,
+          "target_detail": {
+            "val": 0.8549008182698739,
+            "from_cutoff": 4,
+            "seconds": 121.82747507095337
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 91505,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 12
+        },
+        {
+          "task": "user-engagement",
+          "k": 1,
+          "test": 0.8837132191488609,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "patience",
+          "validations": 7,
+          "higher": true,
+          "tokens": 308783,
+          "learning_tokens": 0,
+          "llm_calls": 19,
+          "tool_calls": 31
+        },
+        {
+          "task": "user-engagement",
+          "k": 2,
+          "test": 0.8719962195200058,
+          "target": 0.8802613351304218,
+          "target_detail": {
+            "val": 0.8802613351304218,
+            "from_cutoff": 1,
+            "seconds": 120.09375214576721
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 41033,
+          "learning_tokens": 0,
+          "llm_calls": 4,
+          "tool_calls": 8
+        },
+        {
+          "task": "user-engagement",
+          "k": 3,
+          "test": 0.8900215200131998,
+          "target": 0.8756187330652607,
+          "target_detail": {
+            "val": 0.8756187330652607,
+            "from_cutoff": 2,
+            "seconds": 120.34706687927246
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 39795,
+          "learning_tokens": 0,
+          "llm_calls": 4,
+          "tool_calls": 6
+        },
+        {
+          "task": "user-engagement",
+          "k": 4,
+          "test": 0.8889317138964435,
+          "target": 0.8868823140396196,
+          "target_detail": {
+            "val": 0.8868823140396196,
+            "from_cutoff": 3,
+            "seconds": 120.68109512329102
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 92985,
+          "learning_tokens": 0,
+          "llm_calls": 8,
+          "tool_calls": 12
+        },
+        {
+          "task": "user-engagement",
+          "k": 5,
+          "test": 0.8895958541548749,
+          "target": 0.8860315480721113,
+          "target_detail": {
+            "val": 0.8860315480721113,
+            "from_cutoff": 4,
+            "seconds": 121.34245157241821
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 60988,
+          "learning_tokens": 0,
+          "llm_calls": 6,
+          "tool_calls": 8
+        }
+      ],
+      "mavra": [
+        {
+          "task": "post-votes",
+          "k": 1,
+          "test": 0.06436244583100444,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "validation_budget",
+          "validations": 8,
+          "higher": false,
+          "tokens": 841129,
+          "learning_tokens": 8732,
+          "llm_calls": 30,
+          "tool_calls": 40
+        },
+        {
+          "task": "post-votes",
+          "k": 2,
+          "test": 0.06964626470394028,
+          "target": 0.0643010144345223,
+          "target_detail": {
+            "val": 0.0643010144345223,
+            "from_cutoff": 1,
+            "seconds": 73.62781310081482
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 97963,
+          "learning_tokens": 8864,
+          "llm_calls": 7,
+          "tool_calls": 11
+        },
+        {
+          "task": "post-votes",
+          "k": 3,
+          "test": 0.06286511435295286,
+          "target": 0.07013662764213192,
+          "target_detail": {
+            "val": 0.07013662764213192,
+            "from_cutoff": 2,
+            "seconds": 71.78545498847961
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 89656,
+          "learning_tokens": 10071,
+          "llm_calls": 7,
+          "tool_calls": 16
+        },
+        {
+          "task": "post-votes",
+          "k": 4,
+          "test": 0.060903013367422015,
+          "target": 0.06222649909398374,
+          "target_detail": {
+            "val": 0.06222649909398374,
+            "from_cutoff": 3,
+            "seconds": 72.75783324241638
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 189539,
+          "learning_tokens": 10176,
+          "llm_calls": 11,
+          "tool_calls": 18
+        },
+        {
+          "task": "post-votes",
+          "k": 5,
+          "test": 0.06578415243801283,
+          "target": 0.061074798208017075,
+          "target_detail": {
+            "val": 0.061074798208017075,
+            "from_cutoff": 4,
+            "seconds": 74.48782777786255
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": false,
+          "tokens": 76900,
+          "learning_tokens": 10270,
+          "llm_calls": 5,
+          "tool_calls": 7
+        },
+        {
+          "task": "user-badge",
+          "k": 1,
+          "test": 0.8533282282257134,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "patience",
+          "validations": 7,
+          "higher": true,
+          "tokens": 377742,
+          "learning_tokens": 10884,
+          "llm_calls": 17,
+          "tool_calls": 34
+        },
+        {
+          "task": "user-badge",
+          "k": 2,
+          "test": 0.8557322550343498,
+          "target": 0.8556638267866722,
+          "target_detail": {
+            "val": 0.8556638267866722,
+            "from_cutoff": 1,
+            "seconds": 88.6376359462738
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 71914,
+          "learning_tokens": 11544,
+          "llm_calls": 4,
+          "tool_calls": 6
+        },
+        {
+          "task": "user-badge",
+          "k": 3,
+          "test": 0.8602624384818376,
+          "target": 0.8576989874320837,
+          "target_detail": {
+            "val": 0.8576989874320837,
+            "from_cutoff": 2,
+            "seconds": 92.11394476890564
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 58567,
+          "learning_tokens": 12760,
+          "llm_calls": 3,
+          "tool_calls": 4
+        },
+        {
+          "task": "user-badge",
+          "k": 4,
+          "test": 0.8708832927246647,
+          "target": 0.8566342822051487,
+          "target_detail": {
+            "val": 0.8566342822051487,
+            "from_cutoff": 3,
+            "seconds": 92.32944679260254
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 156055,
+          "learning_tokens": 11786,
+          "llm_calls": 7,
+          "tool_calls": 14
+        },
+        {
+          "task": "user-badge",
+          "k": 5,
+          "test": 0.8607044236993142,
+          "target": 0.873615055836131,
+          "target_detail": {
+            "val": 0.873615055836131,
+            "from_cutoff": 4,
+            "seconds": 94.00159764289856
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 152704,
+          "learning_tokens": 11716,
+          "llm_calls": 7,
+          "tool_calls": 16
+        },
+        {
+          "task": "user-engagement",
+          "k": 1,
+          "test": 0.8822373457803355,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "validation_budget",
+          "validations": 8,
+          "higher": true,
+          "tokens": 226061,
+          "learning_tokens": 10112,
+          "llm_calls": 13,
+          "tool_calls": 21
+        },
+        {
+          "task": "user-engagement",
+          "k": 2,
+          "test": 0.8731283168550368,
+          "target": 0.8796912013419774,
+          "target_detail": {
+            "val": 0.8796912013419774,
+            "from_cutoff": 1,
+            "seconds": 157.85866689682007
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 126698,
+          "learning_tokens": 11436,
+          "llm_calls": 7,
+          "tool_calls": 11
+        },
+        {
+          "task": "user-engagement",
+          "k": 3,
+          "test": 0.8887877819512384,
+          "target": 0.8735244259663727,
+          "target_detail": {
+            "val": 0.8735244259663727,
+            "from_cutoff": 2,
+            "seconds": 170.17249703407288
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 199315,
+          "learning_tokens": 11740,
+          "llm_calls": 8,
+          "tool_calls": 12
+        },
+        {
+          "task": "user-engagement",
+          "k": 4,
+          "test": 0.8921210366795432,
+          "target": 0.8904567356249412,
+          "target_detail": {
+            "val": 0.8904567356249412,
+            "from_cutoff": 3,
+            "seconds": 177.3876450061798
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 147991,
+          "learning_tokens": 11272,
+          "llm_calls": 7,
+          "tool_calls": 11
+        },
+        {
+          "task": "user-engagement",
+          "k": 5,
+          "test": 0.8899435420170443,
+          "target": 0.8871604268689178,
+          "target_detail": {
+            "val": 0.8871604268689178,
+            "from_cutoff": 4,
+            "seconds": 177.99474120140076
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 144786,
+          "learning_tokens": 13111,
+          "llm_calls": 7,
+          "tool_calls": 9
+        }
+      ]
+    },
+    "aggregates": {
+      "all": {
+        "sql-only": {
+          "n": 15,
+          "tokens_with_learning": 2024611,
+          "learn_tokens": 0,
+          "llm_calls": 130,
+          "tool_calls": 201,
+          "llm_retry_seconds": 1374.416368484497
+        },
+        "mavra": {
+          "n": 15,
+          "tokens_with_learning": 2957020,
+          "learn_tokens": 164474,
+          "llm_calls": 140,
+          "tool_calls": 230,
+          "llm_retry_seconds": 1001.7342638969421
+        },
+        "mavra_relative_to_sql": 0.4605373575467089
+      },
+      "reuse": {
+        "sql-only": {
+          "n": 12,
+          "tokens_with_learning": 923365,
+          "learn_tokens": 0,
+          "llm_calls": 71,
+          "tool_calls": 110,
+          "llm_retry_seconds": 1323.5236747264862
+        },
+        "mavra": {
+          "n": 12,
+          "tokens_with_learning": 1512088,
+          "learn_tokens": 134746,
+          "llm_calls": 80,
+          "tool_calls": 135,
+          "llm_retry_seconds": 980.1562702655792
+        },
+        "mavra_relative_to_sql": 0.6375842705755579
+      },
+      "k1": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 1101246,
+          "learn_tokens": 0,
+          "llm_calls": 59,
+          "tool_calls": 91,
+          "llm_retry_seconds": 50.892693758010864
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 1444932,
+          "learn_tokens": 29728,
+          "llm_calls": 60,
+          "tool_calls": 95,
+          "llm_retry_seconds": 21.577993631362915
+        },
+        "mavra_relative_to_sql": 0.3120883072447027
+      },
+      "k2": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 169450,
+          "learn_tokens": 0,
+          "llm_calls": 14,
+          "tool_calls": 23,
+          "llm_retry_seconds": 337.4839129447937
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 296575,
+          "learn_tokens": 31844,
+          "llm_calls": 18,
+          "tool_calls": 28,
+          "llm_retry_seconds": 0.0
+        },
+        "mavra_relative_to_sql": 0.7502213042195338
+      },
+      "k3": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 229482,
+          "learn_tokens": 0,
+          "llm_calls": 17,
+          "tool_calls": 25,
+          "llm_retry_seconds": 242.15366983413696
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 347538,
+          "learn_tokens": 34571,
+          "llm_calls": 18,
+          "tool_calls": 32,
+          "llm_retry_seconds": 32.87698245048523
+        },
+        "mavra_relative_to_sql": 0.5144455774309096
+      },
+      "k4": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 268711,
+          "learn_tokens": 0,
+          "llm_calls": 20,
+          "tool_calls": 30,
+          "llm_retry_seconds": 677.9416244029999
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 493585,
+          "learn_tokens": 33234,
+          "llm_calls": 25,
+          "tool_calls": 43,
+          "llm_retry_seconds": 0.0
+        },
+        "mavra_relative_to_sql": 0.8368619074023764
+      },
+      "k5": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 255722,
+          "learn_tokens": 0,
+          "llm_calls": 20,
+          "tool_calls": 32,
+          "llm_retry_seconds": 65.94446754455566
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 374390,
+          "learn_tokens": 35097,
+          "llm_calls": 19,
+          "tool_calls": 32,
+          "llm_retry_seconds": 947.279287815094
+        },
+        "mavra_relative_to_sql": 0.46405080517124064
+      }
+    },
+    "quality": {
+      "post-votes": {
+        "metric": "MAE",
+        "mean": {
+          "sql-only": 0.06450268282564434,
+          "mavra": 0.06471219813866648
+        },
+        "outside_tolerance_cutoffs": [
+          3
+        ]
+      },
+      "user-badge": {
+        "metric": "AUC",
+        "mean": {
+          "sql-only": 0.83674334446513,
+          "mavra": 0.8601821276331759
+        },
+        "outside_tolerance_cutoffs": []
+      },
+      "user-engagement": {
+        "metric": "AUC",
+        "mean": {
+          "sql-only": 0.884851705346677,
+          "mavra": 0.8852436046566396
+        },
+        "outside_tolerance_cutoffs": []
+      }
+    },
+    "targets": {
+      "reuse_sessions": 12,
+      "both_present": 12,
+      "different": 12,
+      "at_least_one_missing": 0
+    }
+  },
+  "rel-trial": {
+    "source_files_verified": 32,
+    "sessions": {
+      "sql-only": [
+        {
+          "task": "site-success",
+          "k": 1,
+          "test": 0.39215659555125504,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "validation_budget",
+          "validations": 8,
+          "higher": false,
+          "tokens": 1141654,
+          "learning_tokens": 0,
+          "llm_calls": 36,
+          "tool_calls": 48
+        },
+        {
+          "task": "site-success",
+          "k": 2,
+          "test": 0.41025904653250544,
+          "target": 0.3429347396819437,
+          "target_detail": {
+            "val": 0.3429347396819437,
+            "from_cutoff": 1,
+            "seconds": 915.1750621795654
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": false,
+          "tokens": 51420,
+          "learning_tokens": 0,
+          "llm_calls": 4,
+          "tool_calls": 5
+        },
+        {
+          "task": "site-success",
+          "k": 3,
+          "test": 0.3854282459706288,
+          "target": 0.44478484531563334,
+          "target_detail": {
+            "val": 0.44478484531563334,
+            "from_cutoff": 2,
+            "seconds": 1070.0308012962341
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 96868,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 9
+        },
+        {
+          "task": "site-success",
+          "k": 4,
+          "test": 0.39078461127017455,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "previous model failed: SQL error: canceling statement due to statement timeout",
+            "attempts": 2,
+            "seconds": 1202.964637041092
+          },
+          "stop": "validation_budget",
+          "validations": 8,
+          "higher": false,
+          "tokens": 2600137,
+          "learning_tokens": 0,
+          "llm_calls": 38,
+          "tool_calls": 45
+        },
+        {
+          "task": "site-success",
+          "k": 5,
+          "test": 0.39374226869313317,
+          "target": 0.3788944007750987,
+          "target_detail": {
+            "val": 0.3788944007750987,
+            "from_cutoff": 4,
+            "seconds": 65.17793726921082
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 65727,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 12
+        },
+        {
+          "task": "study-adverse",
+          "k": 1,
+          "test": 34.975891452374846,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "patience",
+          "validations": 5,
+          "higher": false,
+          "tokens": 511315,
+          "learning_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 35
+        },
+        {
+          "task": "study-adverse",
+          "k": 2,
+          "test": 50.78408387474906,
+          "target": 34.86724788020103,
+          "target_detail": {
+            "val": 34.86724788020103,
+            "from_cutoff": 1,
+            "seconds": 190.5624086856842
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 72388,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 12
+        },
+        {
+          "task": "study-adverse",
+          "k": 3,
+          "test": 44.247493944564326,
+          "target": 49.612116616938806,
+          "target_detail": {
+            "val": 49.612116616938806,
+            "from_cutoff": 2,
+            "seconds": 236.5524036884308
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 79363,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 11
+        },
+        {
+          "task": "study-adverse",
+          "k": 4,
+          "test": 38.8733930920873,
+          "target": 43.46881830092557,
+          "target_detail": {
+            "val": 43.46881830092557,
+            "from_cutoff": 3,
+            "seconds": 277.44783329963684
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": false,
+          "tokens": 818269,
+          "learning_tokens": 0,
+          "llm_calls": 31,
+          "tool_calls": 36
+        },
+        {
+          "task": "study-adverse",
+          "k": 5,
+          "test": 32.977184528323114,
+          "target": 36.97710119558063,
+          "target_detail": {
+            "val": 36.97710119558063,
+            "from_cutoff": 4,
+            "seconds": 87.56456303596497
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 89676,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 12
+        },
+        {
+          "task": "study-outcome",
+          "k": 1,
+          "test": 0.6471221398646472,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "submitted",
+          "validations": 7,
+          "higher": true,
+          "tokens": 644384,
+          "learning_tokens": 0,
+          "llm_calls": 25,
+          "tool_calls": 35
+        },
+        {
+          "task": "study-outcome",
+          "k": 2,
+          "test": 0.631632773860886,
+          "target": 0.6562197873026103,
+          "target_detail": {
+            "val": 0.6562197873026103,
+            "from_cutoff": 1,
+            "seconds": 559.2228333950043
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 80729,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 10
+        },
+        {
+          "task": "study-outcome",
+          "k": 3,
+          "test": 0.6602466525722339,
+          "target": 0.6458569581877271,
+          "target_detail": {
+            "val": 0.6458569581877271,
+            "from_cutoff": 2,
+            "seconds": 679.7282302379608
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 82472,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 11
+        },
+        {
+          "task": "study-outcome",
+          "k": 4,
+          "test": 0.6707812499999999,
+          "target": 0.6762690293210633,
+          "target_detail": {
+            "val": 0.6762690293210633,
+            "from_cutoff": 3,
+            "seconds": 774.50643491745
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 103250,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 14
+        },
+        {
+          "task": "study-outcome",
+          "k": 5,
+          "test": 0.7139467025050549,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "previous model failed: SQL error: canceling statement due to statement timeout",
+            "attempts": 2,
+            "seconds": 1200.1545236110687
+          },
+          "stop": "patience",
+          "validations": 7,
+          "higher": true,
+          "tokens": 650065,
+          "learning_tokens": 0,
+          "llm_calls": 21,
+          "tool_calls": 33
+        }
+      ],
+      "mavra": [
+        {
+          "task": "site-success",
+          "k": 1,
+          "test": 0.41717934921976746,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "patience",
+          "validations": 7,
+          "higher": false,
+          "tokens": 653181,
+          "learning_tokens": 0,
+          "llm_calls": 26,
+          "tool_calls": 35
+        },
+        {
+          "task": "site-success",
+          "k": 2,
+          "test": 0.4185482316392085,
+          "target": 0.3835047707027138,
+          "target_detail": {
+            "val": 0.3835047707027138,
+            "from_cutoff": 1,
+            "seconds": 171.38869976997375
+          },
+          "stop": "llm_budget",
+          "validations": 2,
+          "higher": false,
+          "tokens": 1122340,
+          "learning_tokens": 12724,
+          "llm_calls": 40,
+          "tool_calls": 51
+        },
+        {
+          "task": "site-success",
+          "k": 3,
+          "test": 0.37039324947383456,
+          "target": 0.42586479303935426,
+          "target_detail": {
+            "val": 0.42586479303935426,
+            "from_cutoff": 2,
+            "seconds": 93.17654776573181
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 84121,
+          "learning_tokens": 0,
+          "llm_calls": 7,
+          "tool_calls": 13
+        },
+        {
+          "task": "site-success",
+          "k": 4,
+          "test": 0.4122873188205576,
+          "target": 0.3867961815759119,
+          "target_detail": {
+            "val": 0.3867961815759119,
+            "from_cutoff": 3,
+            "seconds": 94.85223889350891
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 97006,
+          "learning_tokens": 14375,
+          "llm_calls": 7,
+          "tool_calls": 12
+        },
+        {
+          "task": "site-success",
+          "k": 5,
+          "test": 0.3947900399717577,
+          "target": 0.402147053567626,
+          "target_detail": {
+            "val": 0.402147053567626,
+            "from_cutoff": 4,
+            "seconds": 102.8557813167572
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 102948,
+          "learning_tokens": 13404,
+          "llm_calls": 7,
+          "tool_calls": 12
+        },
+        {
+          "task": "study-adverse",
+          "k": 1,
+          "test": 34.72908614905527,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "patience",
+          "validations": 5,
+          "higher": false,
+          "tokens": 717690,
+          "learning_tokens": 9916,
+          "llm_calls": 26,
+          "tool_calls": 42
+        },
+        {
+          "task": "study-adverse",
+          "k": 2,
+          "test": 49.22163454664504,
+          "target": 34.01680470048039,
+          "target_detail": {
+            "val": 34.01680470048039,
+            "from_cutoff": 1,
+            "seconds": 43.33897590637207
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 89851,
+          "learning_tokens": 15087,
+          "llm_calls": 7,
+          "tool_calls": 11
+        },
+        {
+          "task": "study-adverse",
+          "k": 3,
+          "test": 43.656845993689515,
+          "target": 48.48921948905773,
+          "target_detail": {
+            "val": 48.48921948905773,
+            "from_cutoff": 2,
+            "seconds": 52.245996952056885
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 116963,
+          "learning_tokens": 12617,
+          "llm_calls": 8,
+          "tool_calls": 11
+        },
+        {
+          "task": "study-adverse",
+          "k": 4,
+          "test": 37.34968422109673,
+          "target": 43.104960722536326,
+          "target_detail": {
+            "val": 43.104960722536326,
+            "from_cutoff": 3,
+            "seconds": 55.66340374946594
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 106798,
+          "learning_tokens": 11730,
+          "llm_calls": 7,
+          "tool_calls": 13
+        },
+        {
+          "task": "study-adverse",
+          "k": 5,
+          "test": 33.83553684411818,
+          "target": 36.12527730831032,
+          "target_detail": {
+            "val": 36.12527730831032,
+            "from_cutoff": 4,
+            "seconds": 57.26030492782593
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": false,
+          "tokens": 131652,
+          "learning_tokens": 11969,
+          "llm_calls": 7,
+          "tool_calls": 16
+        },
+        {
+          "task": "study-outcome",
+          "k": 1,
+          "test": 0.6465452787624879,
+          "target": null,
+          "target_detail": {
+            "val": null,
+            "why": "first cutoff"
+          },
+          "stop": "patience",
+          "validations": 5,
+          "higher": true,
+          "tokens": 432633,
+          "learning_tokens": 11482,
+          "llm_calls": 21,
+          "tool_calls": 31
+        },
+        {
+          "task": "study-outcome",
+          "k": 2,
+          "test": 0.6509654845838156,
+          "target": 0.649977441185949,
+          "target_detail": {
+            "val": 0.649977441185949,
+            "from_cutoff": 1,
+            "seconds": 33.96248698234558
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 120710,
+          "learning_tokens": 13108,
+          "llm_calls": 7,
+          "tool_calls": 13
+        },
+        {
+          "task": "study-outcome",
+          "k": 3,
+          "test": 0.6383210007047215,
+          "target": 0.6656538973984283,
+          "target_detail": {
+            "val": 0.6656538973984283,
+            "from_cutoff": 2,
+            "seconds": 40.085026264190674
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 125553,
+          "learning_tokens": 13469,
+          "llm_calls": 7,
+          "tool_calls": 13
+        },
+        {
+          "task": "study-outcome",
+          "k": 4,
+          "test": 0.6579241071428571,
+          "target": 0.6549495465130103,
+          "target_detail": {
+            "val": 0.6549495465130103,
+            "from_cutoff": 3,
+            "seconds": 41.771849155426025
+          },
+          "stop": "reached_previous",
+          "validations": 1,
+          "higher": true,
+          "tokens": 122956,
+          "learning_tokens": 14157,
+          "llm_calls": 7,
+          "tool_calls": 13
+        },
+        {
+          "task": "study-outcome",
+          "k": 5,
+          "test": 0.6812683883622098,
+          "target": 0.6575485058457194,
+          "target_detail": {
+            "val": 0.6575485058457194,
+            "from_cutoff": 4,
+            "seconds": 41.87262725830078
+          },
+          "stop": "reached_previous",
+          "validations": 2,
+          "higher": true,
+          "tokens": 149331,
+          "learning_tokens": 15162,
+          "llm_calls": 7,
+          "tool_calls": 14
+        }
+      ]
+    },
+    "aggregates": {
+      "all": {
+        "sql-only": {
+          "n": 15,
+          "tokens_with_learning": 7087717,
+          "learn_tokens": 0,
+          "llm_calls": 235,
+          "tool_calls": 328,
+          "llm_retry_seconds": 2107.8819794654846
+        },
+        "mavra": {
+          "n": 15,
+          "tokens_with_learning": 4173733,
+          "learn_tokens": 169200,
+          "llm_calls": 191,
+          "tool_calls": 300,
+          "llm_retry_seconds": 2131.963598251343
+        },
+        "mavra_relative_to_sql": -0.4111315392530486
+      },
+      "reuse": {
+        "sql-only": {
+          "n": 12,
+          "tokens_with_learning": 4790364,
+          "learn_tokens": 0,
+          "llm_calls": 150,
+          "tool_calls": 210,
+          "llm_retry_seconds": 845.1585552692413
+        },
+        "mavra": {
+          "n": 12,
+          "tokens_with_learning": 2370229,
+          "learn_tokens": 147802,
+          "llm_calls": 118,
+          "tool_calls": 192,
+          "llm_retry_seconds": 1058.756492614746
+        },
+        "mavra_relative_to_sql": -0.5052089987316204
+      },
+      "k1": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 2297353,
+          "learn_tokens": 0,
+          "llm_calls": 85,
+          "tool_calls": 118,
+          "llm_retry_seconds": 1262.7234241962433
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 1803504,
+          "learn_tokens": 21398,
+          "llm_calls": 73,
+          "tool_calls": 108,
+          "llm_retry_seconds": 1073.2071056365967
+        },
+        "mavra_relative_to_sql": -0.2149643524525835
+      },
+      "k2": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 204537,
+          "learn_tokens": 0,
+          "llm_calls": 18,
+          "tool_calls": 27,
+          "llm_retry_seconds": 405.4931960105896
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 1332901,
+          "learn_tokens": 40919,
+          "llm_calls": 54,
+          "tool_calls": 75,
+          "llm_retry_seconds": 0.0
+        },
+        "mavra_relative_to_sql": 5.516674244757672
+      },
+      "k3": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 258703,
+          "learn_tokens": 0,
+          "llm_calls": 21,
+          "tool_calls": 31,
+          "llm_retry_seconds": 302.41310143470764
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 326637,
+          "learn_tokens": 26086,
+          "llm_calls": 22,
+          "tool_calls": 37,
+          "llm_retry_seconds": 33.142173767089844
+        },
+        "mavra_relative_to_sql": 0.262594558238598
+      },
+      "k4": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 3521656,
+          "learn_tokens": 0,
+          "llm_calls": 76,
+          "tool_calls": 95,
+          "llm_retry_seconds": 67.19526958465576
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 326760,
+          "learn_tokens": 40262,
+          "llm_calls": 21,
+          "tool_calls": 38,
+          "llm_retry_seconds": 815.2277035713196
+        },
+        "mavra_relative_to_sql": -0.9072141060909981
+      },
+      "k5": {
+        "sql-only": {
+          "n": 3,
+          "tokens_with_learning": 805468,
+          "learn_tokens": 0,
+          "llm_calls": 35,
+          "tool_calls": 57,
+          "llm_retry_seconds": 70.05698823928833
+        },
+        "mavra": {
+          "n": 3,
+          "tokens_with_learning": 383931,
+          "learn_tokens": 40535,
+          "llm_calls": 21,
+          "tool_calls": 42,
+          "llm_retry_seconds": 210.38661527633667
+        },
+        "mavra_relative_to_sql": -0.5233441924446409
+      }
+    },
+    "quality": {
+      "site-success": {
+        "metric": "MAE",
+        "mean": {
+          "sql-only": 0.3944741536035394,
+          "mavra": 0.40263963782502515
+        },
+        "outside_tolerance_cutoffs": [
+          1,
+          2,
+          4
+        ]
+      },
+      "study-adverse": {
+        "metric": "MAE",
+        "mean": {
+          "sql-only": 40.37160937841973,
+          "mavra": 39.75855755092095
+        },
+        "outside_tolerance_cutoffs": [
+          5
+        ]
+      },
+      "study-outcome": {
+        "metric": "AUC",
+        "mean": {
+          "sql-only": 0.6647459037605644,
+          "mavra": 0.6550048519112184
+        },
+        "outside_tolerance_cutoffs": [
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    "targets": {
+      "reuse_sessions": 12,
+      "both_present": 10,
+      "different": 10,
+      "at_least_one_missing": 2
+    },
+    "posthoc_sensitivity": {
+      "excluded_task": "site-success",
+      "excluded_cutoff": 4,
+      "excluded_pair": {
+        "sql-only": {
+          "tokens": 2600137,
+          "target_detail": {
+            "val": null,
+            "why": "previous model failed: SQL error: canceling statement due to statement timeout",
+            "attempts": 2,
+            "seconds": 1202.964637041092
+          },
+          "llm_calls": 38,
+          "validations": 8
+        },
+        "mavra": {
+          "tokens": 97006,
+          "target_detail": {
+            "val": 0.3867961815759119,
+            "from_cutoff": 3,
+            "seconds": 94.85223889350891
+          },
+          "llm_calls": 7,
+          "validations": 1
+        }
+      },
+      "remaining_tokens": {
+        "sql-only": 2190227,
+        "mavra": 2273223
+      },
+      "mavra_relative_to_sql": 0.037893789091267616
+    }
+  },
+  "_verification": {
+    "source_snapshot_files": 58,
+    "input_manifests": 4
+  }
+}

@@ -6,15 +6,16 @@
 
 ```bash
 python3 -m pip install -r tools/figures/requirements.txt
-make figures                       # 包括群体图和 RelBench 累计图
+make figures                       # 包括群体、RelBench 累计和机制图
 python3 tools/figures/build.py architecture  # 只画一幅
+python3 tools/figures/mechanism.py  # A/B/C 中英文图及数值宏
 python3 tools/figures/build.py --out /tmp/mavra-figures  # 主绘图器输出到预览目录
 make deck-figures                  # PPT 的六幅图，生成 PDF 并转 PNG
 ```
 
-系统依赖：Ghostscript（`gs`）、带 `kpsewhich` 的 TeX Live 及 libertine、inconsolata、fandol 字体；中文图还需 Noto Sans CJK SC；PPT 的 PNG 转换需要 Poppler 的 `pdftoppm`。Python 依赖清单用于建立绘图环境，未声明为历史实验环境锁文件。
+数据图使用 Matplotlib 直接输出带嵌入字体的矢量 PDF，无需 TeX Live 或 Ghostscript。英文优先使用 Times New Roman，其次为 Liberation Serif、DejaVu Serif；中文需要系统安装 SimSun 或 Noto CJK 等字体。示意图仍需带 `kpsewhich` 的 TeX Live 及 libertine、inconsolata、fandol 字体，中文示意图使用 Noto Sans CJK SC。PDF 预览和 PPT 的 PNG 转换需要 Poppler 的 `pdftoppm`。Python 依赖清单用于建立绘图环境，未声明为历史实验环境锁文件。
 
-论文编译直接使用已提交的 PDF，无需绘图环境。`make figures` 调用主绘图器、`population.py` 和 `relbench_cumulative.py`；后两者保留各自现有接口。
+论文编译直接使用已提交的 PDF，无需绘图环境。`make figures` 调用主绘图器、`population.py`、`relbench_cumulative.py` 和 `mechanism.py`；各自保留现有接口。
 
 ## 图形与数据来源
 
@@ -30,6 +31,9 @@ make deck-figures                  # PPT 的六幅图，生成 PDF 并转 PNG
 | `consumer-cost` | `consumer_cost.py` | 合成场景 `holdout-cost.json` 与通用性 `e2e/outcomes.json.gz` |
 | `population` | `population.py` | `exp/2026-10-12-population/population-stats.json` |
 | `relbench-cumulative` | `relbench_cumulative.py` | `exp/2026-10-20-relbench/paper-sessions.json` |
+| `memory-access-pilot` | `mechanism.py` | `exp/2026-10-29-mechanism-pilot/pilot-summary.json`，八格开发预实验 |
+| `fixed-sharing` | `mechanism.py` | 同批 `system-summary.json` 的 B，固定定义数的三轮共享对照 |
+| `snapshot-control` | `mechanism.py` | 同批 `system-summary.json` 的 C，以及 10-02 批次的 `snapshot-binding-stats.json` / `snapshot-binding-shards-stats.json`；新因果对照与归档开销分开呈现 |
 
 具体哪些图进入稿件，由 `overleaf/sections/` 和图形包装 `.tex` 的引用决定；不使用固定图号来标识脚本。`baselines.py` 是保留的辅助图，不包含在 `make figures` 中；早期外部记忆基线的采用范围以 RelBench 协议为准。
 
@@ -58,7 +62,7 @@ text(x, y, '文字 $数学$ `代码`', size, fill, style, align, width)
 Scale(d0, d1, p0, p1)                          # 数据值到毫米的线性映射
 ```
 
-**文字全部转成轮廓**，PDF 不嵌入字体，pdfLaTeX、XeLaTeX 和各种阅读器里显示都一样，也不会出现投稿系统拒收的 Type 3 字体：
+**示意图文字转成轮廓**，PDF 不嵌入字体，pdfLaTeX、XeLaTeX 和各种阅读器里显示都一样，也不会出现投稿系统拒收的 Type 3 字体：
 
 - 普通文字用 fontTools 排版，字体与论文一致：Linux Biolinum（标签）、Inconsolata zi4（反引号里的代码，同 `\code`），按 GPOS 表做字距调整；中文落到 Noto Sans CJK SC。中文标签里不要用“……”（会取到西文省略号），写“等”。
 - `$...$` 里的数学用 matplotlib 的 MathText 排版，字母用 Libertine（与正文的 newtxmath 一致），缺的符号用 STIX。数学和普通文字共用基线，一个标签里可以混排。
@@ -66,7 +70,7 @@ Scale(d0, d1, p0, p1)                          # 数据值到毫米的线性映�
 
 **共享设置**（`style.py`）：颜色、方法名称、`gen/` 宏的读取与核对，以及 `build()`（每幅图写英文和中文两份）。架构图脚本提供 `NAME`、`W`、`H` 和 `draw(sheet, lang)`。
 
-**数据图**（`mplstyle.py`）：数据图脚本提供 `NAME`、`W`、`H`（毫米）和 `figure(lang)`，返回一个 matplotlib Figure；`mplstyle.setup(lang)` 设置字体与 rcParams（标签 Linux Biolinum，中文回退到 FandolHei，字号下限同上），`mplstyle.save()` 先让 matplotlib 以 Type 3 轮廓写出 PDF，再用 Ghostscript `-dNoOutputFonts` 把所有字形转成路径，最终 PDF 同样不含字体。中文标签不能走 mathtext（其字体没有 CJK 字形），脚注角标用 `mplstyle.label_with_mark()` 单独画。
+**数据图**（`mplstyle.py`）：数据图脚本提供 `NAME`、`W`、`H`（毫米）和 `figure(lang)`，返回一个 Matplotlib Figure；`mplstyle.setup(lang)` 设置衬线字体、白底、黑色完整坐标框、向内刻度与普通字重的图例。`mplstyle.save()` 直接保存矢量 PDF，以 `pdf.fonttype=42` 嵌入字体并保留可检索文字。字体大小按单图的印刷尺寸设置；标签通常为 7.5 pt，刻度 7 pt，紧凑图例和分类标签最低 6.5 pt。
 
 ## 想改的话
 
@@ -81,11 +85,21 @@ Scale(d0, d1, p0, p1)                          # 数据值到毫米的线性映�
 
 改完运行 `build.py`，再编译论文看效果。图里的含义变了，要同步改 `overleaf/figures/<名称>.tex` 里的图注和 `\Description`。实验数据更新后，先按 `overleaf/README.md` 重新生成 `gen/`，再重建图；核对不通过说明图和正文用的不是同一份数据。
 
-## 实验图的配色（图 3–7，2026-10-11 起）
-方法颜色取 Nature（NPG）配色的色相，按色觉与对比度校验调深或调饱和（dataviz 的 validate_palette 逐图检查相邻颜色）：
-MAVRA 藏青 `#2F4F9F`，其消融（回归测试用当前数据）浅蓝 `#5F86D6`；示例检索 青绿 `#00A087`；无记忆 棕 `#9C5A26`；
-模式变更时失效 珊瑚 `#E3643A`；每次写入即失效 青蓝 `#1F8FB0`；dbt 式表级测试 紫 `#8E5BB0`；只重查变化的表 赭 `#A9740A`；
-整定义重查 浅灰 `#B8B8B8`（参照线，带直接标注）、整定义重查 + 查询缓存 深灰 `#3A3A3A`。颜色定义在 `overleaf/latex/preamble.tex`，
-`style.method()` 读取。非方法颜色在 `style.py`：答错与过期定义一律深红 `WRONG`，强调区域（MAVRA 所在行、底色组）一律浅藏青 `FOCUS`，
-其余结果用中性灰。图 5 的正确率底色是一种藏青色阶（`#F7F8FC`→`#4F6CB5`），过期仍用深红框，MAVRA 行用藏青框。点线图的标记按方法固定：MAVRA 圆、示例检索 方、无记忆 正三角、只重查变化的表 倒三角、查询缓存 空心菱形；
-图例里 MAVRA 一律加粗、用藏青。示意图（图 1、2）保留自己的颜色（`ACC` 等常量），不随方法颜色变化。
+## 当前正文实验图的样式
+
+正文中的 `population`、`relbench-cumulative`、`consumer-cost` 和 `two-schemas` 使用常规折线图或分组柱状图。方法颜色沿用 `preamble.tex`，与表格一致；线型、空心标记、黑色柱框和纹理提供额外区分。图例文字统一为黑色、普通字重，各方法采用相同线宽，不单独加粗 MAVRA。
+
+- 群体代价：三幅折线图，均值曲线加每个智能体位置的最小值--最大值误差线；每题 token 面板保留对数轴。正确率移至图注。
+- RelBench 累计 token：每个数据库一幅折线图，用竖直虚线分隔截点，学习与复用阶段在图注解释。
+- 留出查询代价：时间和 token 分成两个分组柱状图，柱高是合并全部问题后的均值，误差线覆盖各次运行的均值。
+- 两种模式的正确率：作为维护边界的受控研究，仅保留无记忆与 MAVRA，按情形分组，从零起画；保留各次运行的最小值--最大值范围和原有情形等权汇总方式。自制示例检索不再进入当前稿件；原始归档保留。
+
+2026-10-28 的官方 API 重构见 [实验协议](../../exp/2026-10-28-official/README.md)。新的 Fig.5 将解释智能体工具调用的组成，另用表格计入内部记忆开销；只有完整配对结果通过核对后才替换原 `consumer-cost`，不能将开发或未完成运行当作正式图表。
+
+这些误差线表示运行范围，不是置信区间。图注和 `Description` 必须与图形一起更新；原始数据、宏核对以及统计汇总逻辑不因样式修改而变化。每幅图同时生成英文和中文版本，并以实际单栏或通栏尺寸检查文字、图例和留白。
+
+## 2026-10-29 三幅机制图
+
+`mechanism.py` 同时生成上述 A/B/C 的中英文矢量 PDF 及 `overleaf/gen/mechanism.tex`，来源哈希保存至 `exp/2026-10-29-mechanism-pilot/paper-integration/figure-sources.json`。A/B 为 84.6 mm 单栏图，C 为 178 mm 通栏图；图注在各自 `.tex` 中维护。所有标签不小于 6.5 pt。
+
+论文版本去掉预览页的总标题与长脚注，把实验范围放入图注和正文；先前 `output/mechanism-pilot-20261029/` 的审阅图不覆盖。A 的缺失方案不画 AUC 零值、仍保留 token；B 的三轮误差线保留 96 次查询异常格；C 分开受控正确性与归档读写开销。数字与限制不因排版而改变。

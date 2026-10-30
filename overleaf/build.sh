@@ -71,7 +71,7 @@ fi
 check_dependencies() {
   local dependency
   local -a required_files=(
-    IEEEtran.cls IEEEtran.bst cite.sty amsmath.sty amssymb.sty amsthm.sty pifont.sty
+    IEEEtran.cls IEEEtran.bst cite.sty balance.sty amsmath.sty amssymb.sty amsthm.sty pifont.sty
     url.sty hyperref.sty graphicx.sty xcolor.sty booktabs.sty tabularx.sty
     colortbl.sty algorithm.sty algpseudocode.sty placeins.sty
   )

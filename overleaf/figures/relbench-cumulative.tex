@@ -6,7 +6,7 @@
 \else
 \includegraphics[width=\linewidth]{figures/relbench-cumulative}
 \fi
-\caption{\bt{Cumulative tokens, including memory operations, for the six LLM-based methods. Panels share the session axis; shading marks cutoff 1 (learning), followed by cutoffs 2--5 (reuse). Thin rules separate cutoffs.}{六种使用 LLM 的方法的累计 token，含记忆操作。两个面板共用会话轴；阴影标出首截点（学习），其后为截点 2--5（复用）。细线分隔各截点。}}
+\caption{\bt{Cumulative tokens for six LLM-based methods, including memory operations. Shading marks learning (cutoff 1); thin lines separate reuse cutoffs 2--5.}{六种 LLM 方法的累计 token，含记忆操作。阴影表示学习（截点 1），细线分隔复用截点 2--5。}}
 \label{fig:relbench-cumulative}
 \Description{Two vertically stacked line charts, rel-stack and rel-trial, show cumulative tokens in millions over 15 sessions, with one shared legend. The first three sessions are shaded as the initial learning cutoff; sessions four through fifteen are subsequent cutoffs in which memory can be reused.}
 \end{figure}

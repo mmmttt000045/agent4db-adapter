@@ -1,5 +1,5 @@
 \begin{table*}[t]
-\caption{\bt{RelBench: predictive quality, valid solutions, and reuse cost. Each method runs three tasks at five cutoffs per database.}{RelBench：预测质量、有效方案与复用代价。每种方法在每个数据库上运行三个任务、五个截点。}}
+\caption{\bt{RelBench predictive quality and reuse cost: three tasks and five cutoffs per database and method.}{RelBench 预测质量与复用代价：每种方法在每个数据库上运行三项任务、五个截点。}}
 \label{tab:relbench}
 \centering
 \ifbilingual\footnotesize\else\small\fi
@@ -17,13 +17,13 @@
   & #2 & #3 & #4 & \bh{Valid\\sessions}{有效会话} & \bh{Quality\\tasks}{达标任务}\\
   \midrule
 }
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrrrrrrcc@{}}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrrrrrr c@{\hspace{8pt}}c@{}}
 \toprule
 \RbTableBody
 \bottomrule
 \end{tabular*}
 \par\smallskip
 \parbox{\textwidth}{\footnotesize\raggedright
-\bt{Cost columns total 12 sessions at cutoffs 2--5, including memory operations; token ratios are relative to no memory. Dashes: not applicable (FeatPilot uses no LLM). Test scores average all five cutoffs, using the entity-table reference for sessions without a valid solution. \emph{Valid sessions}: non-fallback solutions (/15). \emph{Quality tasks}: tasks retaining no-memory predictive quality (/3), with $\mathrm{AUC}\geq\mathrm{AUC}_0-0.01$ or $\mathrm{MAE}\leq 1.02\,\mathrm{MAE}_0$. Subscript 0 denotes no memory; best task means are bold. Time and USD accounting are specified in Section~\ref{sec:relbench-eval}.}{代价列合计截点 2--5 的 12 个会话，含记忆操作；token 比率以无记忆为参照。短横：不适用（FeatPilot 不使用 LLM）。测试分数取五个截点的平均，无有效方案的会话采用实体表参照分数。有效会话计数排除参照回退（共 15 个）；达标任务指保持无记忆预测质量的任务数（共 3 项），满足 $\mathrm{AUC}\geq\mathrm{AUC}_0-0.01$ 或 $\mathrm{MAE}\leq 1.02\,\mathrm{MAE}_0$。下标 0 表示无记忆；各任务最佳平均分加粗。时间与美元计量见第~\ref{sec:relbench-eval} 节。}
+\bt{Costs: 12 reuse sessions, including memory operations; token ratios are relative to no memory (subscript 0). Scores: five-cutoff means with entity-reference fallback for invalid solutions; best task means are bold. Valid sessions exclude fallback (/15). Quality tasks (/3): $\mathrm{AUC}\geq\mathrm{AUC}_0-0.01$ or $\mathrm{MAE}\leq1.02\,\mathrm{MAE}_0$. Dashes: not applicable (FeatPilot uses no LLM). Time/USD accounting: Section~\ref{sec:relbench-eval}.}{代价：12 个复用会话，含记忆操作；token 比率以无记忆（下标 0）为参照。分数：五截点均值，无效方案回退到实体参照；各任务最佳均值加粗。有效会话排除回退（共 15 个）。达标任务（共 3 项）：$\mathrm{AUC}\geq\mathrm{AUC}_0-0.01$ 或 $\mathrm{MAE}\leq1.02\,\mathrm{MAE}_0$。短横表示不适用（FeatPilot 不使用 LLM）。时间／美元计量见第~\ref{sec:relbench-eval} 节。}
 }
 \end{table*}

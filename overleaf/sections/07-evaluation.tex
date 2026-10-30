@@ -1,7 +1,7 @@
 \section{\bt{Evaluation}{实验评估}}
 \label{sec:evaluation}
-\bi{We distinguish policy-level savings, development diagnostics, and mechanism controls. RelBench comparisons and SQL traces describe agent work; a separate memory-access pilot examines coverage and source-cost amortization. Metric studies vary memory scope and check sharing. Finally, data-change tests and a matched-version concurrency control examine maintenance and snapshot validity. Each study retains its own samples, accounting, and limitations.}
-{我们区分完整策略的节省、开发诊断与机制对照。RelBench比较及SQL轨迹描述智能体工作量，独立的记忆访问预实验考察完成率与源成本分摊；指标实验改变记忆作用域及检查共享程度；数据变化实验与同版本源并发对照考察维护及快照有效性。各研究分别保留样本、计量口径与局限。}
+\bi{We evaluate MAVRA across predictive feature engineering and analytical SQL workloads to examine end-to-end cost and predictive quality across temporal cutoffs, agent tool use and reuse behavior, population-level sharing, and the efficiency and correctness of maintenance under data updates.}
+{我们在预测特征工程与分析SQL负载上评估跨时间截点的端到端成本和预测质量、智能体工具调用与复用行为、群体共享，以及数据更新下维护的效率与正确性。}
 \input{sections/evaluation/relbench}
 \input{sections/evaluation/sharing}
 \input{sections/evaluation/memory-pilot}
@@ -10,5 +10,4 @@
 \input{sections/evaluation/cost}
 \input{sections/evaluation/changes}
 \input{sections/evaluation/snapshot}
-% Keep evaluation figures and tables within the evaluation section.
-\FloatBarrier
+% Allow the wide evaluation figure to float while text continues.

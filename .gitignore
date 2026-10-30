@@ -1,9 +1,16 @@
 /target
 build.log
 .env
-.env.deepseek
+.env.*
+!.env.example
 /results/
 /slides/node_modules/
 /slides/build/
 __pycache__/
 /.pydeps-reforce/
+
+# Local compilation, render previews, and authoring caches.
+/tmp/
+/output/
+/ccfa-workfiles/**/build/
+/ccfa-workfiles/**/cache/

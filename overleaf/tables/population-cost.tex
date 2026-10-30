@@ -1,5 +1,5 @@
 \begin{table}[t]
-\caption{\bt{Steady-state per-question cost and accuracy on TPC-DS (agents 9--16, means over \PpRuns\ runs). LLM: LLM calls of the agent; tools: tool calls; tokens include extraction.}{TPC-DS 上稳定阶段的每题代价与正确率（第 9--16 个智能体，\PpRuns\ 次运行的均值）。大模型：智能体的大模型调用次数；工具：工具调用次数；token 包括提取。}}
+\caption{\bt{TPC-DS steady-state cost per question and accuracy: agents 9--16, means over \PpRuns\ runs. LLM/tools: agent call counts; tokens include extraction. Best values are bold.}{TPC-DS 稳定阶段的每题代价与正确率：第 9--16 个智能体，\PpRuns\ 次运行均值。大模型／工具列为智能体调用次数；token 含提取；最优值加粗。}}
 \label{tab:popcost}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -11,7 +11,8 @@
 \midrule
 \bt{No memory}{无记忆} & \PpNoneLateSteps & \PpNoneLateTools & \PpNoneLateTokK\,k & \PpNoneLateS\,s & \PpNoneLateAcc\%\\
 \bt{Single-agent memory}{单智能体记忆} & \PpPrivateLateSteps & \PpPrivateLateTools & \PpPrivateLateTokK\,k & \PpPrivateLateS\,s & \PpPrivateLateAcc\%\\
-\bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \textbf{\PpMavraLateSteps} & \textbf{\PpMavraLateTools} & \textbf{\PpMavraLateTokK\,k} & \textbf{\PpMavraLateS\,s} & \textbf{\PpMavraLateAcc\%}\\
+\bt{Example retrieval (shared)}{示例检索（共享）} & \PpTrajLateSteps & \PpTrajLateTools & \textbf{\PpTrajLateTokK\,k} & \PpTrajLateS\,s & \textbf{\PpTrajLateAcc\%}\\
+\bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \textbf{\PpMavraLateSteps} & \textbf{\PpMavraLateTools} & \PpMavraLateTokK\,k & \textbf{\PpMavraLateS\,s} & \PpMavraLateAcc\%\\
 \midrule
 \bt{\system\ vs.\ no memory}{\system\ 对无记忆} & & & \PpMavraLateTokXNone$\times$ & \PpMavraLateSpeedupNone$\times$ & \\
 \bottomrule

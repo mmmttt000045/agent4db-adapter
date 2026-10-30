@@ -152,11 +152,11 @@ def figure_c(lang):
         vals = [LEGACY['reader_p50_ms'][mode][k] for k in ['steady_ms', 'first_after_write_ms', 'second_after_write_ms']]
         pos = np.arange(3)+(j-.5)*.32
         key = ['definition', 'condition'][j]
-        ax.bar(pos, vals, .30, label=bilingual(lang, ['Legacy pre', 'Bound'][j], ['旧预检查', '快照绑定'][j]),
+        ax.bar(pos, vals, .30, label=bilingual(lang, ['Unbound pre', 'Bound'][j], ['非绑定预检查', '快照绑定'][j]),
                **mplstyle.bar_style(key, ['//', '\\\\'][j]))
     ax.set(xticks=[0, 1, 2], xticklabels=bilingual(lang, ['Steady', '1st', '2nd'], ['稳态', '第1次', '第2次']),
            yscale='log', ylim=(1, 7000))
-    ax.set_title(bilingual(lang, '(b) Archived reader', '(b) 归档读延迟'))
+    ax.set_title(bilingual(lang, '(b) Reader latency', '(b) 读延迟'))
     ax.set_ylabel(bilingual(lang, 'Latency (ms, log)', '延迟（ms，对数）'))
     ax.legend(fontsize=6.5, loc='upper right', bbox_to_anchor=(1, 1.03))
     ax.text(.5, -.39, bilingual(lang, '1st / 2nd read after benign write', '良性写入后的第 1／2 次读取'),
@@ -170,7 +170,7 @@ def figure_c(lang):
         ax.plot([1, 8, 32], vals, color=color, marker=marker, ls=line, mfc='white', mew=.6, label=label)
     ax.axhline(100, color='#555555', ls=':', lw=.6)
     ax.set(xticks=[1, 8, 32], ylim=(0, 115), yticks=[0, 50, 100])
-    ax.set_title(bilingual(lang, '(c) Archived writer', '(c) 归档写吞吐'))
+    ax.set_title(bilingual(lang, '(c) Writer throughput', '(c) 写吞吐'))
     ax.set_ylabel(bilingual(lang, 'Throughput / no trigger (%)', '吞吐／无触发器（%）'))
     ax.set_xlabel(bilingual(lang, 'Writer connections', '写连接数'))
     ax.legend(fontsize=6.5, loc='lower left')

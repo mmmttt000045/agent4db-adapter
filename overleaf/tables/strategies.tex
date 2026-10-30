@@ -1,6 +1,6 @@
 \begin{table}[t]
 % The Times symbol font has no small-caps section sign.
-\caption{\bt{Comparison of memory designs and maintenance policies across evaluation studies. P: population study; Q: cost per question; C: cost of sharing; D: data changes.}{各项评估中记忆设计与维护策略的比较。P：群体实验；Q：每道题的代价；C：共享的代价；D：数据变化。}}
+\caption{\bt{Memory and maintenance variants. P: population; Q: per-question cost; C: sharing cost; D: data changes. Bullets mark study inclusion.}{记忆与维护策略。P：群体实验；Q：每题代价；C：共享代价；D：数据变化。圆点表示纳入该项实验。}}
 \label{tab:ladder}
 \footnotesize
 \setlength{\tabcolsep}{2.4pt}
@@ -11,6 +11,7 @@
 \midrule
 \bt{No memory}{无记忆} & \bt{nothing; every question is explored}{什么也没有，每道题都探索} & \usedin & \usedin & & \usedin\\
 \bt{Single-agent memory}{单智能体记忆} & \bt{\system's memory, but each agent uses only what it learned itself}{\system\ 的记忆，但每个智能体只用自己学到的} & \usedin & & \usedin & \\
+\bt{Example retrieval}{示例检索} & \bt{successful questions, SQL, and derivations; shared without maintenance}{成功题目、SQL 与算式；共享但不维护} & \usedin & & & \usedin\\
 \bt{Invalidate on every write}{每次写入即失效} & \bt{definitions, dropped on any write and relearned}{定义，任何写入都丢弃并重新学习} & & & \usedin & \\
 \bt{Full recheck per definition}{整定义重查} & \bt{definitions, all conditions rechecked on use, no shared results}{定义，使用时重查全部条件、不共享结果} & & & \usedin & \\
 \bt{Validation SQL cache}{验证 SQL 缓存} & \bt{rechecks cached by SQL and dependency versions}{按验证 SQL 与依赖版本缓存重查结果} & & & \usedin & \\

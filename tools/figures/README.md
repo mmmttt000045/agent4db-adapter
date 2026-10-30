@@ -21,7 +21,7 @@ make deck-figures                  # PPT 的六幅图，生成 PDF 并转 PNG
 
 | 输出名（均有英文与 `-zh` 中文 PDF） | 脚本 | 数据或来源 |
 | --- | --- | --- |
-| `metric-record` | `metric_record.py` | 图 1 动机图：智能体与数据库之间的共享记忆层，对照各自探索与跨智能体复用；页脚的 token 节省与端到端加速读取 `gen/population.tex`，对应 16 智能体 TPC-DS 实验 |
+| `metric-record` | `metric_record.py` | 图 1 动机图：多个智能体通过不同的探针、顺序和回访路径重复发现重叠知识；成束请求与返回、共同表上的重复读取表现冗余负载。轨迹、包与路径数量均为示意 |
 | `running-example` | `example.py` | 优化实验的学习、使用与修复轨迹，来源见脚本文件头 |
 | `architecture` | `architecture.py` | 系统示意 |
 | `replay-outcomes` | `replay_outcomes.py` | 验证缓存、TPC-DS 和通用性回放 |

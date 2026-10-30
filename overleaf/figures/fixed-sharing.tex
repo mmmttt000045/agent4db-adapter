@@ -5,7 +5,7 @@
 \else
 \includegraphics[width=\linewidth]{figures/fixed-sharing}
 \fi
-\caption{\bt{Fixed-definition sharing control: 16 definitions, eight agents, 128 requests per cell, and 100,000 rows per fact table. Top: database time divided by the matched full-recheck cell in each run block. Bottom: executed validation SQL queries. Points are three-block medians; error bars span all three observations, including the double-refresh SQL-cache cell at sharing factor 1.}{固定定义数的共享对照：16个定义、8个智能体、每格128次请求，每个事实表100,000行。上：数据库耗时除以同一运行块中对应的全量重查耗时；下：实际执行的验证SQL数。点为三轮中位数，误差棒覆盖全部三次观测，包括共享因子为1时重复刷新两轮的SQL缓存单元。}}
+\caption{\bt{Validation cost at fixed definition count. Top: database time relative to the matched full recheck in each run block. Bottom: validation SQL count. Points show three-block medians; error bars span all three observations.}{固定定义数下的验证开销。上：相对同轮匹配全量重查的数据库耗时；下：验证 SQL 数。点为三轮中位数，误差棒覆盖全部三次观测。}}
 \label{fig:fixed-sharing}
 \Description{Four line charts compare full recheck, SQL/version cache, and MAVRA. Columns separate staggered and simultaneous arrivals and share row-wise axis ranges. Sharing factors are 1, 2, 4, and 8 definitions per table pair. SQL-cache and MAVRA validation counts largely coincide; the retained no-overlap SQL-cache outlier reaches 96 queries and about 199 percent of full-recheck database time. Error bars are observed ranges, not confidence intervals.}
 \end{figure}

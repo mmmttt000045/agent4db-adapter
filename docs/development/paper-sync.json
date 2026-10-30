@@ -4,17 +4,16 @@
   "repository_url": "https://github.com/mmmttt000045/icde-2027-paper",
   "branch": "main",
   "status": "pushed_and_verified",
-  "previous_head": "a5902ab31a5cd9ec45d3e889862ad79fb43dbad1",
-  "remote_commit": "3b54c2b8d3c1082f3d4c47cf8b3b5537ccc9a057",
+  "previous_head": "63a469a688d2367a10bae41ac822b0c9e2072c77",
+  "remote_commit": "92d29428405f5820a0bb7b90afdba392aa4ca444",
   "pending_payload": null,
   "source_package": "overleaf/build/mavra-icde-bilingual.zip",
-  "source_package_sha256": "e429b00988db613a367c064b90d5211ea3e1219081babbf1196df2b586cd5342",
+  "source_package_sha256": "f08ffeeba9984afaada3db97b216f14bec2988e32795a25ba6a0d8d730c5a651",
   "changed_paths": [
     "sections/02-background.tex",
-    "tables/external.tex",
-    "tables/workload.tex"
+    "tables/external.tex"
   ],
-  "changed_files": 3,
+  "changed_files": 2,
   "preserve_remote_only": true,
   "deletions": [],
   "validation": {
@@ -24,10 +23,10 @@
     "source_package_files": 70,
     "packaged_sources_verified": 69,
     "standalone_readme_adapted": true,
-    "existing_remote_files_preserved": 111,
+    "existing_remote_files_preserved": 112,
     "formula_numbering": "continuous; one shared bilingual equation"
   },
-  "commit_url": "https://github.com/mmmttt000045/icde-2027-paper/commit/3b54c2b8d3c1082f3d4c47cf8b3b5537ccc9a057",
+  "commit_url": "https://github.com/mmmttt000045/icde-2027-paper/commit/92d29428405f5820a0bb7b90afdba392aa4ca444",
   "remote_tree": "6dd634caf5bd78087ce368ad0e9a32e0e9476af6",
-  "upload_authorization": "User requested pushing the revised background and updated table captions."
+  "upload_authorization": "User requested restoring the original Table I and cancelling the previous layout adjustments."
 }

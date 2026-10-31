@@ -1,0 +1,366 @@
+[
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 3,
+        "m2": 3,
+        "year": 1996
+      }
+    },
+    "metric": "M1",
+    "phase": "learn",
+    "question": "1996 年 3 月的发货净收入是多少？口径：发货净收入 = 订单明细（lineitem）的成交金额 l_extendedprice × (1 − 折扣 l_discount) 之和，按发货日期（l_shipdate）归属期间；每个订单明细行计一次。保留两位小数。",
+    "task": "M1-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 11,
+        "m2": 11,
+        "year": 1995
+      }
+    },
+    "metric": "M1",
+    "phase": "learn",
+    "question": "1995 年 11 月的发货净收入是多少？口径：发货净收入 = 订单明细（lineitem）的成交金额 l_extendedprice × (1 − 折扣 l_discount) 之和，按发货日期（l_shipdate）归属期间；每个订单明细行计一次。保留两位小数。",
+    "task": "M1-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 3,
+        "m2": 3,
+        "year": 1996
+      }
+    },
+    "metric": "M3",
+    "phase": "learn",
+    "question": "1996 年 3 月的促销商品收入是多少？口径：促销商品收入 = 商品类型（part.p_type）以 PROMO 开头的订单明细的 l_extendedprice × (1 − l_discount) 之和（其余明细计 0），按发货日期（l_shipdate）归属期间；每个订单明细行计一次，商品按其当前信息计。保留两位小数。",
+    "task": "M3-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 11,
+        "m2": 11,
+        "year": 1995
+      }
+    },
+    "metric": "M3",
+    "phase": "learn",
+    "question": "1995 年 11 月的促销商品收入是多少？口径：促销商品收入 = 商品类型（part.p_type）以 PROMO 开头的订单明细的 l_extendedprice × (1 − l_discount) 之和（其余明细计 0），按发货日期（l_shipdate）归属期间；每个订单明细行计一次，商品按其当前信息计。保留两位小数。",
+    "task": "M3-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 3,
+        "m2": 3,
+        "year": 1996
+      }
+    },
+    "metric": "M5",
+    "phase": "learn",
+    "question": "1996 年 3 月的订单数是多少？口径：订单数 = 订单（orders）的个数，按下单日期（o_orderdate）归属期间；每个订单计一次。保留两位小数。",
+    "task": "M5-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 11,
+        "m2": 11,
+        "year": 1995
+      }
+    },
+    "metric": "M5",
+    "phase": "learn",
+    "question": "1995 年 11 月的订单数是多少？口径：订单数 = 订单（orders）的个数，按下单日期（o_orderdate）归属期间；每个订单计一次。保留两位小数。",
+    "task": "M5-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "holdout",
+    "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M3",
+    "phase": "holdout",
+    "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M5",
+    "phase": "holdout",
+    "question": "1997 年 9 月的订单数是多少？保留两位小数。",
+    "task": "M5-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "append",
+    "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M3",
+    "phase": "append",
+    "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M5",
+    "phase": "backfill",
+    "question": "1997 年 9 月的订单数是多少？保留两位小数。",
+    "task": "M5-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "correct",
+    "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M3",
+    "phase": "correct",
+    "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M5",
+    "phase": "addcol",
+    "question": "1997 年 9 月的订单数是多少？保留两位小数。",
+    "task": "M5-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M5",
+    "phase": "status",
+    "question": "1997 年 9 月的订单数是多少？保留两位小数。",
+    "task": "M5-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "revision",
+    "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M3",
+    "phase": "revision",
+    "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "dupload",
+    "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M3",
+    "phase": "dupload",
+    "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M3",
+    "phase": "dimhist",
+    "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "latekey",
+    "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M3",
+    "phase": "latekey",
+    "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "unit",
+    "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M3",
+    "phase": "unit",
+    "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M5",
+    "phase": "mirror",
+    "question": "1997 年 9 月的订单数是多少？保留两位小数。",
+    "task": "M5-P1"
+  }
+]

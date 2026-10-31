@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "method_exact_matches": [
+    "src/llm.rs",
+    "src/metric.rs",
+    "src/middle/metrics.rs",
+    "src/integration_tests.rs",
+    "src/sqlscope.rs",
+    "src/middle.rs"
+  ],
+  "method_line_ending_matches": [],
+  "protected_data_semantic_matches": 17,
+  "runtime_only_benchmark_bridge": "src/metricbench.rs includes the frozen paper-* HTTP memory bridge; the working tree keeps the core benchmark without this cohort-specific bridge."
+}

@@ -1,0 +1,114 @@
+{
+  "status": "passed",
+  "complete_repeats": [
+    1
+  ],
+  "matched_reference_hashes": {
+    "synthetic": "2212a1d522ccecad9cab17295da3f2bb2e3ca00077cdbd2760830a7a6aaf9273",
+    "tpch": "16d579f432a5bb809ec0674ea36d34413da68da966a794bddc63fac6934c6cd9"
+  },
+  "cells": [
+    {
+      "cell": "synthetic-r1-ace-a2",
+      "tasks": 32,
+      "operations": {
+        "begin": 32,
+        "end": 32,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "be2fbc4256fbbe35f076708e1d6718d082bc71856fe4db0277957e76800c94ca"
+    },
+    {
+      "cell": "tpch-r1-ace-a2",
+      "tasks": 26,
+      "operations": {
+        "begin": 26,
+        "end": 26,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "68c17a8bfdfea9553519160761fd2342efdd667af0377916b698ef739a0a0a7f"
+    },
+    {
+      "cell": "synthetic-r1-awm",
+      "tasks": 32,
+      "operations": {
+        "begin": 32,
+        "end": 32,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "bf4de13da75804ae3288456829d559305d384a4d1b03a4377777507426882c28"
+    },
+    {
+      "cell": "tpch-r1-awm",
+      "tasks": 26,
+      "operations": {
+        "begin": 26,
+        "end": 26,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "4a7420f14cc606b7796238360d71a3f534f281225dc1951dffd82d22cb68007e"
+    },
+    {
+      "cell": "synthetic-r1-gmemory",
+      "tasks": 32,
+      "operations": {
+        "begin": 32,
+        "end": 32,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "193973526ccf4df900f24ca2e9907c68a7c65f105aa75bf8e916b420908e06ce"
+    },
+    {
+      "cell": "tpch-r1-gmemory",
+      "tasks": 26,
+      "operations": {
+        "begin": 26,
+        "end": 26,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "bde4c2a97edb1706e1a5abb173b22afa6b13ed89c54cd9b3d800a3dcc1eeadd9"
+    },
+    {
+      "cell": "synthetic-r1-mavra",
+      "tasks": 32,
+      "operations": {
+        "begin": 32,
+        "end": 32,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "6e46b69c61326d7201e83ebc1f71a82736369a19fe1a499bf951c52ac30eaa75"
+    },
+    {
+      "cell": "tpch-r1-mavra",
+      "tasks": 26,
+      "operations": {
+        "begin": 26,
+        "end": 26,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "0c8987a66a0f40c992e23d656b047787f73ba4cc1f064beed39de768fc790278"
+    }
+  ],
+  "checks": [
+    "Same questions, parameters and reference values across every arm/repeat within each schema",
+    "Actual bounded own-result feedback matches the memory journal and emitted planner prompt",
+    "All eleven change branches restore the post-held-out common-feedback checkpoint",
+    "No reference values/SQL or hidden phase labels are added to common feedback"
+  ]
+}

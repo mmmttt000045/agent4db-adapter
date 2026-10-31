@@ -1,0 +1,27 @@
+\begin{algorithm}[t]
+\caption{\bt{Lookup with shared maintenance}{带共享维护的查找}}
+\label{alg:maintenance}
+\normalsize
+\begin{algorithmic}[1]
+\Require Requested revision $x$; shared result store $\mathcal H$
+\Ensure Available revision with refreshed evidence, or $\bot$
+\State Await ongoing maintenance; reread $x$
+\State \textbf{if} $x$ is missing or invalid \textbf{then return} $\bot$
+\State $V\gets$ current dependency versions
+\State \textbf{if} stamps and joins match \textbf{then return} $x$
+\State Join or start maintenance of $x$
+\State \textbf{if} not owner \textbf{then return} owner's result
+\State Reread $x$; if superseded, return usable revision or $\bot$
+\State Refresh affected shared joins
+\For{each affected $c\in C(x)$, added assumptions last}
+  \State \textbf{if} required join unavailable \textbf{then}
+  \State \hspace{\algorithmicindent} Invalidate $x$; \Return $\operatorname{Recover}(x,c)$
+  \State $k\gets\bigl(\operatorname{id}(c),V(\operatorname{dep}(c))\bigr)$
+  \State $o\gets\mathcal H[k]$; on miss, run/join $Q_c$ at $V$ and cache $o$
+  \If{$\neg\operatorname{Accept}(c,o)$}
+    \State Invalidate $x$; \Return $\operatorname{Recover}(x,c)$
+  \EndIf
+\EndFor
+\State Record refreshed stamps and joins; \Return $x$
+\end{algorithmic}
+\end{algorithm}

@@ -1,0 +1,293 @@
+{
+  "status": "passed",
+  "matched_reference_hashes": {
+    "synthetic": "c4282c3c7339b96ce5272a2f2a9cb2b07830c9a5e16238094ac3409b0494c004",
+    "tpch": "a875e82234add60a3bbbe51193ed963cc3d52ea4e48640753ea851281d5687e8"
+  },
+  "cells": [
+    {
+      "dataset": "synthetic",
+      "arm": "ace",
+      "origin": "unchanged frozen control",
+      "tasks": 32,
+      "operations": {
+        "begin": 32,
+        "end": 32,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "be2fbc4256fbbe35f076708e1d6718d082bc71856fe4db0277957e76800c94ca"
+    },
+    {
+      "dataset": "synthetic",
+      "arm": "ace",
+      "origin": "fresh extra branch",
+      "source_tasks_not_counted_twice": 9,
+      "tasks": 3,
+      "operations": {
+        "begin": 12,
+        "end": 12,
+        "checkpoint": 1,
+        "restore": 1,
+        "close": 1
+      },
+      "journal_sha256": "e9377ed0d832e37c4864209410db80acdc14cf2e64a88a23ab802de875ff8aa3"
+    },
+    {
+      "dataset": "synthetic",
+      "arm": "awm",
+      "origin": "unchanged frozen control",
+      "tasks": 32,
+      "operations": {
+        "begin": 32,
+        "end": 32,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "bf4de13da75804ae3288456829d559305d384a4d1b03a4377777507426882c28"
+    },
+    {
+      "dataset": "synthetic",
+      "arm": "awm",
+      "origin": "fresh extra branch",
+      "source_tasks_not_counted_twice": 9,
+      "tasks": 3,
+      "operations": {
+        "begin": 12,
+        "end": 12,
+        "checkpoint": 1,
+        "restore": 1,
+        "close": 1
+      },
+      "journal_sha256": "1e3d3909d35e34331c8340ff4a6744e5b56492594d2709bb6092c28c4de24290"
+    },
+    {
+      "dataset": "synthetic",
+      "arm": "gmemory",
+      "origin": "unchanged frozen control",
+      "tasks": 32,
+      "operations": {
+        "begin": 32,
+        "end": 32,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "193973526ccf4df900f24ca2e9907c68a7c65f105aa75bf8e916b420908e06ce"
+    },
+    {
+      "dataset": "synthetic",
+      "arm": "gmemory",
+      "origin": "fresh extra branch",
+      "source_tasks_not_counted_twice": 9,
+      "tasks": 3,
+      "operations": {
+        "begin": 12,
+        "end": 12,
+        "checkpoint": 1,
+        "restore": 1,
+        "close": 1
+      },
+      "journal_sha256": "1929ac6134cbac799e21ffa314b6dd3511335bc9a54b6b388f3e28c6aaf3e5c3"
+    },
+    {
+      "dataset": "synthetic",
+      "arm": "mavra",
+      "origin": "fresh native",
+      "tasks": 32,
+      "operations": {
+        "begin": 32,
+        "end": 32,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "adb789664f4be303554f14f8053d88faa9607c3a420042f5eef302d33ac1a262"
+    },
+    {
+      "dataset": "synthetic",
+      "arm": "mavra",
+      "origin": "fresh extra branch",
+      "source_tasks_not_counted_twice": 9,
+      "tasks": 3,
+      "operations": {
+        "begin": 12,
+        "end": 12,
+        "checkpoint": 1,
+        "restore": 1,
+        "close": 1
+      },
+      "journal_sha256": "5958202b5e563152f23f3a2451c39428ba8fc3bfb802b623492276cc3cf62138"
+    },
+    {
+      "dataset": "tpch",
+      "arm": "ace",
+      "origin": "unchanged frozen control",
+      "tasks": 26,
+      "operations": {
+        "begin": 26,
+        "end": 26,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "68c17a8bfdfea9553519160761fd2342efdd667af0377916b698ef739a0a0a7f"
+    },
+    {
+      "dataset": "tpch",
+      "arm": "ace",
+      "origin": "fresh extra branch",
+      "source_tasks_not_counted_twice": 9,
+      "tasks": 3,
+      "operations": {
+        "begin": 12,
+        "end": 12,
+        "checkpoint": 1,
+        "restore": 1,
+        "close": 1
+      },
+      "journal_sha256": "f46f5b71eea4f26271a3e6a2b0faa568c75d6754577be3d56a631dc5860bebe6"
+    },
+    {
+      "dataset": "tpch",
+      "arm": "awm",
+      "origin": "unchanged frozen control",
+      "tasks": 26,
+      "operations": {
+        "begin": 26,
+        "end": 26,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "4a7420f14cc606b7796238360d71a3f534f281225dc1951dffd82d22cb68007e"
+    },
+    {
+      "dataset": "tpch",
+      "arm": "awm",
+      "origin": "fresh extra branch",
+      "source_tasks_not_counted_twice": 9,
+      "tasks": 3,
+      "operations": {
+        "begin": 12,
+        "end": 12,
+        "checkpoint": 1,
+        "restore": 1,
+        "close": 1
+      },
+      "journal_sha256": "63c55787a57e0cdd14ec1847aaf00c0dddcd977beee90cc72f3de963d24ffc6b"
+    },
+    {
+      "dataset": "tpch",
+      "arm": "gmemory",
+      "origin": "unchanged frozen control",
+      "tasks": 26,
+      "operations": {
+        "begin": 26,
+        "end": 26,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "bde4c2a97edb1706e1a5abb173b22afa6b13ed89c54cd9b3d800a3dcc1eeadd9"
+    },
+    {
+      "dataset": "tpch",
+      "arm": "gmemory",
+      "origin": "fresh extra branch",
+      "source_tasks_not_counted_twice": 9,
+      "tasks": 3,
+      "operations": {
+        "begin": 12,
+        "end": 12,
+        "checkpoint": 1,
+        "restore": 1,
+        "close": 1
+      },
+      "journal_sha256": "c60fb61eb9adb6d783cd4c606432416ea184efcf2e1eab3147854ceaad73f303"
+    },
+    {
+      "dataset": "tpch",
+      "arm": "mavra",
+      "origin": "fresh native",
+      "tasks": 26,
+      "operations": {
+        "begin": 26,
+        "end": 26,
+        "checkpoint": 1,
+        "restore": 11,
+        "close": 1
+      },
+      "journal_sha256": "ba9e76de567dd12cfde106ea26c6c9f2f51c5ad1f97157fc12e485f80197dc3f"
+    },
+    {
+      "dataset": "tpch",
+      "arm": "mavra",
+      "origin": "fresh extra branch",
+      "source_tasks_not_counted_twice": 9,
+      "tasks": 3,
+      "operations": {
+        "begin": 12,
+        "end": 12,
+        "checkpoint": 1,
+        "restore": 1,
+        "close": 1
+      },
+      "journal_sha256": "80aaeb8fe6e0a2a5671d648faef9772dfe141192ea439f1444429931c1579847"
+    }
+  ],
+  "fresh_api_profiles": {
+    "synthetic-r1-mavra-repaired": {
+      "planning_calls": 152,
+      "memory_or_extraction_calls": 6,
+      "full_actual_update_inputs": true
+    },
+    "tpch-r1-mavra-repaired": {
+      "planning_calls": 106,
+      "memory_or_extraction_calls": 13,
+      "full_actual_update_inputs": true
+    },
+    "synthetic-r1-ace-extra": {
+      "planning_calls": 12,
+      "memory_or_extraction_calls": 6,
+      "full_actual_update_inputs": true
+    },
+    "tpch-r1-ace-extra": {
+      "planning_calls": 8,
+      "memory_or_extraction_calls": 6,
+      "full_actual_update_inputs": true
+    },
+    "synthetic-r1-awm-extra": {
+      "planning_calls": 15,
+      "memory_or_extraction_calls": 3,
+      "full_actual_update_inputs": true
+    },
+    "tpch-r1-awm-extra": {
+      "planning_calls": 9,
+      "memory_or_extraction_calls": 3,
+      "full_actual_update_inputs": true
+    },
+    "synthetic-r1-gmemory-extra": {
+      "planning_calls": 7,
+      "memory_or_extraction_calls": 20,
+      "full_actual_update_inputs": true
+    },
+    "tpch-r1-gmemory-extra": {
+      "planning_calls": 7,
+      "memory_or_extraction_calls": 14,
+      "full_actual_update_inputs": true
+    },
+    "synthetic-r1-mavra-extra": {
+      "planning_calls": 10,
+      "memory_or_extraction_calls": 0,
+      "full_actual_update_inputs": true
+    },
+    "tpch-r1-mavra-extra": {
+      "planning_calls": 9,
+      "memory_or_extraction_calls": 0,
+      "full_actual_update_inputs": true
+    }
+  }
+}

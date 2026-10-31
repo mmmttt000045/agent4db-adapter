@@ -1,0 +1,32 @@
+{
+  "source_manifest": "recovery-history/20261031T044034Z-source-manifest.json",
+  "files": {
+    "exp/2026-10-31-corrected-scenarios/resume-study.py": "b4df5f77bbe206284bfa2f3522fabbc8095a1596d8ba9b8310956887626195f7",
+    "exp/2026-10-31-corrected-scenarios/analyse.py": "4da0bdcd71a682d4f667caad68051f122943e61c2358115fef1e521eff365cdf",
+    "exp/2026-10-31-corrected-scenarios/monitor-study.py": "6f07db04923527d0bfc99eae08818fc2e7e9a71cafa2f13677352318211dd494",
+    "exp/2026-10-31-corrected-scenarios/close-study.py": "d5e4e90f7a22b678c31938a26763e747421046489667515925649d917ba85fbf",
+    "src/integration_tests.rs": "dbcf5cb094923255cab7afc5666ed84f56484e9d5ca201965fa3df79766984fe",
+    "src/sqlscope.rs": "5aceb5a1077062b9a3b75bee36cd13ee47a7b8d727e556f8dc95d084715c6065",
+    "src/middle.rs": "80f3242d8665c8db485acc5cf747a79207f2951dff5d8430012fce21f42e67a3",
+    "exp/2026-10-31-corrected-scenarios/implementation-amendment.json": "d1b420c5ec33849c0bbfac9e69a158917ab188ea3dbbfb9a631dc2a2981d7cb8",
+    "exp/2026-10-31-corrected-scenarios/data-provenance.json": "baafa856f99bac430aa24f3f258af69302a740106aa0ff0f71713686a9753971",
+    "exp/2026-10-11-generality/libs/financial-notes.json": "f990bfda940a38219508fbe0c40bf4452b5fb1699c06526cf1998308426e8922",
+    "exp/2026-10-11-generality/libs/ssb.json": "9589cb0ded524a596825e124205224debf9d8effbf49cafcca872f1f04f7b009",
+    "exp/2026-10-11-generality/libs/tpch.json": "0f4006b8c3c58447c06ebb5dd41fb6930dcbd54a0c51dfeca7685f745cb6755c",
+    "exp/2026-10-11-generality/libs/tpch-kept.json": "941fe4bd7ce8288a31d272662cfede5c673387255619026047e93c1086084182",
+    "exp/2026-10-11-generality/libs/tpch-notes.json": "0eccb91553e32189c964f49818ddc5cb4ace8529b6bb3010f3a2849c53742e94",
+    "exp/2026-10-11-generality/libs/ssb-kept.json": "c7155a6f3b46cb4e7e7b081fcbb0eb8976807f2c2dc5156ca964eb5357ec13ed",
+    "exp/2026-10-11-generality/libs/ssb-notes.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "exp/2026-10-11-generality/libs/financial-kept.json": "fd6259a526a56e66debb50910063a8140ee0c065c6c85079549e094e8243a4b3",
+    "exp/2026-10-11-generality/libs/ssb-summary.json": "b4729f244016cc5baad3157ab741c835ff72ddb407a835601472cacd54cd409c",
+    "exp/2026-10-11-generality/libs/financial-summary.json": "6d0dcbda81120818d3e71d33a87a00c996e0169c467dcb3875bef01bb823313f",
+    "exp/2026-10-11-generality/libs/tpch-summary.json": "0ac643621858431bb71896ce05a6d239344922e68c953956a79353228b34fd5c",
+    "exp/2026-10-11-generality/libs/financial.json": "a0de74e7a5ae01a2e542ad11d3043ad75256a4cebb56e818d0798d9b231c99d6",
+    "exp/2026-10-11-generality/schemas/ssb.json": "924537a8a8f2b09919bf273a83ca9af2dd8227def7057abacdc510e6dcd1d124",
+    "exp/2026-10-11-generality/schemas/tpch.json": "e0c9900e7a6349c9eb409430cb8afbc194a8bfd0b110a6cd62a1ae08eade3221",
+    "exp/2026-10-11-generality/schemas/tpcds.json": "05e70202c27fb7c444510759cbebe7724891e88e1362aedd46817aed973d5b77",
+    "exp/2026-10-11-generality/schemas/financial.json": "344dbcdbb7d1190f7a119b0e21dc3ce4e1b969b800138b4bb3ae7a82c5d12029",
+    "exp/2026-10-11-generality/e2e/tpch-defs.json": "ee636a9419d939f2eba965d93dc1504959040a73278ecba5503ec246aef48708"
+  },
+  "archive_sha256": "6c0be34f1160ae916a07fd0a79181d9a68088eee3586a9ff5cb5d588a5d7cb64"
+}

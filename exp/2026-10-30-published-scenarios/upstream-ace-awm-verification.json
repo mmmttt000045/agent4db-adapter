@@ -1,0 +1,27 @@
+{
+  "ace/reflector_prompts.py": {
+    "source": "https://raw.githubusercontent.com/ace-agent/ace/82709de/ace/prompts/reflector.py",
+    "sha256": "72b343ce2781531dac2fd765543410b6abfc4817c39078dd4f83187c4d217e9c",
+    "matches_normalized_lf": true
+  },
+  "ace/curator_prompts.py": {
+    "source": "https://raw.githubusercontent.com/ace-agent/ace/82709de/ace/prompts/curator.py",
+    "sha256": "eb03d59b3f3593832f730a798199b581ad797acd503c47d1737616c68cf26107",
+    "matches_normalized_lf": true
+  },
+  "ace/playbook_utils.py": {
+    "source": "https://raw.githubusercontent.com/ace-agent/ace/82709de/playbook_utils.py",
+    "sha256": "c67943f06cb0ee747be04d0599216e40d6c00e0cdf96ddc6af38fc26143e3a07",
+    "matches_normalized_lf": true
+  },
+  "awm/instruction.txt": {
+    "source": "https://raw.githubusercontent.com/zorazrw/agent-workflow-memory/8c0ff8c/webarena/prompt/instruction.txt",
+    "sha256": "e05a424931cba5ea442c37f1c9a23d18f3e6c4b959646383eadc662a6d2a3ce9",
+    "matches_normalized_lf": true
+  },
+  "awm/one_shot.txt": {
+    "source": "https://raw.githubusercontent.com/zorazrw/agent-workflow-memory/8c0ff8c/webarena/prompt/one_shot.txt",
+    "sha256": "256e1d5c96ebef4a152915df393e3381bf0a9221e62307eb17df0c84006414ca",
+    "matches_normalized_lf": true
+  }
+}

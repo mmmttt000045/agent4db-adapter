@@ -25,6 +25,141 @@ async fn tool(http: &reqwest::Client, base: &str, name: &str, args: Value) -> Re
     Ok(body)
 }
 
+async fn scoped_admission(url: &str) -> Result<Value> {
+    let admin = Db::connect(url, 2, false)?;
+    admin
+        .query(
+            QKind::Meta,
+            "create table sales (s_key int, s_paid numeric); \
+        create table returns (r_key int, r_amt numeric); \
+        create table etl_batch_log (table_name text, batch_id bigint); \
+        insert into sales values (1,100),(1,100),(2,200),(2,200); \
+        insert into returns values (1,30),(2,45); \
+        analyze sales; analyze returns",
+        )
+        .await?;
+    let mid = Middle::new(Arc::new(Db::connect(url, 4, true)?), MiddleConfig { version_ttl_ms: 0, ..Default::default() }).await?;
+    admin
+        .query(
+            QKind::Meta,
+            "alter table returns add column r_source text not null default 'primary'; \
+        insert into returns values (1,31,'backup'),(2,46,'backup'); analyze returns",
+        )
+        .await?;
+    mid.invalidate_versions();
+    let ctx = Ctx::new("A", "scoped-admission", "queries");
+    let unsafe_sql = "select sum(r_amt) from sales s join returns r on s.s_key=r.r_key";
+    let blocked = mid.run_sql_with(&ctx, unsafe_sql, &[]).await?;
+    ensure!(blocked["rejected"] == true, "unfiltered duplicate join must remain rejected: {blocked}");
+    let fixed_sql = "with s as (select distinct s_key,s_paid from sales), \
+        r as (select r_key,sum(r_amt) r_amt from returns where r_source='primary' group by r_key) \
+        select round(100*sum(r.r_amt)/sum(s.s_paid),2) from s left join r on s.s_key=r.r_key";
+    let fixed = mid.run_sql_with(&ctx, fixed_sql, &[]).await?;
+    ensure!(fixed["result"]["rows"][0][0] == "25.00", "filtered and aggregated inputs must be admitted: {fixed}");
+    let on_filtered = mid
+        .run_sql_with(
+            &ctx,
+            "with s as (select distinct s_key,s_paid from sales) \
+        select round(100*sum(r.r_amt)/sum(s.s_paid),2) from s left join returns r \
+        on s.s_key=r.r_key and r.r_source='primary'",
+            &[],
+        )
+        .await?;
+    ensure!(on_filtered["result"]["rows"][0][0] == "25.00", "right-side ON filter must be respected: {on_filtered}");
+    let self_joined = mid
+        .run_sql_with(
+            &ctx,
+            "with s as (select distinct s_key,s_paid from sales), \
+        p as (select * from returns where r_source='primary'), b as (select * from returns where r_source='backup') \
+        select sum(p.r_amt) from p join b on p.r_key=b.r_key join s on s.s_key=p.r_key where p.r_amt<>b.r_amt",
+            &[],
+        )
+        .await?;
+    ensure!(self_joined["result"]["rows"][0][0] == "75", "filtered self-join must not poison other scopes: {self_joined}");
+    let scalar = mid
+        .run_sql_with(
+            &ctx,
+            "with s as (select distinct s_key,s_paid from sales), \
+        p as (select * from returns where r_source='primary'), b as (select * from returns where r_source='backup') \
+        select sum((select x.s_paid from s x where x.s_key=p.r_key limit 1)) from p join b on p.r_key=b.r_key",
+            &[],
+        )
+        .await?;
+    ensure!(scalar["result"]["rows"][0][0] == "300", "scalar correlation must not be treated as a multiplying join: {scalar}");
+    let exists =
+        mid.run_sql_with(&ctx, "select count(*) from sales s where exists (select 1 from returns r where r.r_key=s.s_key)", &[]).await?;
+    ensure!(exists["result"]["rows"][0][0] == "4", "EXISTS must not be rejected as row multiplication: {exists}");
+    let still_blocked = mid.run_sql_with(&ctx, unsafe_sql, &[]).await?;
+    ensure!(still_blocked["rejected"] == true, "query-local proof must not validate the unfiltered base relation");
+    admin
+        .query(
+            QKind::Meta,
+            "create table promo_sales (ticket int, item int, paid numeric, shipped date, is_current int); \
+        create table promo_part (item int, category text, is_current text); \
+        insert into promo_sales values (1,10,80,'1997-09-05',1),(2,11,30,'1997-09-05',1),(1,10,90,'1997-09-05',0); \
+        insert into promo_part values (10,'PROMO','Y'),(10,'OLD','N'),(11,'STANDARD','Y')",
+        )
+        .await?;
+    let ambiguous = admin.query(QKind::Meta, "select sum(paid) from promo_sales join promo_part using(item) where is_current=1").await;
+    ensure!(ambiguous.is_err(), "the original shared-column ambiguity must be reproduced");
+    let promo: Metric = serde_json::from_value(json!({"name":"promo", "definition":"current promotional sales",
+        "fact":"promo_sales", "measure":"sum(case when promo_part.category='PROMO' then promo_sales.paid else 0 end)",
+        "grain":["ticket","item"], "time":{"role":"shipment","fact_col":"shipped","grain":"day","strategy":"column"},
+        "joins":[{"left":"promo_sales","right":"promo_part","on":[["item","item"]]}],
+        "filters":{"promo_sales":"is_current = 1","promo_part":"is_current = 'Y'"}}))?;
+    let compiled = metric::compile(&promo, &Ask::Single { period: Period::month(1997, 9) })?;
+    let owned = admin.query(QKind::Meta, &compiled).await?;
+    ensure!(owned.cell(0, 0) == Some("80"), "table-owned filters must compile to the intended current rows: {compiled}");
+    admin.query(QKind::Meta, "delete from promo_part where is_current='N'").await?;
+    catalog::install_tx_versions(&admin, &["promo_sales", "promo_part"]).await?;
+    let executor = Middle::new(
+        Arc::new(Db::connect(url, 4, true)?),
+        MiddleConfig { record: true, snapshot_exec: true, result_cache: false, version_ttl_ms: 0, ..Default::default() },
+    )
+    .await?;
+    let exec_ctx = Ctx::new("A", "compiled-metric", "execute");
+    let ask = Ask::Single { period: Period::month(1997, 9) };
+    let seeded = executor.seed_metric(&exec_ctx, promo, ask, 2, &compiled).await?;
+    ensure!(seeded["promoted"] == true, "shared-column metric must pass publication: {seeded}");
+    let request = json!({"key":seeded["key"],"revision":seeded["revision"],"ask":ask});
+    let initial = executor.call_tool(&exec_ctx, "run_metric", &request).await?;
+    ensure!(initial["result"]["rows"][0][0] == "80", "compiled metric initial value: {initial}");
+    admin.query(QKind::Meta, "insert into promo_sales values (3,10,80,'1997-09-05',1)").await?;
+    executor.invalidate_versions();
+    let appended = executor.call_tool(&exec_ctx, "run_metric", &request).await?;
+    ensure!(appended["result"]["rows"][0][0] == "160", "distinct business keys with identical payload must count: {appended}");
+    let mut stale = request.clone();
+    stale["revision"] = json!(seeded["revision"].as_u64().unwrap() + 1);
+    let denied = executor.call_tool(&exec_ctx, "run_metric", &stale).await?;
+    ensure!(denied["rejected"] == true && denied.get("ref").is_none(), "stale revisions must not execute: {denied}");
+    admin.query(QKind::Meta, "insert into promo_sales values (3,10,80,'1997-09-05',1)").await?;
+    executor.invalidate_versions();
+    let duplicated = executor.call_tool(&exec_ctx, "run_metric", &request).await?;
+    ensure!(duplicated["rejected"] == true && duplicated.get("ref").is_none(), "invalidated metrics must not execute: {duplicated}");
+    Ok(json!({"unfiltered_rejected":true,"filtered_preaggregate_value":fixed["result"]["rows"][0][0],
+        "exists_count":exists["result"]["rows"][0][0],"on_filter_value":on_filtered["result"]["rows"][0][0],
+        "self_join_value":self_joined["result"]["rows"][0][0],"scalar_value":scalar["result"]["rows"][0][0],
+        "owned_filter_promo_value":owned.cell(0,0),"compiled_append_value":appended["result"]["rows"][0][0],
+        "stale_and_invalid_execution_denied":true,"base_verdict_unchanged":true}))
+}
+
+#[tokio::test]
+#[ignore = "requires AGENTDB_TEST_URL and PostgreSQL CREATE DATABASE permission"]
+async fn postgres_scoped_sql_admission() -> Result<()> {
+    let url = std::env::var("AGENTDB_TEST_URL").context("AGENTDB_TEST_URL required")?;
+    let admin = Db::connect(&url, 1, false)?;
+    let unique = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
+    let name = format!("agentdb_scope_{}_{unique}", std::process::id());
+    let mut test_url = reqwest::Url::parse(&url)?;
+    test_url.set_path(&format!("/{name}"));
+    admin.query(QKind::Meta, &format!("create database {name}")).await?;
+    let result = tokio::time::timeout(Duration::from_secs(90), Box::pin(scoped_admission(test_url.as_str()))).await;
+    let cleanup = admin.query(QKind::Meta, &format!("drop database {name} with (force)")).await;
+    cleanup.context("scoped test database cleanup failed")?;
+    println!("Scoped admission: {}", result.context("scoped admission test timeout")??);
+    Ok(())
+}
+
 async fn exercise(url: &str) -> Result<Value> {
     let admin = Arc::new(Db::connect(url, 2, false)?);
     admin.query(QKind::Meta, include_str!("../data/mock_fixture.sql")).await?;

@@ -1,0 +1,12 @@
+{
+  "matching_python_files": 139,
+  "mismatches": [],
+  "archive_sha256": "1761cfb447139a2a7784cc4b5bfc6c4830d701a924f1d736c3d0652228d87948",
+  "source": "https://github.com/bingreeky/GMemory/commit/7b581c5",
+  "verified_with_upstream_raw": {
+    "mas/memory/mas_memory/GMemory.py": "3c1bd5466226deffce5d8608abad806939f36c15d0a1f4f45d6a3e1607fca3e4",
+    "mas/memory/mas_memory/prompt.py": "883fa75870ba6a55814c8c568823844884d03df3fdf933f5aa3bb39dfbdaf546",
+    "mas/llm.py": "ea14e611f0be96de3151f1b44941cec808059742774c4eaac5c6838e9fddc72b",
+    "configs/configs.yaml": "36ac2caef4fd876507f35e0ad602fe3fe9db00408b5b13f0af9af51a739fd958"
+  }
+}

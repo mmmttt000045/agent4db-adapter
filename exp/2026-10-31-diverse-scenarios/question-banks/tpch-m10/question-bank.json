@@ -1,0 +1,447 @@
+[
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 3,
+        "m2": 3,
+        "year": 1996
+      }
+    },
+    "metric": "M1",
+    "phase": "learn",
+    "question": "1996 年 3 月的发货净收入是多少？口径：发货净收入 = 订单明细（lineitem）的成交金额 l_extendedprice × (1 − 折扣 l_discount) 之和，按发货日期（l_shipdate）归属期间；每个订单明细行计一次。保留两位小数。",
+    "task": "M1-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 11,
+        "m2": 11,
+        "year": 1995
+      }
+    },
+    "metric": "M1",
+    "phase": "learn",
+    "question": "1995 年 11 月的发货净收入是多少？口径：发货净收入 = 订单明细（lineitem）的成交金额 l_extendedprice × (1 − 折扣 l_discount) 之和，按发货日期（l_shipdate）归属期间；每个订单明细行计一次。保留两位小数。",
+    "task": "M1-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 3,
+        "m2": 3,
+        "year": 1996
+      }
+    },
+    "metric": "M3",
+    "phase": "learn",
+    "question": "1996 年 3 月的促销商品收入是多少？口径：促销商品收入 = 商品类型（part.p_type）以 PROMO 开头的订单明细的 l_extendedprice × (1 − l_discount) 之和（其余明细计 0），按发货日期（l_shipdate）归属期间；每个订单明细行计一次，商品按其当前信息计。保留两位小数。",
+    "task": "M3-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 11,
+        "m2": 11,
+        "year": 1995
+      }
+    },
+    "metric": "M3",
+    "phase": "learn",
+    "question": "1995 年 11 月的促销商品收入是多少？口径：促销商品收入 = 商品类型（part.p_type）以 PROMO 开头的订单明细的 l_extendedprice × (1 − l_discount) 之和（其余明细计 0），按发货日期（l_shipdate）归属期间；每个订单明细行计一次，商品按其当前信息计。保留两位小数。",
+    "task": "M3-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 3,
+        "m2": 3,
+        "year": 1996
+      }
+    },
+    "metric": "M5",
+    "phase": "learn",
+    "question": "1996 年 3 月的订单数是多少？口径：订单数 = 订单（orders）的个数，按下单日期（o_orderdate）归属期间；每个订单计一次。保留两位小数。",
+    "task": "M5-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 11,
+        "m2": 11,
+        "year": 1995
+      }
+    },
+    "metric": "M5",
+    "phase": "learn",
+    "question": "1995 年 11 月的订单数是多少？口径：订单数 = 订单（orders）的个数，按下单日期（o_orderdate）归属期间；每个订单计一次。保留两位小数。",
+    "task": "M5-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 8,
+        "m2": 8,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "holdout",
+    "question": "1997 年 8 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P2"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 1996
+      },
+      "kind": "diff"
+    },
+    "metric": "M1",
+    "phase": "holdout",
+    "question": "1997 年 9 月的发货净收入比1996 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M1-T1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 8,
+        "m2": 8,
+        "year": 1997
+      }
+    },
+    "metric": "M3",
+    "phase": "holdout",
+    "question": "1997 年 8 月的促销商品收入是多少？保留两位小数。",
+    "task": "M3-P2"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 1996
+      },
+      "kind": "diff"
+    },
+    "metric": "M3",
+    "phase": "holdout",
+    "question": "1997 年 9 月的促销商品收入比1996 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M3-T1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 8,
+        "m2": 8,
+        "year": 1997
+      }
+    },
+    "metric": "M5",
+    "phase": "holdout",
+    "question": "1997 年 8 月的订单数是多少？保留两位小数。",
+    "task": "M5-P2"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 1996
+      },
+      "kind": "diff"
+    },
+    "metric": "M5",
+    "phase": "holdout",
+    "question": "1997 年 9 月的订单数比1996 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M5-T1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 1996
+      },
+      "kind": "diff"
+    },
+    "metric": "M1",
+    "phase": "append",
+    "question": "1997 年 9 月的发货净收入比1996 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M1-T1"
+  },
+  {
+    "ask": {
+      "kind": "peak_rise",
+      "year": 1997
+    },
+    "metric": "M3",
+    "phase": "append",
+    "question": "1997 年哪个月的促销商品收入比上一个月增加最多？增加量按本月值减上月值计算。只回答月份数字（2–12），并列取最早月份。",
+    "task": "M3-T3"
+  },
+  {
+    "ask": {
+      "kind": "above_mean",
+      "year": 1996
+    },
+    "metric": "M5",
+    "phase": "backfill",
+    "question": "1996 年有几个月的订单数高于当年 12 个月订单数的平均值？只回答月份个数（0–12）。",
+    "task": "M5-T4-B"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 1997
+    },
+    "metric": "M1",
+    "phase": "correct",
+    "question": "1997 年哪个月的发货净收入最高？只回答月份数字（1–12），并列取最早月份。",
+    "task": "M1-T2"
+  },
+  {
+    "ask": {
+      "kind": "above_mean",
+      "year": 1997
+    },
+    "metric": "M3",
+    "phase": "correct",
+    "question": "1997 年有几个月的促销商品收入高于当年 12 个月促销商品收入的平均值？只回答月份个数（0–12）。",
+    "task": "M3-T4"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M5",
+    "phase": "addcol",
+    "question": "1997 年 9 月的订单数是多少？保留两位小数。",
+    "task": "M5-P1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 1997
+    },
+    "metric": "M5",
+    "phase": "addcol",
+    "question": "1997 年哪个月的订单数最高？只回答月份数字（1–12），并列取最早月份。",
+    "task": "M5-T2"
+  },
+  {
+    "ask": {
+      "kind": "peak_rise",
+      "year": 1997
+    },
+    "metric": "M5",
+    "phase": "status",
+    "question": "1997 年哪个月的订单数比上一个月增加最多？增加量按本月值减上月值计算。只回答月份数字（2–12），并列取最早月份。",
+    "task": "M5-T3"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M5",
+    "phase": "status",
+    "question": "1997 年 9 月的订单数是多少？保留两位小数。",
+    "task": "M5-P1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 1996
+      },
+      "kind": "diff"
+    },
+    "metric": "M3",
+    "phase": "revision",
+    "question": "1997 年 9 月的促销商品收入比1996 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M3-T1"
+  },
+  {
+    "ask": {
+      "kind": "peak_rise",
+      "year": 1997
+    },
+    "metric": "M1",
+    "phase": "revision",
+    "question": "1997 年哪个月的发货净收入比上一个月增加最多？增加量按本月值减上月值计算。只回答月份数字（2–12），并列取最早月份。",
+    "task": "M1-T3"
+  },
+  {
+    "ask": {
+      "kind": "above_mean",
+      "year": 1997
+    },
+    "metric": "M1",
+    "phase": "dupload",
+    "question": "1997 年有几个月的发货净收入高于当年 12 个月发货净收入的平均值？只回答月份个数（0–12）。",
+    "task": "M1-T4"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 1996
+      },
+      "kind": "diff"
+    },
+    "metric": "M3",
+    "phase": "dupload",
+    "question": "1997 年 9 月的促销商品收入比1996 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M3-T1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 1997
+    },
+    "metric": "M3",
+    "phase": "dimhist",
+    "question": "1997 年哪个月的促销商品收入最高？只回答月份数字（1–12），并列取最早月份。",
+    "task": "M3-T2"
+  },
+  {
+    "ask": {
+      "kind": "above_mean",
+      "year": 1997
+    },
+    "metric": "M3",
+    "phase": "dimhist",
+    "question": "1997 年有几个月的促销商品收入高于当年 12 个月促销商品收入的平均值？只回答月份个数（0–12）。",
+    "task": "M3-T4"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "latekey",
+    "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 1997
+    },
+    "metric": "M3",
+    "phase": "latekey",
+    "question": "1997 年哪个月的促销商品收入最高？只回答月份数字（1–12），并列取最早月份。",
+    "task": "M3-T2"
+  },
+  {
+    "ask": {
+      "kind": "peak_rise",
+      "year": 1997
+    },
+    "metric": "M3",
+    "phase": "unit",
+    "question": "1997 年哪个月的促销商品收入比上一个月增加最多？增加量按本月值减上月值计算。只回答月份数字（2–12），并列取最早月份。",
+    "task": "M3-T3"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      }
+    },
+    "metric": "M1",
+    "phase": "unit",
+    "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+    "task": "M1-P1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 1997
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 1996
+      },
+      "kind": "diff"
+    },
+    "metric": "M5",
+    "phase": "mirror",
+    "question": "1997 年 9 月的订单数比1996 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M5-T1"
+  },
+  {
+    "ask": {
+      "kind": "peak_rise",
+      "year": 1997
+    },
+    "metric": "M5",
+    "phase": "mirror",
+    "question": "1997 年哪个月的订单数比上一个月增加最多？增加量按本月值减上月值计算。只回答月份数字（2–12），并列取最早月份。",
+    "task": "M5-T3"
+  }
+]

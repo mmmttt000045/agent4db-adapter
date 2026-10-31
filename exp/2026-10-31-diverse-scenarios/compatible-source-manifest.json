@@ -1,0 +1,74 @@
+{
+  "src/llm.rs": {
+    "sha256": "120dc2ec78525e4b19ed8cbac1aca00358fb53e62cf8f4ff5e054cff60443f95",
+    "bytes": 41899
+  },
+  "src/metricbench.rs": {
+    "sha256": "691317f9a0959db394aea5677ccb17e5514d760c3735bd58d829b4509e55d1a6",
+    "bytes": 127853
+  },
+  "exp/2026-10-31-diverse-scenarios/memory-service.py": {
+    "sha256": "fe6e163377ff05db60cabb868afb226e90506981be80ff4d39219916b5bed345",
+    "bytes": 14600
+  },
+  "exp/2026-10-31-diverse-scenarios/offline-smoke.py": {
+    "sha256": "f6cf772634082b8f3a8682bf4c0046b292ca3e92c60e90eefefa64c9ca48a611",
+    "bytes": 11221
+  },
+  "exp/2026-10-31-diverse-scenarios/run-paired-reuse.py": {
+    "sha256": "14493ddac2c07c8682f899cc4b83609ffe2539357b524e28f07e1c473a2cf45e",
+    "bytes": 8175
+  },
+  "exp/2026-10-31-diverse-scenarios/paired-reuse-protocol.json": {
+    "sha256": "997421a3efc9b5f9b4d5eb7075705e1e98af7ae1c5da18f0259085b375644255",
+    "bytes": 14209
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-compatibility-check.json": {
+    "sha256": "26a78c76a04d58709c5b36fc5e09e18558af2a7f7c586696906a4589864e006b",
+    "bytes": 859
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-benchmark.patch": {
+    "sha256": "4315c22393e7ad920e1b6ea51ab1d93da2e3f5d4239b7745497c9be26bb20e83",
+    "bytes": 3857
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/tpch-extra2/question-bank.json": {
+    "sha256": "6b65a856851c97916f8230906f911d7b2bebb5150a0def733de8e70033fe3b41",
+    "bytes": 4434
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/tpch-extra3/question-bank.json": {
+    "sha256": "745fb36f05cb42f01d852cf717618805d99d3866346e349235ed32313b7a54d6",
+    "bytes": 4769
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/tpch-extra1/question-bank.json": {
+    "sha256": "dfa8868d5859176390f55b95e96b759d0c6ff95110cc83ab8129453c6624be88",
+    "bytes": 4161
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/synthetic-extra4/question-bank.json": {
+    "sha256": "c7e5d80a3963d2522518116f06b8e9700b63393819a372289c453b1330d3dfac",
+    "bytes": 5130
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/synthetic-extra3/question-bank.json": {
+    "sha256": "cd53ce1a082aa5f111cc73becc74d4ac04f88d2c43ab9457204afbb5c103db41",
+    "bytes": 4838
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/synthetic-base/question-bank.json": {
+    "sha256": "8218bf70e709f364b56cf07dfb8fb8ed05db67b8d19a1ad0179c0504c95a1267",
+    "bytes": 10391
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/tpch-base/question-bank.json": {
+    "sha256": "5bf5090e3e724a370b7e272f48ec529ccc0851d36f3f83145e68298a152b6588",
+    "bytes": 8531
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/synthetic-extra1/question-bank.json": {
+    "sha256": "1932545b41d605e8926378be02f9e10582c104121203c9ed60e0835f9a2800c8",
+    "bytes": 4236
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/synthetic-extra2/question-bank.json": {
+    "sha256": "7c685ca99d97abfef86a462c74a4fa6021810c69434e6af41ba396515037c70c",
+    "bytes": 4506
+  },
+  "exp/2026-10-31-diverse-scenarios/reuse-banks/tpch-extra4/question-bank.json": {
+    "sha256": "0203a1ef75b8c0a02d929cfd428ab852d92926ace81c9aff977a266856fd6443",
+    "bytes": 5067
+  }
+}

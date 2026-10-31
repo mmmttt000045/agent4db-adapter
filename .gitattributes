@@ -1,0 +1,8 @@
+# Frozen execution logs and patches retain their original bytes and whitespace.
+exp/**/*.log -text -whitespace
+exp/**/*.patch -text -whitespace
+
+# Research archives are binary inputs, independent of platform line endings.
+*.tgz -text
+*.zip -text
+*.pdf -text

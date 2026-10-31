@@ -1,0 +1,11 @@
+{
+  "sha256": "3bc19de09651e6ec871d0914174a7592e88f04597cf988c23d2cd30344cc8903",
+  "files": 19,
+  "bytes": 67125,
+  "native_base_start_ceiling_cny": 18.68915302,
+  "source_replay_order": [
+    "runtime-source.tgz",
+    "runtime-source-recovery.tgz",
+    "runtime-source-compatible.tgz"
+  ]
+}

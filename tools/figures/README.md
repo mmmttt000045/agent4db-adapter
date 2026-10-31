@@ -27,12 +27,12 @@ make deck-figures                  # PPT 的六幅图，生成 PDF 并转 PNG
 | `replay-outcomes` | `replay_outcomes.py` | 验证缓存、TPC-DS 和通用性回放 |
 | `maintenance-cost` | `maintenance_cost.py` | `exp/2026-10-02-cache-baseline-tpcds/cb-1m-share-stats.json` |
 | `scenario-changes` | `scenario_changes.py` | `exp/2026-10-10-scenarios-q5/` |
-| `two-schemas` | `two_schemas.py` | 合成场景五轮与通用性 `e2e/` 的正确率 |
+| `two-schemas` | `two_schemas.py` | `exp/2026-10-31-diverse-scenarios/study-stats.json`；六个冻结基线对照、两格修复后原生重跑及四方法共同的跨智能体新题；三指标、四题型、十一类变化，13 情形等权，单栏 84.6 × 55 mm、32 根柱；一轮／方法，不画误差棒 |
 | `consumer-cost` | `consumer_cost.py` | 合成场景 `holdout-cost.json` 与通用性 `e2e/outcomes.json.gz` |
 | `population` | `population.py` | `exp/2026-10-12-population/population-stats.json` |
 | `relbench-cumulative` | `relbench_cumulative.py` | `exp/2026-10-20-relbench/paper-sessions.json` |
 | `memory-access-pilot` | `mechanism.py` | `exp/2026-10-29-mechanism-pilot/pilot-summary.json`，八格开发预实验 |
-| `fixed-sharing` | `mechanism.py` | 同批 `system-summary.json` 的 B，固定定义数的三轮共享对照 |
+| `fixed-sharing` | `mechanism.py` | 同批 `system-summary.json` 的 B：固定定义数的三轮共享对照，两个到达模式的数据库耗时；验证 SQL 次数在正文报告 |
 | `snapshot-control` | `mechanism.py` | 同批 `system-summary.json` 的 C，以及 10-02 批次的 `snapshot-binding-stats.json` / `snapshot-binding-shards-stats.json`；新因果对照与归档开销分开呈现 |
 
 具体哪些图进入稿件，由 `overleaf/sections/` 和图形包装 `.tex` 的引用决定；不使用固定图号来标识脚本。`baselines.py` 是保留的辅助图，不包含在 `make figures` 中；早期外部记忆基线的采用范围以 RelBench 协议为准。
@@ -92,7 +92,7 @@ Scale(d0, d1, p0, p1)                          # 数据值到毫米的线性映�
 - 群体代价：三幅折线图，均值曲线加每个智能体位置的最小值--最大值误差线；每题 token 面板保留对数轴。正确率移至图注。
 - RelBench 累计 token：每个数据库一幅折线图，用竖直虚线分隔截点，学习与复用阶段在图注解释。
 - 留出查询代价：时间和 token 分成两个分组柱状图，柱高是合并全部问题后的均值，误差线覆盖各次运行的均值。
-- 两种模式的正确率：作为维护边界的受控研究，仅保留无记忆与 MAVRA，按情形分组，从零起画；保留各次运行的最小值--最大值范围和原有情形等权汇总方式。自制示例检索不再进入当前稿件；原始归档保留。
+- 两种模式的正确率：使用 10-31 SQL 审查／语义保留修复并统一反馈后的完整单轮批次，比较 ACE、AWM、G-Memory 与完整 MAVRA。两库各三指标，按留出、正常更新、覆盖变化及全部情形分组，共 32 根柱，从零起画；各情形等权，本批一轮不画误差棒。ACE/AWM 为发布组件的 SQL 适配，G-Memory 使用官方核心；旧自制场景对照的归档保留。
 
 2026-10-28 的官方 API 重构见 [实验协议](../../exp/2026-10-28-official/README.md)。新的 Fig.5 将解释智能体工具调用的组成，另用表格计入内部记忆开销；只有完整配对结果通过核对后才替换原 `consumer-cost`，不能将开发或未完成运行当作正式图表。
 

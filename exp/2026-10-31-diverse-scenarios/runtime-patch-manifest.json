@@ -1,0 +1,7 @@
+{
+  "base": "Corrected 2026-10-31 frozen runtime, complete published memory bridge",
+  "before_sha256": "aae7377a20d4dff5f3a30679b6f33dfe6b2ed13e2096fa13fad865867f6b49d6",
+  "after_sha256": "3bc278c3bf628fb3867f653c77fd40baaff50b22d16cc3be27e9bf5392852af1",
+  "patch_sha256": "fc0228bb74698844c296561d67e0fd12add820bb8591651a476bac61a893eabd",
+  "replay_verified": true
+}

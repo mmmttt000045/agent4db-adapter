@@ -1,0 +1,2568 @@
+{
+  "study": "paired-reuse-20261031",
+  "native": {
+    "synthetic": {
+      "base": {
+        "run_metric": {
+          "attempted": 20,
+          "executed": 20
+        },
+        "run_metric_forms": {
+          "single": 20
+        },
+        "failures": [
+          {
+            "phase": "latekey",
+            "task": "M1-P1",
+            "ask": {
+              "kind": "single",
+              "period": {
+                "m1": 9,
+                "m2": 9,
+                "year": 2002
+              }
+            },
+            "question": "2002 年 9 月的门店营业额是多少？保留两位小数。",
+            "answer": "13069651.80",
+            "gold": "26139303.60",
+            "outcome": "wrong",
+            "error": null,
+            "executions": [
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as total_rows, count(d_date_sk) as matched_rows from store_sales left join date_dim on store_sales.ss_sold_date_sk = date_dim.d_date_sk"
+                },
+                "output": {
+                  "ref": "r1",
+                  "result": {
+                    "columns": [
+                      "total_rows",
+                      "matched_rows"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "1027095",
+                        "989695"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select sum(ss_net_paid) as value, count(*) as rows_cnt\nfrom store_sales\njoin date_dim on store_sales.ss_sold_date_sk = date_dim.d_date_sk\nwhere date_dim.d_year = 2002 and date_dim.d_moy = 9"
+                },
+                "output": {
+                  "ref": "r2",
+                  "result": {
+                    "columns": [
+                      "value",
+                      "rows_cnt"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "13069651.80",
+                        "27095"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select min(s.ss_sold_date_sk) as min_sk, max(s.ss_sold_date_sk) as max_sk, count(*) as cnt\nfrom store_sales s left join date_dim d on s.ss_sold_date_sk = d.d_date_sk\nwhere d.d_date_sk is null"
+                },
+                "output": {
+                  "ref": "r3",
+                  "result": {
+                    "columns": [
+                      "min_sk",
+                      "max_sk",
+                      "cnt"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "20020901",
+                        "20020930",
+                        "37400"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select min(d_date_sk), max(d_date_sk), count(*) from date_dim"
+                },
+                "output": {
+                  "ref": "r4",
+                  "result": {
+                    "columns": [
+                      "min",
+                      "max",
+                      "count"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "1",
+                        "1096",
+                        "1096"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select min(d_date_sk) as min_sk, max(d_date_sk) as max_sk, min(d_date::text) as min_date, max(d_date::text) as max_date, count(*) as cnt from date_dim where d_year=2002 and d_moy=9"
+                },
+                "output": {
+                  "ref": "r5",
+                  "result": {
+                    "columns": [
+                      "min_sk",
+                      "max_sk",
+                      "min_date",
+                      "max_date",
+                      "cnt"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "975",
+                        "1004",
+                        "2002-09-01",
+                        "2002-09-30",
+                        "30"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select s.ss_sold_date_sk, count(*) as cnt, sum(s.ss_net_paid) as amt\nfrom store_sales s left join date_dim d on s.ss_sold_date_sk = d.d_date_sk\nwhere d.d_date_sk is null\ngroup by s.ss_sold_date_sk\norder by s.ss_sold_date_sk\nlimit 50"
+                },
+                "output": {
+                  "ref": "r6",
+                  "result": {
+                    "columns": [
+                      "ss_sold_date_sk",
+                      "cnt",
+                      "amt"
+                    ],
+                    "row_count": 31,
+                    "rows": [
+                      [
+                        "20020901",
+                        "910",
+                        "423323.50"
+                      ],
+                      [
+                        "20020902",
+                        "905",
+                        "488283.70"
+                      ],
+                      [
+                        "20020903",
+                        "905",
+                        "386327.50"
+                      ],
+                      [
+                        "20020904",
+                        "910",
+                        "438345.90"
+                      ],
+                      [
+                        "20020905",
+                        "905",
+                        "469882.30"
+                      ],
+                      [
+                        "20020906",
+                        "905",
+                        "406298.70"
+                      ],
+                      [
+                        "20020907",
+                        "900",
+                        "469738.00"
+                      ],
+                      [
+                        "20020908",
+                        "900",
+                        "416776.80"
+                      ],
+                      [
+                        "20020909",
+                        "900",
+                        "417456.70"
+                      ],
+                      [
+                        "20020910",
+                        "900",
+                        "487634.90"
+                      ],
+                      [
+                        "20020911",
+                        "900",
+                        "384472.00"
+                      ],
+                      [
+                        "20020912",
+                        "900",
+                        "433382.40"
+                      ],
+                      [
+                        "20020913",
+                        "900",
+                        "467343.40"
+                      ],
+                      [
+                        "20020914",
+                        "900",
+                        "401005.00"
+                      ],
+                      [
+                        "20020915",
+                        "905",
+                        "472306.00"
+                      ],
+                      [
+                        "20020916",
+                        "905",
+                        "415854.10"
+                      ],
+                      [
+                        "20020917",
+                        "905",
+                        "421724.40"
+                      ],
+                      [
+                        "20020918",
+                        "905",
+                        "485479.10"
+                      ],
+                      [
+                        "20020919",
+                        "905",
+                        "388746.50"
+                      ],
+                      [
+                        "20020920",
+                        "905",
+                        "436233.10"
+                      ],
+                      [
+                        "20020921",
+                        "905",
+                        "472366.00"
+                      ],
+                      [
+                        "20020922",
+                        "905",
+                        "404935.20"
+                      ],
+                      [
+                        "20020923",
+                        "905",
+                        "473850.50"
+                      ],
+                      [
+                        "20020924",
+                        "900",
+                        "414011.40"
+                      ],
+                      [
+                        "20020925",
+                        "900",
+                        "417766.10"
+                      ],
+                      [
+                        "20020926",
+                        "905",
+                        "488273.40"
+                      ],
+                      [
+                        "20020927",
+                        "900",
+                        "383598.20"
+                      ],
+                      [
+                        "20020928",
+                        "900",
+                        "434543.70"
+                      ],
+                      [
+                        "20020929",
+                        "905",
+                        "467531.20"
+                      ],
+                      [
+                        "20020930",
+                        "900",
+                        "402162.10"
+                      ],
+                      [
+                        null,
+                        "10305",
+                        "4977034.70"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "with bad as (\n  select * from store_sales where ss_sold_date_sk between 20020901 and 20020930\n), good as (\n  select s.* from store_sales s join date_dim d on s.ss_sold_date_sk=d.d_date_sk where d.d_year=2002 and d.d_moy=9\n)\nselect\n (select count(*) from bad) as bad_cnt,\n (select count(*) from good) as good_cnt,\n (select count(*) from bad b join good g on b.ss_ticket_number=g.ss_ticket_number and b.ss_item_sk=g.ss_item_sk) as key_overlap,\n (select count(*) from bad b join good g on b.ss_ticket_number=g.ss_ticket_number and b.ss_item_sk=g.ss_item_sk and b.ss_net_paid=g.ss_net_paid) as full_overlap,\n (select sum(ss_net_paid) from bad) as bad_amt"
+                },
+                "output": {
+                  "ref": "r7",
+                  "result": {
+                    "columns": [
+                      "bad_cnt",
+                      "good_cnt",
+                      "key_overlap",
+                      "full_overlap",
+                      "bad_amt"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "27095",
+                        "27095",
+                        "0",
+                        "0",
+                        "13069651.80"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "with bad as (\n  select to_char(ss_sold_date_sk::text::date,'YYYY-MM-DD') as day, ss_net_paid from store_sales where ss_sold_date_sk between 20020901 and 20020930\n), good as (\n  select d.d_date::text as day, s.ss_net_paid from store_sales s join date_dim d on s.ss_sold_date_sk=d.d_date_sk where d.d_year=2002 and d.d_moy=9\n)\nselect b.day, b.s as bad_sum, g.s as good_sum, b.c as bad_cnt, g.c as good_cnt\nfrom (select day, sum(ss_net_paid) s, count(*) c from bad group by day) b\nfull join (select day, sum(ss_net_paid) s, count(*) c from good group by day) g using (day)\norder by b.day limit 40"
+                },
+                "output": {
+                  "ref": "r8",
+                  "result": {
+                    "columns": [
+                      "day",
+                      "bad_sum",
+                      "good_sum",
+                      "bad_cnt",
+                      "good_cnt"
+                    ],
+                    "row_count": 30,
+                    "rows": [
+                      [
+                        "2002-09-01",
+                        "423323.50",
+                        "423323.50",
+                        "910",
+                        "910"
+                      ],
+                      [
+                        "2002-09-02",
+                        "488283.70",
+                        "488283.70",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-03",
+                        "386327.50",
+                        "386327.50",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-04",
+                        "438345.90",
+                        "438345.90",
+                        "910",
+                        "910"
+                      ],
+                      [
+                        "2002-09-05",
+                        "469882.30",
+                        "469882.30",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-06",
+                        "406298.70",
+                        "406298.70",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-07",
+                        "469738.00",
+                        "469738.00",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-08",
+                        "416776.80",
+                        "416776.80",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-09",
+                        "417456.70",
+                        "417456.70",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-10",
+                        "487634.90",
+                        "487634.90",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-11",
+                        "384472.00",
+                        "384472.00",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-12",
+                        "433382.40",
+                        "433382.40",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-13",
+                        "467343.40",
+                        "467343.40",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-14",
+                        "401005.00",
+                        "401005.00",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-15",
+                        "472306.00",
+                        "472306.00",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-16",
+                        "415854.10",
+                        "415854.10",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-17",
+                        "421724.40",
+                        "421724.40",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-18",
+                        "485479.10",
+                        "485479.10",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-19",
+                        "388746.50",
+                        "388746.50",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-20",
+                        "436233.10",
+                        "436233.10",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-21",
+                        "472366.00",
+                        "472366.00",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-22",
+                        "404935.20",
+                        "404935.20",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-23",
+                        "473850.50",
+                        "473850.50",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-24",
+                        "414011.40",
+                        "414011.40",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-25",
+                        "417766.10",
+                        "417766.10",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-26",
+                        "488273.40",
+                        "488273.40",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-27",
+                        "383598.20",
+                        "383598.20",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-28",
+                        "434543.70",
+                        "434543.70",
+                        "900",
+                        "900"
+                      ],
+                      [
+                        "2002-09-29",
+                        "467531.20",
+                        "467531.20",
+                        "905",
+                        "905"
+                      ],
+                      [
+                        "2002-09-30",
+                        "402162.10",
+                        "402162.10",
+                        "900",
+                        "900"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              }
+            ]
+          },
+          {
+            "phase": "latekey",
+            "task": "M3-P1",
+            "ask": {
+              "kind": "single",
+              "period": {
+                "m1": 9,
+                "m2": 9,
+                "year": 2002
+              }
+            },
+            "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+            "answer": "23.81",
+            "gold": "11.9039924231187246",
+            "outcome": "wrong",
+            "error": null,
+            "executions": [
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as n_total,\n       count(d.d_date_sk) as n_join,\n       round(100.0*(count(*)-count(d.d_date_sk))/count(*),4) as loss_pct\nfrom store_sales s left join date_dim d on s.ss_sold_date_sk = d.d_date_sk"
+                },
+                "output": {
+                  "ref": "r1",
+                  "result": {
+                    "columns": [
+                      "n_total",
+                      "n_join",
+                      "loss_pct"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "1027095",
+                        "989695",
+                        "3.6413"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select s.ss_sold_date_sk, count(*) as cnt, min(s.ss_sold_date_sk) , max(s.ss_sold_date_sk)\nfrom store_sales s left join date_dim d on s.ss_sold_date_sk = d.d_date_sk\nwhere d.d_date_sk is null\ngroup by 1 order by cnt desc limit 50"
+                },
+                "output": {
+                  "ref": "r2",
+                  "result": {
+                    "columns": [
+                      "ss_sold_date_sk",
+                      "cnt",
+                      "min",
+                      "max"
+                    ],
+                    "row_count": 31,
+                    "rows": [
+                      [
+                        null,
+                        "10305",
+                        null,
+                        null
+                      ],
+                      [
+                        "20020901",
+                        "910",
+                        "20020901",
+                        "20020901"
+                      ],
+                      [
+                        "20020904",
+                        "910",
+                        "20020904",
+                        "20020904"
+                      ],
+                      [
+                        "20020903",
+                        "905",
+                        "20020903",
+                        "20020903"
+                      ],
+                      [
+                        "20020905",
+                        "905",
+                        "20020905",
+                        "20020905"
+                      ],
+                      [
+                        "20020906",
+                        "905",
+                        "20020906",
+                        "20020906"
+                      ],
+                      [
+                        "20020915",
+                        "905",
+                        "20020915",
+                        "20020915"
+                      ],
+                      [
+                        "20020916",
+                        "905",
+                        "20020916",
+                        "20020916"
+                      ],
+                      [
+                        "20020917",
+                        "905",
+                        "20020917",
+                        "20020917"
+                      ],
+                      [
+                        "20020918",
+                        "905",
+                        "20020918",
+                        "20020918"
+                      ],
+                      [
+                        "20020919",
+                        "905",
+                        "20020919",
+                        "20020919"
+                      ],
+                      [
+                        "20020920",
+                        "905",
+                        "20020920",
+                        "20020920"
+                      ],
+                      [
+                        "20020921",
+                        "905",
+                        "20020921",
+                        "20020921"
+                      ],
+                      [
+                        "20020922",
+                        "905",
+                        "20020922",
+                        "20020922"
+                      ],
+                      [
+                        "20020923",
+                        "905",
+                        "20020923",
+                        "20020923"
+                      ],
+                      [
+                        "20020926",
+                        "905",
+                        "20020926",
+                        "20020926"
+                      ],
+                      [
+                        "20020929",
+                        "905",
+                        "20020929",
+                        "20020929"
+                      ],
+                      [
+                        "20020902",
+                        "905",
+                        "20020902",
+                        "20020902"
+                      ],
+                      [
+                        "20020924",
+                        "900",
+                        "20020924",
+                        "20020924"
+                      ],
+                      [
+                        "20020907",
+                        "900",
+                        "20020907",
+                        "20020907"
+                      ],
+                      [
+                        "20020908",
+                        "900",
+                        "20020908",
+                        "20020908"
+                      ],
+                      [
+                        "20020909",
+                        "900",
+                        "20020909",
+                        "20020909"
+                      ],
+                      [
+                        "20020910",
+                        "900",
+                        "20020910",
+                        "20020910"
+                      ],
+                      [
+                        "20020911",
+                        "900",
+                        "20020911",
+                        "20020911"
+                      ],
+                      [
+                        "20020912",
+                        "900",
+                        "20020912",
+                        "20020912"
+                      ],
+                      [
+                        "20020913",
+                        "900",
+                        "20020913",
+                        "20020913"
+                      ],
+                      [
+                        "20020914",
+                        "900",
+                        "20020914",
+                        "20020914"
+                      ],
+                      [
+                        "20020925",
+                        "900",
+                        "20020925",
+                        "20020925"
+                      ],
+                      [
+                        "20020930",
+                        "900",
+                        "20020930",
+                        "20020930"
+                      ],
+                      [
+                        "20020927",
+                        "900",
+                        "20020927",
+                        "20020927"
+                      ],
+                      [
+                        "20020928",
+                        "900",
+                        "20020928",
+                        "20020928"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as n, min(d_date_sk), max(d_date_sk) from date_dim where d_year=2002 and d_moy=9"
+                },
+                "output": {
+                  "ref": "r3",
+                  "result": {
+                    "columns": [
+                      "n",
+                      "min",
+                      "max"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "30",
+                        "975",
+                        "1004"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select (ss_sold_date_sk >= 1000000) as big_key, (ss_sold_date_sk is null) as is_null, count(*) as cnt, min(ss_sold_date_sk), max(ss_sold_date_sk)\nfrom store_sales group by 1,2 order by cnt desc"
+                },
+                "output": {
+                  "ref": "r4",
+                  "result": {
+                    "columns": [
+                      "big_key",
+                      "is_null",
+                      "cnt",
+                      "min",
+                      "max"
+                    ],
+                    "row_count": 3,
+                    "rows": [
+                      [
+                        "f",
+                        "f",
+                        "989695",
+                        "1",
+                        "1096"
+                      ],
+                      [
+                        "t",
+                        "f",
+                        "27095",
+                        "20020901",
+                        "20020930"
+                      ],
+                      [
+                        null,
+                        "t",
+                        "10305",
+                        null,
+                        null
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select\n  (select count(*) from store_sales where ss_sold_date_sk between 975 and 1004) as seq_sep_cnt,\n  (select count(*) from store_sales where ss_sold_date_sk between 20020901 and 20020930) as ymd_sep_cnt,\n  (select count(*) from store_sales a join store_sales b on a.ss_ticket_number=b.ss_ticket_number and a.ss_item_sk=b.ss_item_sk\n     where a.ss_sold_date_sk between 975 and 1004 and b.ss_sold_date_sk between 20020901 and 20020930) as dup_pairs"
+                },
+                "output": {
+                  "ref": "r5",
+                  "result": {
+                    "columns": [
+                      "seq_sep_cnt",
+                      "ymd_sep_cnt",
+                      "dup_pairs"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "27095",
+                        "27095",
+                        "0"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select 'seq' as src, count(*) cnt, count(distinct ss_ticket_number) tix, min(ss_ticket_number), max(ss_ticket_number), sum(ss_net_paid) amt, sum(ss_quantity) qty\nfrom store_sales where ss_sold_date_sk between 975 and 1004\nunion all\nselect 'ymd', count(*), count(distinct ss_ticket_number), min(ss_ticket_number), max(ss_ticket_number), sum(ss_net_paid), sum(ss_quantity)\nfrom store_sales where ss_sold_date_sk between 20020901 and 20020930"
+                },
+                "output": {
+                  "ref": "r6",
+                  "result": {
+                    "columns": [
+                      "src",
+                      "cnt",
+                      "tix",
+                      "min",
+                      "max",
+                      "amt",
+                      "qty"
+                    ],
+                    "row_count": 2,
+                    "rows": [
+                      [
+                        "ymd",
+                        "27095",
+                        "5419",
+                        "1000000004",
+                        "1000199973",
+                        "13069651.80",
+                        "135485"
+                      ],
+                      [
+                        "seq",
+                        "27095",
+                        "5419",
+                        "4",
+                        "199973",
+                        "13069651.80",
+                        "135485"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select\n (select count(*) from store_returns where sr_ticket_number >= 1000000000) as ret_big_tix,\n (select count(*) from store_returns) as ret_total,\n (select count(*) from store_returns where sr_return_amt is null) as null_amt"
+                },
+                "output": {
+                  "ref": "r7",
+                  "result": {
+                    "columns": [
+                      "ret_big_tix",
+                      "ret_total",
+                      "null_amt"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "0",
+                        "395878",
+                        "0"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "with sep as (\n  select ss_ticket_number, ss_item_sk, ss_net_paid\n  from store_sales\n  join date_dim d on store_sales.ss_sold_date_sk = d.d_date_sk\n  where d.d_year = 2002 and d.d_moy = 9\n)\nselect sum(r.sr_return_amt) as ret_amt,\n       sum(s.ss_net_paid) as net_paid,\n       count(*) as cnt,\n       sum(r.sr_return_amt)/sum(s.ss_net_paid)*100 as rate\nfrom sep s\nleft join store_returns r\n  on s.ss_ticket_number = r.sr_ticket_number and s.ss_item_sk = r.sr_item_sk"
+                },
+                "output": {
+                  "ref": "r8",
+                  "result": {
+                    "columns": [
+                      "ret_amt",
+                      "net_paid",
+                      "cnt",
+                      "rate"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "3111620.72",
+                        "13069651.80",
+                        "27095",
+                        "23.80798484623744911100"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) - count(distinct (sr_ticket_number, sr_item_sk)) as dup_keys from store_returns"
+                },
+                "output": {
+                  "ref": "r9",
+                  "result": {
+                    "columns": [
+                      "dup_keys"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "0"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              }
+            ]
+          },
+          {
+            "phase": "latekey",
+            "task": "M5-P1",
+            "ask": {
+              "kind": "single",
+              "period": {
+                "m1": 9,
+                "m2": 9,
+                "year": 2002
+              }
+            },
+            "question": "2002 年 9 月的电子品类门店营业额是多少？保留两位小数。",
+            "answer": "2659254.20",
+            "gold": "5318508.40",
+            "outcome": "wrong",
+            "error": null,
+            "executions": [
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as total_rows,\n       count(*) filter (where ss_sold_date_sk is null) as null_date_key,\n       min(ss_sold_date_sk) as min_key,\n       max(ss_sold_date_sk) as max_key,\n       count(*) filter (where ss_sold_date_sk < 1 or ss_sold_date_sk > 1096) as out_of_range_key,\n       count(*) filter (where ss_is_current = 1) as current_rows\nfrom store_sales"
+                },
+                "output": {
+                  "ref": "r1",
+                  "result": {
+                    "columns": [
+                      "total_rows",
+                      "null_date_key",
+                      "min_key",
+                      "max_key",
+                      "out_of_range_key",
+                      "current_rows"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "1027095",
+                        "10305",
+                        "1",
+                        "20020930",
+                        "27095",
+                        "1027095"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select\n  count(*) as left_rows,\n  count(d.d_date_sk) as matched_rows,\n  count(*) filter (where d.d_date_sk is null and s.ss_sold_date_sk is not null) as unmatched_nonnull,\n  count(*) filter (where s.ss_sold_date_sk is null) as null_keys\nfrom store_sales s\nleft join date_dim d on s.ss_sold_date_sk = d.d_date_sk"
+                },
+                "output": {
+                  "ref": "r2",
+                  "result": {
+                    "columns": [
+                      "left_rows",
+                      "matched_rows",
+                      "unmatched_nonnull",
+                      "null_keys"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "1027095",
+                        "989695",
+                        "27095",
+                        "10305"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select d_year, d_moy, count(*) as rows, sum(ss_net_paid) as net_paid\nfrom store_sales s\njoin date_dim d on s.ss_sold_date_sk=d.d_date_sk\nwhere d.d_year=2002 and d.d_moy=9\ngroup by d_year,d_moy"
+                },
+                "output": {
+                  "ref": "r3",
+                  "result": {
+                    "columns": [
+                      "d_year",
+                      "d_moy",
+                      "rows",
+                      "net_paid"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "2002",
+                        "9",
+                        "27095",
+                        "13069651.80"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select ss_ticket_number, ss_item_sk, count(*) as cnt, count(distinct ss_sold_date_sk) as date_cnt, count(distinct ss_net_paid) as amt_cnt\nfrom store_sales\ngroup by ss_ticket_number, ss_item_sk\nhaving count(*) > 1\nlimit 20"
+                },
+                "output": {
+                  "ref": "r4",
+                  "result": {
+                    "columns": [
+                      "ss_ticket_number",
+                      "ss_item_sk",
+                      "cnt",
+                      "date_cnt",
+                      "amt_cnt"
+                    ],
+                    "row_count": 0,
+                    "rows": [],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select case when ss_sold_date_sk is null then 'null'\n            when ss_sold_date_sk between 1 and 1096 then 'sequential'\n            when ss_sold_date_sk between 20000101 and 20021231 then 'yyyymmdd'\n            else 'other' end as key_type,\n       count(*) as rows,\n       count(distinct ss_ticket_number) as tickets,\n       min(ss_ticket_number) as min_ticket,\n       max(ss_ticket_number) as max_ticket,\n       min(ss_sold_date_sk) as min_key,\n       max(ss_sold_date_sk) as max_key,\n       sum(ss_net_paid) as net_paid\nfrom store_sales\ngroup by 1\norder by 1"
+                },
+                "output": {
+                  "ref": "r5",
+                  "result": {
+                    "columns": [
+                      "key_type",
+                      "rows",
+                      "tickets",
+                      "min_ticket",
+                      "max_ticket",
+                      "min_key",
+                      "max_key",
+                      "net_paid"
+                    ],
+                    "row_count": 3,
+                    "rows": [
+                      [
+                        "null",
+                        "10305",
+                        "2061",
+                        "97",
+                        "199917",
+                        null,
+                        null,
+                        "4977034.70"
+                      ],
+                      [
+                        "sequential",
+                        "989695",
+                        "197939",
+                        "1",
+                        "200000",
+                        "1",
+                        "1096",
+                        "478017953.70"
+                      ],
+                      [
+                        "yyyymmdd",
+                        "27095",
+                        "5419",
+                        "1000000004",
+                        "1000199973",
+                        "20020901",
+                        "20020930",
+                        "13069651.80"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select s.*\nfrom store_sales s\nwhere s.ss_sold_date_sk between 20020901 and 20020930\norder by s.ss_sold_date_sk, s.ss_ticket_number, s.ss_item_sk\nlimit 5"
+                },
+                "output": {
+                  "ref": "r6",
+                  "result": {
+                    "columns": [
+                      "ss_sold_date_sk",
+                      "ss_item_sk",
+                      "ss_ticket_number",
+                      "ss_quantity",
+                      "ss_sales_price",
+                      "ss_ext_sales_price",
+                      "ss_ext_discount_amt",
+                      "ss_net_paid",
+                      "ss_net_paid_inc_tax",
+                      "ss_net_profit",
+                      "ss_is_current"
+                    ],
+                    "row_count": 5,
+                    "rows": [
+                      [
+                        "20020901",
+                        "526",
+                        "1000000106",
+                        "5",
+                        "67.00",
+                        "335.00",
+                        "33.50",
+                        "301.50",
+                        "325.62",
+                        "100.50",
+                        "1"
+                      ],
+                      [
+                        "20020901",
+                        "527",
+                        "1000000106",
+                        "6",
+                        "104.00",
+                        "624.00",
+                        "93.60",
+                        "530.40",
+                        "572.83",
+                        "156.00",
+                        "1"
+                      ],
+                      [
+                        "20020901",
+                        "528",
+                        "1000000106",
+                        "7",
+                        "141.00",
+                        "987.00",
+                        "0.00",
+                        "987.00",
+                        "1065.96",
+                        "394.80",
+                        "1"
+                      ],
+                      [
+                        "20020901",
+                        "529",
+                        "1000000106",
+                        "8",
+                        "178.00",
+                        "1424.00",
+                        "71.20",
+                        "1352.80",
+                        "1461.02",
+                        "498.40",
+                        "1"
+                      ],
+                      [
+                        "20020901",
+                        "530",
+                        "1000000106",
+                        "9",
+                        "15.00",
+                        "135.00",
+                        "13.50",
+                        "121.50",
+                        "131.22",
+                        "40.50",
+                        "1"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select s.*\nfrom store_sales s\njoin date_dim d on s.ss_sold_date_sk=d.d_date_sk\nwhere d.d_year=2002 and d.d_moy=9\norder by s.ss_sold_date_sk, s.ss_ticket_number, s.ss_item_sk\nlimit 5"
+                },
+                "output": {
+                  "ref": "r7",
+                  "result": {
+                    "columns": [
+                      "ss_sold_date_sk",
+                      "ss_item_sk",
+                      "ss_ticket_number",
+                      "ss_quantity",
+                      "ss_sales_price",
+                      "ss_ext_sales_price",
+                      "ss_ext_discount_amt",
+                      "ss_net_paid",
+                      "ss_net_paid_inc_tax",
+                      "ss_net_profit",
+                      "ss_is_current"
+                    ],
+                    "row_count": 5,
+                    "rows": [
+                      [
+                        "975",
+                        "526",
+                        "106",
+                        "5",
+                        "67.00",
+                        "335.00",
+                        "33.50",
+                        "301.50",
+                        "325.62",
+                        "100.50",
+                        "1"
+                      ],
+                      [
+                        "975",
+                        "527",
+                        "106",
+                        "6",
+                        "104.00",
+                        "624.00",
+                        "93.60",
+                        "530.40",
+                        "572.83",
+                        "156.00",
+                        "1"
+                      ],
+                      [
+                        "975",
+                        "528",
+                        "106",
+                        "7",
+                        "141.00",
+                        "987.00",
+                        "0.00",
+                        "987.00",
+                        "1065.96",
+                        "394.80",
+                        "1"
+                      ],
+                      [
+                        "975",
+                        "529",
+                        "106",
+                        "8",
+                        "178.00",
+                        "1424.00",
+                        "71.20",
+                        "1352.80",
+                        "1461.02",
+                        "498.40",
+                        "1"
+                      ],
+                      [
+                        "975",
+                        "530",
+                        "106",
+                        "9",
+                        "15.00",
+                        "135.00",
+                        "13.50",
+                        "121.50",
+                        "131.22",
+                        "40.50",
+                        "1"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select case when ss_sold_date_sk between 1 and 1096 then 'sequential' when ss_sold_date_sk between 20000101 and 20021231 then 'yyyymmdd' else 'other' end as key_type,\n       count(*) as rows,\n       sum(ss_net_paid) as net_paid,\n       sum(case when i.i_category='电子' then 1 else 0 end) as elec_rows,\n       sum(case when i.i_category='电子' then ss_net_paid else 0 end) as elec_net_paid\nfrom store_sales s join item i on s.ss_item_sk=i.i_item_sk\ngroup by 1 order by 1"
+                },
+                "output": {
+                  "ref": "r8",
+                  "result": {
+                    "columns": [
+                      "key_type",
+                      "rows",
+                      "net_paid",
+                      "elec_rows",
+                      "elec_net_paid"
+                    ],
+                    "row_count": 3,
+                    "rows": [
+                      [
+                        "other",
+                        "10305",
+                        "4977034.70",
+                        "2061",
+                        "1010291.20"
+                      ],
+                      [
+                        "sequential",
+                        "989695",
+                        "478017953.70",
+                        "197939",
+                        "97188561.70"
+                      ],
+                      [
+                        "yyyymmdd",
+                        "27095",
+                        "13069651.80",
+                        "5419",
+                        "2659254.20"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select sum(s.ss_net_paid) as elec_net_paid,\n       count(*) as rows,\n       count(distinct s.ss_ticket_number) as tickets\nfrom store_sales s\njoin date_dim d on s.ss_sold_date_sk=d.d_date_sk\njoin item i on s.ss_item_sk=i.i_item_sk\nwhere d.d_year=2002 and d.d_moy=9 and i.i_category='电子'"
+                },
+                "output": {
+                  "ref": "r9",
+                  "result": {
+                    "columns": [
+                      "elec_net_paid",
+                      "rows",
+                      "tickets"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "2659254.20",
+                        "5419",
+                        "5419"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as ymd_rows,\n       count(g.ss_ticket_number) as matched_canonical_rows,\n       count(*) filter (where g.ss_ticket_number is not null\n         and g.ss_item_sk=b.ss_item_sk\n         and g.ss_quantity=b.ss_quantity\n         and g.ss_sales_price=b.ss_sales_price\n         and g.ss_ext_sales_price=b.ss_ext_sales_price\n         and g.ss_ext_discount_amt=b.ss_ext_discount_amt\n         and g.ss_net_paid=b.ss_net_paid\n         and g.ss_net_paid_inc_tax=b.ss_net_paid_inc_tax\n         and g.ss_net_profit=b.ss_net_profit) as exact_value_matches\nfrom store_sales b\nleft join store_sales g\n  on b.ss_ticket_number = g.ss_ticket_number + 1000000000\n and b.ss_item_sk = g.ss_item_sk\nwhere b.ss_sold_date_sk between 20020901 and 20020930"
+                },
+                "output": {
+                  "ref": "r10",
+                  "result": {
+                    "columns": [
+                      "ymd_rows",
+                      "matched_canonical_rows",
+                      "exact_value_matches"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "27095",
+                        "27095",
+                        "27095"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as null_rows,\n       count(g.ss_ticket_number) as same_ticket_item_matches,\n       count(*) filter (where g.ss_ticket_number is not null\n         and g.ss_quantity=n.ss_quantity\n         and g.ss_sales_price=n.ss_sales_price\n         and g.ss_ext_sales_price=n.ss_ext_sales_price\n         and g.ss_ext_discount_amt=n.ss_ext_discount_amt\n         and g.ss_net_paid=n.ss_net_paid\n         and g.ss_net_paid_inc_tax=n.ss_net_paid_inc_tax\n         and g.ss_net_profit=n.ss_net_profit) as exact_value_matches\nfrom store_sales n\nleft join store_sales g\n  on n.ss_ticket_number = g.ss_ticket_number\n and n.ss_item_sk = g.ss_item_sk\nwhere n.ss_sold_date_sk is null"
+                },
+                "output": {
+                  "ref": "r11",
+                  "result": {
+                    "columns": [
+                      "null_rows",
+                      "same_ticket_item_matches",
+                      "exact_value_matches"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "10305",
+                        "10305",
+                        "10305"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as ymd_rows,\n       count(*) filter (where g.ss_ticket_number is not null) as matched\nfrom store_sales b\nleft join store_sales g\n  on b.ss_ticket_number = g.ss_ticket_number + 1000000000\n and b.ss_item_sk = g.ss_item_sk\n and b.ss_quantity = g.ss_quantity\n and b.ss_sales_price = g.ss_sales_price\n and b.ss_ext_sales_price = g.ss_ext_sales_price\n and b.ss_ext_discount_amt = g.ss_ext_discount_amt\n and b.ss_net_paid = g.ss_net_paid\n and b.ss_net_paid_inc_tax = g.ss_net_paid_inc_tax\n and b.ss_net_profit = g.ss_net_profit\nwhere b.ss_sold_date_sk between 20020901 and 20020930"
+                },
+                "output": {
+                  "ref": "r12",
+                  "result": {
+                    "columns": [
+                      "ymd_rows",
+                      "matched"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "27095",
+                        "27095"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              }
+            ]
+          }
+        ],
+        "learning_publications": [
+          {
+            "task": "M1-L1",
+            "event": "promoted",
+            "failed_gate": null,
+            "reason": null
+          },
+          {
+            "task": "M1-L2",
+            "event": "corroborated",
+            "failed_gate": null,
+            "reason": null
+          },
+          {
+            "task": "M3-L1",
+            "event": "promoted",
+            "failed_gate": null,
+            "reason": null
+          },
+          {
+            "task": "M3-L2",
+            "event": "promoted",
+            "failed_gate": null,
+            "reason": null
+          },
+          {
+            "task": "M5-L1",
+            "event": "candidate",
+            "failed_gate": "G7",
+            "reason": "结果 13532799.00 与期望 Num(2754299.6) 不一致"
+          },
+          {
+            "task": "M5-L2",
+            "event": "promoted",
+            "failed_gate": null,
+            "reason": null
+          }
+        ]
+      },
+      "extra": {
+        "run_metric": {
+          "attempted": 5,
+          "executed": 5
+        },
+        "run_metric_forms": {
+          "diff": 3,
+          "rank_month": 1,
+          "peak_rise": 1
+        },
+        "failures": [],
+        "learning_publications": []
+      }
+    },
+    "tpch": {
+      "base": {
+        "run_metric": {
+          "attempted": 16,
+          "executed": 16
+        },
+        "run_metric_forms": {
+          "single": 16
+        },
+        "failures": [
+          {
+            "phase": "append",
+            "task": "M1-P1",
+            "ask": {
+              "kind": "single",
+              "period": {
+                "m1": 9,
+                "m2": 9,
+                "year": 1997
+              }
+            },
+            "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+            "answer": "2715413679.62",
+            "gold": "5430827359.2370",
+            "outcome": "wrong",
+            "error": null,
+            "executions": [
+              {
+                "tool": "run_metric",
+                "input": {
+                  "ask": {
+                    "kind": "single",
+                    "period": {
+                      "m1": 9,
+                      "m2": 9,
+                      "year": 1997
+                    }
+                  },
+                  "key": "metric:发货净收入",
+                  "revision": 0
+                },
+                "output": {
+                  "metric": {
+                    "key": "metric:发货净收入",
+                    "revision": 0
+                  },
+                  "ref": "r1",
+                  "result": {
+                    "columns": [
+                      "value"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "5430827359.2370"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "snapshot": {
+                    "checks_reused": 2,
+                    "checks_run": 0,
+                    "versions": {
+                      "customer": 0,
+                      "lineitem": 1,
+                      "nation": 0,
+                      "orders": 0,
+                      "part": 0,
+                      "region": 0,
+                      "supplier": 0
+                    }
+                  },
+                  "source": "snapshot",
+                  "sql": "select sum(l_extendedprice * (1 - l_discount)) as value from lineitem where lineitem.l_shipdate >= date '1997-09-01' and lineitem.l_shipdate < date '1997-10-01'"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as rows, count(distinct (l_orderkey, l_linenumber)) as distinct_keys from lineitem where l_shipdate >= date '1997-09-01' and l_shipdate < date '1997-10-01'"
+                },
+                "output": {
+                  "ref": "r2",
+                  "result": {
+                    "columns": [
+                      "rows",
+                      "distinct_keys"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "149752",
+                        "149752"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select round(sum(l_extendedprice * (1 - l_discount)), 2) as v from lineitem where l_shipdate >= date '1997-09-01' and l_shipdate < date '1997-10-01'"
+                },
+                "output": {
+                  "ref": "r3",
+                  "result": {
+                    "columns": [
+                      "v"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "5430827359.24"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as total_rows, count(distinct (l_orderkey,l_linenumber)) as distinct_rows, min(l_shipdate) as mn, max(l_shipdate) as mx from lineitem"
+                },
+                "output": {
+                  "ref": "r4",
+                  "result": {
+                    "columns": [
+                      "total_rows",
+                      "distinct_rows",
+                      "mn",
+                      "mx"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "6076091",
+                        "6076091",
+                        "1992-01-02",
+                        "1998-12-01"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as grp_cnt, sum(c) as total_rows from (select l_orderkey, l_partkey, l_suppkey, l_quantity, l_extendedprice, l_discount, l_shipdate, l_commitdate, l_receiptdate, count(*) as c from lineitem group by 1,2,3,4,5,6,7,8,9 having count(*) > 1) t"
+                },
+                "output": {
+                  "ref": "r5",
+                  "result": {
+                    "columns": [
+                      "grp_cnt",
+                      "total_rows"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "74876",
+                        "149752"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select round(sum(l_extendedprice*(1-l_discount)),2) as dedup_sum, count(*) as rows\nfrom (select distinct l_orderkey, l_partkey, l_suppkey, l_quantity, l_extendedprice, l_discount, l_shipdate, l_commitdate, l_receiptdate from lineitem where l_shipdate >= date '1997-09-01' and l_shipdate < date '1997-10-01') t"
+                },
+                "output": {
+                  "ref": "r6",
+                  "result": {
+                    "columns": [
+                      "dedup_sum",
+                      "rows"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "2715413679.62",
+                        "74876"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select min(l_shipdate) as mn, max(l_shipdate) as mx, count(*) as rows_with_dup_linenum from (\n select l_orderkey, l_partkey, l_suppkey, l_quantity, l_extendedprice, l_discount, l_shipdate, l_commitdate, l_receiptdate,\n        count(*) as c, count(distinct l_linenumber) as dln\n from lineitem group by 1,2,3,4,5,6,7,8,9 having count(*)>1) t"
+                },
+                "output": {
+                  "ref": "r7",
+                  "result": {
+                    "columns": [
+                      "mn",
+                      "mx",
+                      "rows_with_dup_linenum"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "1997-09-01",
+                        "1997-09-30",
+                        "74876"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              }
+            ]
+          },
+          {
+            "phase": "append",
+            "task": "M3-P1",
+            "ask": {
+              "kind": "single",
+              "period": {
+                "m1": 9,
+                "m2": 9,
+                "year": 1997
+              }
+            },
+            "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+            "answer": "448273121.78",
+            "gold": "896546243.5626",
+            "outcome": "wrong",
+            "error": null,
+            "executions": [
+              {
+                "tool": "run_metric",
+                "input": {
+                  "ask": {
+                    "kind": "single",
+                    "period": {
+                      "m1": 9,
+                      "m2": 9,
+                      "year": 1997
+                    }
+                  },
+                  "key": "metric:促销商品收入",
+                  "revision": 0
+                },
+                "output": {
+                  "metric": {
+                    "key": "metric:促销商品收入",
+                    "revision": 0
+                  },
+                  "ref": "r1",
+                  "result": {
+                    "columns": [
+                      "value"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "896546243.5626"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "snapshot": {
+                    "checks_reused": 4,
+                    "checks_run": 0,
+                    "versions": {
+                      "customer": 0,
+                      "lineitem": 1,
+                      "nation": 0,
+                      "orders": 0,
+                      "part": 0,
+                      "region": 0,
+                      "supplier": 0
+                    }
+                  },
+                  "source": "snapshot",
+                  "sql": "select sum(l_extendedprice * (1 - l_discount)) as value from lineitem join part on lineitem.l_partkey = part.p_partkey where (part.p_type LIKE 'PROMO%') and lineitem.l_shipdate >= date '1997-09-01' and lineitem.l_shipdate < date '1997-10-01'"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select count(*) as total_rows, count(distinct (l_orderkey, l_linenumber)) as distinct_lines from lineitem where l_shipdate >= date '1997-09-01' and l_shipdate < date '1997-10-01'"
+                },
+                "output": {
+                  "ref": "r2",
+                  "result": {
+                    "columns": [
+                      "total_rows",
+                      "distinct_lines"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "149752",
+                        "149752"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select l_orderkey, l_linenumber, l_partkey, l_suppkey, l_quantity, l_extendedprice, l_discount, l_shipdate, l_commitdate, l_receiptdate from lineitem where l_shipdate >= date '1997-09-01' and l_shipdate < date '1997-10-01' order by l_orderkey, l_linenumber limit 20"
+                },
+                "output": {
+                  "ref": "r3",
+                  "result": {
+                    "columns": [
+                      "l_orderkey",
+                      "l_linenumber",
+                      "l_partkey",
+                      "l_suppkey",
+                      "l_quantity",
+                      "l_extendedprice",
+                      "l_discount",
+                      "l_shipdate",
+                      "l_commitdate",
+                      "l_receiptdate"
+                    ],
+                    "row_count": 20,
+                    "rows": [
+                      [
+                        "163",
+                        "1",
+                        "167545",
+                        "5094",
+                        "43.00",
+                        "69339.22",
+                        "0.01",
+                        "1997-09-19",
+                        "1997-11-19",
+                        "1997-10-03"
+                      ],
+                      [
+                        "163",
+                        "6",
+                        "190825",
+                        "5864",
+                        "20.00",
+                        "38316.40",
+                        "0.00",
+                        "1997-09-27",
+                        "1997-11-15",
+                        "1997-10-07"
+                      ],
+                      [
+                        "163",
+                        "9",
+                        "167545",
+                        "5094",
+                        "43.00",
+                        "69339.22",
+                        "0.01",
+                        "1997-09-19",
+                        "1997-11-19",
+                        "1997-10-03"
+                      ],
+                      [
+                        "163",
+                        "14",
+                        "190825",
+                        "5864",
+                        "20.00",
+                        "38316.40",
+                        "0.00",
+                        "1997-09-27",
+                        "1997-11-15",
+                        "1997-10-07"
+                      ],
+                      [
+                        "453",
+                        "4",
+                        "95748",
+                        "5749",
+                        "45.00",
+                        "78468.30",
+                        "0.10",
+                        "1997-09-18",
+                        "1997-06-29",
+                        "1997-10-14"
+                      ],
+                      [
+                        "453",
+                        "12",
+                        "95748",
+                        "5749",
+                        "45.00",
+                        "78468.30",
+                        "0.10",
+                        "1997-09-18",
+                        "1997-06-29",
+                        "1997-10-14"
+                      ],
+                      [
+                        "647",
+                        "2",
+                        "112177",
+                        "7200",
+                        "5.00",
+                        "5945.85",
+                        "0.10",
+                        "1997-09-25",
+                        "1997-09-22",
+                        "1997-10-25"
+                      ],
+                      [
+                        "647",
+                        "3",
+                        "152882",
+                        "7913",
+                        "15.00",
+                        "29023.20",
+                        "0.08",
+                        "1997-09-23",
+                        "1997-10-09",
+                        "1997-10-21"
+                      ],
+                      [
+                        "647",
+                        "10",
+                        "112177",
+                        "7200",
+                        "5.00",
+                        "5945.85",
+                        "0.10",
+                        "1997-09-25",
+                        "1997-09-22",
+                        "1997-10-25"
+                      ],
+                      [
+                        "647",
+                        "11",
+                        "152882",
+                        "7913",
+                        "15.00",
+                        "29023.20",
+                        "0.08",
+                        "1997-09-23",
+                        "1997-10-09",
+                        "1997-10-21"
+                      ],
+                      [
+                        "675",
+                        "5",
+                        "4669",
+                        "7170",
+                        "46.00",
+                        "72388.36",
+                        "0.09",
+                        "1997-09-18",
+                        "1997-10-14",
+                        "1997-10-01"
+                      ],
+                      [
+                        "675",
+                        "13",
+                        "4669",
+                        "7170",
+                        "46.00",
+                        "72388.36",
+                        "0.09",
+                        "1997-09-18",
+                        "1997-10-14",
+                        "1997-10-01"
+                      ],
+                      [
+                        "864",
+                        "3",
+                        "79304",
+                        "1812",
+                        "34.00",
+                        "43632.20",
+                        "0.03",
+                        "1997-09-14",
+                        "1997-11-04",
+                        "1997-09-21"
+                      ],
+                      [
+                        "864",
+                        "11",
+                        "79304",
+                        "1812",
+                        "34.00",
+                        "43632.20",
+                        "0.03",
+                        "1997-09-14",
+                        "1997-11-04",
+                        "1997-09-21"
+                      ],
+                      [
+                        "1252",
+                        "1",
+                        "86435",
+                        "8944",
+                        "13.00",
+                        "18478.59",
+                        "0.10",
+                        "1997-09-07",
+                        "1997-09-12",
+                        "1997-10-01"
+                      ],
+                      [
+                        "1252",
+                        "9",
+                        "86435",
+                        "8944",
+                        "13.00",
+                        "18478.59",
+                        "0.10",
+                        "1997-09-07",
+                        "1997-09-12",
+                        "1997-10-01"
+                      ],
+                      [
+                        "1413",
+                        "3",
+                        "41545",
+                        "4050",
+                        "6.00",
+                        "8919.24",
+                        "0.04",
+                        "1997-09-07",
+                        "1997-07-30",
+                        "1997-09-21"
+                      ],
+                      [
+                        "1413",
+                        "11",
+                        "41545",
+                        "4050",
+                        "6.00",
+                        "8919.24",
+                        "0.04",
+                        "1997-09-07",
+                        "1997-07-30",
+                        "1997-09-21"
+                      ],
+                      [
+                        "1477",
+                        "4",
+                        "106201",
+                        "6202",
+                        "32.00",
+                        "38630.40",
+                        "0.05",
+                        "1997-09-12",
+                        "1997-10-26",
+                        "1997-10-12"
+                      ],
+                      [
+                        "1477",
+                        "12",
+                        "106201",
+                        "6202",
+                        "32.00",
+                        "38630.40",
+                        "0.05",
+                        "1997-09-12",
+                        "1997-10-26",
+                        "1997-10-12"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              },
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select round(sum(l_extendedprice * (1 - l_discount)), 2) as promo_revenue\nfrom (\n  select distinct l_orderkey, l_partkey, l_suppkey, l_quantity, l_extendedprice, l_discount, l_shipdate, l_commitdate, l_receiptdate\n  from lineitem\n  where l_shipdate >= date '1997-09-01' and l_shipdate < date '1997-10-01'\n) l\njoin part p on l.l_partkey = p.p_partkey\nwhere p.p_type like 'PROMO%'"
+                },
+                "output": {
+                  "ref": "r4",
+                  "result": {
+                    "columns": [
+                      "promo_revenue"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "448273121.78"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              }
+            ]
+          },
+          {
+            "phase": "latekey",
+            "task": "M1-P1",
+            "ask": {
+              "kind": "single",
+              "period": {
+                "m1": 9,
+                "m2": 9,
+                "year": 1997
+              }
+            },
+            "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+            "answer": "2715413679.62",
+            "gold": "5430827359.2370",
+            "outcome": "wrong",
+            "error": null,
+            "executions": [
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select sum(l_extendedprice * (1 - l_discount)) as value from lineitem where l_shipdate >= date '1997-09-01' and l_shipdate < date '1997-10-01'"
+                },
+                "output": {
+                  "ref": "r1",
+                  "result": {
+                    "columns": [
+                      "value"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "2715413679.6185"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              }
+            ]
+          },
+          {
+            "phase": "latekey",
+            "task": "M3-P1",
+            "ask": {
+              "kind": "single",
+              "period": {
+                "m1": 9,
+                "m2": 9,
+                "year": 1997
+              }
+            },
+            "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+            "answer": "448273121.78",
+            "gold": "896546243.5626",
+            "outcome": "wrong",
+            "error": null,
+            "executions": [
+              {
+                "tool": "run_sql",
+                "input": {
+                  "sql": "select sum(li.l_extendedprice * (1 - li.l_discount)) as value, count(*) as rows from lineitem li join part p on li.l_partkey = p.p_partkey where p.p_type like 'PROMO%' and li.l_shipdate >= date '1997-09-01' and li.l_shipdate < date '1997-10-01'"
+                },
+                "output": {
+                  "ref": "r1",
+                  "result": {
+                    "columns": [
+                      "value",
+                      "rows"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "448273121.7813",
+                        "12333"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "source": "executed"
+                },
+                "status": "ok"
+              }
+            ]
+          },
+          {
+            "phase": "unit",
+            "task": "M1-P1",
+            "ask": {
+              "kind": "single",
+              "period": {
+                "m1": 9,
+                "m2": 9,
+                "year": 1997
+              }
+            },
+            "question": "1997 年 9 月的发货净收入是多少？保留两位小数。",
+            "answer": "271541367961.85",
+            "gold": "2715413679.6185",
+            "outcome": "wrong",
+            "error": null,
+            "executions": [
+              {
+                "tool": "run_metric",
+                "input": {
+                  "ask": {
+                    "kind": "single",
+                    "period": {
+                      "m1": 9,
+                      "m2": 9,
+                      "year": 1997
+                    }
+                  },
+                  "key": "metric:发货净收入",
+                  "revision": 0
+                },
+                "output": {
+                  "metric": {
+                    "key": "metric:发货净收入",
+                    "revision": 0
+                  },
+                  "ref": "r1",
+                  "result": {
+                    "columns": [
+                      "value"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "271541367961.8500"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "snapshot": {
+                    "checks_reused": 2,
+                    "checks_run": 0,
+                    "versions": {
+                      "customer": 0,
+                      "lineitem": 14,
+                      "nation": 0,
+                      "orders": 4,
+                      "part": 2,
+                      "region": 0,
+                      "supplier": 0
+                    }
+                  },
+                  "source": "snapshot",
+                  "sql": "select sum(l_extendedprice * (1 - l_discount)) as value from lineitem where lineitem.l_shipdate >= date '1997-09-01' and lineitem.l_shipdate < date '1997-10-01'"
+                },
+                "status": "ok"
+              }
+            ]
+          },
+          {
+            "phase": "unit",
+            "task": "M3-P1",
+            "ask": {
+              "kind": "single",
+              "period": {
+                "m1": 9,
+                "m2": 9,
+                "year": 1997
+              }
+            },
+            "question": "1997 年 9 月的促销商品收入是多少？保留两位小数。",
+            "answer": "44827312178.13",
+            "gold": "448273121.7813",
+            "outcome": "wrong",
+            "error": null,
+            "executions": [
+              {
+                "tool": "run_metric",
+                "input": {
+                  "ask": {
+                    "kind": "single",
+                    "period": {
+                      "m1": 9,
+                      "m2": 9,
+                      "year": 1997
+                    }
+                  },
+                  "key": "metric:促销商品收入",
+                  "revision": 0
+                },
+                "output": {
+                  "metric": {
+                    "key": "metric:促销商品收入",
+                    "revision": 0
+                  },
+                  "ref": "r1",
+                  "result": {
+                    "columns": [
+                      "value"
+                    ],
+                    "row_count": 1,
+                    "rows": [
+                      [
+                        "44827312178.1300"
+                      ]
+                    ],
+                    "truncated": false
+                  },
+                  "snapshot": {
+                    "checks_reused": 3,
+                    "checks_run": 1,
+                    "versions": {
+                      "customer": 0,
+                      "lineitem": 14,
+                      "nation": 0,
+                      "orders": 4,
+                      "part": 2,
+                      "region": 0,
+                      "supplier": 0
+                    }
+                  },
+                  "source": "snapshot",
+                  "sql": "select sum(l_extendedprice * (1 - l_discount)) as value from lineitem join part on lineitem.l_partkey = part.p_partkey where (part.p_type LIKE 'PROMO%') and lineitem.l_shipdate >= date '1997-09-01' and lineitem.l_shipdate < date '1997-10-01'"
+                },
+                "status": "ok"
+              }
+            ]
+          }
+        ],
+        "learning_publications": [
+          {
+            "task": "M1-L1",
+            "event": "promoted",
+            "failed_gate": null,
+            "reason": null
+          },
+          {
+            "task": "M1-L2",
+            "event": "corroborated",
+            "failed_gate": null,
+            "reason": null
+          },
+          {
+            "task": "M3-L1",
+            "event": "promoted",
+            "failed_gate": null,
+            "reason": null
+          },
+          {
+            "task": "M3-L2",
+            "event": "promoted",
+            "failed_gate": null,
+            "reason": null
+          },
+          {
+            "task": "M5-L1",
+            "event": "promoted",
+            "failed_gate": null,
+            "reason": null
+          },
+          {
+            "task": "M5-L2",
+            "event": "promoted",
+            "failed_gate": null,
+            "reason": null
+          }
+        ]
+      },
+      "extra": {
+        "run_metric": {
+          "attempted": 1,
+          "executed": 1
+        },
+        "run_metric_forms": {
+          "peak_rise": 1
+        },
+        "failures": [],
+        "learning_publications": []
+      }
+    }
+  }
+}

@@ -1,0 +1,2682 @@
+{
+  "study": "published-scenarios-20261030",
+  "study_status": "complete",
+  "complete_repeats": [
+    1,
+    2
+  ],
+  "protocol_sha256": "f0e14a7ae331c8b191994aa1a3236c438658bc0a1d9e445eb58c35afda4b0f64",
+  "aggregation": "Equal weight per setting, then equal weight per complete paired repeat; ranges are observed runs, not confidence intervals.",
+  "groups": {
+    "holdout": [
+      "holdout"
+    ],
+    "benign": [
+      "append",
+      "backfill",
+      "correct",
+      "addcol"
+    ],
+    "modeled": [
+      "status",
+      "revision",
+      "dupload",
+      "dimhist",
+      "latekey"
+    ],
+    "all": [
+      "holdout",
+      "append",
+      "backfill",
+      "correct",
+      "addcol",
+      "status",
+      "revision",
+      "dupload",
+      "dimhist",
+      "latekey",
+      "unit",
+      "mirror"
+    ]
+  },
+  "datasets": {
+    "synthetic": {
+      "arms": {
+        "ace": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 1,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 230,
+              "cell_seconds": 1737.766696104,
+              "priced_usage_cny": 1.21859488
+            },
+            {
+              "repeat": 2,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 1,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 223,
+              "cell_seconds": 1552.43962364,
+              "priced_usage_cny": 1.19520808
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 66.66666666666666,
+              "run_values_pct": [
+                73.33333333333333,
+                60.0
+              ],
+              "range_pct": [
+                60.0,
+                73.33333333333333
+              ]
+            },
+            "all": {
+              "accuracy_pct": 75.0,
+              "run_values_pct": [
+                75.0,
+                75.0
+              ],
+              "range_pct": [
+                75.0,
+                75.0
+              ]
+            }
+          }
+        },
+        "awm": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 5,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 5,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 1
+                  }
+                },
+                "revision": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 222,
+              "cell_seconds": 722.746986765,
+              "priced_usage_cny": 0.43661656
+            },
+            {
+              "repeat": 2,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 1,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 1
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 219,
+              "cell_seconds": 757.938686376,
+              "priced_usage_cny": 0.50934628
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 16.666666666666664,
+              "run_values_pct": [
+                0.0,
+                33.33333333333333
+              ],
+              "range_pct": [
+                0.0,
+                33.33333333333333
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 0.0,
+              "run_values_pct": [
+                0.0,
+                0.0
+              ],
+              "range_pct": [
+                0.0,
+                0.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 0.0,
+              "run_values_pct": [
+                0.0,
+                0.0
+              ],
+              "range_pct": [
+                0.0,
+                0.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 1.3888888888888886,
+              "run_values_pct": [
+                0.0,
+                2.7777777777777772
+              ],
+              "range_pct": [
+                0.0,
+                2.7777777777777772
+              ]
+            }
+          }
+        },
+        "gmemory": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 1
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 386,
+              "cell_seconds": 1192.597694462,
+              "priced_usage_cny": 0.78022618
+            },
+            {
+              "repeat": 2,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 1,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 388,
+              "cell_seconds": 1189.69943564,
+              "priced_usage_cny": 0.7539996
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 66.66666666666666,
+              "run_values_pct": [
+                66.66666666666666,
+                66.66666666666666
+              ],
+              "range_pct": [
+                66.66666666666666,
+                66.66666666666666
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 33.33333333333333,
+              "run_values_pct": [
+                33.33333333333333,
+                33.33333333333333
+              ],
+              "range_pct": [
+                33.33333333333333,
+                33.33333333333333
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 40.0,
+              "run_values_pct": [
+                46.666666666666664,
+                33.33333333333333
+              ],
+              "range_pct": [
+                33.33333333333333,
+                46.666666666666664
+              ]
+            },
+            "all": {
+              "accuracy_pct": 34.72222222222222,
+              "run_values_pct": [
+                36.11111111111111,
+                33.333333333333336
+              ],
+              "range_pct": [
+                33.333333333333336,
+                36.11111111111111
+              ]
+            }
+          }
+        },
+        "mavra": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 5,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 5,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 144,
+              "cell_seconds": 761.392683494,
+              "priced_usage_cny": 0.29076148
+            },
+            {
+              "repeat": 2,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 148,
+              "cell_seconds": 737.560305282,
+              "priced_usage_cny": 0.29619372
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 60.0,
+              "run_values_pct": [
+                60.0,
+                60.0
+              ],
+              "range_pct": [
+                60.0,
+                60.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 66.66666666666667,
+              "run_values_pct": [
+                66.66666666666667,
+                66.66666666666667
+              ],
+              "range_pct": [
+                66.66666666666667,
+                66.66666666666667
+              ]
+            }
+          }
+        }
+      }
+    },
+    "tpch": {
+      "arms": {
+        "ace": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 175,
+              "cell_seconds": 1125.006396383,
+              "priced_usage_cny": 0.7356225200000001
+            },
+            {
+              "repeat": 2,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 1,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 172,
+              "cell_seconds": 1081.504201554,
+              "priced_usage_cny": 0.74163676
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 60.0,
+              "run_values_pct": [
+                60.0,
+                60.0
+              ],
+              "range_pct": [
+                60.0,
+                60.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 77.08333333333334,
+              "run_values_pct": [
+                75.0,
+                79.16666666666667
+              ],
+              "range_pct": [
+                75.0,
+                79.16666666666667
+              ]
+            }
+          }
+        },
+        "awm": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 1,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 1,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 1,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 168,
+              "cell_seconds": 645.532275505,
+              "priced_usage_cny": 0.29365536
+            },
+            {
+              "repeat": 2,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 167,
+              "cell_seconds": 650.847214005,
+              "priced_usage_cny": 0.31144112
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 93.75,
+              "run_values_pct": [
+                87.5,
+                100.0
+              ],
+              "range_pct": [
+                87.5,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 60.0,
+              "run_values_pct": [
+                60.0,
+                60.0
+              ],
+              "range_pct": [
+                60.0,
+                60.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 72.91666666666666,
+              "run_values_pct": [
+                70.83333333333333,
+                75.0
+              ],
+              "range_pct": [
+                70.83333333333333,
+                75.0
+              ]
+            }
+          }
+        },
+        "gmemory": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 244,
+              "cell_seconds": 855.876297381,
+              "priced_usage_cny": 0.34785572
+            },
+            {
+              "repeat": 2,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 1,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 253,
+              "cell_seconds": 918.946296581,
+              "priced_usage_cny": 0.36915552
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 65.0,
+              "run_values_pct": [
+                60.0,
+                70.0
+              ],
+              "range_pct": [
+                60.0,
+                70.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 77.08333333333334,
+              "run_values_pct": [
+                75.0,
+                79.16666666666667
+              ],
+              "range_pct": [
+                75.0,
+                79.16666666666667
+              ]
+            }
+          }
+        },
+        "mavra": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 113,
+              "cell_seconds": 3081.091441916,
+              "priced_usage_cny": 0.22508683999999998
+            },
+            {
+              "repeat": 2,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 1,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 114,
+              "cell_seconds": 2226.60209617,
+              "priced_usage_cny": 0.1760028
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0,
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 75.0,
+              "run_values_pct": [
+                80.0,
+                70.0
+              ],
+              "range_pct": [
+                70.0,
+                80.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 81.25,
+              "run_values_pct": [
+                83.33333333333333,
+                79.16666666666667
+              ],
+              "range_pct": [
+                79.16666666666667,
+                83.33333333333333
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "cost": {
+    "authorization_cny": 20.0,
+    "upper_cny": 17.39397484000004,
+    "priced_usage_cny": 8.69698742,
+    "account_decrease_observed_cny": 8.650000000000006,
+    "requests": 3378,
+    "http_errors": 0,
+    "models": {
+      "deepseek-flash": 3378
+    },
+    "includes": "all requests, memory, extraction, optimization, retries and incomplete attempts"
+  },
+  "incomplete_attempts": [
+    "synthetic-r1-gmemory",
+    "tpch-r1-gmemory"
+  ],
+  "verified_memory_profiles": {
+    "awm": 116,
+    "gmemory": 778
+  },
+  "scored_tasks": 368,
+  "learning_tasks": 96
+}

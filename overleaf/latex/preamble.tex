@@ -18,7 +18,9 @@
 \newtheorem{proposition}{Proposition}
 \newtheorem{lemma}{Lemma}
 \usepackage{balance}
-\usepackage{cite}
+% List each citation number inside one pair of brackets: [7, 8, 9, 10].
+\usepackage[nocompress]{cite}
+\renewcommand{\citepunct}{,\penalty\citepunctpenalty\ }
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \providecommand{\Description}[1]{}
@@ -87,6 +89,7 @@
 \input{gen/mechanism}
 \input{gen/relbench}
 \input{gen/relbench-table}
+\input{gen/published-scenarios}
 % Macros of runs still in progress: the generated files override these once the numbers exist.
 \providecommand{\RpTableCorrect}{--}\providecommand{\RpTableWrong}{--}\providecommand{\RpTableNeeded}{--}
 \providecommand{\RpTableUnneeded}{--}\providecommand{\RpTableDB}{--}

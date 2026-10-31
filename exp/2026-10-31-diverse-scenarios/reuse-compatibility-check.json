@@ -1,0 +1,37 @@
+{
+  "status": "passed",
+  "control_cells": [
+    {
+      "cell": "synthetic-r1-ace-a2",
+      "questions": 32,
+      "legacy_feedback_exactly_unchanged": true
+    },
+    {
+      "cell": "synthetic-r1-awm",
+      "questions": 32,
+      "legacy_feedback_exactly_unchanged": true
+    },
+    {
+      "cell": "synthetic-r1-gmemory",
+      "questions": 32,
+      "legacy_feedback_exactly_unchanged": true
+    },
+    {
+      "cell": "tpch-r1-ace-a2",
+      "questions": 26,
+      "legacy_feedback_exactly_unchanged": true
+    },
+    {
+      "cell": "tpch-r1-awm",
+      "questions": 26,
+      "legacy_feedback_exactly_unchanged": true
+    },
+    {
+      "cell": "tpch-r1-gmemory",
+      "questions": 26,
+      "legacy_feedback_exactly_unchanged": true
+    }
+  ],
+  "controls_full_rich_trace_and_feedback_verified": true,
+  "source_shared_sqlscope_unchanged": true
+}

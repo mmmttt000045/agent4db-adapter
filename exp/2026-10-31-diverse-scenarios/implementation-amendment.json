@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-31T08:09:38.933135+00:00",
+  "implementation_revision": 3,
+  "reason": "Allow five analytical Ask forms in the adapter task-file timestamp metadata, rather than assuming a single period",
+  "changed_source_hashes": {
+    "exp/2026-10-31-diverse-scenarios/run-study.py": "a580c4faf89c61b1cbdcb940117c9a829bd8b5143094976228a703377f7b8ee0",
+    "exp/2026-10-31-diverse-scenarios/offline-smoke.py": "0b50005133aa13eafa08cba3821bf982c52fc7feb550690eb1367d51af277dd2",
+    "exp/2026-10-31-diverse-scenarios/prepare-study.py": "070e479a61f2ed04004e27341e06cee44c44d6b96bfee880a1f3ce4bb02a2b22",
+    "exp/2026-10-31-diverse-scenarios/memory-service.py": "e84b0c4c15d1c8a3aebbfb2d325518f10c0ebb2a4eaa37dd418caa7df27297bc"
+  },
+  "protocol_unchanged": true,
+  "native_binary_unchanged": true,
+  "published_upstream_unchanged": true,
+  "all_five_forms_tested_on_all_four_memory_arms": true,
+  "selection_rule": "All initial interrupted cells excluded; all their fees retained; common question bank and eleven scenarios unchanged"
+}

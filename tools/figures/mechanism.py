@@ -82,9 +82,9 @@ def figure_a(lang):
 
 
 def figure_b(lang):
-    fig = mplstyle.figure(84.6, 89)
-    axes = fig.subplots(2, 2, sharey='row')
-    fig.subplots_adjust(left=.17, right=.98, top=.84, bottom=.13, hspace=.60, wspace=.35)
+    fig = mplstyle.figure(84.6, 44)
+    axes = fig.subplots(1, 2, sharey=True)
+    fig.subplots_adjust(left=.17, right=.98, top=.82, bottom=.20, wspace=.35)
     marks = {'definition': 's', 'definition-cache': '^', 'condition': 'o'}
     lines = {'definition': ':', 'definition-cache': '--', 'condition': '-'}
     names = {'definition': bilingual(lang, 'Full recheck', '全量重查'),
@@ -93,28 +93,22 @@ def figure_b(lang):
         for policy in marks:
             pts = [next(r for r in S['B']['groups'] if r['arrival'] == arrival and r['policy'] == policy
                         and r['reuse_factor'] == k) for k in [1, 2, 4, 8]]
-            for row, metric, mult in [(0, 'paired_db_ratio', 100), (1, 'validation_queries', 1)]:
+            for metric, mult in [('paired_db_ratio', 100)]:
                 vals = [r[metric]['median']*mult for r in pts]
                 errs = [[(r[metric]['median']-r[metric]['min'])*mult for r in pts],
                         [(r[metric]['max']-r[metric]['median'])*mult for r in pts]]
-                axes[row, col].errorbar([1, 2, 4, 8], vals, yerr=errs, color=mplstyle.color(policy),
+                axes[col].errorbar([1, 2, 4, 8], vals, yerr=errs, color=mplstyle.color(policy),
                     marker=marks[policy], ls=lines[policy], mfc='white', mew=.6, capsize=1.8,
                     elinewidth=.6, label=names[policy])
-        for row in range(2):
-            ax = axes[row, col]
-            name = bilingual(lang, 'Staggered' if col == 0 else 'Simultaneous', '交错到达' if col == 0 else '同时到达')
-            measure = bilingual(lang, 'time' if row == 0 else 'queries', '耗时' if row == 0 else '查询数')
-            ax.set_title(f"({'abcd'[row*2+col]}) {name}", fontsize=6.5)
-            ax.set(xticks=[1, 2, 4, 8])
-            ax.set_ylim(0, 215 if row == 0 else 105)
-            ax.set_yticks([0, 100, 200] if row == 0 else [0, 50, 100])
-            ax.tick_params(labelleft=True, labelsize=6.5)
-            ax.grid(axis='y')
-            if row == 1:
-                ax.set_xlabel(bilingual(lang, 'Sharing factor', '共享因子'), fontsize=7)
-    axes[0, 0].set_ylabel(bilingual(lang, 'DB time / full (%)', 'DB 耗时／全量重查（%）'), fontsize=7)
-    axes[1, 0].set_ylabel(bilingual(lang, 'Validation queries', '验证 SQL 次数'), fontsize=7)
-    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc='upper center',
+        ax = axes[col]
+        name = bilingual(lang, 'Staggered' if col == 0 else 'Simultaneous', '交错到达' if col == 0 else '同时到达')
+        ax.set_title(f"({'ab'[col]}) {name}", fontsize=6.5)
+        ax.set(xticks=[1, 2, 4, 8], ylim=(0, 215), yticks=[0, 100, 200])
+        ax.tick_params(labelleft=True, labelsize=6.5)
+        ax.grid(axis='y')
+        ax.set_xlabel(bilingual(lang, 'Sharing factor', '共享因子'), fontsize=7)
+    axes[0].set_ylabel(bilingual(lang, 'DB time / full (%)', 'DB 耗时／全量重查（%）'), fontsize=7)
+    fig.legend(*axes[0].get_legend_handles_labels(), loc='upper center',
                bbox_to_anchor=(.54, .99), ncol=3, handlelength=1.6, fontsize=6.5, columnspacing=.7)
     return fig
 

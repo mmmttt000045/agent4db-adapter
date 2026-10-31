@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "owned_failed_debug_databases_removed": [
+    "agentdb_scope_2580403_1793432137033500",
+    "agentdb_scope_2581307_1793432248973673"
+  ],
+  "ownership": "Exact failed-test parent PIDs/timestamps and fixture schemas/rows verified; release and expanded-stack debug tests passed and cleaned their own databases."
+}

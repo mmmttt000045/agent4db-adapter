@@ -1,0 +1,1556 @@
+{
+  "study": "corrected-scenarios-20261031",
+  "study_status": "complete",
+  "complete_repeats": [
+    1
+  ],
+  "protocol_sha256": "8bb72dd73b87523e0b6cc37f9674d6bc24397e1e61783e6cf0c2f0a513833f5d",
+  "aggregation": "Equal weight per setting, then equal weight per complete paired repeat; ranges are observed runs, not confidence intervals.",
+  "groups": {
+    "holdout": [
+      "holdout"
+    ],
+    "benign": [
+      "append",
+      "backfill",
+      "correct",
+      "addcol"
+    ],
+    "modeled": [
+      "status",
+      "revision",
+      "dupload",
+      "dimhist",
+      "latekey"
+    ],
+    "all": [
+      "holdout",
+      "append",
+      "backfill",
+      "correct",
+      "addcol",
+      "status",
+      "revision",
+      "dupload",
+      "dimhist",
+      "latekey",
+      "unit",
+      "mirror"
+    ]
+  },
+  "datasets": {
+    "synthetic": {
+      "arms": {
+        "ace": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 194,
+              "cell_seconds": 1554.917887965,
+              "priced_usage_cny": 1.15828088
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 73.33333333333333,
+              "run_values_pct": [
+                73.33333333333333
+              ],
+              "range_pct": [
+                73.33333333333333,
+                73.33333333333333
+              ]
+            },
+            "all": {
+              "accuracy_pct": 77.77777777777779,
+              "run_values_pct": [
+                77.77777777777779
+              ],
+              "range_pct": [
+                77.77777777777779,
+                77.77777777777779
+              ]
+            }
+          }
+        },
+        "awm": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 186,
+              "cell_seconds": 866.68015338,
+              "priced_usage_cny": 0.57639732
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 75.0,
+              "run_values_pct": [
+                75.0
+              ],
+              "range_pct": [
+                75.0,
+                75.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 80.0,
+              "run_values_pct": [
+                80.0
+              ],
+              "range_pct": [
+                80.0,
+                80.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 72.22222222222221,
+              "run_values_pct": [
+                72.22222222222221
+              ],
+              "range_pct": [
+                72.22222222222221,
+                72.22222222222221
+              ]
+            }
+          }
+        },
+        "gmemory": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 1,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 377,
+              "cell_seconds": 1287.830529821,
+              "priced_usage_cny": 0.8469492
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 66.66666666666666,
+              "run_values_pct": [
+                66.66666666666666
+              ],
+              "range_pct": [
+                66.66666666666666,
+                66.66666666666666
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 33.33333333333333,
+              "run_values_pct": [
+                33.33333333333333
+              ],
+              "range_pct": [
+                33.33333333333333,
+                33.33333333333333
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 40.0,
+              "run_values_pct": [
+                40.0
+              ],
+              "range_pct": [
+                40.0,
+                40.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 33.333333333333336,
+              "run_values_pct": [
+                33.333333333333336
+              ],
+              "range_pct": [
+                33.333333333333336,
+                33.333333333333336
+              ]
+            }
+          }
+        },
+        "mavra": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 3,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 1,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 170,
+              "cell_seconds": 856.06570884,
+              "priced_usage_cny": 0.39886416
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 80.0,
+              "run_values_pct": [
+                80.0
+              ],
+              "range_pct": [
+                80.0,
+                80.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 86.11111111111113,
+              "run_values_pct": [
+                86.11111111111113
+              ],
+              "range_pct": [
+                86.11111111111113,
+                86.11111111111113
+              ]
+            }
+          }
+        }
+      }
+    },
+    "tpch": {
+      "arms": {
+        "ace": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 141,
+              "cell_seconds": 916.971084745,
+              "priced_usage_cny": 0.61894184
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 40.0,
+              "run_values_pct": [
+                40.0
+              ],
+              "range_pct": [
+                40.0,
+                40.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 66.66666666666667,
+              "run_values_pct": [
+                66.66666666666667
+              ],
+              "range_pct": [
+                66.66666666666667,
+                66.66666666666667
+              ]
+            }
+          }
+        },
+        "awm": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 1,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 133,
+              "cell_seconds": 632.161543434,
+              "priced_usage_cny": 0.26354792
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 70.0,
+              "run_values_pct": [
+                70.0
+              ],
+              "range_pct": [
+                70.0,
+                70.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 87.5,
+              "run_values_pct": [
+                87.5
+              ],
+              "range_pct": [
+                87.5,
+                87.5
+              ]
+            }
+          }
+        },
+        "gmemory": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 242,
+              "cell_seconds": 892.885709624,
+              "priced_usage_cny": 0.34857132
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 80.0,
+              "run_values_pct": [
+                80.0
+              ],
+              "range_pct": [
+                80.0,
+                80.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 83.33333333333333,
+              "run_values_pct": [
+                83.33333333333333
+              ],
+              "range_pct": [
+                83.33333333333333,
+                83.33333333333333
+              ]
+            }
+          }
+        },
+        "mavra": {
+          "runs": [
+            {
+              "repeat": 1,
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "append": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dupload": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 0,
+                    "wrong": 2,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "unit": {
+                  "correct": 1,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 1,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1,
+                    "wrong": 0,
+                    "error": 0,
+                    "clarify": 0
+                  }
+                }
+              },
+              "requests": 131,
+              "cell_seconds": 1718.56310103,
+              "priced_usage_cny": 0.27567072
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 75.0,
+              "run_values_pct": [
+                75.0
+              ],
+              "range_pct": [
+                75.0,
+                75.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 80.0,
+              "run_values_pct": [
+                80.0
+              ],
+              "range_pct": [
+                80.0,
+                80.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 79.16666666666667,
+              "run_values_pct": [
+                79.16666666666667
+              ],
+              "range_pct": [
+                79.16666666666667,
+                79.16666666666667
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "feedback_policy": "All four planners receive the same bounded format of their own previous questions, answers, SQL, observations and binary correctness. ACE/AWM/G-Memory retain their published update algorithms; MAVRA retains native publication/maintenance. No gold SQL/value, hidden change label, or other method trace is exposed.",
+  "repairs": [
+    "AST-bound query-local uniqueness proofs for filtered/derived inputs and correlated EXISTS; keep base-table counterexamples",
+    "Unavailable definitions retain attributed business semantics and explicitly invalid historical mappings; execution is still denied"
+  ],
+  "cost": {
+    "authorization_cny": 20.0,
+    "upper_cny": 14.307716460000002,
+    "priced_usage_cny": 14.307716459999998,
+    "prior_usage_floor_cny": 8.69698742,
+    "incremental_usage_cny": 5.61072904,
+    "cumulative_requests": 5144,
+    "account_decrease_observed_cny": 14.300000000000011,
+    "requests": 1766,
+    "http_errors": 0,
+    "models": {
+      "deepseek-flash": 1766
+    },
+    "includes": "all requests, memory, extraction, optimization, retries and incomplete attempts"
+  },
+  "superseded_implementation_cells": [
+    "synthetic-r1-ace"
+  ],
+  "implementation_revision": 2,
+  "incomplete_attempts": [
+    "tpch-r1-ace"
+  ],
+  "verified_memory_profiles": {
+    "awm": 58,
+    "gmemory": 385
+  },
+  "scored_tasks": 184,
+  "learning_tasks": 48
+}

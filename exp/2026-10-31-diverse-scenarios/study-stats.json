@@ -1,0 +1,1534 @@
+{
+  "study": "paired-reuse-20261031",
+  "study_status": "complete",
+  "implementation_revision": 4,
+  "complete_repeats": [
+    1
+  ],
+  "selected_extra_count": 3,
+  "groups": {
+    "holdout": [
+      "holdout"
+    ],
+    "benign": [
+      "append",
+      "backfill",
+      "correct",
+      "addcol"
+    ],
+    "modeled": [
+      "status",
+      "revision",
+      "dupload",
+      "dimhist",
+      "latekey"
+    ],
+    "novel": [
+      "holdout-extra"
+    ],
+    "all": [
+      "holdout",
+      "append",
+      "backfill",
+      "correct",
+      "addcol",
+      "status",
+      "revision",
+      "dupload",
+      "dimhist",
+      "latekey",
+      "unit",
+      "mirror",
+      "holdout-extra"
+    ]
+  },
+  "display_groups": [
+    "benign",
+    "modeled",
+    "novel",
+    "all"
+  ],
+  "aggregation": "Equal independent setting weights. Original heldout and the new question branch are separate settings. All original failures retained. If X=0, retain the original12-setting aggregation and display.",
+  "datasets": {
+    "synthetic": {
+      "arms": {
+        "ace": {
+          "runs": [
+            {
+              "repeat": 1,
+              "source": "unchanged frozen control",
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "append": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 1,
+                    "correct": 2
+                  }
+                },
+                "dupload": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 3
+                  }
+                },
+                "unit": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 1,
+                    "correct": 2
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "wrong": 1
+                  }
+                },
+                "holdout-extra": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 1,
+                    "correct": 2
+                  }
+                }
+              }
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 73.33333333333333,
+              "run_values_pct": [
+                73.33333333333333
+              ],
+              "range_pct": [
+                73.33333333333333,
+                73.33333333333333
+              ]
+            },
+            "novel": {
+              "accuracy_pct": 66.66666666666666,
+              "run_values_pct": [
+                66.66666666666666
+              ],
+              "range_pct": [
+                66.66666666666666,
+                66.66666666666666
+              ]
+            },
+            "all": {
+              "accuracy_pct": 76.92307692307692,
+              "run_values_pct": [
+                76.92307692307692
+              ],
+              "range_pct": [
+                76.92307692307692,
+                76.92307692307692
+              ]
+            }
+          },
+          "extra_usage": {
+            "questions": 3,
+            "official_calls": 18,
+            "prompt_tokens": 54586,
+            "output_tokens": 17694,
+            "total_tokens": 72280,
+            "priced_cny": 0.094002,
+            "includes": "Fresh consumer planning and normal published memory updates; cached source replay excluded."
+          }
+        },
+        "awm": {
+          "runs": [
+            {
+              "repeat": 1,
+              "source": "unchanged frozen control",
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "append": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 3
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "revision": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "dupload": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 3
+                  }
+                },
+                "unit": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 1,
+                    "correct": 2
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "wrong": 1
+                  }
+                },
+                "holdout-extra": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                }
+              }
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 75.0,
+              "run_values_pct": [
+                75.0
+              ],
+              "range_pct": [
+                75.0,
+                75.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 80.0,
+              "run_values_pct": [
+                80.0
+              ],
+              "range_pct": [
+                80.0,
+                80.0
+              ]
+            },
+            "novel": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 74.35897435897435,
+              "run_values_pct": [
+                74.35897435897435
+              ],
+              "range_pct": [
+                74.35897435897435,
+                74.35897435897435
+              ]
+            }
+          },
+          "extra_usage": {
+            "questions": 3,
+            "official_calls": 18,
+            "prompt_tokens": 74279,
+            "output_tokens": 8859,
+            "total_tokens": 83138,
+            "priced_cny": 0.05464684,
+            "includes": "Fresh consumer planning and normal published memory updates; cached source replay excluded."
+          }
+        },
+        "gmemory": {
+          "runs": [
+            {
+              "repeat": 1,
+              "source": "unchanged frozen control",
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6
+                  }
+                },
+                "holdout": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1
+                  }
+                },
+                "backfill": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "wrong": 1
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1
+                  }
+                },
+                "addcol": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "wrong": 1
+                  }
+                },
+                "status": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "wrong": 1
+                  }
+                },
+                "revision": {
+                  "correct": 1,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 2,
+                    "correct": 1
+                  }
+                },
+                "dupload": {
+                  "correct": 2,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 2,
+                    "wrong": 1
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 3
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 3
+                  }
+                },
+                "mirror": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "wrong": 1
+                  }
+                },
+                "holdout-extra": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                }
+              }
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 66.66666666666666,
+              "run_values_pct": [
+                66.66666666666666
+              ],
+              "range_pct": [
+                66.66666666666666,
+                66.66666666666666
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 33.33333333333333,
+              "run_values_pct": [
+                33.33333333333333
+              ],
+              "range_pct": [
+                33.33333333333333,
+                33.33333333333333
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 40.0,
+              "run_values_pct": [
+                40.0
+              ],
+              "range_pct": [
+                40.0,
+                40.0
+              ]
+            },
+            "novel": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 38.46153846153846,
+              "run_values_pct": [
+                38.46153846153846
+              ],
+              "range_pct": [
+                38.46153846153846,
+                38.46153846153846
+              ]
+            }
+          },
+          "extra_usage": {
+            "questions": 3,
+            "official_calls": 27,
+            "prompt_tokens": 61474,
+            "output_tokens": 6057,
+            "total_tokens": 67531,
+            "priced_cny": 0.04807,
+            "includes": "Fresh consumer planning and normal published memory updates; cached source replay excluded."
+          }
+        },
+        "mavra": {
+          "runs": [
+            {
+              "repeat": 1,
+              "source": "fresh native",
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "append": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "correct": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "revision": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "dupload": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 3,
+                  "outcomes": {
+                    "wrong": 3
+                  }
+                },
+                "unit": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "holdout-extra": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                }
+              }
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 80.0,
+              "run_values_pct": [
+                80.0
+              ],
+              "range_pct": [
+                80.0,
+                80.0
+              ]
+            },
+            "novel": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 92.3076923076923,
+              "run_values_pct": [
+                92.3076923076923
+              ],
+              "range_pct": [
+                92.3076923076923,
+                92.3076923076923
+              ]
+            }
+          },
+          "extra_usage": {
+            "questions": 3,
+            "official_calls": 10,
+            "prompt_tokens": 40815,
+            "output_tokens": 1478,
+            "total_tokens": 42293,
+            "priced_cny": 0.01875388,
+            "includes": "Fresh consumer planning and normal published memory updates; cached source replay excluded."
+          }
+        }
+      },
+      "unique_scored_questions": 6,
+      "scored_forms": {
+        "single": 26,
+        "diff": 1,
+        "rank_month": 1,
+        "peak_rise": 1
+      }
+    },
+    "tpch": {
+      "arms": {
+        "ace": {
+          "runs": [
+            {
+              "repeat": 1,
+              "source": "unchanged frozen control",
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "status": {
+                  "correct": 0,
+                  "n": 1,
+                  "outcomes": {
+                    "wrong": 1
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "dupload": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 2
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 2
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 2
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "holdout-extra": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                }
+              }
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 40.0,
+              "run_values_pct": [
+                40.0
+              ],
+              "range_pct": [
+                40.0,
+                40.0
+              ]
+            },
+            "novel": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 69.23076923076923,
+              "run_values_pct": [
+                69.23076923076923
+              ],
+              "range_pct": [
+                69.23076923076923,
+                69.23076923076923
+              ]
+            }
+          },
+          "extra_usage": {
+            "questions": 3,
+            "official_calls": 14,
+            "prompt_tokens": 33809,
+            "output_tokens": 17492,
+            "total_tokens": 51301,
+            "priced_cny": 0.08960228,
+            "includes": "Fresh consumer planning and normal published memory updates; cached source replay excluded."
+          }
+        },
+        "awm": {
+          "runs": [
+            {
+              "repeat": 1,
+              "source": "unchanged frozen control",
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "dupload": {
+                  "correct": 1,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 1,
+                    "correct": 1
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 2
+                  }
+                },
+                "unit": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "holdout-extra": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                }
+              }
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 70.0,
+              "run_values_pct": [
+                70.0
+              ],
+              "range_pct": [
+                70.0,
+                70.0
+              ]
+            },
+            "novel": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 88.46153846153847,
+              "run_values_pct": [
+                88.46153846153847
+              ],
+              "range_pct": [
+                88.46153846153847,
+                88.46153846153847
+              ]
+            }
+          },
+          "extra_usage": {
+            "questions": 3,
+            "official_calls": 12,
+            "prompt_tokens": 28336,
+            "output_tokens": 3511,
+            "total_tokens": 31847,
+            "priced_cny": 0.02343856,
+            "includes": "Fresh consumer planning and normal published memory updates; cached source replay excluded."
+          }
+        },
+        "gmemory": {
+          "runs": [
+            {
+              "repeat": 1,
+              "source": "unchanged frozen control",
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "append": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "dupload": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 2
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 2
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "holdout-extra": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                }
+              }
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 80.0,
+              "run_values_pct": [
+                80.0
+              ],
+              "range_pct": [
+                80.0,
+                80.0
+              ]
+            },
+            "novel": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 84.61538461538461,
+              "run_values_pct": [
+                84.61538461538461
+              ],
+              "range_pct": [
+                84.61538461538461,
+                84.61538461538461
+              ]
+            }
+          },
+          "extra_usage": {
+            "questions": 3,
+            "official_calls": 21,
+            "prompt_tokens": 46006,
+            "output_tokens": 3425,
+            "total_tokens": 49431,
+            "priced_cny": 0.037377679999999996,
+            "includes": "Fresh consumer planning and normal published memory updates; cached source replay excluded."
+          }
+        },
+        "mavra": {
+          "runs": [
+            {
+              "repeat": 1,
+              "source": "fresh native",
+              "phases": {
+                "learn": {
+                  "correct": 6,
+                  "n": 6,
+                  "outcomes": {
+                    "correct": 6
+                  }
+                },
+                "holdout": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                },
+                "append": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 2
+                  }
+                },
+                "backfill": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "correct": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "addcol": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "status": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "revision": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "dupload": {
+                  "correct": 2,
+                  "n": 2,
+                  "outcomes": {
+                    "correct": 2
+                  }
+                },
+                "dimhist": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "latekey": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 2
+                  }
+                },
+                "unit": {
+                  "correct": 0,
+                  "n": 2,
+                  "outcomes": {
+                    "wrong": 2
+                  }
+                },
+                "mirror": {
+                  "correct": 1,
+                  "n": 1,
+                  "outcomes": {
+                    "correct": 1
+                  }
+                },
+                "holdout-extra": {
+                  "correct": 3,
+                  "n": 3,
+                  "outcomes": {
+                    "correct": 3
+                  }
+                }
+              }
+            }
+          ],
+          "groups": {
+            "holdout": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "benign": {
+              "accuracy_pct": 75.0,
+              "run_values_pct": [
+                75.0
+              ],
+              "range_pct": [
+                75.0,
+                75.0
+              ]
+            },
+            "modeled": {
+              "accuracy_pct": 80.0,
+              "run_values_pct": [
+                80.0
+              ],
+              "range_pct": [
+                80.0,
+                80.0
+              ]
+            },
+            "novel": {
+              "accuracy_pct": 100.0,
+              "run_values_pct": [
+                100.0
+              ],
+              "range_pct": [
+                100.0,
+                100.0
+              ]
+            },
+            "all": {
+              "accuracy_pct": 76.92307692307692,
+              "run_values_pct": [
+                76.92307692307692
+              ],
+              "range_pct": [
+                76.92307692307692,
+                76.92307692307692
+              ]
+            }
+          },
+          "extra_usage": {
+            "questions": 3,
+            "official_calls": 9,
+            "prompt_tokens": 32843,
+            "output_tokens": 1507,
+            "total_tokens": 34350,
+            "priced_cny": 0.016919,
+            "includes": "Fresh consumer planning and normal published memory updates; cached source replay excluded."
+          }
+        }
+      },
+      "unique_scored_questions": 6,
+      "scored_forms": {
+        "single": 20,
+        "diff": 1,
+        "rank_month": 1,
+        "peak_rise": 1
+      }
+    }
+  },
+  "reused_control_cells": 6,
+  "fresh_native_base_cells": 2,
+  "extra_cells": 8,
+  "feedback_policy": "Same legacy three-own-result records, declared SQL <=1800 chars and last3 SQL observations <=350 chars; run_metric outputs omit auxiliary SQL/metric fields for observation truncation. Rich assistant/tool transcripts retained for all published updates.",
+  "source_protocol_sha256": "997421a3efc9b5f9b4d5eb7075705e1e98af7ae1c5da18f0259085b375644255",
+  "extra_protocol_sha256": "6f946dce54243c23ce997e6e4df10a1b67b9deffd86455782c6c03841662f401",
+  "cost": {
+    "authorization_cny": 20,
+    "upper_cny": 19.745185940000006,
+    "priced_usage_cny": 19.7429024,
+    "prior_usage_floor_cny": 14.310000000000002,
+    "incremental_usage_cny": 5.43518594,
+    "requests": 1946,
+    "cumulative_requests": 7090,
+    "account_decrease_observed_cny": 19.720000000000013,
+    "http_errors": 0,
+    "models": {
+      "deepseek-flash": 1946
+    },
+    "includes": "All previous, invalid, interrupted, current and extra official API calls; cached paid-source replay creates no new charge."
+  },
+  "scored_tasks": 208,
+  "learning_tasks": 48,
+  "formal_tasks": 256,
+  "unique_scored_questions": 12,
+  "cached_warmup_tasks_not_scored_again": 72,
+  "joint_summary": {
+    "arms": {
+      "ace": {
+        "equal_schema_accuracy_pct": 73.07692307692307,
+        "correct": 38,
+        "n": 52,
+        "micro_accuracy_pct": 73.07692307692308
+      },
+      "awm": {
+        "equal_schema_accuracy_pct": 81.41025641025641,
+        "correct": 41,
+        "n": 52,
+        "micro_accuracy_pct": 78.84615384615384
+      },
+      "gmemory": {
+        "equal_schema_accuracy_pct": 61.53846153846153,
+        "correct": 32,
+        "n": 52,
+        "micro_accuracy_pct": 61.53846153846154
+      },
+      "mavra": {
+        "equal_schema_accuracy_pct": 84.61538461538461,
+        "correct": 43,
+        "n": 52,
+        "micro_accuracy_pct": 82.6923076923077
+      }
+    },
+    "weighting": "Equal weight for both schemas and all thirteen settings within each schema.",
+    "status": "Descriptive summary added after execution; not a new preregistered endpoint. All methods, schemas, settings and failed answers retained.",
+    "statistical_significance_claim": false
+  },
+  "transfer_summary": {
+    "arms": {
+      "ace": {
+        "questions": 6,
+        "correct": 5,
+        "official_calls": 32,
+        "total_tokens": 123581,
+        "priced_cny": 0.18360428
+      },
+      "awm": {
+        "questions": 6,
+        "correct": 6,
+        "official_calls": 30,
+        "total_tokens": 114985,
+        "priced_cny": 0.0780854
+      },
+      "gmemory": {
+        "questions": 6,
+        "correct": 6,
+        "official_calls": 48,
+        "total_tokens": 116962,
+        "priced_cny": 0.08544768
+      },
+      "mavra": {
+        "questions": 6,
+        "correct": 6,
+        "official_calls": 19,
+        "total_tokens": 76643,
+        "priced_cny": 0.035672880000000004
+      }
+    },
+    "fewest_call_baseline": "awm",
+    "call_reduction_pct": 36.66666666666667,
+    "scope": "Fresh additional queries and all normal online memory updates; original source learning excluded for every method. Whole-method comparison, not a representation ablation.",
+    "token_reduction_pct": 33.345218941601075,
+    "token_reduction_pct_baseline": "awm",
+    "priced_cost_reduction_pct": 54.31555706956741,
+    "priced_cost_reduction_pct_baseline": "awm"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-31T11:45:33.502843+00:00",
+  "account_decrease_cny": 19.720000000000013,
+  "cumulative_usage_upper_cny": 19.745185940000006,
+  "prior_usage_floor_cny": 14.310000000000002,
+  "incremental_usage_cny": 5.435185940000004,
+  "requests": 1946,
+  "cumulative_requests": 7090,
+  "spending_authorization_cny": 20,
+  "status": "closed_no_more_model_calls"
+}

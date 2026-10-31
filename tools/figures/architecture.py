@@ -425,9 +425,9 @@ def draw(s, lang):
         yy = fy + 2.9 + 2.7 * k
         mark(fx + 1.4, yy - .55, 'ok')
         text(fx + 2.8, yy, label, NOTE, INK, width=fw - 3.4)
-    # Feature compilation excludes events at/after each seed's cutoff.
+    # Feature compilation includes the seed cutoff and excludes later events.
     text(ex + 1.8, ey + 23.0, L['feature'], NOTE, INK, 'bold')
-    text(ex + ew - 1.8, ey + 23.0, '$t < t_i$', NOTE, EXEC_C, align='right')
+    text(ex + ew - 1.8, ey + 23.0, '$t \\leq t_i$', NOTE, EXEC_C, align='right')
     axis_y, cutoff = ey + 27.5, ex + 20.0
     rect(ex + 2.0, axis_y - 1.0, cutoff - ex - 2.0, 2.0, AMBER_PALE, None, r=.3)
     s.line(ex + 2.0, axis_y, ex + ew - 1.8, axis_y, RULE, .18)

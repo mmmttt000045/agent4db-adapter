@@ -1,13 +1,4 @@
 \section{\bt{Discussion and Conclusion}{讨论与结论}}
 \label{sec:limitations}
-\bi{\system\ introduces a shared executable memory layer that turns successful data-agent explorations into parameterized metric and feature definitions coupled with verifiable data conditions. By sharing version-keyed check results, deterministic grain repairs, and equivalent query rewrites, and binding metric execution to a checked snapshot, \system\ amortizes discovery, validation, and maintenance across agents as data evolve. Across TPC-DS and RelBench, \system\ cuts token consumption by up to \PpMavraTokSaveNone\% on analytical workloads and \RbStackMavraTokSave\% during multi-cutoff predictive reuse while preserving accuracy after data restatements.}
-{\system{}提出共享可执行记忆层，将成功的数据智能体探索转化为带有可验证数据条件的参数化指标与特征定义。通过共享版本键检查结果、确定性粒度修复和等价查询改写，并将指标执行绑定到已检查的快照，\system{}在数据演化时跨智能体分摊探索、验证与维护。在TPC-DS和RelBench上，\system{}分别在分析负载和多截点预测复用中将token减少最多\PpMavraTokSaveNone\%和\RbStackMavraTokSave\%，并在数据更正后保持正确率。}
-
-\bi{\emph{Future work.} We plan to support role-playing and many-to-many joins, incremental feature maintenance, and explicit unit, source-of-record, and distribution-shift checks.}
-{\emph{未来工作。}我们计划支持同表多角色与多对多连接、特征增量维护，以及显式量纲、权威来源和分布漂移检查。}
-
-\section*{\bt{Acknowledgment of AI-Generated Content}{AI 生成内容声明}}
-% ICDE 2027 requires this section (not counted in the 12 pages). The authors must confirm the wording below before submission.
-% Disclosure scope follows https://icde2027.github.io/cf-research-papers (checked 2026-10-23).
-\bi{Evaluated agents use \llmmodel{}. Claude and ChatGPT assisted with coding, analysis, figures, and editing under author direction. The authors verified the work and take responsibility for it.\looseness=-1}
-{受评估智能体使用 \llmmodel{}。在作者指导下，Claude 和 ChatGPT 辅助编码、分析、绘图与编辑。作者核实并负责全部工作。}
+\bi{\system{} shares learned executable definitions, versioned checks, repairs, and rewrites across agents, with metric execution bound to a checked snapshot. TPC-DS analytical workloads and RelBench predictive reuse save up to \PpMavraTokSaveNone\% and \RbStackMavraTokSave\% tokens, respectively, while maintaining accuracy after restatements. Future work covers role-playing/many-to-many joins, incremental features, and unit, source-of-record, and distribution-shift checks.}
+{\system{} 在智能体间共享学得的可执行定义、版本化检查、修复与改写，指标执行绑定已核验快照。TPC-DS 分析负载与 RelBench 预测复用分别节省最多 \PpMavraTokSaveNone\% 和 \RbStackMavraTokSave\% token，并在更正后保持正确率。后续扩展包括同表多角色／多对多连接、增量特征，以及量纲、权威来源和分布漂移检查。}

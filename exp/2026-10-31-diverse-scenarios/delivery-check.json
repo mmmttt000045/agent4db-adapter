@@ -1,0 +1,207 @@
+{
+  "status": "passed",
+  "implementation_revision": 4,
+  "formal_tasks": 256,
+  "scored_tasks": 208,
+  "learning_tasks": 48,
+  "unique_scored_questions": 12,
+  "reused_baseline_cells": 6,
+  "fresh_native_base_cells": 2,
+  "fresh_extra_cells": 8,
+  "verified_new_raw_files": 684,
+  "verified_source_control_files": 492,
+  "cumulative_requests": 7090,
+  "cost": {
+    "authorization_cny": 20,
+    "upper_cny": 19.745185940000006,
+    "priced_usage_cny": 19.7429024,
+    "prior_usage_floor_cny": 14.310000000000002,
+    "incremental_usage_cny": 5.43518594,
+    "requests": 1946,
+    "cumulative_requests": 7090,
+    "account_decrease_observed_cny": 19.720000000000013,
+    "http_errors": 0,
+    "models": {
+      "deepseek-flash": 1946
+    },
+    "includes": "All previous, invalid, interrupted, current and extra official API calls; cached paid-source replay creates no new charge."
+  },
+  "feedback_check": "All eight base journals, all eight extra journals, paid-call update inputs, common questions and reference hashes passed.",
+  "source_check": "37 base-frozen files, 38 extra-frozen files, 49 extra-archive files, 17 protected data inputs and 206 published cores/harness files unchanged.",
+  "fonts": {
+    "overleaf/figures/two-schemas.pdf": {
+      "pages": 1,
+      "size_mm": [
+        84.59999999998332,
+        54.999999999991665
+      ],
+      "font_types": [
+        "/Type0"
+      ],
+      "all_used_fonts_embedded": true,
+      "used_fonts": 1,
+      "type3": false,
+      "unembedded_unused_resources": [],
+      "unused_resource_note": ""
+    },
+    "overleaf/figures/two-schemas-zh.pdf": {
+      "pages": 1,
+      "size_mm": [
+        84.59999999998332,
+        54.999999999991665
+      ],
+      "font_types": [
+        "/Type0"
+      ],
+      "all_used_fonts_embedded": true,
+      "used_fonts": 2,
+      "type3": false,
+      "unembedded_unused_resources": [],
+      "unused_resource_note": ""
+    },
+    "overleaf/build/main-en.pdf": {
+      "pages": 15,
+      "size_mm": [
+        215.89999999999998,
+        279.4
+      ],
+      "font_types": [
+        "/Type0",
+        "/Type1"
+      ],
+      "all_used_fonts_embedded": true,
+      "used_fonts": 25,
+      "type3": false,
+      "unembedded_unused_resources": [
+        "/Helvetica"
+      ],
+      "unused_resource_note": "Inherited ReportLab Helvetica has zero text-show operations."
+    },
+    "overleaf/build/main.pdf": {
+      "pages": 23,
+      "size_mm": [
+        215.89999999999998,
+        279.4
+      ],
+      "font_types": [
+        "/Type0",
+        "/Type1"
+      ],
+      "all_used_fonts_embedded": true,
+      "used_fonts": 38,
+      "type3": false,
+      "unembedded_unused_resources": [
+        "/Helvetica"
+      ],
+      "unused_resource_note": "Inherited ReportLab Helvetica has zero text-show operations."
+    }
+  },
+  "layout": {
+    "english_total_pages": 15,
+    "english_body_pages": 12,
+    "bilingual_total_pages": 23,
+    "english_figure_page": 12,
+    "bilingual_figure_page": 19,
+    "figure_bars": 32,
+    "minimum_figure_label_pt": 6.5,
+    "figure_size_mm": [
+      84.6,
+      55.0
+    ],
+    "en_zh_previews_visually_inspected": true,
+    "all_paper_pages_rendered_and_layout_reviewed": true,
+    "affected_paper_pages_visually_inspected": true,
+    "overfull_boxes": 0,
+    "undefined_references": 0,
+    "preexisting_build_warnings": "Local XeTeX font substitutions and duplicate figure/table destination warnings remain."
+  },
+  "source_package": {
+    "files": 68,
+    "all_members_match_current_sources": true
+  },
+  "checksums": {
+    "exp/2026-10-31-diverse-scenarios/analyse-paired-reuse.py": "82993fc2dfb8a165a48e7f02a0bceb46acca93118a25cbd251327d3606df420e",
+    "exp/2026-10-31-diverse-scenarios/analyse.py": "f224c4c3f21ac0a8ad8a893c23c39e08cb7cb07d116a259a1e5707d440d0f9f0",
+    "exp/2026-10-31-diverse-scenarios/paired-reuse-protocol.json": "997421a3efc9b5f9b4d5eb7075705e1e98af7ae1c5da18f0259085b375644255",
+    "exp/2026-10-31-diverse-scenarios/extra-protocol.json": "6f946dce54243c23ce997e6e4df10a1b67b9deffd86455782c6c03841662f401",
+    "exp/2026-10-31-diverse-scenarios/study-stats.json": "af96465506658819dc78c1bb2cfac0dd6fdf7f0d38c7e12a1ae2ba404d0a597e",
+    "exp/2026-10-31-diverse-scenarios/summary.md": "6d7eed2864670384495d1c269c17e159e11120ca4eadef18989b63485a679ddc",
+    "exp/2026-10-31-diverse-scenarios/failure-analysis.md": "125ec3b74921cbe0eb29f05d9598afef41c376a42fafda1e6b104f7c13d8c233",
+    "exp/2026-10-31-diverse-scenarios/overleaf-numbers.tex": "8bee7fff7de3dba65562f7482d9ac1a54917542d495da9320217eb0827215a45",
+    "exp/2026-10-31-diverse-scenarios/feedback-comparison-check.json": "e8acc5645a38bf7cdd9e732a3ae0f619030ce539f86b5cb457b1ed86188468cb",
+    "exp/2026-10-31-diverse-scenarios/case-evidence.json": "549827452d3bf7d85d9b6f0b55c84b9ab66df6f7ab0408d11dd546084bb85ae9",
+    "exp/2026-10-31-diverse-scenarios/final-source-check.json": "fed6ec903a9a485ebe614170e34337ee497f9fe200b0efded32d90d5e5de5b1f",
+    "exp/2026-10-31-diverse-scenarios/local-source-check.json": "0caeadb2d49e9426c688b9df497c8ceb0de3e138f0aae7910ca9d099fefdc8c8",
+    "exp/2026-10-31-diverse-scenarios/financial-close.json": "6f861973c94ebfc302779d292b8789af08454e9d91b2935bc8538517168b7149",
+    "exp/2026-10-31-diverse-scenarios/database-cleanup-check.json": "e7c24fdbaebad5e6c15042ceef656c288c4fae68f13929c1b148fd6e2d46ff9d",
+    "exp/2026-10-31-diverse-scenarios/archive-verification.json": "1603fe93d0d9c703a9edba1506c1806476ea76fb49e262f43b51310d9371e7d3",
+    "exp/2026-10-31-diverse-scenarios/raw-results.tgz": "e7965d53e4b4a4c68a3f222f48f4d539cede778a54f9178faf30f7fd6003e577",
+    "exp/2026-10-31-diverse-scenarios/runtime-source.tgz": "444c2cb287327a35c527fff9fcebad8a25c31e899df6d551f6a49a8a1a41810c",
+    "exp/2026-10-31-diverse-scenarios/runtime-source-recovery.tgz": "8dba077c51ccb8b143128c92961f495f80dbf12a573efeb6e1909ef459c794ee",
+    "exp/2026-10-31-diverse-scenarios/runtime-source-compatible.tgz": "3bc19de09651e6ec871d0914174a7592e88f04597cf988c23d2cd30344cc8903",
+    "exp/2026-10-31-diverse-scenarios/runtime-source-extra.tgz": "2effa274c023f569b74a54dd1d44d2a291c9198dc1c7d6437353477def567089",
+    "src/metric.rs": "7d63e062ea49d4732842d539bfb29d667780f0051aa624b81dbe3816c40b6044",
+    "src/middle/metrics.rs": "49d500acdd64f471412710f83f4e57c8a2780b3a308081c23344eeebdae7b55c",
+    "src/llm.rs": "120dc2ec78525e4b19ed8cbac1aca00358fb53e62cf8f4ff5e054cff60443f95",
+    "src/metricbench.rs": "8c7c72cd2fede904148d6e86cf72f8aa640878cdcb2ab1a113a0966ba0f7a569",
+    "src/integration_tests.rs": "f0009f213ad3550e88a9a38e35775729e8b78282eb86b3c982b21d0a34f4af4a",
+    "tools/figures/two_schemas.py": "61c131f1b63ce9b973da6ed10059245e7cec959ec8b7ce99e4d14ca98a831cbd",
+    "overleaf/gen/published-scenarios.tex": "8bee7fff7de3dba65562f7482d9ac1a54917542d495da9320217eb0827215a45",
+    "overleaf/figures/two-schemas.tex": "1ce800efa7834fac3cb5179a009c3d56af360a143c8dc8f18dc2468155277e82",
+    "overleaf/figures/two-schemas.pdf": "71c01603fab8f47aa4037e30d22b91d7a45d6e867334609aee228f8e3d1e8f73",
+    "overleaf/figures/two-schemas-zh.pdf": "4b3156731fcdd6916ded2dc87ae64e139c079a39af0a6dd2363353f272d2d052",
+    "overleaf/sections/04-sharing.tex": "10a288c5c2a7245504f01934665a80b6bbb28ebbb334028478a29b412e056170",
+    "overleaf/sections/evaluation/setup.tex": "86096c9ca8c87385f93011afdd350b04cc94303b1e9ea9db1353721871a162c1",
+    "overleaf/sections/evaluation/changes.tex": "e544885f20f6baa7d9f2e73eaee417e67208fbe5fde0cca0fd60a94640968070",
+    "overleaf/build/main-en.pdf": "d0252e4413e04a10efaf59e78848c77455fb2f9f28332e7a6e78813413d010c9",
+    "overleaf/build/main.pdf": "68b6ef91c349ff7988d71deda6ed33cdc71be8288c406639ecdcebd2e75c0931",
+    "overleaf/build/mavra-icde-bilingual.zip": "c4b061b43ea9e342838951dc9aee26a6989a102ea000a2ac33c8be00c9dcc17b"
+  },
+  "joint_summary": {
+    "arms": {
+      "ace": {
+        "equal_schema_accuracy_pct": 73.07692307692307,
+        "correct": 38,
+        "n": 52,
+        "micro_accuracy_pct": 73.07692307692308
+      },
+      "awm": {
+        "equal_schema_accuracy_pct": 81.41025641025641,
+        "correct": 41,
+        "n": 52,
+        "micro_accuracy_pct": 78.84615384615384
+      },
+      "gmemory": {
+        "equal_schema_accuracy_pct": 61.53846153846153,
+        "correct": 32,
+        "n": 52,
+        "micro_accuracy_pct": 61.53846153846154
+      },
+      "mavra": {
+        "equal_schema_accuracy_pct": 84.61538461538461,
+        "correct": 43,
+        "n": 52,
+        "micro_accuracy_pct": 82.6923076923077
+      }
+    },
+    "weighting": "Equal weight for both schemas and all thirteen settings within each schema.",
+    "status": "Descriptive summary added after execution; not a new preregistered endpoint. All methods, schemas, settings and failed answers retained.",
+    "statistical_significance_claim": false
+  },
+  "presentation_update": {
+    "scope": "Foreground equal-schema descriptive summary and transfer cost; retain all per-schema bars and known failures.",
+    "new_official_model_calls": 0,
+    "raw_measurements_changed": false,
+    "extra_endpoint_preregistered": false,
+    "changed_pages_visually_inspected": {
+      "english": [
+        12
+      ],
+      "bilingual": [
+        18,
+        19,
+        20
+      ]
+    }
+  }
+}

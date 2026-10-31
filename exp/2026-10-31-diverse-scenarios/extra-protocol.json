@@ -1,0 +1,72 @@
+{
+  "study": "paired-reuse-20261031",
+  "base_protocol_sha256": "997421a3efc9b5f9b4d5eb7075705e1e98af7ae1c5da18f0259085b375644255",
+  "additional_branch": "holdout-extra",
+  "metric": "M3",
+  "fixed_order": [
+    "diff",
+    "rank_month",
+    "peak_rise",
+    "above_mean"
+  ],
+  "scope": "Cross-agent and cross-form transfer: B receives an explicit M3 definition and asks new forms on v1 after the original A post-heldout checkpoint. All original cases are retained; this is an additional targeted mechanism test, not a replacement or an unseen benchmark.",
+  "selection": "X0..4 is chosen by the already-frozen spending-only rule after the native base run, before any fresh additional answer. No outcome enters selection.",
+  "warmup": "Unmodified controls restore their already-paid source memories and responses; warmup actions, scalar answers and correctness must match the frozen source. Native restores its newly measured source prefix. Cached source replies are never counted as new scored tasks or new official API calls. Each additional question starts a fresh conversation and receives the normal released memory update.",
+  "aggregation": {
+    "holdout": [
+      "holdout"
+    ],
+    "benign": [
+      "append",
+      "backfill",
+      "correct",
+      "addcol"
+    ],
+    "modeled": [
+      "status",
+      "revision",
+      "dupload",
+      "dimhist",
+      "latekey"
+    ],
+    "novel": [
+      "holdout-extra"
+    ],
+    "all": [
+      "holdout",
+      "append",
+      "backfill",
+      "correct",
+      "addcol",
+      "status",
+      "revision",
+      "dupload",
+      "dimhist",
+      "latekey",
+      "unit",
+      "mirror",
+      "holdout-extra"
+    ]
+  },
+  "weighting": "Equal independent setting weights. Original heldout and the new question branch are separate settings. All original failures retained. If X=0, retain the original12-setting aggregation and display.",
+  "display_groups_if_extended": [
+    "benign",
+    "modeled",
+    "novel",
+    "all"
+  ],
+  "display_groups_if_not_extended": [
+    "holdout",
+    "benign",
+    "modeled",
+    "all"
+  ],
+  "exclusions": "Entire failed diverse-trajectory cohort and both interrupted native cells are development-only, regardless of outcomes; every fee retained. Prior baseline controls are not selected by accuracy.",
+  "budget_cny": 20,
+  "no_significance_claim": "One run per method, condition-matched frozen controls; no confidence intervals or claim of statistical significance.",
+  "source_agent": "A",
+  "consumer_agent": "B",
+  "consumer_business_definition": "Every extra question supplies the same explicit business definition to all four methods.",
+  "feedback_scope": "Only B own prior results enter B recent feedback. A recent-result buffer is cleared for the new consumer. ACE/AWM keep private agent scope, G-Memory keeps DB scope, MAVRA keeps global metric scope.",
+  "execution": "Additional cells run sequentially to keep the maximum in-flight reservation within the remaining cumulative budget."
+}

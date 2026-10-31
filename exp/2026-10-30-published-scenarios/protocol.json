@@ -1,0 +1,90 @@
+{
+  "study": "published-scenarios-20261030",
+  "created_utc": "2026-10-30T14:25:08.899816+00:00",
+  "deadline_utc": "2026-10-30T20:25:08.899816+00:00",
+  "budget_cny": 20.0,
+  "authorization": "User requested rerunning Fig.6 against existing published baselines, with total DeepSeek spending at most CNY 20.",
+  "official_endpoint": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "required_reported_model": "deepseek-flash",
+  "documented_version": "DeepSeek-V4.1-Flash-1017",
+  "pricing_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "peak_guard_cny_per_million": {
+    "hit": 0.04,
+    "miss": 2.0,
+    "output": 8.0
+  },
+  "reasoning_effort": "low",
+  "thinking": "enabled",
+  "max_output_tokens": 16384,
+  "max_steps": 20,
+  "datasets": [
+    "synthetic",
+    "tpch"
+  ],
+  "arms": [
+    "ace",
+    "awm",
+    "gmemory",
+    "mavra"
+  ],
+  "modes": {
+    "ace": "paper-ace",
+    "awm": "paper-awm",
+    "gmemory": "paper-gmemory",
+    "mavra": "metric-global-full"
+  },
+  "metrics": [
+    "M1",
+    "M3",
+    "M5"
+  ],
+  "question_set": "v1",
+  "scored_forms": [
+    "single"
+  ],
+  "workload_scope": "Single-period parameterized queries; three fixed metrics spanning basic aggregation, ratios/dimension filters, and multiple fact tables. This is a newly budgeted cohort, not a rerun of the entire historical five-question-form dataset.",
+  "changes": [
+    "append",
+    "backfill",
+    "correct",
+    "addcol",
+    "status",
+    "revision",
+    "dupload",
+    "dimhist",
+    "latekey",
+    "unit",
+    "mirror"
+  ],
+  "rows": 1000000,
+  "sql_timeout_seconds": 120,
+  "concurrency_per_cell": 1,
+  "parallel_cells": 2,
+  "max_repeats": 2,
+  "holdout_agents": [
+    "A"
+  ],
+  "memory_scope": "ACE/AWM retain private agent A memory; G-Memory shares within the dataset run. A also performs source learning so private methods can use learned knowledge. Every question starts a new conversation.",
+  "feedback": "After each completed task, published memory methods receive binary correctness and their own transcript, never gold answers or gold SQL. MAVRA uses its native checked publication/maintenance workflow with learning-SQL snapshot references.",
+  "scenario_isolation": "Each change starts from v1 data and post-heldout memory; all four memory implementations restore the same checkpoint boundary.",
+  "execution_order": "For each repeat, run both datasets for every arm in a fixed Latin-rotated order. Repeat 2 starts only after the entire first matched block completes and conservative remaining funds exceed 1.2 times its full cost plus CNY 0.4. No selection by accuracy. Repeat 2 also requires time remaining greater than 1.2 times the first block elapsed time; every new pair requires at least 20 GiB free disk.",
+  "failure_policy": "Retain all attempts and incurred costs. Model errors/refusals count as incorrect. An infrastructure failure or budget-interrupted cell does not become a completed full-method result; incomplete matched blocks are separately reported.",
+  "reporting": "Accuracy per setting and the original four setting groups with equal setting weights; run ranges only when more than one complete repeat exists. Include all failed answers, memory costs, request usage and budget guards.",
+  "baseline_sources": {
+    "ace": "ace-agent/ace@82709de; released no-ground-truth Reflector/Curator and playbook utilities, existing SQL tool adaptation",
+    "awm": "zorazrw/agent-workflow-memory@8c0ff8c; released prompts and online induction schedule, existing SQL tool adaptation",
+    "gmemory": "bingreeky/GMemory@7b581c5; unchanged official memory core and released MiniLM/retrieval/merge settings via existing service",
+    "mavra": "Current Rust implementation, metric-global-full: snapshot regression, condition sharing, optimization and snapshot execution"
+  },
+  "status_before_execution": "Protocol prepared; paid API calls have not started.",
+  "expected_tasks_per_cell": {
+    "synthetic": 32,
+    "tpch": 26
+  },
+  "expected_scored_tasks_per_cell": {
+    "synthetic": 26,
+    "tpch": 20
+  },
+  "domain_adaptation": "ACE and AWM use released components through the attributed SQL adapters; G-Memory core is unchanged. Domain-specific failure wording is analytical SQL. Upstream empty transport-error replies are surfaced as adapter failures. All four methods retain common native SQL tools and metadata caches; MAVRA additionally has its native checked metric tools."
+}

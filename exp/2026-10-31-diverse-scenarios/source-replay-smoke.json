@@ -1,0 +1,128 @@
+{
+  "status": "passed",
+  "paid_model_calls": 0,
+  "scientific_evidence": false,
+  "cells": [
+    {
+      "cell": "synthetic-r1-ace-source-smoke",
+      "source_tasks_verified": 9,
+      "extra_tasks": 4,
+      "paid_model_calls": 0,
+      "restoration": {
+        "source": {
+          "root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "api_root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "key": "synthetic-r1-ace-a2",
+          "arm": "ace"
+        },
+        "source_tasks": 9,
+        "restored_k": 9,
+        "replayed_api_calls": 31,
+        "new_api_calls_for_source": 0,
+        "utc": "2026-10-31T11:00:51.019750+00:00",
+        "warmup_actions_answers_and_labels_match_source": true
+      }
+    },
+    {
+      "cell": "tpch-r1-ace-source-smoke",
+      "source_tasks_verified": 9,
+      "extra_tasks": 4,
+      "paid_model_calls": 0,
+      "restoration": {
+        "source": {
+          "root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "api_root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "key": "tpch-r1-ace-a2",
+          "arm": "ace"
+        },
+        "source_tasks": 9,
+        "restored_k": 9,
+        "replayed_api_calls": 25,
+        "new_api_calls_for_source": 0,
+        "utc": "2026-10-31T11:01:30.445911+00:00",
+        "warmup_actions_answers_and_labels_match_source": true
+      }
+    },
+    {
+      "cell": "synthetic-r1-awm-source-smoke",
+      "source_tasks_verified": 9,
+      "extra_tasks": 4,
+      "paid_model_calls": 0,
+      "restoration": {
+        "source": {
+          "root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "api_root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "key": "synthetic-r1-awm",
+          "arm": "awm"
+        },
+        "source_tasks": 9,
+        "restored_k": 9,
+        "replayed_api_calls": 31,
+        "new_api_calls_for_source": 0,
+        "utc": "2026-10-31T11:02:09.218484+00:00",
+        "warmup_actions_answers_and_labels_match_source": true
+      }
+    },
+    {
+      "cell": "tpch-r1-awm-source-smoke",
+      "source_tasks_verified": 9,
+      "extra_tasks": 4,
+      "paid_model_calls": 0,
+      "restoration": {
+        "source": {
+          "root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "api_root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "key": "tpch-r1-awm",
+          "arm": "awm"
+        },
+        "source_tasks": 9,
+        "restored_k": 9,
+        "replayed_api_calls": 33,
+        "new_api_calls_for_source": 0,
+        "utc": "2026-10-31T11:02:47.826163+00:00",
+        "warmup_actions_answers_and_labels_match_source": true
+      }
+    },
+    {
+      "cell": "synthetic-r1-gmemory-source-smoke",
+      "source_tasks_verified": 9,
+      "extra_tasks": 4,
+      "paid_model_calls": 0,
+      "restoration": {
+        "source": {
+          "root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "api_root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "key": "synthetic-r1-gmemory",
+          "arm": "gmemory"
+        },
+        "source_tasks": 9,
+        "restored_k": 9,
+        "replayed_api_calls": 27,
+        "new_api_calls_for_source": 0,
+        "utc": "2026-10-31T11:03:26.314597+00:00",
+        "warmup_actions_answers_and_labels_match_source": true
+      }
+    },
+    {
+      "cell": "tpch-r1-gmemory-source-smoke",
+      "source_tasks_verified": 9,
+      "extra_tasks": 4,
+      "paid_model_calls": 0,
+      "restoration": {
+        "source": {
+          "root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "api_root": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031",
+          "key": "tpch-r1-gmemory",
+          "arm": "gmemory"
+        },
+        "source_tasks": 9,
+        "restored_k": 9,
+        "replayed_api_calls": 27,
+        "new_api_calls_for_source": 0,
+        "utc": "2026-10-31T11:04:33.605763+00:00",
+        "warmup_actions_answers_and_labels_match_source": true
+      }
+    }
+  ],
+  "rich_source_and_real_published_update_inputs_verified": true
+}

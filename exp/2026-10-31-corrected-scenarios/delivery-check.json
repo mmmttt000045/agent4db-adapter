@@ -1,0 +1,113 @@
+{
+  "status": "passed",
+  "complete_repeats": [
+    1
+  ],
+  "formal_tasks": 232,
+  "scored_tasks": 184,
+  "learning_tasks": 48,
+  "verified_raw_files": 492,
+  "new_requests": 1766,
+  "cumulative_requests": 5144,
+  "cost": {
+    "authorization_cny": 20.0,
+    "upper_cny": 14.307716460000002,
+    "priced_usage_cny": 14.307716459999998,
+    "prior_usage_floor_cny": 8.69698742,
+    "incremental_usage_cny": 5.61072904,
+    "cumulative_requests": 5144,
+    "account_decrease_observed_cny": 14.300000000000011,
+    "requests": 1766,
+    "http_errors": 0,
+    "models": {
+      "deepseek-flash": 1766
+    },
+    "includes": "all requests, memory, extraction, optimization, retries and incomplete attempts"
+  },
+  "feedback_check": "All eight actual journals and matched question/reference hashes passed.",
+  "local_repaired_sources_match_runtime": [
+    "Cargo.toml",
+    "Cargo.lock",
+    "src/main.rs",
+    "src/sqlscope.rs",
+    "src/middle.rs",
+    "src/middle/metrics.rs",
+    "src/integration_tests.rs"
+  ],
+  "fonts": {
+    "overleaf/figures/two-schemas.pdf": {
+      "size_mm": [
+        84.59999999998332,
+        54.999999999991665
+      ],
+      "font_types": [
+        "/Type0"
+      ],
+      "fonts_embedded": true,
+      "type3": false
+    },
+    "overleaf/figures/two-schemas-zh.pdf": {
+      "size_mm": [
+        84.59999999998332,
+        54.999999999991665
+      ],
+      "font_types": [
+        "/Type0",
+        "/Type0"
+      ],
+      "fonts_embedded": true,
+      "type3": false
+    }
+  },
+  "layout": {
+    "english_total_pages": 15,
+    "english_body_pages": 12,
+    "bilingual_total_pages": 23,
+    "english_figure_page": 12,
+    "bilingual_figure_page": 18,
+    "figure_bars": 32,
+    "en_zh_previews_visually_inspected": true,
+    "all_paper_pages_rendered_and_layout_reviewed": true,
+    "affected_paper_pages_visually_inspected": true,
+    "overfull_boxes": 0,
+    "undefined_references": 0,
+    "preexisting_build_warnings": "Local XeTeX fallback retains font-substitution and duplicate figure/table destination warnings."
+  },
+  "source_package": {
+    "files": 68,
+    "all_members_match_current_sources": true
+  },
+  "checksums": {
+    "exp/2026-10-31-corrected-scenarios/analyse.py": "4da0bdcd71a682d4f667caad68051f122943e61c2358115fef1e521eff365cdf",
+    "exp/2026-10-31-corrected-scenarios/verify-comparison.py": "f1182694617273917646e90cff77cc5ba98d09f6419ad188a02ca71306bd7246",
+    "exp/2026-10-31-corrected-scenarios/protocol.json": "8bb72dd73b87523e0b6cc37f9674d6bc24397e1e61783e6cf0c2f0a513833f5d",
+    "exp/2026-10-31-corrected-scenarios/study-stats.json": "58d3b62fd1c2723a1046ab8a7159ff044ad3e2c31188df22ae988deaf0a95ec1",
+    "exp/2026-10-31-corrected-scenarios/summary.md": "babd64a8b00b9963aa122449cd05d0bb11eac117fd73f7d2398e5f98d2c85290",
+    "exp/2026-10-31-corrected-scenarios/overleaf-numbers.tex": "7ecd750ae4d8c0802d9356f49d1844b0918088011ad536c0c219d25b5cfcd37e",
+    "exp/2026-10-31-corrected-scenarios/implementation-amendment.json": "d1b420c5ec33849c0bbfac9e69a158917ab188ea3dbbfb9a631dc2a2981d7cb8",
+    "exp/2026-10-31-corrected-scenarios/final-source-manifest.json": "627407bfcd62f209954d596cddc8128ae83648cfbc5515a34cdf4f83836a2a2c",
+    "exp/2026-10-31-corrected-scenarios/feedback-comparison-check.json": "fb2fc1a768f4611fc20147903fd6ea2cbeaec0482e549032d13a04c760081e32",
+    "exp/2026-10-31-corrected-scenarios/financial-close.json": "fba8b1fc6a5c059a822c224e78b48e557e32cf3621e7b175702dced91009448d",
+    "exp/2026-10-31-corrected-scenarios/raw-results.tgz": "dfe1e2fb3ed6f4c6f86417bdbfa97cfd0c01999e7dabb5129c460dfa61b8e320",
+    "exp/2026-10-31-corrected-scenarios/runtime-source.tgz": "f0b1e65a4eacee8557f72b705db683aa19ec4252b7a94993459627cd6e143e41",
+    "exp/2026-10-31-corrected-scenarios/runtime-source-recovery.tgz": "6c0be34f1160ae916a07fd0a79181d9a68088eee3586a9ff5cb5d588a5d7cb64",
+    "Cargo.toml": "580e8802e7c62baffc7f13a6f4b68a7f3d1b85e0a7ef437abef896d4f257336b",
+    "Cargo.lock": "6619f19772cad8a136da2ea189f918895838fed36f9a3855c1fbd36fabc0eb9c",
+    "src/main.rs": "e3e121bb515a5ed2d3a20561bd234e6bd10a76fbdfa41d9fe5eb1d8886179487",
+    "src/sqlscope.rs": "5aceb5a1077062b9a3b75bee36cd13ee47a7b8d727e556f8dc95d084715c6065",
+    "src/middle.rs": "80f3242d8665c8db485acc5cf747a79207f2951dff5d8430012fce21f42e67a3",
+    "src/middle/metrics.rs": "0dd6ed48850f50a864491edea8bafede8e8ee5da7f1c2a65946df5983553cf46",
+    "src/integration_tests.rs": "dbcf5cb094923255cab7afc5666ed84f56484e9d5ca201965fa3df79766984fe",
+    "tools/figures/two_schemas.py": "d7176bdc1cb88c3a98781b27e029cea9228f2ec4f1864eb3f1d16530149a0f3a",
+    "overleaf/gen/published-scenarios.tex": "7ecd750ae4d8c0802d9356f49d1844b0918088011ad536c0c219d25b5cfcd37e",
+    "overleaf/figures/two-schemas.tex": "404fa0c6dab0f813dd22f84b51c86a035ca03137e13dcd2843d57889c33244eb",
+    "overleaf/figures/two-schemas.pdf": "fda429c2743b4ad0ad8a33579e2b11fa8e5cf8d88809accb763949034511d8e5",
+    "overleaf/figures/two-schemas-zh.pdf": "5ab12fba6316cd3eacef4ec01dea88c19bbac47cf844a4c9b7af64fb074bc196",
+    "overleaf/sections/04-sharing.tex": "bafed126f058e27bc692f316d7860924407c2ec3fb7426108f7dc1b0989793bb",
+    "overleaf/sections/evaluation/setup.tex": "a2eac8be8ee4a5a0988c162df0d19a94da75361a936be5f75f9b7177cc9a1a6b",
+    "overleaf/sections/evaluation/changes.tex": "1e8eb946228265d1dbfa4c60ea89fc63e84ab5122d07392caaeec70aeacf18b3",
+    "overleaf/build/main-en.pdf": "6b6ea951b952cf25c1359d3833ce255d194bb9d131ebec5c629b55edc75bb847",
+    "overleaf/build/main.pdf": "8cc9f691bb45639614ad831770ef2a28bf96786bb030db8d12009657e9ae19f0",
+    "overleaf/build/mavra-icde-bilingual.zip": "22257725ede2c11f49990206ccfd4dc29bcd2ee89db78a4c765f983d462e4fb8"
+  }
+}

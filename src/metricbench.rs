@@ -59,6 +59,23 @@ pub struct Options {
     /// 计分题集：v1 每个指标 3 道（换参数、跨期差值、全年最高月）；v2 再加比上一个月增加最多的月份、高于各月平均值的月份数
     #[arg(long, default_value = "v1", value_parser = ["v1", "v2"])]
     question_set: String,
+    /// 扩展场景题库：六道留出题，每种变化一道题；按固定排列为前 N 种变化再加一道题。省略时保留原协议。
+    #[arg(long, value_parser = clap::value_parser!(u32).range(0..=11))]
+    scenario_extra_count: Option<u32>,
+    /// 仅导出题单，不连接模型或数据库。
+    #[arg(long)]
+    question_bank_only: bool,
+    /// 与已冻结的单期控制组保持相同基础题单。
+    #[arg(long)]
+    legacy_single: bool,
+    /// 独立的 M3 跨题型留出分支，不改变原有变化分支的检查点。
+    #[arg(long, default_value_t=0, value_parser=clap::value_parser!(u32).range(0..=4))]
+    additional_holdout_count: u32,
+    /// 新增分支的新消费者；指定时向所有方法提供明确业务定义。
+    #[arg(long)]
+    additional_holdout_agent: Option<String>,
+    #[arg(long)]
+    no_changes: bool,
     #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=10))]
     repeats: u32,
     /// 第一轮的编号（分进程跑多轮时各进程给不同编号；群体评测按轮次编号抽题，同一轮各组抽到的题相同）
@@ -318,6 +335,125 @@ pub(crate) fn tasks_with(ids: &[String], v2: bool) -> Vec<Task> {
     out
 }
 
+// Diverse question selection is fixed by metric/phase identity, never outcomes.
+fn study_tasks(o: &Options, spec: Option<&Spec>) -> Vec<Task> {
+    let mut out = tasks_with(&o.metrics, o.question_set == "v2");
+    if o.legacy_single {
+        out.retain(|t| matches!(t.ask, Ask::Single { .. }));
+        let (learn, year) = SPEC_DEFS.get().map_or((2001, 2002), |s| (s.learn, s.holdout));
+        if let Some(def) = defs().iter().find(|d| d.id == "M3") {
+            let forms = [
+                Ask::Diff { a: Period::month(year, 9), b: Period::month(learn, 6) },
+                Ask::RankMonth { year },
+                Ask::PeakRise { year },
+                Ask::AboveMean { year },
+            ];
+            for (i, ask) in forms.into_iter().take(o.additional_holdout_count as usize).enumerate() {
+                out.push(Task { id: format!("M3-X{}", i + 1), def, ask, set: Set::Type });
+            }
+        }
+        return out;
+    }
+    if o.scenario_extra_count.is_none() {
+        return out;
+    }
+    let (learn, holdout) = SPEC_DEFS.get().map_or((2001, 2002), |s| (s.learn, s.holdout));
+    for t in out.iter_mut().filter(|t| t.set != Set::Learn) {
+        t.ask = match t.ask {
+            Ask::Single { .. } => Ask::Single { period: Period::month(holdout, 9) },
+            Ask::Diff { .. } => Ask::Diff { a: Period::month(holdout, 9), b: Period::month(learn, 6) },
+            Ask::RankMonth { .. } => Ask::RankMonth { year: holdout },
+            Ask::PeakRise { .. } => Ask::PeakRise { year: holdout },
+            Ask::AboveMean { .. } => Ask::AboveMean { year: holdout },
+        };
+    }
+    let backfill = spec.and_then(|s| s.changes.get("backfill")).map(String::as_str).unwrap_or("store_returns");
+    let history: Vec<Task> = out
+        .iter()
+        .filter(|t| t.set != Set::Learn && t.def.tables.contains(&backfill))
+        .map(|t| {
+            let ask = match t.ask {
+                Ask::Single { .. } => Ask::Single { period: Period::month(learn, 6) },
+                Ask::Diff { .. } => Ask::Diff { a: Period::month(learn, 6), b: Period::month(learn - 1, 6) },
+                Ask::RankMonth { .. } => Ask::RankMonth { year: learn },
+                Ask::PeakRise { .. } => Ask::PeakRise { year: learn },
+                Ask::AboveMean { .. } => Ask::AboveMean { year: learn },
+            };
+            Task { id: format!("{}-B", t.id), def: t.def, ask, set: t.set }
+        })
+        .collect();
+    out.extend(history);
+    for def in defs().iter().filter(|d| o.metrics.iter().any(|id| id == d.id)) {
+        out.push(Task { id: format!("{}-P2", def.id), def, ask: Ask::Single { period: Period::month(holdout, 8) }, set: Set::Param });
+    }
+    out
+}
+
+fn study_selection<'a>(tasks: &'a [Task], ch: Option<Change>, tables: &[String], extra: Option<u32>) -> Vec<&'a Task> {
+    if extra.is_none() {
+        return tasks
+            .iter()
+            .filter(|t| t.set != Set::Learn && !t.id.contains("-X"))
+            .filter(|t| ch.is_none() || t.def.tables.iter().any(|x| tables.iter().any(|y| y == x)))
+            .collect();
+    }
+    let ids: Vec<&str> = defs()
+        .iter()
+        .filter(|d| tasks.iter().any(|t| t.def.id == d.id))
+        .filter(|d| ch.is_none() || d.tables.iter().any(|x| tables.iter().any(|y| y == x)))
+        .map(|d| d.id)
+        .collect();
+    let Some(ch) = ch else {
+        return ids
+            .iter()
+            .flat_map(|id| ["P2", "T1"].into_iter().filter_map(move |tag| tasks.iter().find(|t| t.id == format!("{id}-{tag}"))))
+            .collect();
+    };
+    if ids.is_empty() {
+        return vec![];
+    }
+    let phases = ["append", "backfill", "correct", "addcol", "status", "revision", "dupload", "dimhist", "latekey", "unit", "mirror"];
+    let index = phases.iter().position(|name| *name == ch.name()).unwrap();
+    let count = 1 + usize::from(((index * 7 + 3) % 11) < extra.unwrap() as usize);
+    let forms = ["P1", "T1", "T2", "T3", "T4"];
+    (0..count)
+        .filter_map(|slot| {
+            let id = ids[(index + slot) % ids.len()];
+            let form = forms[(index * 3 + 1 + slot * 2) % forms.len()];
+            let suffix = if ch.name() == "backfill" { "-B" } else { "" };
+            tasks.iter().find(|t| t.id == format!("{id}-{form}{suffix}"))
+        })
+        .collect()
+}
+
+fn study_question_plan(tasks: &[Task], changes: &[Change], spec: Option<&Spec>, extra: Option<u32>, extra_defined: bool) -> Vec<Value> {
+    let mut rows: Vec<Value> = tasks
+        .iter()
+        .filter(|t| t.set == Set::Learn)
+        .map(|t| json!({"phase":"learn","task":t.id,"metric":t.def.id,"ask":t.ask,"question":text(t,true)}))
+        .collect();
+    for ch in std::iter::once(None).chain(changes.iter().copied().map(Some)) {
+        let tables =
+            ch.map(|c| spec.map_or_else(|| c.tables().iter().map(|s| s.to_string()).collect(), |s| s.change_tables(c))).unwrap_or_default();
+        for t in study_selection(tasks, ch, &tables, extra) {
+            rows.push(json!({"phase":ch.map_or("holdout",Change::name),"task":t.id,"metric":t.def.id,
+                "ask":t.ask,"question":text(t,false)}));
+        }
+    }
+    for t in tasks.iter().filter(|t| t.id.contains("-X")) {
+        rows.push(json!({"phase":"holdout-extra","task":t.id,"metric":t.def.id,"ask":t.ask,"question":text(t,extra_defined)}));
+    }
+    rows
+}
+
+async fn study_gold(db: &Db, tasks: &[&Task]) -> Result<HashMap<String, String>> {
+    let mut gold = HashMap::new();
+    for t in tasks {
+        gold.insert(t.id.clone(), db.query(QKind::Meta, &gold_sql(t)).await?.cell(0, 0).unwrap_or("NULL").to_string());
+    }
+    Ok(gold)
+}
+
 fn cn(p: &Period) -> String {
     match (p.m1, p.m2) {
         (1, 12) => format!("{} 年", p.year),
@@ -332,12 +468,12 @@ pub(crate) fn text(t: &Task, defined: bool) -> String {
         Ask::Single { period } => format!("{}的{n}是多少？", cn(period)),
         Ask::Diff { a, b } => format!("{}的{n}比{}高多少？（用前者减去后者，结果可以为负数）", cn(a), cn(b)),
         Ask::RankMonth { year } => format!("{year} 年哪个月的{n}最高？"),
-        Ask::PeakRise { year } => format!("{year} 年哪个月的{n}比上一个月增加最多？"),
+        Ask::PeakRise { year } => format!("{year} 年哪个月的{n}比上一个月增加最多？增加量按本月值减上月值计算。"),
         Ask::AboveMean { year } => format!("{year} 年有几个月的{n}高于当年 12 个月{n}的平均值？"),
     };
     let fmt = match t.ask {
-        Ask::RankMonth { .. } => "只回答月份数字（1–12）。",
-        Ask::PeakRise { .. } => "只回答月份数字（2–12）。",
+        Ask::RankMonth { .. } => "只回答月份数字（1–12），并列取最早月份。",
+        Ask::PeakRise { .. } => "只回答月份数字（2–12），并列取最早月份。",
         Ask::AboveMean { .. } => "只回答月份个数（0–12）。",
         _ => "保留两位小数。",
     };
@@ -1140,7 +1276,7 @@ async fn audit(env: &Env<'_>, mid: &Middle, gold: &HashMap<String, String>) -> R
         let def = ev.as_ref().and_then(|x| x.task.split('-').next().map(str::to_string)).unwrap_or_default();
         let mut wrong = vec![];
         let mut checked = 0;
-        for t in env.tasks.iter().filter(|t| t.set != Set::Learn && t.def.id == def) {
+        for t in env.tasks.iter().filter(|t| t.set != Set::Learn && t.def.id == def && gold.contains_key(&t.id)) {
             checked += 1;
             let expect = gold.get(&t.id).map(|g| parse_answer(g));
             let ok = match (metric::compile(m, &t.ask), expect) {
@@ -1247,11 +1383,23 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
     let mut checkpoint = None;
     for ch in std::iter::once(None).chain(env.changes.iter().copied().map(Some)) {
         let phase = ch.map_or("holdout", Change::name);
+        let tables = ch.map(|c| env.change_tables(c)).unwrap_or_default();
+        let selected = study_selection(env.tasks, ch, &tables, env.o.scenario_extra_count);
         let gold = match ch {
-            None => gold_map(env.admin, env.tasks).await?,
+            None => {
+                if env.o.scenario_extra_count.is_some() {
+                    study_gold(env.admin, &selected).await?
+                } else {
+                    gold_map(env.admin, env.tasks).await?
+                }
+            }
             Some(c) => {
                 let truth = env.apply_truth(c).await?;
-                let gold = gold_map(env.admin, env.tasks).await?;
+                let gold = if env.o.scenario_extra_count.is_some() {
+                    study_gold(env.admin, &selected).await?
+                } else {
+                    gold_map(env.admin, env.tasks).await?
+                };
                 let hidden = env.apply_hidden(c).await?;
                 eprintln!("  场景 {phase}（{}，{}）：写入 {truth} + {hidden} 行", c.label(), c.class());
                 writes.insert(phase.into(), json!({"truth_rows": truth, "hidden_rows": hidden}));
@@ -1283,12 +1431,7 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
             relearning.push(json!({"phase": phase, "swept": swept, "seconds": t1.elapsed().as_secs_f64()}));
         }
         let ph = Phase { env, mid: &mid, cell: &cell, name: phase, gold: &gold, bad: &bad };
-        let set: Vec<&Task> = env
-            .tasks
-            .iter()
-            .filter(|t| t.set != Set::Learn)
-            .filter(|t| ch.is_none_or(|c| t.def.tables.iter().any(|x| env.change_tables(c).iter().any(|y| y == x))))
-            .collect();
+        let set = selected;
         for agent in &env.o.holdout_agents {
             if is_reforce(mode) {
                 let k = env.o.reforce_concurrency as usize;
@@ -1313,6 +1456,23 @@ async fn cell(env: &Env<'_>, db: Arc<Db>, mode: &str, phrasing: &str, repeat: u3
                 mid.restore(checkpoint.as_ref().context("缺少留出后的经验库快照")?).await?;
             }
         }
+    }
+    if env.o.additional_holdout_count > 0 {
+        mid.restore(checkpoint.as_ref().context("缺少新增题分支的检查点")?).await?;
+        // Independent additional-question branch: restore the original heldout boundary.
+        env.ensure_v1("holdout-extra").await?;
+        let selected: Vec<_> = env.tasks.iter().filter(|t| t.id.contains("-X")).collect();
+        let gold = study_gold(env.admin, &selected).await?;
+        let (rows, bad) = audit(env, &mid, &gold).await?;
+        audits.insert("holdout-extra".into(), json!(rows));
+        let ph = Phase { env, mid: &mid, cell: &cell, name: "holdout-extra", gold: &gold, bad: &bad };
+        let agents = env.o.additional_holdout_agent.as_ref().map(|a| vec![a.clone()]).unwrap_or_else(|| env.o.holdout_agents.clone());
+        for agent in &agents {
+            for t in &selected {
+                records.push(run_task(&ph, agent, t, defined || env.o.additional_holdout_agent.is_some()).await?.json);
+            }
+        }
+        events.insert("holdout-extra".into(), json!(mid.take_metric_events()));
     }
     Ok(json!({
         "cell": cell.id, "mode": mode, "phrasing": phrasing, "repeat": repeat, "seconds": t0.elapsed().as_secs_f64(),
@@ -1599,13 +1759,12 @@ async fn population_cell(env: &Env<'_>, db: Arc<Db>, mode: &str, repeat: u32) ->
 }
 
 pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
+    ensure!(o.scenario_extra_count.is_none() || o.question_set == "v2", "扩展场景题单需要 --question-set v2");
     ensure!(
         !o.holdout_agents.is_empty() && o.holdout_agents.iter().all(|a| !a.trim().is_empty() && !a.contains(['/', '|'])),
         "holdout-agents 不能为空，名称不能含 / 或 |"
     );
-    let agent = Provider::from_env(&o.agent)?;
-    let extractor = Provider::from_env(&o.extractor)?;
-    let changes = o.changes.iter().map(|c| Change::parse(c)).collect::<Result<Vec<_>>>()?;
+    let changes = if o.no_changes { vec![] } else { o.changes.iter().map(|c| Change::parse(c)).collect::<Result<Vec<_>>>()? };
     let timeline = o.timeline.iter().map(|s| Ok((s.clone(), step_of(s)?))).collect::<Result<Vec<_>>>()?;
     ensure!(!o.lifecycle || (o.modes.len() == 1 && o.repeats == 1), "生命周期评测每个进程只跑一个组、一轮（更新累积，各组要从 v1 开始）");
     ensure!(!o.lifecycle || !o.modes.iter().any(|m| is_reforce(m)), "reforce* 组只用于场景评测");
@@ -1617,6 +1776,16 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
     if let Some(s) = &spec {
         load_spec_defs(o.defs.as_deref().context("--spec 需要 --defs")?, s)?;
     }
+    if o.question_bank_only {
+        let tasks = study_tasks(&o, spec.as_ref());
+        let plan = study_question_plan(&tasks, &changes, spec.as_ref(), o.scenario_extra_count, o.additional_holdout_agent.is_some());
+        std::fs::create_dir_all(out)?;
+        std::fs::write(format!("{out}/question-bank.json"), serde_json::to_string_pretty(&plan)?)?;
+        println!("题单已导出：{} 道任务；模型调用 0", plan.len());
+        return Ok(());
+    }
+    let agent = Provider::from_env(&o.agent)?;
+    let extractor = Provider::from_env(&o.extractor)?;
     let stamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_micros();
     let name = format!("agentdb_metric_{}_{stamp}", std::process::id());
     let directory = format!("{out}/metric-{stamp}");
@@ -1689,7 +1858,7 @@ pub async fn run(url: &str, pool: usize, out: &str, o: Options) -> Result<()> {
         };
         let probe = Db::connect(isolated.as_str(), 2, true)?;
         let db = Arc::new(Db::connect_timeout(isolated.as_str(), pool, true, o.sql_timeout_secs)?);
-        let tasks = tasks_with(&o.metrics, o.question_set == "v2");
+        let tasks = study_tasks(&o,spec.as_ref());
         let env = Env {
             o: &o,
             admin: &admin,

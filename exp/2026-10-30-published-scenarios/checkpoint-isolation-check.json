@@ -1,0 +1,9 @@
+{
+  "sqlite_embedding_counts": {
+    "branch-000": 2,
+    "post-heldout-gmemory": 1,
+    "branch-001": 1
+  },
+  "paid_model_calls": 0,
+  "passed": true
+}

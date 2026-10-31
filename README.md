@@ -49,5 +49,6 @@ make check            # Rust 格式、单元测试与 Clippy
 | `data/` | 最小数据库测试输入 |
 | `third_party/` | 外部基线源码；来源与使用条件见各目录说明 |
 | `results/` | 本地实验运行输出，Git 忽略 |
+| `ccfa-workfiles/` | 本地分析草稿、源码对照和预览，Git 忽略；正式依据归档到 `exp/` |
 
 论文依赖的 `overleaf/gen/*.tex` 和图形 PDF 作为编译输入提交；常规编译文件与上传包放在 `build/` 中。运行日志、历史源码快照和正式保留的 PPT 有各自的来源说明。新增文件的归属与旧路径映射见 [仓库维护约定](docs/development/repository.md)。

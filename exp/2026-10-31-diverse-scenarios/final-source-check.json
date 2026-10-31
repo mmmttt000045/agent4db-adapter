@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "utc": "2026-10-31T11:45:23.499824+00:00",
+  "unchanged_files": {
+    "paired-reuse/frozen-source-manifest.json": 37,
+    "paired-reuse/extra-evaluation/frozen-source-manifest.json": 38,
+    "extra_source_archive": 49,
+    "protected_inputs": 17,
+    "published_cores_and_harness": 206
+  }
+}

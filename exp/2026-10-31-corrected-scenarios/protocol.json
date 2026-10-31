@@ -1,0 +1,120 @@
+{
+  "study": "corrected-scenarios-20261031",
+  "created_utc": "2026-10-31T03:50:03.600658+00:00",
+  "deadline_utc": "2026-10-31T15:00:00+00:00",
+  "budget_cny": 20.0,
+  "authorization": "Repair SQL admission and semantic retention, align feedback, rerun all methods, and update compact Fig.6/paper; cumulative DeepSeek CNY 20 including the prior study.",
+  "official_endpoint": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "required_reported_model": "deepseek-flash",
+  "documented_version": "DeepSeek-V4.1-Flash-1017",
+  "pricing_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "peak_guard_cny_per_million": {
+    "hit": 0.04,
+    "miss": 2.0,
+    "output": 8.0
+  },
+  "reasoning_effort": "low",
+  "thinking": "enabled",
+  "max_output_tokens": 16384,
+  "max_steps": 20,
+  "datasets": [
+    "synthetic",
+    "tpch"
+  ],
+  "arms": [
+    "ace",
+    "awm",
+    "gmemory",
+    "mavra"
+  ],
+  "modes": {
+    "ace": "paper-ace",
+    "awm": "paper-awm",
+    "gmemory": "paper-gmemory",
+    "mavra": "metric-global-full"
+  },
+  "metrics": [
+    "M1",
+    "M3",
+    "M5"
+  ],
+  "question_set": "v1",
+  "scored_forms": [
+    "single"
+  ],
+  "workload_scope": "Single-period parameterized queries; three fixed metrics spanning basic aggregation, ratios/dimension filters, and multiple fact tables. This is a newly budgeted cohort, not a rerun of the entire historical five-question-form dataset.",
+  "changes": [
+    "append",
+    "backfill",
+    "correct",
+    "addcol",
+    "status",
+    "revision",
+    "dupload",
+    "dimhist",
+    "latekey",
+    "unit",
+    "mirror"
+  ],
+  "rows": 1000000,
+  "sql_timeout_seconds": 120,
+  "concurrency_per_cell": 1,
+  "parallel_cells": 2,
+  "max_repeats": 2,
+  "holdout_agents": [
+    "A"
+  ],
+  "memory_scope": "ACE/AWM retain private agent A memory; G-Memory shares within the dataset run. A also performs source learning so private methods can use learned knowledge. Every question starts a new conversation.",
+  "feedback": "All four planners receive the same bounded format of their own previous questions, answers, SQL, observations and binary correctness. ACE/AWM/G-Memory retain their published update algorithms; MAVRA retains native publication/maintenance. No gold SQL/value, hidden change label, or other method trace is exposed.",
+  "scenario_isolation": "Each change starts from v1 data and post-heldout memory; all four memory implementations restore the same checkpoint boundary.",
+  "execution_order": "Same fixed Latin-rotated arm order, two datasets per arm. Repeat 2 requires the entire first block plus remaining funds > 1.2 times first-block incremental charge + CNY 0.4, and enough time. All charges include failed attempts.",
+  "failure_policy": "Retain all attempts and incurred costs. Model errors/refusals count as incorrect. An infrastructure failure or budget-interrupted cell does not become a completed full-method result; incomplete matched blocks are separately reported.",
+  "reporting": "Accuracy per setting and the original four setting groups with equal setting weights; run ranges only when more than one complete repeat exists. Include all failed answers, memory costs, request usage and budget guards.",
+  "baseline_sources": {
+    "ace": "ace-agent/ace@82709de; released no-ground-truth Reflector/Curator and playbook utilities, existing SQL tool adaptation",
+    "awm": "zorazrw/agent-workflow-memory@8c0ff8c; released prompts and online induction schedule, existing SQL tool adaptation",
+    "gmemory": "bingreeky/GMemory@7b581c5; unchanged official memory core and released MiniLM/retrieval/merge settings via existing service",
+    "mavra": "Current Rust implementation, metric-global-full: snapshot regression, condition sharing, optimization and snapshot execution"
+  },
+  "status_before_execution": "Prepared; no paid calls in this cohort.",
+  "expected_tasks_per_cell": {
+    "synthetic": 32,
+    "tpch": 26
+  },
+  "expected_scored_tasks_per_cell": {
+    "synthetic": 26,
+    "tpch": 20
+  },
+  "domain_adaptation": "ACE and AWM use released components through the attributed SQL adapters; G-Memory core is unchanged. Domain-specific failure wording is analytical SQL. Upstream empty transport-error replies are surfaced as adapter failures. All four methods retain common native SQL tools and metadata caches; MAVRA additionally has its native checked metric tools.",
+  "feedback_history": {
+    "records": 3,
+    "max_sql_chars": 1800,
+    "max_observations": 3,
+    "max_observation_chars": 350,
+    "scope": "same actor; each change restores the post-heldout checkpoint",
+    "excludes": [
+      "gold answers",
+      "gold SQL",
+      "hidden change labels",
+      "other methods trajectories"
+    ]
+  },
+  "repairs": [
+    "AST-bound query-local uniqueness proofs for filtered/derived inputs and correlated EXISTS; keep base-table counterexamples",
+    "Unavailable definitions retain attributed business semantics and explicitly invalid historical mappings; execution is still denied"
+  ],
+  "selection": "Retain the entire previous two-schema eleven-change suite; no outcome-based scenario or repeat selection. This rerun is informed by the prior failure analysis and is not an unseen evaluation.",
+  "prior_priced_usage_cny": 8.69698742,
+  "prior_actual_debit_cny": 8.65,
+  "prior_private_budget": "/root/agentdb-published-scenarios-20261030/results/published-scenarios-20261030/budget/budget-state.json",
+  "prior_public_archive_sha256": "60038c0c10ffb82d57fe9ec194ea2b225d636749b0b2eae5ad14e7f0b5f54006",
+  "price_policy": "Verified weekend off-peak rates; reject outside the frozen weekend window. Carry prior priced usage conservatively and original account baseline; include all new attempts.",
+  "pricing_window_end_utc": "2026-11-01T16:00:00+00:00",
+  "offpeak_guard_cny_per_million": {
+    "hit": 0.02,
+    "miss": 1.0,
+    "output": 4.0
+  },
+  "prior_ledger_sha256": "44c56216254615e21efc4731331e008b9c8ee6a4bd59c070c4aee2af9a051cde"
+}

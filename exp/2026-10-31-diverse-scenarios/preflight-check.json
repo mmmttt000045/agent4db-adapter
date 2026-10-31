@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "paid_model_calls": 0,
+  "question_banks": {
+    "synthetic": {
+      "variants": 12,
+      "max_tasks": 34,
+      "max_scored": 28,
+      "max_unique_scored_questions": 17,
+      "prefix_invariance": true
+    },
+    "tpch": {
+      "variants": 12,
+      "max_tasks": 34,
+      "max_scored": 28,
+      "max_unique_scored_questions": 18,
+      "prefix_invariance": true
+    }
+  },
+  "prior_cumulative_calls": 5144,
+  "prior_upper_cny": 14.310000000000002,
+  "remaining_upper_cny": 5.689999999999998,
+  "durable_budget_initialized": true,
+  "smoke_plan_structure_matches": true
+}

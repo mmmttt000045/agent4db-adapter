@@ -1,0 +1,14 @@
+
+running 65 tests
+.....iiiiiiii....................................................
+test result: ok. 57 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+
+running 1 test
+
+thread 'integration_tests::postgres_scoped_sql_admission' (2581308) has overflowed its stack
+fatal runtime error: stack overflow, aborting
+error: test failed, to rerun pass `--bin agentdb-mid`
+
+Caused by:
+  process didn't exit successfully: `/root/agentdb-diverse-scenarios-20261031/target/debug/deps/agentdb_mid-9b7a171dc99c1c59 postgres_scoped_sql_admission --ignored --nocapture --quiet` (signal: 6, SIGABRT: process abort signal)

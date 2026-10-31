@@ -1,0 +1,11 @@
+
+running 64 tests
+.........iiiiiiii...............................................
+test result: ok. 56 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+
+running 1 test
+Scoped admission: {"base_verdict_unchanged":true,"exists_count":"4","filtered_preaggregate_value":"25.00","on_filter_value":"25.00","scalar_value":"300","self_join_value":"75","unfiltered_rejected":true}
+.
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 63 filtered out; finished in 0.73s
+

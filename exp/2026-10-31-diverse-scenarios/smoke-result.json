@@ -1,0 +1,208 @@
+{
+  "ace": {
+    "initial": {
+      "system_prompt": "\n\nEnvironment feedback from your own earlier tasks (binary correctness; no reference answers):\n[]\n\nYou are also provided with a curated playbook of strategies, API-specific information, common mistakes, and proven solutions to help you solve the task effectively.\n\n**Playbook**: - Read the **Playbook** first, then execute the task by explicitly leveraging each relevant section:\n### PLAYBOOK BEGIN\n## STRATEGIES & INSIGHTS\n\n## FORMULAS & CALCULATIONS\n\n## CODE SNIPPETS & TEMPLATES\n\n## COMMON MISTAKES TO AVOID\n\n## PROBLEM-SOLVING HEURISTICS\n\n## CONTEXT CLUES & INDICATORS\n\n## OTHERS\n### PLAYBOOK END\n\nReport any used playbook bullet IDs in final_answer.bullet_ids.",
+      "user_prompt": "",
+      "playbook_bullets": 0,
+      "common_feedback": []
+    },
+    "first_update": {
+      "seconds": 0.007721837610006332,
+      "input_tokens": 10,
+      "output_tokens": 10,
+      "bullet_tags": [],
+      "operations": [],
+      "playbook_bullets": 0
+    },
+    "restored": {
+      "ok": true,
+      "k": 1,
+      "branch": 1
+    },
+    "warm": {
+      "system_prompt": "\n\nEnvironment feedback from your own earlier tasks (binary correctness; no reference answers):\n[{\"question\": \"Compute the monthly total.\", \"own_answer\": \"0\", \"correct\": true, \"own_sql\": \"SELECT 0\", \"own_observations\": [{\"tool\": \"run_sql\", \"output\": \"{\\\"ref\\\": \\\"r1\\\", \\\"result\\\": {\\\"columns\\\": [\\\"v\\\"], \\\"rows\\\": [[\\\"0\\\"]]}, \\\"source\\\": \\\"snapshot\\\"}\"}]}]\n\nYou are also provided with a curated playbook of strategies, API-specific information, common mistakes, and proven solutions to help you solve the task effectively.\n\n**Playbook**: - Read the **Playbook** first, then execute the task by explicitly leveraging each relevant section:\n### PLAYBOOK BEGIN\n## STRATEGIES & INSIGHTS\n\n## FORMULAS & CALCULATIONS\n\n## CODE SNIPPETS & TEMPLATES\n\n## COMMON MISTAKES TO AVOID\n\n## PROBLEM-SOLVING HEURISTICS\n\n## CONTEXT CLUES & INDICATORS\n\n## OTHERS\n### PLAYBOOK END\n\nReport any used playbook bullet IDs in final_answer.bullet_ids.",
+      "user_prompt": "",
+      "playbook_bullets": 0,
+      "common_feedback": [
+        {
+          "question": "Compute the monthly total.",
+          "own_answer": "0",
+          "correct": true,
+          "own_sql": "SELECT 0",
+          "own_observations": [
+            {
+              "tool": "run_sql",
+              "output": "{\"ref\": \"r1\", \"result\": {\"columns\": [\"v\"], \"rows\": [[\"0\"]]}, \"source\": \"snapshot\"}"
+            }
+          ]
+        }
+      ]
+    },
+    "update_forms": [
+      "single",
+      "diff",
+      "rank_month",
+      "peak_rise",
+      "above_mean"
+    ]
+  },
+  "awm": {
+    "initial": {
+      "system_prompt": "\n\nEnvironment feedback from your own earlier tasks (binary correctness; no reference answers):\n[]",
+      "user_prompt": "",
+      "workflow_chars": 0,
+      "common_feedback": []
+    },
+    "first_update": {
+      "success": true,
+      "seconds": 0.003930341452360153,
+      "input_tokens": 5,
+      "output_tokens": 5,
+      "experiences": 1,
+      "examples": 1,
+      "workflow_chars": 34,
+      "finish_reason": "stop"
+    },
+    "restored": {
+      "ok": true,
+      "k": 1,
+      "branch": 1
+    },
+    "warm": {
+      "system_prompt": "\n\nEnvironment feedback from your own earlier tasks (binary correctness; no reference answers):\n[{\"question\": \"Compute the monthly total.\", \"own_answer\": \"0\", \"correct\": true, \"own_sql\": \"SELECT 0\", \"own_observations\": [{\"tool\": \"run_sql\", \"output\": \"{\\\"ref\\\": \\\"r1\\\", \\\"result\\\": {\\\"columns\\\": [\\\"v\\\"], \\\"rows\\\": [[\\\"0\\\"]]}, \\\"source\\\": \\\"snapshot\\\"}\"}]}]\n\n{\"operations\":[],\"bullet_tags\":[]}",
+      "user_prompt": "",
+      "workflow_chars": 34,
+      "common_feedback": [
+        {
+          "question": "Compute the monthly total.",
+          "own_answer": "0",
+          "correct": true,
+          "own_sql": "SELECT 0",
+          "own_observations": [
+            {
+              "tool": "run_sql",
+              "output": "{\"ref\": \"r1\", \"result\": {\"columns\": [\"v\"], \"rows\": [[\"0\"]]}, \"source\": \"snapshot\"}"
+            }
+          ]
+        }
+      ]
+    },
+    "update_forms": [
+      "single",
+      "diff",
+      "rank_month",
+      "peak_rise",
+      "above_mean"
+    ]
+  },
+  "gmemory": {
+    "initial": {
+      "prompt": "\n## Successful Examples (Reference Cases)\nBelow are some examples of similar tasks that were successfully completed.  \nPlease use these as references to guide your thinking and approach to the current task:\n\n\n---\n\n## Your Own Past Successes (Execution Patterns)\nHere are examples of successful execution processes you've previously used on similar tasks.  \nPay special attention to the step-by-step procedures and strategies, especially when encountering obstacles:\n\n\n---\n\n## Key Insights from Related Tasks\nThe following are insights gathered during the execution of similar tasks. You may refer to them during your task execution to improve problem-solving accuracy.\n\n\n---\n\n## Your Turn: Take Action!\nUse the above examples and insights as a foundation, and now work on the following task:\nCompute the monthly total.\n\n>\n",
+      "n_success": 0,
+      "n_insights": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "system_prompt": "\n\nEnvironment feedback from your own earlier tasks (binary correctness; no reference answers):\n[]",
+      "user_prompt": "\n\n\n## Successful Examples (Reference Cases)\nBelow are some examples of similar tasks that were successfully completed.  \nPlease use these as references to guide your thinking and approach to the current task:\n\n\n---\n\n## Your Own Past Successes (Execution Patterns)\nHere are examples of successful execution processes you've previously used on similar tasks.  \nPay special attention to the step-by-step procedures and strategies, especially when encountering obstacles:\n\n\n---\n\n## Key Insights from Related Tasks\nThe following are insights gathered during the execution of similar tasks. You may refer to them during your task execution to improve problem-solving accuracy.\n\n\n---\n\n## Your Turn: Take Action!\nUse the above examples and insights as a foundation, and now work on the following task:\nCompute the monthly total.\n\n>\n",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "common_feedback": []
+    },
+    "first_update": {
+      "ok": true,
+      "memory_size": 1,
+      "prompt_tokens": 5,
+      "completion_tokens": 5,
+      "input_tokens": 5,
+      "output_tokens": 5,
+      "seconds": 0.10990373976528645
+    },
+    "restored": {
+      "ok": true,
+      "k": 1,
+      "branch": 1
+    },
+    "warm": {
+      "prompt": "\n## Successful Examples (Reference Cases)\nBelow are some examples of similar tasks that were successfully completed.  \nPlease use these as references to guide your thinking and approach to the current task:\n\n\n---\n\n## Your Own Past Successes (Execution Patterns)\nHere are examples of successful execution processes you've previously used on similar tasks.  \nPay special attention to the step-by-step procedures and strategies, especially when encountering obstacles:\n\nTask 1:\n\n### Task description:   \nCompute the monthly total.\n- Environment feedback\nThe final answer was correct.\n    \n\n### Key steps:\n{\"operations\":[],\"bullet_tags\":[]}\n\n### Detailed trajectory:\n> run_sql: {\"sql\": \"SELECT 0\"}\n{\"ref\": \"r1\", \"result\": {\"columns\": [\"v\"], \"rows\": [[\"0\"]]}, \"sql\": \"SELECT 0\", \"source\": \"snapshot\"}\n> final_answer: {\"answer\": \"0\"}\nrecorded\n\n\n---\n\n## Key Insights from Related Tasks\nThe following are insights gathered during the execution of similar tasks. You may refer to them during your task execution to improve problem-solving accuracy.\n\n\n---\n\n## Your Turn: Take Action!\nUse the above examples and insights as a foundation, and now work on the following task:\nCompute the monthly total.\n\n>\n",
+      "n_success": 1,
+      "n_insights": 0,
+      "prompt_tokens": 5,
+      "completion_tokens": 5,
+      "system_prompt": "\n\nEnvironment feedback from your own earlier tasks (binary correctness; no reference answers):\n[{\"question\": \"Compute the monthly total.\", \"own_answer\": \"0\", \"correct\": true, \"own_sql\": \"SELECT 0\", \"own_observations\": [{\"tool\": \"run_sql\", \"output\": \"{\\\"ref\\\": \\\"r1\\\", \\\"result\\\": {\\\"columns\\\": [\\\"v\\\"], \\\"rows\\\": [[\\\"0\\\"]]}, \\\"source\\\": \\\"snapshot\\\"}\"}]}]",
+      "user_prompt": "\n\n\n## Successful Examples (Reference Cases)\nBelow are some examples of similar tasks that were successfully completed.  \nPlease use these as references to guide your thinking and approach to the current task:\n\n\n---\n\n## Your Own Past Successes (Execution Patterns)\nHere are examples of successful execution processes you've previously used on similar tasks.  \nPay special attention to the step-by-step procedures and strategies, especially when encountering obstacles:\n\nTask 1:\n\n### Task description:   \nCompute the monthly total.\n- Environment feedback\nThe final answer was correct.\n    \n\n### Key steps:\n{\"operations\":[],\"bullet_tags\":[]}\n\n### Detailed trajectory:\n> run_sql: {\"sql\": \"SELECT 0\"}\n{\"ref\": \"r1\", \"result\": {\"columns\": [\"v\"], \"rows\": [[\"0\"]]}, \"sql\": \"SELECT 0\", \"source\": \"snapshot\"}\n> final_answer: {\"answer\": \"0\"}\nrecorded\n\n\n---\n\n## Key Insights from Related Tasks\nThe following are insights gathered during the execution of similar tasks. You may refer to them during your task execution to improve problem-solving accuracy.\n\n\n---\n\n## Your Turn: Take Action!\nUse the above examples and insights as a foundation, and now work on the following task:\nCompute the monthly total.\n\n>\n",
+      "input_tokens": 5,
+      "output_tokens": 5,
+      "common_feedback": [
+        {
+          "question": "Compute the monthly total.",
+          "own_answer": "0",
+          "correct": true,
+          "own_sql": "SELECT 0",
+          "own_observations": [
+            {
+              "tool": "run_sql",
+              "output": "{\"ref\": \"r1\", \"result\": {\"columns\": [\"v\"], \"rows\": [[\"0\"]]}, \"source\": \"snapshot\"}"
+            }
+          ]
+        }
+      ]
+    },
+    "update_forms": [
+      "single",
+      "diff",
+      "rank_month",
+      "peak_rise",
+      "above_mean"
+    ]
+  },
+  "mavra": {
+    "initial": {
+      "system_prompt": "\n\nEnvironment feedback from your own earlier tasks (binary correctness; no reference answers):\n[]",
+      "user_prompt": "",
+      "common_feedback": []
+    },
+    "first_update": {
+      "common_feedback_recorded": true,
+      "feedback_records": 1,
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    "restored": {
+      "ok": true,
+      "k": 1,
+      "branch": 1
+    },
+    "warm": {
+      "system_prompt": "\n\nEnvironment feedback from your own earlier tasks (binary correctness; no reference answers):\n[{\"question\": \"Compute the monthly total.\", \"own_answer\": \"0\", \"correct\": true, \"own_sql\": \"SELECT 0\", \"own_observations\": [{\"tool\": \"run_metric\", \"output\": \"{\\\"ref\\\": \\\"r1\\\", \\\"result\\\": {\\\"columns\\\": [\\\"v\\\"], \\\"rows\\\": [[\\\"0\\\"]]}, \\\"source\\\": \\\"snapshot\\\"}\"}]}]",
+      "user_prompt": "",
+      "common_feedback": [
+        {
+          "question": "Compute the monthly total.",
+          "own_answer": "0",
+          "correct": true,
+          "own_sql": "SELECT 0",
+          "own_observations": [
+            {
+              "tool": "run_metric",
+              "output": "{\"ref\": \"r1\", \"result\": {\"columns\": [\"v\"], \"rows\": [[\"0\"]]}, \"source\": \"snapshot\"}"
+            }
+          ]
+        }
+      ]
+    },
+    "update_forms": [
+      "single",
+      "diff",
+      "rank_month",
+      "peak_rise",
+      "above_mean"
+    ]
+  },
+  "native": {
+    "tasks": 34,
+    "database_cleaned_up": true
+  },
+  "fake_model_calls": 73,
+  "scientific_evidence": false,
+  "paid_model_calls": 0
+}

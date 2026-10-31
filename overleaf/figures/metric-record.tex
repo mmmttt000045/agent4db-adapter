@@ -6,7 +6,7 @@
 \else
 \includegraphics[width=\columnwidth]{figures/metric-record}
 \fi
-\caption{\bt{Agents follow different schema, value-probing, and join-testing trajectories, yet rediscover overlapping database knowledge. Ellipses denote omitted agents; bundled requests and dashed returns illustrate multi-round interactions (schematic).}{多个智能体的模式检查、取值探查与连接测试过程各不相同，但会重复发现重叠的数据库知识。省略号表示其他智能体，成束请求与虚线返回表示多轮交互（示意图）。}}
+\caption{\bt{Agents follow different exploration paths yet rediscover overlapping database knowledge. Ellipses indicate omitted agents; bundled requests and dashed returns represent multiple rounds.}{多个智能体的模式检查、取值探查与连接测试过程各不相同，但会重复发现重叠的数据库知识。省略号表示其他智能体，成束请求与虚线返回表示多轮交互（示意图）。}}
 \label{fig:metric-record}
 \Description{A population of independent LLM agents is illustrated by Agent 1, Agent 2, and Agent N, asking example questions about revenue in March, September, and the third quarter. The workbenches show different representative trajectories. Agent 1 inspects two schemas, samples values with LIMIT, and tests a join key. Agent 2 inspects selected column metadata, checks a join with COUNT(*), then compares sampled results and revisits the join test. Agent N enumerates period values with DISTINCT, browses a table catalog, and compares candidate key alignments; a feedback path revisits values after schema inspection. Ellipses denote additional agents and their exploration paths. Warm-colored request paths carry packets toward one shared database, with dashed return paths. The database shows store\_sales joined to date\_dim. Repeated read arrows hit the same highlighted value fields. The trajectories and packet counts are schematic, not recorded executions.}
 \end{figure}

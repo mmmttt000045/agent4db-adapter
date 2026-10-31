@@ -9,7 +9,11 @@ use anyhow::{anyhow, bail, ensure, Result};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use sqlparser::ast::{Expr, Ident, SetExpr, Statement, VisitMut, VisitorMut};
+use sqlparser::dialect::PostgreSqlDialect;
+use sqlparser::parser::Parser;
 use std::collections::{BTreeMap, BTreeSet};
+use std::ops::ControlFlow;
 use std::sync::OnceLock;
 use std::time::Instant;
 
@@ -336,7 +340,7 @@ pub fn check_join_orientation(m: &Metric) -> Result<()> {
 }
 
 /// 由口径字段编译规范 SQL（G7、G8 与修复后的示例使用）。规范 SQL 不给表起别名：关联条件与期间谓词用表名限定列，
-/// 度量与过滤按口径原文（列名在口径涉及的表之间重名时，口径须写成 `表.列`）。左关联的过滤放在 ON 中，避免把左关联变成内关联。
+/// 度量按口径原文；各表过滤中的裸列按 filters 的所属表限定。左关联过滤留在 ON 中。
 pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
     check_join_orientation(m)?;
     let time = m.time.as_ref().ok_or_else(|| anyhow!("口径没有时间定义，无法按期间编译"))?;
@@ -349,19 +353,20 @@ pub fn compile(m: &Metric, ask: &Ask) -> Result<String> {
         let mut conds: Vec<String> = j.on.iter().map(|(l, r)| format!("{}.{l} = {other}.{r}", j.left)).collect();
         let mut seen_on = BTreeSet::new();
         for f in j.filters.get(other).into_iter().chain(m.filters.get(other)) {
+            let f = qualify_owned_filter(other, f)?;
             match j.kind {
-                JoinKind::Left => push_unique(&mut conds, &mut seen_on, f),
-                JoinKind::Inner => push_unique(&mut wheres, &mut seen, f),
+                JoinKind::Left => push_unique(&mut conds, &mut seen_on, &f),
+                JoinKind::Inner => push_unique(&mut wheres, &mut seen, &f),
             }
         }
         if let Some(f) = j.filters.get(&j.left) {
-            push_unique(&mut wheres, &mut seen, f);
+            push_unique(&mut wheres, &mut seen, &qualify_owned_filter(&j.left, f)?);
         }
         let kw = if j.kind == JoinKind::Left { "left join" } else { "join" };
         from.push_str(&format!(" {kw} {other} on {}", conds.join(" and ")));
     }
     if let Some(f) = m.filters.get(&m.fact) {
-        push_unique(&mut wheres, &mut seen, f);
+        push_unique(&mut wheres, &mut seen, &qualify_owned_filter(&m.fact, f)?);
     }
     let joined = if time.is_column() {
         from.clone()
@@ -450,19 +455,20 @@ pub fn feature_lateral(m: &Metric, alias: &str, seed_key: &str) -> Result<String
         let mut conds: Vec<String> = j.on.iter().map(|(l, r)| format!("{}.{l} = {other}.{r}", j.left)).collect();
         let mut seen_on = BTreeSet::new();
         for f in j.filters.get(other).into_iter().chain(m.filters.get(other)) {
+            let f = qualify_owned_filter(other, f)?;
             match j.kind {
-                JoinKind::Left => push_unique(&mut conds, &mut seen_on, f),
-                JoinKind::Inner => push_unique(&mut wheres, &mut seen, f),
+                JoinKind::Left => push_unique(&mut conds, &mut seen_on, &f),
+                JoinKind::Inner => push_unique(&mut wheres, &mut seen, &f),
             }
         }
         if let Some(f) = j.filters.get(&j.left) {
-            push_unique(&mut wheres, &mut seen, f);
+            push_unique(&mut wheres, &mut seen, &qualify_owned_filter(&j.left, f)?);
         }
         let kw = if j.kind == JoinKind::Left { "left join" } else { "join" };
         from.push_str(&format!(" {kw} {other} on {}", conds.join(" and ")));
     }
     if let Some(f) = m.filters.get(&m.fact) {
-        push_unique(&mut wheres, &mut seen, f);
+        push_unique(&mut wheres, &mut seen, &qualify_owned_filter(&m.fact, f)?);
     }
     match &e.anchor {
         // 关联实体：via 等于种子所指实体行上的 anchor 列
@@ -570,6 +576,34 @@ pub fn qualify_aliases(expr: &str, allowed: &BTreeSet<String>, cat: &Catalog) ->
         }
     })
     .into_owned()
+}
+
+/// A table-keyed filter has a known owner even when joined tables share a column
+/// name. Bind identifiers through the SQL AST; leave literals and function names
+/// alone, and preserve the original text when no binding changes are needed.
+fn qualify_owned_filter(table: &str, filter: &str) -> Result<String> {
+    struct Bind<'a> {
+        table: &'a str,
+        changed: bool,
+    }
+    impl VisitorMut for Bind<'_> {
+        type Break = ();
+        fn pre_visit_expr(&mut self, expr: &mut Expr) -> ControlFlow<()> {
+            if let Expr::Identifier(column) = expr {
+                *expr = Expr::CompoundIdentifier(vec![Ident::new(self.table), column.clone()]);
+                self.changed = true;
+            }
+            ControlFlow::Continue(())
+        }
+    }
+    let mut statements = Parser::parse_sql(&PostgreSqlDialect {}, &format!("SELECT 1 WHERE {filter}"))?;
+    ensure!(statements.len() == 1, "过滤必须是单个表达式");
+    let Statement::Query(query) = &mut statements[0] else { bail!("过滤必须是表达式") };
+    let SetExpr::Select(select) = query.body.as_mut() else { bail!("过滤必须是表达式") };
+    let expression = select.selection.as_mut().ok_or_else(|| anyhow!("过滤不能为空"))?;
+    let mut bind = Bind { table, changed: false };
+    let _ = VisitMut::visit(expression, &mut bind);
+    Ok(if bind.changed { expression.to_string() } else { filter.to_string() })
 }
 
 /// 表达式只能引用 `allowed` 中表的列与少量函数、关键字；不允许子查询与多语句。
@@ -1377,13 +1411,25 @@ mod tests {
     }
 
     #[test]
+    fn owned_filters_bind_shared_columns_without_changing_literals() {
+        assert_eq!(qualify_owned_filter("lineitem", "is_current = 1").unwrap(), "lineitem.is_current = 1");
+        assert_eq!(qualify_owned_filter("part", "is_current = 'Y'").unwrap(), "part.is_current = 'Y'");
+        assert_eq!(
+            qualify_owned_filter("part", "coalesce(is_current, 'is_current') = 'Y'").unwrap(),
+            "coalesce(part.is_current, 'is_current') = 'Y'"
+        );
+        assert_eq!(qualify_owned_filter("part", "part.is_current = 'Y'").unwrap(), "part.is_current = 'Y'");
+        assert!(qualify_owned_filter("part", "is_current = 'Y'; select 2").is_err());
+    }
+
+    #[test]
     fn compile_keeps_left_join_filters_in_on_clause() {
         let m = rate();
         let p = |y, mo| Period::month(y, mo);
         let single = compile(&m, &Ask::Single { period: p(2002, 9) }).unwrap();
         assert!(single.contains(
             "left join store_returns on store_sales.ss_ticket_number = store_returns.sr_ticket_number \
-             and store_sales.ss_item_sk = store_returns.sr_item_sk and (sr_status = '完成')"
+             and store_sales.ss_item_sk = store_returns.sr_item_sk and (store_returns.sr_status = '完成')"
         ));
         assert!(single.contains(
             "join date_dim on store_sales.ss_sold_date_sk = date_dim.d_date_sk where date_dim.d_year = 2002 and date_dim.d_moy between 9 and 9"
@@ -1405,12 +1451,12 @@ mod tests {
         let mut inner = m.clone();
         inner.joins[0].kind = JoinKind::Inner;
         let s = compile(&inner, &Ask::Single { period: p(2002, 9) }).unwrap();
-        assert!(s.contains("where (sr_status = '完成') and date_dim.d_year = 2002"));
+        assert!(s.contains("where (store_returns.sr_status = '完成') and date_dim.d_year = 2002"));
         let mut literal_filters = m.clone();
         literal_filters.joins[0].filters.insert("store_returns".into(), "sr_status = 'A B'".into());
         literal_filters.filters.insert("store_returns".into(), "sr_status = 'AB'".into());
         let s = compile(&literal_filters, &Ask::Single { period: p(2002, 9) }).unwrap();
-        assert!(s.contains("(sr_status = 'A B') and (sr_status = 'AB')"));
+        assert!(s.contains("(store_returns.sr_status = 'A B') and (store_returns.sr_status = 'AB')"));
         let mut different_values = literal_filters.clone();
         different_values.filters.insert("store_returns".into(), "sr_status = 'A B'".into());
         assert!(!same_structure(&literal_filters, &different_values));

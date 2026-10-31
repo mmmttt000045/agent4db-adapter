@@ -98,9 +98,10 @@ impl Provider {
                 "{prefix}_THINKING 必须为 enabled 或 disabled"
             );
             // DeepSeek 与智谱 BigModel 的思考模式都要求在工具调用循环中原样回传 reasoning_content；kunyou 转发 DeepSeek，同样回传
-            let preserve_reasoning = reqwest::Url::parse(&base)
-                .ok()
-                .is_some_and(|u| matches!(u.host_str(), Some("api.deepseek.com" | "open.bigmodel.cn" | "api.kunyou.asia")));
+            let preserve_reasoning = std::env::var_os("FIG6_PRESERVE_REASONING").is_some()
+                || reqwest::Url::parse(&base)
+                    .ok()
+                    .is_some_and(|u| matches!(u.host_str(), Some("api.deepseek.com" | "open.bigmodel.cn" | "api.kunyou.asia")));
             return Ok(Provider::OpenAi {
                 vendor: if name == "openai" { "openai-compatible" } else { name },
                 key: var("API_KEY").ok_or_else(|| anyhow!("缺少 {prefix}_API_KEY（写在 .env 里）"))?,
@@ -442,6 +443,11 @@ async fn openai_chat(
 pub(crate) const SYSTEM_MIDDLE: &str = "工具由数据中间层提供：join_path 返回两表验证过的关联方式（含需要的行过滤）；\
 run_sql 可能拒绝不可靠的写法并说明原因与建议，请按提示修改后重试；返回中的 notices 是中间层对你此前结果的提醒。";
 
+const SYSTEM_BUSINESS_GRAIN: &str = "按题目或已学业务定义的业务键识别事件。其他字段相似、金额相同或结果不同于历史答案，\
+不足以证明不同业务键的记录是重复数据。改变统计粒度、时间归属或度量前，需要当前数据与业务定义的依据。";
+const SYSTEM_METRIC_USE: &str = "回答已知业务指标时，先用 find_metric 查找定义。已有可用定义时，优先用 run_metric 按本题的期间和题型执行，\
+保留定义的度量、业务键和时间归属。不可用条目的历史映射仅供修复理解，计算前须核验当前映射；无法可靠恢复时请求澄清。";
+
 /// `chain`：要求 Agent 给出参与答案的查询编号与算式（指标经验评测用）。
 pub fn final_answer_spec(chain: bool) -> ToolSpec {
     let mut schema =
@@ -499,7 +505,6 @@ pub struct AgentRun {
     pub discarded_replies: u32,
     pub discarded_tokens: u64,
     /// 工具调用与结果（结果截断），供记忆基线在会话结束后写记忆；不进报告
-    #[serde(skip)]
     pub transcript: Vec<Value>,
 }
 
@@ -542,11 +547,20 @@ pub async fn run_agent_with(
     tools: &[ToolSpec],
     max_steps: usize,
 ) -> Result<AgentRun> {
+    let mut system = if std::env::var_os("FIG6_LEGACY_SHARED_PROMPT").is_some() {
+        system.to_string()
+    } else {
+        format!("{system}\n{SYSTEM_BUSINESS_GRAIN}")
+    };
+    if tools.iter().any(|tool| tool.name == "run_metric") {
+        system.push('\n');
+        system.push_str(SYSTEM_METRIC_USE);
+    }
     let mut turns = vec![Turn::User(question.to_string())];
     let mut run = AgentRun::default();
     let t0 = Instant::now();
     for _ in 0..max_steps {
-        let r = crate::timing::measure("llm", p.chat(system, &turns, tools)).await?;
+        let r = crate::timing::measure("llm", p.chat(&system, &turns, tools)).await?;
         crate::timing::reply(r.input_tokens, r.output_tokens, r.discarded_tokens, r.model.as_deref());
         run.steps += 1;
         run.input_tokens += r.input_tokens;
@@ -556,6 +570,7 @@ pub async fn run_agent_with(
         }
         run.discarded_replies += r.discarded;
         run.discarded_tokens += r.discarded_tokens;
+        run.transcript.push(json!({"kind":"assistant", "message":r.raw}));
         turns.push(Turn::Assistant { raw: r.raw.clone() });
         if r.calls.is_empty() {
             run.answer = Some(r.text.trim().to_string());
@@ -606,7 +621,11 @@ pub async fn run_agent_with(
                     Value::String(m) => m.clone(),
                     v => v.to_string(),
                 };
-                run.transcript.push(json!({"tool": c.name, "input": c.input, "output": shown.chars().take(2000).collect::<String>()}));
+                run.transcript.push(json!({"kind":"tool", "call_id":c.id, "status":status, "tool":c.name, "input":c.input, "output":shown.chars().take(12000).collect::<String>()}));
+            }
+            if c.name == "final_answer" || c.name == "ask_clarification" {
+                run.transcript
+                    .push(json!({"kind":"tool", "call_id":c.id, "status":status, "tool":c.name, "input":c.input, "output":"recorded"}));
             }
             if let Some(trace) = &mid.trace {
                 let result = if out.is_null() { Value::Null } else { Value::String(out.to_string().chars().take(600).collect()) };

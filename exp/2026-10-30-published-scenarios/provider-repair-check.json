@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "fake_requests": 1,
+  "paid_calls": 0,
+  "thinking": "disabled",
+  "max_tokens": 512,
+  "memory_size": 1
+}

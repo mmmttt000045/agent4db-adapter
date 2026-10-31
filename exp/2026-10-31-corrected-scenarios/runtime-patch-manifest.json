@@ -1,0 +1,8 @@
+{
+  "base_adapter": "2026-10-30-published-scenarios frozen runtime",
+  "src/metricbench.rs": {
+    "before_sha256_lf": "705fd52f304fcd1b8e2984047e999fc59a95799181961cfc74244032a40d4996",
+    "after_sha256_lf": "aae7377a20d4dff5f3a30679b6f33dfe6b2ed13e2096fa13fad865867f6b49d6"
+  },
+  "scope": "All four modes enter the same feedback service; native metric publication, maintenance and execution remain enabled."
+}

@@ -1,0 +1,7 @@
+Debug harness RUST_MIN_STACK=16777216
+
+running 1 test
+Scoped admission: {"base_verdict_unchanged":true,"compiled_append_value":"160","exists_count":"4","filtered_preaggregate_value":"25.00","on_filter_value":"25.00","owned_filter_promo_value":"80","scalar_value":"300","self_join_value":"75","stale_and_invalid_execution_denied":true,"unfiltered_rejected":true}
+.
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.99s
+

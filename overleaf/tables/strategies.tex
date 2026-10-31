@@ -9,12 +9,16 @@
 \toprule
 \bt{Method}{方法} & \bt{Information available to later sessions}{后续会话可用的信息} & P & Q & C & D\\
 \midrule
-\bt{No memory}{无记忆} & \bt{nothing; every question is explored}{什么也没有，每道题都探索} & \usedin & \usedin & & \usedin\\
+\bt{No memory}{无记忆} & \bt{no learned definitions or examples; metric reasoning is repeated}{无学得定义或示例，重复推导指标} & \usedin & \usedin & & \usedin\\
 \bt{Single-agent memory}{单智能体记忆} & \bt{\system's memory, but each agent uses only what it learned itself}{\system\ 的记忆，但每个智能体只用自己学到的} & \usedin & & \usedin & \\
 \bt{Example retrieval}{示例检索} & \bt{successful questions, SQL, and derivations; shared without maintenance}{成功题目、SQL 与算式；共享但不维护} & \usedin & & & \usedin\\
-\bt{Invalidate on every write}{每次写入即失效} & \bt{definitions, dropped on any write and relearned}{定义，任何写入都丢弃并重新学习} & & & \usedin & \\
-\bt{Full recheck per definition}{整定义重查} & \bt{definitions, all conditions rechecked on use, no shared results}{定义，使用时重查全部条件、不共享结果} & & & \usedin & \\
+\bt{Retrieval + self-verification}{检索 + 自行核验} & \bt{retrieved examples; prompted to check their premises before reuse}{检索到的示例，提示智能体在复用前核验前提} & & & & \usedin\\
+\bt{Invalidate on schema change}{模式变更时失效} & \bt{definitions retained until a schema change invalidates them}{保留定义，模式变化时使其失效} & & & & \usedin\\
+\bt{Invalidate on every write}{每次写入即失效} & \bt{definitions, discarded after each dependency write and relearned}{依赖表写入后丢弃定义并重新学习} & & & \usedin & \usedin\\
+\bt{Full recheck per definition}{整定义重查} & \bt{all affected conditions scheduled without completed-check reuse; gold-SQL repair reference in D}{调度全部受影响条件，不复用已完成检查；D 中修复使用标准答案 SQL 参照} & & & \usedin & \usedin\\
 \bt{Validation SQL cache}{验证 SQL 缓存} & \bt{rechecks cached by SQL and dependency versions}{按验证 SQL 与依赖版本缓存重查结果} & & & \usedin & \\
+\bt{Current-data regression}{当前数据回归变体} & \bt{\system's regression check compares against learning SQL on current data}{\system\ 的回归检查在当前数据上与学习 SQL 比较} & & & & \usedin\\
+\bt{Gold-SQL reference}{标准答案 SQL 参照变体} & \bt{\system's regression check uses benchmark reference SQL}{\system\ 的回归检查使用基准标准答案 SQL} & & & & \usedin\\
 \addlinespace
 \bt{\textbf{\system\ (ours)}}{\textbf{\system（本文）}} & \bt{one memory for all agents; definitions checked, maintained, and optimized once}{所有智能体共用一份记忆；定义的检查、维护与优化都只做一次} & \usedin & \usedin & \usedin & \usedin\\
 \bottomrule

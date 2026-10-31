@@ -1,0 +1,12 @@
+{
+  "prior_requests_verified": 3378,
+  "prior_usage_floor_cny": 8.69698742,
+  "observed_cumulative_debit_cny": 8.690000000000012,
+  "new_model_calls": 0,
+  "cumulative_authorization_cny": 20,
+  "rates": {
+    "hit": 0.02,
+    "miss": 1.0,
+    "output": 4.0
+  }
+}

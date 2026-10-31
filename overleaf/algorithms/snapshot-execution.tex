@@ -1,0 +1,21 @@
+\begin{algorithm}[t]
+\caption{\bt{Snapshot-bound metric execution}{快照绑定的指标执行}}
+\label{alg:snapshot-execution}
+\normalsize
+\begin{algorithmic}[1]
+\Require Read-only SQL $q$; metric revisions $\mathcal R$; result store $\mathcal H_{\mathrm{tx}}$
+\Ensure Query result $y$, or rejection
+\State \textbf{if} revision, required-filter, or SQL review fails \textbf{then reject}
+\State $\mathcal C_{\mathcal R}\gets\bigcup_{m^r\in\mathcal R}C(m^r)$
+\State Open read-only repeatable-read $s$ with state $D_s$
+\State Read transactional versions $v_s$ inside $s$
+\For{each $c\in\mathcal C_{\mathcal R}$}
+  \State $k\gets\bigl(\operatorname{id}(c),v_s(\operatorname{dep}(c))\bigr)$
+  \State $o\gets\mathcal H_{\mathrm{tx}}[k]$; on miss, run/join $Q_c(D_s)$ and cache $o$
+  \If{$\neg\operatorname{Accept}(c,o)$}
+    \State Abort $s$; invalidate version observation; \textbf{reject}
+  \EndIf
+\EndFor
+\State $y\gets q(D_s)$; commit $s$; \Return $y$
+\end{algorithmic}
+\end{algorithm}

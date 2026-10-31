@@ -11,6 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 tools/experiment-index.py --check
+      - name: Offline scenario budget tests
+        run: |
+          python3 exp/2026-10-30-published-scenarios/test-budget.py
+          python3 exp/2026-10-31-corrected-scenarios/test-budget.py
+          python3 exp/2026-10-31-diverse-scenarios/test-budget.py
 
   test:
     strategy:
@@ -46,6 +51,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --locked postgres_http_mock_lifecycle -- --ignored --nocapture
+      - name: Query-scoped admission and compiled metric regression
+        env:
+          RUST_MIN_STACK: "16777216"
+        run: cargo test --locked postgres_scoped_sql_admission -- --ignored --nocapture
       - uses: actions/upload-artifact@v4
         if: always()
         with:

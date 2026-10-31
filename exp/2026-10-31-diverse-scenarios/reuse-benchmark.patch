@@ -1,0 +1,73 @@
+--- a/src/metricbench.rs
++++ b/src/metricbench.rs
+@@ -66,4 +66,12 @@
+     #[arg(long)]
+     question_bank_only: bool,
++    /// 与已冻结的单期控制组保持相同基础题单。
++    #[arg(long)]
++    legacy_single: bool,
++    /// 独立的 M3 跨题型留出分支，不改变原有变化分支的检查点。
++    #[arg(long, default_value_t=0, value_parser=clap::value_parser!(u32).range(0..=4))]
++    additional_holdout_count: u32,
++    #[arg(long)]
++    no_changes: bool,
+     #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=10))]
+     repeats: u32,
+@@ -328,4 +336,16 @@
+ fn study_tasks(o: &Options, spec: Option<&Spec>) -> Vec<Task> {
+     let mut out = tasks_with(&o.metrics, o.question_set == "v2");
++    if o.legacy_single {
++        out.retain(|t|matches!(t.ask,Ask::Single{..}));
++        let (learn,year)=SPEC_DEFS.get().map_or((2001,2002),|s|(s.learn,s.holdout));
++        if let Some(def)=defs().iter().find(|d|d.id=="M3") {
++            let forms=[Ask::Diff{a:Period::month(year,9),b:Period::month(learn,6)},
++                Ask::RankMonth{year},Ask::PeakRise{year},Ask::AboveMean{year}];
++            for (i,ask) in forms.into_iter().take(o.additional_holdout_count as usize).enumerate() {
++                out.push(Task{id:format!("M3-X{}",i+1),def,ask,set:Set::Type});
++            }
++        }
++        return out;
++    }
+     if o.scenario_extra_count.is_none() { return out; }
+     let (learn,holdout)=SPEC_DEFS.get().map_or((2001,2002),|s|(s.learn,s.holdout));
+@@ -359,5 +379,5 @@
+ fn study_selection<'a>(tasks:&'a[Task],ch:Option<Change>,tables:&[String],extra:Option<u32>)->Vec<&'a Task> {
+     if extra.is_none() {
+-        return tasks.iter().filter(|t|t.set!=Set::Learn)
++        return tasks.iter().filter(|t|t.set!=Set::Learn && !t.id.contains("-X"))
+             .filter(|t|ch.is_none() || t.def.tables.iter().any(|x|tables.iter().any(|y|y==x))).collect();
+     }
+@@ -390,4 +410,7 @@
+                 "ask":t.ask,"question":text(t,false)}));
+         }
++    }
++    for t in tasks.iter().filter(|t|t.id.contains("-X")) {
++        rows.push(json!({"phase":"holdout-extra","task":t.id,"metric":t.def.id,"ask":t.ask,"question":text(t,false)}));
+     }
+     rows
+@@ -1395,4 +1418,18 @@
+         }
+     }
++    if env.o.additional_holdout_count>0 {
++        mid.restore(checkpoint.as_ref().context("缺少新增题分支的检查点")?).await?;
++        // Independent additional-question branch: restore the original heldout boundary.
++        env.ensure_v1("holdout-extra").await?;
++        let selected:Vec<_>=env.tasks.iter().filter(|t|t.id.contains("-X")).collect();
++        let gold=study_gold(env.admin,&selected).await?;
++        let (rows,bad)=audit(env,&mid,&gold).await?;
++        audits.insert("holdout-extra".into(),json!(rows));
++        let ph=Phase{env,mid:&mid,cell:&cell,name:"holdout-extra",gold:&gold,bad:&bad};
++        for agent in &env.o.holdout_agents {
++            for t in &selected {records.push(run_task(&ph,agent,t,defined).await?.json);}
++        }
++        events.insert("holdout-extra".into(),json!(mid.take_metric_events()));
++    }
+     Ok(json!({
+         "cell": cell.id, "mode": mode, "phrasing": phrasing, "repeat": repeat, "seconds": t0.elapsed().as_secs_f64(),
+@@ -1685,5 +1722,5 @@
+         "holdout-agents 不能为空，名称不能含 / 或 |"
+     );
+-    let changes = o.changes.iter().map(|c| Change::parse(c)).collect::<Result<Vec<_>>>()?;
++    let changes = if o.no_changes {vec![]} else {o.changes.iter().map(|c| Change::parse(c)).collect::<Result<Vec<_>>>()?};
+     let timeline = o.timeline.iter().map(|s| Ok((s.clone(), step_of(s)?))).collect::<Result<Vec<_>>>()?;
+     ensure!(!o.lifecycle || (o.modes.len() == 1 && o.repeats == 1), "生命周期评测每个进程只跑一个组、一轮（更新累积，各组要从 v1 开始）");

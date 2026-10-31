@@ -1,0 +1,373 @@
+[
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 3,
+        "m2": 3,
+        "year": 2001
+      }
+    },
+    "metric": "M1",
+    "phase": "learn",
+    "question": "2001 年 3 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "task": "M1-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 11,
+        "m2": 11,
+        "year": 2000
+      }
+    },
+    "metric": "M1",
+    "phase": "learn",
+    "question": "2000 年 11 月的门店营业额是多少？口径：门店营业额 = 门店销售行的净支付额（store_sales.ss_net_paid）之和，按销售日期归属期间。保留两位小数。",
+    "task": "M1-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 2,
+        "m2": 2,
+        "year": 2001
+      }
+    },
+    "metric": "M3",
+    "phase": "learn",
+    "question": "2001 年 2 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+    "task": "M3-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 7,
+        "m2": 7,
+        "year": 2000
+      }
+    },
+    "metric": "M3",
+    "phase": "learn",
+    "question": "2000 年 7 月的门店退货率是多少？口径：门店退货率（%）= 期间内售出的门店销售行所对应的退货金额（sr_return_amt）之和 ÷ 这些销售行的净支付额（ss_net_paid）之和 × 100；按销售日期归属期间，退货按小票号和商品与销售行对应，每笔退货只计一次。保留两位小数。",
+    "task": "M3-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 1,
+        "m2": 1,
+        "year": 2001
+      }
+    },
+    "metric": "M5",
+    "phase": "learn",
+    "question": "2001 年 1 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+    "task": "M5-L1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 10,
+        "m2": 10,
+        "year": 2000
+      }
+    },
+    "metric": "M5",
+    "phase": "learn",
+    "question": "2000 年 10 月的电子品类门店营业额是多少？口径：电子品类门店营业额 = 类别（item.i_category）为“电子”的商品的门店销售净支付额（ss_net_paid）之和，按销售日期归属期间；商品按其当前类别计。保留两位小数。",
+    "task": "M5-L2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 8,
+        "m2": 8,
+        "year": 2002
+      }
+    },
+    "metric": "M1",
+    "phase": "holdout",
+    "question": "2002 年 8 月的门店营业额是多少？保留两位小数。",
+    "task": "M1-P2"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M1",
+    "phase": "holdout",
+    "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M1-T1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 8,
+        "m2": 8,
+        "year": 2002
+      }
+    },
+    "metric": "M3",
+    "phase": "holdout",
+    "question": "2002 年 8 月的门店退货率是多少？保留两位小数。",
+    "task": "M3-P2"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M3",
+    "phase": "holdout",
+    "question": "2002 年 9 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M3-T1"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 8,
+        "m2": 8,
+        "year": 2002
+      }
+    },
+    "metric": "M5",
+    "phase": "holdout",
+    "question": "2002 年 8 月的电子品类门店营业额是多少？保留两位小数。",
+    "task": "M5-P2"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M5",
+    "phase": "holdout",
+    "question": "2002 年 9 月的电子品类门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M5-T1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M1",
+    "phase": "append",
+    "question": "2002 年 9 月的门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M1-T1"
+  },
+  {
+    "ask": {
+      "kind": "above_mean",
+      "year": 2001
+    },
+    "metric": "M3",
+    "phase": "backfill",
+    "question": "2001 年有几个月的门店退货率高于当年 12 个月门店退货率的平均值？只回答月份个数（0–12）。",
+    "task": "M3-T4-B"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 2002
+    },
+    "metric": "M5",
+    "phase": "correct",
+    "question": "2002 年哪个月的电子品类门店营业额最高？只回答月份数字（1–12），并列取最早月份。",
+    "task": "M5-T2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      }
+    },
+    "metric": "M3",
+    "phase": "addcol",
+    "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 2002
+    },
+    "metric": "M3",
+    "phase": "addcol",
+    "question": "2002 年哪个月的门店退货率最高？只回答月份数字（1–12），并列取最早月份。",
+    "task": "M3-T2"
+  },
+  {
+    "ask": {
+      "kind": "peak_rise",
+      "year": 2002
+    },
+    "metric": "M3",
+    "phase": "status",
+    "question": "2002 年哪个月的门店退货率比上一个月增加最多？增加量按本月值减上月值计算。只回答月份数字（2–12），并列取最早月份。",
+    "task": "M3-T3"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M5",
+    "phase": "revision",
+    "question": "2002 年 9 月的电子品类门店营业额比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M5-T1"
+  },
+  {
+    "ask": {
+      "kind": "above_mean",
+      "year": 2002
+    },
+    "metric": "M1",
+    "phase": "dupload",
+    "question": "2002 年有几个月的门店营业额高于当年 12 个月门店营业额的平均值？只回答月份个数（0–12）。",
+    "task": "M1-T4"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M3",
+    "phase": "dupload",
+    "question": "2002 年 9 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M3-T1"
+  },
+  {
+    "ask": {
+      "kind": "rank_month",
+      "year": 2002
+    },
+    "metric": "M5",
+    "phase": "dimhist",
+    "question": "2002 年哪个月的电子品类门店营业额最高？只回答月份数字（1–12），并列取最早月份。",
+    "task": "M5-T2"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      }
+    },
+    "metric": "M5",
+    "phase": "latekey",
+    "question": "2002 年 9 月的电子品类门店营业额是多少？保留两位小数。",
+    "task": "M5-P1"
+  },
+  {
+    "ask": {
+      "kind": "peak_rise",
+      "year": 2002
+    },
+    "metric": "M1",
+    "phase": "unit",
+    "question": "2002 年哪个月的门店营业额比上一个月增加最多？增加量按本月值减上月值计算。只回答月份数字（2–12），并列取最早月份。",
+    "task": "M1-T3"
+  },
+  {
+    "ask": {
+      "kind": "single",
+      "period": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      }
+    },
+    "metric": "M3",
+    "phase": "unit",
+    "question": "2002 年 9 月的门店退货率是多少？保留两位小数。",
+    "task": "M3-P1"
+  },
+  {
+    "ask": {
+      "a": {
+        "m1": 9,
+        "m2": 9,
+        "year": 2002
+      },
+      "b": {
+        "m1": 6,
+        "m2": 6,
+        "year": 2001
+      },
+      "kind": "diff"
+    },
+    "metric": "M3",
+    "phase": "mirror",
+    "question": "2002 年 9 月的门店退货率比2001 年 6 月高多少？（用前者减去后者，结果可以为负数）保留两位小数。",
+    "task": "M3-T1"
+  }
+]

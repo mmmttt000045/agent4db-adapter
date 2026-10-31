@@ -1,0 +1,14 @@
+{
+  "src/metricbench.rs": {
+    "base_sha256_lf": "8c0ece2fff3f78b51519465fd7d9b4c0196a1120063dccc13eacfc2c2265dfff",
+    "patched_sha256_lf": "705fd52f304fcd1b8e2984047e999fc59a95799181961cfc74244032a40d4996"
+  },
+  "tools/relbench/gmemory_service.py": {
+    "base_sha256_lf": "dbbb0b80a84b015a48edcbab43d7668b41906fe59e18cb09edeb7724af10ad00",
+    "patched_sha256_lf": "3b33d7f4c1b6e1200219968e5e56e4f944c9382aefc966045c468dff92c3a557"
+  },
+  "src/llm.rs": {
+    "base_sha256_lf": "71a832bba40489350c45f1b268ad72c7d2d4f0e7dfc9a9e3675536cbcc5ee623",
+    "patched_sha256_lf": "adb4753b200d4b5ca9ef6a6eb9d0fa634d0488f9b0368bbd46a469b7dc526aa5"
+  }
+}

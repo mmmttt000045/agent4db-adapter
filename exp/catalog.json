@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_on": "2026-10-29",
+  "reviewed_on": "2026-10-31",
   "experiments": [
     {
       "id": "2026-09-29-maint-share",
@@ -210,8 +210,8 @@
     {
       "id": "2026-10-10-scenarios-q5",
       "title": "题集 v2、每种方法五轮",
-      "status": "current",
-      "scope": "合成场景正确率依据；旧使用成本宏随旧稿归档，沿用协议中的失败、替换与排除规则。",
+      "status": "historical",
+      "scope": "历史合成场景五轮协议及宏保留；当前 Fig.6 改用 10-31 修复与统一反馈批次。旧使用成本宏随旧稿归档，失败、替换与排除规则仍按本批协议。",
       "evidence": [
         "exp/2026-10-10-scenarios-q5/scen-stats.json",
         "exp/2026-10-10-scenarios-q5/paper-results.json",
@@ -234,7 +234,7 @@
       "id": "2026-10-11-generality",
       "title": "TPC-H、SSB、financial 与回放安全",
       "status": "current",
-      "scope": "模式通用性、TPC-H 端到端与四库服务/拒绝审计；按共同题次统计，保留错误服务。",
+      "scope": "当前固定库四模式回放及服务／拒绝审计，按共同题次统计并保留错误服务；旧 TPC-H 端到端场景保留，当前 Fig.6 已改用 10-31 修复与统一反馈批次。",
       "evidence": [
         "exp/2026-10-11-generality/generality-stats.json",
         "exp/2026-10-11-generality/replay-safety-summary.json",
@@ -522,6 +522,123 @@
       ],
       "raw_data": "历史五截点网关数据与官方 API 数据分开保留；本目录仅记录源码恢复与同步，没有新运行。",
       "code_record": "论文仓库提交 b2755c23953b646e27ccd5fe9a1f9cf1798cca92；恢复来源、编译与核验见 github-push-result.json。"
+    },
+    {
+      "id": "2026-10-30-published-scenarios",
+      "title": "修复前已发表记忆基线比较与失败分析",
+      "status": "supporting",
+      "scope": "修复前两轮比较及逐例分析：发现共用 SQL 审查误拒绝、失效语义丢失及反馈条件差异；原始分数和费用保留。当前 Fig.6 采用 10-31 统一修复后的完整批次，旧结果不与其合并。",
+      "evidence": [
+        "exp/2026-10-30-published-scenarios/protocol.json",
+        "exp/2026-10-30-published-scenarios/frozen-source-manifest.json",
+        "exp/2026-10-30-published-scenarios/runtime-source.tgz",
+        "exp/2026-10-30-published-scenarios/upstream-ace-awm-verification.json",
+        "exp/2026-10-30-published-scenarios/upstream-gmemory-verification.json",
+        "exp/2026-10-30-published-scenarios/offline-smoke-result.json",
+        "exp/2026-10-30-published-scenarios/checkpoint-isolation-check.json",
+        "exp/2026-10-30-published-scenarios/raw-results.tgz",
+        "exp/2026-10-30-published-scenarios/archive-manifest.json",
+        "exp/2026-10-30-published-scenarios/runtime-source-recovery.tgz",
+        "exp/2026-10-30-published-scenarios/provider-repair-check.json",
+        "exp/2026-10-30-published-scenarios/financial-close.json",
+        "exp/2026-10-30-published-scenarios/database-cleanup-check.json",
+        "exp/2026-10-30-published-scenarios/delivery-check.json",
+        "exp/2026-10-30-published-scenarios/failure-analysis.md"
+      ],
+      "analysis": [
+        "exp/2026-10-30-published-scenarios/analyse.py"
+      ],
+      "outputs": [
+        "exp/2026-10-30-published-scenarios/study-stats.json",
+        "exp/2026-10-30-published-scenarios/summary.md",
+        "exp/2026-10-30-published-scenarios/overleaf-numbers.tex"
+      ],
+      "raw_data": "本地 raw-results.tgz 与 results/published-scenarios-20261030/ 保存 893 个归档文件；含 16 个完整格、两次失败学习尝试、逐次 API 用量和轨迹。私有余额字段脱敏，消费记录完整；下载包及所有文件哈希已核对。",
+      "code_record": "首次付费前冻结协议与可执行文件；runtime-source.tgz 保存原始源码，runtime-source-recovery.tgz 保存仅修复回环地址下 provider profile 的恢复增量，未改原生 Rust 二进制及上游核心。analyse.py 从全部完整配对轮生成数值，figure 脚本核对绘图均值与正文宏。"
+    },
+    {
+      "id": "2026-10-31-corrected-scenarios",
+      "title": "SQL 审查／语义保留修复与统一反馈比较",
+      "status": "supporting",
+      "scope": "SQL 审查／语义保留修复后的有效批次：232 任务、184 次计分；当前扩展比较复用其全部六个未变更基线格，旧 MAVRA 仅作历史结果。原始数值、492 文件及累计 14.30 元扣费记录保留。",
+      "evidence": [
+        "exp/2026-10-31-corrected-scenarios/protocol.json",
+        "exp/2026-10-31-corrected-scenarios/frozen-source-manifest.json",
+        "exp/2026-10-31-corrected-scenarios/final-source-manifest.json",
+        "exp/2026-10-31-corrected-scenarios/implementation-amendment.json",
+        "exp/2026-10-31-corrected-scenarios/runtime-source.tgz",
+        "exp/2026-10-31-corrected-scenarios/runtime-source-recovery.tgz",
+        "exp/2026-10-31-corrected-scenarios/data-provenance.json",
+        "exp/2026-10-31-corrected-scenarios/repair-verification-extended.log",
+        "exp/2026-10-31-corrected-scenarios/offline-smoke-result.json",
+        "exp/2026-10-31-corrected-scenarios/raw-results.tgz",
+        "exp/2026-10-31-corrected-scenarios/archive-manifest.json",
+        "exp/2026-10-31-corrected-scenarios/archive-verification.json",
+        "exp/2026-10-31-corrected-scenarios/feedback-comparison-check.json",
+        "exp/2026-10-31-corrected-scenarios/repeat-decision.json",
+        "exp/2026-10-31-corrected-scenarios/financial-close.json",
+        "exp/2026-10-31-corrected-scenarios/database-cleanup-check.json",
+        "exp/2026-10-31-corrected-scenarios/delivery-check.json"
+      ],
+      "analysis": [
+        "exp/2026-10-31-corrected-scenarios/analyse.py",
+        "exp/2026-10-31-corrected-scenarios/verify-comparison.py",
+        "exp/2026-10-31-corrected-scenarios/test-budget.py"
+      ],
+      "outputs": [
+        "exp/2026-10-31-corrected-scenarios/study-stats.json",
+        "exp/2026-10-31-corrected-scenarios/summary.md",
+        "exp/2026-10-31-corrected-scenarios/overleaf-numbers.tex"
+      ],
+      "raw_data": "本地 raw-results.tgz 与 results/corrected-scenarios-20261031/ 保存 492 个校验通过的文件；含8个正式格、1个旧实现调试格及1个零调用失败启动。两项私有余额字段脱敏，原始消费和全部轨迹保留；累计 5,144 次调用含前批 3,378 次。",
+      "code_record": "主源码修复已通过56项 Rust 测试和 PostgreSQL 回归；实现2以修订清单冻结，仅四个声明路径较初始快照改变。全部初始实现结果均排除为调试，费用不排除；原协议、数据、反馈和上游核心保留。按预算／时间门槛停止第二轮，不按准确率选场景；TPC-H 克隆增长的误去重案例及剩余日期键／单位失败如实报告。"
+    },
+    {
+      "id": "2026-10-31-diverse-scenarios",
+      "title": "受检指标执行与跨智能体多题型比较",
+      "status": "current",
+      "scope": "当前 Fig.6：12 道不同问题、四题型、208 次计分；六个冻结基线格、两格原生重跑和八格新增题。两库全情形等权描述性汇总 MAVRA 84.6%、AWM 81.4%，分库结果及全部失败保留。新增六题全对，比 AWM 少 36.7% 调用和 33.3% token；累计扣费 19.72 元。",
+      "evidence": [
+        "exp/2026-10-31-diverse-scenarios/paired-reuse-protocol.json",
+        "exp/2026-10-31-diverse-scenarios/extra-protocol.json",
+        "exp/2026-10-31-diverse-scenarios/reuse-compatibility-check.json",
+        "exp/2026-10-31-diverse-scenarios/paired-extra-decision.json",
+        "exp/2026-10-31-diverse-scenarios/runtime-source.tgz",
+        "exp/2026-10-31-diverse-scenarios/runtime-source-recovery.tgz",
+        "exp/2026-10-31-diverse-scenarios/runtime-source-compatible.tgz",
+        "exp/2026-10-31-diverse-scenarios/runtime-source-extra.tgz",
+        "exp/2026-10-31-diverse-scenarios/extra-source-verification.json",
+        "exp/2026-10-31-diverse-scenarios/smoke-result.json",
+        "exp/2026-10-31-diverse-scenarios/source-replay-smoke.json",
+        "exp/2026-10-31-diverse-scenarios/native-source-replay-smoke.json",
+        "exp/2026-10-31-diverse-scenarios/data-provenance.json",
+        "exp/2026-10-31-diverse-scenarios/local-source-check.json",
+        "exp/2026-10-31-diverse-scenarios/final-source-check.json",
+        "exp/2026-10-31-diverse-scenarios/raw-results.tgz",
+        "exp/2026-10-31-diverse-scenarios/archive-manifest.json",
+        "exp/2026-10-31-diverse-scenarios/archive-verification.json",
+        "exp/2026-10-31-diverse-scenarios/feedback-comparison-check.json",
+        "exp/2026-10-31-diverse-scenarios/case-evidence.json",
+        "exp/2026-10-31-diverse-scenarios/financial-close.json",
+        "exp/2026-10-31-diverse-scenarios/database-cleanup-check.json",
+        "exp/2026-10-31-diverse-scenarios/delivery-check.json"
+      ],
+      "analysis": [
+        "exp/2026-10-31-diverse-scenarios/analyse-paired-reuse.py",
+        "exp/2026-10-31-diverse-scenarios/analyse.py",
+        "tools/figures/two_schemas.py"
+      ],
+      "outputs": [
+        "exp/2026-10-31-diverse-scenarios/study-stats.json",
+        "exp/2026-10-31-diverse-scenarios/summary.md",
+        "exp/2026-10-31-diverse-scenarios/failure-analysis.md",
+        "exp/2026-10-31-diverse-scenarios/overleaf-numbers.tex",
+        "overleaf/gen/published-scenarios.tex",
+        "overleaf/figures/two-schemas.pdf",
+        "overleaf/figures/two-schemas-zh.pdf"
+      ],
+      "raw_data": "新批 raw-results.tgz 与本地 results/diverse-scenarios-20261031/ 共684文件逐项核验，包含被排除的开发运行、两格正式原生、八格新增题及全部1946次本批请求；另复用旧有效对照归档492文件。72个缓存源任务不重复计分；两项私有余额字段脱敏，密钥／连接串扫描通过。",
+      "code_record": "57项 Rust 测试及发布版 PostgreSQL 回归通过；完整轨迹丢失的开发批次全部排除但保留费用。按 compatible 与 extra 源码增量修复并冻结；六个对照全量复用，原生原题库重跑。新增题量由先固定的成本门槛选择，不按准确率选题；主／额外源码、17数据输入及206个上游／适配器文件最终哈希核验通过。"
     }
   ]
 }

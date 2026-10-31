@@ -8,7 +8,7 @@ use crate::db::QKind;
 use crate::knowledge::{BadPath, Basis, Content, Entry, Example, JoinKind, JoinPath, Metric, Status, TimeSpec, TimeStrategy};
 use crate::metric::{self, Answer, Ask, Draft, Trajectory};
 use crate::sqlscan;
-use anyhow::Result;
+use anyhow::{ensure, Result};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet, HashMap};
@@ -84,6 +84,21 @@ fn blocked(s: &Status) -> Option<String> {
         Status::Revoked(r) => Some(format!("已撤销：{r}")),
         Status::Candidate(_) => Some("修复待验证或未通过验证，暂不可用".to_string()),
     }
+}
+
+/// Invalid execution evidence does not erase the previously learned business
+/// meaning. The historical mapping is a repair hint, never an executable grant.
+fn unavailable_view(e: &Entry, reason: &str) -> Value {
+    let mut value = json!({"key": e.key, "revision": e.revision, "status": reason,
+        "execution_allowed": false, "historical_mapping_valid": false});
+    if let Some(m) = metric_of(e) {
+        value["business_semantics"] = json!({"name": m.name, "aliases": m.aliases,
+            "definition": m.definition, "time_role": m.time.as_ref().map(|t| &t.role)});
+        value["historical_mapping"] = json!({"fact": m.fact, "measure": m.measure,
+            "business_key": m.grain, "time": m.time, "joins": m.joins, "filters": m.filters});
+    }
+    value["note"] = json!("保留历史业务含义供理解；旧映射和执行证据已经失效，不可声明为有效引用。重新验证当前记录粒度、关联及时间映射后再计算，保持原业务度量与时间归属；证据不足时请求澄清。");
+    value
 }
 
 /// 结构依赖只看口径引用的列（`used`）：引用列都在且类型不变时，无关列的增删不算结构变化。
@@ -874,7 +889,7 @@ impl Middle {
                     }
                     found.push((e.key.clone(), e.revision));
                 }
-                Checked::Unavailable(e, r) => unavailable.push(json!({"key": e.key, "revision": e.revision, "status": r})),
+                Checked::Unavailable(e, r) => unavailable.push(unavailable_view(&e, &r)),
                 Checked::Missing => {}
             }
         }
@@ -887,7 +902,7 @@ impl Middle {
             v["note"] = json!(if unavailable.is_empty() {
                 "没有匹配的已验证指标口径；请直接查看表结构与数据计算"
             } else {
-                "匹配的口径当前不可用：数据变化后其条件不成立，且没有唯一的自动修复。请直接查看表结构与数据计算，不必再查找口径"
+                "匹配口径的执行证据已失效；unavailable 保留原业务含义及历史映射。先修复并验证当前映射，再按原口径作答；不能把旧映射当成可执行的有效定义。无法可靠恢复时请求澄清"
             });
         }
         Ok(v)
@@ -1385,10 +1400,50 @@ impl Middle {
         self.check_view(ctx, &self.mfk(ctx, key)).await
     }
 
+    /// Execute the published representation rather than asking its consumer to
+    /// reconstruct SQL. The regular revision and snapshot checks still apply.
+    pub async fn run_metric(&self, ctx: &Ctx, key: &str, revision: u32, ask: &Ask) -> Result<Value> {
+        let period_ok = |p: &crate::metric::Period| (1..=9999).contains(&p.year) && (1..=12).contains(&p.m1) && (p.m1..=12).contains(&p.m2);
+        let valid = match ask {
+            Ask::Single { period } => period_ok(period),
+            Ask::Diff { a, b } => period_ok(a) && period_ok(b),
+            Ask::RankMonth { year } | Ask::PeakRise { year } | Ask::AboveMean { year } => (1..=9999).contains(year),
+        };
+        ensure!(valid, "期间参数无效");
+        let mut view = Box::pin(self.use_metric(ctx, key)).await?;
+        if view["status"] != "valid" {
+            view["rejected"] = json!(true);
+            return Ok(view);
+        }
+        if view["revision"].as_u64() != Some(revision as u64) {
+            view["status"] = json!("stale");
+            view["rejected"] = json!(true);
+            view["requested_revision"] = json!(revision);
+            view["reason"] = json!("修订已改变，请重新查找口径后执行");
+            return Ok(view);
+        }
+        let metric: Metric = serde_json::from_value(view["metric"].clone())?;
+        ensure!(metric.entity.is_none(), "实体特征请使用 compose_features");
+        let sql = metric::compile(&metric, ask)?;
+        let refs = [(key.to_string(), revision)];
+        let mut result = Box::pin(self.run_sql_with(ctx, &sql, &refs)).await?;
+        result["sql"] = json!(sql);
+        result["metric"] = json!({"key":key,"revision":revision});
+        Ok(result)
+    }
+
     async fn check_view(&self, ctx: &Ctx, fk: &str) -> Result<Value> {
         Ok(match self.metric_check(ctx, fk).await? {
             Checked::Valid(e) => json!({"status": "valid", "revision": e.revision, "metric": metric_of(&e)}),
-            Checked::Unavailable(e, r) => json!({"status": "unavailable", "revision": e.revision, "reason": r}),
+            Checked::Unavailable(e, r) => {
+                if matches!(e.status, Status::Candidate(_)) && !self.is_repaired(fk) {
+                    return Ok(json!({"status": "unavailable", "revision": e.revision, "reason": r}));
+                }
+                let mut value = unavailable_view(&e, &r);
+                value["status"] = json!("unavailable");
+                value["reason"] = json!(r);
+                value
+            }
             Checked::Missing => json!({"status": "missing"}),
         })
     }
@@ -1642,6 +1697,31 @@ impl Middle {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn invalid_execution_preserves_semantics_without_an_execution_grant() {
+        let metric: Metric = serde_json::from_value(json!({"name":"net revenue", "definition":"net paid by sales time",
+            "fact":"sales", "measure":"sum(net_paid)", "grain":["ticket"], "time":null,
+            "joins":[], "examples":[{"question":"old question", "sql":"select sum(net_paid) from sales"}]}))
+        .unwrap();
+        let entry = Entry {
+            key: "metric:revenue".into(),
+            content: Content::Metric(Box::new(metric)),
+            deps: BTreeMap::new(),
+            guards: vec![],
+            status: Status::Revoked("duplicate keys".into()),
+            created_by: "A".into(),
+            hits: 0,
+            consumers: BTreeSet::new(),
+            revision: 3,
+        };
+        let view = unavailable_view(&entry, "duplicate keys");
+        assert_eq!(view["business_semantics"]["definition"], "net paid by sales time");
+        assert_eq!(view["historical_mapping"]["measure"], "sum(net_paid)");
+        assert_eq!(view["execution_allowed"], false);
+        assert_eq!(view["historical_mapping_valid"], false);
+        assert!(view.get("metric").is_none() && view.get("examples").is_none());
+    }
 
     fn ku(table: &str, cols: &[&str], filter: Option<&str>) -> Check {
         Check::KeyUnique { table: table.into(), cols: cols.iter().map(|c| c.to_string()).collect(), filter: filter.map(str::to_string) }

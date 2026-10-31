@@ -36,7 +36,7 @@ RUNS = {
 # 10-21 night (user): AgentSM (preprint) replaced by two data-preparation systems of the database venues
 ARMS = [("none", "None", "No memory"), ("ace", "ACE", "ACE~\\cite{zhang2026ace}"),
         ("gmemory", "GMem", "G-Memory~\\cite{zhang2025gmemory}"), ("awm", "AWM", "AWM~\\cite{wang2025awm}"),
-        ("deepprep", "DeepPrep", "DeepPrep~\\cite{fan2026deepprep}"), ("featpilot", "FeatPilot", "FeatPilot~\\cite{liang2025featpilot}"),
+        ("deepprep", "DeepPrep", "DeepPrep~\\cite{fan2026deepprep}"), ("featpilot", "FeatPilot", "FeatPilot$^{*}$~\\cite{liang2025featpilot}"),
         ("mavra", "Mavra", "\\textbf{\\system\\ (ours)}")]
 TASK_SHORT = {"post-votes": "post-votes", "user-badge": "user-badge", "user-engagement": "user-engage.",
               "study-outcome": "study-outcome", "study-adverse": "study-adverse", "site-success": "site-success"}

@@ -1,0 +1,24 @@
+{
+  "utc": "2026-10-31T04:40:34.354188+00:00",
+  "implementation_revision": 2,
+  "reason": "The first shared-review development cell exposed right-side LEFT JOIN ON filters, self aliases/scalar correlations, and columns added after Middle initialization. Extend scope analysis and use current catalog metadata; all are shared across methods.",
+  "changed_source_hashes": {
+    "src/integration_tests.rs": "dbcf5cb094923255cab7afc5666ed84f56484e9d5ca201965fa3df79766984fe",
+    "src/sqlscope.rs": "5aceb5a1077062b9a3b75bee36cd13ee47a7b8d727e556f8dc95d084715c6065",
+    "src/middle.rs": "80f3242d8665c8db485acc5cf747a79207f2951dff5d8430012fce21f42e67a3",
+    "target/release/agentdb-mid": "aec44814544ec2ff846ad79a0e39beaca5e8dd90060be7f0c148978a0236063e"
+  },
+  "previous_source_hashes": {
+    "src/integration_tests.rs": "d615ba974f62dd22e8cf47d0861b0ea863fcd9f18ccde404de1297f821c39e55",
+    "src/sqlscope.rs": "7c13d715e8ef2ba19ca6f01bca6d43ff0c739b194e314bdc332d4cbcf73e3c6c",
+    "src/middle.rs": "70556274c872272b8abe7b5ad7b0b96a2c973490d14fb52dab6e7f11c0673849",
+    "target/release/agentdb-mid": "1c2793b1c66f190e276a3ac469ce1f7200df5258e9c346db3035e431d5a93efe"
+  },
+  "unchanged": "Original protocol, complete question/change suite, data input contents, feedback/memory adapters, published memory cores, budget relay and cumulative authorization.",
+  "exclusion_rule": "Every initial-implementation cell is development-only, regardless of outcome. Retain all reports and spending. Rerun every method and dataset under implementation 2.",
+  "comparison_start_upper_cny": 9.820493099999997,
+  "development_requests_retained": 192,
+  "development_incremental_upper_cny": 1.1235056799999974,
+  "repeat_gate": "Remaining cumulative allowance > 1.2 times the final-implementation first-block incremental charge + CNY0.4, and enough time. No decision by accuracy.",
+  "checks": "56 Rust tests passed; PostgreSQL regression after adding source column post-initialization passed ON filtering, CTE preaggregation, self join, scalar correlation and EXISTS; unfiltered duplicates still rejected."
+}

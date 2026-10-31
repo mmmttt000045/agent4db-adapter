@@ -1,0 +1,136 @@
+{
+  "study": "diverse-scenarios-20261031",
+  "created_utc": "2026-10-31T07:43:33.601007+00:00",
+  "deadline_utc": "2026-10-31T15:00:00+00:00",
+  "budget_cny": 20.0,
+  "authorization": "Optimize the implementation and increase question quantity/diversity, keeping the cumulative CNY20 limit and compact figure/paper.",
+  "official_endpoint": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "required_reported_model": "deepseek-flash",
+  "documented_version": "DeepSeek-V4.1-Flash-1017",
+  "pricing_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "peak_guard_cny_per_million": {
+    "hit": 0.04,
+    "miss": 2.0,
+    "output": 8.0
+  },
+  "reasoning_effort": "low",
+  "thinking": "enabled",
+  "max_output_tokens": 16384,
+  "max_steps": 20,
+  "datasets": [
+    "synthetic",
+    "tpch"
+  ],
+  "arms": [
+    "ace",
+    "awm",
+    "gmemory",
+    "mavra"
+  ],
+  "modes": {
+    "ace": "paper-ace",
+    "awm": "paper-awm",
+    "gmemory": "paper-gmemory",
+    "mavra": "metric-global-full"
+  },
+  "metrics": [
+    "M1",
+    "M3",
+    "M5"
+  ],
+  "question_set": "v2",
+  "scored_forms": [
+    "single",
+    "diff",
+    "rank_month",
+    "peak_rise",
+    "above_mean"
+  ],
+  "workload_scope": "Same two schemas, M1/M3/M5 and all eleven independent changes. Six heldout questions per cell and one mandatory question per change; up to one further question per change under a predeclared cost gate.",
+  "changes": [
+    "append",
+    "backfill",
+    "correct",
+    "addcol",
+    "status",
+    "revision",
+    "dupload",
+    "dimhist",
+    "latekey",
+    "unit",
+    "mirror"
+  ],
+  "rows": 1000000,
+  "sql_timeout_seconds": 120,
+  "concurrency_per_cell": 1,
+  "parallel_cells": 2,
+  "max_repeats": 1,
+  "holdout_agents": [
+    "A"
+  ],
+  "memory_scope": "ACE/AWM retain private agent A memory; G-Memory shares within the dataset run. A also performs source learning so private methods can use learned knowledge. Every question starts a new conversation.",
+  "feedback": "All four planners receive the same bounded format of their own previous questions, answers, SQL, observations and binary correctness. ACE/AWM/G-Memory retain their published update algorithms; MAVRA retains native publication/maintenance. No gold SQL/value, hidden change label, or other method trace is exposed.",
+  "scenario_isolation": "Each change starts from v1 data and post-heldout memory; all four memory implementations restore the same checkpoint boundary.",
+  "execution_order": "ACE, AWM, G-Memory, MAVRA; datasets run in parallel, one agent task per cell. One matched run; adaptive extra count uses spending only.",
+  "failure_policy": "Retain all attempts and incurred costs. Model errors/refusals count as incorrect. An infrastructure failure or budget-interrupted cell does not become a completed full-method result; incomplete matched blocks are separately reported.",
+  "reporting": "Equal setting weights, then group means. Full common selected question bank, no incomplete method substitution. One run is not statistical-significance evidence. Include total cumulative spending and every discarded extra request.",
+  "baseline_sources": {
+    "ace": "ace-agent/ace@82709de; released no-ground-truth Reflector/Curator and playbook utilities, existing SQL tool adaptation",
+    "awm": "zorazrw/agent-workflow-memory@8c0ff8c; released prompts and online induction schedule, existing SQL tool adaptation",
+    "gmemory": "bingreeky/GMemory@7b581c5; unchanged official memory core and released MiniLM/retrieval/merge settings via existing service",
+    "mavra": "Current Rust implementation, metric-global-full: snapshot regression, condition sharing, optimization and snapshot execution"
+  },
+  "status_before_execution": "Prepared; no paid calls in this cohort.",
+  "expected_tasks_per_cell": "23+M; ACE raw max34; selected34 when M=11",
+  "expected_scored_tasks_per_cell": "17+M on each schema/arm",
+  "domain_adaptation": "ACE and AWM use released components through the attributed SQL adapters; G-Memory core is unchanged. Domain-specific failure wording is analytical SQL. Upstream empty transport-error replies are surfaced as adapter failures. All four methods retain common native SQL tools and metadata caches; MAVRA additionally has its native checked metric tools.",
+  "feedback_history": {
+    "records": 3,
+    "max_sql_chars": 1800,
+    "max_observations": 3,
+    "max_observation_chars": 350,
+    "scope": "same actor; each change restores the post-heldout checkpoint",
+    "excludes": [
+      "gold answers",
+      "gold SQL",
+      "hidden change labels",
+      "other methods trajectories"
+    ]
+  },
+  "repairs": [
+    "Table-owned filter qualification fixes ambiguous shared column names in metric/feature compilation",
+    "run_metric compiles stored definitions for model-supplied kinds/periods and retains revision/snapshot checks",
+    "Common business-key evidence instruction for all methods; native tool-use guidance for available metric execution"
+  ],
+  "selection": "All eleven original scenarios are mandatory, including lossy dates and units. All outcomes on the selected common bank enter accuracy. Original study retained separately; versions are not pooled.",
+  "prior_priced_usage_cny": 14.30771646,
+  "prior_actual_debit_cny": 14.3,
+  "prior_private_budget": "/root/agentdb-corrected-scenarios-20261031/results/corrected-scenarios-20261031/budget/budget-state.json",
+  "prior_public_archive_sha256": "dfe1e2fb3ed6f4c6f86417bdbfa97cfd0c01999e7dabb5129c460dfa61b8e320",
+  "price_policy": "Verified weekend off-peak rates; reject outside the frozen weekend window. Carry prior priced usage conservatively and original account baseline; include all new attempts.",
+  "pricing_window_end_utc": "2026-11-01T16:00:00+00:00",
+  "offpeak_guard_cny_per_million": {
+    "hit": 0.02,
+    "miss": 1.0,
+    "output": 4.0
+  },
+  "prior_ledger_sha256": "a18f02f92818c4510f28c6793dea15665a27b9a61bad0f7ca98e52d719c1323a",
+  "question_selection": "Fixed five-form cycle (3*phase_index+1+2*slot)%5, affected metric cycle, August and difference holdouts. Historical backfill questions target the affected learning year. No score-based selection.",
+  "scenario_extra_count": {
+    "max": 11,
+    "mandatory_scored_per_cell": 17,
+    "target_scored_per_cell": 28,
+    "second_question_rank": "(phase_index*7+3)%11",
+    "gate": "ACE runs max=11 first on both schemas. Choose the largest M0..11 whose projected remaining full-method cost fits; apply the same M to every arm. ACE second questions outside M remain archived/charged and cannot affect selected tasks after branch restore.",
+    "other_to_ace_cost_ratio": 1.5248514491194443,
+    "projection_safety_factor": 1.15,
+    "reserve_cny": 0.15,
+    "previous_ace_cost_cny": 1.77722272,
+    "previous_other_cost_cny": 2.71000064
+  },
+  "prior_batch_requests": 1766,
+  "prior_cumulative_requests": 5144,
+  "prior_floor_before_batch_cny": 8.69698742,
+  "data_changes": "None: original generators, templates and reference libraries retained, including known clone-growth and missing-date limitations."
+}

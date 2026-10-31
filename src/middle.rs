@@ -21,7 +21,7 @@ use crate::db::{lit, Db, QKind};
 use crate::feedback::{Feedback, Obs, AUDIT_RATE};
 use crate::flight::Flight;
 use crate::knowledge::{BadPath, Content, Entry, JoinPath, Status, Store};
-use crate::sqlscan;
+use crate::{sqlscan, sqlscope};
 use anyhow::{anyhow, bail, Result};
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
@@ -1470,9 +1470,24 @@ impl Middle {
 
     /// 执行前审查：关联写法是否已被证伪 / 验证不通过；用到的表是否需要粒度过滤。
     async fn review_sql(&self, ctx: &Ctx, sql: &str, tables: &[String]) -> Result<Option<Value>> {
+        let mut scoped = None;
         for j in sqlscan::joins(sql, &self.cat) {
             let (r, _) = self.verdict(ctx, &j.left, &j.right, &j.on).await?;
             if let Err(bad) = r {
+                // A base-table key counterexample is not a counterexample for an
+                // already filtered/aggregated query input. Prove that exact input
+                // without changing the stored base-table verdict.
+                if bad.reason.contains("唯一") {
+                    if scoped.is_none() {
+                        // The query may use a column added after this Middle was
+                        // initialized (for example a new source-system marker).
+                        let current = Catalog::load(&self.db).await?;
+                        scoped = Some(sqlscope::Analysis::new(sql, &current));
+                    }
+                    if self.scoped_join_is_unique(ctx, scoped.as_ref().unwrap(), &j).await? {
+                        continue;
+                    }
+                }
                 let sugg = self.join_path(ctx, &j.left, &j.right).await?;
                 return Ok(Some(json!({
                     "rejected": true,
@@ -1504,6 +1519,25 @@ impl Middle {
         Ok(None)
     }
 
+    async fn scoped_join_is_unique(&self, ctx: &Ctx, scoped: &sqlscope::Analysis, join: &sqlscan::JoinUse) -> Result<bool> {
+        let Some(probes) = scoped.probes_for(join) else { return Ok(false) };
+        for sql in &probes {
+            let result = match self.vquery(QKind::Check, sql).await {
+                Ok(result) => result,
+                Err(error) => {
+                    self.log(ctx, format!("查询内粒度证明未通过：{error:#}"));
+                    return Ok(false);
+                }
+            };
+            match (result.i64(0, 0), result.i64(0, 1)) {
+                (Some(rows), Some(keys)) if rows == keys => (),
+                _ => return Ok(false),
+            }
+        }
+        self.log(ctx, format!("查询内关联证明通过：{}⋈{}（{} 次唯一性检查；不修改原表关联证据）", join.left, join.right, probes.len()));
+        Ok(true)
+    }
+
     // ───────────────────────── 工具调度（HTTP 与 LLM 共用） ─────────────────────────
 
     pub async fn call_tool(&self, ctx: &Ctx, name: &str, args: &Value) -> Result<Value> {
@@ -1518,6 +1552,11 @@ impl Middle {
                 self.check_join(ctx, s("left")?, s("right")?, &on).await?
             }
             "run_sql" => self.run_sql_with(ctx, s("sql")?, &metric_refs(args)?).await?,
+            "run_metric" => {
+                let refs = metric_refs(&json!({"metrics":[{"key":s("key")?,"revision":args["revision"]}]}))?;
+                let ask: crate::metric::Ask = serde_json::from_value(args["ask"].clone())?;
+                Box::pin(self.run_metric(ctx, &refs[0].0, refs[0].1, &ask)).await?
+            }
             "find_trajectory" if self.cfg.traj_memory => self.find_trajectory(ctx, s("query")?),
             crate::agentmem::AGENTSM_TOOL if self.amem.kind() == Some(crate::agentmem::Kind::AgentSm) => {
                 if self.lookup_exhausted(ctx) {
@@ -1652,6 +1691,20 @@ pub fn tool_specs_with(middle_tools: bool, metric_tools: bool) -> Vec<ToolSpec> 
                 "query": {"type": "string", "description": "指标名称，如“门店营业额”"},
                 "tables": {"type": "array", "items": {"type": "string"}}
             }, "required": ["query"]}),
+        });
+        let period = json!({"type":"object","properties":{
+            "year":{"type":"integer","minimum":1,"maximum":9999},
+            "m1":{"type":"integer","minimum":1,"maximum":12},
+            "m2":{"type":"integer","minimum":1,"maximum":12}},"required":["year","m1","m2"]});
+        v.push(ToolSpec {
+            name:"run_metric",
+            description:"执行 find_metric 返回的可用口径。服务端按结构化定义生成 SQL，保留业务粒度、度量与时间归属，并核对修订和当前数据条件。返回 ref，可直接用于 final_answer。ask: single 使用 period；diff 使用 a 和 b（前者减后者）；rank_month、peak_rise、above_mean 使用 year。",
+            schema:json!({"type":"object","properties":{
+                "key":{"type":"string"},"revision":{"type":"integer","minimum":0},
+                "ask":{"type":"object","properties":{
+                    "kind":{"type":"string","enum":["single","diff","rank_month","peak_rise","above_mean"]},
+                    "period":period.clone(),"a":period.clone(),"b":period,"year":{"type":"integer","minimum":1,"maximum":9999}},
+                    "required":["kind"]}},"required":["key","revision","ask"]}),
         });
     }
     v

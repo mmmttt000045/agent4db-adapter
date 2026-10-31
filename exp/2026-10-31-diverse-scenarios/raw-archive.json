@@ -1,0 +1,9 @@
+{
+  "archive": "raw-results.tgz",
+  "files": 684,
+  "members": 685,
+  "bytes": 27505374,
+  "sha256": "e7965d53e4b4a4c68a3f222f48f4d539cede778a54f9178faf30f7fd6003e577",
+  "private_key_and_connection_scan": "passed",
+  "private_balance_fields_redacted": true
+}

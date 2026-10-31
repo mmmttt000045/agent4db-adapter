@@ -12,5 +12,4 @@ __pycache__/
 # Local compilation, render previews, and authoring caches.
 /tmp/
 /output/
-/ccfa-workfiles/**/build/
-/ccfa-workfiles/**/cache/
+/ccfa-workfiles/

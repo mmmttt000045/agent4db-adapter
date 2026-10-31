@@ -1,0 +1,33 @@
+{
+  "utc": "2026-10-31T10:59:14.239423+00:00",
+  "uses_accuracy": false,
+  "remaining_cny": 0.6376242999999846,
+  "candidates": [
+    {
+      "extra_count": 0,
+      "required_cny": 0.0,
+      "fits": true
+    },
+    {
+      "extra_count": 1,
+      "required_cny": 0.27235088333333335,
+      "fits": true
+    },
+    {
+      "extra_count": 2,
+      "required_cny": 0.3947017666666667,
+      "fits": true
+    },
+    {
+      "extra_count": 3,
+      "required_cny": 0.51705265,
+      "fits": true
+    },
+    {
+      "extra_count": 4,
+      "required_cny": 0.6394035333333333,
+      "fits": false
+    }
+  ],
+  "selected_extra_count": 3
+}

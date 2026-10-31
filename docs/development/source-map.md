@@ -6,13 +6,14 @@
 | --- | --- |
 | `src/main.rs` | CLI 入口、服务与评测命令分发 |
 | `src/middle.rs` | 中间层配置、共享、守护与工具调度 |
-| `src/middle/metrics.rs` | 定义准入、条件维护、撤销、受限修复与执行修订核对 |
+| `src/middle/metrics.rs` | 定义准入、条件维护、撤销、受限修复、`run_metric` 与执行修订核对 |
 | `src/middle/features.rs` | 共享特征的发布、验证与使用 |
 | `src/middle/optimize.rs` | 优化候选验证与修订发布 |
 | `src/metric.rs` | 定义结构、SQL 编译、静态检查与提炼 |
 | `src/catalog.rs`、`src/checks.rs` | 目录、表版本与语义条件检查 |
 | `src/knowledge.rs`、`src/flight.rs` | 经验库与在途请求合并 |
 | `src/db.rs`、`src/etl.rs`、`src/sqlscan.rs` | 数据库访问、ETL 与 SQL 扫描 |
+| `src/sqlscope.rs` | 基于 SQL AST 的查询内列来源与唯一性证明，保留过滤、预聚合和子查询作用域 |
 | `src/llm.rs`、`src/server.rs` | 模型客户端与 HTTP 工具接口 |
 | `src/feedback.rs`、`src/timing.rs` | 检查反馈与请求局部计时 |
 | `src/*bench.rs` | 端到端、维护、回放、会话、群体等评测入口 |

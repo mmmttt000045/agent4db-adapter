@@ -45,7 +45,7 @@ make deck-figures                  # PPT 的六幅图，生成 PDF 并转 PNG
 
 数据图读取 `exp/` 中的归档，并按各脚本的实现与 `overleaf/gen/` 宏交叉核对。场景题集、重复轮次和采用的运行必须一致；更新数据时先检查 [实验索引](../../exp/README.md) 和 [论文说明](../../overleaf/README.md)，再重算宏和图形。
 
-方法颜色从 `overleaf/latex/preamble.tex` 读取；图注、标签与 `Description` 在各图对应的 `.tex` 中维护。单图尺寸以脚本内的 `W`、`H` 为准。
+方法颜色从 `overleaf/preamble.tex` 读取；图注、标签与 `Description` 在各图对应的 `.tex` 中维护。单图尺寸以脚本内的 `W`、`H` 为准。
 
 ## 怎么画出来的
 

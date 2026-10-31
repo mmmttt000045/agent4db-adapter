@@ -1,0 +1,1908 @@
+{
+  "audited_utc": "2026-10-29T01:56:33.126374+00:00",
+  "scope": "All 18 completed MAVRA sessions; read-only, no model calls, no changed scores.",
+  "matching": "Exact SQL after whitespace and trailing-semicolon normalization; no inferred semantic equivalence.",
+  "summary": {
+    "rel-stack": {
+      "sessions": 9,
+      "reuse_sessions": 6,
+      "external_memory_calls": {
+        "find_program": 9,
+        "find_features": 3,
+        "compose_features": 0
+      },
+      "returned_raw_program_sql": 6,
+      "returned_compiled_sql": 6,
+      "returned_truncated_compiled_sql": 1,
+      "raw_program_validated_sessions": 6,
+      "compiled_sql_validated_sessions": 1,
+      "compiled_sql_clean_validated_sessions": 0,
+      "reuse_compiled_sql_validated_sessions": 0,
+      "raw_program_exact_final_sessions": 3,
+      "compiled_sql_exact_final_sessions": 0,
+      "decode_errors": 1
+    },
+    "rel-trial": {
+      "sessions": 9,
+      "reuse_sessions": 6,
+      "external_memory_calls": {
+        "find_program": 9,
+        "find_features": 6,
+        "compose_features": 0
+      },
+      "returned_raw_program_sql": 3,
+      "returned_compiled_sql": 4,
+      "returned_truncated_compiled_sql": 0,
+      "raw_program_validated_sessions": 3,
+      "compiled_sql_validated_sessions": 0,
+      "compiled_sql_clean_validated_sessions": 0,
+      "reuse_compiled_sql_validated_sessions": 0,
+      "raw_program_exact_final_sessions": 3,
+      "compiled_sql_exact_final_sessions": 0,
+      "decode_errors": 0
+    }
+  },
+  "source_code": {
+    "src/middle/features.rs": {
+      "current_sha256": "4ab996b1d84250c4bc65d318091182e70b68d23297b48fdc5af60506b3b8b2e7",
+      "started_sha256": "4ab996b1d84250c4bc65d318091182e70b68d23297b48fdc5af60506b3b8b2e7",
+      "matches_started": true
+    },
+    "src/metric.rs": {
+      "current_sha256": "34488fad67a7560b0cb5e4d8807ae334183f7c65eed6b5f90e82ec2af3e16770",
+      "started_sha256": "34488fad67a7560b0cb5e4d8807ae334183f7c65eed6b5f90e82ec2af3e16770",
+      "matches_started": true
+    }
+  },
+  "sources_sha256": {
+    "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\post_votes-k1.json": "9d8f742bc451967fd58e4119087260b01357698271c7bbc059e6977cbf5ba419",
+    "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\post_votes-k2.json": "4860f91f9feeeb4da1bdf67cdf18047b57dacbb6da45c62dd8bee1c6fa4c11f2",
+    "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\post_votes-k3.json": "78d1e6a83eaaff75873f6c4a115b8c8055e59212516a9268dca72b9274ea7792",
+    "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_badge-k1.json": "48d63517630429494879d10220f752a21d4087b4d3c0c5da03f20f54ae1af8b0",
+    "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_badge-k2.json": "3a524649681dc9f76bf6e490745b57cfa7a2cd902e2881fb8ad6cde12d6fbf15",
+    "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_badge-k3.json": "c5af51c7f7201108aa23e87c208443287f9edf48bacc57cdf6ec0ba99f11a781",
+    "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_engagement-k1.json": "7607b51bc084031824c6baa94088a67e25ad5993243936b71a3ed60596851ce4",
+    "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_engagement-k2.json": "b7487226d5bc4a80ec4c5feaa2a664070d27f11cc13ca863a11959870af0d0d1",
+    "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_engagement-k3.json": "0bc985f53d664d57fd6335bc425c59ba3aa01c7232666a92b28ecbb8f7275ee5",
+    "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\site_success-k1.json": "0a8c4b8b57f665406d8cd5d717782c4d11874b8502d5733965dac49e38b07510",
+    "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\site_success-k2.json": "e97e79a2847fbc2e33218e295876ceb7a92e2d170455aefbbcaf0456076d6b44",
+    "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\site_success-k3.json": "19415572de59dc4000adc5b42d667d4139c5efe350840a0b7bc1674ef31f3a62",
+    "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_adverse-k1.json": "1661bf7e6017c65c2e772c47f687deb499920addfd56c6b65b2c81bf5a659b42",
+    "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_adverse-k2.json": "b98bfcdb898d6abb3b0baff59d557f459e3cfcab0466451c79063242c05c2038",
+    "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_adverse-k3.json": "05f628cf77a066d9c5a9cfcc0eb4088e9fc23e5c118c57b6c19ffe773c0344ac",
+    "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_outcome-k1.json": "ec5ceda967d67858c65292b4946bfc9fe21f18ebbe6ea45d2716a7df39c4277f",
+    "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_outcome-k2.json": "e3c3ee8440a197080fe918951b2f4eb46b377cb617d7a7c4bda2a573c91b687e",
+    "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_outcome-k3.json": "0e7c2886e8803c92455f39b99d0a10366fd235845e142a8baa6d440a5fa265d5"
+  },
+  "sessions": [
+    {
+      "dataset": "rel-stack",
+      "task": "post-votes",
+      "k": 1,
+      "source": "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\post_votes-k1.json",
+      "tools": {
+        "find_program": 1,
+        "find_features": 1,
+        "list_tables": 1,
+        "describe_table": 7,
+        "run_sql": 15,
+        "validate_features": 5
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "note",
+            "program"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        },
+        {
+          "message_index": 5,
+          "tool": "find_features",
+          "keys": [
+            "features",
+            "note"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 20,
+          "val": 0.06645704955173654,
+          "error": null,
+          "leak": true,
+          "leaking_columns": [
+            "site_questions_91d"
+          ],
+          "improved": false,
+          "matches": []
+        },
+        {
+          "tool_i": 22,
+          "val": 0.06672170177777623,
+          "error": null,
+          "leak": true,
+          "leaking_columns": [
+            "site_questions_91d"
+          ],
+          "improved": false,
+          "matches": []
+        },
+        {
+          "tool_i": 27,
+          "val": 0.06560212090326505,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        },
+        {
+          "tool_i": 28,
+          "val": 0.06574879824384539,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": false,
+          "matches": []
+        },
+        {
+          "tool_i": 29,
+          "val": 0.0656821284811489,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": false,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "89db6014e6721ecf07071d25f056fb705a2580f5f43aa1376f25843f04d9c94a",
+      "final_match": [],
+      "audit": {
+        "result": "clean",
+        "from_validation": 27
+      },
+      "final_source": "best_validated",
+      "validation_count": 5,
+      "stop": "validation_budget"
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "post-votes",
+      "k": 2,
+      "source": "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\post_votes-k2.json",
+      "tools": {
+        "find_program": 1,
+        "validate_features": 4,
+        "describe_table": 2,
+        "list_tables": 1,
+        "run_sql": 2
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "columns",
+            "program",
+            "program_sql",
+            "sql",
+            "unavailable"
+          ],
+          "columns": [
+            {
+              "column": "post_days_since_last_comment",
+              "key": "feature:posts:post_days_since_last_comment",
+              "revision": 0
+            },
+            {
+              "column": "post_days_since_last_vote",
+              "key": "feature:posts:post_days_since_last_vote",
+              "revision": 0
+            },
+            {
+              "column": "post_days_since_last_upvote",
+              "key": "feature:posts:post_days_since_last_upvote",
+              "revision": 0
+            },
+            {
+              "column": "owner_questions_posted_all",
+              "key": "feature:posts:owner_questions_posted_all",
+              "revision": 0
+            },
+            {
+              "column": "owner_days_since_last_post",
+              "key": "feature:posts:owner_days_since_last_post",
+              "revision": 0
+            },
+            {
+              "column": "post_upvotes_all",
+              "key": "feature:posts:post_upvotes_all",
+              "revision": 0
+            },
+            {
+              "column": "owner_badges_earned_all",
+              "key": "feature:posts:owner_badges_earned_all",
+              "revision": 0
+            }
+          ],
+          "program": {
+            "cutoff": "2020-01-03 00:00:00",
+            "metric": "mae",
+            "task": "post-votes",
+            "val_score": 0.06560212090326505
+          },
+          "has_program_sql": true,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 1,
+          "val": 0.06471313271592048,
+          "error": null,
+          "leak": true,
+          "leaking_columns": [
+            "acct_age_days"
+          ],
+          "improved": false,
+          "matches": [
+            {
+              "tool": "find_program",
+              "kind": "raw_program",
+              "message_index": 3,
+              "sha256": "89db6014e6721ecf07071d25f056fb705a2580f5f43aa1376f25843f04d9c94a"
+            }
+          ]
+        },
+        {
+          "tool_i": 4,
+          "val": null,
+          "error": "SQL error: column u.reputation does not exist\nLINE 143:     u.reputation AS owner_rep\n              ^",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        },
+        {
+          "tool_i": 6,
+          "val": 0.06465133886331621,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        },
+        {
+          "tool_i": 9,
+          "val": 0.06462571170592483,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "c435d4dd09df6f3c65accc06ed63cb0570a9ed05bdcb5dae220ae0897510c2f6",
+      "final_match": [],
+      "audit": {
+        "result": "clean",
+        "from_validation": 9
+      },
+      "final_source": "best_validated",
+      "validation_count": 4,
+      "stop": "reached_previous"
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "post-votes",
+      "k": 3,
+      "source": "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\post_votes-k3.json",
+      "tools": {
+        "find_program": 1,
+        "validate_features": 3
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "columns",
+            "program",
+            "program_sql"
+          ],
+          "columns": [
+            {
+              "column": "post_upvotes_all",
+              "key": "feature:posts:post_upvotes_all",
+              "revision": 0
+            },
+            {
+              "column": "post_upvotes_730d",
+              "key": "feature:posts:post_upvotes_730d",
+              "revision": 0
+            },
+            {
+              "column": "post_days_since_last_vote",
+              "key": "feature:posts:post_days_since_last_vote",
+              "revision": 0
+            },
+            {
+              "column": "post_days_since_last_upvote",
+              "key": "feature:posts:post_days_since_last_upvote",
+              "revision": 0
+            },
+            {
+              "column": "post_days_since_last_edit",
+              "key": "feature:posts:post_days_since_last_edit",
+              "revision": 0
+            },
+            {
+              "column": "post_days_since_last_comment",
+              "key": "feature:posts:post_days_since_last_comment#2",
+              "revision": 0
+            },
+            {
+              "column": "owner_days_since_last_post",
+              "key": "feature:posts:owner_days_since_last_post",
+              "revision": 0
+            },
+            {
+              "column": "post_days_since_last_answer",
+              "key": "feature:posts:post_days_since_last_answer",
+              "revision": 0
+            },
+            {
+              "column": "post_answers_upvotes_all",
+              "key": "feature:posts:post_answers_upvotes_all",
+              "revision": 0
+            },
+            {
+              "column": "post_upvotes_fraction_365d",
+              "key": "feature:posts:post_upvotes_fraction_365d",
+              "revision": 0
+            }
+          ],
+          "program": {
+            "cutoff": "2020-04-03 00:00:00",
+            "metric": "mae",
+            "task": "post-votes",
+            "val_score": 0.06462571170592483
+          },
+          "has_program_sql": true,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": true
+        }
+      ],
+      "decode_errors": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "incomplete_field": "sql",
+          "chars": 20000,
+          "recovered_complete_fields": [
+            "columns",
+            "program",
+            "program_sql"
+          ]
+        }
+      ],
+      "validation_matches": [
+        {
+          "tool_i": 1,
+          "val": 0.06986684768791765,
+          "error": null,
+          "leak": true,
+          "leaking_columns": [
+            "ans_ups",
+            "ans_with_ups",
+            "best_ans_ups",
+            "ans_ups_pos",
+            "ans_ups_30d",
+            "ans_ups_91d",
+            "best_ans_ups_91d"
+          ],
+          "improved": false,
+          "matches": [
+            {
+              "tool": "find_program",
+              "kind": "raw_program",
+              "message_index": 3,
+              "sha256": "c435d4dd09df6f3c65accc06ed63cb0570a9ed05bdcb5dae220ae0897510c2f6"
+            }
+          ]
+        },
+        {
+          "tool_i": 2,
+          "val": 0.06954040794755503,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        },
+        {
+          "tool_i": 3,
+          "val": 0.06980470498777565,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": false,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "155e11724f2f2cdedda4ae3f6d2fba96396fd62647788b604ab7c44b3a317feb",
+      "final_match": [],
+      "audit": {
+        "result": "clean",
+        "from_validation": 2
+      },
+      "final_source": "best_validated",
+      "validation_count": 3,
+      "stop": "reached_previous"
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "user-badge",
+      "k": 1,
+      "source": "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_badge-k1.json",
+      "tools": {
+        "find_program": 1,
+        "find_features": 1,
+        "list_tables": 1,
+        "describe_table": 6,
+        "run_sql": 8,
+        "validate_features": 5
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "note",
+            "program"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        },
+        {
+          "message_index": 5,
+          "tool": "find_features",
+          "keys": [
+            "features",
+            "note"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 13,
+          "val": 0.8682910097690932,
+          "error": null,
+          "leak": true,
+          "leaking_columns": [
+            "vrec_total",
+            "vrec_up_total",
+            "vrec_90",
+            "vrec_365",
+            "vrec_up_365",
+            "days_since_vote_recv"
+          ],
+          "improved": false,
+          "matches": []
+        },
+        {
+          "tool_i": 15,
+          "val": 0.8727438128373699,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        },
+        {
+          "tool_i": 19,
+          "val": null,
+          "error": "101 feature columns; at most 100",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        },
+        {
+          "tool_i": 20,
+          "val": 0.8710961906297469,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": false,
+          "matches": []
+        },
+        {
+          "tool_i": 21,
+          "val": 0.8704179366051026,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": false,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "faa06ff2a3e5b4aed16eba659724bdebe5178855a9b9b8a7d16afc93d037f8ea",
+      "final_match": [],
+      "audit": {
+        "result": "clean",
+        "from_validation": 15
+      },
+      "final_source": "best_validated",
+      "validation_count": 5,
+      "stop": "validation_budget"
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "user-badge",
+      "k": 2,
+      "source": "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_badge-k2.json",
+      "tools": {
+        "find_program": 1,
+        "validate_features": 2,
+        "list_tables": 1,
+        "describe_table": 3
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "columns",
+            "program",
+            "program_sql",
+            "sql",
+            "unavailable"
+          ],
+          "columns": [
+            {
+              "column": "user_posts_total",
+              "key": "feature:users:user_posts_total",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_last_badge",
+              "key": "feature:users:user_days_since_last_badge",
+              "revision": 0
+            },
+            {
+              "column": "user_posthistory_total",
+              "key": "feature:users:user_posthistory_total",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_first_badge",
+              "key": "feature:users:user_days_since_first_badge",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_last_post",
+              "key": "feature:users:user_days_since_last_post",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_first_post",
+              "key": "feature:users:user_days_since_first_post",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_last_comment",
+              "key": "feature:users:user_days_since_last_comment",
+              "revision": 0
+            },
+            {
+              "column": "user_posthistory_post_days_total",
+              "key": "feature:users:user_posthistory_post_days_total",
+              "revision": 0
+            }
+          ],
+          "program": {
+            "cutoff": "2020-01-03 00:00:00",
+            "metric": "roc_auc",
+            "task": "user-badge",
+            "val_score": 0.8727438128373699
+          },
+          "has_program_sql": true,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 1,
+          "val": 0.8545878870461864,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": [
+            {
+              "tool": "find_program",
+              "kind": "raw_program",
+              "message_index": 3,
+              "sha256": "faa06ff2a3e5b4aed16eba659724bdebe5178855a9b9b8a7d16afc93d037f8ea"
+            }
+          ]
+        },
+        {
+          "tool_i": 6,
+          "val": 0.8533209373446746,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": false,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "faa06ff2a3e5b4aed16eba659724bdebe5178855a9b9b8a7d16afc93d037f8ea",
+      "final_match": [
+        {
+          "tool": "find_program",
+          "kind": "raw_program",
+          "message_index": 3,
+          "sha256": "faa06ff2a3e5b4aed16eba659724bdebe5178855a9b9b8a7d16afc93d037f8ea"
+        }
+      ],
+      "audit": {
+        "result": "clean",
+        "from_validation": 1
+      },
+      "final_source": "best_validated",
+      "validation_count": 2,
+      "stop": "reached_previous"
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "user-badge",
+      "k": 3,
+      "source": "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_badge-k3.json",
+      "tools": {
+        "find_program": 1,
+        "validate_features": 2,
+        "run_sql": 1
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "columns",
+            "program",
+            "program_sql",
+            "sql",
+            "unavailable"
+          ],
+          "columns": [
+            {
+              "column": "user_posts_total",
+              "key": "feature:users:user_posts_total",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_last_badge",
+              "key": "feature:users:user_days_since_last_badge",
+              "revision": 0
+            },
+            {
+              "column": "user_posthistory_total",
+              "key": "feature:users:user_posthistory_total",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_first_badge",
+              "key": "feature:users:user_days_since_first_badge",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_last_post",
+              "key": "feature:users:user_days_since_last_post",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_first_post",
+              "key": "feature:users:user_days_since_first_post",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_last_comment",
+              "key": "feature:users:user_days_since_last_comment",
+              "revision": 0
+            },
+            {
+              "column": "user_posthistory_post_days_total",
+              "key": "feature:users:user_posthistory_post_days_total",
+              "revision": 0
+            }
+          ],
+          "program": {
+            "cutoff": "2020-01-03 00:00:00",
+            "metric": "roc_auc",
+            "task": "user-badge",
+            "val_score": 0.8727438128373699
+          },
+          "has_program_sql": true,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 1,
+          "val": 0.855101621245855,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": [
+            {
+              "tool": "find_program",
+              "kind": "raw_program",
+              "message_index": 3,
+              "sha256": "faa06ff2a3e5b4aed16eba659724bdebe5178855a9b9b8a7d16afc93d037f8ea"
+            }
+          ]
+        },
+        {
+          "tool_i": 3,
+          "val": 0.8555557882165828,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "802b555c26ca91bf45e6493c22d04d8a3f952ed9ceeabcd6880ac6ca43775f7b",
+      "final_match": [],
+      "audit": {
+        "result": "clean",
+        "from_validation": 3
+      },
+      "final_source": "best_validated",
+      "validation_count": 2,
+      "stop": "reached_previous"
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "user-engagement",
+      "k": 1,
+      "source": "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_engagement-k1.json",
+      "tools": {
+        "find_program": 1,
+        "find_features": 1,
+        "list_tables": 1,
+        "validate_features": 5,
+        "describe_table": 6,
+        "run_sql": 6
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "note",
+            "program"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        },
+        {
+          "message_index": 5,
+          "tool": "find_features",
+          "keys": [
+            "columns",
+            "features",
+            "sql"
+          ],
+          "columns": [
+            {
+              "column": "user_posts_total",
+              "key": "feature:users:user_posts_total",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_first_badge",
+              "key": "feature:users:user_days_since_first_badge",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_first_post",
+              "key": "feature:users:user_days_since_first_post",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_last_badge",
+              "key": "feature:users:user_days_since_last_badge",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_last_comment",
+              "key": "feature:users:user_days_since_last_comment",
+              "revision": 0
+            },
+            {
+              "column": "user_days_since_last_post",
+              "key": "feature:users:user_days_since_last_post",
+              "revision": 0
+            },
+            {
+              "column": "user_posthistory_post_days_total",
+              "key": "feature:users:user_posthistory_post_days_total",
+              "revision": 0
+            },
+            {
+              "column": "user_posthistory_total",
+              "key": "feature:users:user_posthistory_total",
+              "revision": 0
+            }
+          ],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 3,
+          "val": 0.8733228646448288,
+          "error": null,
+          "leak": true,
+          "leaking_columns": [
+            "user_posts_total",
+            "user_days_since_first_post",
+            "user_days_since_last_post"
+          ],
+          "improved": false,
+          "matches": [
+            {
+              "tool": "find_features",
+              "kind": "compiled_definitions",
+              "message_index": 5,
+              "sha256": "88c6d745a121c752effacb39905aee401095000720a22f147bcb7c065e48badf"
+            }
+          ]
+        },
+        {
+          "tool_i": 16,
+          "val": 0.8820491077655155,
+          "error": null,
+          "leak": true,
+          "leaking_columns": [
+            "dsl_post",
+            "dsl_comment",
+            "dsl_hist",
+            "dsl_badge",
+            "f_dsl_activity",
+            "p_all",
+            "p_7",
+            "p_30",
+            "p_91",
+            "p_182",
+            "p_365",
+            "q_all",
+            "a_all",
+            "q_91",
+            "a_91",
+            "p_days_all",
+            "p_days_91",
+            "p_maxday_91",
+            "c_all",
+            "c_7"
+          ],
+          "improved": false,
+          "matches": []
+        },
+        {
+          "tool_i": 17,
+          "val": null,
+          "error": "validation failed: ValueError: cannot assemble with duplicate keys",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        },
+        {
+          "tool_i": 18,
+          "val": 0.881598931119488,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        },
+        {
+          "tool_i": 19,
+          "val": null,
+          "error": "SQL error: canceling statement due to statement timeout",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "507a093c1aeb6289f9ab9557f7b67d59b46c5093362da774749a8efadde1347f",
+      "final_match": [],
+      "audit": {
+        "result": "clean",
+        "from_validation": 18
+      },
+      "final_source": "best_validated",
+      "validation_count": 5,
+      "stop": "validation_budget"
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "user-engagement",
+      "k": 2,
+      "source": "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_engagement-k2.json",
+      "tools": {
+        "find_program": 1,
+        "validate_features": 2,
+        "run_sql": 2
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "columns",
+            "program",
+            "program_sql",
+            "sql",
+            "unavailable"
+          ],
+          "columns": [
+            {
+              "column": "user_posts_365d",
+              "key": "feature:users:user_posts_365d",
+              "revision": 0
+            },
+            {
+              "column": "user_posts_730d",
+              "key": "feature:users:user_posts_730d",
+              "revision": 0
+            },
+            {
+              "column": "user_comments_received_all",
+              "key": "feature:users:user_comments_received_all",
+              "revision": 0
+            }
+          ],
+          "program": {
+            "cutoff": "2020-01-03 00:00:00",
+            "metric": "roc_auc",
+            "task": "user-engagement",
+            "val_score": 0.881598931119488
+          },
+          "has_program_sql": true,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 1,
+          "val": 0.8768546569890858,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": [
+            {
+              "tool": "find_program",
+              "kind": "raw_program",
+              "message_index": 3,
+              "sha256": "507a093c1aeb6289f9ab9557f7b67d59b46c5093362da774749a8efadde1347f"
+            }
+          ]
+        },
+        {
+          "tool_i": 4,
+          "val": null,
+          "error": "SQL error: canceling statement due to statement timeout",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "507a093c1aeb6289f9ab9557f7b67d59b46c5093362da774749a8efadde1347f",
+      "final_match": [
+        {
+          "tool": "find_program",
+          "kind": "raw_program",
+          "message_index": 3,
+          "sha256": "507a093c1aeb6289f9ab9557f7b67d59b46c5093362da774749a8efadde1347f"
+        }
+      ],
+      "audit": {
+        "result": "clean",
+        "from_validation": 1
+      },
+      "final_source": "best_validated",
+      "validation_count": 2,
+      "stop": "reached_previous"
+    },
+    {
+      "dataset": "rel-stack",
+      "task": "user-engagement",
+      "k": 3,
+      "source": "results\\official-20261028\\mavra-rel-stack-r1\\sessions\\user_engagement-k3.json",
+      "tools": {
+        "find_program": 1,
+        "validate_features": 2,
+        "list_tables": 1,
+        "run_sql": 1
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "columns",
+            "program",
+            "program_sql",
+            "sql",
+            "unavailable"
+          ],
+          "columns": [
+            {
+              "column": "user_posts_365d",
+              "key": "feature:users:user_posts_365d",
+              "revision": 0
+            },
+            {
+              "column": "user_posts_730d",
+              "key": "feature:users:user_posts_730d",
+              "revision": 0
+            },
+            {
+              "column": "user_comments_received_all",
+              "key": "feature:users:user_comments_received_all",
+              "revision": 0
+            }
+          ],
+          "program": {
+            "cutoff": "2020-01-03 00:00:00",
+            "metric": "roc_auc",
+            "task": "user-engagement",
+            "val_score": 0.881598931119488
+          },
+          "has_program_sql": true,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 1,
+          "val": 0.8712944409154589,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": [
+            {
+              "tool": "find_program",
+              "kind": "raw_program",
+              "message_index": 3,
+              "sha256": "507a093c1aeb6289f9ab9557f7b67d59b46c5093362da774749a8efadde1347f"
+            }
+          ]
+        },
+        {
+          "tool_i": 4,
+          "val": null,
+          "error": "SQL error: column \"score\" does not exist\nLINE 9:               count(*) filter (where score>0) npos,\n                                             ^",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "507a093c1aeb6289f9ab9557f7b67d59b46c5093362da774749a8efadde1347f",
+      "final_match": [
+        {
+          "tool": "find_program",
+          "kind": "raw_program",
+          "message_index": 3,
+          "sha256": "507a093c1aeb6289f9ab9557f7b67d59b46c5093362da774749a8efadde1347f"
+        }
+      ],
+      "audit": {
+        "result": "clean",
+        "from_validation": 1
+      },
+      "final_source": "best_validated",
+      "validation_count": 2,
+      "stop": "reached_previous"
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "site-success",
+      "k": 1,
+      "source": "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\site_success-k1.json",
+      "tools": {
+        "find_program": 1,
+        "find_features": 1,
+        "list_tables": 1,
+        "describe_table": 10,
+        "run_sql": 18,
+        "validate_features": 3
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "note",
+            "program"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        },
+        {
+          "message_index": 5,
+          "tool": "find_features",
+          "keys": [
+            "features",
+            "note"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 26,
+          "val": null,
+          "error": "validation failed: ValueError: cannot assemble with duplicate keys",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        },
+        {
+          "tool_i": 27,
+          "val": 0.3104451634634449,
+          "error": null,
+          "leak": true,
+          "leaking_columns": [
+            "m_f_res",
+            "m_f_an",
+            "m_f_sig",
+            "m_f_ae",
+            "m_avg_an",
+            "m_avg_out",
+            "m_sum_sig",
+            "m_sum_an",
+            "m_avg_ser_ratio",
+            "m_avg_drops",
+            "m_drop_rate",
+            "r_f_an",
+            "r_f_sig"
+          ],
+          "improved": false,
+          "matches": []
+        },
+        {
+          "tool_i": 28,
+          "val": 0.4270374044414396,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "afc8dc4bde2fbe7f93ac21708e06095d751e6693dd686b2bbbdce364ee142003",
+      "final_match": [],
+      "audit": {
+        "result": "clean",
+        "from_validation": 28
+      },
+      "final_source": "best_validated",
+      "validation_count": 3,
+      "stop": "llm_budget"
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "site-success",
+      "k": 2,
+      "source": "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\site_success-k2.json",
+      "tools": {
+        "find_program": 1,
+        "find_features": 1,
+        "list_tables": 1,
+        "describe_table": 6,
+        "run_sql": 25
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "note",
+            "program"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        },
+        {
+          "message_index": 5,
+          "tool": "find_features",
+          "keys": [
+            "features",
+            "note"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [],
+      "final_sql_sha256": null,
+      "final_match": [],
+      "audit": null,
+      "final_source": null,
+      "validation_count": 0,
+      "stop": "llm_budget"
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "site-success",
+      "k": 3,
+      "source": "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\site_success-k3.json",
+      "tools": {
+        "find_program": 1,
+        "find_features": 1,
+        "list_tables": 1,
+        "describe_table": 6,
+        "run_sql": 22
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "note",
+            "program"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        },
+        {
+          "message_index": 5,
+          "tool": "find_features",
+          "keys": [
+            "features",
+            "note"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [],
+      "final_sql_sha256": null,
+      "final_match": [],
+      "audit": null,
+      "final_source": null,
+      "validation_count": 0,
+      "stop": "llm_budget"
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "study-adverse",
+      "k": 1,
+      "source": "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_adverse-k1.json",
+      "tools": {
+        "find_program": 1,
+        "list_tables": 1,
+        "describe_table": 12,
+        "run_sql": 21,
+        "find_features": 1,
+        "validate_features": 1
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "note",
+            "program"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        },
+        {
+          "message_index": 11,
+          "tool": "find_features",
+          "keys": [
+            "features",
+            "note"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 34,
+          "val": null,
+          "error": "SQL error: column s.seed_time does not exist\nLINE 143: ..._id = cn.main_cond AND rc.m = date_trunc('month', s.seed_tim...\n                                                               ^",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": null,
+      "final_match": [],
+      "audit": null,
+      "final_source": null,
+      "validation_count": 1,
+      "stop": "llm_budget"
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "study-adverse",
+      "k": 2,
+      "source": "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_adverse-k2.json",
+      "tools": {
+        "find_program": 1,
+        "find_features": 1,
+        "list_tables": 1,
+        "describe_table": 10,
+        "run_sql": 11,
+        "validate_features": 5
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "note",
+            "program"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        },
+        {
+          "message_index": 5,
+          "tool": "find_features",
+          "keys": [
+            "columns",
+            "features",
+            "sql"
+          ],
+          "columns": [
+            {
+              "column": "study_conditions_count_all",
+              "key": "feature:studies:study_conditions_count_all",
+              "revision": 0
+            },
+            {
+              "column": "study_facilities_count_all",
+              "key": "feature:studies:study_facilities_count_all",
+              "revision": 0
+            },
+            {
+              "column": "study_interventions_count_all",
+              "key": "feature:studies:study_interventions_count_all",
+              "revision": 0
+            }
+          ],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 20,
+          "val": null,
+          "error": "SQL error: type \"double\" does not exist\nLINE 60: ...   (regexp_replace(e.minimum_age,'[^0-9.].*$',''))::double *\n                                                                ^",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        },
+        {
+          "tool_i": 23,
+          "val": 35.16504300465283,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        },
+        {
+          "tool_i": 25,
+          "val": 34.25444752745581,
+          "error": null,
+          "leak": true,
+          "leaking_columns": [
+            "gy_sa",
+            "gy_risk",
+            "gy_serious_rate"
+          ],
+          "improved": false,
+          "matches": []
+        },
+        {
+          "tool_i": 26,
+          "val": 34.191025147077504,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        },
+        {
+          "tool_i": 28,
+          "val": 33.19943419406958,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "0e9316195e17007462b70c572eb54e1a204e43091e65253bf92622548134910f",
+      "final_match": [],
+      "audit": {
+        "result": "clean",
+        "from_validation": 28
+      },
+      "final_source": "best_validated",
+      "validation_count": 5,
+      "stop": "validation_budget"
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "study-adverse",
+      "k": 3,
+      "source": "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_adverse-k3.json",
+      "tools": {
+        "find_program": 1,
+        "validate_features": 2,
+        "describe_table": 1
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "columns",
+            "program",
+            "program_sql",
+            "sql",
+            "unavailable"
+          ],
+          "columns": [
+            {
+              "column": "study_facilities_all",
+              "key": "feature:studies:study_facilities_all",
+              "revision": 0
+            },
+            {
+              "column": "log_study_facilities_all",
+              "key": "feature:studies:log_study_facilities_all",
+              "revision": 0
+            },
+            {
+              "column": "study_industry_sponsors_all",
+              "key": "feature:studies:study_industry_sponsors_all",
+              "revision": 0
+            },
+            {
+              "column": "study_lead_industry_sponsor_all",
+              "key": "feature:studies:study_lead_industry_sponsor_all",
+              "revision": 0
+            },
+            {
+              "column": "study_oncology_conditions_all",
+              "key": "feature:studies:study_oncology_conditions_all",
+              "revision": 0
+            }
+          ],
+          "program": {
+            "cutoff": "2018-01-02 00:00:00",
+            "metric": "mae",
+            "task": "study-adverse",
+            "val_score": 33.19943419406958
+          },
+          "has_program_sql": true,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 1,
+          "val": 47.48823194335855,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": [
+            {
+              "tool": "find_program",
+              "kind": "raw_program",
+              "message_index": 3,
+              "sha256": "0e9316195e17007462b70c572eb54e1a204e43091e65253bf92622548134910f"
+            }
+          ]
+        },
+        {
+          "tool_i": 3,
+          "val": null,
+          "error": "117 feature columns; at most 100",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "0e9316195e17007462b70c572eb54e1a204e43091e65253bf92622548134910f",
+      "final_match": [
+        {
+          "tool": "find_program",
+          "kind": "raw_program",
+          "message_index": 3,
+          "sha256": "0e9316195e17007462b70c572eb54e1a204e43091e65253bf92622548134910f"
+        }
+      ],
+      "audit": {
+        "result": "clean",
+        "from_validation": 1
+      },
+      "final_source": "best_validated",
+      "validation_count": 2,
+      "stop": "reached_previous"
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "study-outcome",
+      "k": 1,
+      "source": "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_outcome-k1.json",
+      "tools": {
+        "find_program": 1,
+        "list_tables": 1,
+        "find_features": 1,
+        "describe_table": 12,
+        "run_sql": 15,
+        "validate_features": 5
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "note",
+            "program"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        },
+        {
+          "message_index": 6,
+          "tool": "find_features",
+          "keys": [
+            "features",
+            "note"
+          ],
+          "columns": [],
+          "program": null,
+          "has_program_sql": false,
+          "has_compiled_sql": false,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 28,
+          "val": 0.6696661532727107,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        },
+        {
+          "tool_i": 29,
+          "val": null,
+          "error": "121 feature columns; at most 100",
+          "leak": null,
+          "leaking_columns": null,
+          "improved": null,
+          "matches": []
+        },
+        {
+          "tool_i": 30,
+          "val": 0.6552172781680978,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": false,
+          "matches": []
+        },
+        {
+          "tool_i": 33,
+          "val": 0.6715966552032127,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": []
+        },
+        {
+          "tool_i": 34,
+          "val": 0.6550766222897371,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": false,
+          "matches": []
+        }
+      ],
+      "final_sql_sha256": "493b4a7b537d02a1e8c62c2ff747257f606349674eb235ba09935e4ee970e401",
+      "final_match": [],
+      "audit": {
+        "result": "clean",
+        "from_validation": 33
+      },
+      "final_source": "best_validated",
+      "validation_count": 5,
+      "stop": "validation_budget"
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "study-outcome",
+      "k": 2,
+      "source": "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_outcome-k2.json",
+      "tools": {
+        "find_program": 1,
+        "validate_features": 1,
+        "list_tables": 1,
+        "describe_table": 4
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "columns",
+            "program",
+            "program_sql",
+            "sql",
+            "unavailable"
+          ],
+          "columns": [
+            {
+              "column": "study_facilities_count_all",
+              "key": "feature:studies:study_facilities_count_all",
+              "revision": 0
+            },
+            {
+              "column": "study_conditions_count_all",
+              "key": "feature:studies:study_conditions_count_all",
+              "revision": 0
+            },
+            {
+              "column": "study_interventions_count_all",
+              "key": "feature:studies:study_interventions_count_all",
+              "revision": 0
+            }
+          ],
+          "program": {
+            "cutoff": "2017-01-02 00:00:00",
+            "metric": "roc_auc",
+            "task": "study-outcome",
+            "val_score": 0.6715966552032127
+          },
+          "has_program_sql": true,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 1,
+          "val": 0.6508862391234289,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": [
+            {
+              "tool": "find_program",
+              "kind": "raw_program",
+              "message_index": 3,
+              "sha256": "493b4a7b537d02a1e8c62c2ff747257f606349674eb235ba09935e4ee970e401"
+            }
+          ]
+        }
+      ],
+      "final_sql_sha256": "493b4a7b537d02a1e8c62c2ff747257f606349674eb235ba09935e4ee970e401",
+      "final_match": [
+        {
+          "tool": "find_program",
+          "kind": "raw_program",
+          "message_index": 3,
+          "sha256": "493b4a7b537d02a1e8c62c2ff747257f606349674eb235ba09935e4ee970e401"
+        }
+      ],
+      "audit": {
+        "result": "clean",
+        "from_validation": 1
+      },
+      "final_source": "best_validated",
+      "validation_count": 1,
+      "stop": "reached_previous"
+    },
+    {
+      "dataset": "rel-trial",
+      "task": "study-outcome",
+      "k": 3,
+      "source": "results\\official-20261028\\mavra-rel-trial-r1\\sessions\\study_outcome-k3.json",
+      "tools": {
+        "find_program": 1,
+        "validate_features": 1,
+        "describe_table": 2,
+        "run_sql": 2,
+        "list_tables": 1
+      },
+      "memory_outputs": [
+        {
+          "message_index": 3,
+          "tool": "find_program",
+          "keys": [
+            "columns",
+            "program",
+            "program_sql",
+            "sql",
+            "unavailable"
+          ],
+          "columns": [
+            {
+              "column": "study_facilities_count_all",
+              "key": "feature:studies:study_facilities_count_all",
+              "revision": 0
+            },
+            {
+              "column": "study_conditions_count_all",
+              "key": "feature:studies:study_conditions_count_all",
+              "revision": 0
+            },
+            {
+              "column": "study_interventions_count_all",
+              "key": "feature:studies:study_interventions_count_all",
+              "revision": 0
+            }
+          ],
+          "program": {
+            "cutoff": "2017-01-02 00:00:00",
+            "metric": "roc_auc",
+            "task": "study-outcome",
+            "val_score": 0.6715966552032127
+          },
+          "has_program_sql": true,
+          "has_compiled_sql": true,
+          "truncated_compiled_sql": false
+        }
+      ],
+      "decode_errors": [],
+      "validation_matches": [
+        {
+          "tool_i": 1,
+          "val": 0.668312003464795,
+          "error": null,
+          "leak": false,
+          "leaking_columns": [],
+          "improved": true,
+          "matches": [
+            {
+              "tool": "find_program",
+              "kind": "raw_program",
+              "message_index": 3,
+              "sha256": "493b4a7b537d02a1e8c62c2ff747257f606349674eb235ba09935e4ee970e401"
+            }
+          ]
+        }
+      ],
+      "final_sql_sha256": "493b4a7b537d02a1e8c62c2ff747257f606349674eb235ba09935e4ee970e401",
+      "final_match": [
+        {
+          "tool": "find_program",
+          "kind": "raw_program",
+          "message_index": 3,
+          "sha256": "493b4a7b537d02a1e8c62c2ff747257f606349674eb235ba09935e4ee970e401"
+        }
+      ],
+      "audit": {
+        "result": "clean",
+        "from_validation": 1
+      },
+      "final_source": "best_validated",
+      "validation_count": 1,
+      "stop": "reached_previous"
+    }
+  ]
+}

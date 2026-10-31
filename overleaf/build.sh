@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Compile the shared manuscript or package its sources for Overleaf.
 # Usage: ./build.sh [en|bi|all|pack]   (default: all)
+#   en   main.tex            -> build/main.pdf            (submission, pdfLaTeX)
+#   bi   main-bilingual.tex  -> build/main-bilingual.pdf  (reading copy, XeLaTeX)
 set -euo pipefail
 cd "$(dirname "$0")"
 target="${1:-all}"
@@ -43,7 +45,7 @@ def collect(path, stack=()):
             raise SystemExit(f'Missing graphic: {graphic}')
         files.add(graphic)
 
-for entry in ('main.tex', 'main-en.tex'):
+for entry in ('main.tex', 'main-bilingual.tex'):
     collect(Path(entry))
 
 archive = Path('build/mavra-icde-bilingual.zip')
@@ -113,7 +115,7 @@ compile() {  # $1 = source, $2 = latexmk engine flag
 
 mkdir -p build
 case "$target" in
-  en)  compile main-en.tex -pdf ;;
-  bi)  compile main.tex -xelatex ;;
-  all) compile main-en.tex -pdf; compile main.tex -xelatex ;;
+  en)  compile main.tex -pdf ;;
+  bi)  compile main-bilingual.tex -xelatex ;;
+  all) compile main.tex -pdf; compile main-bilingual.tex -xelatex ;;
 esac

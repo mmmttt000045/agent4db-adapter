@@ -1,6 +1,19 @@
 # MAVRA：ICDE 稿件
 
-`main-en.tex` 是英文投稿入口（IEEEtran conference，pdfLaTeX）；`main.tex` 是共用源码的中英对照阅读稿（XeLaTeX）。双语稿不用于投稿。
+`main.tex` 是英文投稿入口（IEEEtran conference，pdfLaTeX）；`main-bilingual.tex` 是共用源码的中英对照阅读稿（XeLaTeX），不用于投稿。两者都只 `\input{paper}`，正文、图表与数值宏共用。
+
+2026-10-31 起目录按投稿规范整理：原 `main-en.tex` 改名为 `main.tex`，原双语 `main.tex` 改名为 `main-bilingual.tex`；`latex/preamble.tex` 移到根目录 `preamble.tex`；章节文件连续编号为 `01-introduction` … `07-conclusion`（原 `04-sharing`、`07-evaluation`、`08-related-work`、`10-conclusion`）；原 `sections/evaluation/` 下各小节按原顺序并入 `05-evaluation.tex`（展开后正文逐字相同），未使用的 `memory-pilot.tex`、`quality.tex` 删除；`references.tex` 并入 `paper.tex`；删除不再使用的 SIGMOD `acmart` 文件。下方历史记录保留当时的文件名。
+
+| 目录／文件 | 内容 |
+| --- | --- |
+| `main.tex`、`main-bilingual.tex` | 两个编译入口 |
+| `paper.tex`、`preamble.tex` | 标题、作者、章节顺序；宏包与共用宏 |
+| `sections/` | 摘要、七个章节（每章一个文件）、AI 声明 |
+| `figures/`、`tables/`、`algorithms/` | 图（`.tex` 图环境 + 矢量 PDF，`-zh` 为中文版）、表、算法 |
+| `gen/` | 由 `tools/` 生成的数值宏，勿手改 |
+| `references.bib` | 参考文献库（IEEEtran 样式，在 `paper.tex` 末尾调用） |
+
+本目录还保留未进入正文的历史图表源文件；独立论文仓库只接收编译实际依赖的文件（见下文“独立论文仓库”）。
 
 根据 [ICDE 2027 Research CFP](https://icde2027.github.io/cf-research-papers)，正文最多 12 页，参考文献和 AI 生成内容声明不计入，不能附加附录。作者姓名与单位仍为占位符，投稿前需填写。最终以投稿编译环境生成的 PDF 为准。
 
@@ -11,17 +24,17 @@
 在本目录执行：
 
 ```bash
-bash build.sh en    # build/main-en.pdf
-bash build.sh bi    # build/main.pdf
+bash build.sh en    # build/main.pdf（投稿稿）
+bash build.sh bi    # build/main-bilingual.pdf
 bash build.sh all   # 两份均编译
 bash build.sh pack  # build/mavra-icde-bilingual.zip
 ```
 
 构建优先使用 latexmk，亦支持 Tectonic。TeX 环境须提供 IEEEtran 类与参考文献样式及标准宏包；双语稿还需 ctex 和 Noto Serif CJK SC、Noto Sans CJK SC、Noto Sans Mono CJK SC 字体。`build.sh` 预检直接宏包依赖，字体由 XeLaTeX 检查。
 
-上传 `build/mavra-icde-bilingual.zip` 至 Overleaf 后，英文选择 `main-en.tex` / pdfLaTeX，双语选择 `main.tex` / XeLaTeX。包内按输入与图形依赖收集源码，并包含 `references.bib`；不需要实验服务器或原始数据即可编译。
+上传 `build/mavra-icde-bilingual.zip` 至 Overleaf 后，英文选择 `main.tex` / pdfLaTeX（Overleaf 默认），双语选择 `main-bilingual.tex` / XeLaTeX。包内按输入与图形依赖收集源码，并包含 `references.bib`；不需要实验服务器或原始数据即可编译。
 
-`references.tex` 调用 `IEEEtran.bst` 与 BibTeX：只输出正文引用的条目，按首次引用排序。正文中的多篇引用统一在一组方括号内逐一列出，逗号后留空格，例如 `[7, 8, 9, 10]`，不压缩为编号区间。英文稿与中英对照稿共用这一设置。`references.bib` 保留原稿全部元数据；未引用条目不占参考文献版面。此次转换未对每条文献重新做出版信息核验。
+`paper.tex` 末尾调用 `IEEEtran.bst` 与 BibTeX（原 `references.tex` 已并入）：只输出正文引用的条目，按首次引用排序。正文中的多篇引用统一在一组方括号内逐一列出，逗号后留空格，例如 `[7, 8, 9, 10]`，不压缩为编号区间。英文稿与中英对照稿共用这一设置。`references.bib` 保留原稿全部元数据；未引用条目不占参考文献版面。此次转换未对每条文献重新做出版信息核验。
 
 ## 2026-10-31 受检执行与跨智能体多题型 Fig.6（当前）
 
@@ -166,6 +179,14 @@ python3 tools/replay-safety-summary.py
 
 ## 独立论文仓库
 
-`overleaf/` 仍是主仓库的普通目录，主仓库远程地址保持不变。独立论文仓库为 [icde-2027-paper](https://github.com/mmmttt000045/icde-2027-paper)，论文源文件放在该仓库根目录，可用 Overleaf 的 GitHub 导入功能创建项目。本目录的修改不会自动同步过去；将当前源码同步到独立论文仓库后，还需在 Overleaf 的 Integrations → GitHub 中手动拉取。Overleaf 中的修改也需先推送回 GitHub，再合入本目录。
+`overleaf/` 仍是主仓库的普通目录，主仓库远程地址保持不变。独立论文仓库为 [icde-2027-paper](https://github.com/mmmttt000045/icde-2027-paper)，论文源文件放在该仓库根目录，可用 Overleaf 的 GitHub 导入功能创建项目。本目录是唯一来源，论文仓库是它的发布镜像，用 `tools/sync-paper-repo.py` 同步：
+
+```bash
+git clone git@github.com:mmmttt000045/icde-2027-paper.git <clone>
+python3 tools/sync-paper-repo.py --repo <clone>                   # 预演
+python3 tools/sync-paper-repo.py --repo <clone> --apply --push    # 写入、提交并推送
+```
+
+脚本用 `build.sh pack` 的依赖收集结果作为文件清单：论文仓库只含编译实际依赖的源码、图形、`references.bib` 和 `build.sh`，其余文件删除；论文仓库自己的 `README.md`、`.gitignore`、`.gitattributes` 保留。文本统一为 LF。推送后在 Overleaf 的 Menu → GitHub 中拉取；Overleaf 中的修改需先推送回 GitHub，再手动合入本目录，否则下次同步会覆盖。
 
 工作量图沿用 `exp/2026-10-29-fig45-official/build-figures.py` 已生成的原 Fig.5 PDF，数据和版式本轮不变。此前生成的质量图与官方累计图从正文移除，文件作为历史版本留档，不再参与当前编译。恢复记录与源文件保护哈希见 `exp/2026-10-29-fig3-restore/`。

@@ -4,7 +4,7 @@
 
 ## 当前稿件
 
-当前论文使用 ICDE 模板，英文入口是 [main-en.tex](../../overleaf/main-en.tex)，双语阅读入口是 [main.tex](../../overleaf/main.tex)。构建、投稿包和独立论文仓库的同步方式见 [论文说明](../../overleaf/README.md)。
+当前论文使用 ICDE 模板，英文投稿入口是 [main.tex](../../overleaf/main.tex)，双语阅读入口是 [main-bilingual.tex](../../overleaf/main-bilingual.tex)。构建、投稿包和独立论文仓库的同步方式见 [论文说明](../../overleaf/README.md)。
 
 研究围绕跨智能体共享经过检查的数据库知识，以及数据变化后的维护与使用。当前评估以 RelBench 为主，TPC-DS 群体实验与指标维护实验提供受控证据。实现入口见 [源码导览](../development/source-map.md)。
 
@@ -12,11 +12,11 @@
 
 | 问题 | 主要依据 | 稿件入口 |
 | --- | --- | --- |
-| 真实关系基准上共享记忆的使用、token 与工具调用 | [RelBench](../../exp/2026-10-20-relbench/README.md) | `sections/evaluation/relbench.tex` |
-| 智能体陆续到来时，共享与私有记忆的成本 | [群体实验](../../exp/2026-10-12-population/README.md) | `sections/evaluation/population.tex` |
-| 已有定义对新使用者的帮助 | [场景题集 v2](../../exp/2026-10-10-scenarios-q5/README.md)、[通用性实验](../../exp/2026-10-11-generality/README.md) | `sections/evaluation/sharing.tex` |
-| 更新后的维护成本、优化收益 | [验证缓存与 TPC-DS](../../exp/2026-10-02-cache-baseline-tpcds/README.md)、[优化修订](../../exp/2026-10-08-optimize/README.md) | `sections/evaluation/cost.tex` |
-| 数据变化下的正确服务、错误服务与拒绝 | [通用性回放及审计](../../exp/2026-10-11-generality/replay-safety-summary.json)、[场景题集 v2](../../exp/2026-10-10-scenarios-q5/README.md) | `sections/evaluation/changes.tex` |
+| 真实关系基准上共享记忆的使用、token 与工具调用 | [RelBench](../../exp/2026-10-20-relbench/README.md) | `sections/05-evaluation.tex`（RelBench 小节） |
+| 智能体陆续到来时，共享与私有记忆的成本 | [群体实验](../../exp/2026-10-12-population/README.md) | `sections/05-evaluation.tex`（群体实验小节） |
+| 已有定义对新使用者的帮助 | [场景题集 v2](../../exp/2026-10-10-scenarios-q5/README.md)、[通用性实验](../../exp/2026-10-11-generality/README.md) | `sections/05-evaluation.tex`（共享使用小节） |
+| 更新后的维护成本、优化收益 | [验证缓存与 TPC-DS](../../exp/2026-10-02-cache-baseline-tpcds/README.md)、[优化修订](../../exp/2026-10-08-optimize/README.md) | `sections/05-evaluation.tex`（维护与优化小节） |
+| 数据变化下的正确服务、错误服务与拒绝 | [通用性回放及审计](../../exp/2026-10-11-generality/replay-safety-summary.json)、[场景题集 v2](../../exp/2026-10-10-scenarios-q5/README.md) | `sections/05-evaluation.tex`（数据变化小节） |
 | 不同任务重复需要数据库知识的动机 | [外部基准统计](../../exp/2026-10-14-external-motivation/README.md) | `gen/external.tex` |
 
 表中的稿件路径均相对 `overleaf/`。完整目录、原始数据位置、统计脚本和历史批次见 [实验索引](../../exp/README.md)。

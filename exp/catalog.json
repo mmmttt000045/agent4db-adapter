@@ -416,9 +416,6 @@
         "tools/figures/mechanism.py"
       ],
       "outputs": [
-        "output/mechanism-pilot-20261029/figure-a-pilot.pdf",
-        "output/mechanism-pilot-20261029/figure-b-controlled.pdf",
-        "output/mechanism-pilot-20261029/figure-c-combined-preview.pdf",
         "overleaf/gen/mechanism.tex",
         "overleaf/figures/memory-access-pilot.pdf",
         "overleaf/figures/fixed-sharing.pdf",
@@ -480,7 +477,7 @@
         "exp/2026-10-29-fig5-review/audit_lineage.py"
       ],
       "outputs": [
-        "overleaf/sections/evaluation/sharing.tex"
+        "overleaf/sections/05-evaluation.tex"
       ],
       "raw_data": "审阅 2026-10-28 官方 API 的 MAVRA 原始会话；本目录保存逐会话来源审计及历史修订草稿，不新增实验。",
       "code_record": "审计逻辑见 audit_lineage.py；冻结时源码、候选修订和后续同步按本目录 README 分开解释。"

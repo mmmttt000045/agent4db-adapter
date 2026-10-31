@@ -1,0 +1,6207 @@
+{
+  "generated_utc": "2026-10-28T20:06:43.955884+00:00",
+  "protocol": {
+    "study": "official-20261028",
+    "created_utc": "2026-10-28T10:35:00Z",
+    "deadline_utc": "2026-10-28T20:19:55Z",
+    "budget_cny": 50.0,
+    "budget_source": "User explicitly approved a maximum of CNY 50 in this chat on 2026-10-28; account balance is not the cap.",
+    "official_endpoint": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "low",
+    "thinking": "enabled",
+    "max_output_tokens": 16384,
+    "max_model_calls": 24,
+    "max_validations": 5,
+    "post_goal_calls": 3,
+    "sql_timeout_seconds": 180,
+    "training_sample": 50000,
+    "leak_audit_seeds": 5000,
+    "development": {
+      "dataset": "rel-amazon",
+      "tasks": [
+        "user-churn"
+      ],
+      "cutoffs": [
+        1,
+        2
+      ],
+      "candidates": [
+        "original",
+        "compact-reuse"
+      ],
+      "selection": "Use compact-reuse only if all development sessions finish, all final audits are clean, validation AUC is within 0.01 of original at each cutoff, and total tokens including learning are lower. Never read development test labels. Otherwise use original."
+    },
+    "evaluation": {
+      "datasets": [
+        "rel-stack",
+        "rel-trial"
+      ],
+      "arms": [
+        "none",
+        "mavra",
+        "ace",
+        "awm",
+        "gmemory"
+      ],
+      "cutoffs": [
+        1,
+        2,
+        3
+      ],
+      "runs": [
+        1
+      ],
+      "parallel_cells": 4,
+      "within_cell_parallel": 1,
+      "memory_max_gb": 20,
+      "min_disk_free_gb": 20,
+      "order": "Fixed method/database order with at most four active cells (increased from three after a resource-only audit at 01:14 local: 48 cores, load 2.71/3.36/3.78, available RAM 60.3 GiB, free disk 71.4 GiB). A free slot takes the next full sequence without waiting for a method pair. The no-memory rel-stack control may overlap the second development candidate. Selection reads development validation only and preserves its original freeze record on restart. No scheduling or repetition selection based on test scores."
+    },
+    "reporting": {
+      "primary": [
+        "test AUC or MAE by task",
+        "all-session tokens including memory",
+        "reuse-session tokens",
+        "completed and clean sessions"
+      ],
+      "secondary": [
+        "schema and probe calls",
+        "validation and memory calls",
+        "memory construction and maintenance time",
+        "observed session time"
+      ],
+      "quality_margin": {
+        "auc_absolute": 0.01,
+        "mae_relative": 0.02
+      },
+      "single_run": "Descriptive comparison; time cutoffs are not independent repeats. No significance claim.",
+      "incomplete": "Show every scheduled cell's status. Only complete matched support is used in comparative plots; no winner-selected tasks, runs or cutoffs.",
+      "historical": "Do not pool third-party-gateway runs with this official-API study. Preserve archived evidence."
+    },
+    "feature_statement_timeout_seconds": 600,
+    "tool_call_http_timeout_seconds": 180,
+    "timeout_implementation_audit": "The shared read_sql function bound timeout_s=600 when imported. Setting harness.FEATURE_SQL_TIMEOUT_S to 180 only affected dynamic lookups such as Middle.call HTTP timeout, not that bound default. All existing cells actually used 600-second feature statements. Correct metadata only; preserve runtime behavior and frozen algorithm."
+  },
+  "cells": [
+    {
+      "arm": "none",
+      "dataset": "rel-stack",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "post-votes",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.06430804222170446,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 214829,
+          "agent_tokens": 214829,
+          "learn_tokens": 0,
+          "llm_calls": 16,
+          "tool_calls": 25,
+          "schema": 7,
+          "probe": 13,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 1593.6307106018066,
+          "learn_seconds": 0,
+          "source": "none-rel-stack-r1/sessions/post_votes-k1.json",
+          "sha256": "93c98317c7d98174f7085bf757aa2481e24e27f251daae1eeef7548e5578e5cd"
+        },
+        {
+          "task": "post-votes",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.0745340759660996,
+          "quality_source": "entity_reference",
+          "fallback_reason": "evaluation_error",
+          "evaluation_error": "SQL error: canceling statement due to statement timeout",
+          "valid": false,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 151590,
+          "agent_tokens": 151590,
+          "learn_tokens": 0,
+          "llm_calls": 13,
+          "tool_calls": 23,
+          "schema": 5,
+          "probe": 16,
+          "validate": 2,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 1927.1311621665955,
+          "learn_seconds": 0,
+          "source": "none-rel-stack-r1/sessions/post_votes-k2.json",
+          "sha256": "1e26aff565d46e7da05dae1d70405293efa0520979b77729a35bd3653eceb73d"
+        },
+        {
+          "task": "post-votes",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.061355901423506665,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "patience",
+          "tokens": 240550,
+          "agent_tokens": 240550,
+          "learn_tokens": 0,
+          "llm_calls": 18,
+          "tool_calls": 25,
+          "schema": 7,
+          "probe": 14,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 423.9686493873596,
+          "learn_seconds": 0,
+          "source": "none-rel-stack-r1/sessions/post_votes-k3.json",
+          "sha256": "40b73cc9484d281727ca09955a13554b148095b862338b1862ea00741c5ce60e"
+        },
+        {
+          "task": "user-badge",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8479381310539205,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 269901,
+          "agent_tokens": 269901,
+          "learn_tokens": 0,
+          "llm_calls": 13,
+          "tool_calls": 23,
+          "schema": 7,
+          "probe": 11,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 400.67513823509216,
+          "learn_seconds": 0,
+          "source": "none-rel-stack-r1/sessions/user_badge-k1.json",
+          "sha256": "3deae19570a89d9fa37a6f036c7602170c3e6a1b5737cf690152770064059d61"
+        },
+        {
+          "task": "user-badge",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8562657852166632,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 63961,
+          "agent_tokens": 63961,
+          "learn_tokens": 0,
+          "llm_calls": 8,
+          "tool_calls": 15,
+          "schema": 8,
+          "probe": 5,
+          "validate": 2,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 110.31426978111267,
+          "learn_seconds": 0,
+          "source": "none-rel-stack-r1/sessions/user_badge-k2.json",
+          "sha256": "ac0b59caeba1a4864b7f59d9ba3e277920e7617880aae08303ba0b5a5fba8add"
+        },
+        {
+          "task": "user-badge",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8566047470327719,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "patience",
+          "tokens": 221085,
+          "agent_tokens": 221085,
+          "learn_tokens": 0,
+          "llm_calls": 15,
+          "tool_calls": 24,
+          "schema": 7,
+          "probe": 13,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 414.36551904678345,
+          "learn_seconds": 0,
+          "source": "none-rel-stack-r1/sessions/user_badge-k3.json",
+          "sha256": "d3fd09f64bf036bf0fab6c6546fca9be45045df8bf0b4b22bd50f3e829fe4fc9"
+        },
+        {
+          "task": "user-engagement",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8819834129530888,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "submitted",
+          "tokens": 149219,
+          "agent_tokens": 149219,
+          "learn_tokens": 0,
+          "llm_calls": 10,
+          "tool_calls": 17,
+          "schema": 7,
+          "probe": 4,
+          "validate": 4,
+          "memory": 0,
+          "submit": 2,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 229.98099851608276,
+          "learn_seconds": 0,
+          "source": "none-rel-stack-r1/sessions/user_engagement-k1.json",
+          "sha256": "ee8d0868050c913eaa5b44d705f1f5cf1016ac3e9633c4c612399ab831eac316"
+        },
+        {
+          "task": "user-engagement",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8705584515534168,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 316260,
+          "agent_tokens": 316260,
+          "learn_tokens": 0,
+          "llm_calls": 21,
+          "tool_calls": 29,
+          "schema": 7,
+          "probe": 17,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 494.48415756225586,
+          "learn_seconds": 0,
+          "source": "none-rel-stack-r1/sessions/user_engagement-k2.json",
+          "sha256": "b5e68b2ba7abaff7f04b3642924d6a6674099f3c41ddf889d2e9baf4732b3251"
+        },
+        {
+          "task": "user-engagement",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8892220450927868,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 306491,
+          "agent_tokens": 306491,
+          "learn_tokens": 0,
+          "llm_calls": 15,
+          "tool_calls": 27,
+          "schema": 7,
+          "probe": 16,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 542.7865791320801,
+          "learn_seconds": 0,
+          "source": "none-rel-stack-r1/sessions/user_engagement-k3.json",
+          "sha256": "1157c995e2345b5e7a5e5fcf8c66532489ad03b80b4602dd2fe3a48d6871d4d5"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "middle-alone",
+          "parallel_ok": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    },
+    {
+      "arm": "mavra",
+      "dataset": "rel-stack",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "post-votes",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.0642693029655485,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 376826,
+          "agent_tokens": 358614,
+          "learn_tokens": 18212,
+          "llm_calls": 21,
+          "tool_calls": 30,
+          "schema": 8,
+          "probe": 15,
+          "validate": 5,
+          "memory": 2,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 1,
+            "compose_features": 0
+          },
+          "drafts": 10,
+          "definitions_promoted": 7,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 3,
+            "F4": 0
+          },
+          "program_saved": true,
+          "learning_skipped": null,
+          "agent_seconds": 579.9169855117798,
+          "learn_seconds": 75.6522102355957,
+          "source": "mavra-rel-stack-r1/sessions/post_votes-k1.json",
+          "sha256": "9d8f742bc451967fd58e4119087260b01357698271c7bbc059e6977cbf5ba419"
+        },
+        {
+          "task": "post-votes",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.06960532240357985,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 174152,
+          "agent_tokens": 158655,
+          "learn_tokens": 15497,
+          "llm_calls": 8,
+          "tool_calls": 10,
+          "schema": 3,
+          "probe": 2,
+          "validate": 4,
+          "memory": 1,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 10,
+          "definitions_promoted": 6,
+          "definitions_corroborated": 4,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": true,
+          "learning_skipped": null,
+          "agent_seconds": 407.13657307624817,
+          "learn_seconds": 51.20370936393738,
+          "source": "mavra-rel-stack-r1/sessions/post_votes-k2.json",
+          "sha256": "4860f91f9feeeb4da1bdf67cdf18047b57dacbb6da45c62dd8bee1c6fa4c11f2"
+        },
+        {
+          "task": "post-votes",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.06191544859979212,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 89660,
+          "agent_tokens": 73695,
+          "learn_tokens": 15965,
+          "llm_calls": 4,
+          "tool_calls": 4,
+          "schema": 0,
+          "probe": 0,
+          "validate": 3,
+          "memory": 1,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 10,
+          "definitions_promoted": 3,
+          "definitions_corroborated": 5,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 2,
+            "F4": 0
+          },
+          "program_saved": true,
+          "learning_skipped": null,
+          "agent_seconds": 438.0606586933136,
+          "learn_seconds": 53.08137655258179,
+          "source": "mavra-rel-stack-r1/sessions/post_votes-k3.json",
+          "sha256": "78d1e6a83eaaff75873f6c4a115b8c8055e59212516a9268dca72b9274ea7792"
+        },
+        {
+          "task": "user-badge",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8519324085218758,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 256974,
+          "agent_tokens": 241015,
+          "learn_tokens": 15959,
+          "llm_calls": 16,
+          "tool_calls": 22,
+          "schema": 7,
+          "probe": 8,
+          "validate": 5,
+          "memory": 2,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 1,
+            "compose_features": 0
+          },
+          "drafts": 12,
+          "definitions_promoted": 8,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 4,
+            "F4": 0
+          },
+          "program_saved": true,
+          "learning_skipped": null,
+          "agent_seconds": 418.85680103302,
+          "learn_seconds": 58.19248700141907,
+          "source": "mavra-rel-stack-r1/sessions/user_badge-k1.json",
+          "sha256": "48d63517630429494879d10220f752a21d4087b4d3c0c5da03f20f54ae1af8b0"
+        },
+        {
+          "task": "user-badge",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8543383058396284,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 56146,
+          "agent_tokens": 56146,
+          "learn_tokens": 0,
+          "llm_calls": 5,
+          "tool_calls": 7,
+          "schema": 4,
+          "probe": 0,
+          "validate": 2,
+          "memory": 1,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "identical previously published SQL; current validation and audit passed",
+          "agent_seconds": 214.40627241134644,
+          "learn_seconds": 0,
+          "source": "mavra-rel-stack-r1/sessions/user_badge-k2.json",
+          "sha256": "3a524649681dc9f76bf6e490745b57cfa7a2cd902e2881fb8ad6cde12d6fbf15"
+        },
+        {
+          "task": "user-badge",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8560808658079431,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 51560,
+          "agent_tokens": 40247,
+          "learn_tokens": 11313,
+          "llm_calls": 4,
+          "tool_calls": 4,
+          "schema": 0,
+          "probe": 1,
+          "validate": 2,
+          "memory": 1,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 12,
+          "definitions_promoted": 7,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 5,
+            "F4": 0
+          },
+          "program_saved": true,
+          "learning_skipped": null,
+          "agent_seconds": 198.87405824661255,
+          "learn_seconds": 26.515769004821777,
+          "source": "mavra-rel-stack-r1/sessions/user_badge-k3.json",
+          "sha256": "c5af51c7f7201108aa23e87c208443287f9edf48bacc57cdf6ec0ba99f11a781"
+        },
+        {
+          "task": "user-engagement",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8792601238517936,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 245415,
+          "agent_tokens": 235384,
+          "learn_tokens": 10031,
+          "llm_calls": 14,
+          "tool_calls": 20,
+          "schema": 7,
+          "probe": 6,
+          "validate": 5,
+          "memory": 2,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 1,
+            "compose_features": 0
+          },
+          "drafts": 12,
+          "definitions_promoted": 3,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 9,
+            "F4": 0
+          },
+          "program_saved": true,
+          "learning_skipped": null,
+          "agent_seconds": 2665.856558084488,
+          "learn_seconds": 36.56632447242737,
+          "source": "mavra-rel-stack-r1/sessions/user_engagement-k1.json",
+          "sha256": "7607b51bc084031824c6baa94088a67e25ad5993243936b71a3ed60596851ce4"
+        },
+        {
+          "task": "user-engagement",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8706251856625989,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 32596,
+          "agent_tokens": 32596,
+          "learn_tokens": 0,
+          "llm_calls": 4,
+          "tool_calls": 5,
+          "schema": 0,
+          "probe": 2,
+          "validate": 2,
+          "memory": 1,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "identical previously published SQL; current validation and audit passed",
+          "agent_seconds": 1554.7384140491486,
+          "learn_seconds": 0,
+          "source": "mavra-rel-stack-r1/sessions/user_engagement-k2.json",
+          "sha256": "b7487226d5bc4a80ec4c5feaa2a664070d27f11cc13ca863a11959870af0d0d1"
+        },
+        {
+          "task": "user-engagement",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8873847833682738,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 34966,
+          "agent_tokens": 34966,
+          "learn_tokens": 0,
+          "llm_calls": 4,
+          "tool_calls": 5,
+          "schema": 1,
+          "probe": 1,
+          "validate": 2,
+          "memory": 1,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "identical previously published SQL; current validation and audit passed",
+          "agent_seconds": 983.7031660079956,
+          "learn_seconds": 0,
+          "source": "mavra-rel-stack-r1/sessions/user_engagement-k3.json",
+          "sha256": "0bc985f53d664d57fd6335bc425c59ba3aa01c7232666a92b28ecbb8f7275ee5"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "relbench-mavra",
+          "parallel_ok": false,
+          "feature_memory": true,
+          "extractor": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    },
+    {
+      "arm": "ace",
+      "dataset": "rel-stack",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "post-votes",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.06450283102791307,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "llm_budget",
+          "tokens": 510325,
+          "agent_tokens": 472613,
+          "learn_tokens": 37712,
+          "llm_calls": 24,
+          "tool_calls": 36,
+          "schema": 8,
+          "probe": 25,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 318.91621446609497,
+          "learn_seconds": 63.351242542266846,
+          "source": "ace-rel-stack-r1/sessions/post_votes-k1.json",
+          "sha256": "68d114299cd89725c6c2b20a132e26a25e2e34f31975fb3e03c753311dbbb2b6"
+        },
+        {
+          "task": "post-votes",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.0696866329999933,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 217021,
+          "agent_tokens": 187777,
+          "learn_tokens": 29244,
+          "llm_calls": 15,
+          "tool_calls": 31,
+          "schema": 9,
+          "probe": 19,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 234.3215456008911,
+          "learn_seconds": 59.2263708114624,
+          "source": "ace-rel-stack-r1/sessions/post_votes-k2.json",
+          "sha256": "f47ed6e0c983b4b2d0a57191625abeca81b8b930a50f6a3803f3f511e9b06f45"
+        },
+        {
+          "task": "post-votes",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.061856580166872455,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 159146,
+          "agent_tokens": 123525,
+          "learn_tokens": 35621,
+          "llm_calls": 13,
+          "tool_calls": 22,
+          "schema": 7,
+          "probe": 12,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 200.99555373191833,
+          "learn_seconds": 80.27319955825806,
+          "source": "ace-rel-stack-r1/sessions/post_votes-k3.json",
+          "sha256": "be8a68f81ca0f138c1e1d8129a94bcfc8d983f3c50e09922a3682657a9c00e0d"
+        },
+        {
+          "task": "user-badge",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8452527178991242,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 246964,
+          "agent_tokens": 198296,
+          "learn_tokens": 48668,
+          "llm_calls": 13,
+          "tool_calls": 19,
+          "schema": 7,
+          "probe": 7,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 475.08334612846375,
+          "learn_seconds": 93.61915159225464,
+          "source": "ace-rel-stack-r1/sessions/user_badge-k1.json",
+          "sha256": "28eec8bfcc465990b98c07d34a5fc61bacccccadd48d0c9bf2dac7277b5092d0"
+        },
+        {
+          "task": "user-badge",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8176272671825915,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "patience",
+          "tokens": 275938,
+          "agent_tokens": 238303,
+          "learn_tokens": 37635,
+          "llm_calls": 13,
+          "tool_calls": 23,
+          "schema": 8,
+          "probe": 12,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 224.82257771492004,
+          "learn_seconds": 72.14145278930664,
+          "source": "ace-rel-stack-r1/sessions/user_badge-k2.json",
+          "sha256": "4e104fc576412ecc5e008fe5fbba8270bbb2b459f275540bad3405d6dacae4bc"
+        },
+        {
+          "task": "user-badge",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8506950974040998,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 159306,
+          "agent_tokens": 122562,
+          "learn_tokens": 36744,
+          "llm_calls": 10,
+          "tool_calls": 20,
+          "schema": 8,
+          "probe": 10,
+          "validate": 2,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 172.91860365867615,
+          "learn_seconds": 80.22783279418945,
+          "source": "ace-rel-stack-r1/sessions/user_badge-k3.json",
+          "sha256": "d1adf5c50e4d8c319a98db476099add9200e32e3410026aa62917fa2a1091aa3"
+        },
+        {
+          "task": "user-engagement",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8808366510948711,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "submitted",
+          "tokens": 194913,
+          "agent_tokens": 164677,
+          "learn_tokens": 30236,
+          "llm_calls": 13,
+          "tool_calls": 23,
+          "schema": 8,
+          "probe": 10,
+          "validate": 4,
+          "memory": 0,
+          "submit": 1,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 163.62004923820496,
+          "learn_seconds": 57.62450909614563,
+          "source": "ace-rel-stack-r1/sessions/user_engagement-k1.json",
+          "sha256": "731f488553f79549c8904ef92db326cec8f3878662794e15edd446df1892f6d5"
+        },
+        {
+          "task": "user-engagement",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8726741137924798,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 149726,
+          "agent_tokens": 116596,
+          "learn_tokens": 33130,
+          "llm_calls": 10,
+          "tool_calls": 18,
+          "schema": 7,
+          "probe": 9,
+          "validate": 2,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 180.38756442070007,
+          "learn_seconds": 59.49159789085388,
+          "source": "ace-rel-stack-r1/sessions/user_engagement-k2.json",
+          "sha256": "10d98a09773c2d1999170c04c598f41ac8aae0c182afa2b22bc043a5db831613"
+        },
+        {
+          "task": "user-engagement",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8901202199316717,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 516111,
+          "agent_tokens": 461512,
+          "learn_tokens": 54599,
+          "llm_calls": 18,
+          "tool_calls": 26,
+          "schema": 8,
+          "probe": 13,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 588.675012588501,
+          "learn_seconds": 54.948256731033325,
+          "source": "ace-rel-stack-r1/sessions/user_engagement-k3.json",
+          "sha256": "e0e57d4e5facb9d07cfadf2506764948adc91d0b7ac1017680388688106a7f71"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "middle-alone",
+          "parallel_ok": true,
+          "ace": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    },
+    {
+      "arm": "awm",
+      "dataset": "rel-stack",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "post-votes",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.0636425131990785,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 511734,
+          "agent_tokens": 469166,
+          "learn_tokens": 42568,
+          "llm_calls": 21,
+          "tool_calls": 36,
+          "schema": 7,
+          "probe": 24,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 658.8397748470306,
+          "learn_seconds": 9.696628093719482,
+          "source": "awm-rel-stack-r1/sessions/post_votes-k1.json",
+          "sha256": "076f7e7fe24018d275faecc6261f368723fc641e7cab8cf76da3af1fe1c74994"
+        },
+        {
+          "task": "post-votes",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.0745340759660996,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 710025,
+          "agent_tokens": 668589,
+          "learn_tokens": 41436,
+          "llm_calls": 24,
+          "tool_calls": 35,
+          "schema": 9,
+          "probe": 24,
+          "validate": 2,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 766.1239931583405,
+          "learn_seconds": 4.557900428771973,
+          "source": "awm-rel-stack-r1/sessions/post_votes-k2.json",
+          "sha256": "69011bd8d60cf404e5772c9bb06988318eec9c73e3503c53bcdbfd1fce2c8963"
+        },
+        {
+          "task": "post-votes",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.06180792809783184,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 413140,
+          "agent_tokens": 371938,
+          "learn_tokens": 41202,
+          "llm_calls": 16,
+          "tool_calls": 30,
+          "schema": 8,
+          "probe": 17,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 1332.7740149497986,
+          "learn_seconds": 5.701072931289673,
+          "source": "awm-rel-stack-r1/sessions/post_votes-k3.json",
+          "sha256": "c00b4b0dd58bec5b7d5e21582eb9c948731a8418642c7b68acd8aa1ad343dc6d"
+        },
+        {
+          "task": "user-badge",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8500654798523465,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "patience",
+          "tokens": 94181,
+          "agent_tokens": 84409,
+          "learn_tokens": 9772,
+          "llm_calls": 10,
+          "tool_calls": 18,
+          "schema": 7,
+          "probe": 7,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 142.8577492237091,
+          "learn_seconds": 4.757689952850342,
+          "source": "awm-rel-stack-r1/sessions/user_badge-k1.json",
+          "sha256": "5313fe84f460ded5412153089273a5a1705dae9e788aac7111b1c1965bc9762e"
+        },
+        {
+          "task": "user-badge",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8528228202052783,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 217428,
+          "agent_tokens": 198514,
+          "learn_tokens": 18914,
+          "llm_calls": 14,
+          "tool_calls": 22,
+          "schema": 7,
+          "probe": 11,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 313.9670627117157,
+          "learn_seconds": 9.287279605865479,
+          "source": "awm-rel-stack-r1/sessions/user_badge-k2.json",
+          "sha256": "31ef8b2b40962ebe3d04a0dc9eb49e241df2503f30ed7c36d22cd590cf5243f1"
+        },
+        {
+          "task": "user-badge",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8545647907179061,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "patience",
+          "tokens": 244229,
+          "agent_tokens": 226399,
+          "learn_tokens": 17830,
+          "llm_calls": 13,
+          "tool_calls": 22,
+          "schema": 4,
+          "probe": 14,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 402.8526849746704,
+          "learn_seconds": 4.396031379699707,
+          "source": "awm-rel-stack-r1/sessions/user_badge-k3.json",
+          "sha256": "4546542a533e87eb23422eea85665a42c989152c8230ff802503efacffb42de0"
+        },
+        {
+          "task": "user-engagement",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.879724883061541,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 117830,
+          "agent_tokens": 99618,
+          "learn_tokens": 18212,
+          "llm_calls": 8,
+          "tool_calls": 14,
+          "schema": 7,
+          "probe": 2,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 239.86337423324585,
+          "learn_seconds": 5.9059717655181885,
+          "source": "awm-rel-stack-r1/sessions/user_engagement-k1.json",
+          "sha256": "bd92f5ff90f6f26c079730e68f6817635b3705ecc7341409cd7370e1006060b0"
+        },
+        {
+          "task": "user-engagement",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8730251087709064,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 180214,
+          "agent_tokens": 164973,
+          "learn_tokens": 15241,
+          "llm_calls": 13,
+          "tool_calls": 22,
+          "schema": 8,
+          "probe": 11,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 233.81171226501465,
+          "learn_seconds": 6.274476051330566,
+          "source": "awm-rel-stack-r1/sessions/user_engagement-k2.json",
+          "sha256": "3fe435c7c81d1f2aa8aab6f3ea3638efa0f20945713a4f70ba3382593209530d"
+        },
+        {
+          "task": "user-engagement",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8894026200597873,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 141568,
+          "agent_tokens": 127104,
+          "learn_tokens": 14464,
+          "llm_calls": 10,
+          "tool_calls": 18,
+          "schema": 8,
+          "probe": 7,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 331.3034200668335,
+          "learn_seconds": 3.434755802154541,
+          "source": "awm-rel-stack-r1/sessions/user_engagement-k3.json",
+          "sha256": "0816786dc95e02675bb48c5291bd729c58cb7a245c04e76c455045f057c8f4b8"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "middle-alone",
+          "parallel_ok": true,
+          "awm": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    },
+    {
+      "arm": "gmemory",
+      "dataset": "rel-stack",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "post-votes",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.06398508427734889,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 613086,
+          "agent_tokens": 586786,
+          "learn_tokens": 26300,
+          "llm_calls": 17,
+          "tool_calls": 24,
+          "schema": 2,
+          "probe": 17,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 701.5413517951965,
+          "learn_seconds": 17.689799308776855,
+          "source": "gmemory-rel-stack-r1/sessions/post_votes-k1.json",
+          "sha256": "934c8a809897ddfa9d971a37fd9d476354f340f5a3d97b276fa0d7fa0bf4910d"
+        },
+        {
+          "task": "post-votes",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.06892942557989137,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 313513,
+          "agent_tokens": 277114,
+          "learn_tokens": 36399,
+          "llm_calls": 9,
+          "tool_calls": 17,
+          "schema": 6,
+          "probe": 6,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 724.6444115638733,
+          "learn_seconds": 1.7777559757232666,
+          "source": "gmemory-rel-stack-r1/sessions/post_votes-k2.json",
+          "sha256": "d034436bbef942a3958193da55defced8592c0574a929520abafefa2f8e5b41b"
+        },
+        {
+          "task": "post-votes",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.06166840664315023,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 320613,
+          "agent_tokens": 290209,
+          "learn_tokens": 30404,
+          "llm_calls": 12,
+          "tool_calls": 25,
+          "schema": 7,
+          "probe": 16,
+          "validate": 2,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 497.3395025730133,
+          "learn_seconds": 3.415546417236328,
+          "source": "gmemory-rel-stack-r1/sessions/post_votes-k3.json",
+          "sha256": "2743eea21208a2284ba61f8030daa11b3867984d32f77eed70e89e4f7cf15609"
+        },
+        {
+          "task": "user-badge",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8553935615600827,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 459081,
+          "agent_tokens": 446146,
+          "learn_tokens": 12935,
+          "llm_calls": 20,
+          "tool_calls": 29,
+          "schema": 7,
+          "probe": 17,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 420.47460865974426,
+          "learn_seconds": 1.6730296611785889,
+          "source": "gmemory-rel-stack-r1/sessions/user_badge-k1.json",
+          "sha256": "7030f089bc84b473eb062c352d75d2b04e360aad0d6d0afe6f753173088fd3a0"
+        },
+        {
+          "task": "user-badge",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.855161362990956,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 534704,
+          "agent_tokens": 361842,
+          "learn_tokens": 172862,
+          "llm_calls": 10,
+          "tool_calls": 16,
+          "schema": 3,
+          "probe": 8,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 407.98891401290894,
+          "learn_seconds": 31.826526403427124,
+          "source": "gmemory-rel-stack-r1/sessions/user_badge-k2.json",
+          "sha256": "f98e02b44794a119fb8a1a75f1050396c10056c356dda507cc302342b562b6bd"
+        },
+        {
+          "task": "user-badge",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8583115116327474,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 665026,
+          "agent_tokens": 629470,
+          "learn_tokens": 35556,
+          "llm_calls": 18,
+          "tool_calls": 25,
+          "schema": 1,
+          "probe": 19,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 2268.52787566185,
+          "learn_seconds": 18.001248121261597,
+          "source": "gmemory-rel-stack-r1/sessions/user_badge-k3.json",
+          "sha256": "ec0d043c09ef5a6465b3b151240d0a25670756b39512f32935edc1da2a90072b"
+        },
+        {
+          "task": "user-engagement",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.5607762759866322,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "validation_budget",
+          "tokens": 526039,
+          "agent_tokens": 490908,
+          "learn_tokens": 35131,
+          "llm_calls": 15,
+          "tool_calls": 19,
+          "schema": 1,
+          "probe": 13,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 426.2436046600342,
+          "learn_seconds": 6.017704248428345,
+          "source": "gmemory-rel-stack-r1/sessions/user_engagement-k1.json",
+          "sha256": "ac94df4fb26fdaf2829fe0953c7e47b0d6270c86606e2ca82c8bfdd8ad64c3cb"
+        },
+        {
+          "task": "user-engagement",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8709185462100143,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "patience",
+          "tokens": 217086,
+          "agent_tokens": 183424,
+          "learn_tokens": 33662,
+          "llm_calls": 9,
+          "tool_calls": 18,
+          "schema": 7,
+          "probe": 8,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 183.6960666179657,
+          "learn_seconds": 1.8654873371124268,
+          "source": "gmemory-rel-stack-r1/sessions/user_engagement-k2.json",
+          "sha256": "abdc6cc06e423c8e02d306e45454af5c743470d2cc5f39c1d8002e1cd3a2520a"
+        },
+        {
+          "task": "user-engagement",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.8903292617827472,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 132006,
+          "agent_tokens": 108169,
+          "learn_tokens": 23837,
+          "llm_calls": 6,
+          "tool_calls": 9,
+          "schema": 3,
+          "probe": 3,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 249.72410368919373,
+          "learn_seconds": 2.830930709838867,
+          "source": "gmemory-rel-stack-r1/sessions/user_engagement-k3.json",
+          "sha256": "ee13a02059de1d7c60b54a4a7773ec821f9ec8e67cdf49ac7380eeca13a69f34"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "middle-alone",
+          "parallel_ok": false,
+          "gmemory": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    },
+    {
+      "arm": "none",
+      "dataset": "rel-trial",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "site-success",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.508448417743245,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 374576,
+          "agent_tokens": 374576,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 36,
+          "schema": 7,
+          "probe": 29,
+          "validate": 0,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 111.32886338233948,
+          "learn_seconds": 0,
+          "source": "none-rel-trial-r1/sessions/site_success-k1.json",
+          "sha256": "5404f40f71d4aa5d1bb62670b2986ac0b1cac1720b482d956296a8b3c840ddac"
+        },
+        {
+          "task": "site-success",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.4125676319611412,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 549389,
+          "agent_tokens": 549389,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 38,
+          "schema": 13,
+          "probe": 25,
+          "validate": 0,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 336.13141775131226,
+          "learn_seconds": 0,
+          "source": "none-rel-trial-r1/sessions/site_success-k2.json",
+          "sha256": "4728c1aa6a359a2adbb67ddc459b063b66c11bf04149bfe2c6cf3277ccb20a3c"
+        },
+        {
+          "task": "site-success",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.4138089358514066,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 392903,
+          "agent_tokens": 392903,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 33,
+          "schema": 7,
+          "probe": 26,
+          "validate": 0,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 125.76250123977661,
+          "learn_seconds": 0,
+          "source": "none-rel-trial-r1/sessions/site_success-k3.json",
+          "sha256": "ed1d4cf6642131fae8ba4b029c951236cb40c8e23e0e7e1cb20f412b1df1d859"
+        },
+        {
+          "task": "study-adverse",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 35.518346492471736,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "patience",
+          "tokens": 358526,
+          "agent_tokens": 358526,
+          "learn_tokens": 0,
+          "llm_calls": 22,
+          "tool_calls": 29,
+          "schema": 5,
+          "probe": 20,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 188.04912519454956,
+          "learn_seconds": 0,
+          "source": "none-rel-trial-r1/sessions/study_adverse-k1.json",
+          "sha256": "c1b04a5a61baf3f6a478e4d59b55c60771822c2ccdd1d6c57160e4187dff8282"
+        },
+        {
+          "task": "study-adverse",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 49.93407749943018,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 412182,
+          "agent_tokens": 412182,
+          "learn_tokens": 0,
+          "llm_calls": 19,
+          "tool_calls": 33,
+          "schema": 15,
+          "probe": 16,
+          "validate": 2,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 327.9645721912384,
+          "learn_seconds": 0,
+          "source": "none-rel-trial-r1/sessions/study_adverse-k2.json",
+          "sha256": "7c9ef98129fee0b1278077eaf4d0c889f476f08e04abbc87b345a95aa4a74a67"
+        },
+        {
+          "task": "study-adverse",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 44.37184485552964,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 430362,
+          "agent_tokens": 430362,
+          "learn_tokens": 0,
+          "llm_calls": 21,
+          "tool_calls": 38,
+          "schema": 13,
+          "probe": 24,
+          "validate": 1,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 171.5985426902771,
+          "learn_seconds": 0,
+          "source": "none-rel-trial-r1/sessions/study_adverse-k3.json",
+          "sha256": "222f16acf91f1a9f207c52107ebd99d87e64da053761260af44317fb216d10a4"
+        },
+        {
+          "task": "study-outcome",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6518111504995165,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "patience",
+          "tokens": 663798,
+          "agent_tokens": 663798,
+          "learn_tokens": 0,
+          "llm_calls": 23,
+          "tool_calls": 37,
+          "schema": 16,
+          "probe": 17,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 921.9059731960297,
+          "learn_seconds": 0,
+          "source": "none-rel-trial-r1/sessions/study_outcome-k1.json",
+          "sha256": "14c752fce92ec5bf5d4c961ff6d2626f81c1d0cc11ea6de045e5580f16a58e25"
+        },
+        {
+          "task": "study-outcome",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6488773282121435,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 523287,
+          "agent_tokens": 523287,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 34,
+          "schema": 12,
+          "probe": 17,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 442.5199785232544,
+          "learn_seconds": 0,
+          "source": "none-rel-trial-r1/sessions/study_outcome-k2.json",
+          "sha256": "201d3c059ec953d279a99ef6b297185b9c898e5a8a109bbf1a00072c0f079b7a"
+        },
+        {
+          "task": "study-outcome",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6482135306553911,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "llm_budget",
+          "tokens": 509532,
+          "agent_tokens": 509532,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 43,
+          "schema": 13,
+          "probe": 27,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 256.245121717453,
+          "learn_seconds": 0,
+          "source": "none-rel-trial-r1/sessions/study_outcome-k3.json",
+          "sha256": "89006f4a4f34bc3a8911d407edd06255e264d06b9557c020f55e67b35e9a493c"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "middle-alone",
+          "parallel_ok": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    },
+    {
+      "arm": "mavra",
+      "dataset": "rel-trial",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "site-success",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.42997840571202545,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "llm_budget",
+          "tokens": 571555,
+          "agent_tokens": 571555,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 34,
+          "schema": 11,
+          "probe": 18,
+          "validate": 3,
+          "memory": 2,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 1,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "validation score not better than the reference",
+          "agent_seconds": 289.2330000400543,
+          "learn_seconds": 0,
+          "source": "mavra-rel-trial-r1/sessions/site_success-k1.json",
+          "sha256": "0a8c4b8b57f665406d8cd5d717782c4d11874b8502d5733965dac49e38b07510"
+        },
+        {
+          "task": "site-success",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.4125676319611412,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 376556,
+          "agent_tokens": 376556,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 34,
+          "schema": 7,
+          "probe": 25,
+          "validate": 0,
+          "memory": 2,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 1,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 404.54700446128845,
+          "learn_seconds": 0,
+          "source": "mavra-rel-trial-r1/sessions/site_success-k2.json",
+          "sha256": "e97e79a2847fbc2e33218e295876ceb7a92e2d170455aefbbcaf0456076d6b44"
+        },
+        {
+          "task": "site-success",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.4138089358514066,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 341705,
+          "agent_tokens": 341705,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 31,
+          "schema": 7,
+          "probe": 22,
+          "validate": 0,
+          "memory": 2,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 1,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 142.4747929573059,
+          "learn_seconds": 0,
+          "source": "mavra-rel-trial-r1/sessions/site_success-k3.json",
+          "sha256": "19415572de59dc4000adc5b42d667d4139c5efe350840a0b7bc1674ef31f3a62"
+        },
+        {
+          "task": "study-adverse",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 42.675946798725015,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 436175,
+          "agent_tokens": 436175,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 37,
+          "schema": 13,
+          "probe": 21,
+          "validate": 1,
+          "memory": 2,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 1,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 138.8096685409546,
+          "learn_seconds": 0,
+          "source": "mavra-rel-trial-r1/sessions/study_adverse-k1.json",
+          "sha256": "1661bf7e6017c65c2e772c47f687deb499920addfd56c6b65b2c81bf5a659b42"
+        },
+        {
+          "task": "study-adverse",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 48.0419904150232,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 406725,
+          "agent_tokens": 389664,
+          "learn_tokens": 17061,
+          "llm_calls": 20,
+          "tool_calls": 29,
+          "schema": 11,
+          "probe": 11,
+          "validate": 5,
+          "memory": 2,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 1,
+            "compose_features": 0
+          },
+          "drafts": 6,
+          "definitions_promoted": 5,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 1,
+            "F4": 0
+          },
+          "program_saved": true,
+          "learning_skipped": null,
+          "agent_seconds": 636.1586306095123,
+          "learn_seconds": 165.25330638885498,
+          "source": "mavra-rel-trial-r1/sessions/study_adverse-k2.json",
+          "sha256": "b98bfcdb898d6abb3b0baff59d557f459e3cfcab0466451c79063242c05c2038"
+        },
+        {
+          "task": "study-adverse",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 43.357122713160265,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 48753,
+          "agent_tokens": 48753,
+          "learn_tokens": 0,
+          "llm_calls": 4,
+          "tool_calls": 4,
+          "schema": 1,
+          "probe": 0,
+          "validate": 2,
+          "memory": 1,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "identical previously published SQL; current validation and audit passed",
+          "agent_seconds": 1017.857889175415,
+          "learn_seconds": 0,
+          "source": "mavra-rel-trial-r1/sessions/study_adverse-k3.json",
+          "sha256": "05f628cf77a066d9c5a9cfcc0eb4088e9fc23e5c118c57b6c19ffe773c0344ac"
+        },
+        {
+          "task": "study-outcome",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6466484047695779,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 562826,
+          "agent_tokens": 550856,
+          "learn_tokens": 11970,
+          "llm_calls": 23,
+          "tool_calls": 35,
+          "schema": 13,
+          "probe": 15,
+          "validate": 5,
+          "memory": 2,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 1,
+            "compose_features": 0
+          },
+          "drafts": 3,
+          "definitions_promoted": 3,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": true,
+          "learning_skipped": null,
+          "agent_seconds": 325.2684922218323,
+          "learn_seconds": 23.342419147491455,
+          "source": "mavra-rel-trial-r1/sessions/study_outcome-k1.json",
+          "sha256": "ec5ceda967d67858c65292b4946bfc9fe21f18ebbe6ea45d2716a7df39c4277f"
+        },
+        {
+          "task": "study-outcome",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6430502209828475,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 50628,
+          "agent_tokens": 50628,
+          "learn_tokens": 0,
+          "llm_calls": 5,
+          "tool_calls": 7,
+          "schema": 5,
+          "probe": 0,
+          "validate": 1,
+          "memory": 1,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "identical previously published SQL; current validation and audit passed",
+          "agent_seconds": 56.07535219192505,
+          "learn_seconds": 0,
+          "source": "mavra-rel-trial-r1/sessions/study_outcome-k2.json",
+          "sha256": "e3c3ee8440a197080fe918951b2f4eb46b377cb617d7a7c4bda2a573c91b687e"
+        },
+        {
+          "task": "study-outcome",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6512455954897814,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 55961,
+          "agent_tokens": 55961,
+          "learn_tokens": 0,
+          "llm_calls": 5,
+          "tool_calls": 7,
+          "schema": 3,
+          "probe": 2,
+          "validate": 1,
+          "memory": 1,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 1,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "identical previously published SQL; current validation and audit passed",
+          "agent_seconds": 60.992358446121216,
+          "learn_seconds": 0,
+          "source": "mavra-rel-trial-r1/sessions/study_outcome-k3.json",
+          "sha256": "0e7c2886e8803c92455f39b99d0a10366fd235845e142a8baa6d440a5fa265d5"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "relbench-mavra",
+          "parallel_ok": false,
+          "feature_memory": true,
+          "extractor": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    },
+    {
+      "arm": "ace",
+      "dataset": "rel-trial",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "site-success",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.508448417743245,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 497597,
+          "agent_tokens": 466411,
+          "learn_tokens": 31186,
+          "llm_calls": 24,
+          "tool_calls": 30,
+          "schema": 8,
+          "probe": 22,
+          "validate": 0,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 187.85092735290527,
+          "learn_seconds": 35.69016766548157,
+          "source": "ace-rel-trial-r1/sessions/site_success-k1.json",
+          "sha256": "0ada5e30b39faf7fb0d0d21f4c69b2f0259b71e06c5809546ae9f10c63a0a2f9"
+        },
+        {
+          "task": "site-success",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.4200291346254215,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 744233,
+          "agent_tokens": 674380,
+          "learn_tokens": 69853,
+          "llm_calls": 21,
+          "tool_calls": 29,
+          "schema": 8,
+          "probe": 16,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 643.9585251808167,
+          "learn_seconds": 61.89197874069214,
+          "source": "ace-rel-trial-r1/sessions/site_success-k2.json",
+          "sha256": "1e0c96541d3a0db1507a7edde14f508f43ecbc885d27f48ba740dbdb7ee3aaff"
+        },
+        {
+          "task": "site-success",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.3912999296973047,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 173744,
+          "agent_tokens": 139819,
+          "learn_tokens": 33925,
+          "llm_calls": 11,
+          "tool_calls": 18,
+          "schema": 9,
+          "probe": 7,
+          "validate": 2,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 337.8879461288452,
+          "learn_seconds": 57.704994678497314,
+          "source": "ace-rel-trial-r1/sessions/site_success-k3.json",
+          "sha256": "0f95fc1c1217413208a5542e217d369c242624358cb3c3948354722527f6e864"
+        },
+        {
+          "task": "study-adverse",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 42.675946798725015,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 415770,
+          "agent_tokens": 391219,
+          "learn_tokens": 24551,
+          "llm_calls": 24,
+          "tool_calls": 38,
+          "schema": 7,
+          "probe": 31,
+          "validate": 0,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 100.7389326095581,
+          "learn_seconds": 32.802525997161865,
+          "source": "ace-rel-trial-r1/sessions/study_adverse-k1.json",
+          "sha256": "8a1cbbd92826febd225aca5f6339b0b57c012da2d3595c7e14e665382a137496"
+        },
+        {
+          "task": "study-adverse",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 50.15987609295978,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "llm_budget",
+          "tokens": 741352,
+          "agent_tokens": 666303,
+          "learn_tokens": 75049,
+          "llm_calls": 24,
+          "tool_calls": 37,
+          "schema": 9,
+          "probe": 24,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 265.8223125934601,
+          "learn_seconds": 62.085230350494385,
+          "source": "ace-rel-trial-r1/sessions/study_adverse-k2.json",
+          "sha256": "9dc869f70deda0e9b9a6ec310b59755375d2aa8c10c7476ad018919cb57ad6f7"
+        },
+        {
+          "task": "study-adverse",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 44.50047061315291,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "llm_budget",
+          "tokens": 523241,
+          "agent_tokens": 477880,
+          "learn_tokens": 45361,
+          "llm_calls": 24,
+          "tool_calls": 39,
+          "schema": 7,
+          "probe": 29,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 211.66860342025757,
+          "learn_seconds": 39.021918058395386,
+          "source": "ace-rel-trial-r1/sessions/study_adverse-k3.json",
+          "sha256": "9e2b237ae42a1e596f56d2b533442354e52a5d742a8325f461c59bb6957fa646"
+        },
+        {
+          "task": "study-outcome",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6335610699323235,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "llm_budget",
+          "tokens": 570867,
+          "agent_tokens": 519525,
+          "learn_tokens": 51342,
+          "llm_calls": 24,
+          "tool_calls": 38,
+          "schema": 11,
+          "probe": 24,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 273.1704008579254,
+          "learn_seconds": 64.9746732711792,
+          "source": "ace-rel-trial-r1/sessions/study_outcome-k1.json",
+          "sha256": "2c6413c079a1956f0dc61392eb30b36a260be229ffc5b30b78b75a393d454297"
+        },
+        {
+          "task": "study-outcome",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.649781647900663,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 473530,
+          "agent_tokens": 419778,
+          "learn_tokens": 53752,
+          "llm_calls": 22,
+          "tool_calls": 41,
+          "schema": 11,
+          "probe": 27,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 176.23575448989868,
+          "learn_seconds": 58.30370044708252,
+          "source": "ace-rel-trial-r1/sessions/study_outcome-k2.json",
+          "sha256": "cc220b7de29f30039ea9a3245963e35ce3968b0ce1f6b80e8e1254a412c48232"
+        },
+        {
+          "task": "study-outcome",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6409795630725863,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 361746,
+          "agent_tokens": 307370,
+          "learn_tokens": 54376,
+          "llm_calls": 17,
+          "tool_calls": 31,
+          "schema": 4,
+          "probe": 24,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 247.99707436561584,
+          "learn_seconds": 78.06424951553345,
+          "source": "ace-rel-trial-r1/sessions/study_outcome-k3.json",
+          "sha256": "88026044bcbd4ffe3f8e196c5d0af5d1df82c268729f65e443d10de95bbb1583"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "middle-alone",
+          "parallel_ok": true,
+          "ace": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    },
+    {
+      "arm": "awm",
+      "dataset": "rel-trial",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "site-success",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.508448417743245,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 529015,
+          "agent_tokens": 529015,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 32,
+          "schema": 10,
+          "probe": 22,
+          "validate": 0,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "no successful experience yet",
+          "agent_seconds": 143.71943163871765,
+          "learn_seconds": 0,
+          "source": "awm-rel-trial-r1/sessions/site_success-k1.json",
+          "sha256": "eba5d1a25aa93ce672d181ba3078f25c30d84ad2de8d855b4de0fdf9f45ed14e"
+        },
+        {
+          "task": "site-success",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.4125676319611412,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 421528,
+          "agent_tokens": 421528,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 35,
+          "schema": 6,
+          "probe": 29,
+          "validate": 0,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "no successful experience yet",
+          "agent_seconds": 112.10240864753723,
+          "learn_seconds": 0,
+          "source": "awm-rel-trial-r1/sessions/site_success-k2.json",
+          "sha256": "4fcbc024f05faa3e55923091335131da51408b231c8d47f70e1f0478342d36c0"
+        },
+        {
+          "task": "site-success",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.37890510879831857,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "llm_budget",
+          "tokens": 480727,
+          "agent_tokens": 480727,
+          "learn_tokens": 0,
+          "llm_calls": 24,
+          "tool_calls": 43,
+          "schema": 10,
+          "probe": 32,
+          "validate": 1,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": "no successful experience yet",
+          "agent_seconds": 257.399626493454,
+          "learn_seconds": 0,
+          "source": "awm-rel-trial-r1/sessions/site_success-k3.json",
+          "sha256": "05144f68aa4d98217f20af4bdc978ebc2a41948746b22becc1d067aca59f7d44"
+        },
+        {
+          "task": "study-adverse",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 34.25405231068286,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 448828,
+          "agent_tokens": 419494,
+          "learn_tokens": 29334,
+          "llm_calls": 21,
+          "tool_calls": 36,
+          "schema": 14,
+          "probe": 17,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 2179.8990337848663,
+          "learn_seconds": 8.445976495742798,
+          "source": "awm-rel-trial-r1/sessions/study_adverse-k1.json",
+          "sha256": "16d92b9479bffb73a0e1490c44f5f52d735ce41d878072b4ce32dedaf3d6a628"
+        },
+        {
+          "task": "study-adverse",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 50.82627037651309,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 428462,
+          "agent_tokens": 390502,
+          "learn_tokens": 37960,
+          "llm_calls": 18,
+          "tool_calls": 28,
+          "schema": 4,
+          "probe": 19,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 302.97907853126526,
+          "learn_seconds": 7.630752086639404,
+          "source": "awm-rel-trial-r1/sessions/study_adverse-k2.json",
+          "sha256": "7b9fe14c017ecdb978d41fc4acfb0c6b6cfd7198a6850660ad5856fb071bc99f"
+        },
+        {
+          "task": "study-adverse",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 44.8904955076231,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 360872,
+          "agent_tokens": 324093,
+          "learn_tokens": 36779,
+          "llm_calls": 18,
+          "tool_calls": 34,
+          "schema": 11,
+          "probe": 21,
+          "validate": 2,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 155.4379003047943,
+          "learn_seconds": 2.250303268432617,
+          "source": "awm-rel-trial-r1/sessions/study_adverse-k3.json",
+          "sha256": "78d92be3b9797e895ae5d1ab7dc35e19cfd26a7028fddfdeb644df43d42e96c5"
+        },
+        {
+          "task": "study-outcome",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6596519497260716,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "llm_budget",
+          "tokens": 574005,
+          "agent_tokens": 556038,
+          "learn_tokens": 17967,
+          "llm_calls": 24,
+          "tool_calls": 35,
+          "schema": 13,
+          "probe": 18,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 154.89645218849182,
+          "learn_seconds": 7.11567497253418,
+          "source": "awm-rel-trial-r1/sessions/study_outcome-k1.json",
+          "sha256": "7e8592e131d841ea86030c8cb2b4f86c3ae825ff2baf97bda8aff63b0a8157c9"
+        },
+        {
+          "task": "study-outcome",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6398308428917184,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 460859,
+          "agent_tokens": 434059,
+          "learn_tokens": 26800,
+          "llm_calls": 20,
+          "tool_calls": 32,
+          "schema": 16,
+          "probe": 11,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 367.6140775680542,
+          "learn_seconds": 7.636505126953125,
+          "source": "awm-rel-trial-r1/sessions/study_outcome-k2.json",
+          "sha256": "7683bce0077e977b4a8df6301033a0bebdf284746389ec7f58c19e12400642b0"
+        },
+        {
+          "task": "study-outcome",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6467723749119098,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 556864,
+          "agent_tokens": 529796,
+          "learn_tokens": 27068,
+          "llm_calls": 21,
+          "tool_calls": 33,
+          "schema": 12,
+          "probe": 16,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 440.51651334762573,
+          "learn_seconds": 7.764835596084595,
+          "source": "awm-rel-trial-r1/sessions/study_outcome-k3.json",
+          "sha256": "50cd631f341179da38d9d6346dd2334a3f6fbda60081a5dd073f482a9b0372a5"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "middle-alone",
+          "parallel_ok": true,
+          "awm": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    },
+    {
+      "arm": "gmemory",
+      "dataset": "rel-trial",
+      "status": "complete",
+      "issues": [],
+      "sessions": [
+        {
+          "task": "site-success",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.4335527813537437,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "patience",
+          "tokens": 924509,
+          "agent_tokens": 862786,
+          "learn_tokens": 61723,
+          "llm_calls": 20,
+          "tool_calls": 34,
+          "schema": 7,
+          "probe": 23,
+          "validate": 4,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 486.784056186676,
+          "learn_seconds": 6.641124486923218,
+          "source": "gmemory-rel-trial-r1/sessions/site_success-k1.json",
+          "sha256": "c55bf2adaad07f53643ad62762b1c68e908b7fa4612306cf516bceaacb1a0a31"
+        },
+        {
+          "task": "site-success",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.4125676319611412,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 907268,
+          "agent_tokens": 851545,
+          "learn_tokens": 55723,
+          "llm_calls": 24,
+          "tool_calls": 33,
+          "schema": 1,
+          "probe": 29,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 1175.5647921562195,
+          "learn_seconds": 10.471997261047363,
+          "source": "gmemory-rel-trial-r1/sessions/site_success-k2.json",
+          "sha256": "7fea43da398252d5f289b9884ce490f1b3e407514fcd1830e138374c0a1cc36c"
+        },
+        {
+          "task": "site-success",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 0.4138089358514066,
+          "quality_source": "entity_reference",
+          "fallback_reason": "no_query",
+          "evaluation_error": null,
+          "valid": false,
+          "audit": null,
+          "stop": "llm_budget",
+          "tokens": 603015,
+          "agent_tokens": 556174,
+          "learn_tokens": 46841,
+          "llm_calls": 24,
+          "tool_calls": 32,
+          "schema": 1,
+          "probe": 31,
+          "validate": 0,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 431.2478816509247,
+          "learn_seconds": 6.887218475341797,
+          "source": "gmemory-rel-trial-r1/sessions/site_success-k3.json",
+          "sha256": "52369ac92b38f0b8eb8222b737136c56571f92266336ae12fb01835f5ae68657"
+        },
+        {
+          "task": "study-adverse",
+          "k": 1,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 33.90673404306068,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "llm_budget",
+          "tokens": 509300,
+          "agent_tokens": 495406,
+          "learn_tokens": 13894,
+          "llm_calls": 24,
+          "tool_calls": 40,
+          "schema": 7,
+          "probe": 30,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 176.92250561714172,
+          "learn_seconds": 2.5067358016967773,
+          "source": "gmemory-rel-trial-r1/sessions/study_adverse-k1.json",
+          "sha256": "964ca107e1889e139cc519b8d307af769705fb0aaeabbf17d92bab5f262bfe67"
+        },
+        {
+          "task": "study-adverse",
+          "k": 2,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 48.12847037669775,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 588480,
+          "agent_tokens": 347251,
+          "learn_tokens": 241229,
+          "llm_calls": 11,
+          "tool_calls": 23,
+          "schema": 5,
+          "probe": 15,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 279.50315165519714,
+          "learn_seconds": 26.931193828582764,
+          "source": "gmemory-rel-trial-r1/sessions/study_adverse-k2.json",
+          "sha256": "731b4959f800274c7257510b50915d78e7fb22423885d58ae189f7c5e3d686e1"
+        },
+        {
+          "task": "study-adverse",
+          "k": 3,
+          "metric": "mae",
+          "higher_is_better": false,
+          "test": 42.45635370101861,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 547744,
+          "agent_tokens": 508747,
+          "learn_tokens": 38997,
+          "llm_calls": 16,
+          "tool_calls": 30,
+          "schema": 1,
+          "probe": 24,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 399.00023651123047,
+          "learn_seconds": 3.1838386058807373,
+          "source": "gmemory-rel-trial-r1/sessions/study_adverse-k3.json",
+          "sha256": "032b0d00ea30c8a16c775f2eb3db6f87d3b9ef780dc0f847dd3070dd99bac6a9"
+        },
+        {
+          "task": "study-outcome",
+          "k": 1,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6616274572993878,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "validation_budget",
+          "tokens": 815787,
+          "agent_tokens": 785423,
+          "learn_tokens": 30364,
+          "llm_calls": 21,
+          "tool_calls": 33,
+          "schema": 0,
+          "probe": 28,
+          "validate": 5,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 1117.569785118103,
+          "learn_seconds": 2.832409381866455,
+          "source": "gmemory-rel-trial-r1/sessions/study_outcome-k1.json",
+          "sha256": "3f2ed54d8af53855f365bf0b2473bdada24b381d448c22ecd87bf08ff1b05c41"
+        },
+        {
+          "task": "study-outcome",
+          "k": 2,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6473054561717353,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 461788,
+          "agent_tokens": 426314,
+          "learn_tokens": 35474,
+          "llm_calls": 14,
+          "tool_calls": 29,
+          "schema": 1,
+          "probe": 25,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 1496.8098967075348,
+          "learn_seconds": 2.9471163749694824,
+          "source": "gmemory-rel-trial-r1/sessions/study_outcome-k2.json",
+          "sha256": "85e4802c94b2ba5355a27360fb620b79c3f888c5ba130df2fc12716d8f9e99b7"
+        },
+        {
+          "task": "study-outcome",
+          "k": 3,
+          "metric": "roc_auc",
+          "higher_is_better": true,
+          "test": 0.6759249471458774,
+          "quality_source": "final_sql",
+          "fallback_reason": null,
+          "evaluation_error": null,
+          "valid": true,
+          "audit": "clean",
+          "stop": "reached_previous",
+          "tokens": 284660,
+          "agent_tokens": 250480,
+          "learn_tokens": 34180,
+          "llm_calls": 10,
+          "tool_calls": 27,
+          "schema": 1,
+          "probe": 23,
+          "validate": 3,
+          "memory": 0,
+          "submit": 0,
+          "memory_tools": {
+            "find_program": 0,
+            "find_features": 0,
+            "compose_features": 0
+          },
+          "drafts": 0,
+          "definitions_promoted": 0,
+          "definitions_corroborated": 0,
+          "rejected_gates": {
+            "F1": 0,
+            "F2": 0,
+            "F3": 0,
+            "F4": 0
+          },
+          "program_saved": false,
+          "learning_skipped": null,
+          "agent_seconds": 466.60781717300415,
+          "learn_seconds": 2.3727359771728516,
+          "source": "gmemory-rel-trial-r1/sessions/study_outcome-k3.json",
+          "sha256": "966658079620f70ed1cc089d605ddf5cee202b0a8f3f210e19591296040ae620"
+        }
+      ],
+      "settings": {
+        "MAX_LLM_CALLS": 24,
+        "MAX_VALIDATIONS": 5,
+        "PATIENCE": 2,
+        "SAMPLE_SIZE": 50000,
+        "LGB_PARAMS": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "num_leaves": 63,
+          "min_child_samples": 20,
+          "colsample_bytree": 0.8,
+          "subsample": 0.8,
+          "subsample_freq": 1,
+          "random_state": 42,
+          "deterministic": true,
+          "force_row_wise": true,
+          "n_jobs": 8,
+          "verbose": -1
+        },
+        "model": "deepseek-flash",
+        "llm": "deepseek",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "base_url": "http://127.0.0.1:18928",
+        "require_model": null,
+        "arm_config": {
+          "middle_mode": "middle-alone",
+          "parallel_ok": false,
+          "gmemory": true
+        },
+        "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+        "test_scores": "after the run"
+      }
+    }
+  ],
+  "comparisons": {
+    "rel-stack": {
+      "complete_method_set": true,
+      "has_published_baseline": true,
+      "arms": {
+        "none": {
+          "n": 9,
+          "valid": 8,
+          "fallback_counts": {
+            "evaluation_error": 1
+          },
+          "tokens": 1933886,
+          "reuse_tokens": 1299937,
+          "learn_tokens": 0,
+          "agent_seconds": 6137.337184429169,
+          "learn_seconds": 0,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 0,
+              "find_features": 0,
+              "compose_features": 0
+            },
+            "drafts": 0,
+            "definitions_promoted": 0,
+            "definitions_corroborated": 0,
+            "programs_saved": 0,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 0,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 6.833333333333333,
+            "probe": 13.5,
+            "validate": 3.5,
+            "memory": 0,
+            "submit": 0,
+            "llm_calls": 15
+          },
+          "quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.06673267320377024,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.06430804222170446,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.0745340759660996,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.061355901423506665,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8536028877677851,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.8479381310539205,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.8562657852166632,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8566047470327719,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8805879698664308,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.8819834129530888,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.8705584515534168,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8892220450927868,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.06794498869480313,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.0745340759660996,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.061355901423506665,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8564352661247175,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.8562657852166632,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8566047470327719,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8798902483231018,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.8705584515534168,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8892220450927868,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 5,
+          "token_saving_vs_none_pct": 0.0,
+          "reuse_token_saving_vs_none_pct": 0.0
+        },
+        "mavra": {
+          "n": 9,
+          "valid": 9,
+          "fallback_counts": {},
+          "tokens": 1318295,
+          "reuse_tokens": 439080,
+          "learn_tokens": 86977,
+          "agent_seconds": 7461.549487113953,
+          "learn_seconds": 301.2118766307831,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 9,
+              "find_features": 3,
+              "compose_features": 0
+            },
+            "drafts": 66,
+            "definitions_promoted": 34,
+            "definitions_corroborated": 9,
+            "programs_saved": 6,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 23,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 1.3333333333333333,
+            "probe": 1,
+            "validate": 2.5,
+            "memory": 1,
+            "submit": 0,
+            "llm_calls": 4.833333333333333
+          },
+          "quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.06526335798964016,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.0642693029655485,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.06960532240357985,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.06191544859979212,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8541171933898157,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.8519324085218758,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.8543383058396284,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8560808658079431,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8790900309608888,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.8792601238517936,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.8706251856625989,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8873847833682738,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.06576038550168598,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.06960532240357985,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.06191544859979212,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8552095858237858,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.8543383058396284,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8560808658079431,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8790049845154364,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.8706251856625989,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8873847833682738,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 6,
+          "token_saving_vs_none_pct": 31.831814284813063,
+          "reuse_token_saving_vs_none_pct": 66.22297849818875
+        },
+        "ace": {
+          "n": 9,
+          "valid": 9,
+          "fallback_counts": {},
+          "tokens": 2429450,
+          "reuse_tokens": 1477248,
+          "learn_tokens": 343589,
+          "agent_seconds": 2559.7404675483704,
+          "learn_seconds": 620.9036138057709,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 0,
+              "find_features": 0,
+              "compose_features": 0
+            },
+            "drafts": 0,
+            "definitions_promoted": 0,
+            "definitions_corroborated": 0,
+            "programs_saved": 0,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 0,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 7.833333333333333,
+            "probe": 12.5,
+            "validate": 3,
+            "memory": 0,
+            "submit": 0,
+            "llm_calls": 13.166666666666666
+          },
+          "quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.06534868139825961,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.06450283102791307,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.0696866329999933,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.061856580166872455,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8378583608286051,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.8452527178991242,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.8176272671825915,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8506950974040998,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": false
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8812103282730075,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.8808366510948711,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.8726741137924798,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8901202199316717,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.06577160658343287,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.0696866329999933,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.061856580166872455,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8341611822933457,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.8176272671825915,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8506950974040998,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": false
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8813971668620757,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.8726741137924798,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8901202199316717,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 6,
+          "token_saving_vs_none_pct": -25.62529538969722,
+          "reuse_token_saving_vs_none_pct": -13.639968706175765
+        },
+        "awm": {
+          "n": 9,
+          "valid": 8,
+          "fallback_counts": {
+            "no_query": 1
+          },
+          "tokens": 2630349,
+          "reuse_tokens": 1906604,
+          "learn_tokens": 219639,
+          "agent_seconds": 4422.393786430359,
+          "learn_seconds": 54.01180601119995,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 0,
+              "find_features": 0,
+              "compose_features": 0
+            },
+            "drafts": 0,
+            "definitions_promoted": 0,
+            "definitions_corroborated": 0,
+            "programs_saved": 0,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 0,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 7.333333333333333,
+            "probe": 14,
+            "validate": 3.5,
+            "memory": 0,
+            "submit": 0,
+            "llm_calls": 15
+          },
+          "quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.06666150575433664,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.0636425131990785,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.0745340759660996,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.06180792809783184,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8524843635918437,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.8500654798523465,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.8528228202052783,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8545647907179061,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8807175372974115,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.879724883061541,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.8730251087709064,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8894026200597873,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.06817100203196572,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.0745340759660996,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.06180792809783184,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8536938054615922,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.8528228202052783,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8545647907179061,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8812138644153469,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.8730251087709064,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8894026200597873,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 5,
+          "token_saving_vs_none_pct": -36.013653338407735,
+          "reuse_token_saving_vs_none_pct": -46.66895395699946
+        },
+        "gmemory": {
+          "n": 9,
+          "valid": 8,
+          "fallback_counts": {
+            "no_query": 1
+          },
+          "tokens": 3781154,
+          "reuse_tokens": 2182948,
+          "learn_tokens": 407086,
+          "agent_seconds": 5880.18043923378,
+          "learn_seconds": 85.0980281829834,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 0,
+              "find_features": 0,
+              "compose_features": 0
+            },
+            "drafts": 0,
+            "definitions_promoted": 0,
+            "definitions_corroborated": 0,
+            "programs_saved": 0,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 0,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 4.5,
+            "probe": 10,
+            "validate": 3.8333333333333335,
+            "memory": 0,
+            "submit": 0,
+            "llm_calls": 10.666666666666666
+          },
+          "quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.06486097216679683,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.06398508427734889,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.06892942557989137,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.06166840664315023,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8562888120612621,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.8553935615600827,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.855161362990956,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8583115116327474,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.7740080279931312,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.5607762759866322,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 2,
+                  "score": 0.8709185462100143,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8903292617827472,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": false
+            }
+          },
+          "reuse_quality": {
+            "post-votes": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.0652989161115208,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.06892942557989137,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.06166840664315023,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-badge": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8567364373118518,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.855161362990956,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8583115116327474,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "user-engagement": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.8806239039963808,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.8709185462100143,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.8903292617827472,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 6,
+          "token_saving_vs_none_pct": -95.521038985752,
+          "reuse_token_saving_vs_none_pct": -67.9272149342622
+        }
+      }
+    },
+    "rel-trial": {
+      "complete_method_set": true,
+      "has_published_baseline": true,
+      "arms": {
+        "none": {
+          "n": 9,
+          "valid": 6,
+          "fallback_counts": {
+            "no_query": 3
+          },
+          "tokens": 4214555,
+          "reuse_tokens": 2817655,
+          "learn_tokens": 0,
+          "agent_seconds": 2881.5060958862305,
+          "learn_seconds": 0,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 0,
+              "find_features": 0,
+              "compose_features": 0
+            },
+            "drafts": 0,
+            "definitions_promoted": 0,
+            "definitions_corroborated": 0,
+            "programs_saved": 0,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 0,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 12.166666666666666,
+            "probe": 22.5,
+            "validate": 1.8333333333333333,
+            "memory": 0,
+            "submit": 0,
+            "llm_calls": 22.666666666666668
+          },
+          "quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.44494166185193096,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.508448417743245,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 2,
+                  "score": 0.4125676319611412,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.4138089358514066,
+                  "source": "entity_reference"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 43.274756282477185,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 35.518346492471736,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 49.93407749943018,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 44.37184485552964,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6496340031223504,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.6518111504995165,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.6488773282121435,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6482135306553911,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.41318828390627393,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.4125676319611412,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.4138089358514066,
+                  "source": "entity_reference"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 47.15296117747991,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 49.93407749943018,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 44.37184485552964,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6485454294337674,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.6488773282121435,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6482135306553911,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 4,
+          "token_saving_vs_none_pct": 0.0,
+          "reuse_token_saving_vs_none_pct": 0.0
+        },
+        "mavra": {
+          "n": 9,
+          "valid": 6,
+          "fallback_counts": {
+            "no_query": 3
+          },
+          "tokens": 2850884,
+          "reuse_tokens": 1280328,
+          "learn_tokens": 29031,
+          "agent_seconds": 3071.417188644409,
+          "learn_seconds": 188.59572553634644,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 9,
+              "find_features": 6,
+              "compose_features": 0
+            },
+            "drafts": 9,
+            "definitions_promoted": 8,
+            "definitions_corroborated": 0,
+            "programs_saved": 2,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 1,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 5.666666666666667,
+            "probe": 10,
+            "validate": 1.5,
+            "memory": 1.5,
+            "submit": 0,
+            "llm_calls": 13.666666666666666
+          },
+          "quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.41878499117485773,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.42997840571202545,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.4125676319611412,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.4138089358514066,
+                  "source": "entity_reference"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 44.69168664230283,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 42.675946798725015,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 2,
+                  "score": 48.0419904150232,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 43.357122713160265,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": false
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6469814070807356,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.6466484047695779,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.6430502209828475,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6512455954897814,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.41318828390627393,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.4125676319611412,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.4138089358514066,
+                  "source": "entity_reference"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 45.699556564091736,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 48.0419904150232,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 43.357122713160265,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6471479082363145,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.6430502209828475,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6512455954897814,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 4,
+          "token_saving_vs_none_pct": 32.356227407163985,
+          "reuse_token_saving_vs_none_pct": 54.560512198973974
+        },
+        "ace": {
+          "n": 9,
+          "valid": 7,
+          "fallback_counts": {
+            "no_query": 2
+          },
+          "tokens": 4502080,
+          "reuse_tokens": 3017846,
+          "learn_tokens": 439395,
+          "agent_seconds": 2445.330476999283,
+          "learn_seconds": 490.5394387245178,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 0,
+              "find_features": 0,
+              "compose_features": 0
+            },
+            "drafts": 0,
+            "definitions_promoted": 0,
+            "definitions_corroborated": 0,
+            "programs_saved": 0,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 0,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 8,
+            "probe": 21.166666666666668,
+            "validate": 3.3333333333333335,
+            "memory": 0,
+            "submit": 0,
+            "llm_calls": 19.833333333333332
+          },
+          "quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.43992582735532376,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.508448417743245,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 2,
+                  "score": 0.4200291346254215,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.3912999296973047,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 45.77876450161257,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 42.675946798725015,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 2,
+                  "score": 50.15987609295978,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 44.50047061315291,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": false
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6414407603018576,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.6335610699323235,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.649781647900663,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6409795630725863,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.4056645321613631,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.4200291346254215,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.3912999296973047,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 47.330173353056345,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 50.15987609295978,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 44.50047061315291,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6453806054866247,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.649781647900663,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6409795630725863,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 6,
+          "token_saving_vs_none_pct": -6.822191192189919,
+          "reuse_token_saving_vs_none_pct": -7.1048797670403285
+        },
+        "awm": {
+          "n": 9,
+          "valid": 7,
+          "fallback_counts": {
+            "no_query": 2
+          },
+          "tokens": 4261160,
+          "reuse_tokens": 2709312,
+          "learn_tokens": 175908,
+          "agent_seconds": 4114.5645225048065,
+          "learn_seconds": 40.84404754638672,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 0,
+              "find_features": 0,
+              "compose_features": 0
+            },
+            "drafts": 0,
+            "definitions_promoted": 0,
+            "definitions_corroborated": 0,
+            "programs_saved": 0,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 0,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 9.833333333333334,
+            "probe": 21.333333333333332,
+            "validate": 3,
+            "memory": 0,
+            "submit": 0,
+            "llm_calls": 20.833333333333332
+          },
+          "quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.43330705283423493,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.508448417743245,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 2,
+                  "score": 0.4125676319611412,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.37890510879831857,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 43.32360606493968,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 34.25405231068286,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 50.82627037651309,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 44.8904955076231,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6487517225098999,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.6596519497260716,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.6398308428917184,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6467723749119098,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.39573637037972986,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.4125676319611412,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.37890510879831857,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 47.85838294206809,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 50.82627037651309,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 44.8904955076231,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6433016089018141,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.6398308428917184,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6467723749119098,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 5,
+          "token_saving_vs_none_pct": -1.1058106965029513,
+          "reuse_token_saving_vs_none_pct": 3.845147826827633
+        },
+        "gmemory": {
+          "n": 9,
+          "valid": 7,
+          "fallback_counts": {
+            "no_query": 2
+          },
+          "tokens": 5642551,
+          "reuse_tokens": 3392955,
+          "learn_tokens": 558425,
+          "agent_seconds": 6030.0101227760315,
+          "learn_seconds": 64.77437019348145,
+          "mechanism": {
+            "memory_tools": {
+              "find_program": 0,
+              "find_features": 0,
+              "compose_features": 0
+            },
+            "drafts": 0,
+            "definitions_promoted": 0,
+            "definitions_corroborated": 0,
+            "programs_saved": 0,
+            "rejected_gates": {
+              "F1": 0,
+              "F2": 0,
+              "F3": 0,
+              "F4": 0
+            }
+          },
+          "reuse_mean_calls": {
+            "schema": 1.6666666666666667,
+            "probe": 24.5,
+            "validate": 2.8333333333333335,
+            "memory": 0,
+            "submit": 0,
+            "llm_calls": 16.5
+          },
+          "quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.4199764497220972,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.4335527813537437,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.4125676319611412,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.4138089358514066,
+                  "source": "entity_reference"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 41.49718604025901,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 33.90673404306068,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 48.12847037669775,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 42.45635370101861,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6616192868723335,
+              "per_cutoff": [
+                {
+                  "k": 1,
+                  "score": 0.6616274572993878,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 2,
+                  "score": 0.6473054561717353,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6759249471458774,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_quality": {
+            "site-success": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 0.41318828390627393,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.4125676319611412,
+                  "source": "entity_reference"
+                },
+                {
+                  "k": 3,
+                  "score": 0.4138089358514066,
+                  "source": "entity_reference"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-adverse": {
+              "metric": "mae",
+              "higher_is_better": false,
+              "mean": 45.292412038858174,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 48.12847037669775,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 42.45635370101861,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            },
+            "study-outcome": {
+              "metric": "roc_auc",
+              "higher_is_better": true,
+              "mean": 0.6616152016588064,
+              "per_cutoff": [
+                {
+                  "k": 2,
+                  "score": 0.6473054561717353,
+                  "source": "final_sql"
+                },
+                {
+                  "k": 3,
+                  "score": 0.6759249471458774,
+                  "source": "final_sql"
+                }
+              ],
+              "within_margin_vs_none": true
+            }
+          },
+          "reuse_n": 6,
+          "reuse_valid": 4,
+          "token_saving_vs_none_pct": -33.88248581404205,
+          "reuse_token_saving_vs_none_pct": -20.417687758082526
+        }
+      }
+    }
+  },
+  "status": {
+    "status": "completed",
+    "cells": [
+      {
+        "name": "dev-original",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T10:33:43.696112+00:00",
+        "finished_at_server_time": "2026-10-28 19:45:01",
+        "observed_completion_utc": "2026-10-28T17:16:38.457721+00:00"
+      },
+      {
+        "name": "dev-compact-reuse",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T11:45:03.246241+00:00",
+        "finished_at_server_time": "2026-10-28 20:33:38",
+        "observed_completion_utc": "2026-10-28T17:16:38.463741+00:00"
+      },
+      {
+        "name": "none-rel-stack-r1",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T11:49:44.129501+00:00",
+        "finished_at_server_time": "2026-10-28 22:44:55",
+        "observed_completion_utc": "2026-10-28T17:16:38.465159+00:00"
+      },
+      {
+        "name": "mavra-rel-trial-r1",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T13:46:33.546484+00:00",
+        "finished_at_server_time": "2026-10-28 23:25:11",
+        "observed_completion_utc": "2026-10-28T17:16:38.469004+00:00"
+      },
+      {
+        "name": "ace-rel-stack-r1",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T14:45:02.413202+00:00",
+        "finished_at_server_time": "2026-10-28 23:58:01",
+        "observed_completion_utc": "2026-10-28T17:16:38.470724+00:00"
+      },
+      {
+        "name": "none-rel-trial-r1",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T12:33:47.035694+00:00",
+        "finished_at_server_time": "2026-10-28 21:46:29",
+        "observed_completion_utc": "2026-10-28T17:16:38.471150+00:00"
+      },
+      {
+        "name": "ace-rel-trial-r1",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T15:25:24.848160+00:00",
+        "finished_at_server_time": "2026-10-29 00:33:32",
+        "observed_completion_utc": "2026-10-28T17:16:38.471664+00:00"
+      },
+      {
+        "name": "mavra-rel-stack-r1",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T13:19:11.740409+00:00",
+        "finished_at_server_time": "2026-10-29 01:23:30",
+        "observed_completion_utc": "2026-10-28T17:23:33.928225+00:00"
+      },
+      {
+        "name": "awm-rel-stack-r1",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T15:58:07.068740+00:00",
+        "finished_at_server_time": "2026-10-29 01:37:10",
+        "observed_completion_utc": "2026-10-28T17:37:14.804070+00:00"
+      },
+      {
+        "name": "awm-rel-trial-r1",
+        "status": "finished",
+        "adopted_existing": true,
+        "started_utc": "2026-10-28T16:33:39.201960+00:00",
+        "finished_at_server_time": "2026-10-29 02:02:12",
+        "observed_completion_utc": "2026-10-28T18:02:16.428628+00:00"
+      },
+      {
+        "name": "gmemory-rel-stack-r1",
+        "status": "finished",
+        "exit_code": 0,
+        "started_utc": "2026-10-28T17:16:38.474085+00:00",
+        "ended_utc": "2026-10-28T19:24:31.581798+00:00"
+      },
+      {
+        "name": "gmemory-rel-trial-r1",
+        "status": "finished",
+        "finished_at_server_time": "2026-10-29 04:04:44",
+        "observed_completion_utc": "2026-10-28T20:06:43.664847+00:00"
+      }
+    ],
+    "deadline_utc": "2026-10-28T20:19:55Z",
+    "frozen_candidate": "compact-reuse",
+    "model_calls_closed_utc": "2026-10-28T19:51:52.195359+00:00",
+    "ended_utc": "2026-10-28T20:06:43.664847+00:00",
+    "model_calls_closed": true
+  },
+  "budget-state": {
+    "started_utc": "2026-10-28T10:31:10.206425+00:00",
+    "initial_balance_cny": 103.05,
+    "ceiling_cny": 29.256339439999987,
+    "calls": 1669,
+    "errors": 0,
+    "models": {
+      "deepseek-flash": 1669
+    },
+    "status": "ready",
+    "reserved_cny": -4.440892098500626e-16,
+    "updated_utc": "2026-10-28T19:49:30.933129+00:00",
+    "balance_cny": 88.47,
+    "observed_account_decrease_cny": 14.579999999999998,
+    "pricing_policy": "official-cny-peak-2026-10-29",
+    "rates_cny_per_million": {
+      "hit": 0.04,
+      "miss": 2.0,
+      "output": 8.0
+    }
+  },
+  "selection": {
+    "candidate": "compact-reuse",
+    "reason": {
+      "validation_quality_gate": true,
+      "development_tokens": [
+        506477,
+        162954
+      ],
+      "test_labels_used": false
+    },
+    "frozen_utc": "2026-10-28T12:33:47.033547+00:00"
+  },
+  "build-provenance": {
+    "binary_sha256": "9e05ce79e002b46c154e5dbcdede717de9aa6b7f9d63e151960288c56b16d030",
+    "build_log": "results/build.log",
+    "source_archive_sha256": "e96e161cfa6e8bbec07edcf75e76d1b035ceaa556e499235d5a145cf0446b4f9"
+  },
+  "timeout-audit": {
+    "audited_utc": "2026-10-28T14:19:06.399023+00:00",
+    "feature_statement_timeout_seconds": 600,
+    "tool_call_http_timeout_seconds": 180,
+    "harness_sha256": "622565d63424e5f6dfc50828728772d1967f68e8929e7dc7a98ed9f6d7669f10",
+    "source_archive_sha256": "e96e161cfa6e8bbec07edcf75e76d1b035ceaa556e499235d5a145cf0446b4f9",
+    "explanation": "Bound read_sql default remained 600 after module constant was set to 180. Records corrected, runtime behavior unchanged. Audit imports only, no API request."
+  }
+}

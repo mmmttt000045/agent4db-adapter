@@ -206,7 +206,7 @@ if __name__ == '__main__':
         ''.join('\\newcommand{\\'+k+'}{'+v+'}\n' for k, v in numbers().items()), encoding='utf-8')
     sources = [STUDY/'pilot-summary.json', STUDY/'system-summary.json',
                ARCHIVE/'snapshot-binding-stats.json', ARCHIVE/'snapshot-binding-shards-stats.json',
-               Path(__file__), ROOT/'tools/figures/mplstyle.py', ROOT/'tools/figures/style.py', ROOT/'overleaf/latex/preamble.tex']
+               Path(__file__), ROOT/'tools/figures/mplstyle.py', ROOT/'tools/figures/style.py', ROOT/'overleaf/preamble.tex']
     evidence = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     (STUDY/'paper-integration/figure-sources.json').write_text(json.dumps(evidence, indent=2), encoding='utf-8')
     print('Generated six paper figures and mechanism number macros.')

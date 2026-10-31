@@ -1,6 +1,6 @@
 """Shared look, method names and data checks for the paper's figures.
 
-Method colors are read from overleaf/latex/preamble.tex, the same
+Method colors are read from overleaf/preamble.tex, the same
 \\definecolor lines the tables' swatches use, so a figure can never show a
 method in a different color than Table 2, whose names METHODS repeats. Figures that plot experiment data
 read the archived JSON in exp/ and compare every number the text also prints
@@ -19,7 +19,7 @@ COLUMN, TEXTWIDTH = 84.6, 178.0        # acmart sigconf widths, mm
 
 
 def _palette():
-    text = (PAPER / 'latex/preamble.tex').read_text(encoding='utf-8')
+    text = (PAPER / 'preamble.tex').read_text(encoding='utf-8')
     found = re.findall(r'\\definecolor\{(\w+)\}\{HTML\}\{([0-9A-Fa-f]{6})\}', text)
     return {name: '#' + value.upper() for name, value in found}
 

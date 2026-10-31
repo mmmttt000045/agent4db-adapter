@@ -8,7 +8,7 @@ MAVRA 是面向数据智能体的共享记忆系统原型：在智能体与 Post
 | --- | --- |
 | 系统开发、运行与测试 | [开发指南](docs/development/README.md)、[源码导览](docs/development/source-map.md) |
 | 查看实验依据与复现入口 | [全部实验索引](exp/README.md)、[实验清单](exp/catalog.json) |
-| 编辑论文 | [ICDE 稿件说明](overleaf/README.md)；英文 `overleaf/main-en.tex`，双语 `overleaf/main.tex` |
+| 编辑论文 | [ICDE 稿件说明](overleaf/README.md)；英文投稿 `overleaf/main.tex`，双语 `overleaf/main-bilingual.tex` |
 | 修改与生成汇报 PPT | [汇报说明](slides/README.md)、[现有版本](slides/versions/README.md) |
 | 了解当前研究状态 | [研究状态与证据](docs/research/README.md) |
 | 查阅阶段性方案与历史记录 | [历史文档](docs/history/README.md) |
